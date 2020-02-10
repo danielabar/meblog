@@ -1,0 +1,17 @@
+.container {
+  justify-content: space-between;
+  display: flex;
+}
+
+.logo {
+  display: flex;
+}
+
+.profile {
+  border: 1px solid var(--brand-darken-30);
+  border-radius: 50%;
+}
+
+.nav-list {
+  display: flex;
+}

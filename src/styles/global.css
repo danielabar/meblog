@@ -1,0 +1,41 @@
+:root {
+  --brand: #81439c;
+
+  --brand-lighten-10: #9c5ab8;
+  --brand-lighten-20: #b17ec7;
+  --brand-lighten-30: #c7a1d7;
+  --brand-lighten-40: #dcc5e6;
+  --brand-lighten-50: #f1e9f5;
+  --brand-lighten-55: #fcfafd;
+
+  --brand-darken-10: #81439c;
+  --brand-darken-20: #633478;
+  --brand-darken-30: #281531;
+  --brand-darken-40: #0b060d;
+}
+
+/* apply a natural box layout model to all elements, but allowing components to change */
+html {
+  box-sizing: border-box;
+}
+
+*,
+*:before,
+*:after {
+  box-sizing: inherit;
+}
+
+body {
+  background-color: var(--brand-lighten-55);
+  color: var(--brand-darken-40);
+  color-adjust: exact !important;
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", "Roboto", "Oxygen",
+    "Ubuntu", "Cantarell", "Fira Sans", "Droid Sans", "Helvetica Neue",
+    sans-serif;
+  font-size: 1rem;
+  margin: 10px;
+  -moz-osx-font-smoothing: grayscale;
+  -webkit-font-smoothing: antialiased;
+  /* enable background printing https://stackoverflow.com/a/14784655/3991687 */
+  -webkit-print-color-adjust: exact !important;
+}
