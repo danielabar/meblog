@@ -5,7 +5,7 @@ date: "2019-08-04"
 
 Have you ever seen a course, tutorial or colleague using their terminal and it looks something like this:
 
-![terminal-agnoster](images/terminal-agnoster "Terminal Agnoster")
+![terminal-agnoster](./terminal-agnoster.png "Terminal Agnoster")
 
 and wondered "how do they make it look like that"?
 

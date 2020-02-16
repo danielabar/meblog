@@ -3,6 +3,22 @@ module.exports = {
     title: "Daniela Baron Blog",
   },
   plugins: [
+    "gatsby-plugin-sharp",
+    "gatsby-transformer-sharp",
+    "gatsby-transformer-remark",
+    {
+      resolve: `gatsby-transformer-remark`,
+      options: {
+        plugins: [
+          {
+            resolve: `gatsby-remark-images`,
+            options: {
+              maxWidth: 800,
+            },
+          },
+        ],
+      },
+    },
     {
       resolve: "gatsby-source-filesystem",
       options: {
@@ -10,6 +26,11 @@ module.exports = {
         path: `${__dirname}/src/markdown`,
       },
     },
-    "gatsby-transformer-remark",
+    {
+      resolve: `gatsby-source-filesystem`,
+      options: {
+        path: `${__dirname}/src/images`,
+      },
+    },
   ],
 }
