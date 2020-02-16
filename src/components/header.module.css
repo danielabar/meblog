@@ -10,6 +10,8 @@
 .profile {
   border: 1px solid var(--brand-darken-30);
   border-radius: 50%;
+  height: 50px;
+  width: 50px;
 }
 
 .nav-list {
