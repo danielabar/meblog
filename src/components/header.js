@@ -13,7 +13,9 @@ export default () => (
 
     <nav className={styles.nav}>
       <ul className={styles.navList}>
-        <li>Blog</li>
+        <Link to="/blog">
+          <li>Blog</li>
+        </Link>
         <li>Projects</li>
         <li>Courses</li>
         <li>About</li>
