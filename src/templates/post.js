@@ -1,4 +1,5 @@
 import React from "react"
+import SEO from "../components/SEO"
 import Layout from "../components/layout"
 import styles from "./post.module.css"
 
@@ -6,9 +7,11 @@ import styles from "./post.module.css"
 export default props => {
   const content = props.pageContext.content
   const title = props.pageContext.title
+  const slug = props.pageContext.slug
 
   return (
     <Layout>
+      <SEO title={title} pathname={slug} />
       <div className={styles.container}>
         <h1>{title}</h1>
         <div

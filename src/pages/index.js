@@ -1,6 +1,7 @@
 import React from "react"
 import { Link } from "gatsby"
 import { graphql } from "gatsby"
+import SEO from "../components/SEO"
 import Layout from "../components/layout"
 import Intro from "../components/intro"
 import ArticleList from "../components/article-list"
@@ -8,6 +9,7 @@ import styles from "./index.module.css"
 
 export default ({ data }) => (
   <Layout>
+    <SEO title="Home" pathname="/" />
     <Intro />
     <ArticleList articles={data.allMarkdownRemark.edges} />
     <div className={styles.all}>

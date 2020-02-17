@@ -1,5 +1,6 @@
 import React from "react"
 import { graphql } from "gatsby"
+import SEO from "../components/SEO"
 import Layout from "../components/layout"
 import ArticleList from "../components/article-list"
 import Pagination from "../components/pagination"
@@ -15,6 +16,7 @@ export default class BlogList extends React.Component {
 
     return (
       <Layout>
+        <SEO title="Blog" pathname="/blog" />
         <ArticleList
           articles={this.props.data.allMarkdownRemark.edges}
         ></ArticleList>
