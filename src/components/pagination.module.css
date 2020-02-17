@@ -1,0 +1,12 @@
+.container {
+  height: 30px;
+  margin: 20px 0;
+}
+
+.prev {
+  float: left;
+}
+
+.next {
+  float: right;
+}

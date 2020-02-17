@@ -1,8 +1,8 @@
 import React from "react"
-import { Link } from "gatsby"
 import { graphql } from "gatsby"
 import Layout from "../components/layout"
 import ArticleList from "../components/article-list"
+import Pagination from "../components/pagination"
 
 export default class BlogList extends React.Component {
   render() {
@@ -18,16 +18,12 @@ export default class BlogList extends React.Component {
         <ArticleList
           articles={this.props.data.allMarkdownRemark.edges}
         ></ArticleList>
-        {!isFirst && (
-          <Link to={prevPage} rel="prev">
-            ← Previous Page
-          </Link>
-        )}
-        {!isLast && (
-          <Link to={nextPage} rel="next">
-            Next Page →
-          </Link>
-        )}
+        <Pagination
+          isFirst={isFirst}
+          prevPage={prevPage}
+          isLast={isLast}
+          nextPage={nextPage}
+        />
       </Layout>
     )
   }
@@ -47,7 +43,9 @@ export const blogListQuery = graphql`
           }
           frontmatter {
             title
+            date(formatString: "YYYY MMMM DD")
           }
+          excerpt
         }
       }
     }
