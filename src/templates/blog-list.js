@@ -1,5 +1,6 @@
 import React from "react"
 import { graphql } from "gatsby"
+import SEO from "../components/SEO"
 import Layout from "../components/layout"
 import ArticleList from "../components/article-list"
 import Pagination from "../components/pagination"
@@ -7,6 +8,7 @@ import Pagination from "../components/pagination"
 export default class BlogList extends React.Component {
   render() {
     const { currentPage, numPages } = this.props.pageContext
+    const seoPath = `/blog/${currentPage}`
     const isFirst = currentPage === 1
     const isLast = currentPage === numPages
     const prevPage =
@@ -15,6 +17,7 @@ export default class BlogList extends React.Component {
 
     return (
       <Layout>
+        <SEO title="Blog" pathname={seoPath} />
         <ArticleList
           articles={this.props.data.allMarkdownRemark.edges}
         ></ArticleList>
