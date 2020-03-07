@@ -11,10 +11,14 @@
   --brand-darken-10: #81439c;
   --brand-darken-20: #633478;
   --brand-darken-30: #281531;
+  --brand-darken-35: #1a0d1f;
   --brand-darken-40: #0b060d;
 
-  --base-font: -apple-system, system-ui, "Segoe UI", Roboto, Oxygen-Sans, Ubuntu,
-    Cantarell, "Helvetica Neue", sans-serif;
+  --link-color: #5d93ff;
+
+  --base-font-color: var(--brand-darken-35);
+  --base-font-family: -apple-system, system-ui, "Segoe UI", Roboto, Oxygen-Sans,
+    Ubuntu, Cantarell, "Helvetica Neue", sans-serif;
 }
 
 /* apply a natural box layout model to all elements, but allowing components to change */
@@ -30,9 +34,9 @@ html {
 
 body {
   background-color: var(--brand-lighten-55);
-  color: var(--brand-darken-40);
+  color: var(--base-font-color);
   color-adjust: exact !important;
-  font-family: var(--base-font);
+  font-family: var(--base-font-family);
   font-size: 1rem;
   font-weight: 400;
   line-height: 26px;
