@@ -4,7 +4,10 @@ import styles from "./article.module.css"
 
 export default props => (
   <article className={styles.container}>
-    <div className={styles.date}>{props.date}</div>
+    <div className={styles.subheader}>
+      <div className={styles.date}>{props.date}</div>
+      <div className={styles.category}>{props.category}</div>
+    </div>
     <Link to={props.to} className={styles.title}>
       {props.title}
     </Link>

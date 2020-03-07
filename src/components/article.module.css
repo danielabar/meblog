@@ -12,10 +12,19 @@
   border-bottom: 1px solid var(--base-font-color);
 }
 
-.date {
+.subheader {
+  display: flex;
   font-size: 0.9em;
   font-weight: 600;
   text-transform: uppercase;
+}
+
+.date {
+  margin-right: 10px;
+}
+
+.category {
+  color: var(--brand-lighten-10);
 }
 
 .read {

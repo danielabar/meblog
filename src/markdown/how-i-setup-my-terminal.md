@@ -1,6 +1,7 @@
 ---
 title: "How I Setup my Terminal"
 date: "2019-08-04"
+category: "terminal"
 ---
 
 Have you ever seen a course, tutorial or colleague using their terminal and it looks something like this:
