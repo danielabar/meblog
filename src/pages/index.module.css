@@ -1,3 +1,11 @@
 .all {
-  margin-top: 10px;
+  margin-top: 20px;
+}
+
+.all-link {
+  color: var(--link-color);
+}
+
+.all-link:hover {
+  border-bottom: 1px solid var(--link-color);
 }

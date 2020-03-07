@@ -13,7 +13,9 @@ export default ({ data }) => (
     <Intro />
     <ArticleList articles={data.allMarkdownRemark.edges} />
     <div className={styles.all}>
-      <Link to="/blog">See all posts</Link>
+      <Link to="/blog" className={styles.allLink}>
+        See all posts
+      </Link>
     </div>
   </Layout>
 )
