@@ -1,0 +1,14 @@
+.all-link {
+  color: var(--brand-darken-30);
+  display: inline-block;
+  height: 35px;
+  padding: 0 25px;
+  line-height: 35px;
+  text-align: center;
+  border: 1px solid var(--brand-lighten-40);
+  border-radius: 20px;
+}
+
+.all-link:hover {
+  border-color: var(--brand-lighten-30);
+}

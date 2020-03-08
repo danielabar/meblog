@@ -1,22 +1,17 @@
 import React from "react"
-import { Link } from "gatsby"
 import { graphql } from "gatsby"
 import SEO from "../components/SEO"
 import Layout from "../components/layout"
 import Intro from "../components/intro"
 import ArticleList from "../components/article-list"
-import styles from "./index.module.css"
+import AllLink from "../components/all-link"
 
 export default ({ data }) => (
   <Layout>
     <SEO title="Home" pathname="/" />
     <Intro />
     <ArticleList articles={data.allMarkdownRemark.edges} />
-    <div className={styles.all}>
-      <Link to="/blog" className={styles.allLink}>
-        See all posts
-      </Link>
-    </div>
+    <AllLink marginTop="30px" />
   </Layout>
 )
 
