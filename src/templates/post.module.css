@@ -1,5 +1,21 @@
-.container {
+.title {
+  font-size: 3rem;
+  font-weight: 600;
+  line-height: 60px;
+  margin: 20px 0;
+  text-align: center;
 }
 
 .content {
+  font-size: 1.1rem;
+  line-height: 30px;
+}
+
+.content a {
+  color: var(--link-color);
+}
+
+.content a:hover {
+  border-bottom: 1px solid var(--brand-lighten-10);
+  color: var(--brand-lighten-10);
 }
