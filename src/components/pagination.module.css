@@ -3,6 +3,23 @@
   margin: 20px 0;
 }
 
+.pagination {
+  color: var(--brand-lighten-10);
+  font-size: 26px;
+  font-weight: 700;
+  line-height: 26px;
+  text-transform: uppercase;
+}
+
+.pagination:hover {
+  color: var(--link-color);
+}
+
+.inactive {
+  color: #bbb;
+  pointer-events: none;
+}
+
 .prev {
   float: left;
 }
