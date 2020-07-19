@@ -1,9 +1,36 @@
 .container {
-  margin-top: 20px;
+  margin-top: 25px;
 }
 
-.article-date {
+.title {
+  font-size: 1.5rem;
+  font-weight: 600;
+  line-height: 40px;
 }
 
-.excerpt {
+.title:hover {
+  border-bottom: 1px solid var(--base-font-color);
+}
+
+.subheader {
+  display: flex;
+  font-size: 0.9em;
+  font-weight: 600;
+  text-transform: uppercase;
+}
+
+.date {
+  margin-right: 10px;
+}
+
+.category {
+  color: var(--brand-lighten-10);
+}
+
+.read {
+  color: var(--link-color);
+}
+
+.read:hover {
+  border-bottom: 1px solid var(--link-color);
 }

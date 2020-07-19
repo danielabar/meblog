@@ -10,6 +10,7 @@ export default props => (
         id={node.id}
         to={node.fields.slug}
         title={node.frontmatter.title}
+        category={node.frontmatter.category}
         date={node.frontmatter.date}
         excerpt={node.excerpt}
       />

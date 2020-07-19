@@ -1,6 +1,7 @@
 ---
 title: "How to Access Chrome Bookmarks via Keyboard"
 date: "2019-08-11"
+category: "productivity"
 ---
 
 If you make heavy use of the [Chrome bookmarks](https://support.google.com/chrome/answer/188842?co=GENIE.Platform%3DDesktop&hl=en) feature, then you probably have long lists of them, possibly nested if they're organized with folders and sub-folders.

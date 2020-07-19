@@ -5,17 +5,27 @@ import styles from "./pagination.module.css"
 export default props => (
   <div className={styles.container}>
     {!props.isFirst && (
-      <div className={styles.prev}>
+      <div className={`${styles.prev} ${styles.pagination}`}>
         <Link to={props.prevPage} rel="prev">
-          ← Previous Page
+          ← prev
         </Link>
       </div>
     )}
+    {props.isFirst && (
+      <div className={`${styles.prev} ${styles.pagination} ${styles.inactive}`}>
+        ← prev
+      </div>
+    )}
     {!props.isLast && (
-      <div className={styles.next}>
+      <div className={`${styles.next} ${styles.pagination}`}>
         <Link to={props.nextPage} rel="next">
-          Next Page →
+          next →
         </Link>
+      </div>
+    )}
+    {props.isLast && (
+      <div className={`${styles.next} ${styles.pagination} ${styles.inactive}`}>
+        next →
       </div>
     )}
   </div>

@@ -1,6 +1,7 @@
 import React from "react"
 import SEO from "../components/SEO"
 import Layout from "../components/layout"
+import AllLink from "../components/all-link"
 import styles from "./post.module.css"
 
 // props.pageContext object contains context from gatsby-node.js createPages
@@ -13,12 +14,13 @@ export default props => {
     <Layout>
       <SEO title={title} pathname={slug} />
       <div className={styles.container}>
-        <h1>{title}</h1>
+        <h1 className={styles.title}>{title}</h1>
         <div
           className={styles.content}
           dangerouslySetInnerHTML={{ __html: content }}
         />
       </div>
+      <AllLink marginTop="30px" />
     </Layout>
   )
 }

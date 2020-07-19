@@ -3,11 +3,17 @@ import { Link } from "gatsby"
 import styles from "./article.module.css"
 
 export default props => (
-  <Link to={props.to}>
-    <article className={styles.container}>
-      <h1>{props.title}</h1>
-      <div className={styles.articleDate}>{props.date}</div>
-      <div className={styles.excerot}>{props.excerpt}</div>
-    </article>
-  </Link>
+  <article className={styles.container}>
+    <div className={styles.subheader}>
+      <div className={styles.date}>{props.date}</div>
+      <div className={styles.category}>{props.category}</div>
+    </div>
+    <Link to={props.to} className={styles.title}>
+      {props.title}
+    </Link>
+    <div className={styles.excerot}>{props.excerpt}</div>
+    <Link to={props.to} className={styles.read}>
+      Read
+    </Link>
+  </article>
 )
