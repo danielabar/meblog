@@ -16,8 +16,6 @@ export default () => (
         <Link to="/blog">
           <li>Blog</li>
         </Link>
-        <li>Projects</li>
-        <li>Courses</li>
         <li>About</li>
       </ul>
     </nav>

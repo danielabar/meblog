@@ -16,6 +16,8 @@
 
   --link-color: #5d93ff;
 
+  --inactive-color: #bbb;
+
   --base-font-color: var(--brand-darken-35);
   --base-font-family: -apple-system, system-ui, "Segoe UI", Roboto, Oxygen-Sans,
     Ubuntu, Cantarell, "Helvetica Neue", sans-serif;

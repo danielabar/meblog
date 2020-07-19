@@ -16,7 +16,7 @@
 }
 
 .inactive {
-  color: #bbb;
+  color: var(--inactive-color);
   pointer-events: none;
 }
 
