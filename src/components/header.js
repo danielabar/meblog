@@ -6,7 +6,13 @@ export default () => (
   <header className={styles.container}>
     <Link to="/">
       <div className={styles.logo}>
-        <div className={styles.profile}>Img TBD</div>
+        <div className={styles.profileWrapper}>
+          <img
+            className={styles.profileImg}
+            src={"/images/profile.png"}
+            alt="Profile"
+          />
+        </div>
         <div className={styles.title}>Daniela Baron</div>
       </div>
     </Link>

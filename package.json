@@ -6,11 +6,13 @@
   "license": "MIT",
   "scripts": {
     "build": "gatsby build",
+    "clean": "gatsby clean",
+    "deployold": "gatsby build --prefix-paths && gh-pages -d public",
+    "deploy": "gatsby build && gh-pages -d public",
     "develop": "gatsby develop",
     "format": "prettier --write \"**/*.{js,jsx,json,md}\"",
-    "start": "npm run develop",
     "serve": "gatsby serve",
-    "clean": "gatsby clean",
+    "start": "npm run develop",
     "test": "echo \"Write tests! -> https://gatsby.dev/unit-testing\" && exit 1"
   },
   "dependencies": {
@@ -27,6 +29,7 @@
     "react-helmet": "5.2.1"
   },
   "devDependencies": {
+    "gh-pages": "3.1.0",
     "prettier": "^1.19.1"
   },
   "repository": {

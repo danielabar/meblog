@@ -5,8 +5,12 @@ module.exports = {
     siteUrl: "https://danielabaron.me",
     url: "https://danielabaron.me",
     description: "The personal website of Daniela Baron, software developer.",
-    image: "/images/placeholder.png",
+    image: "/images/profile.png",
     twitterUsername: "@DanielaMBaron",
+    // for temporary testing at https://danielabar.github.io/meblog/
+    // remove later when add CNAME
+    // https://www.gatsbyjs.org/docs/how-gatsby-works-with-github-pages/
+    // pathPrefix: "/meblog",
   },
   plugins: [
     "gatsby-plugin-sharp",
