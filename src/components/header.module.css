@@ -1,24 +1,48 @@
 .container {
-  justify-content: space-between;
+  align-items: center;
   display: flex;
+  justify-content: space-between;
 }
 
 .logo {
+  align-items: center;
   display: flex;
 }
 
-.profile {
-  border: 1px solid var(--brand-darken-30);
+.profile-wrapper {
+  border: 1px solid var(--brand-lighten-40);
   border-radius: 50%;
-  height: 50px;
-  width: 50px;
+  height: 70px;
+  overflow: hidden;
+  position: relative;
+  width: 70px;
+}
+
+.profile-img {
+  height: 100%;
+  left: 0px;
+  object-fit: cover;
+  object-position: center center;
+  position: absolute;
+  top: 0px;
+  width: 100%;
+}
+
+.header-item {
+  color: var(--brand-darken-10);
+  font-size: 22px;
 }
 
 .title {
-  font-size: 18px;
   font-weight: 600;
+  margin-left: 10px;
 }
 
 .nav-list {
   display: flex;
+}
+
+.nav-item {
+  font-weight: 500;
+  margin-left: 15px;
 }

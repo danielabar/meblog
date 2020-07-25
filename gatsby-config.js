@@ -5,7 +5,7 @@ module.exports = {
     siteUrl: "https://danielabaron.me",
     url: "https://danielabaron.me",
     description: "The personal website of Daniela Baron, software developer.",
-    image: "/images/placeholder.png",
+    image: "/images/profile.png",
     twitterUsername: "@DanielaMBaron",
   },
   plugins: [
