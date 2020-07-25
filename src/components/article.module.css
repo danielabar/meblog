@@ -1,5 +1,6 @@
 .container {
   margin-top: 25px;
+  padding-right: 150px;
 }
 
 .title {
@@ -33,4 +34,26 @@
 
 .read:hover {
   border-bottom: 1px solid var(--link-color);
+}
+
+/* tablet landscape */
+@media (max-width: 1280px) {
+}
+
+/* tablet portrait */
+@media (max-width: 1024px) {
+}
+
+/* mobile landscape */
+@media (max-width: 768px) {
+  .container {
+    padding-right: 50px;
+  }
+}
+
+/* mobile portrait */
+@media (max-width: 640px) {
+  .container {
+    padding-right: 0;
+  }
 }
