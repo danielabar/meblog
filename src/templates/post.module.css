@@ -1,13 +1,12 @@
 .title {
-  font-size: 3rem;
+  font-size: 2.7rem;
   font-weight: 600;
-  line-height: 60px;
+  line-height: 55px;
   margin: 20px 0;
-  text-align: center;
 }
 
 .content {
-  font-size: 1.1rem;
+  font-size: 1.2rem;
   line-height: 30px;
 }
 
@@ -15,7 +14,35 @@
   color: var(--link-color);
 }
 
+.content p {
+  margin-bottom: 30px;
+}
+
 .content a:hover {
   border-bottom: 1px solid var(--brand-lighten-10);
   color: var(--brand-lighten-10);
+}
+
+/* tablet landscape */
+@media (max-width: 1280px) {
+}
+
+/* tablet portrait */
+@media (max-width: 1024px) {
+}
+
+/* mobile landscape */
+@media (max-width: 768px) {
+  .title {
+    font-size: 2.3rem;
+    line-height: 40px;
+  }
+}
+
+/* mobile portrait */
+@media (max-width: 640px) {
+  .title {
+    font-size: 2.3rem;
+    line-height: 40px;
+  }
 }
