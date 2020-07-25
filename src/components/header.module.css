@@ -28,13 +28,21 @@
   width: 100%;
 }
 
-.title {
+.header-item {
   color: var(--brand-darken-10);
-  font-size: 20px;
+  font-size: 22px;
+}
+
+.title {
   font-weight: 600;
   margin-left: 10px;
 }
 
 .nav-list {
   display: flex;
+}
+
+.nav-item {
+  font-weight: 500;
+  margin-left: 15px;
 }

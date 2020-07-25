@@ -13,16 +13,18 @@ export default () => (
             alt="Profile"
           />
         </div>
-        <div className={styles.title}>Daniela Baron</div>
+        <div className={`${styles.headerItem} ${styles.title}`}>
+          Daniela Baron
+        </div>
       </div>
     </Link>
 
     <nav className={styles.nav}>
       <ul className={styles.navList}>
-        <Link to="/blog">
-          <li>Blog</li>
-        </Link>
-        <li>About</li>
+        <li className={`${styles.headerItem} ${styles.navItem}`}>
+          <Link to="/blog">Blog</Link>
+        </li>
+        <li className={`${styles.headerItem} ${styles.navItem}`}>About</li>
       </ul>
     </nav>
   </header>
