@@ -24,7 +24,9 @@ export default () => (
         <li className={`${styles.headerItem} ${styles.navItem}`}>
           <Link to="/blog">Blog</Link>
         </li>
-        <li className={`${styles.headerItem} ${styles.navItem}`}>About</li>
+        <li className={`${styles.headerItem} ${styles.navItem}`}>
+          <Link to="/about">About</Link>
+        </li>
       </ul>
     </nav>
   </header>
