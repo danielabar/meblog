@@ -1,2 +1,6 @@
 .container {
+  margin-bottom: 30px;
+  line-height: 1.4;
+  font-weight: 300;
+  font-size: 1.1em;
 }
