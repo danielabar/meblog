@@ -3,6 +3,8 @@ import styles from "./footer.module.css"
 
 export default () => (
   <footer className={styles.container}>
-    <div className={styles.footer}>Footer copy TBD</div>
+    <hr className={styles.sep} />
+    <p className={styles.copy}>All materials © Daniela Baron 2020</p>
+    <div className={styles.social}>icons TBD...</div>
   </footer>
 )
