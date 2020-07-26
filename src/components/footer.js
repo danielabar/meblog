@@ -4,9 +4,12 @@ import styles from "./footer.module.css"
 import { FaTwitter, FaGithub, FaCodepen, FaLinkedinIn } from "react-icons/fa"
 
 const Footer = () => {
-  const iconColor = window
-    .getComputedStyle(document.documentElement)
-    .getPropertyValue("--base-font-color")
+  const iconColor =
+    typeof window !== "undefined"
+      ? window
+          .getComputedStyle(document.documentElement)
+          .getPropertyValue("--base-font-color")
+      : ""
 
   return (
     <footer className={styles.container}>
