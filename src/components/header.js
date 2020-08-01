@@ -1,33 +1,38 @@
 import React from "react"
 import { Link } from "gatsby"
+import useViewport from "../hooks/useviewport"
 import styles from "./header.module.css"
+import NavMenuResponsive from "./nav-menu-responsive"
+import NavMenu from "./nav-menu"
 
-export default () => (
-  <header className={styles.container}>
-    <Link to="/">
-      <div className={styles.logo}>
-        <div className={styles.profileWrapper}>
-          <img
-            className={styles.profileImg}
-            src={"/images/profile.png"}
-            alt="Profile"
-          />
-        </div>
-        <div className={`${styles.headerItem} ${styles.title}`}>
-          Daniela Baron
-        </div>
-      </div>
-    </Link>
+const Header = () => {
+  const { width } = useViewport()
+  const breakpoint = 640
 
-    <nav className={styles.nav}>
-      <ul className={styles.navList}>
-        <li className={`${styles.headerItem} ${styles.navItem}`}>
-          <Link to="/blog">Blog</Link>
-        </li>
-        <li className={`${styles.headerItem} ${styles.navItem}`}>
-          <Link to="/about">About</Link>
-        </li>
-      </ul>
-    </nav>
-  </header>
-)
+  function menuHelper() {
+    return width < breakpoint ? <NavMenuResponsive /> : <NavMenu />
+  }
+
+  return (
+    <header className={styles.container}>
+      <Link to="/">
+        <div className={styles.logo}>
+          <div className={styles.profileWrapper}>
+            <img
+              className={styles.profileImg}
+              src={"/images/profile.png"}
+              alt="Profile"
+            />
+          </div>
+          <div className={`${styles.headerItem} ${styles.title}`}>
+            Daniela Baron
+          </div>
+        </div>
+      </Link>
+
+      {menuHelper()}
+    </header>
+  )
+}
+
+export default Header
