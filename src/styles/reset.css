@@ -131,3 +131,19 @@ a {
   color: inherit;
   text-decoration: inherit;
 }
+
+button,
+input,
+textarea {
+  border-radius: 0;
+  -webkit-border-radius: 0px;
+}
+button,
+input {
+  -webkit-appearance: none;
+}
+html {
+  -webkit-text-size-adjust: 100%;
+  -moz-text-size-adjust: 100%;
+  -ms-text-size-adjust: 100%;
+}

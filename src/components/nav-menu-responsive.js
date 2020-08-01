@@ -1,5 +1,6 @@
 import React, { useState } from "react"
 import { Link } from "gatsby"
+import { MdMenu, MdClose } from "react-icons/md"
 import styles from "./nav-menu-responsive.module.css"
 
 const NavMenuResponsive = () => {
@@ -10,12 +11,15 @@ const NavMenuResponsive = () => {
       return (
         <nav className={styles.nav}>
           <ul className={styles.navList}>
-            <li className={styles.menuButton}>
+            <li>
               <button
+                className={styles.menuButton}
                 onClick={e => {
                   setOpen(false)
                 }}
               >
+                <MdClose size="1.7rem" />
+                <br />
                 close
               </button>
             </li>
@@ -32,12 +36,15 @@ const NavMenuResponsive = () => {
     return (
       <nav className={styles.nav}>
         <ul className={styles.navList}>
-          <li className={styles.menuButton}>
+          <li>
             <button
+              className={styles.menuButton}
               onClick={e => {
                 setOpen(true)
               }}
             >
+              <MdMenu size="1.7rem" />
+              <br />
               menu
             </button>
           </li>
