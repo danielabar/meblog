@@ -9,25 +9,33 @@ const NavMenuResponsive = () => {
   function navHelper() {
     if (open) {
       return (
-        <nav className={styles.nav}>
+        <nav className={styles.navOpen}>
+          <button
+            className={`${styles.menuButton} ${styles.menuButtonClose}`}
+            onClick={e => {
+              setOpen(false)
+            }}
+          >
+            <MdClose size="1.7rem" />
+            <br />
+            close
+          </button>
           <ul className={styles.navList}>
-            <li>
-              <button
-                className={styles.menuButton}
-                onClick={e => {
-                  setOpen(false)
-                }}
-              >
-                <MdClose size="1.7rem" />
-                <br />
-                close
-              </button>
+            <li></li>
+            <li className={`${styles.headerItem} ${styles.navItem}`}>
+              <Link to="/" className={styles.navLink}>
+                Home
+              </Link>
             </li>
             <li className={`${styles.headerItem} ${styles.navItem}`}>
-              <Link to="/blog">Blog</Link>
+              <Link to="/blog" className={styles.navLink}>
+                Blog
+              </Link>
             </li>
             <li className={`${styles.headerItem} ${styles.navItem}`}>
-              <Link to="/about">About</Link>
+              <Link className={styles.navLink} to="/about">
+                About
+              </Link>
             </li>
           </ul>
         </nav>
