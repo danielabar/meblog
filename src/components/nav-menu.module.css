@@ -1,0 +1,14 @@
+.nav-list {
+  display: flex;
+  flex-direction: row;
+}
+
+.header-item {
+  color: var(--brand-darken-10);
+  font-size: 22px;
+}
+
+.nav-item {
+  font-weight: 500;
+  margin-left: 15px;
+}

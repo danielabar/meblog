@@ -41,6 +41,7 @@ export const blogListQuery = graphql`
     ) {
       edges {
         node {
+          id
           fields {
             slug
           }
