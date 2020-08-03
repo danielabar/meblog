@@ -11,8 +11,8 @@
     "deploy": "gatsby build && gh-pages -d public",
     "develop": "gatsby develop -H 0.0.0.0",
     "format": "prettier --write \"**/*.{js,jsx,json,md}\"",
-    "serve": "gatsby serve",
-    "servebuild": "gatsby build && gatsby serve",
+    "serve": "gatsby serve -H 0.0.0.0",
+    "servebuild": "gatsby build && gatsby serve -H 0.0.0.0",
     "start": "npm run develop",
     "test": "echo \"Write tests! -> https://gatsby.dev/unit-testing\" && exit 1"
   },
