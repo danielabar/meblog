@@ -15,6 +15,13 @@
   --brand-darken-35: #1a0d1f;
   --brand-darken-40: #0b060d;
 
+  --brand-saturate-5: #833da2;
+  --brand-desaturate-35: #726a75;
+  --brand-desaturate-35-transp-50: rgba(114, 106, 117, 0.5);
+
+  --brand-complement: #9c8f43;
+  --brand-complement-lighten-45: #eeead7;
+
   --link-color: #5d93ff;
 
   --inactive-color: #bbb;

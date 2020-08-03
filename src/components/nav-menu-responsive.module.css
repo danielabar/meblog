@@ -1,6 +1,6 @@
 .nav-open {
   align-items: center;
-  background: #e1dfa5;
+  background: var(--brand-complement-lighten-45);
   display: flex;
   height: 100%;
   justify-content: center;
@@ -20,12 +20,12 @@
 }
 
 .header-item {
-  color: var(--brand-darken-10);
+  color: var(--brand-saturate-5);
   font-size: 22px;
 }
 
 .nav-item {
-  box-shadow: 5px 5px 5px 5px rgba(105, 102, 105, 0.5);
+  box-shadow: 5px 5px 5px 5px var(--brand-desaturate-35-transp-50);
   font-weight: 500;
   margin-bottom: 20px;
   margin-left: 25px;
