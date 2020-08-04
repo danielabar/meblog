@@ -6,10 +6,9 @@ import styles from "./nav-menu-responsive.module.css"
 const NavMenuResponsive = () => {
   const [open, setOpen] = useState(false)
 
-  function doIt(evt) {
-    const containsActive = str => str.includes("active")
+  function closeIfActive(evt) {
     const linkClasses = Array.from(evt.target.classList)
-    if (linkClasses.some(containsActive)) {
+    if (linkClasses.some(str => str.includes("active"))) {
       setOpen(false)
     }
   }
@@ -33,7 +32,7 @@ const NavMenuResponsive = () => {
             <li className={`${styles.headerItem} ${styles.navItem}`}>
               <Link
                 to="/"
-                onClick={doIt}
+                onClick={closeIfActive}
                 className={styles.navLink}
                 activeClassName={styles.active}
               >
@@ -43,7 +42,7 @@ const NavMenuResponsive = () => {
             <li className={`${styles.headerItem} ${styles.navItem}`}>
               <Link
                 to="/blog"
-                onClick={doIt}
+                onClick={closeIfActive}
                 className={styles.navLink}
                 activeClassName={styles.active}
               >
@@ -53,7 +52,7 @@ const NavMenuResponsive = () => {
             <li className={`${styles.headerItem} ${styles.navItem}`}>
               <Link
                 to="/about"
-                onClick={doIt}
+                onClick={closeIfActive}
                 className={styles.navLink}
                 activeClassName={styles.active}
               >
