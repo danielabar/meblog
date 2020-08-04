@@ -7,13 +7,19 @@ const NavMenu = () => {
     <nav className={styles.nav}>
       <ul className={styles.navList}>
         <li className={`${styles.headerItem} ${styles.navItem}`}>
-          <Link to="/">Home</Link>
+          <Link to="/" activeClassName={styles.active}>
+            Home
+          </Link>
         </li>
         <li className={`${styles.headerItem} ${styles.navItem}`}>
-          <Link to="/blog">Blog</Link>
+          <Link to="/blog" activeClassName={styles.active}>
+            Blog
+          </Link>
         </li>
         <li className={`${styles.headerItem} ${styles.navItem}`}>
-          <Link to="/about">About</Link>
+          <Link to="/about" activeClassName={styles.active}>
+            About
+          </Link>
         </li>
       </ul>
     </nav>

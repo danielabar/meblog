@@ -4,11 +4,16 @@
 }
 
 .header-item {
-  color: var(--brand-darken-10);
+  color: var(--brand);
   font-size: 22px;
 }
 
 .nav-item {
   font-weight: 500;
   margin-left: 15px;
+}
+
+.active {
+  color: var(--brand-darken-20);
+  cursor: inherit;
 }
