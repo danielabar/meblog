@@ -51,3 +51,7 @@
   font-weight: 600;
   line-height: 2.5;
 }
+
+.active {
+  color: var(--brand-darken-20);
+}

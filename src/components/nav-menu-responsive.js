@@ -6,6 +6,14 @@ import styles from "./nav-menu-responsive.module.css"
 const NavMenuResponsive = () => {
   const [open, setOpen] = useState(false)
 
+  function doIt(evt) {
+    const containsActive = str => str.includes("active")
+    const linkClasses = Array.from(evt.target.classList)
+    if (linkClasses.some(containsActive)) {
+      setOpen(false)
+    }
+  }
+
   function navHelper() {
     if (open) {
       return (
@@ -23,17 +31,32 @@ const NavMenuResponsive = () => {
           <ul className={styles.navList}>
             <li></li>
             <li className={`${styles.headerItem} ${styles.navItem}`}>
-              <Link to="/" className={styles.navLink}>
+              <Link
+                to="/"
+                onClick={doIt}
+                className={styles.navLink}
+                activeClassName={styles.active}
+              >
                 Home
               </Link>
             </li>
             <li className={`${styles.headerItem} ${styles.navItem}`}>
-              <Link to="/blog" className={styles.navLink}>
+              <Link
+                to="/blog"
+                onClick={doIt}
+                className={styles.navLink}
+                activeClassName={styles.active}
+              >
                 Blog
               </Link>
             </li>
             <li className={`${styles.headerItem} ${styles.navItem}`}>
-              <Link className={styles.navLink} to="/about">
+              <Link
+                to="/about"
+                onClick={doIt}
+                className={styles.navLink}
+                activeClassName={styles.active}
+              >
                 About
               </Link>
             </li>
