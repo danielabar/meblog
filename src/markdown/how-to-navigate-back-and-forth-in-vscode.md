@@ -1,5 +1,6 @@
 ---
 title: "How to Navigate Back and Forth in VS Code"
+description: "How to Navigate Back and Forth in VS Code"
 date: "2019-08-18"
 category: "vscode"
 ---

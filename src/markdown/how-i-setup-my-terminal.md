@@ -1,5 +1,6 @@
 ---
 title: "How I Setup my Terminal"
+description: "How to setup your terminal with oh-my-zsh and agnoster theme"
 date: "2019-08-04"
 category: "terminal"
 ---
