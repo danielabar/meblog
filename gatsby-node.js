@@ -26,6 +26,7 @@ exports.createPages = ({ graphql, actions }) => {
             node {
               frontmatter {
                 title
+                description
               }
               fields {
                 slug
@@ -45,6 +46,7 @@ exports.createPages = ({ graphql, actions }) => {
             slug: node.fields.slug,
             content: node.html,
             title: node.frontmatter.title,
+            description: node.frontmatter.description,
           },
         })
       })

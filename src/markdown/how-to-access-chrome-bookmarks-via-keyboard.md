@@ -1,5 +1,6 @@
 ---
 title: "How to Access Chrome Bookmarks via Keyboard"
+description: "Improve productivity with Alfred and Chrome bookmarks"
 date: "2019-08-11"
 category: "productivity"
 ---
