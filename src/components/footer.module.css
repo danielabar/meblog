@@ -15,10 +15,20 @@
 
 .social {
   margin-top: 25px;
-  opacity: 0.7;
 }
 
 .social a {
   display: inline-block;
   margin-left: 15px;
+}
+
+.footer-icon {
+  color: var(--base-font-color);
+  opacity: 0.7;
+  transition: all 0.3s ease;
+}
+
+.footer-icon:hover {
+  color: var(--brand-saturate-5);
+  opacity: 1;
 }
