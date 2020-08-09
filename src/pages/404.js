@@ -6,7 +6,7 @@ import styles from "./404.module.css"
 
 export default () => (
   <Layout>
-    <SEO title="Home" pathname="/" />
+    <SEO title="404" pathname="/404" />
     <div className={styles.container}>
       <div className={styles.main}>404</div>
       <div className={styles.submain}>Ooops!!</div>
