@@ -12,19 +12,19 @@ const Footer = () => {
           href="https://twitter.com/DanielaMBaron"
           className={styles.footerIcon}
         >
-          <FaTwitter size="1.7rem" />
+          <FaTwitter />
         </a>
         <a href="https://github.com/danielabar" className={styles.footerIcon}>
-          <FaGithub size="1.7rem" />
+          <FaGithub />
         </a>
         <a href="https://codepen.io/danielabar" className={styles.footerIcon}>
-          <FaCodepen size="1.7rem" />
+          <FaCodepen />
         </a>
         <a
           href="https://www.linkedin.com/in/danielabaron/"
           className={styles.footerIcon}
         >
-          <FaLinkedinIn size="1.7rem" />
+          <FaLinkedinIn />
         </a>
       </div>
     </footer>
