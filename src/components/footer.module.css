@@ -22,8 +22,13 @@
   margin-left: 15px;
 }
 
+.social a:first-child {
+  margin-left: 0;
+}
+
 .footer-icon {
   color: var(--base-font-color);
+  font-size: 1.7em;
   opacity: 0.7;
   transition: all 0.3s ease;
 }
@@ -31,4 +36,15 @@
 .footer-icon:hover {
   color: var(--brand-saturate-5);
   opacity: 1;
+}
+
+/* mobile landscape */
+@media (max-width: 768px) {
+  .social a {
+    margin-left: 25px;
+  }
+
+  .footer-icon {
+    font-size: 2em;
+  }
 }
