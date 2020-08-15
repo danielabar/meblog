@@ -5,6 +5,10 @@
   margin: 20px 0;
 }
 
+.feature-image {
+  margin-bottom: 20px;
+}
+
 .content {
   font-size: 1.2rem;
   line-height: 30px;
