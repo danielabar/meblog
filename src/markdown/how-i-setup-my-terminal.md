@@ -8,7 +8,7 @@ category: "terminal"
 
 Have you ever seen a course, tutorial or colleague using their terminal and it looks something like this:
 
-![terminal-agnoster](./terminal-agnoster.png "Terminal Agnoster")
+![terminal-agnoster](../images/terminal-agnoster.png "Terminal Agnoster")
 
 and wondered "how do they make it look like that"?
 
