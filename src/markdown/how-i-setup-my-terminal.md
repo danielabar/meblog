@@ -1,6 +1,6 @@
 ---
 title: "How I Setup my Terminal"
-featuredImage: "terminal-cookie-the-pom-gySMaocSdqs-unsplash.jpg"
+featuredImage: "../images/terminal-cookie-the-pom-gySMaocSdqs-unsplash.jpg"
 description: "How to setup your terminal with oh-my-zsh and agnoster theme"
 date: "2019-08-04"
 category: "terminal"
@@ -8,7 +8,7 @@ category: "terminal"
 
 Have you ever seen a course, tutorial or colleague using their terminal and it looks something like this:
 
-![terminal-agnoster](./terminal-agnoster.png "Terminal Agnoster")
+![terminal-agnoster](../images/terminal-agnoster.png "Terminal Agnoster")
 
 and wondered "how do they make it look like that"?
 

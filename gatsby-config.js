@@ -23,6 +23,13 @@ module.exports = {
               maxWidth: 800,
             },
           },
+          {
+            resolve: `gatsby-remark-vscode`,
+            options: {
+              theme: "Monokai", // Or install your favorite theme from GitHub
+              wrapperClassName: "gatsby-highlight",
+            },
+          },
         ],
       },
     },
