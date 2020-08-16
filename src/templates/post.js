@@ -11,6 +11,7 @@ import styles from "./post.module.css"
 export default props => {
   const featuredImgFluid =
     props.data.markdownRemark.frontmatter.featuredImage.childImageSharp.fluid
+  const imageSrc = featuredImgFluid.src
   const content = props.pageContext.content
   const title = props.pageContext.title
   const description = props.pageContext.description || props.pageContext.title
@@ -23,6 +24,7 @@ export default props => {
         pathname={slug}
         article={true}
         description={description}
+        image={imageSrc}
       />
       <div className={styles.container}>
         <h1 className={styles.title}>{title}</h1>
