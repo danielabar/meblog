@@ -1,6 +1,6 @@
 ---
 title: "How to Navigate Back and Forth in VS Code"
-featuredImage: "back-forth-pablo-garcia-saldana-lPQIndZz8Mo-unsplash.jpg"
+featuredImage: "../images/back-forth-pablo-garcia-saldana-lPQIndZz8Mo-unsplash.jpg"
 description: "How to Navigate Back and Forth in VS Code"
 date: "2019-08-18"
 category: "vscode"

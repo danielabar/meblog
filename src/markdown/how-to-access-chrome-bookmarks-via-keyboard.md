@@ -1,6 +1,6 @@
 ---
 title: "How to Access Chrome Bookmarks via Keyboard"
-featuredImage: "bookmark-chiara-f-MI8He1NWPWg-unsplash.jpg"
+featuredImage: "../images/bookmark-chiara-f-MI8He1NWPWg-unsplash.jpg"
 description: "Improve productivity with Alfred and Chrome bookmarks"
 date: "2019-08-11"
 category: "productivity"
