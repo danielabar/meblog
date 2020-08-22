@@ -28,6 +28,11 @@ module.exports = {
             options: {
               theme: "Monokai", // Or install your favorite theme from GitHub
               wrapperClassName: "gatsby-highlight",
+              inlineCode: {
+                className: "my-inline",
+                marker: "•",
+                // theme: "Monokai",
+              },
             },
           },
         ],
