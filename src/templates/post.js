@@ -12,7 +12,7 @@ export default props => {
   const featuredImgFluid =
     props.data.markdownRemark.frontmatter.featuredImage.childImageSharp.fluid
   const imageSrc = featuredImgFluid.src
-  const content = props.pageContext.content
+  const content = props.data.markdownRemark.html
   const title = props.pageContext.title
   const description = props.pageContext.description || props.pageContext.title
   const slug = props.pageContext.slug
