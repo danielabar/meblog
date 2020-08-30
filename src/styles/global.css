@@ -23,8 +23,11 @@
   --brand-complement-lighten-45: #eeead7;
 
   --link-color: #5d93ff;
-
   --inactive-color: #bbb;
+
+  --post-link-color: var(--brand-lighten-10);
+  --post-link-color-brighten: var(--brand-saturate-5);
+  --post-link-color-hover: #999;
 
   --base-font-color: var(--brand-darken-35);
   --base-font-family: -apple-system, system-ui, "Segoe UI", Roboto, Oxygen-Sans,
