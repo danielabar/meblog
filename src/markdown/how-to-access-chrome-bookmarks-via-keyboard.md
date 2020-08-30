@@ -28,9 +28,9 @@ For `Show bookmarks`, there are two options - I use `via keyword`, with a single
 For `Open bookmarks` option, I use default browser which on my system is Chrome. But if you're importing bookmarks from both Chrome and Safari, you may also choose `in bookmark's source browser` for this option.
 
 ## Launch Bookmarks
-Now close Alfred preferences and try it out - launch Alfred via your configured hotkey (I leave mine at the default `alt` + `space`), type `b`, then start typing to see your bookmarks. When the one you want shows up, hit `Enter` to action it and it should launch in your browser of choice.
+Now close Alfred preferences and try it out - launch Alfred via your configured hotkey (I leave mine at the default <kbd>alt</kbd> + <kbd>space</kbd>), type <kbd>b</kbd>, then start typing to see your bookmarks. When the one you want shows up, hit <kbd>Enter</kbd> to action it and it should launch in your browser of choice.
 
-For example, I have a bookmark folder named `design`, so typing `b` followed by first few letters of design brings up all these bookmarks:
+For example, I have a bookmark folder named "design", so typing <kbd>b</kbd> followed by first few letters of design brings up all these bookmarks:
 
 ![alfred bookmark example](../images/alfred-bookmark-example.png "alfred bookmark example")
 

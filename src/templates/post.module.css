@@ -23,6 +23,12 @@
   margin-bottom: 15px;
 }
 
+.content h3 {
+  font-size: 1.4rem;
+  font-weight: 500;
+  margin-bottom: 5px;
+}
+
 .content p {
   margin-bottom: 20px;
 }
@@ -38,6 +44,7 @@
 
 .content ul {
   list-style-type: "→";
+  margin-bottom: 15px;
   margin-left: 20px;
 }
 
