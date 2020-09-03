@@ -1,3 +1,43 @@
+# My Blog
+
+My blog is built with [GatsbyJS](https://www.gatsbyjs.com/), initialized with [Gatsby's Hello World Starter](https://github.com/gatsbyjs/gatsby-starter-hello-world), and customized with:
+
+1. SEO component for static pages, and dynamically generated content per post, including Facebook Open Graph and Twitter meta tags.
+2. Pagination.
+3. Optimized images and per post featured image.
+4. Navigation for desktop and mobile responsive menu collapse/expand.
+5. SVG icons from [react-icons](https://github.com/react-icons/react-icons).
+6. Custom 404 page.
+7. Syntax highlighting with [gatsby-remark-vscode](https://www.gatsbyjs.com/plugins/gatsby-remark-vscode/).
+
+## Development
+
+In a terminal at root of project, run:
+
+```bash
+npm start
+```
+
+If some pages don't refresh as expected, try this task which will first wipe out the cache:
+
+```bash
+npm run cleanstart
+```
+
+To test the production build locally:
+
+```bash
+npm run servebuild
+```
+
+To deploy to Github Pages:
+
+```bash
+npm run deploy
+```
+
+## Original Docs from Starter
+
 <!-- AUTO-GENERATED-CONTENT:START (STARTER) -->
 <p align="center">
   <a href="https://www.gatsbyjs.org">
