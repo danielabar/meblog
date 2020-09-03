@@ -6,6 +6,12 @@
   margin: 20px 0;
 }
 
+.published {
+  font-style: italic;
+  font-weight: 300;
+  margin: 15px 0;
+}
+
 .feature-image {
   margin-bottom: 20px;
 }

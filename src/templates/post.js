@@ -6,16 +6,17 @@ import Layout from "../components/layout"
 import AllLink from "../components/all-link"
 import styles from "./post.module.css"
 
-// props.pageContext contains context from gatsby-node.js createPages
 // props.data contains result from query object defined at bottom of this component - needed for featured image
 export default props => {
+  const markdown = props.data.markdownRemark
+  const publishedDate = markdown.frontmatter.date
   const featuredImgFluid =
-    props.data.markdownRemark.frontmatter.featuredImage.childImageSharp.fluid
+    markdown.frontmatter.featuredImage.childImageSharp.fluid
   const imageSrc = featuredImgFluid.src
-  const content = props.data.markdownRemark.html
-  const title = props.pageContext.title
-  const description = props.pageContext.description || props.pageContext.title
-  const slug = props.pageContext.slug
+  const content = markdown.html
+  const title = markdown.frontmatter.title
+  const description = markdown.frontmatter.description || title
+  const slug = markdown.fields.slug
 
   return (
     <Layout>
@@ -28,6 +29,7 @@ export default props => {
       />
       <div className={styles.container}>
         <h1 className={styles.title}>{title}</h1>
+        <div className={styles.published}>Published {publishedDate}</div>
         <Img fluid={featuredImgFluid} className={styles.featureImage} />
         <div
           className={styles.content}
@@ -46,6 +48,7 @@ export const query = graphql`
       html
       frontmatter {
         title
+        date(formatString: "DD MMM YYYY")
         description
         featuredImage {
           childImageSharp {
