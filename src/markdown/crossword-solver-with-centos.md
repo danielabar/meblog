@@ -3,7 +3,7 @@ title: "Crossword Solver with CentOS"
 featuredImage: "../images/crossword-marjanblan-i9bAvQ57J1k-unsplash.jpg"
 description: "Learn how to use CentOS words package for help solving crossword puzzles"
 date: "2019-08-25"
-category: "centos"
+category: "just for fun"
 ---
 
 If you enjoy crossword puzzles but sometimes get stuck on a devious one, here's a fun use of the CentOS [words](https://centos.pkgs.org/7/centos-x86_64/words-3.0-22.el7.noarch.rpm.html) package.

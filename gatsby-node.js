@@ -53,8 +53,7 @@ exports.createPages = ({ graphql, actions }) => {
       })
       // build blog-list pages (aka pagination)
       const posts = result.data.allMarkdownRemark.edges
-      // TODO: bump this up to 5, just small number now for testing
-      const postsPerPage = 2
+      const postsPerPage = 5
       const numPages = Math.ceil(posts.length / postsPerPage)
       Array.from({ length: numPages }).forEach((_, i) => {
         createPage({
