@@ -22,7 +22,7 @@ However, for all the others that do run ads, it's important to clearly distingui
 
 ## 3. Limit inside jokes
 
-This can happen when there are two or more co-hosts thath know each other well or have a long history of working together.. Something will be said that causes all the hosts to start laughing hysterically or go on giggling for some time, but it won't be apparent to the audience what's so funny. This can leave the listener feeling left out of the "inside joke".  If you run a podcast and find this happening, try to take a few minutes to fill in the audience on the joke, or if its one of those "you just had to be there" moments, try to limit how often it happens or even edit these out.
+This can happen when there are two or more co-hosts thath know each other well or have a long history of working together. Something will be said that causes all the hosts to start laughing hysterically or go on giggling for some time, but it won't be apparent to the audience what's so funny. This can leave the listener feeling left out of the "inside joke".  If you run a podcast and find this happening, try to take a few minutes to fill in the audience on the joke, or if its one of those "you just had to be there" moments, try to limit how often it happens or even edit these out.
 
 ## 4. Limit the fillers
 
@@ -33,6 +33,10 @@ This one's a little tricky because I understand that guests may be nervous, or a
 Wikipedia defines [signal-to-noise ratio](https://en.wikipedia.org/wiki/Signal-to-noise_ratio) as "A measure used in science and engineering that compares the level of a desired signal to the level of background noise". What does this have to do with podcasts you ask? Well, allow me a small tangent... Suppose you have a speaker that emits a small hiss, so even when nothing is playing, if you turn the volume all the way up, you'll hear that hiss get even louder. That's the noise. Now the music you want to play on that speaker is the signal. Imagine if the hiss was really loud, then when you turned up the volume, although the music would get louder, it would partially get drowned out by the hiss, this would be a low signal to noise ratio. Ideally you want a high signal to noise ratio so that the music comes out clearly with little static. Really good explanation of this [here](https://www.lifewire.com/signal-to-noise-ratio-3134701).
 
 Ok, now back to podcasts. Many will have some level of "noise" in some conversational banter or tangents that the hosts go on. The "signal" is the topic that's being covered. A good podcast, in my opinion, will limit the amount of noise the audience has to wade through to get to the signal. Of course, some podcasts are all about the banter and that's part of their charm, but I tend to gravitate towards educational shows and so value mostly signal. Some podcasts that do a good balance of banter and education include [Dear HBR](https://hbr.org/2018/01/podcast-dear-hbr) and [Motley Fool Money](https://www.fool.com/podcasts/motley-fool-money/).
+
+## 6. Let the guests speak
+
+This applies to the interview format - there's a host, and then each week a different guest is brought on to be interviewed. What I've noticed on some podcasts, is the host has a point they'd like to make, so they'll ask a question, but before letting the guest answer, the host keeps going on appending their opinion, so by the time they're finished asking their "question", it's lost the flow of the question and answer format. Or sometimes the guest will be interrupted when they're in the middle of answering a question. Presumably the guest was brought on for their expertise in a particular subject. A good podcast will give the guest an opportunity to share their knowledge. A podcast that does this really well is [Software Engineering Radio](https://www.se-radio.net/).
 
 ## Conclusion
 
