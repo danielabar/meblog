@@ -24,7 +24,7 @@ Next, install [Oh My Zsh](https://github.com/ohmyzsh/ohmyzsh). This will switch 
 Oh My Zsh adds a lot of additional utilities including plugins and themes. Speaking of themes, we'll be configuring the agnoster theme, and this requires some fonts. Go ahead and install the [Powerline fonts](https://github.com/powerline/fonts) from Github. The `install.sh` script will add all the fonts to the Font Book app on your Mac.
 
 ## Step 4: Configure iTerm2
-Some changes are required to iTerm2 preferences to support the agnoster theme from Oh My Zsh. Launch iTerm2, then hit `Cmd` + `,` to open the Preferences panel.
+Some changes are required to iTerm2 preferences to support the agnoster theme from Oh My Zsh. Launch iTerm2, then hit <kbd>Cmd</kbd> + <kbd>,</kbd> to open the Preferences panel.
 
 Select the `Profiles` tab. Use the `+` button at the bottom of the Profile pane to add a new profile, and name it whatever you like. You can also modify the Default profile but it's safer to make a custom one, if things go horribly wrong you can always delete the custom one and go back to Default settings.
 
