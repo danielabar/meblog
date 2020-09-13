@@ -61,6 +61,12 @@
   background-size: 4px 50px;
 }
 
+.content ol {
+  list-style: decimal;
+  margin-bottom: 15px;
+  margin-left: 20px;
+}
+
 .content ul {
   list-style-type: "→";
   margin-bottom: 15px;
