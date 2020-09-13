@@ -8,11 +8,11 @@
     "build": "gatsby build",
     "clean": "gatsby clean",
     "deployold": "gatsby build --prefix-paths && gh-pages -d public",
-    "deploy": "gatsby build && gh-pages -d public",
+    "deploy": "gatsby clean && gatsby build && gh-pages -d public",
     "develop": "gatsby develop -H 0.0.0.0",
     "format": "prettier --write \"**/*.{js,jsx,json,md}\"",
     "serve": "gatsby serve -H 0.0.0.0",
-    "servebuild": "gatsby build && gatsby serve -H 0.0.0.0",
+    "servebuild": "gatsby clean && gatsby build && gatsby serve -H 0.0.0.0",
     "start": "npm run develop",
     "cleanstart": "gatsby clean && gatsby develop -H 0.0.0.0",
     "test": "echo \"Write tests! -> https://gatsby.dev/unit-testing\" && exit 1"
