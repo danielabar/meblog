@@ -24,7 +24,8 @@ This post will walk through the setup, to achieve each of the above workflows st
 
 ## Introducing docker-compose
 
-According to [Docker Best Practices](https://docs.docker.com/develop/develop-images/dockerfile_best-practices/): "Each container should have only one concern. Decoupling applications into multiple containers makes it easier to scale horizontally and reuse containers. For instance, a web application stack might consist of three separate containers, each with its own unique image, to manage the web application, database, and an in-memory cache in a decoupled manner."
+According to [Docker Best Practices](https://docs.docker.com/develop/develop-images/dockerfile_best-practices/):
+>Each container should have only one concern. Decoupling applications into multiple containers makes it easier to scale horizontally and reuse containers. For instance, a web application stack might consist of three separate containers, each with its own unique image, to manage the web application, database, and an in-memory cache in a decoupled manner.
 
 Looking at what's needed to run a Rails app (server, webpacker, MySQL, Redis, etc), it becomes clear that each of these is a separate concern, therefore should be run in a separate container. However, these containers will need to communicate with each other, and be coordinated such that they run at the appropriate time. For example, it would not make sense for the container that seeds the database to start running before the container that houses the MySQL database is available.
 

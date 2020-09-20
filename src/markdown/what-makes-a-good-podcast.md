@@ -6,7 +6,10 @@ date: "2019-09-15"
 category: "podcasts"
 ---
 
-I absolutely love podcasts. It's probably safe to assume everyone already knows what a podcast is, but just in case, [Wikipedia](https://en.wikipedia.org/wiki/Podcast) defines it as: "An episodic series of spoken word digital audio files that a user can download to a personal device for easy listening." There are podcasts on every topic under the sun, from comedy, to sports, true crime stories, health, business and everything in between. My favorite categories include programming, personal finance and alternative health.
+I absolutely love podcasts. It's probably safe to assume everyone already knows what a podcast is, but just in case, [Wikipedia](https://en.wikipedia.org/wiki/Podcast) defines it as:
+>An episodic series of spoken word digital audio files that a user can download to a personal device for easy listening.
+
+There are podcasts on every topic under the sun, from comedy, to sports, true crime stories, health, business and everything in between. My favorite categories include programming, personal finance and alternative health.
 
 One of the things I like best about the format is it feels like "hacking the brain". Since they're (mostly) free and so easily accessible, you can be learning and exposing yourself to new ideas while doing the most mundane things like commuting, going for a run, or chores around the house. In this post I'm going to share some opinions on what makes a good podcast. Keep in mind my preference is on education and always learning new things over idle chit chat.
 
@@ -30,7 +33,10 @@ This one's a little tricky because I understand that guests may be nervous, or a
 
 ## 5. Signal to noise
 
-Wikipedia defines [signal-to-noise ratio](https://en.wikipedia.org/wiki/Signal-to-noise_ratio) as "A measure used in science and engineering that compares the level of a desired signal to the level of background noise". What does this have to do with podcasts you ask? Well, allow me a small tangent... Suppose you have a speaker that emits a small hiss, so even when nothing is playing, if you turn the volume all the way up, you'll hear that hiss get even louder. That's the noise. Now the music you want to play on that speaker is the signal. Imagine if the hiss was really loud, then when you turned up the volume, although the music would get louder, it would partially get drowned out by the hiss, this would be a low signal to noise ratio. Ideally you want a high signal to noise ratio so that the music comes out clearly with little static. Really good explanation of this [here](https://www.lifewire.com/signal-to-noise-ratio-3134701).
+Wikipedia defines [signal-to-noise ratio](https://en.wikipedia.org/wiki/Signal-to-noise_ratio) as:
+>A measure used in science and engineering that compares the level of a desired signal to the level of background noise.
+
+What does this have to do with podcasts you ask? Well, allow me a small tangent... Suppose you have a speaker that emits a small hiss, so even when nothing is playing, if you turn the volume all the way up, you'll hear that hiss get even louder. That's the noise. Now the music you want to play on that speaker is the signal. Imagine if the hiss was really loud, then when you turned up the volume, although the music would get louder, it would partially get drowned out by the hiss, this would be a low signal to noise ratio. Ideally you want a high signal to noise ratio so that the music comes out clearly with little static. Really good explanation of this [here](https://www.lifewire.com/signal-to-noise-ratio-3134701).
 
 Ok, now back to podcasts. Many will have some level of "noise" in some conversational banter or tangents that the hosts go on. The "signal" is the topic that's being covered. A good podcast, in my opinion, will limit the amount of noise the audience has to wade through to get to the signal. Of course, some podcasts are all about the banter and that's part of their charm, but I tend to gravitate towards educational shows and so value mostly signal. Some podcasts that do a good balance of banter and education include [Dear HBR](https://hbr.org/2018/01/podcast-dear-hbr) and [Motley Fool Money](https://www.fool.com/podcasts/motley-fool-money/).
 

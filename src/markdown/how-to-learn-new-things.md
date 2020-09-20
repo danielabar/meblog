@@ -80,7 +80,10 @@ Books are great for those who have a lot of self discipline and are able to set 
 
 ## 5. MOOCs
 
-According to the [wiki page](https://en.wikipedia.org/wiki/Massive_open_online_course), a MOOC (Massive Open Online Course) is "an online course aimed at unlimited participation and open access via the web". These are often university level courses taught by university professors. They're offerred by a variety of institutions, Coursera was one of the first in this market, but now there's others such as individual universities, Udemy, edX and [many others](https://www.classcentral.com/providers).
+According to the [wiki page](https://en.wikipedia.org/wiki/Massive_open_online_course), a MOOC (Massive Open Online Course) is:
+>An online course aimed at unlimited participation and open access via the web.
+
+These are often university level courses taught by university professors. They're offerred by a variety of institutions, Coursera was one of the first in this market, but now there's others such as individual universities, Udemy, edX and [many others](https://www.classcentral.com/providers).
 
 They follow a schedule, although not quite as rigid as in-classroom. Typically a new lecture is released each week along with a homework assignment that is due within a week or two. Some may require completion of a capstone project in addition to the weekly assignments and/or a final exam. You can watch the lectures at any time after they've been released, but in order to get full credit, the homework assignment must be completed on time. There is also a student forum, moderated by teaching assistants (TA) where students can post questions and receive answers from either the TAs or other students. Some courses may require the purchase of a textbook.
 
