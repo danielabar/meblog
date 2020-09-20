@@ -136,6 +136,10 @@
   content: "js";
 }
 
+.content pre[data-language="ruby"]::before {
+  content: "ruby";
+}
+
 /* tablet landscape */
 @media (max-width: 1280px) {
   .content ul {
