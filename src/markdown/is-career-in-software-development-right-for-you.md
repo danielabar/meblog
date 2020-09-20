@@ -14,9 +14,9 @@ A few years ago a "Learn to Code" movement started, encouraging everyone to lear
 
 First, let's get a common misconception out of the way. You do not need to be a super genius or have a PhD in mathematics to be a successful programmer. Well maybe if your goal is to work at NASA on a rocket guidance system... But seriously, aside from some specific areas such as computer graphics and animation which require a solid understanding of linear algebra and trigonometry, for most jobs this simply isn't required (not covering AI or Machine Learning in this post as those are completely different areas outside of my expertise). Being logical however, is definitely a must. Some of the most common concepts a programmer encounters are conditionals, as in "if something is true, then do task A, otherwise, do task B".
 
-## 2. Curiousity
+## 2. Curiosity
 
-While this may have killed the cat, curiousity most certainly benefits programmers. Being curious about how something works, "what's under the hood" so to speak is a good quality to have. For example, if you're reading some code and there's a function call you've never seen before, inspect into it to see what it does. If it's part of the language API, go ahead and look it up in the documentation. Curiousity ensures developers are always learning something new about the code they're working with. If you find yourself frequently asking "why" or doing some research on how something works, this is a good sign that you're curious.
+While this may have killed the cat, curiosity most certainly benefits programmers. Being curious about how something works, "what's under the hood" so to speak is a good quality to have. For example, if you're reading some code and there's a function call you've never seen before, inspect into it to see what it does. If it's part of the language API, go ahead and look it up in the documentation. Curiosity ensures developers are always learning something new about the code they're working with. If you find yourself frequently asking "why" or doing some research on how something works, this is a good sign that you're curious.
 
 ## 3. Persistence
 
