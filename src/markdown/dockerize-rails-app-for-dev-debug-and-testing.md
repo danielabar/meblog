@@ -1,12 +1,12 @@
 ---
-title: "Dockerize a Rails application for Development"
+title: "Dockerize a Rails Application for Development"
 featuredImage: "../images/docker-rails-shipping-containers.jpg"
 description: "Dockerize a Rails application to support the full development workflow including debugging, testing, and working with databases"
 date: "2020-09-20"
 category: "rails"
 ---
 
-At work, I was recently tasked with Dockerizing a Rails monolith. This app has a React front end built with Webpacker, client side dependencies managed with Yarn, and uses a MySQL database and Redis. The existing setup involved developers installing all dependencies on their laptops and took some non-trivial amount of time to get working. The goal of packaging everything with Docker was to make it easier and faster for new developers to get up and running. It was also important to ensure the project could still be run the "old fashioned" way, i.e. all dependencies installed directly on laptop. This was a hedge in case something was found that could not be made to work with Docker.
+At work, I was recently tasked with Dockerizing a Rails monolith. This app has a React front end built with Webpacker, client side dependencies managed with Yarn, runs background jobs with Active Job, and uses a MySQL database and Redis. The existing setup involved developers installing all dependencies on their laptops and took some non-trivial amount of time to get working. The goal of packaging everything with Docker was to make it easier and faster for new developers to get up and running. It was also important to ensure the project could still be run the "old fashioned" way, i.e. all dependencies installed directly on laptop. This was a hedge in case something was found that could not be made to work with Docker.
 
 ## Development Workflow
 
@@ -20,7 +20,7 @@ Although there are many benefits to using Docker for development, there are also
 6. Running one off commands such as applying database migrations or running tests.
 7. Being able to access an interactive Rails console.
 
-This post will walk through the setup, to achieve each of the above workflows steps. A quick note first - this post assumes knowledge of Docker concepts such as Images, Containers and Volumes. For those unfamiliar or new to Docker, I recommend the [Docker Deep Dive](https://www.pluralsight.com/courses/docker-deep-dive-update) course on Pluralsight course.
+This post will walk through the setup, to achieve each of the above workflows steps. A quick note first - this post assumes knowledge of Docker concepts such as Images, Containers and Volumes. For those unfamiliar or new to Docker, I recommend the [Docker Deep Dive](https://www.pluralsight.com/courses/docker-deep-dive-update) course on Pluralsight.
 
 ## Introducing docker-compose
 
@@ -147,7 +147,7 @@ development
   # Use DB_HOST environment variable if set, otherwise default to localhost,
   # This ensures that project can still run the "old fashioned" way when everything
   # is installed directly on laptop.
-  host: <%= ENV['DB_HOST'] || "127.0.0.1 %>
+  host: <%= ENV['DB_HOST'] || "127.0.0.1" %>
   # Replace with your app's database name
   database: appdb
 ```
@@ -163,7 +163,7 @@ At this point, the containers should all start up (run `docker ps` to confirm), 
 
 ## 2. Run one-time database setup
 
-This project makes use of `db/seeds.rb` to initialize the database with some sample data, which should only run on first time setup. The solution is to use an ephemeral container, based on the app image to issue the `rake db:reset` command, if the `INIT_DB` environment variable is set. This will drop the database if it already exists, then run `db:setup` which will create the database, load the schema (defined in `db/schema.rb` which gets populated every time a new migration is added), and run `db:seed` to populate the database.
+This project makes use of `db/seeds.rb` to initialize the database with some sample data, which should only run on first time setup. The solution is to use an ephemeral container, based on the app image to issue the `rake db:reset` command, if the `INIT_DBS` environment variable is set. This will drop the database if it already exists, then run `db:setup` which will create the database, load the schema (defined in `db/schema.rb` which gets populated every time a new migration is added), and run `db:seed` to populate the database.
 
 Aside: See this [Stack Overflow Answer](https://stackoverflow.com/a/10302357/3991687) for an explanation of what all the various `rake db:xxx` tasks do.
 
@@ -244,6 +244,7 @@ services:
       RAILS_ENV: development
       REDIS_URL: "redis://redis/"
 
+  ############### ADD NEW SERVICE HERE #####################
   # Ephemeral container to issue rake db:reset command
   dbcmd:
     # Use same image as `web` service to avoid multiple builds
@@ -293,6 +294,7 @@ services:
 # All named volumes referenced by services must be listed here.
 volumes:
   db_data:
+  node_modules:
 ```
 
 Also add `docker-entrypoint-dbcmd.sh` to project root which contains the database reset commands for the development and test databases:
@@ -302,28 +304,324 @@ Also add `docker-entrypoint-dbcmd.sh` to project root which contains the databas
 
 set -e
 
-if [ "$INIT_DB" = "yes" ]; then
+if [ "$INIT_DBS" = "yes" ]; then
   echo "=== INITIALIZING DATABASES"
   bin/rails db:environment:set RAILS_ENV=development && bundle exec rake db:reset
   bin/rails db:environment:set RAILS_ENV=test && bundle exec rake db:test:reset
 fi
 ```
 
-Now run the build again (since the `Dockerfile` was modified) and bring up the containers with the `INIT_DB` environment variable set to trigger database population:
+Now run the build again (since the `Dockerfile` was modified) and bring up the containers with the `INIT_DBS` environment variable set to trigger database population:
 
 ```bash
 docker-compose build
-INIT_DB=yes docker-compose up
+INIT_DBS=yes docker-compose up
 ```
 
 Now open a browser and navigate to [http://localhost:3000](http://localhost:3000), your app's homepage should load. It may be very slow due to webpacker compiling front end assets on demand, but not to worry, this will be resolved in the next step.
 
-Before moving on to next step, make sure that the bind mount is working by making a small change to the server side code on your laptop, then check that it's reflected in the `web` container. For example, add some logging to the `index` method of the main controller:
+Before moving on to next step, make sure that the `/app` bind mount is working by making a small change to the server side code on your laptop, then check that it's reflected in the `web` container. For example, add some logging to the `index` method of the main controller:
 
 ```ruby
 def index
   Rails.logger.info("Hello from Docker!)
+  ...
 end
 ```
 
 Refresh the app in browser (assuming it's still on the main page) and watch the console output where `docker-compose up` is running, it should display `Hello from Docker!`.
+
+## 3. Run Webpacker
+
+The next step is to run a Webpack dev server in another container to watch for changes to front end assets, recompile them, and refresh the browser. This will greatly speed up page load time during development.
+
+But first, take a look at the `dev_server` section of `config/webpacker.yml`:
+
+```yml
+dev_server:
+  https: false
+  host: localhost
+  port: 3035
+  ...
+```
+
+In order for the Webpack dev server to work in a container, the host can no longer be `localhost`, instead it should be the container this service will be running in, which will be named `webpacker`. However, the goal is to also have this setup work in a non Docker environment, so it won't work to simply change it to `host: webpacker`. One would think that since this is a yaml file in Rails, ERB syntax is supported to make a similar change as was done in `database.yml`, for example something like this:
+
+```yml
+dev_server:
+  https: false
+  # DOES NOT WORK!
+  host: host: <%= ENV['WEBPACK_HOST'] || "localhost" %>
+  port: 3035
+  ...
+```
+
+However, this particular yaml file is also used on the JavaScript side therefore ERB cannot be used. Fortunately, Webpacker has a solution for this, the `WEBPACKER_DEV_SERVER_HOST` environment variable can be specified when running Webpacker, which will override the `host` value in `config/webpacker.yml`. It should also be specified in the container running the Rails server.
+
+Modify `docker-compose.yml` to add a new `webpacker` service as shown below. Also note the change to the `web` container command to specify the `WEBPACKER_DEV_SERVER_HOST` environment variable.
+
+```yml
+version: "3.3"
+services:
+  # The main service that runs a Rails server
+  web:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    ################ MODIFY COMMAND HERE ####################
+    # This runs when container started as part of docker-compose up.
+    command: bash -c "rm -f tmp/pids/server.pid && WEBPACKER_DEV_SERVER_HOST=webpacker bundle exec rails s -b '0.0.0.0'"
+    depends_on:
+      - "db"
+      - "redis"
+    volumes:
+      # Mount current directory as shared volume for development so that changes
+      # made to local code will reflect on app running on container.
+      - .:/app
+      # Mount a persistent docker volume in place of local node_modules directory
+      # this prevents yarn (or npm) errors in case developer has also been running the app natively.
+      - node_modules:/app/node_modules
+    ports:
+      # Expose port 3000 from container to host so can run http://localhost:3000 in browser on laptop.
+      - "3000:3000"
+    environment:
+      # Used in database.yml to tell Rails where the database is.
+      DB_HOST: db
+      RAILS_ENV: development
+      REDIS_URL: "redis://redis/"
+
+  # Ephemeral container to issue rake db:reset command
+  dbcmd:
+    # Use same image as `web` service to avoid multiple builds
+    image: app
+    # Make sure MySQL is up before attempting db population
+    command: ["/wait-for-it.sh", "db:3306", "--", "./docker-entrypoint-dbcmd.sh"]
+    depends_on:
+      - "db"
+    volumes:
+      - .:/app
+      - node_modules:/app/node_modules
+    environment:
+      DB_HOST: db
+      RAILS_ENV: development
+      # Usage to populate databases with seed data: INIT_DBS=yes docker-compose up
+      INIT_DBS:
+
+  # Run MySQL database
+  db:
+    # Replace with your MySQL version or refer to Postgres image if using.
+    image: mysql:5.7
+    volumes:
+      # Use a named volume so that changes to db state will persist even if container removed.
+      - db_data:/var/lib/mysql
+    ports:
+      # If a MySQL database is also running on laptop, map 3306 in container to a different port on host,
+      # such as 3307. Otherwise can use "3306:3306" here. This is useful for connecting a SQL client from
+      # host machine to container.
+      - "3307:3306"
+    environment:
+      MYSQL_ALLOW_EMPTY_PASSWORD: "yes"
+      # Replace with your app's database name
+      MYSQL_DATABASE: appdb
+      # Enable if required for development
+      # MYSQL_USERNAME: appdbuser
+      # MYSQL_PASSWORD: appdbpassword
+
+  # Run Redis
+  redis:
+    image: redis:3
+    ports:
+      # If you're also running a Redis instance on host, map 6379 in container to a different port on host,
+      # such as 6380. Otherwise can use "6379:6379" here. This is useful for connecting a Redis client from
+      # host machine to container.
+      - "6380:6379"
+
+  ############## ADD NEW SERVICE HERE ##################
+  # Run Webpack
+  webpacker:
+    image: app
+    command: bash -c "WEBPACKER_DEV_SERVER_HOST=webpacker ./bin/webpack-dev-server"
+    volumes:
+      - .:/app
+      - node_modules:/app/node_modules
+    ports:
+      - 3035:3035
+    environment:
+      RAILS_ENV: development
+
+# All named volumes referenced by services must be listed here.
+volumes:
+  db_data:
+  node_modules:
+```
+
+Now start the containers again (`docker-compose up`), give webpacker a minute or so to compile all front end assets, then open a browser and navigate to [http://localhost:3000](http://localhost:3000). This time the home page should load quickly. Also make a change to some front end code on your laptop, save it, then watch the terminal where docker-compose is running. Webpack should pick up the change, recompile, and browser should refresh and the change should be visible.
+
+## 4. Running background job processor
+
+This project uses [Active Job](https://guides.rubyonrails.org/active_job_basics.html) with Delayed Job queuing backend, which uses the `delayed_job` table. As we've seen in previous sections, the job processor is a separate process therefore will run in its own container. However, because it depends on the existence of the `delayed_job` table, this introduces another synchronization issue with the database. The simplest solution would be to use `wait-for-it.sh` again, waiting for the database on port 3306. But this will fail on first time setup when the database is being seeded. Since the seeds take some time to run, its possible the database will be available, but the schema has not yet been applied therefore the `delayed_job` table doesn't exist yet.
+
+A custom wait wrapper can be used to solve this. Start by modifying the `docker-compose.yml` file to add a new `delayedjob` service:
+
+```yml
+version: "3.3"
+services:
+  # The main service that runs a Rails server
+  web:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    # This runs when container started as part of docker-compose up.
+    command: bash -c "rm -f tmp/pids/server.pid && WEBPACKER_DEV_SERVER_HOST=webpacker bundle exec rails s -b '0.0.0.0'"
+    depends_on:
+      - "db"
+      - "redis"
+    volumes:
+      # Mount current directory as shared volume for development so that changes
+      # made to local code will reflect on app running on container.
+      - .:/app
+      # Mount a persistent docker volume in place of local node_modules directory
+      # this prevents yarn (or npm) errors in case developer has also been running the app natively.
+      - node_modules:/app/node_modules
+    ports:
+      # Expose port 3000 from container to host so can run http://localhost:3000 in browser on laptop.
+      - "3000:3000"
+    environment:
+      # Used in database.yml to tell Rails where the database is.
+      DB_HOST: db
+      RAILS_ENV: development
+      REDIS_URL: "redis://redis/"
+
+  # Ephemeral container to issue rake db:reset command
+  dbcmd:
+    # Use same image as `web` service to avoid multiple builds
+    image: app
+    # Make sure MySQL is up before attempting db population
+    command: ["/wait-for-it.sh", "db:3306", "--", "./docker-entrypoint-dbcmd.sh"]
+    depends_on:
+      - "db"
+    volumes:
+      - .:/app
+      - node_modules:/app/node_modules
+    environment:
+      DB_HOST: db
+      RAILS_ENV: development
+      # Usage to populate databases with seed data: INIT_DBS=yes docker-compose up
+      INIT_DBS:
+
+  # Run MySQL database
+  db:
+    # Replace with your MySQL version or refer to Postgres image if using.
+    image: mysql:5.7
+    volumes:
+      # Use a named volume so that changes to db state will persist even if container removed.
+      - db_data:/var/lib/mysql
+    ports:
+      # If a MySQL database is also running on laptop, map 3306 in container to a different port on host,
+      # such as 3307. Otherwise can use "3306:3306" here. This is useful for connecting a SQL client from
+      # host machine to container.
+      - "3307:3306"
+    environment:
+      MYSQL_ALLOW_EMPTY_PASSWORD: "yes"
+      # Replace with your app's database name
+      MYSQL_DATABASE: appdb
+      # Enable if required for development
+      # MYSQL_USERNAME: appdbuser
+      # MYSQL_PASSWORD: appdbpassword
+
+  # Run Redis
+  redis:
+    image: redis:3
+    ports:
+      # If you're also running a Redis instance on host, map 6379 in container to a different port on host,
+      # such as 6380. Otherwise can use "6379:6379" here. This is useful for connecting a Redis client from
+      # host machine to container.
+      - "6380:6379"
+
+  # Run Webpack
+  webpacker:
+    image: app
+    command: bash -c "WEBPACKER_DEV_SERVER_HOST=webpacker ./bin/webpack-dev-server"
+    volumes:
+      - .:/app
+      - node_modules:/app/node_modules
+    ports:
+      - 3035:3035
+    environment:
+      RAILS_ENV: development
+
+  ############## ADD NEW SERVICE HERE ##################
+  delayedjob:
+    image: app
+    # Make sure delayed_jobs table has been created before starting jobs processing
+    command: ["/wait-for-mysql.sh", "db", "./docker-entrypoint-delayedjob.sh"]
+    volumes:
+      - .:/app
+      - node_modules:/app/node_modules
+    depends_on:
+      - "web"
+      - "db"
+      - "dbcmd"
+    environment:
+      DB_HOST: db
+      RAILS_ENV: development
+      RACK_ENV: development
+
+# All named volumes referenced by services must be listed here.
+volumes:
+  db_data:
+  node_modules:
+```
+
+Create a new file in project root named `delayed_job.sql`, this simply queries the `delayed_job` table. When run via a `mysql` client (shown in next paragraph), it will return an error when table does not exist, and `0` (i.e. success) when table is available:
+
+```sql
+select * from delayed_jobs;
+```
+
+Then create a new file in project root named `wait-for-mysql.sh`. Notice the way it gets invoked from the compose file, the first argument will be the host, in this case the `db` service to query. Then it enters a loop, invoking `mysql` client with the `delayed_job.sql` file. The `mysql` client is installed on the image as part of the `Dockerfile`. If the table exists, this will return 0 (i.e. success) and exit the loop. Otherwise, it sleeps for 3 seconds, then tries again. Upon successful exit of the loop, it then runs whatever command the script was called with as its remaining arguments. In our case, `docker-entrypoint-delayedjob.sh`, which will be created in the next step.
+
+```bash
+#!/bin/sh
+# wait-for-mysql.sh
+# https://docs.docker.com/compose/startup-order/
+
+host="$1"
+shift
+cmd="$@"
+
+while true; do
+  mysql -h "$host" -u root appdbpswd < /delayed_job.sql
+  if [ $? -eq 0 ]; then
+      break
+  fi
+  >&2 echo "MySQL delayed_jobs table is UNAVAILABLE - sleeping"
+  sleep 3
+done
+
+>&2 echo "MySQL delayed_jobs table is AVAILABLE - executing command"
+exec $cmd
+```
+
+Add another file `docker-entrypoint-delayedjob.sh` in project root, which simply starts the Active Job processor:
+
+```bash
+#!/bin/sh
+
+set -e
+
+echo "=== RUNNING DELAYED JOBS"
+bundle exec rails jobs:work
+```
+
+Now if the database has not been seeded, and this command is run to bring up the containers, the console will display several `MySQL delayed_jobs table is UNAVAILABLE - sleeping`. Then when the `dbcmd` service has finished seeding the database, shortly after the compose console should display `MySQL delayed_jobs table is AVAILABLE - executing command`, then the Active Job processor should start up.
+
+```bash
+INIT_DBS=yes docker-compose up
+```
+
+## 5. Debugging
+
+At this point, all app services are fully functional. However, we also need the ability to debug (i.e. step through the code one line at a time, inspecting variables). There are two ways to do this depending on the developers preference - either via command line with [binding.pry](https://github.com/pry/pry), or with an IDE such as VS Code.
+
+### Command line debugging

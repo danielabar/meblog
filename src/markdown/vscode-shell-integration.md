@@ -22,7 +22,7 @@ Enter <kbd>Cmd</kbd> + <kbd>Shift</kbd> + <kbd>P</kbd> (or <kbd>Ctrl</kbd> for W
 
 Then, quit VS Code, and open a terminal (if terminal was already open, it may need to be closed and restarted or source your profile for the changes to take effect).
 
-Now in your terminal, you can type in `code .` in any directory and it will open VS Code with that folder opened. You can also type `code /path/to/file` and it will open just that file in VS Code. For example:
+Now in your terminal, you can type in `code .` in any directory and it will open VS Code with that folder open. You can also type `code /path/to/file` and it will open just that file in VS Code. For example:
 
 ```bash
 pwd # /some/folder
