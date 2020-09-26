@@ -77,6 +77,14 @@
   padding-left: 5px;
 }
 
+.content blockquote {
+  border-left: 3px solid var(--brand-triadic-middle);
+  font-size: 0.9em;
+  font-style: italic;
+  font-weight: 200;
+  padding-left: 15px;
+}
+
 .content kbd {
   display: inline-block;
   margin: 0 0.1em;
@@ -134,6 +142,18 @@
 
 .content pre[data-language="js"]::before {
   content: "js";
+}
+
+.content pre[data-language="ruby"]::before {
+  content: "ruby";
+}
+
+.content pre[data-language="yml"]::before {
+  content: "yml";
+}
+
+.content pre[data-language="json"]::before {
+  content: "json";
 }
 
 /* tablet landscape */

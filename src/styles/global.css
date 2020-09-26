@@ -1,4 +1,5 @@
 /* http://scg.ar-ch.org/ */
+/* https://www.sessions.edu/color-calculator/ */
 :root {
   --brand: #81439c;
 
@@ -21,6 +22,8 @@
 
   --brand-complement: #9c8f43;
   --brand-complement-lighten-45: #eeead7;
+
+  --brand-triadic-middle: #5e9c43;
 
   --link-color: #5d93ff;
   --inactive-color: #bbb;
