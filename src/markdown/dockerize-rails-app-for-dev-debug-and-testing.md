@@ -213,7 +213,7 @@ RUN bundle check || bundle install
 RUN yarn install --check-files
 ```
 
-Then modify `docker-compose.yml` to define a new `dbcmd` service. Note that it's based on the same app image as the `web` service, which means that when `docker-compose build` is run, it won't need to run a separate build for this service because it can re-use the same image that's already been built for the `web` service.
+Then modify `docker-compose.yml` to define a new `dbcmd` service. Note that it's based on the same app image as the `web` service, which means that when `docker-compose build` is run, it won't need to run a separate build for this service because it can re-use the same image that's already been built for the `web` service. For this to work, the `web` service definition is modified to name the image `app`:
 
 ```yml
 version: "3.3"
@@ -223,6 +223,9 @@ services:
     build:
       context: .
       dockerfile: Dockerfile
+    ############### ADD THIS LINE HERE #####################
+    # name this image so it can be used by other containers without requiring a build
+    image: app
     # This runs when container started as part of docker-compose up.
     command: bash -c "rm -f tmp/pids/server.pid && bundle exec rails s -b '0.0.0.0'"
     depends_on:
@@ -368,6 +371,8 @@ services:
     build:
       context: .
       dockerfile: Dockerfile
+    # name this image so it can be used by other containers without requiring a build
+    image: app
     ################ MODIFY COMMAND HERE ####################
     # This runs when container started as part of docker-compose up.
     command: bash -c "rm -f tmp/pids/server.pid && WEBPACKER_DEV_SERVER_HOST=webpacker bundle exec rails s -b '0.0.0.0'"
@@ -455,7 +460,7 @@ volumes:
   node_modules:
 ```
 
-Now start the containers again (`docker-compose up`), give webpacker a minute or so to compile all front end assets, then open a browser and navigate to [http://localhost:3000](http://localhost:3000). This time the home page should load quickly. Also make a change to some front end code on your laptop, save it, then watch the terminal where docker-compose is running. Webpack should pick up the change, recompile, and browser should refresh and the change should be visible.
+Now start the containers again (`docker-compose up`), give webpacker a few seconds to compile all front end assets, then open a browser and navigate to [http://localhost:3000](http://localhost:3000). This time the home page should load quickly. Also make a change to some front end code on your laptop, save it, then watch the terminal where docker-compose is running. Webpack should pick up the change, recompile, and browser should refresh and the change should be visible.
 
 ## 4. Running background job processor
 
@@ -471,6 +476,8 @@ services:
     build:
       context: .
       dockerfile: Dockerfile
+    # name this image so it can be used by other containers without requiring a build
+    image: app
     # This runs when container started as part of docker-compose up.
     command: bash -c "rm -f tmp/pids/server.pid && WEBPACKER_DEV_SERVER_HOST=webpacker bundle exec rails s -b '0.0.0.0'"
     depends_on:
@@ -565,7 +572,6 @@ services:
     environment:
       DB_HOST: db
       RAILS_ENV: development
-      RACK_ENV: development
 
 # All named volumes referenced by services must be listed here.
 volumes:
@@ -573,7 +579,7 @@ volumes:
   node_modules:
 ```
 
-Create a new file in project root named `delayed_job.sql`, this simply queries the `delayed_job` table. When run via a `mysql` client (shown in next paragraph), it will return an error when table does not exist, and `0` (i.e. success) when table is available:
+Create a new file in project root named `delayed_job.sql`, this simply queries the `delayed_job` table:
 
 ```sql
 select * from delayed_jobs;
@@ -614,9 +620,55 @@ echo "=== RUNNING DELAYED JOBS"
 bundle exec rails jobs:work
 ```
 
-Now if the database has not been seeded, and this command is run to bring up the containers, the console will display several `MySQL delayed_jobs table is UNAVAILABLE - sleeping`. Then when the `dbcmd` service has finished seeding the database, shortly after the compose console should display `MySQL delayed_jobs table is AVAILABLE - executing command`, then the Active Job processor should start up.
+One final change required to make this all work is to modify the `Dockerfile` to add these additional files and make them executable.
+
+```Dockerfile
+# Replace this with your Ruby version and Linux flavor/version
+FROM ruby:2.6.6-stretch
+
+# Package dependencies
+RUN apt-get update && apt-get install -y curl build-essential gnupg mysql-client
+
+# Replace with newer bundler version if using
+RUN gem install bundler --no-document -v '1.17.3'
+
+# Replace this with your Node version if newer than 10.x, this is for client side tooling.
+# Install Node.js https://www.digitalocean.com/community/tutorials/how-to-install-node-js-on-debian-9
+RUN curl -sL https://deb.nodesource.com/setup_10.x -o nodesource_setup.sh
+RUN bash nodesource_setup.sh
+RUN apt-get install -y nodejs
+
+# Skip this if your project uses npm instead of yarn
+# Install yarn https://linuxize.com/post/how-to-install-yarn-on-debian-9/
+RUN curl -sS https://dl.yarnpkg.com/debian/pubkey.gpg | apt-key add -
+RUN echo "deb https://dl.yarnpkg.com/debian/ stable main" | tee /etc/apt/sources.list.d/yarn.list
+RUN apt update
+RUN apt install -y yarn
+ENV PATH $(yarn global bin):$PATH
+
+# Use wait-for-it.sh to control startup order of containers
+COPY wait-for-it.sh /wait-for-it.sh
+RUN chmod +x /wait-for-it.sh
+############## NEW COMMANDS TO ADD HERE #############################
+COPY wait-for-mysql.sh /wait-for-mysql.sh
+RUN chmod +x /wait-for-mysql.sh
+COPY delayed_job.sql /delayed_job.sql
+####################################################################
+
+# Copy all project source to working directory
+WORKDIR /app
+COPY . /app
+
+# Run server and client side builds. These steps are performed one time as part of the image build,
+# so they don't need to be re-run each time a container is started.
+RUN bundle check || bundle install
+RUN yarn install --check-files
+```
+
+Now if the database has not been seeded, and the containers are started, the console will display several `MySQL delayed_jobs table is UNAVAILABLE - sleeping`. Then when the `dbcmd` service has finished seeding the database, shortly after the compose console should display `MySQL delayed_jobs table is AVAILABLE - executing command`, then the Active Job processor should start up. Remember to run a build first as the `Dockerfile` wss modified:
 
 ```bash
+docker-compose build
 INIT_DBS=yes docker-compose up
 ```
 
@@ -625,3 +677,155 @@ INIT_DBS=yes docker-compose up
 At this point, all app services are fully functional. However, we also need the ability to debug (i.e. step through the code one line at a time, inspecting variables). There are two ways to do this depending on the developers preference - either via command line with [binding.pry](https://github.com/pry/pry), or with an IDE such as VS Code.
 
 ### Command line debugging
+
+First add [pry](https://github.com/pry/pry) and [pry-byebug](https://github.com/deivid-rodriguez/pry-byebug) to the `Gemfile`, then run `docker-compose build` to update the app image with these installed gems.
+
+Given that the `pry` is available, the line `binding.pry` can be inserted anywhere in a running Ruby program, which will suspend execution and open an interactive `pry` session. From there, variable values can be inspected, expressions can be evaluated, basically anything that could be done in pry.
+
+To make this work in a Docker container, add the following two properties to the `web` service definition in `docker-compose.yml`. The code below only shows the web service portion of the file:
+
+```yml
+version: "3.3"
+services:
+  # The main service that runs a Rails server
+  web:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    # name this image so it can be used by other containers without requiring a build
+    image: app
+    # This runs when container started as part of docker-compose up.
+    command: bash -c "rm -f tmp/pids/server.pid && WEBPACKER_DEV_SERVER_HOST=webpacker bundle exec rails s -b '0.0.0.0'"
+    depends_on:
+      - "db"
+      - "redis"
+    volumes:
+      # Mount current directory as shared volume for development so that changes
+      # made to local code will reflect on app running on container.
+      - .:/app
+      # Mount a persistent docker volume in place of local node_modules directory
+      # this prevents yarn (or npm) errors in case developer has also been running the app natively.
+      - node_modules:/app/node_modules
+    ports:
+      # Expose port 3000 from container to host so can run http://localhost:3000 in browser on laptop.
+      - "3000:3000"
+    ################# ADD THESE TWO PROPERTIES ################################
+    # Keep the stdin open to support attaching to app containers process for binding.pry
+    tty: true
+    # Allow for sending signals (CTRL+C, CTRL+P + CTRL+Q) into the container
+    stdin_open: true
+    ###########################################################################
+    environment:
+      # Used in database.yml to tell Rails where the database is.
+      DB_HOST: db
+      RAILS_ENV: development
+      REDIS_URL: "redis://redis/"
+```
+
+Restart the containers with these new properties set, then add `binding.pry` to any section of code to be inspected, for example, the `index` method in home controller:
+
+```ruby
+def index
+  binding.pry
+  ...
+end
+```
+
+Then open a new terminal and `attach` to the running `web` container. You'll need the name of the container to do this, first run `docker ps`, it will be named after the directory compose is running in. For example, if you're in a directory named `myproject`, then the `web` container name will be `myproject_web_1`. To attach to it, run the following:
+
+```bash
+docker attach myproject_web_1
+```
+
+This will display the console output of the `web` container. It may display nothing at the moment because there's no activity. Let's change that. On your laptop, open a browser and navigate to your project's home page (or any page that will exercise the code where `binding.pry` was added earlier). Keep an eye on the terminal where the `attach` command is running. It will now show the console output, AND pause execution at the line where `binding.pry` was added, and open an interactive pry session. Go ahead and inspect variables.
+
+When finished, type `exit` to end `pry`. Do NOT use <kbd>Ctrl</kbd> + <kbd>C</kbd> to end the attach session because that will cause the process (rails server) in the container to end, which causes the container to exit. Instead, use the detach sequence <kbd>Ctrl</kbd> + <kbd>P</kbd> + <kbd>Q</kbd>.
+
+### IDE Debugging
+
+This is a little more complicated than command line debugging because the Rails server needs to be started in a different way, with some additional ports exposed. To start, make sure the [rdebug-ide](https://github.com/ruby-debug/ruby-debug-ide) gem is included in the Gemfile. If it's not, add it, then run `docker-compose build`.
+
+Then add a new file to project root named `docker-compose.debug.yml`:
+
+```yml
+version: "3.3"
+services:
+  web:
+    command: bash -c "rm -f tmp/pids/server.pid && WEBPACKER_DEV_SERVER_HOST=webpacker bundle exec rdebug-ide --debug --host 0.0.0.0 --port 1234 -- bin/rails s -p 3000 -b 0.0.0.0"
+    depends_on:
+      - "db"
+      - "redis"
+      - "webpacker"
+    volumes:
+      - .:/app
+      - node_modules:/app/node_modules
+    ports:
+      # IDE debug
+      - "1234:1234"
+      - "26166:26168"
+      - "26162:26162"
+```
+
+Now run the containers with the debug file specified as an override. What this will do is override the definition of the `web` service in `docker-compose.yml` with the version in `docker-compose.debug.yml`.
+
+```bash
+docker-compose -f docker-compose.debug.yml up
+```
+
+Since the `command` is running `rdebug-ide`, the rails server won't start as it usually does, but rather, it's waiting for an IDE debugger to be attached. to do that, open your project in VS Code, click on the Run button from the sidebar as shown below:
+
+![VS Code run](../images/vscode-run.png "VS Code run")
+
+Then add the following configuration to `launch.json`. If this file hasn't been created, click on `create a launch.json file` link in the `Run` panel.
+
+```json
+{
+  "name": "Attach to Docker",
+  "type": "Ruby",
+  "request": "attach",
+  "remotePort": "1234",
+  "remoteHost": "0.0.0.0",
+  "remoteWorkspaceRoot": "/app",
+  "cwd": "${workspaceRoot}",
+  "showDebuggerOutput": true
+}
+```
+
+After this is added, `Attach to Docker` will show up in the dropdown menu at the top of the Run panel. Click on the green triangle to run it. This will attach to the Rails server via rdebug-ide on port `1234`.
+
+Then add breakpoints in VS Code, navigate to a page in your browser to exercise that code, and VS Code will suspend at that point in the Debugger.
+
+## 6. Run one-off commands such as migrations or tests
+
+To run commands such as migrations or tests, the `docker-compose run` command will be used. This will start up another container based on the service specified (`web`), overriding the `command` in the compose file with a provided command. Use the `--no-deps` option to tell compose not to also start up this service's dependent containers and the `--rm` option to have this temporary container removed after the command is finished.
+
+To run migrations: (if you use a rake task, replace the command in quotes with your command)
+
+```bash
+docker-compose run --no-deps --rm web bash -c "bin/rails db:migrate RAILS_ENV=development"
+docker-compose run --no-deps --rm web bash -c "bin/rails db:migrate RAILS_ENV=test"
+```
+
+A similar technique is used to run tests. Use `-e` option to override the services' `RAILS_ENV: development` environment variable to `test`:
+
+```bash
+docker-compose run -e RAILS_ENV=test --no-deps --rm web bash -c "bundle exec rspec"
+```
+
+More generally, this technique can be used for any command to run against the Rails environment. Anywhere you would have opened a new terminal tab at the project root and run a command, place that command in the quotes:
+
+```bash
+docker-compose run --no-deps --rm web bash -c "your command here"
+```
+
+## 7. Rails Console
+
+Last thing that's needed to complete the development workflow is to have access to an interactive Rails console. Turns out this is simple, use the same technique as in the previous section to run a command against a temporary container from the same image as `web`. Except this time, since the Rails console is interactive, you will be in a shell in the container until exiting <kbd>Ctrl</kbd> + <kbd>D</kbd>, at which point the container will be removed:
+
+```bash
+docker-compose run --no-deps --rm web bash -c "bundle exec rails c"
+```
+
+## Conclusion
+
+Phew, that was a lot of work, but well worth it to have a complete development workflow in Docker. This took me several weeks of work to figure out all the details but hopefully will save you some time if you're looking to Dockerize your Rails setup.

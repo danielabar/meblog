@@ -148,6 +148,14 @@
   content: "ruby";
 }
 
+.content pre[data-language="yml"]::before {
+  content: "yml";
+}
+
+.content pre[data-language="json"]::before {
+  content: "json";
+}
+
 /* tablet landscape */
 @media (max-width: 1280px) {
   .content ul {
