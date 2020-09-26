@@ -22,6 +22,8 @@
     "gatsby-image": "2.2.41",
     "gatsby-plugin-react-helmet": "3.1.22",
     "gatsby-plugin-sharp": "2.4.5",
+    "gatsby-remark-autolink-headers": "2.3.13",
+    "gatsby-remark-classes": "1.0.0",
     "gatsby-remark-images": "3.1.44",
     "gatsby-remark-vscode": "3.0.1",
     "gatsby-source-filesystem": "2.1.48",

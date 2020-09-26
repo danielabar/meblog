@@ -21,7 +21,7 @@
   line-height: 30px;
 }
 
-.content h2 {
+.content h2.subtitle {
   font-size: 1.8rem;
   font-weight: 400;
   letter-spacing: -0.5px;
@@ -39,7 +39,7 @@
   margin-bottom: 20px;
 }
 
-.content a {
+.content a.content-link {
   text-decoration: none;
   background: linear-gradient(
     to bottom,
@@ -55,7 +55,7 @@
   border-radius: 4px;
 }
 
-.content a:hover {
+.content a.content-link:hover {
   text-decoration: none;
   color: var(--post-link-color-brighten);
   background-size: 4px 50px;
