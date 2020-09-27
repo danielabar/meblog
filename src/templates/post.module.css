@@ -156,6 +156,10 @@
   content: "json";
 }
 
+.content pre[data-language="html"]::before {
+  content: "html";
+}
+
 /* tablet landscape */
 @media (max-width: 1280px) {
   .content ul {
