@@ -2,7 +2,7 @@
 title: "Access Chrome Bookmarks with Keyboard"
 featuredImage: "../images/bookmark-chiara-f-MI8He1NWPWg-unsplash.jpg"
 description: "Improve productivity with keyboard access to Chrome bookmarks using Alfred for Mac."
-date: "2019-08-11"
+date: "2020-04-26"
 category: "productivity"
 ---
 

@@ -2,7 +2,7 @@
 title: "Off with the Digital Distractions!"
 featuredImage: "../images/distraction-charlz-gutierrez-de-pineres-2w_U2-Ah57E-unsplash.jpg"
 description: "Improve your productivity and focus by reducing digital distractions in your life"
-date: "2019-09-08"
+date: "2020-05-24"
 category: "productivity"
 ---
 

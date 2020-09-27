@@ -1,7 +1,7 @@
 ---
 title: "Dockerize a Rails Application for Development"
 featuredImage: "../images/docker-rails-shipping-containers.jpg"
-description: "Dockerize a Rails application to support the full development workflow including debugging, testing, and working with databases"
+description: "Learn how to Dockerize a Rails application to support the full development workflow including debugging, testing, and working with databases"
 date: "2020-09-20"
 category: "rails"
 ---

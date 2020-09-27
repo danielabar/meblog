@@ -2,7 +2,7 @@
 title: "Is a Career in Software Development Right for You?"
 featuredImage: "../images/career-software-markus-spiske-Fa0pTKuoDVY-unsplash.jpg"
 description: "Some personality traits that make a good software developer"
-date: "2019-09-22"
+date: "2020-07-26"
 category: "career"
 ---
 
