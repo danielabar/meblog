@@ -2,7 +2,7 @@
 title: "How to Learn New Things"
 featuredImage: "../images/learning-tim-mossholder-WE_Kv_ZB1l0-unsplash.jpg"
 description: "What are all the different ways to learn new things in your programming career"
-date: "2019-09-01"
+date: "2020-01-26"
 category: "career"
 ---
 

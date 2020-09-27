@@ -2,7 +2,7 @@
 title: "Crossword Solver with CentOS"
 featuredImage: "../images/crossword-marjanblan-i9bAvQ57J1k-unsplash.jpg"
 description: "Learn how to use CentOS words package for help solving crossword puzzles"
-date: "2019-08-25"
+date: "2020-03-29"
 category: "just for fun"
 ---
 

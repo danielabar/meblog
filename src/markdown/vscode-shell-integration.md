@@ -2,7 +2,7 @@
 title: "VS Code Shell Integration"
 featuredImage: "../images/vscode-shell-integration-michael-dziedzic-qDG7XKJLKbs-unsplash.jpg"
 description: "Open files and folders faster in VS Code with this simple trick to enable shell integration."
-date: "2019-09-29"
+date: "2020-08-23"
 category: "vscode"
 ---
 

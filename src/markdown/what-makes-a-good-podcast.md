@@ -2,7 +2,7 @@
 title: "What Makes a Good Podcast"
 featuredImage: "../images/podcast-jonathan-velasquez-c1ZN57GfDB0-unsplash.jpg"
 description: "What Makes a Good Podcast"
-date: "2019-09-15"
+date: "2020-06-28"
 category: "podcasts"
 ---
 

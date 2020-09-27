@@ -2,7 +2,7 @@
 title: "How I Setup my Terminal"
 featuredImage: "../images/terminal-cookie-the-pom-gySMaocSdqs-unsplash.jpg"
 description: "How to setup your terminal with oh-my-zsh and agnoster theme"
-date: "2019-08-04"
+date: "2019-12-15"
 category: "terminal"
 ---
 
