@@ -160,6 +160,10 @@
   content: "html";
 }
 
+.content pre[data-language="markdown"]::before {
+  content: "markdown";
+}
+
 /* tablet landscape */
 @media (max-width: 1280px) {
   .content ul {
