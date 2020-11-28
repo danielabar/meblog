@@ -40,7 +40,7 @@ For example:
 
 Let's build a snippet for this so that it only requires typing `img`, then <kbd>Ctrl</kbd> + <kbd>Space</kbd> to bring up the snippet template, which can then be filled in to specify the alt text, local path to image and a title. The final result will work like this:
 
-![user snippet](../images/user-snippet.gif)
+![user snippet](../images/user-snippet2.gif)
 
 ## Create a Snippet
 
