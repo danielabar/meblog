@@ -18,7 +18,7 @@ This is much harder to do because you don't have the actual code to look at, ins
 
 This post will walk you through an example of using TDD that I did recently to add a new feature to [Tidysum](https://github.com/danielabar/tidysum). I will assume that you already know how to write tests generally, but are new to TDD specifically.
 
-First, what is Tidysum? Tidysum is a personal finance app that takes in a list of daily expenses and outputs a summary json file with year and month breakdowns of these expenses by category, sums of total and average spending per month and per year, and makes savings and spending reduction recommendations if provided fixed monthly expenses and monthly income. The feature I added was a percentage difference calculation for total and by-category spending year over year. The idea was to calculate a personalized rate of inflation based on your actual spending, rather than some theoretical basket of goods determined by government bureaucrats.
+First, what is Tidysum? Tidysum is a personal finance app that takes in a list of daily expenses and outputs a summary json file with year and month breakdowns of these expenses by category, showing total and average spending per month and per year, and makes savings and spending reduction recommendations. The feature I added was a percentage difference calculation for total and by-category spending year over year. The idea is to calculate a personalized rate of inflation based on your actual spending, rather than some theoretical basket of goods determined by government bureaucrats.
 
 Aside: I was inspired to add this after learning from several finance podcasts that the official government inflation numbers may not reflect reality as they don't include food and energy. As some government benefits are indexed to inflation, as are many employers annual cost of living increases, it may benefit some to have this number reported as lower than it really is. The inflation number is also used in personal finance for retirement planning and so can be disastrous if incorrect. Of course there's nothing I can do about the big macro, but as a developer, I can improve my software to generate more personalized information to help people make better decisions.
 
@@ -213,12 +213,14 @@ const recommendation = require('./recommendation');
 // other imports...
 
 async function process(inputFile, mothlyIn, fixedExp) {
+  // Read input csv of expenses to generate summary json
   const expenseSummary = await processFile(inputFile);
+  // Enhance the json summary with averages
   const expenseSummaryWithAvg = calculator.calcAvg(expenseSummary);
   if (mothlyIn && fixedExp) {
     recommendation.determine(expenseSummaryWithAvg, mothlyIn, fixedExp);
   }
-  // TODO: Calculate percentage diff year over year
+  // TODO: Further enhance json summary - Calculate percentage diff year over year
   return expenseSummaryWithAvg;
 }
 
@@ -260,7 +262,7 @@ Here is the existing calculator module:
 const decimalUtil = require('./decimal-util');
 
 function calcAvg(expenseSummary) {
-  // ...
+  // existing logic...
 }
 
 module.exports = {
@@ -457,9 +459,230 @@ Now running the test results in a different failure, the returned object is not 
 
 Well we've made some progress as the gifts and total percentage calculations are correct. But notice the color coding for expected (green) vs actual (red) results. If the result of the calculation is a decimal, we only want to see two decimals of precision. Currently there's no rounding or truncation so results are not as expected.
 
+Let's fix the code to make the test pass. To get the desired decimal precision, will use `Math.round(num * 100) / 100` where `num` is the percentage difference calculation:
+
+```js
+// lib/calculator.js
+
+function calcYearlyDiff(expenseSummary) {
+  Object.entries(expenseSummary).forEach(([year, yearSummary]) => {
+    const intYear = parseInt(year, 10);
+    const prevYear = intYear - 1;
+    if (!expenseSummary[prevYear]) {
+      yearSummary.percentageDiffPreviousYear = 'N/A';
+    } else {
+      const totalDiff = ((yearSummary.total - expenseSummary[prevYear].total) / expenseSummary[prevYear].total) * 100;
+      const totalDiffRounded = Math.round(totalDiff * 100) / 100;
+      yearSummary.percentageDiffPreviousYear.total = totalDiffRounded + '';
+      Object.entries(yearSummary.average.byCategory).forEach(([curCategory, curAvg]) => {
+        const prevAvg = expenseSummary[prevYear].average.byCategory[curCategory];
+        const categoryDiff = ((curAvg - prevAvg) / prevAvg) * 100;
+        const categoryDiffRounded = Math.round(categoryDiff * 100) / 100;
+        yearSummary.percentageDiffPreviousYear[curCategory] = categoryDiffRounded + '';
+      }); // for each category average within year
+    }
+  }); // for each year
+  return expenseSummary;
+}
+```
+
+And now the test passes - yay!
+
+At this point, you may have noticed two things: 1) The percentage difference calculation is repeated in two places - once for the total difference, and again in the loop for each category. And 2) this code is getting messy, especially once the rounding logic is added. At this point, it might be tempting to refactor, but let's hold off for now until all the tests are in place. The goal here is to get all the functionality working, then we can refactor to make improvements.
+
+One more feature this code needs to support is detection of new categories. For example, suppose you purchased some vitamins in 2020, but didn't purchase any in 2019. In this case we can't calculate the percentage difference in vitamin spending because there's nothing to compare it to.  In this case, the code should simply display `new category`. Let's define this behavior in a new test. Again, this is TDD, we write the test before implementing the requirement:
+
+```js
+// test/lib/calculator.test.js
+
+const calculator = require('../../lib/calculator');
+const { expect } = require('chai');
+
+describe('calculator', () => {
+  describe('calcAvg', () => {
+    // existing tests for calcAvg function...
+  });
+
+  describe('calcYearlyDiff', () => {
+    it('calculates percentage difference in total and categories compared to previous year', () => {
+      // test we just wrote...
+    });
+
+    // Our new test here:
+    it('detects a new category in the current year', () => {
+      // Given
+      const summary = {
+        '2019': {
+          total: '20000',
+          average: {
+            byCategory: {
+              groceries: '900',
+            },
+          },
+        },
+        '2020': {
+          total: '25000',
+          average: {
+            byCategory: {
+              groceries: '1000',
+              vitamins: '90',
+            },
+          },
+        },
+      };
+      const expectedSummaryWithDiff = {
+        '2019': {
+          total: '20000',
+          average: {
+            byCategory: {
+              groceries: '900',
+            },
+          },
+          percentageDiffPreviousYear: 'N/A',
+        },
+        '2020': {
+          total: '25000',
+          average: {
+            byCategory: {
+              groceries: '1000',
+              vitamins: '90',
+            },
+          },
+          percentageDiffPreviousYear: {
+            total: '25',
+            groceries: '11.11',
+            vitamins: 'new category',
+          },
+        },
+      };
+      // When
+      calculator.calcYearlyDiff(summary);
+      // Then
+      expect(summary).to.eql(expectedSummaryWithDiff);
+    });
+  });
+});
+```
+
+Now when we run the calculation tests, the first test that we wrote earlier passes, but the newly added test fails:
+
+![tdd fail 2](../images/tdd-fail-2.png "tdd fail 2")
+
+Again this makes sense because vitamin spending for 2019 doesn't exist therefore the line to retrieve the previous years category average will return `undefined`. Then trying to use `undefined` in a calculation results in `NaN`:
+
+```js
+// When `curCategory` is 'vitamins', `prevAvg` will be undefined
+const prevAvg = expenseSummary[prevYear].average.byCategory[curCategory];
+const categoryDiff = ((curAvg - prevAvg) / prevAvg) * 100;    // NaN
+const categoryDiffRounded = Math.round(categoryDiff * 100) / 100;   // NaN
+```
+
+Now that the test is in place, we can enhance the code to handle this case. The solution is to first check if the previous years average exists. If it doesn't, then output `new category`, otherwise, go ahead and run the percentage difference calculation:
+
+```js
+// lib/calculator.js
+
+function calcYearlyDiff(expenseSummary) {
+  Object.entries(expenseSummary).forEach(([year, yearSummary]) => {
+    const intYear = parseInt(year, 10);
+    const prevYear = intYear - 1;
+    if (!expenseSummary[prevYear]) {
+      yearSummary.percentageDiffPreviousYear = 'N/A';
+    } else {
+      const totalDiff = ((yearSummary.total - expenseSummary[prevYear].total) / expenseSummary[prevYear].total) * 100;
+      const totalDiffRounded = Math.round(totalDiff * 100) / 100;
+      yearSummary.percentageDiffPreviousYear.total = totalDiffRounded + '';
+      Object.entries(yearSummary.average.byCategory).forEach(([curCategory, curAvg]) => {
+        const prevAvg = expenseSummary[prevYear].average.byCategory[curCategory];
+        if (!prevAvg) {
+          yearSummary.percentageDiffPreviousYear[curCategory] = 'new category';
+        } else {
+          const categoryDiff = ((curAvg - prevAvg) / prevAvg) * 100;
+          const categoryDiffRounded = Math.round(categoryDiff * 100) / 100;
+          yearSummary.percentageDiffPreviousYear[curCategory] = categoryDiffRounded + '';
+        }
+      }); // for each category average within year
+    }
+  }); // for each year
+  return expenseSummary;
+}
+```
+
+This time both tests should pass.
+
+But we're not done yet. Remember earlier I pointed out several issues with this code - the same percentage difference calculation is written twice, and overall code is getting messy. This code is both iterating the expense summary and doing some mathematical calculations. Now that we've got all the percentage difference feature covered by tests, we can tackle a refactor to fix these issues.
+
+This project actually has another module `lib/decimal-util.js` to perform all numeric calculations. This module uses the [decimal.js](https://github.com/MikeMcl/decimal.js/) library. I was looking for something similar to [BigDecimal](https://docs.oracle.com/en/java/javase/15/docs/api/java.base/java/math/BigDecimal.html) in Java to avoid some Javascript known issues with decimal calculations. The decimal-util module would be a perfect place for the percentage difference calculation to live. Then the calculator module could simply make use of it wherever needed. Here's what I'm picturing:
+
+```js
+// lib/calculator.js
+
+// This module is already imported because its used in other functions in the calculator module
+const decimalUtil = require('./decimal-util');
+// other imports and functions...
+
+function calcYearlyDiff(expenseSummary) {
+  Object.entries(expenseSummary).forEach(([year, yearSummary]) => {
+    const intYear = parseInt(year, 10);
+    const prevYear = intYear - 1;
+    if (!expenseSummary[prevYear]) {
+      yearSummary.percentageDiffPreviousYear = 'N/A';
+    } else {
+      yearSummary.percentageDiffPreviousYear = {};
+      // NEW: Use decimal-util module for percentage diff calculation
+      yearSummary.percentageDiffPreviousYear.total = decimalUtil.percentDiff(expenseSummary[prevYear].total, yearSummary.total);
+      Object.entries(yearSummary.average.byCategory).forEach(([curCategory, curAvg]) => {
+        const prevAvg = expenseSummary[prevYear].average.byCategory[curCategory];
+        if (!prevAvg) {
+          yearSummary.percentageDiffPreviousYear[curCategory] = 'new category';
+        } else {
+          // NEW: Use decimal-util module for percentage diff calculation
+          yearSummary.percentageDiffPreviousYear[curCategory] = decimalUtil.percentDiff(prevAvg, curAvg);
+        }
+      }); // for each category average within year
+    }
+  }); // for each year
+  return expenseSummary;
+}
+```
+
+Now running the tests will fail:
+
+![tdd fail 3](../images/tdd-fail-3.png "tdd fail 3")
+
+The reason both tests are failing now is because it's trying to invoke a function `decimalUtil.percentDiff(...)` that doesn't exist. The solution to this is to add the `percentDiff` function to the `decimal-util` module, write the implementation and export it. But wait, we're doing this TDD style. So before writing any implementation, let's write a test, this time for the decimal util module.
+
+Here's the existing decimal util module:
+
+```js
+// lib/decimal-util.js
+const Decimal = require('decimal.js');
+
+function divideAndRound(numeratorIn, denominatorIn) {
+  const numerator = new Decimal(numeratorIn);
+  const denominator = new Decimal(denominatorIn);
+  return numerator
+    .dividedBy(denominator)
+    .toFixed(2)
+    .toString();
+}
+
+function sum(in1, in2) {
+  const in1Dec = new Decimal(in1);
+  const in2Dec = new Decimal(in2);
+  return in1Dec.plus(in2Dec).toString();
+}
+
+// more functions...
+
+module.exports = {
+  divideAndRound,
+  sum,
+  // other functions...
+};
+```
+
 TODO:
-* Use solution from https://stackoverflow.com/questions/11832914/round-to-at-most-2-decimal-places-only-if-necessary to round/truncate.
-* Add test for "new category" situation -> fails, add impl, run test -> passes
 * Then point out code is getting messy and percent diff calc is duplicated so introduce decimal util -> TDD that.
 * Come back to calculator replace calc with decimal util -> tests should still pass as no change in behaviour -> i.e. having the tests allow you to refactor with confidence.
 
