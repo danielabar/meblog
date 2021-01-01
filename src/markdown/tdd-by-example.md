@@ -6,19 +6,17 @@ date: "2021-01-03"
 category: "javascript"
 ---
 
-If you've been coding for any length of time, you've probably heard that you should test your code, and by that I mean writing automated tests. This can be challenging at first, but with some practice, it becomes easier.
-
-When first learning to write tests, it's easier to have already written the production code, then open up another editor tab side by side with that code, and write some tests against that code. However, there's another approach to writing tests called [Test Driven Development](https://en.wikipedia.org/wiki/Test-driven_development), aka TDD. According to Wikipedia, TDD is:
+If you've been coding for any length of time, you've probably heard that you should test your code, and by that I mean writing automated tests. This can be challenging at first, but with some practice, it becomes easier. When first learning to write tests, it's easier to have already written the production code, then open up another editor tab side by side with that code, and write some tests against that code. However, there's another approach to writing tests called [Test Driven Development](https://en.wikipedia.org/wiki/Test-driven_development), aka TDD. According to Wikipedia, TDD is:
 
 > A software development process relying on software requirements being converted to test cases before software is fully developed, and tracking all software development by repeatedly testing the software against all test cases. This is opposed to software being developed first and test cases created later.
 
-In practice what this means is, suppose you want to add a new feature to some software. You would first write a test for that feature and run the test. The test would of course fail since the new feature hasn't been written yet. Then you write just enough code to get that test to pass. When it passes, then you add another test for this feature, run it to see that it fails, write more code to get this to pass, and continue until the feature is complete. Typically the first test you write would be for the "happy path", then next test would be for an edge case such as invalid input and so on.
+In practice what this means is, suppose you want to add a new feature to some software. You would first write a test for that feature and run the test. The test would fail since the new feature hasn't been written yet. Then you write just enough code to get that test to pass. When it passes, then you add another test for this feature, run it to see that it fails, write more code to get this to pass, and continue until the feature is complete. Typically the first test you write would be for the "happy path", then next test would be for an edge case such as invalid input and so on.
 
 This is much harder to do because you don't have the actual code to look at, instead you have to picture what the result of the code should be and write a test to expect that result. In fact, this is the benefit of TDD. You end up with tests that verify the results of the code, rather than implementation details. But the first time you try this, it can be difficult to know where to start.
 
 This post will walk you through an example of using TDD that I did recently to add a new feature to [Tidysum](https://github.com/danielabar/tidysum). I will assume that you already know how to write tests generally, but are new to TDD specifically.
 
-First, what is Tidysum? Tidysum is a personal finance app that takes in a list of daily expenses and outputs a summary json file with year and month breakdowns of these expenses by category, showing total and average spending per month and per year, and makes savings and spending reduction recommendations. The feature I added was a percentage difference calculation for total and by-category spending year over year. The idea is to calculate a personalized rate of inflation based on your actual spending, rather than some theoretical basket of goods determined by government bureaucrats.
+First, what is Tidysum? Tidysum is a personal finance app that takes in a list of daily expenses and outputs a summary json file with year and month breakdowns of these expenses by category, showing total and average spending per month and per year, and makes savings and spending reduction recommendations. It's written as an npm module and runs as a CLI. The feature I added was a percentage difference calculation for total and by-category spending year over year. The idea is to calculate a personalized rate of inflation based on your actual spending, rather than some theoretical basket of goods determined by government bureaucrats.
 
 Aside: I was inspired to add this after learning from several finance podcasts that the official government inflation numbers may not reflect reality as they don't include food and energy. As some government benefits are indexed to inflation, as are many employers annual cost of living increases, it may benefit some to have this number reported as lower than it really is. The inflation number is also used in personal finance for retirement planning and so can be disastrous if incorrect. Of course there's nothing I can do about the big macro, but as a developer, I can improve my software to generate more personalized information to help people make better decisions.
 
@@ -251,9 +249,7 @@ async function process(inputFile, mothlyIn, fixedExp) {
 }
 ```
 
-Now instead of jumping in to add a new method `calcYearlyDiff` to the calculator module and implement it, this is where the TDD approach will come in. Let's first add a test to specify what should be the expected output of this method.
-
-This project uses the [Mocha](https://mochajs.org/) test framework and [Chai](https://www.chaijs.com/api/assert/) for assertions, but TDD principles can be used with any testing library.
+Now instead of jumping in to add a new method `calcYearlyDiff` to the calculator module and implement it, this is where the TDD approach will come in. Let's first add a test to specify what should be the expected output of this method. This project uses the [Mocha](https://mochajs.org/) test framework and [Chai](https://www.chaijs.com/api/assert/) for assertions, but TDD principles can be used with any testing library.
 
 Here is the existing calculator module:
 
@@ -426,9 +422,7 @@ Again, this is expected because the function has no implementation, it implicitl
 
 Ok, NOW we're ready to write some implementation in the calculator module. This solution iterates over each year in the `expenseSummary` using `Object.entries(obj)` which returns an array of key/value pairs of the given object, and then `forEach` to loop over these.
 
-For each year, find the previous year in the object, if it's not found, set the current year's `percentageDiffPreviousYear` to `N/A` because there's nothing to compare to.
-
-Otherwise calculate percentage difference between the current year's total spending to previous years total spending and save this in the `percentageDiffPreviousYear.total` property of the current year. And then iterate over each average by category spending for current year, calculate its percentage difference relative to previous year, and save it in the `percentageDiffPreviousYear[curCategory]` property of the current year.
+For each year, find the previous year in the object, if it's not found, set the current year's `percentageDiffPreviousYear` to `N/A` because there's nothing to compare to. Otherwise calculate percentage difference between the current year's total spending to previous years total spending and save this in the `percentageDiffPreviousYear.total` property of the current year. And then iterate over each average by category spending for current year, calculate its percentage difference relative to previous year, and save it in the `percentageDiffPreviousYear[curCategory]` property of the current year.
 
 ```js
 // lib/calculator.js
@@ -682,9 +676,174 @@ module.exports = {
 };
 ```
 
-TODO:
-* Then point out code is getting messy and percent diff calc is duplicated so introduce decimal util -> TDD that.
-* Come back to calculator replace calc with decimal util -> tests should still pass as no change in behaviour -> i.e. having the tests allow you to refactor with confidence.
+And the existing decimal util tests:
 
+```js
+// test/lib/decimal-utils.test.js
+const decimalUtil = require('../../lib/decimal-util');
+const { expect } = require('chai');
 
-Somewhere at end: Eagle eyed readers may have observed that the `calcYearlyDiff` function modifies its input. Normally I wouldn't do this, especially in a large application where there could be many callers of this function and modifying the input would be unexpected. But for a small side project where the input is actually running through a series of transformations and isn't used anywhere else, I decided this was fine. A future refactor could first make a deep copy of the input, and then operate only on the copy. Since the test makes assertions on the returned result, it would still be expected to pass.
+describe('decimalUtil', () => {
+  describe('divideAndRound', () => {
+    // tests for divideAndRound function...
+  });
+  // tests for other functions...
+});
+```
+
+Looking at the refactored calculator module, we need a method in decimal util `percentDiff` that takes two numbers - a previous and current, and returns the percentage difference between them. If the current value is greater than previous, we expect a percentage increase. If current value is less than previous, we expect a percentage decrease. If they are the same, then percentage difference should be 0. Finally, if the result is not an integer, it should round to two decimal places. That's 4 different requirements, let's define all of these as tests:
+
+```js
+// test/lib/decimal-utils.test.js
+const decimalUtil = require('../../lib/decimal-util');
+const { expect } = require('chai');
+
+describe('decimalUtil', () => {
+  describe('divideAndRound', () => {
+    // tests for divideAndRound function...
+  });
+
+  // NEW: Tests for percentDiff function
+  describe('percentDiff', () => {
+    it('Returns percentage increase when current is greater than previous', () => {
+      // Given
+      const prev = '80';
+      const cur = '100';
+      // When
+      const result = decimalUtil.percentDiff(prev, cur);
+      // Then
+      expect(result).to.equal('25');
+    });
+
+    it('Returns percentage decrease when current is less than previous', () => {
+      // Given
+      const prev = '100';
+      const cur = '80';
+      // When
+      const result = decimalUtil.percentDiff(prev, cur);
+      // Then
+      expect(result).to.equal('-20');
+    });
+
+    it('Returns 0 when current is the same as previous', () => {
+      // Given
+      const prev = '80';
+      const cur = '80';
+      // When
+      const result = decimalUtil.percentDiff(prev, cur);
+      // Then
+      expect(result).to.equal('0');
+    });
+
+    it('Rounds to 2 decimal places', () => {
+      // Given
+      const prev = '900';
+      const cur = '1000';
+      // When
+      const result = decimalUtil.percentDiff(prev, cur);
+      // Then
+      expect(result).to.equal('11.11');
+    });
+  });
+});
+```
+
+Running the decimal util tests now will result in all of them failing because we haven't yet defined the function:
+
+![tdd fail 4](../images/tdd-fail-4.png "tdd fail 4")
+
+Same drill as last time, first step to fix this is to define the function in the decimal util module and export it so it's visible:
+
+```js
+// lib/decimal-util.js
+const Decimal = require('decimal.js');
+
+// other functions
+
+function percentDiff(prev, cur) {
+  // Implementation TBD...
+}
+
+module.exports = {
+  // other functions...
+  percentDiff,
+};
+```
+
+Results of running the tests again at this point should surprise no one - they all fail comparing `undefined` to the expected calculation. Just like when we started the TDD process in the calculator module, an empty function implicitly returns undefined:
+
+![tdd fail 5](../images/tdd-fail-5.png "tdd fail 5")
+
+Now we can solve this by filling in the implementation for the `percentDiff` function:
+
+```js
+// lib/decimal-util.js
+const Decimal = require('decimal.js');
+
+// other functions
+
+function percentDiff(prev, cur) {
+  const prevDec = new Decimal(prev);
+  const curDec = new Decimal(cur);
+  const diff = curDec.minus(prevDec);
+  return diff
+    .dividedBy(prevDec)
+    .mul(100)
+    .toDecimalPlaces(2, Decimal.ROUND_HALF_UP)
+    .toString();
+}
+
+module.exports = {
+  // other functions...
+  percentDiff,
+};
+```
+
+And now all the decimal util tests pass:
+
+![tdd-pass](../images/tdd-pass.png "tdd-pass")
+
+Now let's turn our attention back to the calculator module, recall we had changed it to use the decimal util module to clean up the percentage difference calculation.
+
+```js
+// lib/calculator.js
+
+// This module is already imported because its used in other functions in the calculator module
+const decimalUtil = require('./decimal-util');
+// other imports and functions...
+
+function calcYearlyDiff(expenseSummary) {
+  Object.entries(expenseSummary).forEach(([year, yearSummary]) => {
+    const intYear = parseInt(year, 10);
+    const prevYear = intYear - 1;
+    if (!expenseSummary[prevYear]) {
+      yearSummary.percentageDiffPreviousYear = 'N/A';
+    } else {
+      yearSummary.percentageDiffPreviousYear = {};
+      // NEW: Use decimal-util module for percentage diff calculation
+      yearSummary.percentageDiffPreviousYear.total = decimalUtil.percentDiff(expenseSummary[prevYear].total, yearSummary.total);
+      Object.entries(yearSummary.average.byCategory).forEach(([curCategory, curAvg]) => {
+        const prevAvg = expenseSummary[prevYear].average.byCategory[curCategory];
+        if (!prevAvg) {
+          yearSummary.percentageDiffPreviousYear[curCategory] = 'new category';
+        } else {
+          // NEW: Use decimal-util module for percentage diff calculation
+          yearSummary.percentageDiffPreviousYear[curCategory] = decimalUtil.percentDiff(prevAvg, curAvg);
+        }
+      }); // for each category average within year
+    }
+  }); // for each year
+  return expenseSummary;
+}
+```
+
+At this point the calculator tests should pass since we've finished implementing the decimal util `percentDiff` function:
+
+![tdd pass 2](../images/tdd-pass-2.png "tdd pass 2")
+
+A quick note about the calculator module - since it's now delegating some of the functionality to the decimal-util module, the calculator tests are now functioning more like integration tests than unit tests because they're not isolated to just the one module. If this bothers you, you can introduce a mock to mock out the behavior of the decimal util module. I'm not a huge fan of this approach as it results in testing the implementation details rather than the actual output of the function. This is not strictly related to TDD so won't go into any more detail here, other than to say, I'm fine with having some of the tests more like integration tests. If in the future a bug gets introduced into decimal util that affects the calculator result, the calculator tests will fail which would be a good warning.
+
+One more quick note about the calculator - eagle eyed readers may have observed that the `calcYearlyDiff` function modifies its input. Normally I wouldn't do this, especially in a large application where there could be many callers of this function and modifying the input would be unexpected. But for a small side project where the input is actually running through a series of transformations and isn't used anywhere else, I decided this was fine. A future refactor could first make a deep copy of the input, and then operate only on the copy. Since the test makes assertions on the returned result, it would still be expected to pass.
+## Conclusion
+
+The TDD approach lends itself really well to cases where the exact requirements are known. I've found this to especially be the case with calculations, validations and transformation type code. I hope this post has given you some ideas about how to get started with TDD. Next time you're adding a new feature to a project, think first if you know exactly how the new feature should behave and try to write a test for it first.
