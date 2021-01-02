@@ -1,8 +1,8 @@
 ---
 title: "TDD by Example"
-featuredImage: "../images/snippet-riyaz-hyder-czc72SCP5C4-unsplash.jpg"
+featuredImage: "../images/tdd-by-example.png"
 description: "A practical example of using TDD to add a new feature to an existing project."
-date: "2021-01-03"
+date: "2021-01-02"
 category: "javascript"
 ---
 
@@ -16,9 +16,9 @@ This is much harder to do because you don't have the actual code to look at, ins
 
 This post will walk you through an example of using TDD that I did recently to add a new feature to [Tidysum](https://github.com/danielabar/tidysum). I will assume that you already know how to write tests generally, but are new to TDD specifically.
 
-First, what is Tidysum? Tidysum is a personal finance app that takes in a list of daily expenses and outputs a summary json file with year and month breakdowns of these expenses by category, showing total and average spending per month and per year, and makes savings and spending reduction recommendations. It's written as an npm module and runs as a CLI. The feature I added was a percentage difference calculation for total and by-category spending year over year. The idea is to calculate a personalized rate of inflation based on your actual spending, rather than some theoretical basket of goods determined by government bureaucrats.
+First, what is Tidysum? Tidysum is a personal finance app that takes in a list of daily expenses and outputs a summary json file with year and month breakdowns of these expenses by category, showing total and average spending per month and per year, and makes savings and spending recommendations. It's written as an npm module and runs as a CLI. The feature I added was a percentage difference calculation for total and by-category spending year over year. The idea is to calculate a personalized rate of inflation based on your actual spending, rather than some theoretical basket of goods determined by government bureaucrats.
 
-Aside: I was inspired to add this after learning from several finance podcasts that the official government inflation numbers may not reflect reality as they don't include food and energy. As some government benefits are indexed to inflation, as are many employers annual cost of living increases, it may benefit some to have this number reported as lower than it really is. The inflation number is also used in personal finance for retirement planning and so can be disastrous if incorrect. Of course there's nothing I can do about the big macro, but as a developer, I can improve my software to generate more personalized information to help people make better decisions.
+Aside: I was inspired to add this after learning from several finance podcasts that the official government inflation numbers may not reflect reality as they don't include food and energy. As some government benefits are indexed to inflation, as are many employers' annual cost of living increases, it may benefit some to have this number reported as lower than it really is. The inflation number is also used in personal finance for retirement planning and so can be disastrous if incorrect. Of course there's nothing I can do about the big macro, but as a developer, I can improve my software to generate more personalized information to help inform better decision making.
 
 Ok back to TDD. Tidysum reads in a csv file of expenses like this (abbreviated, but imagine this goes on for several years):
 
@@ -114,7 +114,7 @@ Each year also has an `average` section, where it shows on average how much was 
 }
 ```
 
-What I wanted to add was another per year entry to show the percentage difference in total and per category spending as compared to the previous year, something like this:
+What I wanted to add was another per year entry to show the percentage difference in total and per category spending as compared to the previous year, like this:
 
 ```json
 {
@@ -248,6 +248,8 @@ async function process(inputFile, mothlyIn, fixedExp) {
   return withYearlyDiff;
 }
 ```
+
+## Calculator Tests
 
 Now instead of jumping in to add a new method `calcYearlyDiff` to the calculator module and implement it, this is where the TDD approach will come in. Let's first add a test to specify what should be the expected output of this method. This project uses the [Mocha](https://mochajs.org/) test framework and [Chai](https://www.chaijs.com/api/assert/) for assertions, but TDD principles can be used with any testing library.
 
@@ -420,6 +422,8 @@ AssertionError: expected undefined to deeply equal { Object (2019, 2020) }
 
 Again, this is expected because the function has no implementation, it implicitly returns `undefined`, which does not match the `expectedSummaryWithDiff` the test expects.
 
+## Calculator Implementation
+
 Ok, NOW we're ready to write some implementation in the calculator module. This solution iterates over each year in the `expenseSummary` using `Object.entries(obj)` which returns an array of key/value pairs of the given object, and then `forEach` to loop over these.
 
 For each year, find the previous year in the object, if it's not found, set the current year's `percentageDiffPreviousYear` to `N/A` because there's nothing to compare to. Otherwise calculate percentage difference between the current year's total spending to previous years total spending and save this in the `percentageDiffPreviousYear.total` property of the current year. And then iterate over each average by category spending for current year, calculate its percentage difference relative to previous year, and save it in the `percentageDiffPreviousYear[curCategory]` property of the current year.
@@ -483,6 +487,8 @@ function calcYearlyDiff(expenseSummary) {
 And now the test passes - yay!
 
 At this point, you may have noticed two things: 1) The percentage difference calculation is repeated in two places - once for the total difference, and again in the loop for each category. And 2) this code is getting messy, especially once the rounding logic is added. At this point, it might be tempting to refactor, but let's hold off for now until all the tests are in place. The goal here is to get all the functionality working, then we can refactor to make improvements.
+
+## Detect New Categories
 
 One more feature this code needs to support is detection of new categories. For example, suppose you purchased some vitamins in 2020, but didn't purchase any in 2019. In this case we can't calculate the percentage difference in vitamin spending because there's nothing to compare it to.  In this case, the code should simply display `new category`. Let's define this behavior in a new test. Again, this is TDD, we write the test before implementing the requirement:
 
@@ -605,6 +611,8 @@ function calcYearlyDiff(expenseSummary) {
 This time both tests should pass.
 
 But we're not done yet. Remember earlier I pointed out several issues with this code - the same percentage difference calculation is written twice, and overall code is getting messy. This code is both iterating the expense summary and doing some mathematical calculations. Now that we've got all the percentage difference feature covered by tests, we can tackle a refactor to fix these issues.
+
+## Refactoring Calculation
 
 This project actually has another module `lib/decimal-util.js` to perform all numeric calculations. This module uses the [decimal.js](https://github.com/MikeMcl/decimal.js/) library. I was looking for something similar to [BigDecimal](https://docs.oracle.com/en/java/javase/15/docs/api/java.base/java/math/BigDecimal.html) in Java to avoid some Javascript known issues with decimal calculations. The decimal-util module would be a perfect place for the percentage difference calculation to live. Then the calculator module could simply make use of it wherever needed. Here's what I'm picturing:
 
@@ -841,9 +849,9 @@ At this point the calculator tests should pass since we've finished implementing
 
 ![tdd pass 2](../images/tdd-pass-2.png "tdd pass 2")
 
-A quick note about the calculator module - since it's now delegating some of the functionality to the decimal-util module, the calculator tests are now functioning more like integration tests than unit tests because they're not isolated to just the one module. If this bothers you, you can introduce a mock to mock out the behavior of the decimal util module. I'm not a huge fan of this approach as it results in testing the implementation details rather than the actual output of the function. This is not strictly related to TDD so won't go into any more detail here, other than to say, I'm fine with having some of the tests more like integration tests. If in the future a bug gets introduced into decimal util that affects the calculator result, the calculator tests will fail which would be a good warning.
+A quick note about the calculator module - since it's now delegating some of the functionality to the decimal-util module, the calculator tests function more like integration tests than unit tests because they're not isolated to just the one module. If this bothers you, you can introduce a mock to mock out the behavior of the decimal util module. I'm not a huge fan of this approach as it results in testing the implementation details rather than the actual output of the function. This is not strictly related to TDD so won't go into any more detail here, other than to say, I'm fine with having some of the tests more like integration tests. If in the future a bug gets introduced into decimal util that affects the calculator result, the calculator tests will fail which would be a good warning.
 
 One more quick note about the calculator - eagle eyed readers may have observed that the `calcYearlyDiff` function modifies its input. Normally I wouldn't do this, especially in a large application where there could be many callers of this function and modifying the input would be unexpected. But for a small side project where the input is actually running through a series of transformations and isn't used anywhere else, I decided this was fine. A future refactor could first make a deep copy of the input, and then operate only on the copy. Since the test makes assertions on the returned result, it would still be expected to pass.
 ## Conclusion
 
-The TDD approach lends itself really well to cases where the exact requirements are known. I've found this to especially be the case with calculations, validations and transformation type code. I hope this post has given you some ideas about how to get started with TDD. Next time you're adding a new feature to a project, think first if you know exactly how the new feature should behave and try to write a test for it first.
+I hope this post has given you some ideas about how to get started with TDD. The TDD approach lends itself really well to cases where the exact requirements are known. I've found this to especially be the case with calculations, validations and transformation type code. Next time you're adding a new feature to a project, if you know exactly how the new feature should behave, try to write a test for it first.
