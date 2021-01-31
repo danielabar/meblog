@@ -164,6 +164,10 @@
   content: "markdown";
 }
 
+.content pre[data-language="sql"]::before {
+  content: "sql";
+}
+
 /* tablet landscape */
 @media (max-width: 1280px) {
   .content ul {
