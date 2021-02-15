@@ -2,7 +2,7 @@
 title: "Debug Github Actions"
 featuredImage: "../images/computer-bug.jpg"
 description: "How to use tmate to debug a github action for running CI with Rails and Postgres"
-date: "2021-01-31"
+date: "2021-02-15"
 category: "rails"
 ---
 
