@@ -168,6 +168,10 @@
   content: "sql";
 }
 
+.content pre[data-language="python"]::before {
+  content: "python";
+}
+
 /* tablet landscape */
 @media (max-width: 1280px) {
   .content ul {
