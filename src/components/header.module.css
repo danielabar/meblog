@@ -7,6 +7,7 @@
 .logo {
   align-items: center;
   display: flex;
+  margin-left: -5px;
 }
 
 .profile-wrapper {
