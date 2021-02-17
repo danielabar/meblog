@@ -5,7 +5,9 @@
 
 .header-item {
   color: var(--brand);
-  font-size: 22px;
+  font-size: 17px;
+  letter-spacing: 1.5px;
+  text-transform: uppercase;
 }
 
 .nav-item {

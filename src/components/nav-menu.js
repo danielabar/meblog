@@ -7,11 +7,6 @@ const NavMenu = () => {
     <nav className={styles.nav}>
       <ul className={styles.navList}>
         <li className={`${styles.headerItem} ${styles.navItem}`}>
-          <Link to="/" activeClassName={styles.active}>
-            Home
-          </Link>
-        </li>
-        <li className={`${styles.headerItem} ${styles.navItem}`}>
           <Link to="/blog" activeClassName={styles.active}>
             Blog
           </Link>
