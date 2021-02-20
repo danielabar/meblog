@@ -80,9 +80,9 @@
 
 .content blockquote {
   border-left: 3px solid var(--brand-triadic-middle);
-  font-size: 0.9em;
+  font-size: 19px;
   font-style: italic;
-  font-weight: 200;
+  opacity: 0.8;
   padding-left: 15px;
 }
 
