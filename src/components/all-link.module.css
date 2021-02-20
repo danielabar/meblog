@@ -1,14 +1,20 @@
 .all-link {
-  color: var(--brand-darken-30);
+  background-color: var(--brand-lighten-10);
+  border: 1px solid transparent;
+  border-radius: 10px;
+  color: white;
   display: inline-block;
+  font-size: 16px;
+  font-weight: 500;
   height: 35px;
-  padding: 0 25px;
+  letter-spacing: 1.1px;
   line-height: 35px;
+  padding: 0 25px;
   text-align: center;
-  border: 1px solid var(--brand-lighten-40);
-  border-radius: 20px;
+  text-transform: uppercase;
+  transition: all 0.3s ease;
 }
 
 .all-link:hover {
-  border-color: var(--brand-lighten-30);
+  background-color: var(--brand-lighten-5);
 }

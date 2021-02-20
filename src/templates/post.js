@@ -36,7 +36,7 @@ export default props => {
           dangerouslySetInnerHTML={{ __html: content }}
         />
       </div>
-      <AllLink marginTop="30px" />
+      <AllLink marginTop="60px" />
     </Layout>
   )
 }
