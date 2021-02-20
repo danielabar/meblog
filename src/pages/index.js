@@ -1,5 +1,12 @@
 import React from "react"
 import { graphql } from "gatsby"
+import "@fontsource/bai-jamjuree/200.css"
+import "@fontsource/bai-jamjuree/300.css"
+import "@fontsource/bai-jamjuree/400.css"
+import "@fontsource/bai-jamjuree/500.css"
+import "@fontsource/bai-jamjuree/600.css"
+import "@fontsource/bai-jamjuree/700.css"
+// TODO: Also need italic font for quote sections in posts
 import SEO from "../components/SEO"
 import Layout from "../components/layout"
 import Intro from "../components/intro"
