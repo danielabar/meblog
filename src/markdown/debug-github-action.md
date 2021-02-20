@@ -215,7 +215,9 @@ server started
 psql:/docker-entrypoint-initdb.d/init.sql: error: could not read from input file: Is a directory
 ```
 
-This reveals another clue, so the database fails to start because it tried to run `init.sql` but was unable to find it. So what is this file? The `postgres:13` Docker image has support for running one-time initialization sql files. The first time the database is being created, if any files are found in directory `/docker-entrypoint-initdb.d`, then they will be run.
+This reveals another clue, so the database fails to start because it tried to run `init.sql` but was unable to find it. Before moving on, to exit the debug session, enter `touch continue` in the runner ssh session, this will end it and the workflow on Github will continue to run after this point.
+
+Back to the investigation, what is this `init.sql` file that the Postgres container logs reported as not being able to read? The `postgres:13` Docker image has support for running one-time initialization sql files. The first time the database is being created, if any files are found in directory `/docker-entrypoint-initdb.d`, then they will be run.
 
 For this project, `init.sql` is located in the project root and is only intended to be used for development and CI where Postgres is run in a container:
 
@@ -330,4 +332,4 @@ And this time the workflow did run successfully. The database was initialized wi
 
 ## Conclusion
 
-If you get stuck on a Github Action workflow not running as you would expect, try adding the [tmate](https://github.com/mxschmitt/action-tmate) action to your workflow file, ssh to the runner machine, and see what you can find. Happy debugging!
+If you get stuck on a Github Action workflow not running as you would expect, try adding the [tmate](https://github.com/mxschmitt/action-tmate) action to your workflow file, ssh to the runner machine, and see what you can find. Remember to remove the debug step when the issue has been resolved.
