@@ -3,6 +3,7 @@
 :root {
   --brand: #81439c;
 
+  --brand-lighten-5: #904bae;
   --brand-lighten-10: #9c5ab8;
   --brand-lighten-20: #b17ec7;
   --brand-lighten-30: #c7a1d7;
@@ -33,8 +34,8 @@
   --post-link-color-hover: #999;
 
   --base-font-color: var(--brand-darken-35);
-  --base-font-family: -apple-system, system-ui, "Segoe UI", Roboto, Oxygen-Sans,
-    Ubuntu, Cantarell, "Helvetica Neue", sans-serif;
+  --base-font-family: "Bai Jamjuree", -apple-system, system-ui, "Segoe UI",
+    Roboto, Oxygen-Sans, Ubuntu, Cantarell, "Helvetica Neue", sans-serif;
 }
 
 /* apply a natural box layout model to all elements, but allowing components to change */

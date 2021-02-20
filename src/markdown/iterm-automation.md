@@ -163,3 +163,7 @@ iterm2.run_until_complete(main)
 ```
 
 You can keep customizing until the script is performing all the daily tasks you would otherwise be typing in manually.
+
+## Backup
+
+Last thing to do is to make a backup of the script to avoid losing it should your hard drive crash. The script is located at `/Users/yourusername/Library/Application Support/iTerm2/Scripts/script-name.py`.
