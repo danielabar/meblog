@@ -15,6 +15,7 @@ const SEO = ({ title, description, image, pathname, article }) => (
           siteUrl,
           defaultImage,
           twitterUsername,
+          googleSiteVerification,
         },
       },
     }) => {
@@ -23,6 +24,7 @@ const SEO = ({ title, description, image, pathname, article }) => (
         description: description || defaultDescription,
         image: `${siteUrl}${image || defaultImage}`,
         url: `${siteUrl}${pathname || "/"}`,
+        googleSiteVerification: googleSiteVerification,
       }
 
       return (
@@ -30,7 +32,7 @@ const SEO = ({ title, description, image, pathname, article }) => (
           <Helmet title={seo.title} titleTemplate={titleTemplate}>
             <meta name="description" content={seo.description} />
             <meta name="image" content={seo.image} />
-            <meta name="google-site-verification" content="zmLm6qu34TLdeqUUPDF_K6faoqGqQincxyNZk7VsHgY" />
+            <meta name="google-site-verification" content={seo.googleSiteVerification} />
             {seo.url && <meta property="og:url" content={seo.url} />}
             {(article ? true : null) && (
               <meta property="og:type" content="article" />
@@ -160,7 +162,8 @@ const query = graphql`
         defaultDescription: description
         siteUrl: url
         defaultImage: image
-        twitterUsername
+        twitterUsername,
+        googleSiteVerification,
       }
     }
   }
