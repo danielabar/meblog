@@ -7,12 +7,14 @@ module.exports = {
     description: "The personal website of Daniela Baron, software developer.",
     image: "/images/profile.png",
     twitterUsername: "@DanielaMBaron",
+    googleSiteVerification: "zmLm6qu34TLdeqUUPDF_K6faoqGqQincxyNZk7VsHgY"
   },
   plugins: [
     "gatsby-plugin-sharp",
     "gatsby-transformer-sharp",
     "gatsby-transformer-remark",
     "gatsby-plugin-react-helmet",
+    'gatsby-plugin-sitemap',
     {
       resolve: `gatsby-transformer-remark`,
       options: {
