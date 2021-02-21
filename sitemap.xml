@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9" xmlns:news="http://www.google.com/schemas/sitemap-news/0.9" xmlns:xhtml="http://www.w3.org/1999/xhtml" xmlns:mobile="http://www.google.com/schemas/sitemap-mobile/1.0" xmlns:image="http://www.google.com/schemas/sitemap-image/1.1" xmlns:video="http://www.google.com/schemas/sitemap-video/1.1">
+<url> <loc>https://danielabaron.me/blog/iterm-automation/</loc> <changefreq>daily</changefreq> <priority>0.7</priority> </url>
+<url> <loc>https://danielabaron.me/blog/debug-github-action/</loc> <changefreq>daily</changefreq> <priority>0.7</priority> </url>
+<url> <loc>https://danielabaron.me/blog/tdd-by-example/</loc> <changefreq>daily</changefreq> <priority>0.7</priority> </url>
+<url> <loc>https://danielabaron.me/blog/emergency-fund-fine-print/</loc> <changefreq>daily</changefreq> <priority>0.7</priority> </url>
+<url> <loc>https://danielabaron.me/blog/improve-productivity-with-vs-code-snippets/</loc> <changefreq>daily</changefreq> <priority>0.7</priority> </url>
+<url> <loc>https://danielabaron.me/blog/patch-request-with-json-api/</loc> <changefreq>daily</changefreq> <priority>0.7</priority> </url>
+<url> <loc>https://danielabaron.me/blog/rails-uuid-primary-key-postgres/</loc> <changefreq>daily</changefreq> <priority>0.7</priority> </url>
+<url> <loc>https://danielabaron.me/blog/start-rails-6-project-with-rspec/</loc> <changefreq>daily</changefreq> <priority>0.7</priority> </url>
+<url> <loc>https://danielabaron.me/blog/find-jira-tickets-faster/</loc> <changefreq>daily</changefreq> <priority>0.7</priority> </url>
+<url> <loc>https://danielabaron.me/blog/phone-localhost/</loc> <changefreq>daily</changefreq> <priority>0.7</priority> </url>
+<url> <loc>https://danielabaron.me/blog/dockerize-rails-app-for-dev-debug-and-testing/</loc> <changefreq>daily</changefreq> <priority>0.7</priority> </url>
+<url> <loc>https://danielabaron.me/blog/vscode-shell-integration/</loc> <changefreq>daily</changefreq> <priority>0.7</priority> </url>
+<url> <loc>https://danielabaron.me/blog/is-career-in-software-development-right-for-you/</loc> <changefreq>daily</changefreq> <priority>0.7</priority> </url>
+<url> <loc>https://danielabaron.me/blog/what-makes-a-good-podcast/</loc> <changefreq>daily</changefreq> <priority>0.7</priority> </url>
+<url> <loc>https://danielabaron.me/blog/off-with-the-digital-distractions/</loc> <changefreq>daily</changefreq> <priority>0.7</priority> </url>
+<url> <loc>https://danielabaron.me/blog/how-to-access-chrome-bookmarks-via-keyboard/</loc> <changefreq>daily</changefreq> <priority>0.7</priority> </url>
+<url> <loc>https://danielabaron.me/blog/crossword-solver-with-centos/</loc> <changefreq>daily</changefreq> <priority>0.7</priority> </url>
+<url> <loc>https://danielabaron.me/blog/how-to-navigate-back-and-forth-in-vscode/</loc> <changefreq>daily</changefreq> <priority>0.7</priority> </url>
+<url> <loc>https://danielabaron.me/blog/how-to-learn-new-things/</loc> <changefreq>daily</changefreq> <priority>0.7</priority> </url>
+<url> <loc>https://danielabaron.me/blog/how-i-setup-my-terminal/</loc> <changefreq>daily</changefreq> <priority>0.7</priority> </url>
+<url> <loc>https://danielabaron.me/blog</loc> <changefreq>daily</changefreq> <priority>0.7</priority> </url>
+<url> <loc>https://danielabaron.me/blog/2</loc> <changefreq>daily</changefreq> <priority>0.7</priority> </url>
+<url> <loc>https://danielabaron.me/blog/3</loc> <changefreq>daily</changefreq> <priority>0.7</priority> </url>
+<url> <loc>https://danielabaron.me/blog/4</loc> <changefreq>daily</changefreq> <priority>0.7</priority> </url>
+<url> <loc>https://danielabaron.me/about/</loc> <changefreq>daily</changefreq> <priority>0.7</priority> </url>
+<url> <loc>https://danielabaron.me/</loc> <changefreq>daily</changefreq> <priority>0.7</priority> </url>
+</urlset>
