@@ -1,8 +1,8 @@
 ---
 title: "Solving a Python Interview Question in Ruby"
 featuredImage: "../images/python-interview-question.jpg"
-description: "Learn how to approximate tuples in Ruby and solve a Python data science interview question in Ruby"
-date: "2021-03-07"
+description: "Learn how to model tuples in Ruby and solve a Python data science interview question in Ruby."
+date: "2021-03-01"
 category: "ruby"
 ---
 
@@ -18,11 +18,13 @@ Why? Because being asked to solve something like this on the spot with someone t
 
 But regardless of my thoughts on technical interviews, found myself curious about solving this, although not in Python. It's been quite a few years since I worked in that language and have since pivoted to Ruby/Rails. So thought it would be interesting to break down this problem in Ruby and solve it TDD style with RSpec.
 
-Caveats: Ruby is not the [go-to language for data science](https://www.quora.com/Is-Ruby-a-good-language-for-data-science?share=1), and my experience is primarily with web development, not data science, so this is just an exercise to get some practice with Ruby.
+## Caveats
+
+Ruby is [not the go-to language for data science](https://www.quora.com/Is-Ruby-a-good-language-for-data-science?share=1), and my experience is primarily with web development, not data science, so this is just an exercise to get some practice with Ruby.
 
 ## Analysis
 
-At first glance the problem seems relatively straightforward, given an input string such as `'aaaabbbcca'`, return a data structure containing a key for each letter, and the value being the count of how many times the letter appears in the string. But looking more closely, that's not what's being asked. Notice the last letter `a` in the input string appears separate from the first 4 `a`s in the beginning of the string. Then the expected output has two entries for the letter `a`. The first entry has a count of 4, and the last entry has a count of 1. So the question is actually asking to identify counts of repeating sequences of letters. This problem is also known as [Run-length encoding](https://en.wikipedia.org/wiki/Run-length_encoding).
+At first glance the problem seems relatively straightforward, given an input string such as `'aaaabbbcca'`, return a data structure containing a key for each letter, and the value being the count of how many times the letter appears in the string. But looking more closely, that's not what's being asked. Notice the last letter `a` in the input string appears separate from the first 4 `a`s in the beginning of the string. Then the expected output has two entries for the letter `a`. The first entry has a count of 4, and the last entry has a count of 1. So the question is actually asking to identify counts of repeating sequences of letters. This problem is known as [Run-length encoding](https://en.wikipedia.org/wiki/Run-length_encoding).
 
 What this means is that as each letter in the string is being processed, we need to "remember" what the previous letter we just processed was. This is because the decision whether to increment a given letter counter or start a new counter will depend on whether the previous letter was the same as the current one (in which case, increment counter) or different than the current one (in which case, start a new counter).
 
@@ -70,6 +72,8 @@ a_count._1
 a_count._2
 => 4
 ```
+
+See this [SO answer](https://stackoverflow.com/questions/525957/using-tuples-in-ruby) for more details.
 
 ## Setup for TDD
 
@@ -373,3 +377,18 @@ describe DataScience do
   end
 end
 ```
+
+![interview question tdd six passing](../images/interview-q-tdd-six-passing.png "interview question tdd six passing")
+
+Success, edge cases are now passing!
+
+## Conclusion
+
+To circle back to the original tweet that inspired all this, I didn't time myself exactly but estimate spent approximately an hour. Figuring out the actual logic was around half hour, with some extra time researching how to model Tuples in Ruby. Then more time researching how to setup a plain Ruby project with RSpec, and time to write the tests. Then a little more time thinking of edge cases. This was definitely a useful exercise, I learned a few new things including:
+
+* The term "run length encoding"
+* Use of Ruby `Struct` to model a tuple.
+* Use of `some_var.to_s.empty?` to check for nil or empty in a single expression.
+* How to setup a plain Ruby project with RSpec tests.
+
+What do you think of all this? Tweet me if you have some thoughts on - is there a faster/better way to implement run length encoding in Ruby? Have I missed some test cases? What do you think of this style of interview question?
