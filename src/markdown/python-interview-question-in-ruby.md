@@ -382,6 +382,8 @@ end
 
 Success, edge cases are now passing!
 
+For the complete code and project, go ahead and [clone it on Github](https://github.com/danielabar/RLE).
+
 ## Conclusion
 
 To circle back to the original tweet that inspired all this, I didn't time myself exactly but estimate spent approximately an hour. Figuring out the actual logic was around half hour, with some extra time researching how to model Tuples in Ruby. Then more time researching how to setup a plain Ruby project with RSpec, and time to write the tests. Then a little more time thinking of edge cases. This was definitely a useful exercise, I learned a few new things including:
