@@ -2,6 +2,7 @@ import React from "react"
 import { Helmet } from "react-helmet"
 import PropTypes from "prop-types"
 import { StaticQuery, graphql } from "gatsby"
+import HelloWorker from '../workers/hello.worker.js'
 
 const SEO = ({ title, description, image, pathname, article }) => (
   <StaticQuery
@@ -19,6 +20,12 @@ const SEO = ({ title, description, image, pathname, article }) => (
         },
       },
     }) => {
+      if (typeof window === 'object') {
+        const helloWorker = new HelloWorker()
+        helloWorker.postMessage([window.location.href, document.referrer])
+        // helloWorker.sayHello();
+      }
+
       const seo = {
         title: title || defaultTitle,
         description: description || defaultDescription,
