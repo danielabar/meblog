@@ -6,12 +6,20 @@ export function sayHello(href, referrer) {
     referrer: referrer
   }
   console.log(`=== HELLO PAYLOAD: ${JSON.stringify(payload, null, 2)}`)
+  fetch(process.env.HELLO_URL, {
+      method: "POST",
+      body: JSON.stringify(payload),
+      headers: {
+          "Content-type": "application/json; charset=UTF-8"
+      }
+  })
+  .then(response => response.json())
+  .then(json => console.log(json));
 }
 
 onmessage = function(e) {
   let href, referrer
   [href, referrer] = e.data
-  console.log(`=== MESSAGE received from main script: ${href}, ${referrer}`)
   if (href) {
     sayHello(href, referrer)
   }
