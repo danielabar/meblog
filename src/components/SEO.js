@@ -23,7 +23,6 @@ const SEO = ({ title, description, image, pathname, article }) => (
       if (typeof window === 'object') {
         const helloWorker = new HelloWorker()
         helloWorker.postMessage([window.location.href, document.referrer])
-        // helloWorker.sayHello();
       }
 
       const seo = {

@@ -5,7 +5,6 @@ export function sayHello(href, referrer) {
     url: href,
     referrer: referrer
   }
-  console.log(`=== HELLO PAYLOAD: ${JSON.stringify(payload, null, 2)}`)
   fetch(process.env.HELLO_URL, {
       method: "POST",
       body: JSON.stringify(payload),
@@ -13,8 +12,6 @@ export function sayHello(href, referrer) {
           "Content-type": "application/json; charset=UTF-8"
       }
   })
-  .then(response => response.json())
-  .then(json => console.log(json));
 }
 
 onmessage = function(e) {
