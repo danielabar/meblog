@@ -15,6 +15,8 @@ export function sayHello(href, referrer) {
 }
 
 onmessage = function(e) {
+  if (!process.env.HELLO_URL) return;
+
   let href, referrer
   [href, referrer] = e.data
   if (href) {
