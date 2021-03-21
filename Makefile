@@ -1,4 +1,7 @@
 dev:
+	npm run develop
+
+devclean:
 	npm run cleanstart
 
 serve:

@@ -10,30 +10,42 @@ My blog is built with [GatsbyJS](https://www.gatsbyjs.com/), initialized with [G
 6. Custom 404 page.
 7. Syntax highlighting with [gatsby-remark-vscode](https://www.gatsbyjs.com/plugins/gatsby-remark-vscode/).
 
+## Setup
+
+In terminal at root of project, run:
+
+```bash
+touch .env.development
+echo "HELLO_URL=http://localhost:3000/visits" >> .env.development
+touch .env.production
+echo "HELLO_URL=https://replace.with.hello.host/visits" >> .env.production
+npm install
+```
+
 ## Development
 
 In a terminal at root of project, run:
 
 ```bash
-npm start
+make dev
 ```
 
 If some pages don't refresh as expected, try this task which will first wipe out the cache:
 
 ```bash
-npm run cleanstart
+make devclean
 ```
 
 To test the production build locally:
 
 ```bash
-npm run servebuild
+make serve
 ```
 
 To deploy to Github Pages:
 
 ```bash
-npm run deploy
+make deploy
 ```
 
 ## Original Docs from Starter
