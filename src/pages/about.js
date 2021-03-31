@@ -2,6 +2,7 @@ import React from "react"
 import SEO from "../components/SEO"
 import Layout from "../components/layout"
 import styles from "./about.module.css"
+import AllLink from "../components/all-link"
 
 export default () => (
   <Layout>
@@ -82,5 +83,6 @@ export default () => (
         skills. I hope others will find my posts helpful.
       </p>
     </div>
+    <AllLink marginTop="30px" />
   </Layout>
 )
