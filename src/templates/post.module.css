@@ -36,6 +36,10 @@
   margin-bottom: 5px;
 }
 
+.content strong {
+  font-weight: 700;
+}
+
 .content p {
   margin-bottom: 20px;
 }

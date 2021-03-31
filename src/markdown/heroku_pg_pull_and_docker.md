@@ -6,6 +6,8 @@ date: "2021-04-01"
 category: "PostgreSQL"
 ---
 
+**TLDR:** Use `PG_HOST=127.0.0.1` when running Heroku's `pg:pull` to a local target database that is running in a Docker container. For a more detailed explanation, read on...
+
 I recently starting using [Heroku](https://www.heroku.com/) to deploy a side project built with Rails and Postgres. Heroku is a PaaS (Platform as a Service) that makes it really easy to deploy web applications, and other related services such as a database. Since I'm not currently monetizing my side project, I selected the free tier, together with the Hobby Dev package for the database, which provides a limited amount of storage.
 
 One thing you might like to do once there's some significant amount of production data in the database, is to make a copy of it to import into a locally running database. For local development you'd usually be using fake or test data (i.e. seeds in Rails). However, it can sometimes be useful to develop against real data. For example, when working on a data visualization app, having real data can help to determine if the data viz is providing any insight.
@@ -33,7 +35,7 @@ createdb: error: could not connect to database template1: could not connect to s
 	connections on Unix domain socket "/tmp/.s.PGSQL.5432"?
 ```
 
-According to the Heroku [docs](https://devcenter.heroku.com/articles/heroku-postgresql#pg-push-and-pg-pull), this error can result from not having the Postgres binaries in the `$PATH` because `pg:pull` ie essentially a wrapper around `pg_dump`. But this was not the root cause of this error in my case as `pg_dump` was indeed in the PATH. This can be verified as follows:
+According to the Heroku [docs](https://devcenter.heroku.com/articles/heroku-postgresql#pg-push-and-pg-pull), this error can result from not having the Postgres binaries in the `$PATH` because `pg:pull` is essentially a wrapper around `pg_dump`. But this was not the root cause of this error in my case as `pg_dump` was indeed in the PATH. This can be verified as follows:
 
 ```bash
 > type pg_dump
@@ -71,4 +73,4 @@ So the final working command for Heroku to pull the production database to a loc
 PGUSER=postgres PGPASSWORD=somethingSomething PGHOST=127.0.0.1 heroku pg:pull postgresql-sushi-123 my_prod_copy --app mystic-wind-83
 ```
 
-Now you can connect to your newly created local database `my_prod_copy`. Note that the `pg:pull` command will not copy the production user/role, so you'll have to connect with your POSTGRES_USER/POSTGRES_PASSWORD credentials.
+Now you can connect to your newly created local database `my_prod_copy`. Note that the `pg:pull` command will not copy the production user/role, so you'll have to connect with your `POSTGRES_USER/POSTGRES_PASSWORD` credentials.
