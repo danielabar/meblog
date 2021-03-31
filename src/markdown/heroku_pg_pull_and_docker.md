@@ -6,11 +6,11 @@ date: "2021-04-01"
 category: "PostgreSQL"
 ---
 
-I recently starting using [Heroku](https://www.heroku.com/) to deploy a side project built with Rails and Postgres. For those who haven't used it before, Heroku is a PaaS (Platform as a Service) that makes it really easy to deploy web applications, and other related services such as a database. Since I'm not currently monetizing my side project, I selected the free tier, together with the Hobby Dev package for the database, which provides a limited amount of storage.
+I recently starting using [Heroku](https://www.heroku.com/) to deploy a side project built with Rails and Postgres. Heroku is a PaaS (Platform as a Service) that makes it really easy to deploy web applications, and other related services such as a database. Since I'm not currently monetizing my side project, I selected the free tier, together with the Hobby Dev package for the database, which provides a limited amount of storage.
 
 One thing you might like to do once there's some significant amount of production data in the database, is to make a copy of it to import into a locally running database. For local development you'd usually be using fake or test data (i.e. seeds in Rails). However, it can sometimes be useful to develop against real data. For example, when working on a data visualization app, having real data can help to determine if the data viz is providing any insight.
 
-Heroku provides a convenient `pg:pull` command to pull data from a production database on Heroku to a locally running database. It's run from a terminal (given that you've already authenticated via `heroku login`):
+Heroku provides a convenient `pg:pull` command to pull data from a production database on Heroku to a locally running database. It's run from a terminal (given that you've already authenticated via `heroku login`). The basic structure of the command is:
 
 ```bash
 heroku pg:pull your-heroku-db-name target-local-db-name --app your-heroku-app-name
@@ -18,13 +18,13 @@ heroku pg:pull your-heroku-db-name target-local-db-name --app your-heroku-app-na
 
 Note that this command requires a postgres client to be installed locally, the easiest way on a Mac is via Homebrew: `brew update && brew cleanup && brew install postgresql` (actually installs both client and server but only client portion is needed).
 
-The value of `your-heroku-app-name` is found on your Heroku dashboard, for example `mystic-wind-83`. The value of `your-heroku-db-name` can also be found from the Heroku dashboard by clicking on the app, the database name will be listed in the "Installed add-ons" section, for example `postgresql-sushi-123`. Finally, `target-local-db-name` is the name of a new database that will be created in your local Postgres, for example `my_prod_copy`. You can name this any valid database name but it must not already exist on your system. Putting this all together, the command would look like:
+The value of `your-heroku-app-name` is found on your Heroku dashboard, for example `mystic-wind-83`. The value of `your-heroku-db-name` can also be found from the Heroku dashboard by clicking on the app, the database name will be listed in the "Installed add-ons" section, for example `postgresql-sushi-123`. Finally, `target-local-db-name` is the name of a new database that will be created on your local Postgres, for example `my_prod_copy`. You can name this any valid database name but it must not already exist on your system. Putting this all together, the command would look like:
 
 ```bash
 heroku pg:pull postgresql-sushi-123 my_prod_copy --app mystic-wind-83
 ```
 
-However, since I'm running Postgres in a Docker container for my app, received this error message:
+However, since I'm running Postgres in a Docker container for my app, the `pg:pull` command returned the following error message:
 
 ```
 heroku-cli: Pulling postgresql-sushi-123 ---> my_prod_copy
@@ -33,7 +33,7 @@ createdb: error: could not connect to database template1: could not connect to s
 	connections on Unix domain socket "/tmp/.s.PGSQL.5432"?
 ```
 
-According to the Heroku [docs](https://devcenter.heroku.com/articles/heroku-postgresql#pg-push-and-pg-pull), this error can result from not having the Postgres binaries in the `$PATH` because `pg:pull` ie essentially a wrapper around `pg_dump`. But this was not the root cause of this error in my case as `pg_dump` was indeed in the PATH:
+According to the Heroku [docs](https://devcenter.heroku.com/articles/heroku-postgresql#pg-push-and-pg-pull), this error can result from not having the Postgres binaries in the `$PATH` because `pg:pull` ie essentially a wrapper around `pg_dump`. But this was not the root cause of this error in my case as `pg_dump` was indeed in the PATH. This can be verified as follows:
 
 ```bash
 > type pg_dump
