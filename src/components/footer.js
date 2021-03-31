@@ -6,7 +6,7 @@ const Footer = () => {
   return (
     <footer className={styles.container}>
       <hr className={styles.sep} />
-      <p className={styles.copy}>All materials © Daniela Baron 2020</p>
+      <p className={styles.copy}>All materials © Daniela Baron 2021</p>
       <div className={styles.social}>
         <a
           href="https://twitter.com/DanielaMBaron"
