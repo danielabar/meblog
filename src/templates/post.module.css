@@ -38,6 +38,7 @@
 
 .content strong {
   font-weight: 700;
+  opacity: 0.8;
 }
 
 .content p {

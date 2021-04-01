@@ -2,6 +2,9 @@
   background-color: var(--brand-lighten-10);
   border: 1px solid transparent;
   border-radius: 10px;
+  box-shadow: 2px 2px 4px 0px rgba(0, 0, 0, 0.3);
+  -webkit-box-shadow: 2px 2px 4px 0px rgba(0, 0, 0, 0.3);
+  -moz-box-shadow: 2px 2px 4px 0px rgba(0, 0, 0, 0.3);
   color: white;
   display: inline-block;
   font-size: 16px;
