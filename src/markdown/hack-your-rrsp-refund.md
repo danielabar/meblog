@@ -6,7 +6,9 @@ date: "2021-04-11"
 category: "personal finance"
 ---
 
-It's April, the time of year when many Canadians look forward to receiving their tax refunds after having filed their taxes including RRSP contributions. In today's post, I'd like to present an alternative way of looking at this, in which receiving a refund is actually not optimal from a personal finance perspective.
+Ah spring is in the air. A time when Canadians start shedding their winter layers, setting out the patio furniture, and looking forward to their tax refunds after having filed their taxes including RRSP contributions.
+
+In today's post, I'd like to present an alternative way of looking at this, in which receiving a refund is actually not optimal from a personal finance perspective.
 
 What's the issue with receiving a large tax refund? Well, given that you've made an [RRSP](https://www.canada.ca/en/revenue-agency/services/tax/individuals/topics/rrsps-related-plans/registered-retirement-savings-plan-rrsp.html) contribution, that's *your* money the government has been holding on to for an entire year. In other words, you've effectively given the government a one year interest free loan, probably not what most people intended.
 
@@ -32,4 +34,4 @@ This strategy works best for those who have the discipline to take that reduced 
 
 ## Disclaimer
 
-Ugh, have to include an obligatory disclaimer here: The above post is for informational and educational purposes only and should not be considered legal or financial advice. If you need specific tax or other financial advice please consult with a qualified/certified professional such as a CPA, CFP, etc.
+Have to include an obligatory disclaimer here: The above post is for informational and educational purposes only and should not be considered legal or financial advice. If you need specific tax or other financial advice please consult with a qualified/certified professional such as a CPA, CFP, etc.
