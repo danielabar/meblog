@@ -1,7 +1,7 @@
 ---
 title: "Hack Your RRSP Tax Refund"
 featuredImage: "../images/tax-season.png"
-description: "Learn how to get your RRSP tax refund throughout the year."
+description: "Why wait a year to get your RRSP tax refund? Learn a neat trick to get it faster."
 date: "2021-04-11"
 category: "personal finance"
 ---
