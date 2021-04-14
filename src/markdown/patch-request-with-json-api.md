@@ -110,3 +110,11 @@ The curious thing is that the plan id needs to be specified twice - once in the 
 ```
 
 At first I couldn't understand why this error was returned given the id is specified in the url, but it looks like the `jsonapi-resource` gem expects to also find it in the body. I hope this will save you some time if you're setting up an api with this gem.
+
+## Related Content
+
+The following includes Amazon affiliate links:
+
+Looking to level up on Rails 6? You might like this book: [Agile Web Development with Rails 6](https://amzn.to/3wS8GNA).
+
+Working on a large legacy code base? This book [Working Effectively with Legacy Code](https://amzn.to/3accwHF) is a must read.

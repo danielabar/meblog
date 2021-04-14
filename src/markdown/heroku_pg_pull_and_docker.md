@@ -74,3 +74,11 @@ PGUSER=postgres PGPASSWORD=somethingSomething PGHOST=127.0.0.1 heroku pg:pull po
 ```
 
 Now you can connect to your newly created local database `my_prod_copy`. Note that the `pg:pull` command will not copy the production user/role, so you'll have to connect with your `POSTGRES_USER/POSTGRES_PASSWORD` credentials.
+
+## Related Content
+
+The following includes Amazon affiliate links:
+
+Looking to level up on Rails 6? You might like this book: [Agile Web Development with Rails 6](https://amzn.to/3wS8GNA).
+
+Working on a large legacy code base? This book [Working Effectively with Legacy Code](https://amzn.to/3accwHF) is a must read.

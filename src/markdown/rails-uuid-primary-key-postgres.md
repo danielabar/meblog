@@ -114,3 +114,11 @@ end
 ```
 
 That's it, now you're all setup to use UUID as the primary key in all your models.
+
+## Related Content
+
+The following includes Amazon affiliate links:
+
+Looking to level up on Rails 6? You might like this book: [Agile Web Development with Rails 6](https://amzn.to/3wS8GNA).
+
+Working on a large legacy code base? This book [Working Effectively with Legacy Code](https://amzn.to/3accwHF) is a must read.

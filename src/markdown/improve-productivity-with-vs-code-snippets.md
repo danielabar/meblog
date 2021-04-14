@@ -148,3 +148,9 @@ Again save these changes and try the snippet again in a markdown file. This time
 ## Summary
 
 That's it, your very first custom VS Code snippet. I hope this post has taught you how to continue building more of these to optimize your workflow.
+
+## Related Content
+
+The following includes Amazon affiliate links:
+
+Speaking of productivity, wanted to share a book I found really incredible in improving my productivity at work by figuring out *when* is the best time to do certain types of tasks such as analytical vs insight. The book is [When: The Scientific Secrets of Perfect Timing](https://amzn.to/32dBPF1).

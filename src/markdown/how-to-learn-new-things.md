@@ -145,3 +145,9 @@ No matter which style of learning you choose, you'll get the most out of it by t
 Regarding the expense, some employers will reimburse employees for continuing education. Definitely ask your boss or HR department if there is such a program where you work and what are the requirements. For example, you may be required to pay up front, then present some evidence of successful completion before being reimbursed.
 
 And finally, keep on learning.
+
+## Related Content
+
+The following includes Amazon affiliate links:
+
+Just wanted to share a book I found really incredible in improving my productivity by figuring out *when* is the best time to do certain types of tasks such as analytical vs insight. The book is [When: The Scientific Secrets of Perfect Timing](https://amzn.to/32dBPF1).

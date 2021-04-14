@@ -87,3 +87,13 @@ Of course that’s all just a dramatization and my possibly over-active imaginat
 So what’s the moral of the story here? Could I have been more vigilant about reading the terms? Sure, although I’m not sure that the wording would have overridden my strong intuition about how interest works on savings accounts, based on all my past experience. Is there any legal case to be made that the bank is in the wrong here? Nope, the terms are very clear about how it works.
 
 However, people don’t make their impressions based on legalities and technicalities. My perception is that I’ve been tricked, even if legally everything is above board. That perception becomes reality, that I can no longer trust this institution and would not want to do business with them again. It’s sad that a Canadian bank would resort to a tactic like this to gain more customers. I hope other institutions won’t attempt to emulate this, and that with this post, I’ve increased some awareness of this issue.
+
+## Related Content
+
+The following includes Amazon affiliate links:
+
+A book you might like is [Your Money or Your Life](https://amzn.to/2Q4UboX), it will completely transform your relationship with money.
+
+Looking for more information on Canadian taxes? You might like this book: [The Grumpy Accountant: One Fed-Up Tax Pro's Practical Plan to Fix Canada's Senselessly Complicated Tax System](https://amzn.to/3aaj4qh).
+
+Another book I really enjoyed is [The Psychology of Money: Timeless lessons on wealth, greed, and happiness](https://amzn.to/2Q7BIrT). In it you'll learn that being successful with money depends way more on how you behave than being a so-called financial expert.

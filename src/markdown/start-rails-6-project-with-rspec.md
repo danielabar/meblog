@@ -94,3 +94,11 @@ rm -rf test
 ```
 
 That's it, now you're setup for RSpec testing, happy coding!
+
+## Related Content
+
+The following includes Amazon affiliate links:
+
+Looking to level up on Rails 6? You might like this book: [Agile Web Development with Rails 6](https://amzn.to/3wS8GNA).
+
+Working on a large legacy code base? This book [Working Effectively with Legacy Code](https://amzn.to/3accwHF) is a must read.

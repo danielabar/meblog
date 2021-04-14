@@ -47,3 +47,9 @@ Whether you use Outlook or Gmail or any other email client, go to the notificati
 ## Final Thoughts
 
 If you've been losing productivity due to digital distractions, I hope trying some of these tips will help you. Just one final word of caution - before doing any of these, especially the work related apps, check with your manager on expectations around communication. For example, if you receive an email, are you expected to reply within an hour? The next day? How about a Slack message in a team channel? In my opinion, the ideal is a company that values [asynchronous communication](https://blog.doist.com/asynchronous-communication/) but from my experience, this has been the exception rather than the rule.
+
+## Related Content
+
+The following includes Amazon affiliate links:
+
+Just wanted to share a book I found really incredible in improving my productivity by figuring out *when* is the best time to do certain types of tasks such as analytical vs insight. The book is [When: The Scientific Secrets of Perfect Timing](https://amzn.to/32dBPF1).
