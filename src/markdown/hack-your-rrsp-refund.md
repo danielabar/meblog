@@ -35,3 +35,13 @@ This strategy works best for those who have the discipline to take that reduced 
 ## Disclaimer
 
 Have to include an obligatory disclaimer here: The above post is for informational and educational purposes only and should not be considered legal or financial advice. If you need specific tax or other financial advice please consult with a qualified/certified professional such as a CPA, CFP, etc.
+
+## Related Content
+
+The following includes Amazon affiliate links:
+
+Looking for more information on Canadian taxes? You might like this book: [The Grumpy Accountant: One Fed-Up Tax Pro's Practical Plan to Fix Canada's Senselessly Complicated Tax System](https://amzn.to/3aaj4qh).
+
+Another book you might like is [Your Money or Your Life](https://amzn.to/2Q4UboX), it will completely transform your relationship with money.
+
+Another book I really enjoyed is [The Psychology of Money: Timeless lessons on wealth, greed, and happiness](https://amzn.to/2Q7BIrT). In it you'll learn that being successful with money depends way more on how you behave than being a so-called financial expert.
