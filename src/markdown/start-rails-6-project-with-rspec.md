@@ -97,8 +97,10 @@ That's it, now you're setup for RSpec testing, happy coding!
 
 ## Related Content
 
-The following includes Amazon affiliate links:
+The following section contains affiliate links for related content you may find useful. I get a small commission from purchases which helps me maintain this site.
 
 Looking to level up on Rails 6? You might like this book: [Agile Web Development with Rails 6](https://amzn.to/3wS8GNA).
 
 Working on a large legacy code base? This book [Working Effectively with Legacy Code](https://amzn.to/3accwHF) is a must read.
+
+Martin Fowler's [Refactoring: Improving the Design of Existing Code](https://amzn.to/2RFC0Xn) is also amazingly useful on this topic.
