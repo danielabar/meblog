@@ -38,10 +38,10 @@ Have to include an obligatory disclaimer here: The above post is for information
 
 ## Related Content
 
-The following includes Amazon affiliate links:
+The following section contains affiliate links for related content you may find useful. I get a small commission from purchases which helps me maintain this site.
 
 Looking for more information on Canadian taxes? You might like this book: [The Grumpy Accountant: One Fed-Up Tax Pro's Practical Plan to Fix Canada's Senselessly Complicated Tax System](https://amzn.to/3aaj4qh).
 
-Another book you might like is [Your Money or Your Life](https://amzn.to/2Q4UboX), it will completely transform your relationship with money.
+This book [Your Money or Your Life](https://amzn.to/2Q4UboX), completely changed how I view money. Never mind all the economists definitions like money is a "unit of account" or a "store of value". This book will teach you the only definition of money that matters in your life.
 
-Another book I really enjoyed is [The Psychology of Money: Timeless lessons on wealth, greed, and happiness](https://amzn.to/2Q7BIrT). In it you'll learn that being successful with money depends way more on how you behave than being a so-called financial expert.
+A book I really enjoyed is [The Psychology of Money: Timeless lessons on wealth, greed, and happiness](https://amzn.to/2Q7BIrT). In it you'll learn that being successful with money depends way more on how you behave than being a so-called financial expert.

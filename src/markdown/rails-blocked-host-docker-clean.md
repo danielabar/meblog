@@ -6,7 +6,7 @@ date: "2021-04-18"
 category: "rails"
 ---
 
-Today I want to share a debugging story about trying to make different versioned Rails containers talk to each other, and a blocked host error that ended up being resolved by a Docker cleanup.
+Today I want to share a debugging story about trying to make different versioned Rails containers talk to each other via docker compose networking, and a blocked host error that ended up being resolved by a Docker cleanup.
 
 ## Setup
 
@@ -16,7 +16,7 @@ Communication between the services is via an HTTP api. Specifically, the monolit
 
 The monolith runs the Rails server on port 3000 and the subscription service runs on port 4000. If the services were running natively on the laptop, the monolith could address the service via `localhost`, for example, `GET http://localhost:4000/api/subscriptions`. But this won't work when the monolith is running in a Docker container because it will look for a service running on port 4000 *within the container*, which does not exist.
 
-One solution to this is to build an image of the subscription service, push it to a Docker registry (self hosted, Docker Hub, Github container registry etc.) then add another service in the `docker-compose.yml` of the monolith that uses this image. For example:
+One solution is to build an image of the subscription service, push it to a Docker registry (self hosted, Docker Hub, Github container registry etc.) then add another service in the `docker-compose.yml` of the monolith that uses this image. For example:
 
 ```yml
 # docker-compose.yml in the monolith project
@@ -105,6 +105,8 @@ Another possibility could have been that the networking wasn't working and the c
 
 Ok well if they can communicate at a network level, what about running `curl` in the shell (still in the Rails 5 container)? Tried `curl http://subapp_api_1:4000/api/subscription` (along with necessary auth headers), and *amazingly*, this also returned the Rails 6 html error page `<h1>Blocked host: subapp_api_1</h1>`!
 
+At the same time, I was monitoring the log files for the container running the subscription service and there was no activity there, confirming that the http requests were never getting past the Rails 5 container.
+
 ## Solution: Docker Cleanup
 
 After nearly a day of investigation, my manager suggested wiping out all the Docker things to get a fresh start. Was it possible that somehow the Rails 5 and 6 image layers had gotten mixed up? Seems strange but at this point had exhausted all the other possibilities so why not try this.
@@ -124,3 +126,13 @@ $ docker system prune -a --volumes
 After this I re-ran `docker-compose up` in both projects which built/downloaded all images from scratch, ran the scripts to re-seed data in both projects, then tried the code to `GET http://subapp_api_1:4000/api/subscriptions` from the monolith and it worked!
 
 I'm curious if you've had mysterious issues resolved by a Docker cleanup? Tweet me your stories if you have.
+
+## Related Content
+
+The following section contains affiliate links for related content you may find useful. I get a small commission from purchases which helps me maintain this site.
+
+Looking to level up on Rails 6? You might like this book: [Agile Web Development with Rails 6](https://amzn.to/3wS8GNA).
+
+Working on a large legacy code base? This book [Working Effectively with Legacy Code](https://amzn.to/3accwHF) is a must read.
+
+Martin Fowler's [Refactoring: Improving the Design of Existing Code](https://amzn.to/2RFC0Xn) is also amazingly useful on this topic.

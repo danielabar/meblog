@@ -48,6 +48,6 @@ If you recognize some of these qualities in yourself and have never done any pro
 
 ## Related Content
 
-The following includes Amazon affiliate links:
+The following section contains affiliate links for related content you may find useful. I get a small commission from purchases which helps me maintain this site.
 
 Just wanted to share a book I found really incredible in improving my productivity by figuring out *when* is the best time to do certain types of tasks such as analytical vs insight. The book is [When: The Scientific Secrets of Perfect Timing](https://amzn.to/32dBPF1).
