@@ -2,7 +2,7 @@
 title: "Saving on monthly expenses - A Cautionary Tale"
 featuredImage: "../images/save-cell-praveen-kumar-mathivanan-yqLrqIsl294-unsplash.jpg"
 description: "How much effort is it worth to try and save a few dollars on your cell phone bill?"
-date: "2021-05-02"
+date: "2021-04-26"
 category: "personal finance"
 ---
 
@@ -12,7 +12,7 @@ An often repeated piece of personal finance advice is to minimize recurring expe
 
 Stories like [this one](https://www.mrmoneymustache.com/2019/08/22/1000-per-hour/) of saving ~$1000 on a yearly basis from just an hour on the phone are very compelling. So when a few months ago I received a notice of my cell phone bill going up by $3/month, I was very motivated to call my provider to avoid this increase, and perhaps get an even better price. $3/month works out to $36/year so that's certainly worth a quick phone call (ignoring taxes for this story, just to keep all the numbers simple). Here's how it went:
 
-One quick note first - all the customer service reps I spoke to on this journey were very nice and doing their best to be helpful. If this comes off as sounding critical, it's aimed at the provider/system as a whole, not any individual working there.
+One quick note first - all the customer service reps I spoke to on this journey were very nice and doing their best to be helpful. If this comes off as sounding critical, it's my frustration at the provider/system as a whole, not any individual working there.
 
 ## Call One
 
