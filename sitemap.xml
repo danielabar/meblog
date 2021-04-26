@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9" xmlns:news="http://www.google.com/schemas/sitemap-news/0.9" xmlns:xhtml="http://www.w3.org/1999/xhtml" xmlns:mobile="http://www.google.com/schemas/sitemap-mobile/1.0" xmlns:image="http://www.google.com/schemas/sitemap-image/1.1" xmlns:video="http://www.google.com/schemas/sitemap-video/1.1">
+<url> <loc>https://danielabaron.me/blog/save-monthly-expense-caution/</loc> <changefreq>daily</changefreq> <priority>0.7</priority> </url>
 <url> <loc>https://danielabaron.me/blog/rails-blocked-host-docker-clean/</loc> <changefreq>daily</changefreq> <priority>0.7</priority> </url>
 <url> <loc>https://danielabaron.me/blog/hack-your-rrsp-refund/</loc> <changefreq>daily</changefreq> <priority>0.7</priority> </url>
 <url> <loc>https://danielabaron.me/blog/heroku_pg_pull_and_docker/</loc> <changefreq>daily</changefreq> <priority>0.7</priority> </url>
@@ -30,6 +31,7 @@
 <url> <loc>https://danielabaron.me/blog/3</loc> <changefreq>daily</changefreq> <priority>0.7</priority> </url>
 <url> <loc>https://danielabaron.me/blog/4</loc> <changefreq>daily</changefreq> <priority>0.7</priority> </url>
 <url> <loc>https://danielabaron.me/blog/5</loc> <changefreq>daily</changefreq> <priority>0.7</priority> </url>
+<url> <loc>https://danielabaron.me/blog/6</loc> <changefreq>daily</changefreq> <priority>0.7</priority> </url>
 <url> <loc>https://danielabaron.me/about/</loc> <changefreq>daily</changefreq> <priority>0.7</priority> </url>
 <url> <loc>https://danielabaron.me/</loc> <changefreq>daily</changefreq> <priority>0.7</priority> </url>
 </urlset>
