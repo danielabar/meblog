@@ -22,10 +22,64 @@ Digging into the input `expenses.csv` file, I found the issue - notice the secon
 ...
 ```
 
-The expected format for the input csv is: `date in YYYY-MM-DD format,numeric spending amount,spending category,store`. However, the second line has a typo in the date, there's a `,` where the second `-` should be. But, `2021-04` is a valid date. So what the program did is take the first field `2021-04` as the date, then the second "field", which was really the date portion of `24` as the amount field, then the amount field of `194.87` which was now the third field got tracked as a category, and the actual category `Groceries` was now the fourth field and got tracked as the store. The final field `Metro` which is the actual store ended up in the fifth position and was ignored entirely. This is how the spending of `$194.87` got incorrectly recorded as `$24.00` and that's how total spending for April was under-reported.
+The expected format for the input csv is: `date in YYYY-MM-DD format,numeric spending amount,category,store`. However, the second line has a typo in the date, there's a `,` where the second `-` should be. But, `2021-04` is a valid date. So what the program did is take the first field `2021-04` as the date, then the second "field", which was really the date portion of `24` as the amount field, then the amount field of `194.87` which was now the third field got tracked as a category, and the actual category `Groceries` was now the fourth field and got tracked as the store. The final field `Metro` which is the actual store ended up in the fifth position and was ignored entirely. This is how the spending of `$194.87` got incorrectly recorded as `$24.00` and that's how total spending for April was under-reported.
 
-Looking at the code, I realized there was no validation of the input file. It's read in via a csv stream library and processed one line at a time, assuming each line is in the expected format.
+Normally when a developer discovers a bug in their code, there's a kind of instinct to dive in, figure out what's wrong and fix it as quickly as possible. But with TDD, the approach is different. After figuring out where in the code the problem lies, you first write a failing test. That is, a test that exercises the buggy portion of the code, and makes assertions assuming the bug has already been fixed. This test will fail because you haven't actually fixed it yet. Then you go in and fix the code, run the test again, and this time it should pass.
 
-TODO: Show snip of relevant code...
+The benefit of this approach is it forces you to first think about how the code should behave under the bug circumstances by documenting it in a test. Then having the test ensures that this bug will never creep into your code again.
+
+So first things first, let's figure out where in the code this problem with processing potentially invalid data occurs.
+
+## Analysis
+
+Looking at the code, I realized there was no validation of the input file. It's read in via a csv stream library and processed one line at a time, assuming each line is in the expected format. Here's the relevant code starting from the command line entrypoint:
+
+```javascript
+// index.js (entrypoint)
+const expense = require('./lib/expense');
+
+// grab the command line arguments including `argv.e` which is path to expense file
+(async () => {
+  const result = await expense.process(argv.e);
+  fs.writeFileSync('expenses.json', JSON.stringify(result, null, 2), 'utf8');
+})();
+
+// lib/expense.js
+const csv = require('csv-streamify');
+const fs = require('fs');
+
+async function process(inputFile) {
+  // No validation, inputFile is passed as is to processFile function.
+  const expenseSummary = await processFile(inputFile);
+  return expenseSummary;
+}
+
+async function processFile(file) {
+  return new Promise(resolve => {
+    const output = {};
+    const parser = csv();
+    parser.on('data', line => {
+      // csv-streamify exposes the data as an array of values from csv line
+      // eg: 2020-04-29,194.23,Groceries,Metro turns into:
+      // ['2020-04-29', '194.23', 'Groceries', 'Metro']
+      processLine(line, output);
+    });
+    parser.on('end', () => {
+      resolve(output);
+    });
+    fs.createReadStream(file, { encoding: 'utf8' }).pipe(parser);
+  });
+}
+
+function processLine(line, output) {
+  // Use destructuring assignment to unpack values out of array that csv-streamify generated from line in csv file
+  const [dateStr, amountStr, category, merchant] = line;
+  processEntry({ dateStr, amountStr, category, merchant }, output);
+}
+
+function processEntry(data, output) {
+  // Begin calculations...
+}
+```
 
 Aside: Some of you may be wondering why write a custom program for expense tracking when there's Excel and countless free apps out there, a [short explanation here](https://github.com/danielabar/tidysum#why-not-use-excel).
