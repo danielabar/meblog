@@ -17,7 +17,7 @@ Digging into the input `expenses.csv` file, I found the issue - notice the secon
 ```
 ...
 2021-04-11,131.32,Groceries,Metro
-2021-04,24,194.87,Groceries,Metro <-- BUG IN THIS LINE
+2021-04,24,194.87,Groceries,Metro <-- BUG HANDLING THIS LINE
 2021-04-25,20.00,Gas,Shell
 ...
 ```
@@ -40,12 +40,17 @@ Looking at the code, I realized there was no validation of the input file. It's 
 // index.js (entrypoint)
 const expense = require('./lib/expense');
 
-// grab the command line arguments including `argv.e` which is path to expense file
+// Left out some code for brevity - that grabs the command line arguments
+// including `argv.e` which is path to expense file
+// ...
+
 (async () => {
   const result = await expense.process(argv.e);
   fs.writeFileSync('expenses.json', JSON.stringify(result, null, 2), 'utf8');
 })();
+```
 
+```js
 // lib/expense.js
 const csv = require('csv-streamify');
 const fs = require('fs');
@@ -90,7 +95,7 @@ The critical part is this line that uses `csv-streamify` to stream in the csv fi
 parser.on('data', line => {
 ```
 
-At this point, `line` is an array of values from the line in the csv file that was just read. There will be one entry in the array for each value in the csv line. Then this array `line` gets passed to the `processLine` function which uses destructuring assignment to unpack the values in the `line` array into individual values:
+At this point, `line` is an array of values from the line in the csv file that was just read. There will be one entry in the array for each value in the csv line. Then this array `line` gets passed to the `processLine` function which uses [destructuring assignment](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Operators/Destructuring_assignment) to unpack the values in the `line` array into individual values:
 
 ```js
 function processLine(line, output) {
@@ -127,7 +132,7 @@ Then before the program goes into the calculation step, it should check if any v
 
 Since the bug can be observed from the results of the `process` function in `lib/expense.js`, I will start with writing a test for this function. The test will provide an invalid input file to the `process` function, and expects some validation errors returned instead of the usual calculations that `process` would return.
 
-It's very likely that the validation implementation won't go in the `process` function itself because the whole `lib/expense.js` module is about calculating expenses. Keeping with the [single responsibility principle](https://en.wikipedia.org/wiki/Single-responsibility_principle), the actual validation will be performed by another module, and `process` will just call out to it before proceeding with calculation. However, I don't want to get into any implementation details before having at least one failing test in place, and since I can see the buggy behaviour from `process`, this is where I'm starting with a (failing) test.
+It's very likely that the validation implementation won't go in the `process` function itself because the `lib/expense.js` module is about calculating expenses. Keeping with the [single responsibility principle](https://en.wikipedia.org/wiki/Single-responsibility_principle), the actual validation will be performed by another module, and `process` will just call out to it before proceeding with calculation. However, I don't want to get into any implementation details before having at least one failing test in place, and since I can see the buggy behaviour from `process`, this is where I'm starting with a (failing) test.
 
 This project uses the [Mocha](https://mochajs.org/) testing library with [Chai](https://www.chaijs.com/) expect-style assertions, but the same TDD principles would apply to any test framework/library.
 
@@ -179,7 +184,7 @@ describe('processExpenses', function() {
 
 Run `npm test` in a terminal to run the tests, and as expected, this new test fails because validation has not yet been implemented.
 
-You can see the bug in action here because the code is attempting to run calculations on invalid data. There's a category of `194.32` due to the date parsing error on the first invalid line. Also there's a Merchant of `undefined` which comes from the second invalid line that only has 3 fields (missing Merchant field):
+You can see the bug in action here because the code is attempting to run calculations on invalid data. There's a category of `194.32` due to the date parsing error on the first invalid line. Also there's a Merchant of `undefined` which comes from the second invalid line that only has 3 fields (missing Merchant field). And the total spending is incorrect, it should be `194.32` + `45.87` = `240.19` (the intended amounts from input data if it were valid), but instead the total is `29` (from incorrectly parsed date in ine 1) + `45.87` = `74.87`.
 
 ![tdd bug fail 1](../images/tdd-bug-fail-1.png "tdd bug fail 1")
 
@@ -260,7 +265,7 @@ async function processFile(file) {
 
 **Aside:** Why use a streaming approach to read in the expense file? While certainly the code would be easier to read by reading the entire file into memory in a single operation, this won't scale. If the user has been diligently tracking their every single expense for many years, the expense file could grow too large to fit into memory and then the program would crash. A full discussion of Node.js streams is outside the scope of this article, but if you'd like to learn more about this topic, see the [Streams](https://nodejs.dev/learn/nodejs-streams) documentation.
 
-Back to implementation. Since the csv input file is being read one line at a time, will need an object to accumulate the results of validation. What should this object look like? This is the expected result specified in the test (that is currently failing), recall the expected object to be returned from this function looks like this:
+Back to implementation. Since the csv input file is being read one line at a time, an object is needed to accumulate the results of validation. What should this object look like? This is the expected result specified in the test (that is currently failing), recall the expected object to be returned from this function looks like this:
 
 ```js
 const expectedResult = {
@@ -390,7 +395,7 @@ And finally, the test passes!
 
 ![tdd bug pass 1](../images/tdd-bug-pass-1.png "tdd bug pass 1")
 
-## Refactoring
+## Refactoring: Extract Method
 
 There's still more work to be done though. Remember the number of fields is not the only thing that could be wrong with a line in the input file. The program should also validate that the date is in expected `YYYY-MM-DD` format and that the amount field is numeric.
 
@@ -503,7 +508,7 @@ This time the test will fail because the date format validation has not yet been
 
 Now let's go back to the `validateLine` function of the `validate` module to add date format validation. The technique used here is to [parse](https://momentjs.com/docs/#/parsing/string-format/) the date using moment.js in strict mode (passing boolean `true` as the third argument), then checking the resulting moment.js object's `isValid()` function to determine if parsing worked as expected.
 
-**Aside** This program is from a few years ago and already using moment.js for date handling so will continue using that for the validation. However, if starting a new project, there are more lightweight and modern [alternatives](https://momentjs.com/docs/#/-project-status/) available.
+**Aside:** This program is from a few years ago and already using moment.js for date handling so will continue using that for the validation. However, if starting a new project, there are more lightweight and modern [alternatives](https://momentjs.com/docs/#/-project-status/) available.
 
 Here is the updated `validateLine` function with additional date validation:
 
@@ -546,7 +551,7 @@ Now the updated test passes.
 
 Up until this point the validation code has been test driven from the `process` function test of the `expense` module. This is an integration test because it's using file I/O and testing the result of multiple modules working together. It was a good place to start with testing because that's where the buggy behaviour was observed. But now that the program is taking shape and we see that the actual validation logic is in a validation module, it's time to move one level lower and unit test just the validation module. While it's great to have higher level integration tests to ensure all the modules work together, these can be slower than unit tests.
 
-I'd like to just test the `validateLine` function of the `validator` module because it doesn't require a file input, allowing the tests to focus one passing it just one invalid line at a time. Here is a skeleton of the `validator` module test and a few tests that cover the existing validation rules for number of fields and date format. A `beforeEach` block is used to reset the `output` accumulator object to an empty state before each test:
+I'd like to just test the `validateLine` function of the `validator` module because it doesn't require a file input, allowing the tests to focus on passing it just one invalid line at a time. Here is a skeleton of the `validator` module test and a few tests that cover the existing validation rules for number of fields and date format. A `beforeEach` block is used to reset the `output` accumulator object to an empty state before each test:
 
 ```js
 // test/lib/validator.test.js
@@ -618,11 +623,271 @@ function validateLine(line, output) {
 }
 
 module.exports = {
+  // Only one function is public
   processFile,
 }
 ```
 
-TODO: Mention benefit of default and protected java access modifiers https://www.programiz.com/java-programming/access-modifiers
+However, in order to unit test the `validateLine` method of the `validator` module, it must also be exposed in the `module.exports` section, effectively making it public. This is one of the few times that I miss Java, where the `default` and `protected` [access modifiers](https://www.programiz.com/java-programming/access-modifiers) are perfect for this purpose. A method can be marked `default` or `protected` to give it package level visibility, which makes it available to the test which lives in the same package, but doesn't make it `public` to the entire program.
+
+One way around this in JavaScript is to extract out the method to be tested into yet another module, say `validator-details.js`, expose that method publicly in the new module, then have the `validator` module call out to `validator-details` module. However, this feels like way too much overhead for this purpose so I'm simply going to add `validateLine` to the list of public methods in the `validator` module:
+
+```js
+// lib/validator.js
+
+async function processFile(file) {
+  // ...
+}
+
+function validateLine(line, output) {
+  // ...
+}
+
+module.exports = {
+  processFile,
+  // NOW validateLine can be unit tested
+  validateLine,
+}
+```
+
+And this makes the tests pass, including the new tests in `test/lib/validator.test.js`
+
 ## More Validation: Numeric Amount
 
-The last validation to add is to ensure the spending amount provided in each csv line is numeric. So the usual drill, add or update a test first. But first, something to consider.
+The last validation to add is to ensure the spending amount provided in each csv line is numeric. Now that we have lower level unit testing set up for the `validator` module, let's add this test:
+
+```js
+// test/lib/validator.test.js
+const validator = require('../../lib/validator');
+const { expect } = require('chai');
+
+describe('validator', () => {
+  describe('validateLine', () => {
+    let output;
+
+    beforeEach(() => {
+      output = {
+        lineErrors: [],
+      };
+    });
+
+    it('sets errors when number of fields is greater than 4 and date field is invalid', () => {
+      // existing test...
+    });
+
+    it('sets error when number of fields is less than 4', () => {
+      // existing test...
+    });
+
+    // NEW TEST HERE
+    it('sets error when amount is not numeric', () => {
+      // Given
+      const line = ['2021-04-27', '1o7.e8', 'Groceries', 'Metro'];
+      // When
+      validator.validateLine(line, output);
+      // Then
+      const expectedOutput = {
+        lineErrors: [
+          {
+            line: '2021-04-27,1o7.e8,Groceries,Metro',
+            errors: ['Amount must be numeric.'],
+          },
+        ],
+      };
+      expect(output).to.deep.equal(expectedOutput);
+    });
+  });
+});
+```
+
+At this point, the test will fail because numeric amount validation has not yet been implemented. So the `lineErrors` property of the `output` object will be an empty array rather than the expected error:
+
+![tdd bug fail 6](../images/tdd-bug-fail-6.png "tdd bug fail 6")
+
+For implementation, there's plenty of JavaScript [solutions](https://www.wikitechy.com/tutorials/javascript/validate-decimal-numbers) to verify if a given input is a decimal number. Since the Tidysum app is already using [decimal.js](https://github.com/MikeMcl/decimal.js/), I decided to make use of that library's parsing, which throws an error if the input cannot be parsed to a numeric. Note that all values come in as strings from csv parsing, so the solution needs to consider `'123.45'` to be valid, but `'123abc'` is not.
+
+Here is the updated validator module with numeric amount validation added:
+
+```js
+// lib/validator.js
+const moment = require('moment');
+const Decimal = require('decimal.js');
+
+async function processFile(file) {
+  // ...
+}
+
+function validateLine(line, output) {
+  // Build an entry to record everything that might be wrong with this line.
+  const lineErrorEntry = {
+    line: line.join(','),
+    errors: [],
+  };
+
+  // Validate number of fields
+  if (line.length != 4) {
+    lineErrorEntry.errors.push(`Expected 4 fields, got ${line.length}.`);
+  }
+
+  // Validate date format
+  if (line.length > 0 && !moment(line[0], 'YYYY-MM-DD', true).isValid()) {
+    lineErrorEntry.errors.push(`Date format must be YYYY-MM-DD.`);
+  }
+
+  // NEWLY ADDED: Validate numeric amount
+  if (line.length > 1) {
+    try {
+      new Decimal(line[1]);
+    } catch (_) {
+      lineErrorEntry.errors.push('Amount must be numeric.');
+    }
+  }
+}
+
+module.exports = {
+  processFile,
+  validateLine,
+}
+```
+
+And now the tests pass.
+
+One last test that should be added is to pass in a valid line, and ensure that no errors are reported. This is to make sure there's no false negative in the validation code - i.e. flagging a valid line as invalid:
+
+```js
+// test/lib/validator.test.js
+const validator = require('../../lib/validator');
+const { expect } = require('chai');
+
+describe('validator', () => {
+  describe('validateLine', () => {
+    let output;
+
+    beforeEach(() => {
+      output = {
+        lineErrors: [],
+      };
+    });
+
+    it('sets errors when number of fields is greater than 4 and date field is invalid', () => {
+      // existing test...
+    });
+
+    it('sets error when number of fields is less than 4', () => {
+      // existing test...
+    });
+
+    it('sets error when amount is not numeric', () => {
+      // existing test...
+    });
+
+    // NEW TEST HERE: Valid scenario
+    it('does not report any errors when input line is valid', () => {
+      // Given
+      const line = ['2021-04-05', '78.34', 'Groceries', 'Metro'];
+      // When
+      validator.validateLine(line, output);
+      // Then
+      const expectedOutput = {
+        lineErrors: [],
+      };
+      expect(output).to.deep.equal(expectedOutput);
+    });
+  });
+});
+```
+
+And this test passes as well.
+
+Good, all validation is now implemented. But not quite ready to call it a day.
+## Refactoring: Extract Validation Methods
+
+It's time to do just a little more refactoring. Looking at the validator module, there's a few things bothering me:
+
+1. The `validateLine` function has gotten too long, it has the details of 3 different validations, and each one has a comment describing what it does. It would be cleaner to extract each of these to a separate method, and name the method to match the comment, then the comments can be removed.
+2. There are several hard-coded values: `4` for number of fields, and `YYYY-MM-DD` for date format. It would be cleaner to extract these as constants.
+
+Again we can rely on the tests here. It's safe to re-arrange the code to make any internal improvements, and as long as the tests are still passing, can be confident that the code is still working as expected.
+
+Here is the refactored validation module with individual methods to implement each validation rule, and hard-coded values extracted as constants:
+
+```js
+// lib/validator.js
+const NUM_FIELDS = 4;
+const DATE_FORMAT = 'YYYY-MM-DD';
+
+async function processFile(file) {
+  // ...
+}
+
+function validateLine(line, output) {
+  // Build an entry to record everything that might be wrong with this line.
+  const lineErrorEntry = {
+    line: line.join(','),
+    errors: [],
+  };
+
+  // Call out to individual validation methods for each rule
+  validateNumFields(line, lineErrorEntry);
+  validateDateFormat(line, lineErrorEntry);
+  validateNumeric(line, lineErrorEntry);
+
+  // If found at least one thing wrong with this line, add it to the output
+  if (lineErrorEntry.errors.length > 0) {
+    output.lineErrors.push(lineErrorEntry);
+  }
+}
+
+function validateNumFields(line, lineErrorEntry) {
+  if (line.length != NUM_FIELDS) {
+    lineErrorEntry.errors.push(`Expected ${NUM_FIELDS} fields, got ${line.length}.`);
+  }
+}
+
+function validateDateFormat(line, lineErrorEntry) {
+  if (line.length > 0 && !moment(line[0], DATE_FORMAT, true).isValid()) {
+    lineErrorEntry.errors.push(`Date format must be ${DATE_FORMAT}.`);
+  }
+}
+
+function validateNumeric(line, lineErrorEntry) {
+  if (line.length > 1) {
+    try {
+      new Decimal(line[1]);
+    } catch (_) {
+      lineErrorEntry.errors.push('Amount must be numeric.');
+    }
+  }
+}
+
+module.exports = {
+  processFile,
+  validateLine,
+};
+```
+
+And all the tests are still passing, hurray!
+
+## Summary
+
+This post has walked you through a practical example of using TDD to fix a bug, and apply refactoring to improve the design of the code, while relying on the tests to confirm the code still works as expected. In general the process is as follows:
+
+1. Analyze the code to find where/how/why the bug is occurring.
+2. Define expectations about how the code should behave.
+3. Write a test that fails because of the bug.
+4. Write some code to make the test pass.
+5. Refactor and re-run tests as needed.
+
+I hope this has inspired you to try out TDD next time you're faced with a bug. Good luck and happy coding!
+
+## Related Content
+
+The following section contains affiliate links for related content you may find useful. I get a small commission from purchases which helps me maintain this site.
+
+You've seen a few simple examples of refactoring in this blog post. Martin Fowler's [Refactoring: Improving the Design of Existing Code](https://amzn.to/2RFC0Xn) is the go-to book to learn all about this topic.
+
+Working on a large legacy code base? This book [Working Effectively with Legacy Code](https://amzn.to/3accwHF) is a must read.
+
+Is your organization introducing microservices? This book [Building Event-Driven Microservices: Leveraging Organizational Data at Scale](https://amzn.to/3uSxa87) is a fantastic resource on this topic.
+
+Looking to level up on Rails 6? You might like this book: [Agile Web Development with Rails 6](https://amzn.to/3wS8GNA).

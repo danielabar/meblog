@@ -64,6 +64,8 @@ The following section contains affiliate links for related content you may find 
 
 This book [Your Money or Your Life](https://amzn.to/2Q4UboX), completely changed how I view money. Never mind all the economists definitions like money is a "unit of account" or a "store of value". This book will teach you the only definition of money that matters in your life.
 
+Even if you love your job and could never imagine quitting, [Quit Like A Millionaire](https://amzn.to/3hu0xcQ) will teach you how to amass enough wealth to live life on your own terms. Equal parts entertaining and educational, this is one of the most enjoyable personal finance books I have read.
+
 Another book I really enjoyed is [The Psychology of Money: Timeless lessons on wealth, greed, and happiness](https://amzn.to/2Q7BIrT). In it you'll learn that being successful with money depends way more on how you behave than being a so-called financial expert.
 
 Looking for information on Canadian taxes? You might like this book: [The Grumpy Accountant: One Fed-Up Tax Pro's Practical Plan to Fix Canada's Senselessly Complicated Tax System](https://amzn.to/3aaj4qh).
