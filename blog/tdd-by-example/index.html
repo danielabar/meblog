@@ -914,6 +914,12 @@
 <p>One more quick note about the calculator - eagle eyed readers may have observed that the <code>calcYearlyDiff</code> function modifies its input. Normally I wouldn't do this, especially in a large application where there could be many callers of this function and modifying the input would be unexpected. But for a small side project where the input is actually running through a series of transformations and isn't used anywhere else, I decided this was fine. A future refactor could first make a deep copy of the input, and then operate only on the copy. Since the test makes assertions on the returned result, it would still be expected to pass.</p>
 <h2>Conclusion</h2>
 <p>I hope this post has given you some ideas about how to get started with TDD. The TDD approach lends itself really well to cases where the exact requirements are known. I've found this to especially be the case with calculations, validations and transformation type code. Next time you're adding a new feature to a project, if you know exactly how the new feature should behave, try to write a test for it first.</p>
+<h2>Related Content</h2>
+<p>The following section contains affiliate links for related content you may find useful. I get a small commission from purchases which helps me maintain this site.</p>
+<p>You've seen a few simple examples of refactoring in this blog post. Martin Fowler's <a href="https://amzn.to/2RFC0Xn">Refactoring: Improving the Design of Existing Code</a> is the go-to book to learn all about this topic.</p>
+<p>Working on a large legacy code base? This book <a href="https://amzn.to/3accwHF">Working Effectively with Legacy Code</a> is a must read.</p>
+<p>Is your organization introducing microservices? This book <a href="https://amzn.to/3uSxa87">Building Event-Driven Microservices: Leveraging Organizational Data at Scale</a> is a fantastic resource on this topic.</p>
+<p>Looking to level up on Rails 6? You might like this book: <a href="https://amzn.to/3wS8GNA">Agile Web Development with Rails 6</a>.</p>
 <style class="grvsc-styles">
   .grvsc-container {
     overflow: auto;
