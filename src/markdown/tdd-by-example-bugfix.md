@@ -1,7 +1,7 @@
 ---
 title: "TDD by Example: Fixing a Bug"
 featuredImage: "../images/tdd-bug-charlotte-descamps-1sbVyhfdoQM-unsplash.jpg"
-description: "A practical example of using TDD to fix a bug on an existing project."
+description: "A practical example of using TDD to fix a bug and do some refactoring on an existing project."
 date: "2021-05-16"
 category: "javascript"
 ---
