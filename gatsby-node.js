@@ -1,6 +1,7 @@
 const { createFilePath } = require(`gatsby-source-filesystem`)
 const path = require("path")
 const fs = require('fs');
+const searchHelper = require('./lib/search-helper');
 
 // Add slug to each post
 exports.onCreateNode = ({ node, getNode, actions }) => {
@@ -28,6 +29,8 @@ exports.createPages = ({ graphql, actions }) => {
             node {
               frontmatter {
                 title
+                category
+                date(formatString: "YYYY-MM-DD")
                 description
               }
               fields {
@@ -52,9 +55,9 @@ exports.createPages = ({ graphql, actions }) => {
             description: node.frontmatter.description,
           },
         })
-        // generate search insert statements for pg
-        forInsert = node.rawMarkdownBody.replace(/(?:\r\n|\r|\n)/g, ' ');
-        fs.appendFileSync('search.sql', forInsert + '\n\n', 'utf8');
+        // generate search insert statements for postgres full text search service
+        insertStatement = searchHelper.generateInsert(node)
+        fs.appendFileSync('search.sql', insertStatement + '\n', 'utf8');
       })
       // build blog-list pages (aka pagination)
       const posts = result.data.allMarkdownRemark.edges
