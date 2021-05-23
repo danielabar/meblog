@@ -43,8 +43,13 @@ exports.createPages = ({ graphql, actions }) => {
         }
       }
     `).then(result => {
-      // build individual blog pages
+      // wipe out old search file
+      if (fs.existsSync(path)) {
+        fs.unlinkSync('search.sql');
+      }
+
       result.data.allMarkdownRemark.edges.forEach(({ node }) => {
+        // build individual blog pages
         createPage({
           path: node.fields.slug,
           component: path.resolve("./src/templates/post.js"),
@@ -55,6 +60,7 @@ exports.createPages = ({ graphql, actions }) => {
             description: node.frontmatter.description,
           },
         })
+
         // generate search insert statements for postgres full text search service
         insertStatement = searchHelper.generateInsert(node)
         fs.appendFileSync('search.sql', insertStatement + '\n', 'utf8');
