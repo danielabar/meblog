@@ -11,3 +11,22 @@ export async function getSearchResults(query) {
   }
   return json;
 }
+
+export function toNodeArray(searchResults) {
+  return searchResults.map(sr => {
+    return {
+      node: {
+        excerpt: 'Excerpt TBD...',
+        fields: {
+          slug: sr.slug
+        },
+        frontmatter: {
+          category: sr.category,
+          date: sr.published_at,
+          title: sr.title
+        },
+        id: sr.title
+      }
+    }
+  })
+}

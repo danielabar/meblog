@@ -1,7 +1,8 @@
 import React, { useEffect, useState } from "react"
 import { useLocation } from '@reach/router';
 import queryString from 'query-string';
-import { getSearchResults } from '../services/search';
+import { getSearchResults, toNodeArray } from '../services/search';
+import ArticleList from "../components/article-list"
 import SEO from "../components/SEO"
 import Layout from "../components/layout"
 import AllLink from "../components/all-link"
@@ -13,6 +14,12 @@ const SearchResults = () => {
   const searchTerm = query.q
   const [list, setList] = useState([]);
 
+  // TODO: Modify search-helper.js to also generate excerpt
+  // TODO: Modify server documents table to add excerpt column
+  // TODO: Style h2 header
+  // TODO: Handle empty state (list of search results is empty array)
+  // TODO: Add search-input component to mobile nav
+  // TODO: Search UI, example https://egghead.io/lessons/gatsby-navigate-to-a-new-page-programmatically-in-gatsby
   useEffect(() => {
     async function fetchData() {
       const searchResults = await getSearchResults(searchTerm);
@@ -26,9 +33,7 @@ const SearchResults = () => {
       <SEO title="Search Results" pathname="/search-results" />
       <div className={styles.container}>
         <h2>Search Results for {query.q}</h2>
-        <ul>
-          {list.map(item => <li key={item.title}>{item.title}</li>)}
-        </ul>
+        <ArticleList articles={toNodeArray(list)} />
       </div>
       <AllLink marginTop="30px" />
     </Layout>

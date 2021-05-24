@@ -22,7 +22,6 @@ const SearchInput = () => {
     }
   }, 300);
 
-  // TODO: Search UI, example https://egghead.io/lessons/gatsby-navigate-to-a-new-page-programmatically-in-gatsby
   return (
     <input type="text"
            className={styles.search}
