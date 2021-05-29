@@ -36,6 +36,7 @@ exports.createPages = ({ graphql, actions }) => {
               fields {
                 slug
               }
+              excerpt,
               html,
               rawMarkdownBody
             }
@@ -44,7 +45,7 @@ exports.createPages = ({ graphql, actions }) => {
       }
     `).then(result => {
       // wipe out old search file
-      if (fs.existsSync(path)) {
+      if (fs.existsSync('search.sql')) {
         fs.unlinkSync('search.sql');
       }
 

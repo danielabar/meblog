@@ -14,12 +14,11 @@ const SearchResults = () => {
   const searchTerm = query.q
   const [list, setList] = useState([]);
 
-  // TODO: Modify search-helper.js to also generate excerpt
-  // TODO: Modify server documents table to add excerpt column
   // TODO: Style h2 header
   // TODO: Handle empty state (list of search results is empty array)
   // TODO: Add search-input component to mobile nav
   // TODO: Search UI, example https://egghead.io/lessons/gatsby-navigate-to-a-new-page-programmatically-in-gatsby
+  // TODO: Add SEARCH_ENABLED env var
   useEffect(() => {
     async function fetchData() {
       const searchResults = await getSearchResults(searchTerm);

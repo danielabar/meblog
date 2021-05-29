@@ -16,7 +16,7 @@ export function toNodeArray(searchResults) {
   return searchResults.map(sr => {
     return {
       node: {
-        excerpt: 'Excerpt TBD...',
+        excerpt: sr.excerpt,
         fields: {
           slug: sr.slug
         },
