@@ -1,6 +1,7 @@
 import React from 'react';
-import styles from "./search-input.module.css"
 import { navigate } from 'gatsby';
+import { MdSearch } from "react-icons/md";
+import styles from "./search-input.module.css"
 
 const SearchInput = () => {
 
@@ -23,11 +24,14 @@ const SearchInput = () => {
   }, 300);
 
   return (
-    <input type="text"
-           className={styles.search}
-           aria-label="Search"
-           placeholder="Search, eg: Rails"
-           onChange={(e) => search(e.target.value)} />
+    <div className={styles.wrapper}>
+      <MdSearch size="1.7rem" />
+      <input type="text"
+            className={styles.search}
+            aria-label="Search"
+            placeholder="Search, eg: Rails"
+            onChange={(e) => search(e.target.value)} />
+    </div>
   )
 }
 

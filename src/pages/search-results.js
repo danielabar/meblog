@@ -18,7 +18,6 @@ const SearchResults = () => {
 
   // TODO: What if searchTerm is null/undefined
   // TODO: Add search-input component to mobile nav
-  // TODO: Search UI, example https://egghead.io/lessons/gatsby-navigate-to-a-new-page-programmatically-in-gatsby
   // TODO: Add SEARCH_ENABLED env var
   useEffect(() => {
     async function fetchData() {

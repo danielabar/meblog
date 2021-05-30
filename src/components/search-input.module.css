@@ -1,3 +1,18 @@
+.wrapper {
+  color: var(--brand-desaturate-35-transp-50);
+  position: relative;
+}
+
+.wrapper svg {
+  left: 5px;
+  position: absolute;
+  top: 4px;
+}
+
 .search {
-  padding: 5px;
+  border: 1px solid var(--brand-desaturate-39);
+  border-radius: 3px;
+  padding-left: 35px;
+  padding-top: 10px;
+  padding-bottom: 10px;
 }
