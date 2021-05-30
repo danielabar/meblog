@@ -17,7 +17,7 @@ const SearchInput = () => {
   }
 
   const search = debounce((text) => {
-    if (text.length > 3) {
+    if (text.length >= 3) {
       navigate(`/search-results/?q=${text}`);
     }
   }, 300);

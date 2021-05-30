@@ -16,6 +16,7 @@ const SearchResults = () => {
 
   // TODO: Style h2 header
   // TODO: Handle empty state (list of search results is empty array)
+  // TODO: What if searchTerm is null/undefined
   // TODO: Add search-input component to mobile nav
   // TODO: Search UI, example https://egghead.io/lessons/gatsby-navigate-to-a-new-page-programmatically-in-gatsby
   // TODO: Add SEARCH_ENABLED env var
@@ -31,7 +32,7 @@ const SearchResults = () => {
     <Layout>
       <SEO title="Search Results" pathname="/search-results" />
       <div className={styles.container}>
-        <h2>Search Results for {query.q}</h2>
+        <h2 className={styles.header}>Search Results For: <span className={styles.term}>{query.q}</span></h2>
         <ArticleList articles={toNodeArray(list)} />
       </div>
       <AllLink marginTop="30px" />
