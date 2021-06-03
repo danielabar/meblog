@@ -1,5 +1,7 @@
 const { createFilePath } = require(`gatsby-source-filesystem`)
 const path = require("path")
+const fs = require('fs');
+const searchHelper = require('./lib/search-helper');
 
 // Add slug to each post
 exports.onCreateNode = ({ node, getNode, actions }) => {
@@ -27,19 +29,28 @@ exports.createPages = ({ graphql, actions }) => {
             node {
               frontmatter {
                 title
+                category
+                date(formatString: "YYYY-MM-DD")
                 description
               }
               fields {
                 slug
               }
-              html
+              excerpt,
+              html,
+              rawMarkdownBody
             }
           }
         }
       }
     `).then(result => {
-      // build individual blog pages
+      // wipe out old search file
+      if (fs.existsSync('search.sql')) {
+        fs.unlinkSync('search.sql');
+      }
+
       result.data.allMarkdownRemark.edges.forEach(({ node }) => {
+        // build individual blog pages
         createPage({
           path: node.fields.slug,
           component: path.resolve("./src/templates/post.js"),
@@ -50,6 +61,10 @@ exports.createPages = ({ graphql, actions }) => {
             description: node.frontmatter.description,
           },
         })
+
+        // generate search insert statements for postgres full text search service
+        insertStatement = searchHelper.generateInsert(node)
+        fs.appendFileSync('search.sql', insertStatement + '\n', 'utf8');
       })
       // build blog-list pages (aka pagination)
       const posts = result.data.allMarkdownRemark.edges
