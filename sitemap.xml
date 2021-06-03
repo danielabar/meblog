@@ -35,4 +35,5 @@
 <url> <loc>https://danielabaron.me/blog/6</loc> <changefreq>daily</changefreq> <priority>0.7</priority> </url>
 <url> <loc>https://danielabaron.me/about/</loc> <changefreq>daily</changefreq> <priority>0.7</priority> </url>
 <url> <loc>https://danielabaron.me/</loc> <changefreq>daily</changefreq> <priority>0.7</priority> </url>
+<url> <loc>https://danielabaron.me/search-results/</loc> <changefreq>daily</changefreq> <priority>0.7</priority> </url>
 </urlset>
