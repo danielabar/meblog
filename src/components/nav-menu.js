@@ -4,6 +4,15 @@ import styles from "./nav-menu.module.css"
 import SearchInput from "./search-input"
 
 const NavMenu = () => {
+  function renderSearchInput() {
+    if (process.env.SEARCH_ENABLED === 'true') {
+      return (
+        <li className={`${styles.headerItem} ${styles.navItem}`}>
+          <SearchInput />
+        </li>
+      )
+    }
+  }
   return (
     <nav className={styles.nav}>
       <ul className={styles.navList}>
@@ -17,9 +26,7 @@ const NavMenu = () => {
             About
           </Link>
         </li>
-        <li className={`${styles.headerItem} ${styles.navItem}`}>
-          <SearchInput />
-        </li>
+        { renderSearchInput() }
       </ul>
     </nav>
   )

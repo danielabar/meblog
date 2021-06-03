@@ -16,9 +16,6 @@ const SearchResults = () => {
   const [list, setList] = useState([]);
   const [searching, setSearching] = useState(true)
 
-  // TODO: What if searchTerm is null/undefined
-  // TODO: Add search-input component to mobile nav
-  // TODO: Add SEARCH_ENABLED env var
   useEffect(() => {
     async function fetchData() {
       setSearching(true)
