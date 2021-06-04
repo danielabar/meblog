@@ -3,9 +3,9 @@ import { Link } from 'gatsby';
 import { useLocation } from '@reach/router';
 import queryString from 'query-string';
 import { getSearchResults, toNodeArray } from '../services/search';
-import ArticleList from "../components/article-list"
 import SEO from "../components/SEO"
 import Layout from "../components/layout"
+import ArticleList from "../components/article-list"
 import AllLink from "../components/all-link"
 import styles from "./search-results.module.css"
 
