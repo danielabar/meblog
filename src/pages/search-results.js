@@ -15,6 +15,7 @@ const SearchResults = () => {
   const searchTerm = query.q
   const [list, setList] = useState([]);
   const [searching, setSearching] = useState(true)
+  const [track, setTrack] = useState('NO')
 
   useEffect(() => {
     async function fetchData() {
@@ -23,6 +24,8 @@ const SearchResults = () => {
       const searchResults = await getSearchResults(searchTerm);
       setList(searchResults);
       setSearching(false)
+      setTrack('YES')
+      setTrack('NO')
     }
     fetchData();
   }, [searchTerm]);
@@ -53,7 +56,7 @@ const SearchResults = () => {
 
   return (
     <Layout>
-      <SEO title="Search Results" pathname="/search-results" />
+      <SEO title="Search Results" pathname="/search-results" track={track} />
       { renderHelper() }
       <AllLink marginTop="30px" />
     </Layout>

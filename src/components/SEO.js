@@ -4,7 +4,7 @@ import PropTypes from "prop-types"
 import { StaticQuery, graphql } from "gatsby"
 import HelloWorker from '../workers/hello.worker.js'
 
-const SEO = ({ title, description, image, pathname, article }) => (
+const SEO = ({ title, description, image, pathname, article, track }) => (
   <StaticQuery
     query={query}
     render={({
@@ -20,7 +20,8 @@ const SEO = ({ title, description, image, pathname, article }) => (
         },
       },
     }) => {
-      if (typeof window === 'object') {
+      const recordVisit = track === 'NO' ? false : true
+      if (typeof window === 'object' && recordVisit) {
         const helloWorker = new HelloWorker()
         helloWorker.postMessage([window.location.href, document.referrer])
       }
