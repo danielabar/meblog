@@ -53,7 +53,7 @@ const SearchResults = () => {
 
   return (
     <Layout>
-      <SEO title="Search Results" pathname="/search-results" />
+      <SEO title="Search Results" pathname="/search-results" track="NO" />
       { renderHelper() }
       <AllLink marginTop="30px" />
     </Layout>
