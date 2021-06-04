@@ -7,23 +7,29 @@ const ENTER_KEY_CODE = 13;
 
 const SearchInput = () => {
 
-  function debounce(func, duration) {
-    let timeout
-    return function (...args) {
-      const effect = () => {
-        timeout = null
-        return func.apply(this, args)
-      }
-      clearTimeout(timeout)
-      timeout = setTimeout(effect, duration)
-    }
-  }
+  // function debounce(func, duration) {
+  //   let timeout
+  //   return function (...args) {
+  //     const effect = () => {
+  //       timeout = null
+  //       return func.apply(this, args)
+  //     }
+  //     clearTimeout(timeout)
+  //     timeout = setTimeout(effect, duration)
+  //   }
+  // }
 
-  const search = debounce((charCode, text) => {
+  // const search = debounce((charCode, text) => {
+  //   if (charCode === ENTER_KEY_CODE) {
+  //     navigate(`/search-results/?q=${text}`);
+  //   }
+  // }, 300);
+
+  function search (charCode, text) {
     if (charCode === ENTER_KEY_CODE) {
       navigate(`/search-results/?q=${text}`);
     }
-  }, 300);
+  }
 
   return (
     <div className={styles.wrapper}>
