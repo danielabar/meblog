@@ -170,6 +170,10 @@
   content: "html";
 }
 
+.content pre[data-language="http"]::before {
+  content: "http";
+}
+
 .content pre[data-language="markdown"]::before {
   content: "markdown";
 }
