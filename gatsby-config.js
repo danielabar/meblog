@@ -39,6 +39,7 @@ module.exports = {
             resolve: `gatsby-remark-vscode`,
             options: {
               theme: "Monokai", // Or install your favorite theme from GitHub
+              extensions: ['rest-client'],
               wrapperClassName: "gatsby-highlight",
               inlineCode: {
                 className: "my-inline",

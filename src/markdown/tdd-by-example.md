@@ -22,7 +22,7 @@ Aside: I was inspired to add this after learning from several finance podcasts t
 
 Ok back to TDD. Tidysum reads in a csv file of expenses like this (abbreviated, but imagine this goes on for several years):
 
-```csv
+```
 2018-01-01,...
 2018-10-01,34.29,Groceries,Loblaws
 2018-10-01,133.99,Restaurant,The Keg
