@@ -47,7 +47,7 @@ To add the first request, edit the file as follows. If following along with your
 
 ```http
 # Get all subscriptions
-GET http://localhost:3000/api/v1/subscriptions
+GET http://localhost:4000/api/v1/subscriptions
 
 Accept: application/vnd.api+json
 Myapp-Tenant-Api-Key: thekey
