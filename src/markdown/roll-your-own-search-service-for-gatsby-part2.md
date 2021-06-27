@@ -61,9 +61,9 @@ Indexes:
 
 ## Document Table Example Row
 
-Next step in building the search index is to populate the table with SQL `INSERT` statements.
+Next step in building the search index is to populate the table with content from this blog.
 
-The following illustrates how each field in the `documents` table should be populated with content from the blog:
+The following illustrates how each field in the `documents` table should be mapped to content from the blog:
 
 ![search fields](../images/search-fields.png "search fields")
 
@@ -176,7 +176,7 @@ exports.createPages = ({ graphql, actions }) => {
           // snip...
         })
 
-        // NEW CODE HERE: generate search insert statements for postgres full text search service
+        // NEW CODE HERE: generate search insert statements for search service
         insertStatement = searchHelper.generateInsert(node)
         fs.appendFileSync('search.sql', insertStatement + '\n', 'utf8');
       })
@@ -308,4 +308,4 @@ This way, every time I add a new article to my blog, I can safely reload the gen
 
 ## What's Next?
 
-So now the `documents` table is fully populated and ready to be used for search. Next up, see [Part 3: Search Engine and API](../roll-your-own-search-service-for-gatsby-part3) for how to search the table and build a service to expose a search API.
+So now the `documents` table is fully populated and ready to be used for search. Next up, see [Part 3: Search Engine](../roll-your-own-search-service-for-gatsby-part3) for how to use the built-in PostgreSQL search functions to search the documents.

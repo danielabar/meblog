@@ -8,7 +8,7 @@ category: "web development"
 
 This is the first in a multi-part series of posts detailing how I built the search feature for this blog.
 
-This blog is built with [Gatsby](https://www.gatsbyjs.com/), which is a React and GraphQL powered static site generator. Gatsby also makes React available at run time to support dynamic content. This blog is primarily static. The posts are written in markdown files. A build step runs a GraphQL query to retrieve the markdown content and metadata (such as title, description, featured image, etc.) and converts this content to HTML templates which are built with React.
+This blog is built with [Gatsby](https://www.gatsbyjs.com/), which is a React and GraphQL powered static site generator. Gatsby also makes React available at run time to support dynamic content. This blog is primarily static with the posts being written in markdown files. A build step runs a GraphQL query to retrieve the markdown content and metadata (such as title, description, featured image, etc.) and converts this content to HTML templates which are built with React.
 
 After some time, as the number of posts on this site grew, I realized it would be useful to add a search feature. Search by definition is dynamic - there's no way to anticipate every possible search string users may type in and build a static pages for each possible set of search results. So this would have to be a dynamic feature.
 
@@ -16,11 +16,17 @@ After some time, as the number of posts on this site grew, I realized it would b
 
 I started my research by looking up the Gatsby docs on how to [add search](https://www.gatsbyjs.com/docs/how-to/adding-common-features/adding-search/) to a static site. At the time of this writing, there were three options available. After some analysis, I decided none of them were optimal. Briefly, here are the options and my concerns:
 
-**1. Client-side search:** With this approach, a library or gatsby plugin is used that generates a search index that is intended to be shipped as part of the Gatsby static site.  Then some client side components are added to search this index at run time. My main concern with this approach is the increase in the bundle size delivered to each user, whether they want to use search or not. Many users may land on one of these posts from a web search, just quickly want to read that specific article and never execute any searches. It doesn't make sense to slow down the loading time and force extra data on all users. And even if some users do end up executing a search, it will most likely be for just a small fraction of the entire site index, so it still doesn't make sense that their browser needs to download the entire search index.
+### 1. Client-side search
 
-**2. Server API - Algolia:** Algolia is a commercial search service (i.e. paid, although there may be a limited use free tier). In this case some Algolia will host the search index and provide the search API. The Gatsby site makes search requests to the Algolia server, retrieves results, then renders them in client side components. My concern with this approach was additional costs, and additional dependency on another company.
+With this approach, a gatsby plugin is used that generates a search index that must be shipped as part of the Gatsby static site. Then some client side components are added to search this index at run time. My main concern with this approach is the increase in the bundle size delivered to each user, whether they want to use search or not. Many users may land on one of these posts from a web search, just quickly want to read that specific article and never execute any in-blog searches. It doesn't make sense to slow down the loading time and force extra data on all users. And even if some users do end up executing a search, it will most likely be for just a small fraction of the entire site index, so it still doesn't make sense that their browser needs to download the entire search index.
 
-**3. Server API - ElasticSearch/Solr:** A similar idea to Algolia, except ElasticSearch and Solr are available either as commercial (i.e. paid) services, or, since they're open source, can be self hosted on any cloud provider such as AWS, DigitalOcean etc. On the commercial side, my concern was the same as Algolia. On the open source side, my concern was the additional time commitment of standing up a server, installing the software, and securing/maintaining it.
+### 2. Server API - Algolia
+
+Algolia is a commercial search service (i.e. paid, although there may be a limited use free tier). In this case Algolia will host the search index and provide the search API. The Gatsby site makes search requests to the Algolia server, retrieves results, then renders them in client side components. My concern with this approach was additional costs, and additional dependency on another company.
+
+### 3. Server API - ElasticSearch/Solr
+
+A similar idea to Algolia, except ElasticSearch and Solr are available either as commercial (i.e. paid) services, or, since they're open source, can be self hosted on any cloud provider such as AWS, DigitalOcean etc. On the commercial side, my concern was the same as Algolia. On the open source side, my concern was the additional time commitment of standing up a server, installing the software, and securing/maintaining it.
 
 ## Decision
 
@@ -34,4 +40,4 @@ But even after deciding to go with PostgreSQL full text search, Rails, and the `
 
 ## What's Next?
 
-Next up, see [Part 2: Search Index](../roll-your-own-search-service-for-gatsby-part2)
+Next up, see [Part 2: Search Index](../roll-your-own-search-service-for-gatsby-part2) for how to design and populate a table to contain all the content to be searched.
