@@ -1,12 +1,12 @@
 ---
-title: "Roll Your Own Search Service with Rails and Postgres: Search Index"
+title: "Roll Your Own Search with Rails and Postgres: Search Index"
 featuredImage: "../images/roll-search-2.png"
 description: "Learn how to build search service using Rails and Postgres Full Text Search for a Gatsby blog."
 date: "2021-07-05"
 category: "web development"
 ---
 
-This is the second in a multi-part series of posts detailing how I built the search feature for this blog. In this section, I will explain how I built the search index.
+This is the second in a multi-part series of posts detailing how I built the search feature for this blog. In this post, I will explain how I built the search index.
 
 In case you missed it, [Part 1: Search Introduction](../roll-your-own-search-service-for-gatsby-part1) covers the existing options for adding search to a Gatsby site, and why I decided not to use any of them, and instead build a custom search service using PostgreSQL [Full Text Search](https://www.postgresql.org/docs/13/textsearch.html)  and Rails.
 
