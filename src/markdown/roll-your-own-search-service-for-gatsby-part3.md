@@ -6,7 +6,7 @@ date: "2021-07-06"
 category: "PostgreSQL"
 ---
 
-This is the third in a multi-part series of posts detailing how I built the search feature for this blog. This post will provide an overview to the search engine, provided by PostgreSQL [Full Text Search](https://www.postgresql.org/docs/13/textsearch.html), and introduce some concepts that will be needed in understanding how to integrate this with Rails.
+This is the third in a multi-part series of posts detailing how I built the search feature for this blog. This post will provide an overview of the search engine, provided by PostgreSQL [Full Text Search](https://www.postgresql.org/docs/13/textsearch.html), and introduce some concepts that will be needed in understanding how to integrate this with Rails.
 
 In case you missed it, [Part 1: Search Introduction](../roll-your-own-search-service-for-gatsby-part1) of this series covers the existing options for adding search to a Gatsby site, and why I decided not to use any of them, and instead build a custom search service. [Part 2: Search Index](../roll-your-own-search-service-for-gatsby-part2) covers the design and population of the `documents` table that contains all the content to be searched.
 
