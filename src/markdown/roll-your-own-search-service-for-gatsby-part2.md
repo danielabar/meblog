@@ -10,7 +10,7 @@ This is the second in a multi-part series of posts detailing how I built the sea
 
 In case you missed it, [Part 1: Search Introduction](../roll-your-own-search-service-for-gatsby-part1) covers the existing options for adding search to a Gatsby site, and why I decided not to use any of them, and instead build a custom search service using PostgreSQL [Full Text Search](https://www.postgresql.org/docs/13/textsearch.html)  and Rails.
 
-## Documents Model
+## Document Model
 
 The first step in building the search service is to design a database table containing the content to be searched. Since the posts on this blog are written in markdown, this will be all the text in the markdown files. The table also needs to contain enough information for the search results page on the client (this blog) to render the results and make each result clickable to link to the original content.
 
@@ -187,6 +187,8 @@ exports.createPages = ({ graphql, actions }) => {
 ```
 
 The new `searchHelper` module exposes a `generateInsert` function that takes in a `node` result from the graphql query and uses the fields in `node` to generate an INSERT statement. Newlines and some markdown format characters are removed from the content since they're not necessary for being searched.
+
+As for knowing how to parse a `node` object into fields such as `title`, `description`, this comes from [gatsby-transformer-remark](https://github.com/gatsbyjs/gatsby/tree/master/packages/gatsby-transformer-remark). A Gatsby plugin I use on this blog to parse Markdown files.
 
 ```js
 // lib/search-helper.js
