@@ -62,7 +62,7 @@ This needs to be integrated with Gatsby. Even though it's a static site generato
 
 ## Design
 
-Before diving into the search components, the following diagram illustrates the search flow.
+Before diving into the search components, the following diagram illustrates the search flow for an example user that wants to search for blog posts on "rails":
 
 ![search ui](../images/search-ui-2.png "search ui")
 
@@ -86,7 +86,9 @@ The search results from the server get converted to a format expected by the exi
 
 Now let's take a closer look at each UI component, starting with the new `search-input`, which is added to the top navigation bar.
 
-The input element has an `onKeyPress` event handler, which invokes a `search` function that checks if the <kbd>Enter</kbd> key has been pressed, and if so, navigates to the new `/search-results` page. This event handler has access to the current character code being entered via `event.charCode` and the complete value of the text entered in the input via `event.target.value`. Notice that the entire text value is passed to the `/search-results` page with a template string `/search-results/?q=${text}`.
+The input element has an `onKeyPress` event handler, which invokes a `search` function that checks if the <kbd>Enter</kbd> key has been pressed, and if so, navigates to the new `/search-results` page. This event handler has access to the current character code being entered via `event.charCode` and the complete value of the text entered in the input via `event.target.value`.
+
+Notice that the argument to the `onKeyPress` attribute of the `<input>` element is a function, *not* the invocation of the function. Also notice that the entire text value is passed to the `/search-results` page with a template string `/search-results/?q=${text}`.
 
 To navigate to a page programmatically, Gatsby provides the [navigate](https://www.gatsbyjs.com/docs/reference/built-in-components/gatsby-link/#how-to-use-the-navigate-helper-function) helper function.
 
