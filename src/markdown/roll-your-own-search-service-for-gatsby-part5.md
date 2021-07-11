@@ -167,4 +167,261 @@ export default SearchResults;
 
 ### Fetch Results
 
-The next step is to fetch search results from the server for the `searchTerm` that was parsed out of the url.
+The next step is to fetch search results from the server for the `searchTerm` that was parsed out of the url. Since fetching data is considered a side effect, this code goes in a [useEffect](https://reactjs.org/docs/hooks-effect.html) hook.
+
+Fetching the data will require an `async/await` function. When combining `async/await` with the `useEffect` hook in React, it's necessary to define the `async` function and invoke it directly in the hook. This gets a little messy so the actual function to get results from the server `getSearchResults` will be defined outside, and a smaller function that simply wraps this `fetchData` will be defined inside the `useEffect` hook.
+
+I'm using the [Fetch API](https://developer.mozilla.org/en-US/docs/Web/API/Fetch_API) to get results from the search server.
+
+`<Layout>` is an existing component used in this blog to render the top navigation and footer.
+
+```js
+// src/pages/search-results.js
+
+import React, { useEffect } from "react";
+import { useLocation } from '@reach/router';
+import queryString from 'query-string';
+import Layout from "../components/layout"
+
+const SearchResults = () => {
+  // Parse query from URL
+  const location = useLocation();
+  const query = queryString.parse(location.search);
+  const searchTerm = query.q
+
+  // This function will be called from within the useEffect hook.
+  async function getSearchResults(query) {
+    let json = []
+    const response = await fetch(`https://prod.rails.host/search?q=${query}`, {
+      method: 'GET',
+      headers: {
+        'Accept': 'application/json'
+      }
+    });
+    if (response.ok) {
+      json = await response.json();
+    }
+    return json;
+  }
+
+  useEffect(() => {
+    // fetchData is simply a wrapper around getSearchResults.
+    // This is needed due to how React handles async functions within useEffect hook.
+    // `searchTerm` is what was parsed out of the URL
+    // eg: `rails` for url `/search-results?q=rails`
+    async function fetchData() {
+      const searchResults = await getSearchResults(searchTerm);
+      // Do something with search results
+    }
+    // Call the wrapper function directly within the useEffect hook.
+    fetchData();
+  }, [searchTerm]);
+
+
+  return (
+    <Layout>
+      TBD...
+    </Layout>
+  )
+}
+
+export default SearchResults;
+```
+
+### Render Results
+
+Now that the search results have been retrieved from the server, they need to be rendered. This site already has an `<ArticleList>` component that is used to display a list of articles such as on the home page or on the paginated blog pages. The goal is to re-use it to display search results. Here is what it looks like:
+
+![search fields](../images/search-fields.png "search fields")
+
+The `<ArticleList>` component expects a single prop `articles`, which is a list of "nodes", which are objects generated from the `gatsby-transformer-remark` plugin. These contain the metadata from the markdown content of each blog post (title, publish date, etc.). The reason for this is the blog pages are built statically during the Gatsby build process with a GraphQL query against the markdown content.
+
+The `<ArticleList>` component iterates over the `articles` prop, which is an array of `node` objects, and renders an `<Article>` component for each node. Here is what an `<Article>` component looks like, a single entry in the `ArticleList`:
+
+![search article](../images/search-article.png "search article")
+
+The code for the `ArticleList` component:
+
+```js
+import React from "react"
+import styles from "./article-list.module.css"
+import Article from "./article"
+
+export default props => (
+  <section className={styles.container}>
+    {props.articles.map(({ node }) => (
+      <Article
+        key={node.id}
+        id={node.id}
+        to={node.fields.slug}
+        title={node.frontmatter.title}
+        category={node.frontmatter.category}
+        date={node.frontmatter.date}
+        excerpt={node.excerpt}
+      />
+    ))}
+  </section>
+)
+```
+
+One really cool thing about Gatsby is the same components can be re-used for dynamic content as well. All that's needed is to convert the search results from the search service into "node" objects expected by the `<ArticleList>` component, pass that in as the `articles` prop, and it will render dynamically.
+
+In order to do that, in the `SearchResults` component, the `useState` hook is used to save the search results into a `list` variable, and then that gets converted to the format expected by `ArticleList` with a `toNodeArray` function.
+
+```js
+// src/pages/search-results.js
+
+import React, { useEffect, useState } from "react";
+import { useLocation } from '@reach/router';
+import queryString from 'query-string';
+import Layout from "../components/layout"
+import ArticleList from "../components/article-list"
+import styles from "./search-results.module.css"
+
+const SearchResults = () => {
+  const location = useLocation();
+  const query = queryString.parse(location.search);
+  const searchTerm = query.q
+
+  // Used for saving search results within this component
+  const [list, setList] = useState([]);
+
+  async function getSearchResults(query) {
+    // snip...
+  }
+
+  // Convert search results from search service to a format expected by ArticleList
+  function toNodeArray(searchResults) {
+    return searchResults.map(sr => {
+      return {
+        node: {
+          excerpt: sr.excerpt,
+          fields: {
+            slug: sr.slug
+          },
+          frontmatter: {
+            category: sr.category,
+            date: sr.published_at,
+            title: sr.title
+          },
+          id: sr.title
+        }
+      }
+    })
+  }
+
+  useEffect(() => {
+    async function fetchData() {
+      const searchResults = await getSearchResults(searchTerm);
+      // Save search results
+      setList(searchResults);
+    }
+    fetchData();
+  }, [searchTerm]);
+
+
+  return (
+    <Layout>
+      <div className={styles.container}>
+        <h2 className={styles.header}>Search Results For: <span className={styles.term}>{query.q}</span></h2>
+        <ArticleList articles={toNodeArray(list)} />
+      </div>
+    </Layout>
+  )
+}
+
+export default SearchResults;
+```
+
+And that's it, now the search results are displayed!
+
+### Cleanup
+
+The `SearchResults` component is getting a little messy having too much logic in it. It can be cleaned up by extracting the `getSearchResults` and `toNodeArray` functions into a search service module.
+
+```js
+// src/services/search.js
+
+export async function getSearchResults(query) {
+  let json = []
+  const response = await fetch(`https://prod.rails.host/search?q=${query}`, {
+    method: 'GET',
+    headers: {
+      'Accept': 'application/json'
+    }
+  });
+  if (response.ok) {
+    json = await response.json();
+  }
+  return json;
+}
+
+export function toNodeArray(searchResults) {
+  return searchResults.map(sr => {
+    return {
+      node: {
+        excerpt: sr.excerpt,
+        fields: {
+          slug: sr.slug
+        },
+        frontmatter: {
+          category: sr.category,
+          date: sr.published_at,
+          title: sr.title
+        },
+        id: sr.title
+      }
+    }
+  })
+}
+```
+
+And now this function can be used in the search results component with less clutter:
+
+```js
+// src/pages/search-results.js
+
+import React, { useEffect, useState } from "react";
+import { Link } from 'gatsby';
+import { useLocation } from '@reach/router';
+import queryString from 'query-string';
+
+// Use utility functions from a service to avoid cluttering up this component
+import { getSearchResults, toNodeArray } from '../services/search';
+
+import Layout from "../components/layout"
+import ArticleList from "../components/article-list"
+import styles from "./search-results.module.css"
+
+const SearchResults = () => {
+  const location = useLocation();
+  const query = queryString.parse(location.search);
+  const searchTerm = query.q
+  const [list, setList] = useState([]);
+
+  useEffect(() => {
+    async function fetchData() {
+      const searchResults = await getSearchResults(searchTerm);
+      setList(searchResults);
+    }
+    fetchData();
+  }, [searchTerm]);
+
+  return (
+    <Layout>
+      <div className={styles.container}>
+        <h2 className={styles.header}>Search Results For: <span className={styles.term}>{query.q}</span></h2>
+        <ArticleList articles={toNodeArray(list)} />
+      </div>
+    </Layout>
+  )
+}
+
+export default SearchResults;
+```
+
+## Conclusion
+
+TBD...
+
+This concludes the multi-part series on rolling your own search service for a static site...
