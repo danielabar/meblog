@@ -12,12 +12,12 @@ In case you missed it:
 
 * [Part 1: Search Introduction](../roll-your-own-search-service-for-gatsby-part1) covers the existing options for adding search to a Gatsby site, and why I decided not to use any of them, and instead build a custom search service.
 * [Part 2: Search Index](../roll-your-own-search-service-for-gatsby-part2) covers the design and population of the `documents` table that contains all the content to be searched.
-* [Part 3: Search Engine](../roll-your-own-search-service-for-gatsby-part3) provides an introduction to Postgres Full Text Search, showing some examples of using it to write queries to search against a documents table.
+* [Part 3: Search Engine](../roll-your-own-search-service-for-gatsby-part3) provides an introduction to PostgreSQL Full Text Search, showing some examples of using it to write queries to search against a documents table.
 * [Part 4: Search API](../roll-your-own-search-service-for-gatsby-part4) explains how to expose an HTTP based search API using Rails and PostgreSQL, and how to deploy it.
 
 ## API Refresher
 
-A quick reminder of where [Part 4: Search API](../roll-your-own-search-service-for-gatsby-part4) left off, the search API can be executed with a `GET` to the `/search` endpoint and any given `q` parameter to specify the search term. For example:
+A quick reminder of where [Part 4: Search API](../roll-your-own-search-service-for-gatsby-part4) left off, the search API (hosted on a Rails server) can be executed with a `GET` to the `/search` endpoint and any given `q` parameter to specify the search term. For example:
 
 ```http
 GET {{host}}/search?q=tdd
@@ -126,6 +126,42 @@ const SearchInput = () => {
 export default SearchInput
 ```
 
+Then the new `<SearchInput>` component is added to the existing `<NavMenu>` component, which renders the navigation links at the top right of the page:
+
+```js
+// src/components/nav-menu.js
+
+import React from "react"
+import { Link } from "gatsby"
+import styles from "./nav-menu.module.css"
+import SearchInput from "./search-input"
+
+const NavMenu = () => {
+  return (
+    <nav className={styles.nav}>
+      <ul className={styles.navList}>
+        <li className={`${styles.headerItem}`}>
+          <Link to="/blog">
+            Blog
+          </Link>
+        </li>
+        <li className={`${styles.headerItem}`}>
+          <Link to="/about">
+            About
+          </Link>
+        </li>
+        {/* NEW: SearchInput ADDED HERE */}
+        <li className={`${styles.headerItem}`}>
+          <SearchInput />
+        </li>
+      </ul>
+    </nav>
+  )
+}
+
+export default NavMenu
+```
+
 ## Search Results
 
 In Gatsby terms, this is a "page" rather than a component because it's the target of the router, and it lives in the `pages` project directory. But technically, it's still a React component. This page does all the heavy lifting of search so it's a little more involved than the `search-input` component.
@@ -134,7 +170,7 @@ In Gatsby terms, this is a "page" rather than a component because it's the targe
 
 The first challenge is to extract the `q` parameter from the url to this page, which represents the search term. For example, if this page gets called with `/search-results?q=rails`, then it needs to set a variable `searchTerm` to the value "rails".
 
-Surprisingly, I found this wasn't possible via the [reach-router](https://github.com/reach/router) alone. Gatsby's router is basically a wrapper around `reach-router`. I had to bring in the [query-string](https://github.com/sindresorhus/query-string) library to parse the query portion of the url.
+Surprisingly, I found this wasn't possible with the Gatsby router, which is basically a wrapper around [reach-router](https://github.com/reach/router). I had to bring in the [query-string](https://github.com/sindresorhus/query-string) library to parse the query portion of the url.
 
 Here is just the first snippet of the component to parse `searchTerm` out of the url using the `useLocation` hook provided by the `reach-router` and the `parse` method of the `query-string` library. Note that `location.search` refers to the `search` property of the `location` object returned by the `useLocation()` hook, not to be confused with the actual search term in the url. The `search` property of the `location` object refers to any portion of the url string after and including the `?`.
 
@@ -165,6 +201,25 @@ const SearchResults = () => {
 export default SearchResults;
 ```
 
+The `<Layout>` component in the returned JSX is a wrapper or "box" component for every page on this site. It uses `props.children` to render any content that it's given between the `<Header>` and `<Footer>` components (also existing components, details not important for search feature). Using it in the `SearchResults` page ensures it will have the same look and feel as every other page on this site:
+
+```js
+// src/components/layout.js
+
+import React from "react"
+import styles from "./layout.module.css"
+import Header from "./header.js"
+import Footer from "./footer.js"
+
+export default ({ children }) => (
+  <div className={styles.container}>
+    <Header />
+      <div className={styles.content}>{children}</div>
+    <Footer />
+  </div>
+)
+```
+
 ### Fetch Results
 
 The next step is to fetch search results from the server for the `searchTerm` that was parsed out of the url. Since fetching data is considered a side effect, this code goes in a [useEffect](https://reactjs.org/docs/hooks-effect.html) hook.
@@ -173,12 +228,12 @@ Fetching the data will require an `async/await` function. When combining `async/
 
 I'm using the [Fetch API](https://developer.mozilla.org/en-US/docs/Web/API/Fetch_API) to get results from the search server.
 
-`<Layout>` is an existing component used in this blog to render the top navigation and footer.
+Finally, to make use of the search results for rendering into the DOM, they'll need to be in state, so let's bring in the `useState` hook for that.
 
 ```js
 // src/pages/search-results.js
 
-import React, { useEffect } from "react";
+import React, { useEffect, useState } from "react";
 import { useLocation } from '@reach/router';
 import queryString from 'query-string';
 import Layout from "../components/layout"
@@ -188,6 +243,8 @@ const SearchResults = () => {
   const location = useLocation();
   const query = queryString.parse(location.search);
   const searchTerm = query.q
+  // For saving search results in state
+  const [list, setList] = useState([]);
 
   // This function will be called from within the useEffect hook.
   async function getSearchResults(query) {
@@ -211,7 +268,8 @@ const SearchResults = () => {
     // eg: `rails` for url `/search-results?q=rails`
     async function fetchData() {
       const searchResults = await getSearchResults(searchTerm);
-      // Do something with search results
+      // Save searchResults in state so they can be used for rendering
+      setList(searchResults);
     }
     // Call the wrapper function directly within the useEffect hook.
     fetchData();
@@ -230,13 +288,48 @@ export default SearchResults;
 
 ### Render Results
 
-Now that the search results have been retrieved from the server, they need to be rendered. This site already has an `<ArticleList>` component that is used to display a list of articles such as on the home page or on the paginated blog pages. The goal is to re-use it to display search results. Here is what it looks like:
+Now that the search results have been retrieved from the server, they need to be rendered. One way to do this would be to iterate over the search results in the JSX that's returned by the `SearchResults` component and generate a few simple DOM nodes populated from each `searchResult` field. Something like this:
+
+```js
+// src/pages/search-results.js
+
+import React, { useEffect } from "react";
+import { Link } from "gatsby";
+import { useLocation } from '@reach/router';
+import queryString from 'query-string';
+import Layout from "../components/layout"
+
+const SearchResults = () => {
+  // snip...
+
+  return (
+    <Layout>
+      {/* The `list` variable in state has array of searchResults */}
+      {list.map((searchResult) => (
+        <article key={searchResult.id}>
+          <div>{searchResult.published_at}</div>
+          <div>{searchResult.title}</div>
+          <div>{searchResult.category}</div>
+          <div>{searchResult.excerpt}</div>
+          <Link to={searchResult.slug}>Read</Link>
+        </article>
+      ))}
+    </Layout>
+  )
+}
+
+export default SearchResults;
+```
+
+However, this site already has an `<ArticleList>` component that is used to display a list of articles such as on the home page or on the paginated blog pages. To maintain a similar look and feel, I wanted to re-use it to display search results.
+
+Here is what the `<ArticleList>` component looks like:
 
 ![search fields](../images/search-fields.png "search fields")
 
-The `<ArticleList>` component expects a single prop `articles`, which is a list of "nodes", which are objects generated from the `gatsby-transformer-remark` plugin. These contain the metadata from the markdown content of each blog post (title, publish date, etc.). The reason for this is the blog pages are built statically during the Gatsby build process with a GraphQL query against the markdown content.
+This component expects a single prop `articles`. During the Gatsby build process, the `articles` prop is populated with a list of "nodes", which are objects generated from the `gatsby-transformer-remark` plugin. These contain the metadata from the markdown content of each blog post (title, publish date, etc.).
 
-The `<ArticleList>` component iterates over the `articles` prop, which is an array of `node` objects, and renders an `<Article>` component for each node. Here is what an `<Article>` component looks like, a single entry in the `ArticleList`:
+The `<ArticleList>` component iterates over the `articles` prop, and renders an `<Article>` component for each node. Here is what an `<Article>` component looks like, a single entry in the `ArticleList`:
 
 ![search article](../images/search-article.png "search article")
 
@@ -266,7 +359,7 @@ export default props => (
 
 One really cool thing about Gatsby is the same components can be re-used for dynamic content as well. All that's needed is to convert the search results from the search service into "node" objects expected by the `<ArticleList>` component, pass that in as the `articles` prop, and it will render dynamically.
 
-In order to do that, in the `SearchResults` component, the `useState` hook is used to save the search results into a `list` variable, and then that gets converted to the format expected by `ArticleList` with a `toNodeArray` function.
+In order to do that, a new function `toNodeArray` is added which converts the array of `searchResults` to an array of `nodes`.
 
 ```js
 // src/pages/search-results.js
@@ -279,6 +372,7 @@ import ArticleList from "../components/article-list"
 import styles from "./search-results.module.css"
 
 const SearchResults = () => {
+  // Parse searchTerm out of url
   const location = useLocation();
   const query = queryString.parse(location.search);
   const searchTerm = query.q
@@ -323,7 +417,8 @@ const SearchResults = () => {
   return (
     <Layout>
       <div className={styles.container}>
-        <h2 className={styles.header}>Search Results For: <span className={styles.term}>{query.q}</span></h2>
+        <h2 className={styles.header}>Search Results For: {query.q}</h2>
+        {/* Pass in converted searchResults to ArticleList component */}
         <ArticleList articles={toNodeArray(list)} />
       </div>
     </Layout>
@@ -335,7 +430,11 @@ export default SearchResults;
 
 And that's it, now the search results are displayed!
 
-### Cleanup
+Here's an example of search results display for `rails`:
+
+![search results example](../images/search-results-example.png "search results example")
+
+### Refactor: Search Service
 
 The `SearchResults` component is getting a little messy having too much logic in it. It can be cleaned up by extracting the `getSearchResults` and `toNodeArray` functions into a search service module.
 
@@ -410,7 +509,7 @@ const SearchResults = () => {
   return (
     <Layout>
       <div className={styles.container}>
-        <h2 className={styles.header}>Search Results For: <span className={styles.term}>{query.q}</span></h2>
+        <h2 className={styles.header}>Search Results For: {query.q}</h2>
         <ArticleList articles={toNodeArray(list)} />
       </div>
     </Layout>
@@ -420,8 +519,80 @@ const SearchResults = () => {
 export default SearchResults;
 ```
 
+### Refactor: Search URL
+
+Another issue is that the search URL is currently hard-coded to the production Rails host:
+
+```js
+// src/services/search.js
+
+export async function getSearchResults(query) {
+  let json = []
+  // HARD-CODED URL HERE!
+  const response = await fetch(`https://prod.rails.host/search?q=${query}`, {
+    method: 'GET',
+    headers: {
+      'Accept': 'application/json'
+    }
+  });
+  ...
+```
+
+Given that the Rails server is CORS enabled, (see [Part 3: Search Engine](../roll-your-own-search-service-for-gatsby-part3) for more details), the production server will not accept requests from `localhost`.
+
+Ideally for development, the search server runs locally and the Gatsby site points to the local version of the search url. And when the Gatsby site is deployed, it points to the production version of the search url. This can be achieved with environment variables.
+
+Even though Gatsby is a static site generator, environment variables can be used at build time and referenced via `process.env.SOME_VAR`. This is done via the [dotenv](https://www.npmjs.com/package/dotenv) package which comes with Gatsby. To enable it, add the following at the beginning of `gatsby-config.js`:
+
+```js
+// gatsby-config.js
+require("dotenv").config({
+  path: `.env.${process.env.NODE_ENV}`,
+});
+...
+```
+
+This will load any files in the project root starting with `.env...` and matching the node environment.
+
+Then add the dotenv files for development and production in the project root (replacing the production value with wherever the Rails server is hosted):
+
+```
+# .env.development
+SEARCH_URL=http://localhost:3000/search
+```
+
+```
+# .env.production
+SEARCH_URL=https://prod.rails.host/search
+```
+
+Finally, go back to the code that fetches search results and replace the hard-coded url with `process.env.SEARCH_URL`:
+
+```js
+// src/services/search.js
+
+export async function getSearchResults(query) {
+  let json = []
+  // USE ENVIRONMENT VARIABLE FOR SEARCH SERVER URL
+  const response = await fetch(`${process.env.SEARCH_URL}?q=${query}`, {
+    method: 'GET',
+    headers: {
+      'Accept': 'application/json'
+    }
+  });
+  ...
+```
+
+Now when running Gatsby in development mode `gatsby develop -H 0.0.0.0`, it will use the `localhost` search url specified in `.env.development`. And when the Gatsby build is run for production `gatsby build`, it will use the production search url specified in `.env.production`.
+
 ## Conclusion
 
-TBD...
+This concludes the multi-part series on rolling your own search service for a static site. If you've been following from the beginning, [Part 1: Search Introduction](../roll-your-own-search-service-for-gatsby-part1) introduced the challenge of adding a dynamic feature like search to a static site, listed a few existing options and some problems with them, and suggested an alternate idea to use PostgreSQL and Rails to solve the problem.
 
-This concludes the multi-part series on rolling your own search service for a static site...
+[Part 2: Search Index](../roll-your-own-search-service-for-gatsby-part2) covered how to build a search index from the markdown content on the Gatsby site. [Part 3: Search Engine](../roll-your-own-search-service-for-gatsby-part3) gave an introduction to PostgreSQL full text search and terminology used in it such as `ts_vector` and `ts_query`. [Part 4: Search API](../roll-your-own-search-service-for-gatsby-part4) covered how to build a simple search API with Rails and PostgreSQL full text search.
+
+Finally this last part covered how to build a search UI for a Gatsby site and how to tie it all together with the Rails search service.
+
+I just want to point out that this may not be an optimal solution for every static site that requires a search feature. It was a lot of work and now requires some maintenance in populating the search index whenever a new article is published. For some sites, using a paid service like [Algolia](https://www.algolia.com/) or [Managed Elasticsearch](https://www.elastic.co/subscriptions/cloud) may be a perfectly good option.
+
+However, it was a lot of fun and a good learning experience putting all this together. If you enjoy building things, definitely give it a try.
