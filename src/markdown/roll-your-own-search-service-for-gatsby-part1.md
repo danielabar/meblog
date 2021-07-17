@@ -2,7 +2,7 @@
 title: "Roll Your Own Search with Rails and Postgres: Introduction"
 featuredImage: "../images/roll-your-own-luigi-pozzoli-iIS1SIO5_aY-unsplash.jpg"
 description: "Learn how to build search service using Rails and Postgres Full Text Search for a Gatsby blog."
-date: "2021-07-04"
+date: "2021-07-03"
 category: "Gatsby"
 ---
 

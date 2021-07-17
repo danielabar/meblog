@@ -2,7 +2,7 @@
 title: "Roll Your Own Search with Rails and Postgres: Search UI"
 featuredImage: "../images/roll-search-5.jpg"
 description: "Learn how to build search service using Rails and Postgres Full Text Search for a Gatsby blog."
-date: "2021-07-08"
+date: "2021-07-17"
 category: "Gatsby"
 ---
 
@@ -538,7 +538,7 @@ export async function getSearchResults(query) {
   ...
 ```
 
-Given that the Rails server is CORS enabled, (see [Part 3: Search Engine](../roll-your-own-search-service-for-gatsby-part3) for more details), the production server will not accept requests from `localhost`.
+Given that the Rails server is CORS enabled, (see [Part 4: Search Service](../roll-your-own-search-service-for-gatsby-part4) for more details), the production server will not accept requests from `localhost`.
 
 Ideally for development, the search server runs locally and the Gatsby site points to the local version of the search url. And when the Gatsby site is deployed, it points to the production version of the search url. This can be achieved with environment variables.
 
@@ -589,7 +589,7 @@ Now when running Gatsby in development mode `gatsby develop -H 0.0.0.0`, it will
 
 This concludes the multi-part series on rolling your own search service for a static site. If you've been following from the beginning, [Part 1: Search Introduction](../roll-your-own-search-service-for-gatsby-part1) introduced the challenge of adding a dynamic feature like search to a static site, listed a few existing options and some problems with them, and suggested an alternate idea to use PostgreSQL and Rails to solve the problem.
 
-[Part 2: Search Index](../roll-your-own-search-service-for-gatsby-part2) covered how to build a search index from the markdown content on the Gatsby site. [Part 3: Search Engine](../roll-your-own-search-service-for-gatsby-part3) gave an introduction to PostgreSQL full text search and terminology used in it such as `ts_vector` and `ts_query`. [Part 4: Search API](../roll-your-own-search-service-for-gatsby-part4) covered how to build a simple search API with Rails and PostgreSQL full text search.
+[Part 2: Search Index](../roll-your-own-search-service-for-gatsby-part2) covered how to build a search index from the markdown content on the Gatsby site. [Part 3: Search Engine](../roll-your-own-search-service-for-gatsby-part3) gave an introduction to PostgreSQL full text search and terminology used in it such as `to_tsvector` and `to_tsquery`. [Part 4: Search API](../roll-your-own-search-service-for-gatsby-part4) covered how to build a simple search API with Rails and PostgreSQL full text search.
 
 Finally this last part covered how to build a search UI for a Gatsby site and how to tie it all together with the Rails search service.
 

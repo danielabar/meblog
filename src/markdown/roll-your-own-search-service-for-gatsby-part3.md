@@ -2,7 +2,7 @@
 title: "Roll Your Own Search with Rails and Postgres: Search Engine"
 featuredImage: "../images/roll-search-3.jpg"
 description: "Learn how to build search service using Rails and Postgres Full Text Search for a Gatsby blog."
-date: "2021-07-06"
+date: "2021-07-10"
 category: "PostgreSQL"
 ---
 
@@ -14,7 +14,7 @@ In case you missed it, [Part 1: Search Introduction](../roll-your-own-search-ser
 
 A full discussion of how PostgreSQL full text search works is beyond the scope of this article, and I'm actually going to be using a gem that makes integrating it into Rails fairly easy. However, in order to make sense of what the gem is doing, it's worth taking a look "under the hood" into the search functions at the database level.
 
-Recall the `documents` table looks, covered in [Part 2: Search Index](../roll-your-own-search-service-for-gatsby-part2) of this series, looks like this, just showing a few rows, `body` column shortened for legibility:
+Recall the `documents` table, covered in [Part 2: Search Index](../roll-your-own-search-service-for-gatsby-part2) of this series, looks like this, just showing a few rows, `body` column shortened for legibility:
 
 ```
 hello=> select title, category, slug, left(body, 40) as body from documents;

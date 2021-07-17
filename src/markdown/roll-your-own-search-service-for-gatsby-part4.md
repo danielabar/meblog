@@ -2,13 +2,13 @@
 title: "Roll Your Own Search with Rails and Postgres: Search API"
 featuredImage: "../images/roll-search-4.jpg"
 description: "Learn how to build search service using Rails and Postgres Full Text Search for a Gatsby blog."
-date: "2021-07-07"
+date: "2021-07-11"
 category: "Rails"
 ---
 
 This is the fourth in a multi-part series of posts detailing how I built the search feature for this blog. This post will explain how to build a search API with Rails, using the [pg-search](https://github.com/Casecommons/pg_search) gem and how to deploy it to production.
 
-In case you missed it, [Part 1: Search Introduction](../roll-your-own-search-service-for-gatsby-part1) of this series covers the existing options for adding search to a Gatsby site, and why I decided not to use any of them, and instead build a custom search service. [Part 2: Search Index](../roll-your-own-search-service-for-gatsby-part2) covers the design and population of the `documents` table that contains all the content to be searched. [Part 3: Search Engine](../roll-your-own-search-service-for-gatsby-part3) provides an introduction to Postgres Full Text Search, showing some examples of using it to write queries to search against a documents table.
+In case you missed it, [Part 1: Search Introduction](../roll-your-own-search-service-for-gatsby-part1) of this series covers the existing options for adding search to a Gatsby site, and why I decided not to use any of them, and instead build a custom search service. [Part 2: Search Index](../roll-your-own-search-service-for-gatsby-part2) covers the design and population of the `documents` table that contains all the content to be searched. [Part 3: Search Engine](../roll-your-own-search-service-for-gatsby-part3) provides an introduction to PostgreSQL Full Text Search, showing some examples of using it to write queries to search against a documents table.
 
 ## Install
 
@@ -156,6 +156,8 @@ It's great that there's an easy way to search the `Document` model, but recall t
 Starting with the route. This will be read only so only exposing the `index` method:
 
 ```ruby
+# config/routes.rb
+
 Rails.application.routes.draw do
   resources :search, only: %i[index]
 end
@@ -377,4 +379,4 @@ To test that it's working on Heroku:
 If the production request doesn't succeed, check the Heroku logs with `heroku logs --tail` for further investigation.
 ## What's Next?
 
-This post explained how to build a search service API using Rails and PostgreSQL with the help of the [pg-search](https://github.com/Casecommons/pg_search) gem and how to deploy it. Next up, see[Part 5: Search GUI](../roll-your-own-search-service-for-gatsby-part5) for how to build the search UI components of the Gatsby blog, which will tie everything in this series together.
+This post explained how to build a search service API using Rails and PostgreSQL with the help of the [pg-search](https://github.com/Casecommons/pg_search) gem and how to deploy it. Next up, see [Part 5: Search GUI](../roll-your-own-search-service-for-gatsby-part5) for how to build the search UI components of the Gatsby blog, which will tie everything in this series together.
