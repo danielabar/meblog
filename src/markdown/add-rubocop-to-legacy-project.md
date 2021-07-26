@@ -6,7 +6,7 @@ date: "2021-07-25"
 category: "rails"
 ---
 
-I love Rubocop! There are some that find it (and linters in general) annoying, even leading to git commit messages along the lines of "F@%#^!ng rubocop". But for me, coding with Rubocop is like having a wizard with the entire collective wisdom of the Ruby community sitting beside me, pointing out where improvements could be made, resulting in more idiomatic Ruby.
+I think Rubocop is awesome! There are some that find it (and linters in general) annoying, even leading to git commit messages along the lines of "F@%#^!ng rubocop". But for me, coding with Rubocop is like having a wizard with the entire collective wisdom of the Ruby community sitting beside me, pointing out where improvements could be made, resulting in more idiomatic Ruby.
 
 Before going any further, for those unfamiliar with what is Rubocop, from the [docs](https://github.com/rubocop/rubocop):
 
@@ -24,7 +24,7 @@ Before making any changes, verify the project has decent test coverage. This sho
 
 ## 2. Install Rubocop and Autocorrect
 
-Add rubocop to the project Gemfile, then run `bundle install`. Then create a `.rubocop.yml` configuration file in the project root. I typically exclude Rails auto generated files and disable the `Style/Documentation` rule. Although I'm a huge fan of *useful* documentation, have found that when the `Style/Documentation` is enabled, developers may write comments like "Customer Model" for `class Customer < ApplicationRecord` just to get the rule to pass.
+Add rubocop to the project Gemfile and run `bundle install`. Then create a `.rubocop.yml` configuration file in the project root. I typically exclude Rails auto generated files and disable the `Style/Documentation` rule. Although I'm a huge fan of *useful* documentation, have found that when the `Style/Documentation` is enabled, developers may write comments like "Customer Model" for `class Customer < ApplicationRecord` just to get the rule to pass.
 
 ```yml
 # .rubocop.yml
@@ -120,7 +120,7 @@ You'll see all the same scrolling output as before as it finds each rule violati
 At this point, all the easy fixes have been done. Now we're entering into trickier territory. Let's run the summary report again to see how many offenses are left to deal with. An example from a recent project:
 
 ```
-rubocop --format offenses
+bundle exec rubocop --format offenses
 
 19  Metrics/MethodLength
 18  Metrics/BlockLength
@@ -163,7 +163,7 @@ Metrics/AbcSize:
 
 The problem with the naive approach is that there's nothing to stop the code quality from getting worse as more features are added to the project. For example, the next developer to work on a method with a high `AbcSize` score won't get a warning when they go to add another assignment to the offending method, and the next developer and the next after that. The complexity will keep increasing.
 
-A better approach is to capture the existing maximum value for every rule, and configure that as the maximum allowed on this project. What this does is effectively draw a line in the sand to express - "yeah we know it's not great but at least things will get no worse". For example, suppose the longest method length in your project is 25 and you don't want it to get any worse than that in the future, then you'd add the following to `.rubocop.yml`:
+A better approach is to capture the existing maximum value for every rule, and configure that as the maximum allowed on this project. What this does is effectively draw a line in the sand to express: "Yeah we know it's not great but at least things will get no worse". For example, suppose the longest method length in your project is 25 and you don't want it to get any worse than that in the future, then you'd add the following to `.rubocop.yml`:
 
 ```yml
 # .rubocop.yml
@@ -173,7 +173,11 @@ Metrics/MethodLength:
 
 Then the next developer to modify this method, say to add a new feature or fix a bug will get a warning that the maximum has been exceeded. A refactor can be undertaken at that time, which will be more comprehensible in the scope of just that feature, rather than in the massive Rubocop pull request.
 
-So the next question is - how do you go about finding the max violation values in the project? Clearly no one is going to go around manually counting method lengths or calculating `AbcSize` scores. Fortunately, Rubocop displays this information when detecting offenses.
+So the next question is - how do you go about finding the max violation values in the project? Clearly no one is going to go around manually counting method lengths or calculating `AbcSize` scores.
+
+There are two ways to do this, the first involves more effort but is useful for understanding what's going on. The second way is more automated. Let's start with the manual method just to get a better understanding.
+
+### Manual Tuning
 
 For each of the rules that could not be auto-corrected, run rubocop, filtering the output for just that rule. For example, to see only the `Metrics/MethodLength` violations:
 
@@ -213,13 +217,41 @@ Metrics/MethodLength:
 
 Repeat this for every rule that has a `Max` value that can be configured. For other rules such as `Naming/ConstantName` or `Style/SafeNavigation`, use your judgement if its just a small number of occurrences, and its easy to fix, go ahead, otherwise, disable the rule in `.rubocop.yml`.
 
-At the end of this process, you should have some changes to `.rubocop.yml` and minimal if any code changes. Review the changes, run tests, and commit. Now you're ready to submit a pull request for adding Rubocop to a legacy project.
+### Automatic Tuning
 
-### Alternative: auto-gen-config
+An easier way is to run:
 
-Just want to mention there is an alternative approach to this using `rubocop --auto-gen-config`. This will generate a `.rubocop-todo.yml` file listing all the offenses (indicating whether they are autocorrectable) and excluding the specific files in your project that violate the rules. It also generates the maximum values for rules that have a `Max` value.
+```
+bundle exec rubocop --auto-gen-config
+```
 
-Then it generates a `.rubocop.yml` that simply inherits from the todo file. This way rubocop passes with no code changes (because all the offenses are effectively ignored). The idea is you can go one offense at a time and deal with it. While it's great that the Max values are calculated, it seems like a lot of work to have to go through all the offenses one by one and remove them from the todo file so that autocorrect can do its work, or bring them to the global ignore list, or bring them over with modified config values to the main rubocop yml file. It is useful however to get a sense of the type and number of existing violations so go ahead and try the `--auto-gen-config` option to see what the output looks like.
+This will generate a `.rubocop-todo.yml` file listing all the offenses and excluding the specific files in your project that violate the rules. For rules that have a `Max` value, it will determine the largest value from your project and configure the rule with that value. For example:
+
+```yml
+# .rubocop-todo.yml
+
+# Offense count: 4
+# Configuration parameters: IgnoredMethods, CountRepeatedAttributes.
+Metrics/AbcSize:
+  Max: 38
+
+# Offense count: 19
+# Configuration parameters: CountComments, CountAsOne, ExcludedMethods, IgnoredMethods.
+Metrics/MethodLength:
+  Max: 31
+
+# Offense count: 1
+Naming/ConstantName:
+  Exclude:
+    - 'lib/acme/logger_formatter.rb'
+
+# ...
+```
+
+It also generates (or updates existing) a `.rubocop.yml` that inherits from the todo file. This way rubocop passes with no code changes (because all the offenses are effectively ignored). Then you can go over each configured rule in the `.rubocop-todo.yml` and bring it over to `.rubocop.yml`.
+
+Whichever option you chose (manual or automatic tuning), at the end of this process, you should have some changes to `.rubocop.yml` and minimal if any code changes. Review the changes, run tests, and commit. Now you're ready to submit a pull request for adding Rubocop to a legacy project.
+
 
 ## Conclusion
 
