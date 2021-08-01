@@ -14,10 +14,11 @@ export default class BlogList extends React.Component {
     const prevPage =
       currentPage - 1 === 1 ? "/blog" : `/blog/${(currentPage - 1).toString()}`
     const nextPage = `/blog/${(currentPage + 1).toString()}`
+    const visitTrack = 'NO'
 
     return (
       <Layout>
-        <SEO title="Blog" pathname={seoPath} />
+        <SEO title="Blog" pathname={seoPath} track={visitTrack}/>
         <ArticleList
           articles={this.props.data.allMarkdownRemark.edges}
         ></ArticleList>
