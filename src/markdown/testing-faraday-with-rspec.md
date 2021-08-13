@@ -142,8 +142,143 @@ RSpec.describe WeatherClient do
 end
 ```
 
+### Problems
+
 While this works, it feels a little clunky. We have to know some details of Faraday like the fact that calling `get` returns a `Faraday::Response` object. If a future release of Faraday will refactor to return a different object, then this test will fail even the refactored object behaves exactly the same as in the previous version. Generally speaking, use of stubs/mocks can make a test brittle because its verifying some implementation details rather than only focusing on the expected return value of a method.
 
-Also the double stubbing required - once for `Faraday.get` and again for the response double it returns makes the test hard to read. Fortunately, Faraday provides a cleaner way to test code that uses it, but this will require some refactoring.
+Also the double stubbing required - once for `Faraday.get` and again for the response double it returns makes the test hard to read.
+
+Another issue occurs when trying to add another Weather API request. For example, in addition to the current weather `/current.json`, there's another endpoint for the future weather at `/forecast.json`. When using `Faraday.get`, each request has to repeat the base url, headers, and common parameters such as the API key, for example:
+
+```ruby
+class WeatherClient
+  def today(city:)
+    response = Faraday.get('https://api.weatherapi.com/v1/current.json',
+                           {
+                             key: ENV['WEATHER_API_KEY'],
+                             q: city,
+                             aqi: 'yes'
+                           },
+                           { 'Accept' => 'application/json' })
+    parse_today(JSON.parse(response.body))
+  end
+
+  # Some duplication with `today` method including base url, headers, and setting of API key
+  def forecast(city:)
+    response = Faraday.get('https://api.weatherapi.com/v1/forecast.json',
+                           {
+                             key: ENV['WEATHER_API_KEY'],
+                             q: city
+                           },
+                           { 'Accept' => 'application/json' })
+    # do something with response...
+  end
+
+  private
+
+  # snip...
+end
+```
 
 ## 2. Faraday Stubbing
+
+Fortunately, Faraday provides a cleaner solution for testing, but this will require some refactoring and introducing several new concepts.
+
+### Faraday Connection
+
+First, to fix the issue of code duplication - that every request to the API requires repeating the base url and common parameters. Faraday provides a `Faraday::Connection` object to store common configuration. Then subsequent http requests such as `get`, `post`, etc. can be made on the connection object.
+
+To create a connection object, call `Faraday.new`. For example, the `today` method on `WeatherClient` could be written like this:
+
+```ruby
+class WeatherClient
+  def today(city:)
+    conn = Faraday.new(
+      url: 'https://api.weatherapi.com/v1',
+      params: { key: ENV['WEATHER_API_KEY'] },
+      headers: { 'Accept' => 'application/json' }
+    )
+
+    response = conn.get('current.json', { q: city, aqi: 'yes' })
+    parse_today(JSON.parse(response.body))
+  end
+
+  private
+
+  # snip...
+end
+```
+
+At this point, it doesn't seem like much of an improvement because all the common logic (base url, api key and headers) are still in the `today` method.
+
+The beauty of this approach comes when pulling out the connection object into the `initialize` method and making it an instance variable. Then it can be shared among multiple API methods without having to repeat the base url, api key and headers. For example:
+
+```ruby
+class WeatherClient
+  def initialize
+    @conn = Faraday.new(
+      url: 'https://api.weatherapi.com/v1',
+      params: { key: ENV['WEATHER_API_KEY'] },
+      headers: { 'Accept' => 'application/json' }
+    )
+  end
+
+  def today(city:)
+    response = @conn.get('current.json', { q: city, aqi: 'yes' })
+    parse_today(JSON.parse(response.body))
+  end
+
+  def future(city:)
+    response = @conn.get('forecast.json', { q: city })
+    # do something with response...
+  end
+
+  private
+
+  # snip...
+end
+```
+
+### Faraday Test Adapter
+
+Ok so the code duplication issue has been solved with use of an instance `Faraday::Connection` object, but how does this help with testing?
+
+Faraday comes with a built-in test adapter for defining stubbed HTTP requests to mock out network services. Then a `Faraday::Connection` object can be instantiated using the test adapter. For example:
+
+```ruby
+# Test adapter
+stubs = Faraday::Adapter::Test::Stubs.new
+
+# Instantiate a connection that uses the test adapter
+conn = Faraday.new { |b| b.adapter(:test, stubs) }
+
+# Define any number of mock network requests on the test adapter, which yields an array of three elements:
+#   1. HTTP response code
+#   2. Hash of HTTP response headers
+#   3. String of HTTP response body
+stubs.get('/some-endpoint') do
+  [
+    200,
+    { 'Content-Type': 'application/json' },
+    '{"name": "some canned response for testing"}'
+  ]
+end
+```
+
+This means that any code that used `conn` from the above code to invoke for example `conn.get('/some-endpoint')...` would receive an HTTP response code of 200 with the canned response `'{"name": "some canned response for testing"}'`. And this leads to the last and final concept that will tie this all together.
+
+### Dependency Injection
+
+TBD...
+
+## Which Approach to Use?
+
+WIP
+
+If green fielding new project (or at least a new client class), use DI for connection object, then can use Faraday's built-in test adapter. If adding tests to legacy code that uses Faraday class helper methods like `Faraday.get`, `Faraday.post`, etc. use RSpec stubbing, unless entire project has really good test coverage and you feel confident refactoring code to use `Faraday::Connection` and inject via `initialize` method.
+
+## Conclusion
+
+WIP
+
+This post has covered two different ways of testing Faraday.
