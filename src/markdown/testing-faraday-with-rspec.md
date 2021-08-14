@@ -104,7 +104,7 @@ irb(main):001:0> WeatherClient.new.today(city: 'Paris')
 
 ## 1. RSpec Stubbing
 
-How to write a test for `WeatherClient`? Calling out to the Weather API is a side effect, and tests should not have any side effects. For example, each call uses up request quota for the API key. Even if usage were unlimited, this code is requesting the *current* weather. This means at any given day/time, the response could be different so it will be impossible to write a test expecting a specific result.
+How to write a test for `WeatherClient`? Calling out to the Weather API is a side effect, and tests should not have any side effects. For example, each call uses up request quota for the API key. Even if usage were unlimited, this code is requesting the *current* weather. This means at any given day/time, the response could be different so it will be impossible to write a test expecting a specific result. Another consideration is the Weather API could go down at the same instance when the test is run, this would cause the test to fail even though no code changes had been made on this app.
 
 Because the `today` method calls `Faraday.get` directly, RSpec stubbing must be used to set the returned response of the `Faraday.get` method for the test. This will prevent a real HTTP request from being sent when the test is run and instead return a canned response of our design. But in order to do this, we must know what kind of object is returned by `Faraday.get`, which is a `Faraday::Response`.
 
@@ -144,9 +144,9 @@ end
 
 ### Problems
 
-While this works, it feels a little clunky. We have to know some details of Faraday like the fact that calling `get` returns a `Faraday::Response` object. If a future release of Faraday will refactor to return a different object, then this test will fail even the refactored object behaves exactly the same as in the previous version. Generally speaking, use of stubs/mocks can make a test brittle because its verifying some implementation details rather than only focusing on the expected return value of a method.
+While this works, it feels a little clunky. We have to know some details of Faraday like the fact that calling `get` returns a `Faraday::Response` object. If a future release of Faraday will refactor to return a different object, then this test will fail even the refactored object behaves exactly the same as in the previous version. Generally speaking, use of stubs/mocks can make a test brittle because its verifying some implementation details rather than focusing on the expected return value of a method.
 
-Also the double stubbing required - once for `Faraday.get` and again for the response double it returns makes the test hard to read.
+Also the double stubbing required - once for `Faraday.get` and again for the response double it returns, makes the test hard to read.
 
 Another issue occurs when trying to add another Weather API request. For example, in addition to the current weather `/current.json`, there's another endpoint for the future weather at `/forecast.json`. When using `Faraday.get`, each request has to repeat the base url, headers, and common parameters such as the API key, for example:
 
@@ -239,11 +239,11 @@ class WeatherClient
 end
 ```
 
-### Faraday Test Adapter
-
 Ok so the code duplication issue has been solved with use of an instance `Faraday::Connection` object, but how does this help with testing?
 
-Faraday comes with a built-in test adapter for defining stubbed HTTP requests to mock out network services. Then a `Faraday::Connection` object can be instantiated using the test adapter. For example:
+### Faraday Test Adapter
+
+Faraday comes with a built-in test adapter for defining stubbed HTTP requests to mock out network services. A `Faraday::Connection` object can then be instantiated using the test adapter. For example:
 
 ```ruby
 # Test adapter
@@ -265,20 +265,122 @@ stubs.get('/some-endpoint') do
 end
 ```
 
-This means that any code that used `conn` from the above code to invoke for example `conn.get('/some-endpoint')...` would receive an HTTP response code of 200 with the canned response `'{"name": "some canned response for testing"}'`. And this leads to the last and final concept that will tie this all together.
+If the stubbed connection object `conn` gets used to make an HTTP request that matches what is stubbed, then the HTTP response code will be 200 and the response body will be the canned response. No real network request to `/some-endpoint` will be made. For example:
+
+```ruby
+resp = conn.get('/some-endpoint')
+
+resp.status # 200
+resp.headers # { 'Content-Type': 'application/json' }
+resp.body # '{"name": "some canned response for testing"}'
+```
+
+So the next question is - how to make `WeatherClient` use this stubbed connection object instead of a real connection object when running tests? This leads to the last and final concept that will tie this all together.
 
 ### Dependency Injection
 
-TBD...
+Dependency injection is a technique that will allow us to "inject" a stubbed Faraday connection into `WeatherClient` for testing purposes. But first, what is dependency injection? According to [Wikipedia](https://en.wikipedia.org/wiki/Dependency_injection):
+
+> In software engineering, dependency injection is a technique in which an object receives other objects that it depends on, called dependencies. Typically, the receiving object is called a client and the passed-in ('injected') object is called a service. The code that passes the service to the client is called the injector. Instead of the client specifying which service it will use, the injector tells the client what service to use. The 'injection' refers to the passing of a dependency (a service) into the client that uses it.
+
+In this example, the `WeatherClient` is the "receiving object", and the "service" we want to pass in is a `Faraday::Connection`. The problem with the current implementation of `WeatherClient` is that the initializer *always* instantiates a new instance of `Faraday::Connection`:
+
+```ruby
+class WeatherClient
+  def initialize
+    # always constructs a new Faraday::Connection object
+    @conn = Faraday.new(
+      url: 'https://api.weatherapi.com/v1',
+      params: { key: ENV['WEATHER_API_KEY'] },
+      headers: { 'Accept' => 'application/json' }
+    )
+  end
+
+  # snip...
+end
+```
+
+To make `WeatherClient` support injecting a connection object, the `initialize` method is modified to optionally accept a `conn` parameter, and either use the provided parameter, or if not specified, instantiate a new Faraday connection object:
+
+```ruby
+class WeatherClient
+  # Make Faraday connection injectable for easier testing.
+  def initialize(conn = nil)
+    @conn = conn || Faraday.new(
+      url: 'https://api.weatherapi.com/v1',
+      params: { key: ENV['WEATHER_API_KEY'] },
+      headers: { 'Accept' => 'application/json' }
+    )
+  end
+
+  # snip...
+end
+```
+
+And finally, a test can be written against this version of `WeatherClient`, initializing it with a stubbed `Faraday::Connection` to avoid making real HTTP requests:
+
+```ruby
+require './app/weather_client'
+
+RSpec.describe WeatherClient do
+  # Faraday test adapter
+  let(:stubs) { Faraday::Adapter::Test::Stubs.new }
+
+  # Faraday::Connection object that uses the test adapter
+  let(:conn) { Faraday.new { |b| b.adapter(:test, stubs) } }
+
+  # WeatherClient with the stubbed connection object injected
+  let(:client) { described_class.new(conn) }
+
+  # Clear default connection to prevent it from being cached between different tests.
+  # This allows for each test to have its own set of stubs
+  after do
+    Faraday.default_connection = nil
+  end
+
+  describe '#today' do
+    it 'gets current weather for a city' do
+      # Block yields an array with 3 items:
+      #   1. HTTP response code
+      #   2. Hash of headers
+      #   3. String response body
+      stubs.get('current.json') do
+        [
+          200,
+          { 'Content-Type': 'application/json' },
+          '{"location":{"name":"Paris","country":"France"},"current":{"temp_c":16.0,"condition":{"text":"Clear"},"air_quality":{"us-epa-index":1}}}'
+        ]
+      end
+
+      paris_weather = client.today(city: 'Paris')
+      expect(paris_weather).to eq('Weather for Paris, France is 16.0 degrees. Clear. Air quality is Good')
+
+      # Verify every stubbed method that was defined on test adapter actually got called when code was exercised
+      stubs.verify_stubbed_calls
+    end
+  end
+end
+
+```
 
 ## Which Approach to Use?
 
-WIP
+My preference is to use the built-in Faraday test adapter whenever possible because it results in cleaner looking tests and is officially supported by the library. However, as with most technical decisions, the correct answer is, it depends.
 
-If green fielding new project (or at least a new client class), use DI for connection object, then can use Faraday's built-in test adapter. If adding tests to legacy code that uses Faraday class helper methods like `Faraday.get`, `Faraday.post`, etc. use RSpec stubbing, unless entire project has really good test coverage and you feel confident refactoring code to use `Faraday::Connection` and inject via `initialize` method.
+If you're fortunate to be green fielding a project, or at the very least, the client class that will be making HTTP requests, then go ahead and design the class with dependency injection and use the built-in Faraday test adapter. If on the other hand, you're dealing with legacy code that uses the Faraday class helper methods such as `Faraday.get`, `Faraday.post`, then the safest solution may be to use regular RSpec stubbing.
 
 ## Conclusion
 
-WIP
+This post has covered two different ways of using and testing Faraday for making HTTP requests to an external service. The first approach is to use Faraday's class helper methods, and test with regular RSpec stubbing. Although this works, it can lead to brittle, difficult to read tests, but may be the safest option when dealing with legacy code. The second approach is to design the client class with dependency injection, and then use Faraday's built-in test adapter to inject a stubbed connection into the class for testing.
 
-This post has covered two different ways of testing Faraday.
+## Related Content
+
+The following section contains affiliate links for related content you may find useful. I get a small commission from purchases which helps me maintain this site.
+
+Looking to level up on Rails 6? You might like this book: [Agile Web Development with Rails 6](https://amzn.to/3wS8GNA).
+
+Working on a large legacy code base? This book [Working Effectively with Legacy Code](https://amzn.to/3accwHF) is a must read.
+
+Martin Fowler's [Refactoring: Improving the Design of Existing Code](https://amzn.to/2RFC0Xn) is also amazingly useful on this topic.
+
+Is your organization introducing microservices? This book [Building Event-Driven Microservices: Leveraging Organizational Data at Scale](https://amzn.to/3uSxa87) is a fantastic resource on this topic.
