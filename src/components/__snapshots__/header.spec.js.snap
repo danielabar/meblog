@@ -1,0 +1,56 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`Header renders correctly 1`] = `
+<header
+  className="container"
+>
+  <a
+    href="/"
+  >
+    <div
+      className="logo"
+    >
+      <div
+        className="profileWrapper"
+      >
+        <img
+          alt="Profile"
+          className="profileImg"
+          src="/images/profile.png"
+        />
+      </div>
+      <div
+        className="headerItem title"
+      >
+        Daniela Baron
+      </div>
+    </div>
+  </a>
+  <nav
+    className="nav"
+  >
+    <ul
+      className="navList"
+    >
+      <li
+        className="headerItem navItem"
+      >
+        <a
+          href="/blog"
+        >
+          Blog
+        </a>
+      </li>
+      <li
+        className="headerItem navItem"
+      >
+        <a
+          href="/about"
+        >
+          About
+        </a>
+      </li>
+    </ul>
+  </nav>
+</header>
+`;

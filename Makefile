@@ -9,3 +9,9 @@ serve:
 
 deploy:
 	npm run deploy
+
+test:
+	npm test
+
+testdev:
+	npm test -- --watch

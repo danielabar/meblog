@@ -48,6 +48,26 @@ To deploy to Github Pages:
 make deploy
 ```
 
+## Testing
+
+Run all tests and exit:
+
+```bash
+make test
+```
+
+Run tests in watch mode:
+
+```bash
+make testdev
+```
+
+### References
+
+- [Gatsby Unit Testing](https://www.gatsbyjs.com/docs/how-to/testing/unit-testing/)
+- [Jest](https://jestjs.io/docs/getting-started)
+- [react-test-renderer](https://reactjs.org/docs/test-renderer.html)
+
 ## Original Docs from Starter
 
 <!-- AUTO-GENERATED-CONTENT:START (STARTER) -->
