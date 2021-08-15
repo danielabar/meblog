@@ -2,15 +2,14 @@ import React from "react"
 import renderer from "react-test-renderer"
 
 import Header from "./header"
+import NavMenu from "./nav-menu"
 
 describe("Header", () => {
   it("renders correctly", () => {
-    const tree = renderer
-      .create(<Header />)
-      .toJSON()
-    expect(tree).toMatchSnapshot()
+    const testRenderer = renderer.create(<Header />);
+    expect(testRenderer.toJSON()).toMatchSnapshot()
 
-    // const root = tree.root
-    // expect(root.findByType(NavMenu)).toBe('bar');
+    const testInstance = testRenderer.root;
+    expect(testInstance.findByType(NavMenu)).toBeDefined();
   })
 })

@@ -59,7 +59,7 @@ make test
 Run tests in watch mode:
 
 ```bash
-make testdev
+make testw
 ```
 
 ### References

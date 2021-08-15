@@ -13,5 +13,5 @@ deploy:
 test:
 	npm test
 
-testdev:
+testw:
 	npm test -- --watch
