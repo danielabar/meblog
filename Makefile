@@ -1,3 +1,6 @@
+install:
+	npm install
+
 dev:
 	npm run develop
 
@@ -15,3 +18,6 @@ test:
 
 testw:
 	npm test -- --watch
+
+build:
+	npm run build
