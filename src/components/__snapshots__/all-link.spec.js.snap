@@ -1,0 +1,18 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`AllLink renders correctly 1`] = `
+<div
+  style={
+    Object {
+      "marginTop": "30px",
+    }
+  }
+>
+  <a
+    className="allLink"
+    href="/blog"
+  >
+    All Articles
+  </a>
+</div>
+`;
