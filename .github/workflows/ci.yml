@@ -16,11 +16,11 @@ jobs:
         node-version: "14"
         cache: "npm"
 
-      - name: install
-        run: make install
+    - name: install
+      run: make install
 
-      - name: build
-        run: make build
+    - name: build
+      run: make build
 
-      - name: test
-        run: make test
+    - name: test
+      run: make test
