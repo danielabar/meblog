@@ -6,21 +6,21 @@ jobs:
   ci:
     runs-on: ubuntu-latest
 
-  steps:
-    - name: Checkout source
-      uses: actions/checkout@v1
+    steps:
+      - name: Checkout source
+        uses: actions/checkout@v1
 
-    - name: Setup node
-      uses: actions/setup-node@v2
-      with:
-        node-version: "14"
-        cache: "npm"
+      - name: Setup node
+        uses: actions/setup-node@v2
+        with:
+          node-version: "14"
+          cache: "npm"
 
-    - name: install
-      run: make install
+      - name: install
+        run: make install
 
-    - name: build
-      run: make build
+      - name: build
+        run: make build
 
-    - name: test
-      run: make test
+      - name: test
+        run: make test
