@@ -67,6 +67,8 @@ make testw
 - [Gatsby Unit Testing](https://www.gatsbyjs.com/docs/how-to/testing/unit-testing/)
 - [Jest](https://jestjs.io/docs/getting-started)
 - [react-test-renderer](https://reactjs.org/docs/test-renderer.html)
+- [react testing library and Gatsby](https://www.emgoto.com/gatsby-unit-testing/)
+- [react testing library and snapshot testing](https://stackoverflow.com/questions/66362759/react-snapshot-testing-react-test-renderer-vs-react-testing-library)
 
 ## Original Docs from Starter
 
