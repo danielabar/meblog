@@ -1,0 +1,78 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`AllLink renders correctly 1`] = `
+<section
+  className="container"
+>
+  <article
+    className="container"
+  >
+    <div
+      className="subheader"
+    >
+      <div
+        className="date"
+      >
+        August 2021
+      </div>
+      <div
+        className="category"
+      >
+        Rails
+      </div>
+    </div>
+    <a
+      className="title"
+      href="/blog/some-article-1"
+    >
+      Some Article 1
+    </a>
+    <div
+      className="excerpt"
+    >
+      First sentence of article 1 blah blah blah...
+    </div>
+    <a
+      className="read"
+      href="/blog/some-article-1"
+    >
+      Read
+    </a>
+  </article>
+  <article
+    className="container"
+  >
+    <div
+      className="subheader"
+    >
+      <div
+        className="date"
+      >
+        September 2021
+      </div>
+      <div
+        className="category"
+      >
+        Docker
+      </div>
+    </div>
+    <a
+      className="title"
+      href="/blog/some-article-2"
+    >
+      Some Article 2
+    </a>
+    <div
+      className="excerpt"
+    >
+      First sentence of article 2 blah blah blah...
+    </div>
+    <a
+      className="read"
+      href="/blog/some-article-2"
+    >
+      Read
+    </a>
+  </article>
+</section>
+`;

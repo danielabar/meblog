@@ -1,0 +1,39 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`Article renders correctly 1`] = `
+<article
+  className="container"
+>
+  <div
+    className="subheader"
+  >
+    <div
+      className="date"
+    >
+      August 2021
+    </div>
+    <div
+      className="category"
+    >
+      Rails
+    </div>
+  </div>
+  <a
+    className="title"
+    href="/blog/some-article"
+  >
+    Some Article
+  </a>
+  <div
+    className="excerpt"
+  >
+    First sentence of the article blah blah blah...
+  </div>
+  <a
+    className="read"
+    href="/blog/some-article"
+  >
+    Read
+  </a>
+</article>
+`;
