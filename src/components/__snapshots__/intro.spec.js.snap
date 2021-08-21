@@ -1,0 +1,9 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`Intro renders correctly 1`] = `
+<section
+  className="container"
+>
+  I'm a software engineer based in Toronto, Canada. My interests include fullstack development, test automation, personal finance, listening to podcasts, reading, building side projects, health and fitness, and always learning new things.
+</section>
+`;
