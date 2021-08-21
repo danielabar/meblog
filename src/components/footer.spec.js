@@ -5,9 +5,7 @@ import Footer from "./footer"
 
 describe("Footer", () => {
   it("renders correctly", () => {
-    const tree = renderer
-      .create(<Footer />)
-      .toJSON()
+    const tree = renderer.create(<Footer />).toJSON()
     expect(tree).toMatchSnapshot()
   })
 })

@@ -5,7 +5,7 @@ import Intro from "./intro"
 
 describe("Intro", () => {
   it("renders correctly", () => {
-    const testRenderer = renderer.create(<Intro />);
+    const testRenderer = renderer.create(<Intro />)
     expect(testRenderer.toJSON()).toMatchSnapshot()
   })
 })

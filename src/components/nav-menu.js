@@ -5,7 +5,7 @@ import SearchInput from "./search-input"
 
 const NavMenu = () => {
   function renderSearchInput() {
-    if (process.env.SEARCH_ENABLED === 'true') {
+    if (process.env.SEARCH_ENABLED === "true") {
       return (
         <li className={`${styles.headerItem} ${styles.navItem}`}>
           <SearchInput />
@@ -26,7 +26,7 @@ const NavMenu = () => {
             About
           </Link>
         </li>
-        { renderSearchInput() }
+        {renderSearchInput()}
       </ul>
     </nav>
   )

@@ -10,7 +10,7 @@
     "deployold": "gatsby build --prefix-paths && gh-pages -d public",
     "deploy": "gatsby clean && gatsby build && gh-pages -d public",
     "develop": "gatsby develop -H 0.0.0.0",
-    "format": "prettier --write \"**/*.{js,jsx,json,md}\"",
+    "format": "prettier --write \"**/*.{js,jsx}\"",
     "serve": "gatsby serve -H 0.0.0.0",
     "servebuild": "gatsby clean && gatsby build && gatsby serve -H 0.0.0.0",
     "start": "npm run develop",

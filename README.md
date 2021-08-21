@@ -48,6 +48,12 @@ To deploy to Github Pages:
 make deploy
 ```
 
+## Format Code
+
+```bash
+npm run format
+```
+
 ## Testing
 
 Run all tests and exit:

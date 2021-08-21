@@ -2,7 +2,7 @@ import React from "react"
 import { Helmet } from "react-helmet"
 import PropTypes from "prop-types"
 import { StaticQuery, graphql } from "gatsby"
-import HelloWorker from '../workers/hello.worker.js'
+import HelloWorker from "../workers/hello.worker.js"
 
 const SEO = ({ title, description, image, pathname, article, track }) => (
   <StaticQuery
@@ -20,8 +20,8 @@ const SEO = ({ title, description, image, pathname, article, track }) => (
         },
       },
     }) => {
-      const recordVisit = track === 'NO' ? false : true
-      if (typeof window === 'object' && recordVisit) {
+      const recordVisit = track === "NO" ? false : true
+      if (typeof window === "object" && recordVisit) {
         const helloWorker = new HelloWorker()
         helloWorker.postMessage([window.location.href, document.referrer])
       }
@@ -39,7 +39,10 @@ const SEO = ({ title, description, image, pathname, article, track }) => (
           <Helmet title={seo.title} titleTemplate={titleTemplate}>
             <meta name="description" content={seo.description} />
             <meta name="image" content={seo.image} />
-            <meta name="google-site-verification" content={seo.googleSiteVerification} />
+            <meta
+              name="google-site-verification"
+              content={seo.googleSiteVerification}
+            />
             {seo.url && <meta property="og:url" content={seo.url} />}
             {(article ? true : null) && (
               <meta property="og:type" content="article" />
@@ -169,8 +172,8 @@ const query = graphql`
         defaultDescription: description
         siteUrl: url
         defaultImage: image
-        twitterUsername,
-        googleSiteVerification,
+        twitterUsername
+        googleSiteVerification
       }
     }
   }
