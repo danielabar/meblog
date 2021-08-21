@@ -77,6 +77,7 @@ make testw
 - [react testing library and Gatsby](https://www.emgoto.com/gatsby-unit-testing/)
 - [react testing library and snapshot testing](https://stackoverflow.com/questions/66362759/react-snapshot-testing-react-test-renderer-vs-react-testing-library)
 - [example react testing library mock server](https://testing-library.com/docs/react-testing-library/example-intro#full-example)
+- [jest and dotenv](https://tekloon.dev/using-dotenv-with-jest)
 
 ## Original Docs from Starter
 

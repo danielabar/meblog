@@ -29,4 +29,15 @@ describe("NavMenuResponsive", () => {
     )
     expect(screen.queryByTestId("nav-menu-responsive-menu")).toBeNull()
   })
+
+  it("closes after being opened", () => {
+    render(<NavMenuResponsive />)
+    fireEvent.click(screen.getByTestId("nav-menu-responsive-menu"))
+    fireEvent.click(screen.getByTestId("nav-menu-responsive-close"))
+
+    expect(screen.getByTestId("nav-menu-responsive-menu")).toHaveTextContent(
+      "menu"
+    )
+    expect(screen.queryByTestId("nav-menu-responsive-close")).toBeNull()
+  })
 })

@@ -22,5 +22,8 @@ test:
 testw:
 	npm test -- --watch
 
+test_cover:
+	npm test -- --coverage
+
 build:
 	npm run build
