@@ -13,6 +13,9 @@ serve:
 deploy:
 	npm run deploy
 
+format:
+	npm run format
+
 test:
 	npm test
 
