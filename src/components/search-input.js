@@ -36,6 +36,7 @@ const SearchInput = () => {
       <input
         type="text"
         className={styles.search}
+        data-testid="search-input"
         aria-label="Search"
         placeholder="Search, eg: Rails"
         onKeyPress={event => search(event.charCode, event.target.value)}

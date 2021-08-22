@@ -16,7 +16,9 @@ describe("NavMenuResponsive", () => {
     expect(screen.getByTestId("nav-menu-responsive-menu")).toHaveTextContent(
       "menu"
     )
-    expect(screen.queryByTestId("nav-menu-responsive-close")).toBeNull()
+    expect(
+      screen.queryByTestId("nav-menu-responsive-close")
+    ).not.toBeInTheDocument()
   })
 
   it("opens", () => {
@@ -27,7 +29,9 @@ describe("NavMenuResponsive", () => {
     expect(screen.getByTestId("nav-menu-responsive-close")).toHaveTextContent(
       "close"
     )
-    expect(screen.queryByTestId("nav-menu-responsive-menu")).toBeNull()
+    expect(
+      screen.queryByTestId("nav-menu-responsive-menu")
+    ).not.toBeInTheDocument()
   })
 
   it("closes after being opened", () => {
@@ -38,6 +42,8 @@ describe("NavMenuResponsive", () => {
     expect(screen.getByTestId("nav-menu-responsive-menu")).toHaveTextContent(
       "menu"
     )
-    expect(screen.queryByTestId("nav-menu-responsive-close")).toBeNull()
+    expect(
+      screen.queryByTestId("nav-menu-responsive-close")
+    ).not.toBeInTheDocument()
   })
 })
