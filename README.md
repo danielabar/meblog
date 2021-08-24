@@ -79,6 +79,7 @@ make testw
 - [example react testing library mock server](https://testing-library.com/docs/react-testing-library/example-intro#full-example)
 - [jest and dotenv](https://tekloon.dev/using-dotenv-with-jest)
 - [jest dom matchers](https://github.com/testing-library/jest-dom#custom-matchers)
+- [more realistic user event simulation than fireEvent](https://testing-library.com/docs/ecosystem-user-event/)
 
 ## Original Docs from Starter
 
