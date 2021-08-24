@@ -8,9 +8,6 @@ import "@testing-library/jest-dom"
 
 import Pagination from "./pagination"
 
-// First page:   { "isFirst": true, "prevPage": "/blog/0", "isLast": false, "nextPage": "/blog/2" }
-// Middle page:  { "isFirst": false, "prevPage": "/blog", "isLast": false, "nextPage": "/blog/3" }
-// Last page:    { "isFirst": false, "prevPage": "/blog/7", "isLast": true, "nextPage": "/blog/9" }
 describe("Pagination", () => {
   it("renders first page", () => {
     const container = render(
