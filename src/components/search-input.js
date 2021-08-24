@@ -3,7 +3,7 @@ import { navigate } from "gatsby"
 import { MdSearch } from "react-icons/md"
 import styles from "./search-input.module.css"
 
-const ENTER_KEY_CODE = 13
+const ENTER_KEY = "Enter"
 
 const SearchInput = () => {
   // function debounce(func, duration) {
@@ -24,8 +24,8 @@ const SearchInput = () => {
   //   }
   // }, 300);
 
-  function search(charCode, text) {
-    if (charCode === ENTER_KEY_CODE) {
+  function search(eventKey, text) {
+    if (eventKey === ENTER_KEY) {
       navigate(`/search-results/?q=${text}`)
     }
   }
@@ -39,7 +39,7 @@ const SearchInput = () => {
         data-testid="search-input"
         aria-label="Search"
         placeholder="Search, eg: Rails"
-        onKeyPress={event => search(event.charCode, event.target.value)}
+        onKeyPress={event => search(event.key, event.target.value)}
       />
     </div>
   )
