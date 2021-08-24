@@ -80,6 +80,7 @@ make testw
 - [jest and dotenv](https://tekloon.dev/using-dotenv-with-jest)
 - [jest dom matchers](https://github.com/testing-library/jest-dom#custom-matchers)
 - [more realistic user event simulation than fireEvent](https://testing-library.com/docs/ecosystem-user-event/)
+- [various useful testing including mock helmet for seo](https://www.emgoto.com/gatsby-unit-testing/)
 
 ## Original Docs from Starter
 
