@@ -65,7 +65,7 @@ const NavMenuResponsive = () => {
       )
     }
     return (
-      <nav className={styles.nav}>
+      <nav className={styles.nav} data-testid="nav-menu-responsive">
         <ul className={styles.navList}>
           <li>
             <button

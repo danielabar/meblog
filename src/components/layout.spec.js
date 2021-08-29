@@ -1,20 +1,24 @@
+/**
+ * @jest-environment jsdom
+ */
+
 import React from "react"
-import renderer from "react-test-renderer"
+import { render, screen } from "@testing-library/react"
+import "@testing-library/jest-dom"
 
 import Layout from "./layout"
 
 describe("Layout", () => {
   it("renders correctly", () => {
-    const testRenderer = renderer.create(
+    const container = render(
       <Layout>
-        <div className="data-test-1">test content</div>
+        <div data-testid="test-content">test content</div>
       </Layout>
     )
-    expect(testRenderer.toJSON()).toMatchSnapshot()
+    expect(container).toMatchSnapshot()
 
-    const testInstance = testRenderer.root
-    expect(
-      testInstance.findByProps({ className: "data-test-1" }).children
-    ).toEqual(["test content"])
+    expect(screen.getByTestId("header")).toBeInTheDocument()
+    expect(screen.getByTestId("test-content")).toBeInTheDocument()
+    expect(screen.getByTestId("footer")).toBeInTheDocument()
   })
 })

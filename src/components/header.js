@@ -14,7 +14,7 @@ const Header = () => {
   }
 
   return (
-    <header className={styles.container}>
+    <header className={styles.container} data-testid="header">
       <Link to="/">
         <div className={styles.logo}>
           <div className={styles.profileWrapper}>

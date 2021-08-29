@@ -1,15 +1,19 @@
+/**
+ * @jest-environment jsdom
+ */
+
 import React from "react"
-import renderer from "react-test-renderer"
+import { render, screen } from "@testing-library/react"
+import "@testing-library/jest-dom"
 
 import AllLink from "./all-link"
-import { Link } from "gatsby"
 
 describe("AllLink", () => {
   it("renders correctly", () => {
-    const testRenderer = renderer.create(<AllLink marginTop="30px" />)
-    expect(testRenderer.toJSON()).toMatchSnapshot()
+    const container = render(<AllLink marginTop="30px" />)
+    expect(container).toMatchSnapshot()
 
-    const testInstance = testRenderer.root
-    expect(testInstance.findByType(Link)).toBeDefined()
+    const div = screen.getByTestId("all-wrapper")
+    expect(div).toHaveStyle("marginTop: 30px")
   })
 })

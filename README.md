@@ -73,14 +73,14 @@ make testw
 - [Gatsby Unit Testing](https://www.gatsbyjs.com/docs/how-to/testing/unit-testing/)
 - [Jest](https://jestjs.io/docs/getting-started)
 - [Jest Expect](https://jestjs.io/docs/expect)
-- [react-test-renderer](https://reactjs.org/docs/test-renderer.html)
 - [react testing library and Gatsby](https://www.emgoto.com/gatsby-unit-testing/)
-- [react testing library and snapshot testing](https://stackoverflow.com/questions/66362759/react-snapshot-testing-react-test-renderer-vs-react-testing-library)
 - [example react testing library mock server](https://testing-library.com/docs/react-testing-library/example-intro#full-example)
 - [jest and dotenv](https://tekloon.dev/using-dotenv-with-jest)
 - [jest dom matchers](https://github.com/testing-library/jest-dom#custom-matchers)
 - [more realistic user event simulation than fireEvent](https://testing-library.com/docs/ecosystem-user-event/)
 - [various useful testing including mock helmet for seo](https://www.emgoto.com/gatsby-unit-testing/)
+- [run just one test](https://stackoverflow.com/questions/28725955/how-do-i-test-a-single-file-using-jest)
+- [Gatsby and Cypress](https://www.gatsbyjs.com/docs/how-to/testing/end-to-end-testing/)
 
 ## Original Docs from Starter
 

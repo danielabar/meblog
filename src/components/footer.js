@@ -4,7 +4,7 @@ import { FaTwitter, FaGithub, FaCodepen, FaLinkedinIn } from "react-icons/fa"
 
 const Footer = () => {
   return (
-    <footer className={styles.container}>
+    <footer className={styles.container} data-testid="footer">
       <hr className={styles.sep} />
       <p className={styles.copy}>All materials © Daniela Baron 2021</p>
       <div className={styles.social}>

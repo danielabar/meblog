@@ -1,15 +1,37 @@
+/**
+ * @jest-environment jsdom
+ */
+
 import React from "react"
-import renderer from "react-test-renderer"
+import { render, screen } from "@testing-library/react"
+import "@testing-library/jest-dom"
 
 import Header from "./header"
-import NavMenu from "./nav-menu"
+
+let mockWidth = 1024
+jest.mock("../hooks/useviewport", () => ({
+  __esModule: true,
+  default: () => ({ width: mockWidth }),
+}))
 
 describe("Header", () => {
-  it("renders correctly", () => {
-    const testRenderer = renderer.create(<Header />)
-    expect(testRenderer.toJSON()).toMatchSnapshot()
+  afterEach(() => {
+    jest.clearAllMocks()
+  })
 
-    const testInstance = testRenderer.root
-    expect(testInstance.findByType(NavMenu)).toBeDefined()
+  it("renders nav menu for wide widths", () => {
+    mockWidth = 900
+    const container = render(<Header />)
+
+    expect(container).toMatchSnapshot()
+    expect(screen.getByTestId("nav-menu")).toBeInTheDocument
+  })
+
+  it("renders nav menu responsive for narrow widths", () => {
+    mockWidth = 400
+    const container = render(<Header />)
+
+    expect(container).toMatchSnapshot()
+    expect(screen.getByTestId("nav-menu-responsive")).toBeInTheDocument
   })
 })

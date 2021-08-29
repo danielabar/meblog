@@ -3,7 +3,7 @@ import { Link } from "gatsby"
 import styles from "./all-link.module.css"
 
 export default ({ marginTop }) => (
-  <div style={{ marginTop: marginTop }}>
+  <div data-testid="all-wrapper" style={{ marginTop: marginTop }}>
     <Link to="/blog" className={styles.allLink}>
       All Articles
     </Link>

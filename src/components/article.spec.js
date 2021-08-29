@@ -1,11 +1,16 @@
+/**
+ * @jest-environment jsdom
+ */
+
 import React from "react"
-import renderer from "react-test-renderer"
+import { render } from "@testing-library/react"
+import "@testing-library/jest-dom"
 
 import Article from "./article"
 
 describe("Article", () => {
   it("renders correctly", () => {
-    const testRenderer = renderer.create(
+    const container = render(
       <Article
         key="123abc"
         id="123abc"
@@ -16,6 +21,6 @@ describe("Article", () => {
         excerpt="First sentence of the article blah blah blah..."
       />
     )
-    expect(testRenderer.toJSON()).toMatchSnapshot()
+    expect(container).toMatchSnapshot()
   })
 })

@@ -1,56 +1,351 @@
 // Jest Snapshot v1, https://goo.gl/fbAQLP
 
-exports[`Header renders correctly 1`] = `
-<header
-  className="container"
->
-  <a
-    href="/"
-  >
-    <div
-      className="logo"
-    >
-      <div
-        className="profileWrapper"
+exports[`Header renders nav menu for wide widths 1`] = `
+Object {
+  "asFragment": [Function],
+  "baseElement": <body>
+    <div>
+      <header
+        class="container"
+        data-testid="header"
       >
-        <img
-          alt="Profile"
-          className="profileImg"
-          src="/images/profile.png"
-        />
-      </div>
-      <div
-        className="headerItem title"
-      >
-        Daniela Baron
-      </div>
+        <a
+          href="/"
+        >
+          <div
+            class="logo"
+          >
+            <div
+              class="profileWrapper"
+            >
+              <img
+                alt="Profile"
+                class="profileImg"
+                src="/images/profile.png"
+              />
+            </div>
+            <div
+              class="headerItem title"
+            >
+              Daniela Baron
+            </div>
+          </div>
+        </a>
+        <nav
+          class="nav"
+          data-testid="nav-menu"
+        >
+          <ul
+            class="navList"
+          >
+            <li
+              class="headerItem navItem"
+            >
+              <a
+                href="/blog"
+              >
+                Blog
+              </a>
+            </li>
+            <li
+              class="headerItem navItem"
+            >
+              <a
+                href="/about"
+              >
+                About
+              </a>
+            </li>
+          </ul>
+        </nav>
+      </header>
     </div>
-  </a>
-  <nav
-    className="nav"
-  >
-    <ul
-      className="navList"
+  </body>,
+  "container": <div>
+    <header
+      class="container"
+      data-testid="header"
     >
-      <li
-        className="headerItem navItem"
+      <a
+        href="/"
+      >
+        <div
+          class="logo"
+        >
+          <div
+            class="profileWrapper"
+          >
+            <img
+              alt="Profile"
+              class="profileImg"
+              src="/images/profile.png"
+            />
+          </div>
+          <div
+            class="headerItem title"
+          >
+            Daniela Baron
+          </div>
+        </div>
+      </a>
+      <nav
+        class="nav"
+        data-testid="nav-menu"
+      >
+        <ul
+          class="navList"
+        >
+          <li
+            class="headerItem navItem"
+          >
+            <a
+              href="/blog"
+            >
+              Blog
+            </a>
+          </li>
+          <li
+            class="headerItem navItem"
+          >
+            <a
+              href="/about"
+            >
+              About
+            </a>
+          </li>
+        </ul>
+      </nav>
+    </header>
+  </div>,
+  "debug": [Function],
+  "findAllByAltText": [Function],
+  "findAllByDisplayValue": [Function],
+  "findAllByLabelText": [Function],
+  "findAllByPlaceholderText": [Function],
+  "findAllByRole": [Function],
+  "findAllByTestId": [Function],
+  "findAllByText": [Function],
+  "findAllByTitle": [Function],
+  "findByAltText": [Function],
+  "findByDisplayValue": [Function],
+  "findByLabelText": [Function],
+  "findByPlaceholderText": [Function],
+  "findByRole": [Function],
+  "findByTestId": [Function],
+  "findByText": [Function],
+  "findByTitle": [Function],
+  "getAllByAltText": [Function],
+  "getAllByDisplayValue": [Function],
+  "getAllByLabelText": [Function],
+  "getAllByPlaceholderText": [Function],
+  "getAllByRole": [Function],
+  "getAllByTestId": [Function],
+  "getAllByText": [Function],
+  "getAllByTitle": [Function],
+  "getByAltText": [Function],
+  "getByDisplayValue": [Function],
+  "getByLabelText": [Function],
+  "getByPlaceholderText": [Function],
+  "getByRole": [Function],
+  "getByTestId": [Function],
+  "getByText": [Function],
+  "getByTitle": [Function],
+  "queryAllByAltText": [Function],
+  "queryAllByDisplayValue": [Function],
+  "queryAllByLabelText": [Function],
+  "queryAllByPlaceholderText": [Function],
+  "queryAllByRole": [Function],
+  "queryAllByTestId": [Function],
+  "queryAllByText": [Function],
+  "queryAllByTitle": [Function],
+  "queryByAltText": [Function],
+  "queryByDisplayValue": [Function],
+  "queryByLabelText": [Function],
+  "queryByPlaceholderText": [Function],
+  "queryByRole": [Function],
+  "queryByTestId": [Function],
+  "queryByText": [Function],
+  "queryByTitle": [Function],
+  "rerender": [Function],
+  "unmount": [Function],
+}
+`;
+
+exports[`Header renders nav menu responsive for narrow widths 1`] = `
+Object {
+  "asFragment": [Function],
+  "baseElement": <body>
+    <div>
+      <header
+        class="container"
+        data-testid="header"
       >
         <a
-          href="/blog"
+          href="/"
         >
-          Blog
+          <div
+            class="logo"
+          >
+            <div
+              class="profileWrapper"
+            >
+              <img
+                alt="Profile"
+                class="profileImg"
+                src="/images/profile.png"
+              />
+            </div>
+            <div
+              class="headerItem title"
+            >
+              Daniela Baron
+            </div>
+          </div>
         </a>
-      </li>
-      <li
-        className="headerItem navItem"
+        <nav
+          class="nav"
+          data-testid="nav-menu-responsive"
+        >
+          <ul
+            class="navList"
+          >
+            <li>
+              <button
+                class="menuButton"
+                data-testid="nav-menu-responsive-menu"
+              >
+                <svg
+                  fill="currentColor"
+                  height="1.7rem"
+                  stroke="currentColor"
+                  stroke-width="0"
+                  viewBox="0 0 24 24"
+                  width="1.7rem"
+                  xmlns="http://www.w3.org/2000/svg"
+                >
+                  <path
+                    d="M3 18h18v-2H3v2zm0-5h18v-2H3v2zm0-7v2h18V6H3z"
+                  />
+                </svg>
+                <br />
+                menu
+              </button>
+            </li>
+          </ul>
+        </nav>
+      </header>
+    </div>
+  </body>,
+  "container": <div>
+    <header
+      class="container"
+      data-testid="header"
+    >
+      <a
+        href="/"
       >
-        <a
-          href="/about"
+        <div
+          class="logo"
         >
-          About
-        </a>
-      </li>
-    </ul>
-  </nav>
-</header>
+          <div
+            class="profileWrapper"
+          >
+            <img
+              alt="Profile"
+              class="profileImg"
+              src="/images/profile.png"
+            />
+          </div>
+          <div
+            class="headerItem title"
+          >
+            Daniela Baron
+          </div>
+        </div>
+      </a>
+      <nav
+        class="nav"
+        data-testid="nav-menu-responsive"
+      >
+        <ul
+          class="navList"
+        >
+          <li>
+            <button
+              class="menuButton"
+              data-testid="nav-menu-responsive-menu"
+            >
+              <svg
+                fill="currentColor"
+                height="1.7rem"
+                stroke="currentColor"
+                stroke-width="0"
+                viewBox="0 0 24 24"
+                width="1.7rem"
+                xmlns="http://www.w3.org/2000/svg"
+              >
+                <path
+                  d="M3 18h18v-2H3v2zm0-5h18v-2H3v2zm0-7v2h18V6H3z"
+                />
+              </svg>
+              <br />
+              menu
+            </button>
+          </li>
+        </ul>
+      </nav>
+    </header>
+  </div>,
+  "debug": [Function],
+  "findAllByAltText": [Function],
+  "findAllByDisplayValue": [Function],
+  "findAllByLabelText": [Function],
+  "findAllByPlaceholderText": [Function],
+  "findAllByRole": [Function],
+  "findAllByTestId": [Function],
+  "findAllByText": [Function],
+  "findAllByTitle": [Function],
+  "findByAltText": [Function],
+  "findByDisplayValue": [Function],
+  "findByLabelText": [Function],
+  "findByPlaceholderText": [Function],
+  "findByRole": [Function],
+  "findByTestId": [Function],
+  "findByText": [Function],
+  "findByTitle": [Function],
+  "getAllByAltText": [Function],
+  "getAllByDisplayValue": [Function],
+  "getAllByLabelText": [Function],
+  "getAllByPlaceholderText": [Function],
+  "getAllByRole": [Function],
+  "getAllByTestId": [Function],
+  "getAllByText": [Function],
+  "getAllByTitle": [Function],
+  "getByAltText": [Function],
+  "getByDisplayValue": [Function],
+  "getByLabelText": [Function],
+  "getByPlaceholderText": [Function],
+  "getByRole": [Function],
+  "getByTestId": [Function],
+  "getByText": [Function],
+  "getByTitle": [Function],
+  "queryAllByAltText": [Function],
+  "queryAllByDisplayValue": [Function],
+  "queryAllByLabelText": [Function],
+  "queryAllByPlaceholderText": [Function],
+  "queryAllByRole": [Function],
+  "queryAllByTestId": [Function],
+  "queryAllByText": [Function],
+  "queryAllByTitle": [Function],
+  "queryByAltText": [Function],
+  "queryByDisplayValue": [Function],
+  "queryByLabelText": [Function],
+  "queryByPlaceholderText": [Function],
+  "queryByRole": [Function],
+  "queryByTestId": [Function],
+  "queryByText": [Function],
+  "queryByTitle": [Function],
+  "rerender": [Function],
+  "unmount": [Function],
+}
 `;

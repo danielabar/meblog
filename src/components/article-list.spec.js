@@ -1,5 +1,10 @@
+/**
+ * @jest-environment jsdom
+ */
+
 import React from "react"
-import renderer from "react-test-renderer"
+import { render, screen } from "@testing-library/react"
+import "@testing-library/jest-dom"
 
 import ArticleList from "./article-list"
 
@@ -36,7 +41,10 @@ describe("AllLink", () => {
       },
     ]
 
-    const testRenderer = renderer.create(<ArticleList articles={testData} />)
-    expect(testRenderer.toJSON()).toMatchSnapshot()
+    const container = render(<ArticleList articles={testData} />)
+    expect(container).toMatchSnapshot()
+
+    expect(screen.getByText("Some Article 1")).toBeInTheDocument()
+    expect(screen.getByText("Some Article 2")).toBeInTheDocument()
   })
 })

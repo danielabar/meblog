@@ -188,6 +188,7 @@ Object {
     <div>
       <nav
         class="nav"
+        data-testid="nav-menu-responsive"
       >
         <ul
           class="navList"
@@ -221,6 +222,7 @@ Object {
   "container": <div>
     <nav
       class="nav"
+      data-testid="nav-menu-responsive"
     >
       <ul
         class="navList"
