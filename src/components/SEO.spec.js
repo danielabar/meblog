@@ -8,6 +8,7 @@ import "@testing-library/jest-dom"
 import Helmet from "react-helmet"
 import SEO from "./SEO"
 
+const mockWorkerImpl = jest.fn()
 let mockedWorker = jest.Mock;
 jest.mock('../workers/hello.worker.js', () => {
   return {
@@ -15,10 +16,9 @@ jest.mock('../workers/hello.worker.js', () => {
     default: jest.fn().mockImplementation(() => {
       return {
         init: mockedWorker,
-        postMessage: jest.fn()
-        // postMessage: jest.fn().mockImplementation(() => {
-        //   console.log('TEST')
-        // })
+        postMessage: jest.fn().mockImplementation(() => {
+          mockWorkerImpl()
+        })
       };
     }),
   };
@@ -38,6 +38,7 @@ describe("SEO", () => {
   beforeEach(() => {
     mockedWorker = jest.fn().mockImplementation();
     mockedWorker.mockClear();
+    mockWorkerImpl.mockClear();
   });
 
   it("tracks", () => {
@@ -48,6 +49,8 @@ describe("SEO", () => {
         track="YES"
       />
     )
+
+    expect(mockWorkerImpl).toHaveBeenCalled();
   })
 
   it("renders for home page", () => {
@@ -58,6 +61,8 @@ describe("SEO", () => {
         track="NO"
       />
     )
+
+    expect(mockWorkerImpl).not.toHaveBeenCalled();
 
     const helmet = Helmet.peek()
     expect(helmet.title).toEqual("Home · Jane Doe")
@@ -97,6 +102,8 @@ describe("SEO", () => {
         track="NO"
       />
     )
+
+    expect(mockWorkerImpl).not.toHaveBeenCalled();
 
     const helmet = Helmet.peek()
     expect(helmet.title).toEqual("About · Jane Doe")
@@ -140,6 +147,8 @@ describe("SEO", () => {
       />
     )
 
+    expect(mockWorkerImpl).not.toHaveBeenCalled();
+
     const helmet = Helmet.peek()
     expect(helmet.title).toEqual("Article Title · Jane Doe")
     expect(helmet.metaTags).toEqual(
@@ -180,6 +189,8 @@ describe("SEO", () => {
       />
     )
 
+    expect(mockWorkerImpl).not.toHaveBeenCalled();
+
     const helmet = Helmet.peek()
     expect(helmet.title).toEqual("Blog · Jane Doe")
     expect(helmet.metaTags).toEqual(
@@ -218,6 +229,8 @@ describe("SEO", () => {
         track="NO"
       />
     )
+
+    expect(mockWorkerImpl).not.toHaveBeenCalled();
 
     const helmet = Helmet.peek()
     expect(helmet.title).toEqual("Search Results · Jane Doe")

@@ -31,7 +31,6 @@ export default function SEO({
   if (typeof window === "object" && recordVisit) {
     const helloWorker = new HelloWorker()
     helloWorker.postMessage([window.location.href, document.referrer])
-    console.log(`Called postMessage with ${window.location.href}, ${document.referrer}`)
   }
 
   const seo = {
