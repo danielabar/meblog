@@ -22,7 +22,37 @@ module.exports = {
         href: to,
       })
   ),
-  StaticQuery: jest.fn(),
-  useStaticQuery: jest.fn(),
+  // TODO: Remove, no longer using StaticQuery component
+  StaticQuery: jest.fn().mockImplementation(() => {
+    return {
+      site: {
+        siteMetadata: {
+          defaultTitle: "Jane Doe Blog",
+          titleTemplate: "%s · Jane Doe",
+          defaultDescription: "Blog description.",
+          siteUrl: "https://someblog.com",
+          defaultImage: "/images/profile.png",
+          twitterUsername: "@somebody",
+          googleSiteVerification: "abc123",
+        },
+      },
+    }
+  }),
+  // This works because only SEO component uses useStaticQuery hook
+  useStaticQuery: jest.fn().mockImplementation(() => {
+    return {
+      site: {
+        siteMetadata: {
+          defaultTitle: "Jane Doe Blog",
+          titleTemplate: "%s · Jane Doe",
+          defaultDescription: "Blog description.",
+          siteUrl: "https://someblog.com",
+          defaultImage: "/images/profile.png",
+          twitterUsername: "@somebody",
+          googleSiteVerification: "abc123",
+        },
+      },
+    }
+  }),
   navigate: jest.fn(),
 }
