@@ -9,8 +9,8 @@ import Helmet from "react-helmet"
 import SEO from "./SEO"
 
 const mockWorkerImpl = jest.fn()
-let mockedWorker = jest.Mock;
-jest.mock('../workers/hello.worker.js', () => {
+let mockedWorker = jest.Mock
+jest.mock("../workers/hello.worker.js", () => {
   return {
     __esModule: true,
     default: jest.fn().mockImplementation(() => {
@@ -18,51 +18,38 @@ jest.mock('../workers/hello.worker.js', () => {
         init: mockedWorker,
         postMessage: jest.fn().mockImplementation(() => {
           mockWorkerImpl()
-        })
-      };
+        }),
+      }
     }),
-  };
-});
+  }
+})
 
 describe("SEO", () => {
-
   const COMMON_META_TAGS = [
-   { content: "abc123", name: "google-site-verification" },
-   { content: "summary_large_image", name: "twitter:card" },
-   { content: "@somebody", name: "twitter:creator" },
-   { content: "#ffffff", name: "msapplication-TileColor" },
-   { content: "/ms-icon-144x144.png", name: "msapplication-TileImage" },
-   { content: "#ffffff", name: "theme-color" },
+    { content: "abc123", name: "google-site-verification" },
+    { content: "summary_large_image", name: "twitter:card" },
+    { content: "@somebody", name: "twitter:creator" },
+    { content: "#ffffff", name: "msapplication-TileColor" },
+    { content: "/ms-icon-144x144.png", name: "msapplication-TileImage" },
+    { content: "#ffffff", name: "theme-color" },
   ]
 
   beforeEach(() => {
-    mockedWorker = jest.fn().mockImplementation();
-    mockedWorker.mockClear();
-    mockWorkerImpl.mockClear();
-  });
+    mockedWorker = jest.fn().mockImplementation()
+    mockedWorker.mockClear()
+    mockWorkerImpl.mockClear()
+  })
 
   it("tracks", () => {
-    render(
-      <SEO
-        title="Home"
-        pathname="/"
-        track="YES"
-      />
-    )
+    render(<SEO title="Home" pathname="/" track="YES" />)
 
-    expect(mockWorkerImpl).toHaveBeenCalled();
+    expect(mockWorkerImpl).toHaveBeenCalled()
   })
 
   it("renders for home page", () => {
-    render(
-      <SEO
-        title="Home"
-        pathname="/"
-        track="NO"
-      />
-    )
+    render(<SEO title="Home" pathname="/" track="NO" />)
 
-    expect(mockWorkerImpl).not.toHaveBeenCalled();
+    expect(mockWorkerImpl).not.toHaveBeenCalled()
 
     const helmet = Helmet.peek()
     expect(helmet.title).toEqual("Home · Jane Doe")
@@ -74,7 +61,8 @@ describe("SEO", () => {
           name: "image",
         },
         {
-          content: "https://someblog.com/", property: "og:url",
+          content: "https://someblog.com/",
+          property: "og:url",
         },
         { content: "website", property: "og:type" },
         { content: "Home", property: "og:title" },
@@ -89,21 +77,15 @@ describe("SEO", () => {
           content: "https://someblog.com/images/profile.png",
           name: "twitter:image",
         },
-        ...COMMON_META_TAGS
+        ...COMMON_META_TAGS,
       ])
     )
   })
 
   it("renders for about page", () => {
-    render(
-      <SEO
-        title="About"
-        pathname="/about"
-        track="NO"
-      />
-    )
+    render(<SEO title="About" pathname="/about" track="NO" />)
 
-    expect(mockWorkerImpl).not.toHaveBeenCalled();
+    expect(mockWorkerImpl).not.toHaveBeenCalled()
 
     const helmet = Helmet.peek()
     expect(helmet.title).toEqual("About · Jane Doe")
@@ -115,7 +97,8 @@ describe("SEO", () => {
           name: "image",
         },
         {
-          content: "https://someblog.com/about", property: "og:url",
+          content: "https://someblog.com/about",
+          property: "og:url",
         },
         { content: "website", property: "og:type" },
         { content: "About", property: "og:title" },
@@ -130,7 +113,7 @@ describe("SEO", () => {
           content: "https://someblog.com/images/profile.png",
           name: "twitter:image",
         },
-        ...COMMON_META_TAGS
+        ...COMMON_META_TAGS,
       ])
     )
   })
@@ -147,7 +130,7 @@ describe("SEO", () => {
       />
     )
 
-    expect(mockWorkerImpl).not.toHaveBeenCalled();
+    expect(mockWorkerImpl).not.toHaveBeenCalled()
 
     const helmet = Helmet.peek()
     expect(helmet.title).toEqual("Article Title · Jane Doe")
@@ -175,21 +158,15 @@ describe("SEO", () => {
           content: "https://someblog.com/static/abc123/def/article-image.jpg",
           name: "twitter:image",
         },
-        ...COMMON_META_TAGS
+        ...COMMON_META_TAGS,
       ])
     )
   })
 
   it("renders for article list page", () => {
-    render(
-      <SEO
-        title="Blog"
-        pathname="/blog/2"
-        track="NO"
-      />
-    )
+    render(<SEO title="Blog" pathname="/blog/2" track="NO" />)
 
-    expect(mockWorkerImpl).not.toHaveBeenCalled();
+    expect(mockWorkerImpl).not.toHaveBeenCalled()
 
     const helmet = Helmet.peek()
     expect(helmet.title).toEqual("Blog · Jane Doe")
@@ -201,7 +178,8 @@ describe("SEO", () => {
           name: "image",
         },
         {
-          content: "https://someblog.com/blog/2", property: "og:url",
+          content: "https://someblog.com/blog/2",
+          property: "og:url",
         },
         { content: "website", property: "og:type" },
         { content: "Blog", property: "og:title" },
@@ -216,21 +194,15 @@ describe("SEO", () => {
           content: "https://someblog.com/images/profile.png",
           name: "twitter:image",
         },
-        ...COMMON_META_TAGS
+        ...COMMON_META_TAGS,
       ])
     )
   })
 
   it("renders for search results page", () => {
-    render(
-      <SEO
-        title="Search Results"
-        pathname="/search-results"
-        track="NO"
-      />
-    )
+    render(<SEO title="Search Results" pathname="/search-results" track="NO" />)
 
-    expect(mockWorkerImpl).not.toHaveBeenCalled();
+    expect(mockWorkerImpl).not.toHaveBeenCalled()
 
     const helmet = Helmet.peek()
     expect(helmet.title).toEqual("Search Results · Jane Doe")
@@ -242,7 +214,8 @@ describe("SEO", () => {
           name: "image",
         },
         {
-          content: "https://someblog.com/search-results", property: "og:url",
+          content: "https://someblog.com/search-results",
+          property: "og:url",
         },
         { content: "website", property: "og:type" },
         { content: "Search Results", property: "og:title" },
@@ -257,7 +230,7 @@ describe("SEO", () => {
           content: "https://someblog.com/images/profile.png",
           name: "twitter:image",
         },
-        ...COMMON_META_TAGS
+        ...COMMON_META_TAGS,
       ])
     )
   })
