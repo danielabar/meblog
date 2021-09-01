@@ -1,15 +1,15 @@
 export async function getSearchResults(query) {
   let json = []
   const response = await fetch(`${process.env.SEARCH_URL}?q=${query}`, {
-    method: 'GET',
+    method: "GET",
     headers: {
-      'Accept': 'application/json'
-    }
-  });
+      Accept: "application/json",
+    },
+  })
   if (response.ok) {
-    json = await response.json();
+    json = await response.json()
   }
-  return json;
+  return json
 }
 
 export function toNodeArray(searchResults) {
@@ -18,15 +18,15 @@ export function toNodeArray(searchResults) {
       node: {
         excerpt: sr.excerpt,
         fields: {
-          slug: sr.slug
+          slug: sr.slug,
         },
         frontmatter: {
           category: sr.category,
           date: sr.published_at,
-          title: sr.title
+          title: sr.title,
         },
-        id: sr.title
-      }
+        id: sr.title,
+      },
     }
   })
 }

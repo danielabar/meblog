@@ -1,3 +1,6 @@
+install:
+	npm install
+
 dev:
 	npm run develop
 
@@ -9,3 +12,18 @@ serve:
 
 deploy:
 	npm run deploy
+
+format:
+	npm run format
+
+test:
+	npm test
+
+testw:
+	npm test -- --watch
+
+test_cover:
+	npm test -- --coverage
+
+build:
+	npm run build

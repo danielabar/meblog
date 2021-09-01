@@ -19,6 +19,7 @@ const NavMenuResponsive = () => {
         <nav className={styles.navOpen}>
           <button
             className={`${styles.menuButton} ${styles.menuButtonClose}`}
+            data-testid="nav-menu-responsive-close"
             onClick={e => {
               setOpen(false)
             }}
@@ -64,11 +65,12 @@ const NavMenuResponsive = () => {
       )
     }
     return (
-      <nav className={styles.nav}>
+      <nav className={styles.nav} data-testid="nav-menu-responsive">
         <ul className={styles.navList}>
           <li>
             <button
               className={styles.menuButton}
+              data-testid="nav-menu-responsive-menu"
               onClick={e => {
                 setOpen(true)
               }}

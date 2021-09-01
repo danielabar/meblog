@@ -11,14 +11,14 @@ module.exports = {
     description: "The personal website of Daniela Baron, software developer.",
     image: "/images/profile.png",
     twitterUsername: "@DanielaMBaron",
-    googleSiteVerification: "zmLm6qu34TLdeqUUPDF_K6faoqGqQincxyNZk7VsHgY"
+    googleSiteVerification: "zmLm6qu34TLdeqUUPDF_K6faoqGqQincxyNZk7VsHgY",
   },
   plugins: [
     "gatsby-plugin-sharp",
     "gatsby-transformer-sharp",
     "gatsby-transformer-remark",
     "gatsby-plugin-react-helmet",
-    'gatsby-plugin-sitemap',
+    "gatsby-plugin-sitemap",
     {
       resolve: `gatsby-transformer-remark`,
       options: {
@@ -39,7 +39,7 @@ module.exports = {
             resolve: `gatsby-remark-vscode`,
             options: {
               theme: "Monokai", // Or install your favorite theme from GitHub
-              extensions: ['rest-client'],
+              extensions: ["rest-client"],
               wrapperClassName: "gatsby-highlight",
               inlineCode: {
                 className: "my-inline",
