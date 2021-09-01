@@ -3,7 +3,7 @@ import styles from "./article-list.module.css"
 import Article from "./article"
 
 export default props => (
-  <section className={styles.container}>
+  <section className={styles.container} data-testid="article-list">
     {props.articles.map(({ node }) => (
       <Article
         key={node.id}
