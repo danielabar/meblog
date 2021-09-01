@@ -7,7 +7,7 @@ dotenv.config({ path: `.env.test` })
 import fs from "fs"
 
 import React from "react"
-import { render, fireEvent, screen } from "@testing-library/react"
+import { render, screen } from "@testing-library/react"
 import "@testing-library/jest-dom"
 
 import NavMenu from "./nav-menu"

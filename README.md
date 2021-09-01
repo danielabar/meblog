@@ -79,8 +79,13 @@ make testw
 - [jest dom matchers](https://github.com/testing-library/jest-dom#custom-matchers)
 - [more realistic user event simulation than fireEvent](https://testing-library.com/docs/ecosystem-user-event/)
 - [various useful testing including mock helmet for seo](https://www.emgoto.com/gatsby-unit-testing/)
+- [mock components with jest](https://thoughtbot.com/blog/mocking-react-components-with-jest)
 - [run just one test](https://stackoverflow.com/questions/28725955/how-do-i-test-a-single-file-using-jest)
 - [Gatsby and Cypress](https://www.gatsbyjs.com/docs/how-to/testing/end-to-end-testing/)
+
+## TODO
+
+Use [Fira Code](https://fontsource.org/fonts/fira-code) for code blocks.
 
 ## Original Docs from Starter
 
