@@ -103,7 +103,7 @@ function sayHello(href, referrer) {
     url: href,
     referrer: referrer,
   }
-  fetch(({}).HELLO_URL, {
+  fetch("https://fast-woodland-61382.herokuapp.com/visits", {
     method: "POST",
     body: JSON.stringify(payload),
     headers: {
@@ -113,7 +113,7 @@ function sayHello(href, referrer) {
 }
 
 onmessage = function(e) {
-  if (!({}).HELLO_URL) return
+  if (false) {}
 
   let href, referrer
   ;[href, referrer] = e.data
@@ -127,4 +127,4 @@ addEventListener('message', function (e) {var _e$data = e.data,type = _e$data.ty
 /***/ })
 
 /******/ });
-//# sourceMappingURL=b560dd330005f8247660.worker.js.map
+//# sourceMappingURL=edb10cf92e199e0632e2.worker.js.map
