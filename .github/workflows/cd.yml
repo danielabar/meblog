@@ -20,13 +20,25 @@ jobs:
           node-version: "14"
           cache: "npm"
 
-      - name: install
+      - name: Install
         run: make install
 
-      - name: build
+      - name: Generate prod env file
+        env:
+          HELLO_URL: ${{ secrets.HELLO_URL }}
+          SEARCH_URL: ${{ secrets.SEARCH_URL }}
+          SEARCH_ENABLED: ${{ secrets.SEARCH_ENABLED }}
+        run: |
+          touch .env.production
+          echo HELLO_URL="$HELLO_URL" >> .env.production
+          echo SEARCH_URL="$SEARCH_URL" >> .env.production
+          echo SEARCH_ENABLED="$SEARCH_ENABLED" >> .env.production
+        shell: bash
+
+      - name: Build
         run: make build
 
-      - name: Deploy
+      - name: Deploy to Github Pages
         uses: peaceiris/actions-gh-pages@v3
         with:
           github_token: ${{ secrets.GITHUB_TOKEN }}
