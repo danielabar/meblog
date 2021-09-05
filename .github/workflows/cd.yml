@@ -43,3 +43,11 @@ jobs:
         with:
           github_token: ${{ secrets.GITHUB_TOKEN }}
           publish_dir: ./public
+
+      - name: Ingest search docs
+        env:
+          HEROKU_APP_NAME: ${{ secrets.HEROKU_APP_NAME }}
+          HEROKU_API_KEY: ${{ secrets.HEROKU_API_KEY }}
+        run: |
+          HEROKU_API_KEY=$HEROKU_API_KEY cat search.sql | heroku pg:psql --app $HEROKU_APP_NAME
+        shell: bash
