@@ -1,8 +1,8 @@
 ---
 title: "Fix Rails Blocked Host Error with Docker"
-featuredImage: "../images/blocked-host-fix-utsman-media--LCkOaso6rg-unsplash.jpg"
+featuredImage: "../images/blocked-host-fix-markus-spiske-KTuHfak_EEk-unsplash.jpg"
 description: "Learn how to fix the Rails Blocked Host error when using Docker."
-date: "2021-09-12"
+date: "2021-09-10"
 category: "rails"
 ---
 
@@ -30,7 +30,7 @@ Rails.application.configure do
 end
 ```
 
-This means that when running a Rails server (assume default port 3000) in development mode, for example, on your laptop, you could address it as `http://localhost:3000` or `http://127.0.0.1:3000` or even by your internal IP address such as `http://193.168.1.2:3000`.
+This means that when running a Rails server (assume default port 3000) in development mode on your laptop, you could address it as `http://localhost:3000` or `http://127.0.0.1:3000` or even by your internal IP address such as `http://193.168.1.2:3000`.
 
 In production, if your app should be available at `https://myapp.com`, then the hosts could be configured as:
 
@@ -55,7 +55,7 @@ Here's the setup: Suppose there is an app called `mainapp`, and it uses a micros
 Here's a simplified docker-compose file showing only the main app and subscription services. `mainapp` has all the `app` code available to it via a host mount because this is the main app under development. `subscription_service` uses a private image from the [Github Container Registry](https://github.blog/2020-09-01-introducing-github-container-registry/) because that is an already built microservice that `mainapp` depends on.
 
 ```yml
-# docker-compose.yml
+# docker-compose.yml (mainapp)
 version: "3.3"
 services:
   mainapp:
@@ -74,7 +74,7 @@ services:
       - "4000:4000"
 ```
 
-Since both `mainapp` and `subscription_service` are started in the same docker network created when `docker-compose up` is run, it should be possible for the main app to make http requests to the subscription service. For example, the subscription service exposes a REST style API to retrieve all plans, at `GET {{host}}/api/v1/plans`. Therefore, the following code in `mainapp`, using Faraday to make an http request *should* work:
+Since both `mainapp` and `subscription_service` are started in the same docker network created when `docker-compose up` is run, it should be possible for the main app to make http requests to the subscription service. For example, the subscription service exposes a REST style API to retrieve all plans, with `GET {{host}}/api/v1/plans`. Therefore, the following code in `mainapp`, using Faraday to make an http request *should* work:
 
 ```ruby
 # Any ruby file in mainapp
@@ -128,7 +128,7 @@ end
 Now suppose a project that wishes to use the subscription microservice would like to refer to it as `subs`, for example `GET http://subs:4000/api/v1/plans`. Then they could do so by specifying `subs` as the value for `SERVER_HOST_NAME` in the `environment` section of the subscription service in the docker compose file as follows:
 
 ```yml
-# docker-compose.yml
+# docker-compose.yml (mainapp)
 version: "3.3"
 services:
   mainapp:
@@ -151,7 +151,7 @@ services:
 
 ## Conclusion
 
-This post has covered what is the Rails Blocked Host problem and several different ways to solve it for development and production.
+This post has covered what the Rails Blocked Host error is and several different ways to solve it for development and production. See the Rails docs on [configuring middleware](https://guides.rubyonrails.org/configuring.html#configuring-middleware) to learn more about `ActionDispatch::HostAuthorization` middleware.
 
 ## Related Content
 
