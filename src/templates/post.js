@@ -1,6 +1,7 @@
 import React from "react"
 import { graphql } from "gatsby"
 import Img from "gatsby-image"
+import "@fontsource/fira-code"
 import SEO from "../components/SEO"
 import Layout from "../components/layout"
 import AllLink from "../components/all-link"
