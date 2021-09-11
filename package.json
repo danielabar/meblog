@@ -15,7 +15,8 @@
     "servebuild": "gatsby clean && gatsby build && gatsby serve -H 0.0.0.0",
     "start": "npm run develop",
     "cleanstart": "gatsby clean && gatsby develop -H 0.0.0.0",
-    "test": "jest"
+    "test": "jest",
+    "testcache": "jest --clearCache"
   },
   "dependencies": {
     "@fontsource/bai-jamjuree": "4.2.1",
