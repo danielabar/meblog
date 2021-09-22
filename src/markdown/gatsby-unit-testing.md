@@ -1,7 +1,7 @@
 ---
 title: "Get started with Gatsby and Unit Testing"
-featuredImage: "../images/add-language-pankaj-patel-fvMeP4ml4bU-unsplash.jpg"
-description: "Description TBD..."
+featuredImage: "../images/gatsby-unit-test-nina-mercado-5Y8NrzPya-w-unsplash.jpg"
+description: "Learn how to add unit tests to a Gatsby site with Jest and react-testing-library."
 date: "2021-09-26"
 category: "gatsby"
 ---
@@ -26,7 +26,7 @@ However, rather than installing `react-test-renderer` as shown in the Gatsby doc
 npm i @testing-library/jest-dom testing-library/react testing-library/user-event --save-dev
 ```
 
-## First Test
+## Simple Snapshot Test
 
 Now that all the testing libraries are installed and configured, it's time to write a simple test. The footer component on my blog simply renders out social links and the copyright:
 
@@ -52,7 +52,7 @@ const Footer = () => {
 export default Footer
 ```
 
-Since there's no logic or interactivity in this component, the unit test for it will simply render it, then verify against the snapshot:
+Since there's no logic or interactivity in this component, the unit test for it will simply render it using the `render` function from react testing library, then verify against the snapshot using jest's `toMatchSnapshot` function:
 
 ```js
 // src/components/footer.spec.js
@@ -74,7 +74,7 @@ See the Jest docs to learn more about [snapshot testing](https://jestjs.io/docs/
 
 ## Run Tests
 
-The command to run tests is simply `jest`, however, since the jest library is installed in the `node_modules` of the project, you would have to run it specifying the full path from your project root: `node_modules/bin/jest`. That's a little tedious to type out each time.  A better way is to add a `test` entry in the `scripts` section of the project's `package.json` file. When running npm scripts, npm will search the projects' local `node_modules` directory for the binary, saving you the trouble of having to specify the full path:
+The command to run tests in a terminal is simply `jest`, however, since the jest library is installed in the `node_modules` of the project, you would have to run it specifying the full path from your project root: `node_modules/bin/jest`. That's a little tedious to type out each time.  A better way is to add a `test` entry in the `scripts` section of the project's `package.json` file. When running npm scripts, npm will search the projects' local `node_modules` directory for the binary, saving you the trouble of having to specify the full path:
 
 ```json
 // package.json
@@ -93,12 +93,12 @@ Let's move on to a slightly more complex component that accepts some props. In t
 
 ### Temp Outline
 
-- simplest possible - footer, just snapshot
-- how to run tests
 - slightly more complex - alllink, passed in prop to control margintop, use datatestid to verify
-- more complicated - header component uses customer useViewport hook to determine whether to render regular nav or responsive nav
 - component with children props - Layout - test with arbitrary content in between header and footer
+- more complicated: mock dependency on custom hook - header component uses customer useViewport hook to determine whether to render regular nav or responsive nav
 - user interaction: entering text (search-input.spec.js) - watch out: don't use key events from `@testing-library/react` as they don't fully mimic real browser behaviour, instead use `type` method from `"@testing-library/user-event"`. Also notice special control character `{enter}`, see https://testing-library.com/docs/ecosystem-user-event/#special-characters for all of them
 - SEO - component that generates meta tags using `react-helmet` for social sharing, static query is mocked. Meta tags not query-able on screen object from react testing library so instead will use `Helmet.peek`
+- business logic: pagination component - given props of prev/next page and is first/last - verify prev/next links enabled/disabled accordingly.
+- template to list paginated lists of articles - blog-list.spec.js, verify pagination links are pointing to correct pages
 - Optional wrap test commands with Makefile - test and exit, test watch, test with coverage, test clean (clean jest cache). Convenient if you work on multiple projects in different languages/tech stacks. Rather than having to remember various build commands, make is universally available on *nix systems so it can be consistent, eg: every project can have a `make test` command.
 - Run tests on CI - probably getting too long here - link to next post if this is enough content to generate another post?
