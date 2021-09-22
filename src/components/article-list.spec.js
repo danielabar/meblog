@@ -8,7 +8,7 @@ import "@testing-library/jest-dom"
 
 import ArticleList from "./article-list"
 
-describe("AllLink", () => {
+describe("ArticleList", () => {
   it("renders correctly", () => {
     const testData = [
       {
