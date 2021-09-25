@@ -89,14 +89,293 @@ Now you can run the tests with `npm test`.
 
 ## Component with Props
 
-Let's move on to a slightly more complex component that accepts some props. In the example below, the `AllLink` component accepts a `marginTop` prop to control how much space is styled right above it. This component gets rendered in various places throughout my blog and the spacing can vary:
+Let's move on to a slightly more complex component that accepts some props. In the example below, the `AllLink` component accepts a `marginTop` prop to control how much space is styled right above it. This component gets rendered in various places throughout my blog and the spacing can vary. Notice teh `data-testid` attribute on the outer element, this will be used later by the test. In general, it's preferable to use data test attributes to find elements rather than depending on specific classes:
+
+```js
+// src/components/all-link.js
+import React from "react"
+import { Link } from "gatsby"
+import styles from "./all-link.module.css"
+
+export default ({ marginTop }) => (
+  <div data-testid="all-wrapper" style={{ marginTop: marginTop }}>
+    <Link to="/blog" className={styles.allLink}>
+      All Articles
+    </Link>
+  </div>
+)
+```
+
+The test uses the `render` function from react testing library to render the component, this time with the `marginTop` prop and compares to a snapshot. To verify that the `marginTop` prop value was correctly applied as the style, the `screen.getByTestId` function from react testing library is used. This function accepts a string value such as `"all-wrapper"` and returns the DOM node in the component that has this value set as its `data-testid` attribute. Finally, jest-dom's [toHaveStyle](https://github.com/testing-library/jest-dom#tohavestyle) matcher is used to verify that the DOM node has a `marginTop` style of `30px`, which is what was provided when the test rendered the `AllLink` component:
+
+```js
+// src/components/all-link.spec.js
+import React from "react"
+import { render, screen } from "@testing-library/react"
+import "@testing-library/jest-dom"
+
+import AllLink from "./all-link"
+
+describe("AllLink", () => {
+  it("renders correctly", () => {
+    const container = render(<AllLink marginTop="30px" />)
+    expect(container).toMatchSnapshot()
+
+    const div = screen.getByTestId("all-wrapper")
+    expect(div).toHaveStyle("marginTop: 30px")
+  })
+})
+```
+
+## Component with Children
+
+In a typical Gatsby site, there will most likely be a `<Layout>` component used by every page to get a consistent look and feel. My `<Layout>` component simply renders the `<Header>` and `<Footer>` components, and then renders the page content in between these using the `children` prop:
+
+```js
+// src/components/layout.js
+import React from "react"
+import styles from "./layout.module.css"
+import Header from "./header.js"
+import Footer from "./footer.js"
+
+export default ({ children }) => (
+  <div className={styles.container}>
+    <Header />
+      <div className={styles.content}>{children}</div>
+    <Footer />
+  </div>
+)
+```
+
+The Layout component test renders the component with some simple content using a `data-testid` attribute to verify it was rendered. Note that the `<Header>` and `<Footer>` components are wrapped in DOM nodes with `data-testid` attributes of `header` and `footer` respectively. This makes them easy to find in the `Layout` component test to verify it did indeed render the Header and Footer components. The easiest way to verify that an element got rendered is to use jest-dom's [toBeInTheDocument](https://github.com/testing-library/jest-dom#tobeinthedocument) matcher:
+
+```js
+// src/components/layout.spec.js
+import React from "react"
+import { render, screen } from "@testing-library/react"
+import "@testing-library/jest-dom"
+
+import Layout from "./layout"
+
+describe("Layout", () => {
+  it("renders correctly", () => {
+    const container = render(
+      <Layout>
+        <div data-testid="test-content">test content</div>
+      </Layout>
+    )
+    expect(container).toMatchSnapshot()
+
+    expect(screen.getByTestId("header")).toBeInTheDocument()
+    expect(screen.getByTestId("test-content")).toBeInTheDocument()
+    expect(screen.getByTestId("footer")).toBeInTheDocument()
+  })
+})
+```
+
+## Mocking Dependencies
+
+The `<Header>` component makes use of a custom `useViewport` hook to change the navigation menu layout between responsive design (viewport width < 640px) and regular (viewport width >= 640px). The `useViewport` hook returns the current width of the viewport:
+
+```js
+// src/components/header.js
+import React from "react"
+import { Link } from "gatsby"
+import useViewport from "../hooks/useviewport"
+import styles from "./header.module.css"
+import NavMenuResponsive from "./nav-menu-responsive"
+import NavMenu from "./nav-menu"
+
+const Header = () => {
+  const { width } = useViewport()
+  const breakpoint = 640
+
+  // Use result of useViewport hook to determine which navigation component to render
+  function menuHelper() {
+    return width < breakpoint ? <NavMenuResponsive /> : <NavMenu />
+  }
+
+  return (
+    <header className={styles.container} data-testid="header">
+      <Link to="/">
+        <div className={styles.logo}>
+          <div className={styles.profileWrapper}>
+            <img className={styles.profileImg} src={"/images/profile.png"} alt="Profile" />
+          </div>
+          <div className={`${styles.headerItem} ${styles.title}`}>
+            Daniela Baron
+          </div>
+        </div>
+      </Link>
+
+      {menuHelper()}
+    </header>
+  )
+}
+
+export default Header
+```
+
+To test the `<Header>` component, the `useViewport` hook will need to be mocked out because it depends on the `window` object which isn't present when unit tests are running (Jest tests run via Node.js, not in a browser).
+
+Since the hook is imported from a module, the test will use the `jest.mock(...)` function to mock out the entire module. Furthermore, a mock function that returns a width is specified as the return result from the `default` export. Then each test can modify the returned width value and verify the correct version of the navigation menu gets rendered, as well as verifying that the `useViewport` hook was called.
+
+```js
+// src/components/header.spec.js
+import React from "react"
+import { render, screen } from "@testing-library/react"
+import "@testing-library/jest-dom"
+import useViewport from "../hooks/useviewport"
+import Header from "./header"
+
+let mockWidth = 1024
+jest.mock("../hooks/useviewport", () => ({
+  __esModule: true,
+  default: jest.fn(() => ({ width: mockWidth })),
+}))
+
+describe("Header", () => {
+  afterEach(() => {
+    jest.clearAllMocks()
+  })
+
+  it("renders nav menu for wide widths", () => {
+    mockWidth = 900
+    const container = render(<Header />)
+
+    expect(container).toMatchSnapshot()
+    expect(screen.getByTestId("nav-menu")).toBeInTheDocument
+    expect(useViewport).toHaveBeenCalled();
+  })
+
+  it("renders nav menu responsive for narrow widths", () => {
+    mockWidth = 400
+    const container = render(<Header />)
+
+    expect(container).toMatchSnapshot()
+    expect(screen.getByTestId("nav-menu-responsive")).toBeInTheDocument
+    expect(useViewport).toHaveBeenCalled();
+  })
+})
+```
+
+I found Jest mocking not quite as intuitive as RSpec mocking, learn more about it [here](https://jestjs.io/docs/mock-functions).
+
+## User Interaction
+
+The `<SearchInput>` component renders an input text box where user can type in a search term, when they hit <kbd>Enter</kbd>, the UI will navigate to the search results for that page at url `/search-results/?q=searchTermUserTypedIn`:
+
+```js
+// src/components/search-input.js
+import React from "react"
+import { navigate } from "gatsby"
+import { MdSearch } from "react-icons/md"
+import styles from "./search-input.module.css"
+
+const ENTER_KEY = "Enter"
+
+const SearchInput = () => {
+  function search(eventKey, text) {
+    if (eventKey === ENTER_KEY) {
+      navigate(`/search-results/?q=${text}`)
+    }
+  }
+
+  return (
+    <div className={styles.wrapper}>
+      <MdSearch size="1.7rem" />
+      <input
+        type="text"
+        className={styles.search}
+        data-testid="search-input"
+        aria-label="Search"
+        placeholder="Search, eg: Rails"
+        onKeyPress={event => search(event.key, event.target.value)}
+      />
+    </div>
+  )
+}
+
+export default SearchInput
+```
+
+In order to simulate a user typing into the search input box, the test for this component will use functions from the [user-event](https://testing-library.com/docs/ecosystem-user-event/) library, which works with react testing library to provide more realistic simulations of browser events.
+
+**WATCH OUT:** Do not attempt to use the [fireEvent](https://testing-library.com/docs/dom-testing-library/api-events) function from react testing library. Although in theory it should be possible to simulate the correct combination of key press/up/down events using the `fireEvent` function, in practice I couldn't get it working. Then I read that it's recommended to use the [user-event](https://testing-library.com/docs/ecosystem-user-event/) library for this purpose and it made everything much easier.
+
+Also this test should not attempt to navigate to another page for real as this is just a unit test running in Node.js, not an end-to-end test running in a browser. To avoid real navigation, Gatsby's `navigate` function is mocked out with a Jest mock function. Since this is universally desired across all the tests, the mock function can be defined in the global `__mocks__/gatsby.js` file. The first part of this file you should already have from following the [initial setup](https://www.gatsbyjs.com/docs/how-to/testing/unit-testing/) instructions:
+
+```js
+// __mocks__/gatsby.js
+const React = require("react")
+const gatsby = jest.requireActual("gatsby")
+
+module.exports = {
+  ...gatsby,
+  graphql: jest.fn(),
+  Link: jest.fn().mockImplementation(
+    ({
+      activeClassName,
+      activeStyle,
+      getProps,
+      innerRef,
+      partiallyActive,
+      ref,
+      replace,
+      to,
+      ...rest
+    }) =>
+      React.createElement("a", {
+        ...rest,
+        href: to,
+      })
+  ),
+  // +++ ADD MOCK NAVIGATE FUNCTION HERE +++
+  navigate: jest.fn()
+}
+```
+
+And here are the tests for the `<SearchInput>` component. The first test is a simple snapshot test. The next two tests use the `getByTestId` function to locate the text input element, then use the `userEvent.type` function to enter some example text into the search box. Finally the tests use Jest's `toHaveBeenCalledWith` function which verifies the mock version of the `navigate` function was called after user hit <kbd>Enter</kbd>.
+
+```js
+import React from "react"
+import { navigate } from "gatsby"
+import { render, screen } from "@testing-library/react"
+import "@testing-library/jest-dom"
+import userEvent from "@testing-library/user-event"
+
+import SearchInput from "./search-input"
+
+describe("SearchInput", () => {
+  it("renders", () => {
+    const container = render(<SearchInput />)
+    expect(container).toMatchSnapshot()
+  })
+
+  it("navigates to search results on Enter key press", () => {
+    render(<SearchInput />)
+
+    const inputEl = screen.getByTestId("search-input")
+    userEvent.type(inputEl, "Rails{enter}")
+
+    expect(navigate).toHaveBeenCalledWith("/search-results/?q=Rails")
+  })
+
+  it("navigates to search results on Enter key press for a different term", () => {
+    render(<SearchInput />)
+
+    const inputEl = screen.getByTestId("search-input")
+    userEvent.type(inputEl, "docker{enter}")
+
+    expect(navigate).toHaveBeenCalledWith("/search-results/?q=docker")
+  })
+})
+```
+
+Notice the use of the special control character `{enter}` to simulate the <kbd>Enter</kbd> key. See the user-event docs for a list of all such [control characters](https://testing-library.com/docs/ecosystem-user-event/#special-characters).
 
 ### Temp Outline
 
-- slightly more complex - alllink, passed in prop to control margintop, use datatestid to verify
-- component with children props - Layout - test with arbitrary content in between header and footer
-- more complicated: mock dependency on custom hook - header component uses customer useViewport hook to determine whether to render regular nav or responsive nav
-- user interaction: entering text (search-input.spec.js) - watch out: don't use key events from `@testing-library/react` as they don't fully mimic real browser behaviour, instead use `type` method from `"@testing-library/user-event"`. Also notice special control character `{enter}`, see https://testing-library.com/docs/ecosystem-user-event/#special-characters for all of them
 - SEO - component that generates meta tags using `react-helmet` for social sharing, static query is mocked. Meta tags not query-able on screen object from react testing library so instead will use `Helmet.peek`
 - business logic: pagination component - given props of prev/next page and is first/last - verify prev/next links enabled/disabled accordingly.
 - template to list paginated lists of articles - blog-list.spec.js, verify pagination links are pointing to correct pages
