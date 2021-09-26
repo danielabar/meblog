@@ -22,7 +22,7 @@ test:
 testw:
 	npm test -- --watch
 
-test_cover:
+testc:
 	npm test -- --coverage
 
 build:
