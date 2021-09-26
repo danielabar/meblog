@@ -10,11 +10,11 @@ This post will demonstrate how to add unit tests to a Gatsby project using Jest 
 
 ## Why?
 
-But before getting into the mechanics of how to do this, first you may be wondering - why should I add unit tests to my Gatsby site? To answer this, let's start with a common use case for a Gatsby site - a personal or company blog. In my case, I started with the [Hello World Gatsby starter project](https://github.com/gatsbyjs/gatsby-starter-hello-world), then started writing some posts in markdown. Over time I gradually added more features including pagination, SEO, typography with self-hosted google fonts, responsive nav menu for desktop vs mobile layouts, custom analytics, and search.
+Before getting into the mechanics of how to do this, why does a Gatsby site need tests? To answer this, consider a common use case for a Gatsby site - a personal or company blog. For example, this blog was initialized with the [Hello World Gatsby starter project](https://github.com/gatsbyjs/gatsby-starter-hello-world). Then I started writing some posts in markdown. Over time I gradually added more features including pagination, SEO, typography with self-hosted google fonts, responsive nav menu for desktop vs mobile layouts, custom analytics, and search.
 
-Even for a simple blog site without all these features, it's still valuable to add some basic unit tests to snapshot all the page layouts and components. A complete explanation of snapshot testing is beyond the scope of this article, but [here](TBD) is a great reference.
+Even for a simple blog site without all these features, it's still valuable to add some basic unit tests to snapshot all the page layouts and components. Then if your blog does have additional features, especially those requiring user interaction such as search, it will be even more valuable to add unit testing to verify the user's interactions with these components.
 
-Then if your blog does have additional features, especially those requiring user interaction such as search, it will be even more valuable to add unit testing to verify the user's interactions with these components. Finally Gatsby can be used for more than just blogging and any site will benefit from at least some basic snapshot tests, and some more complex tests for interactive components or components that have more logic in them than simply rendering a layout.
+Finally Gatsby can be used for more than just blogging and any site will benefit from at least some basic snapshot tests, and some more complex tests for interactive components or components that have more logic in them than simply rendering a layout.
 
 ## Initial Setup
 
@@ -96,7 +96,7 @@ The command to run tests in a terminal is simply `jest`, however, since the jest
 }
 ```
 
-Now you can run the tests with `npm test`.
+Now the tests can be run with `npm test`.
 
 ## Component with Props
 
@@ -117,7 +117,9 @@ export default ({ marginTop }) => (
 )
 ```
 
-The test uses the `render` function from react testing library to render the component, this time with the `marginTop` prop and compares to a snapshot. To verify that the `marginTop` prop value was correctly applied as the style, the `screen.getByTestId` function from react testing library is used. This function accepts a string value such as `"all-wrapper"` and returns the DOM node in the component that has this value set as its `data-testid` attribute. Finally, jest-dom's [toHaveStyle](https://github.com/testing-library/jest-dom#tohavestyle) matcher is used to verify that the DOM node has a `marginTop` style of `30px`, which is what was provided when the test rendered the `AllLink` component:
+The test uses the `render` function from react testing library to render the component, this time with the `marginTop` prop. To verify that the `marginTop` prop value was correctly applied as the style, the `screen.getByTestId` function from react testing library is used. This function accepts a string value such as `"all-wrapper"` and returns the DOM node in the component that has this value set as its `data-testid` attribute.
+
+Then, jest-dom's [toHaveStyle](https://github.com/testing-library/jest-dom#tohavestyle) matcher is used to verify that the DOM node has a `marginTop` style of `30px`, which is what was provided when the test rendered the `AllLink` component:
 
 ```js
 // src/components/all-link.spec.js
@@ -130,7 +132,6 @@ import AllLink from "./all-link"
 describe("AllLink", () => {
   it("renders correctly", () => {
     const container = render(<AllLink marginTop="30px" />)
-    expect(container).toMatchSnapshot()
 
     const div = screen.getByTestId("all-wrapper")
     expect(div).toHaveStyle("marginTop: 30px")
@@ -175,7 +176,6 @@ describe("Layout", () => {
         <div data-testid="test-content">test content</div>
       </Layout>
     )
-    expect(container).toMatchSnapshot()
 
     expect(screen.getByTestId("header")).toBeInTheDocument()
     expect(screen.getByTestId("test-content")).toBeInTheDocument()
@@ -254,7 +254,6 @@ describe("Header", () => {
     mockWidth = 900
     const container = render(<Header />)
 
-    expect(container).toMatchSnapshot()
     expect(screen.getByTestId("nav-menu")).toBeInTheDocument
     expect(useViewport).toHaveBeenCalled();
   })
@@ -263,14 +262,13 @@ describe("Header", () => {
     mockWidth = 400
     const container = render(<Header />)
 
-    expect(container).toMatchSnapshot()
     expect(screen.getByTestId("nav-menu-responsive")).toBeInTheDocument
     expect(useViewport).toHaveBeenCalled();
   })
 })
 ```
 
-I found Jest mocking not quite as intuitive as RSpec mocking, learn more about it [here](https://jestjs.io/docs/mock-functions).
+This is just one example of Jest mocking, there are many more variations and use cases. Learn more about it [here](https://jestjs.io/docs/mock-functions).
 
 ## User Interaction
 
@@ -375,7 +373,7 @@ Notice the use of the special control character `{enter}` to simulate the <kbd>E
 
 Many Gatsby sites will have an `<SEO>` component that gets included in every page. It uses a static query to get the site's metadata such as title, description, url, etc. (defined in `gatsby-config.js`), and also accepts properties to override these. Then it uses `react-helmet` to output meta tags for site description, image, url, and also the social sharing tags so that nice looking cards can be generated on the various social media platforms when someone shares a link to your site.
 
-A full discussion of how to build this component is out of scope for this article as I just want to focus on how to test it, but take a look at [this article](https://www.gatsbyjs.com/docs/add-seo-component/) on the Gatsby site for more information on building an SEO component. Mine looks something like this:
+A full discussion of how to build this component is out of scope for this post as I just want to focus on how to test it, but the Gatsby docs have a step-by-step [guide](https://www.gatsbyjs.com/docs/add-seo-component/) on how to do this. For example:
 
 ```js
 // src/components/SEO.js
@@ -429,7 +427,7 @@ export default function SEO({
 
 In order to test this component, the `useStaticQuery` hook must be mocked out. This is because the build time GraphQL server may not be running when tests are running and unit tests should not have any external dependencies.
 
-This can be done in the test, or if there's only one component that uses a static query, the mock can be defined in the global `__mocks__/gatsby.js`. Unlike when we mocked the Gatsby `navigate` function earlier, for this test, the returned result matters because the values will be used to generate the meta tag values, therefore Gatsby's `mockImplementation` function will be used to have the mock return a result:
+This can be done in the test, or if there's only one component that uses a static query, the mock can be defined in the global `__mocks__/gatsby.js`. Unlike the mocked Gatsby `navigate` function demonstrated earlier, the return result matters because the values will be used to generate the meta tag values, therefore Gatsby's `mockImplementation` function will be used to have the mock return a result:
 
 ```js
 // __mocks__/gatsby.js
@@ -457,7 +455,9 @@ module.exports = {
 }
 ```
 
-The other thing that will be different about this test is that the meta tags are not query-able in react testing library. Instead, the `Helmet.peek` method is used. Here are a few example tests for the Home Page and an Article Page. It gets quite lengthy verifying all the meta tags so will only include a few to demonstrate the idea. See [SEO.spec.js](https://github.com/danielabar/meblog/blob/master/src/components/SEO.spec.js) on my blog project on Github for the complete listing.
+The other thing that will be different about this test is that the meta tags are not query-able in react testing library. This is because `react-helmet` renders side effects to the document `<head>` element. Instead, the `Helmet.peek` method is used which returns all the markup assigned to Helmet.
+
+Here are a few example tests for the Home Page and an Article Page. It gets quite lengthy verifying all the meta tags so will only include a few to demonstrate the idea. See [SEO.spec.js](https://github.com/danielabar/meblog/blob/master/src/components/SEO.spec.js) on my blog project on Github for the complete listing.
 
 ```js
 // src/components/SEO.spec.js
@@ -726,7 +726,51 @@ describe("Post", () => {
 })
 ```
 
+## Google Fonts Gotcha
+
+This section isn't a testing technique, but describes how to get past a Jest error you may encounter when loading fonts.
+
+When using Google Fonts (or other open source fonts), the recommended solution is to self host them. The [@fontsource](https://github.com/fontsource/fontsource) project provides an easy way to do this, making each font available as an npm package. For example, I use [bai-jamjuree](https://www.npmjs.com/package/@fontsource/bai-jamjuree) on this site:
+
+```js
+// src/pages/index.js
+import React from "react"
+import { graphql } from "gatsby"
+import "@fontsource/bai-jamjuree/200.css"
+import "@fontsource/bai-jamjuree/300.css"
+// rest of the font sizes and home page...
+```
+
+However, when running a Jest test for a page that loads fonts from `@fontsource`, it will fail with this error:
+
+```
+SyntaxError: Invalid or unexpected token
+```
+
+The issue is that Jest can't handle static file imports, which includes importing assets such as css and fonts. The solution is to add a regex pattern for `@fontsource` in the `moduleNameMapper` section of `jest.config.js` which tells Jest how to handle various import types (similar to how Webpack works):
+
+```js
+// jest.config.js
+module.exports = {
+  moduleNameMapper: {
+    "@fontsource/*": "<rootDir>/__mocks__/font-mock.js",
+    // other rules...
+  },
+  // other configuration...
+}
+```
+
+Where `font-mock` simply exports an empty module:
+
+```js
+// __mocks__/font-mock.js
+module.exports = {};
+```
+
+Now when a Jest test encounters any import starting with `@fontsource`, it won't attempt to load the module for real, and instead will replace it with the mock empty module defined in `__mocks__/font-mock.js`.
 ## Jest Test Options
+
+This section isn't Gatsby specific, but just want to share a few useful options that can be used on any project that's running tests with Jest.
 
 During development, it's convenient to have Jest watch for any file changes, and automatically re-run affected tests. This provides nearly instant feedback if anything has broken. Given that you've added `"test": "jest",` to `package.json`, the command to have Jest run in "watch" mode is:
 
@@ -734,7 +778,7 @@ During development, it's convenient to have Jest watch for any file changes, and
 npm test -- --watch
 ```
 
-Jest can also generate a coverage report showing percentage of lines and files in the project that have been "covered", i.e. exercised by a test. Don't stress about getting this all the way up to 100% as that can be difficult. Instead I use the coverage report to focus on areas of the project that are missing tests and see where test coverage could be improved. The command to run tests and generate the coverage report is:
+Jest can also generate a coverage report showing percentage of lines and files in the project that have been "covered", i.e. exercised by a test. Don't stress about getting this all the way up to 100% as that can be difficult. Rather, the coverage report is useful to identify areas of the project that are missing or low on tests and see where test coverage could be improved. The command to run tests and generate the coverage report is:
 
 ```
 npm test -- --coverage
@@ -742,4 +786,4 @@ npm test -- --coverage
 
 ## Conclusion
 
-This post has covered how to get started with unit testing on a Gatsby project using Jest and react testing library. It has covered simple snapshot testing, testing components with props, components with children, mocking dependencies globally and per test, user interaction, meta tags, business logic and templates. It has also covered a few different options for how to run the tests. I hope this will encourage everyone who runs a Gatsby site to go ahead and add at least a few tests.
+This post has covered how to get started with unit testing on a Gatsby project using Jest and react testing library. It has covered simple snapshot testing, testing components with props, components with children, mocking dependencies globally and per test, user interaction, meta tags, business logic and templates. It has also covered a few different options for how to run the tests. I hope this will encourage everyone who maintains a Gatsby site to go ahead and add some tests.
