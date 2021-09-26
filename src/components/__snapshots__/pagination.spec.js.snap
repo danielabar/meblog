@@ -329,7 +329,7 @@ Object {
           data-testid="next-enabled"
         >
           <a
-            href="/blog/4"
+            href="/blog/5"
             rel="next"
           >
             next →
@@ -358,7 +358,7 @@ Object {
         data-testid="next-enabled"
       >
         <a
-          href="/blog/4"
+          href="/blog/5"
           rel="next"
         >
           next →

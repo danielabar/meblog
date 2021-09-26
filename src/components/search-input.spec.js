@@ -1,7 +1,3 @@
-/**
- * @jest-environment jsdom
- */
-
 import React from "react"
 import { navigate } from "gatsby"
 import { render, screen } from "@testing-library/react"

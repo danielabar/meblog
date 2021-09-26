@@ -1,7 +1,3 @@
-/**
- * @jest-environment jsdom
- */
-
 import dotenv from "dotenv"
 dotenv.config({ path: `.env.test` })
 import fs from "fs"
