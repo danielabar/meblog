@@ -1,14 +1,10 @@
-/**
- * @jest-environment jsdom
- */
-
 import React from "react"
 import { render, screen } from "@testing-library/react"
 import "@testing-library/jest-dom"
 
 import ArticleList from "./article-list"
 
-describe("AllLink", () => {
+describe("ArticleList", () => {
   it("renders correctly", () => {
     const testData = [
       {

@@ -1,7 +1,3 @@
-/**
- * @jest-environment jsdom
- */
-
 import React from "react"
 import { render, screen } from "@testing-library/react"
 import "@testing-library/jest-dom"
@@ -24,6 +20,12 @@ describe("Pagination", () => {
     expect(screen.queryByTestId("previous-disabled")).toBeInTheDocument()
     expect(screen.queryByTestId("next-enabled")).toBeInTheDocument()
     expect(screen.queryByTestId("next-disabled")).not.toBeInTheDocument()
+
+    expect(
+      document
+        .querySelector("[data-testid='next-enabled'] a")
+        .getAttribute("href")
+    ).toEqual("/blog/2")
   })
 
   it("renders middle page", () => {
@@ -32,7 +34,7 @@ describe("Pagination", () => {
         isFirst={false}
         prevPage={"/blog/3"}
         isLast={false}
-        nextPage={"/blog/4"}
+        nextPage={"/blog/5"}
       />
     )
     expect(container).toMatchSnapshot()
@@ -41,6 +43,17 @@ describe("Pagination", () => {
     expect(screen.queryByTestId("previous-disabled")).not.toBeInTheDocument()
     expect(screen.queryByTestId("next-enabled")).toBeInTheDocument()
     expect(screen.queryByTestId("next-disabled")).not.toBeInTheDocument()
+
+    expect(
+      document
+        .querySelector("[data-testid='previous-enabled'] a")
+        .getAttribute("href")
+    ).toEqual("/blog/3")
+    expect(
+      document
+        .querySelector("[data-testid='next-enabled'] a")
+        .getAttribute("href")
+    ).toEqual("/blog/5")
   })
 
   it("renders last page", () => {
@@ -58,6 +71,12 @@ describe("Pagination", () => {
     expect(screen.queryByTestId("previous-disabled")).not.toBeInTheDocument()
     expect(screen.queryByTestId("next-enabled")).not.toBeInTheDocument()
     expect(screen.queryByTestId("next-disabled")).toBeInTheDocument()
+
+    expect(
+      document
+        .querySelector("[data-testid='previous-enabled'] a")
+        .getAttribute("href")
+    ).toEqual("/blog/7")
   })
 
   it("renders a single page", () => {
