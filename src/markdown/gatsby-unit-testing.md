@@ -6,11 +6,11 @@ date: "2021-09-26"
 category: "gatsby"
 ---
 
-This post will demonstrate how to add unit tests to a Gatsby project using Jest and react-testing-library. Gatsby is a static site generator powered by React and GraphQL so the libraries to test it are pretty much the same as you would use testing any React project.
+This post will demonstrate how to add unit tests to a Gatsby project using Jest and react-testing-library. Gatsby is a static site generator powered by React and GraphQL so the libraries to test it are similar to those used for testing any React project.
 
 ## Why?
 
-But before getting into the mechanics of how to do this, first you may be wondering - why should I add unit tests to my Gatsby site? To answer this, let's start with a common use case for a Gatsby site - a personal or company blog. In my case, I started with the Hello World Gatsby starter project, then started writing some posts in markdown. Over time I gradually added more features including pagination, SEO, typography with self-hosted google fonts, responsive nav menu for desktop vs mobile layouts, custom analytics, and search.
+But before getting into the mechanics of how to do this, first you may be wondering - why should I add unit tests to my Gatsby site? To answer this, let's start with a common use case for a Gatsby site - a personal or company blog. In my case, I started with the [Hello World Gatsby starter project](https://github.com/gatsbyjs/gatsby-starter-hello-world), then started writing some posts in markdown. Over time I gradually added more features including pagination, SEO, typography with self-hosted google fonts, responsive nav menu for desktop vs mobile layouts, custom analytics, and search.
 
 Even for a simple blog site without all these features, it's still valuable to add some basic unit tests to snapshot all the page layouts and components. A complete explanation of snapshot testing is beyond the scope of this article, but [here](TBD) is a great reference.
 
@@ -18,14 +18,25 @@ Then if your blog does have additional features, especially those requiring user
 
 ## Initial Setup
 
-Start by going over the Gatsby [unit testing](https://www.gatsbyjs.com/docs/how-to/testing/unit-testing/) docs, which explain how to get setup for unit testing including installing the necessary libraries from npm, configuring jest and babel, and setting up some useful mocks.
+Start by following the Gatsby [unit testing](https://www.gatsbyjs.com/docs/how-to/testing/unit-testing/) docs, which explain how to get setup for unit testing including installing the necessary libraries from npm, configuring jest and babel, and setting up some useful mocks.
 
-However, rather than installing `react-test-renderer` as shown in the Gatsby docs, I recommend installing [React Testing Library](https://testing-library.com/docs/react-testing-library/intro/). This is because `react-test-renderer` will only render a component and then you can verify the expected output, but does not support interactivity like clicking a button or entering text into an input box. React Testing Library on the other hand, will provide a lot more flexibility. Specifically, instead of `react-test-renderer`, install these additional libraries:
+However, rather than installing `react-test-renderer` as shown in the Gatsby docs, I recommend installing [React Testing Library](https://testing-library.com/docs/react-testing-library/intro/). This is because `react-test-renderer` will only render a component and then you can verify the expected output, but does not support interactivity like clicking a button or entering text into an input box. React Testing Library on the other hand, will provide a lot more flexibility with interaction and querying the DOM.
+
+Specifically, instead of `react-test-renderer`, install these additional libraries:
 
 ```
 npm i @testing-library/jest-dom testing-library/react testing-library/user-event --save-dev
 ```
 
+One additional step is to set the jest test environment to `jsdom`. By default, its set to `node` and any tests that attempt to query the DOM will fail without this change:
+
+```js
+// jest.config.js
+module.exports = {
+  testEnvironment: "jsdom",
+  // rest of the config from following Gatsby instructions...
+}
+```
 ## Simple Snapshot Test
 
 Now that all the testing libraries are installed and configured, it's time to write a simple test. The footer component on my blog simply renders out social links and the copyright:
@@ -89,7 +100,7 @@ Now you can run the tests with `npm test`.
 
 ## Component with Props
 
-Let's move on to a slightly more complex component that accepts some props. In the example below, the `AllLink` component accepts a `marginTop` prop to control how much space is styled right above it. This component gets rendered in various places throughout my blog and the spacing can vary. Notice teh `data-testid` attribute on the outer element, this will be used later by the test. In general, it's preferable to use data test attributes to find elements rather than depending on specific classes:
+Let's move on to a slightly more complex component that accepts some props. In the example below, the `AllLink` component accepts a `marginTop` prop to control how much space is styled right above it. This component gets rendered in various places throughout my blog and the spacing can vary. Notice the `data-testid` attribute on the outer element, this will be used later by the test.
 
 ```js
 // src/components/all-link.js
@@ -263,7 +274,7 @@ I found Jest mocking not quite as intuitive as RSpec mocking, learn more about i
 
 ## User Interaction
 
-The `<SearchInput>` component renders an input text box where user can type in a search term, when they hit <kbd>Enter</kbd>, the UI will navigate to the search results for that page at url `/search-results/?q=searchTermUserTypedIn`:
+The `<SearchInput>` component renders an input text box where user can type in a search term. When they hit <kbd>Enter</kbd>, the UI will navigate to the search results for that page at url `/search-results/?q=searchTermUserTypedIn`:
 
 ```js
 // src/components/search-input.js
@@ -335,7 +346,7 @@ module.exports = {
 }
 ```
 
-And here are the tests for the `<SearchInput>` component. The first test is a simple snapshot test. The next two tests use the `getByTestId` function to locate the text input element, then use the `userEvent.type` function to enter some example text into the search box. Finally the tests use Jest's `toHaveBeenCalledWith` function which verifies the mock version of the `navigate` function was called after user hit <kbd>Enter</kbd>.
+And here is the test for the `<SearchInput>` component. It uses the `getByTestId` function to locate the text input element, then uses the `userEvent.type` function to enter some example text into the search box. Finally Jest's `toHaveBeenCalledWith` function is used to verify the mock version of the `navigate` function was called after user hit <kbd>Enter</kbd>.
 
 ```js
 import React from "react"
@@ -347,11 +358,6 @@ import userEvent from "@testing-library/user-event"
 import SearchInput from "./search-input"
 
 describe("SearchInput", () => {
-  it("renders", () => {
-    const container = render(<SearchInput />)
-    expect(container).toMatchSnapshot()
-  })
-
   it("navigates to search results on Enter key press", () => {
     render(<SearchInput />)
 
@@ -359,15 +365,6 @@ describe("SearchInput", () => {
     userEvent.type(inputEl, "Rails{enter}")
 
     expect(navigate).toHaveBeenCalledWith("/search-results/?q=Rails")
-  })
-
-  it("navigates to search results on Enter key press for a different term", () => {
-    render(<SearchInput />)
-
-    const inputEl = screen.getByTestId("search-input")
-    userEvent.type(inputEl, "docker{enter}")
-
-    expect(navigate).toHaveBeenCalledWith("/search-results/?q=docker")
   })
 })
 ```
@@ -472,7 +469,7 @@ import SEO from "./SEO"
 
 describe("SEO", () => {
   it("renders for home page", () => {
-    render(<SEO title="Home" pathname="/" track="NO" />)
+    render(<SEO title="Home" pathname="/"/>)
 
     const helmet = Helmet.peek()
     expect(helmet.title).toEqual("Home · Jane Doe")
@@ -524,9 +521,225 @@ describe("SEO", () => {
 })
 ```
 
-### Temp Outline
+## Pagination Logic
 
-- business logic: pagination component - given props of prev/next page and is first/last - verify prev/next links enabled/disabled accordingly.
-- template to list paginated lists of articles - blog-list.spec.js, verify pagination links are pointing to correct pages
-- Optional wrap test commands with Makefile - test and exit, test watch, test with coverage, test clean (clean jest cache). Convenient if you work on multiple projects in different languages/tech stacks. Rather than having to remember various build commands, make is universally available on *nix systems so it can be consistent, eg: every project can have a `make test` command.
-- Run tests on CI - probably getting too long here - link to next post if this is enough content to generate another post?
+Another type of component you might want to test is one that implements some business logic. For example, on my site all the blog list pages are paginated, 5 articles at a time, with Previous and Next links shown across the bottom of each list of 5 articles. The display of these links is implemented with a `<Pagination>` component that receives some props indicating if this is the first page or last page, and the previous/next page links.
+
+The rules for this component are that the previous link should be disabled if this is the first page and the next link should be disabled if this is the last page. For any other page, both previous and next links will be enabled. The href for (enabled) previous/next links should be for the page number as provided in the props.
+
+```js
+// src/components/pagination.js
+import React from "react"
+import { Link } from "gatsby"
+import styles from "./pagination.module.css"
+
+export default props => (
+  <div className={styles.container}>
+    {!props.isFirst && (
+      <div className={`${styles.prev} ${styles.pagination}`} data-testid="previous-enabled" >
+        <Link to={props.prevPage} rel="prev"> ← prev </Link>
+      </div>
+    )}
+    {props.isFirst && (
+      <div className={`${styles.prev} ${styles.pagination} ${styles.inactive}`} data-testid="previous-disabled" >
+        ← prev
+      </div>
+    )}
+    {!props.isLast && (
+      <div className={`${styles.next} ${styles.pagination}`} data-testid="next-enabled" >
+        <Link to={props.nextPage} rel="next"> next → </Link>
+      </div>
+    )}
+    {props.isLast && (
+      <div className={`${styles.next} ${styles.pagination} ${styles.inactive}`} data-testid="next-disabled" >
+        next →
+      </div>
+    )}
+  </div>
+)
+```
+
+The tests for this component should cover all possible cases: first page, middle page, last page, and an edge case where there only is one page (first and last links disabled). Each test renders the component with props representing these scenarios, then verifies the presence or absence of expected DOM elements by `data-testid`.
+
+If a link is expected, then the test will also verify its expected href value. I couldn't find a convenience `getByHref...` query from react testing library so the "escape hatch" `document.querySelector...` is used to verify the href attributes of the links.
+
+Verifying all the expectations gets quite lengthy so this snippet below shows only the tests for first and middle page. See [pagination.spec.js](https://github.com/danielabar/meblog/blob/master/src/components/pagination.spec.js) on my blog project on Github for the complete listing.
+
+```js
+// src/components/pagination.spec.js
+import React from "react"
+import { render, screen } from "@testing-library/react"
+import "@testing-library/jest-dom"
+
+import Pagination from "./pagination"
+
+describe("Pagination", () => {
+  it("renders first page", () => {
+    const container = render(
+      <Pagination
+        isFirst={true}
+        prevPage={"/blog/0"}
+        isLast={false}
+        nextPage={"/blog/2"}
+      />
+    )
+
+    expect(screen.queryByTestId("previous-enabled")).not.toBeInTheDocument()
+    expect(screen.queryByTestId("previous-disabled")).toBeInTheDocument()
+    expect(screen.queryByTestId("next-enabled")).toBeInTheDocument()
+    expect(screen.queryByTestId("next-disabled")).not.toBeInTheDocument()
+
+    expect(document.querySelector("[data-testid='next-enabled'] a").getAttribute("href")).toEqual("/blog/2")
+  })
+
+  it("renders middle page", () => {
+    const container = render(
+      <Pagination
+        isFirst={false}
+        prevPage={"/blog/3"}
+        isLast={false}
+        nextPage={"/blog/5"}
+      />
+    )
+
+    expect(screen.queryByTestId("previous-enabled")).toBeInTheDocument()
+    expect(screen.queryByTestId("previous-disabled")).not.toBeInTheDocument()
+    expect(screen.queryByTestId("next-enabled")).toBeInTheDocument()
+    expect(screen.queryByTestId("next-disabled")).not.toBeInTheDocument()
+
+    expect(document.querySelector("[data-testid='previous-enabled'] a").getAttribute("href")).toEqual("/blog/3")
+    expect(document.querySelector("[data-testid='next-enabled'] a").getAttribute("href")).toEqual("/blog/5")
+  })
+```
+
+## Templates
+
+So far all of the test examples have been for components. Pages and templates can also be tested in a similar manner. For example, here is my `Post` template, which is used to render each post (including the one that you're reading right now), consisting of the article html content, published date, featured image, and title:
+
+```js
+// src/templates/post.js
+import React from "react"
+import { graphql } from "gatsby"
+import Img from "gatsby-image"
+import Layout from "../components/layout"
+import styles from "./post.module.css"
+
+export default props => {
+  const markdown = props.data.markdownRemark
+  const publishedDate = markdown.frontmatter.date
+  const featuredImgFluid = markdown.frontmatter.featuredImage.childImageSharp.fluid
+  const content = markdown.html
+  const title = markdown.frontmatter.title
+
+  return (
+    <Layout>
+      <div className={styles.container}>
+        <h1 className={styles.title}>{title}</h1>
+        <div className={styles.published}>Published {publishedDate}</div>
+        <Img fluid={featuredImgFluid} className={styles.featureImage} />
+        <div className={styles.content} dangerouslySetInnerHTML={{ __html: content }}/>
+      </div>
+    </Layout>
+  )
+}
+
+// Results of graphql query will NOT be available when this a unit test renders this template
+export const query = graphql`
+  query($slug: String!) {
+    markdownRemark(fields: { slug: { eq: $slug } }) {
+      html
+      frontmatter {
+        title
+        date(formatString: "DD MMM YYYY")
+        featuredImage {
+          childImageSharp {
+            fluid(maxWidth: 800) {
+              ...GatsbyImageSharpFluid
+            }
+          }
+        }
+      }
+      fields {
+        slug
+      }
+    }
+  }
+`
+```
+
+The main difference is that for pages or templates that use `graphql`, recall that this is mocked out, therefore will not return any results. From the initial Gatsby unit test setup [instructions]((https://www.gatsbyjs.com/docs/how-to/testing/unit-testing/)), you should have:
+
+```js
+// __mocks__/gatsby.js
+const React = require("react")
+const gatsby = jest.requireActual("gatsby")
+
+module.exports = {
+  ...gatsby,
+  // All graphql queries are mocked out
+  graphql: jest.fn(),
+  // rest of the mocks...
+}
+```
+
+The important thing to understand for testing is when the Gatsby templates are built, results from the graphql query are made available in the `data` prop. This means that when the template is rendered in a test, simply pass in an example of what the query would have returned as `data` when rendering, then use snapshot testing:
+
+```js
+// src/templates/post.spec.js
+import React from "react"
+import { render, screen } from "@testing-library/react"
+import "@testing-library/jest-dom"
+import Post from "./post"
+
+describe("Post", () => {
+  it("Renders in layout", () => {
+    // An example of what the graphql query used by the Post template returns:
+    const postData = {
+      markdownRemark: {
+        fields: {
+          slug: "/blog/some-slug",
+        },
+        frontmatter: {
+          date: "14 Aug 2021",
+          title: "This is the title",
+          featuredImage: {
+            childImageSharp: {
+              fluid: {
+                aspectRatio: 1.5,
+                base64: "data:image/jpeg;base64,/9j/2wBDABALDA4MChAODQ4k=",
+                sizes: "(max-width: 800px) 100vw, 800px",
+                src: "/static/69f6b/14b42/some-img.jpg",
+                srcSet: "/static/69f6b/f836f/some-img.jpg 200w, /static/69f6b/2244e/some-img.jpg 400w, /static/69f6b/14b42/some-img.jpg 800w, /static/69f6b/a7715/some-img.jpg 1000w",
+              },
+            },
+          },
+        },
+        html:
+          "<p>Here is the first paragraph</p><h2>Sub Heading</h2><p>And another paragraph</p>",
+      },
+    }
+
+    // Render the template with the data prop to mimic graphql passing results to it:
+    const container = render(<Post data={postData} />)
+    expect(container).toMatchSnapshot()
+  })
+})
+```
+
+## Jest Test Options
+
+During development, it's convenient to have Jest watch for any file changes, and automatically re-run affected tests. This provides nearly instant feedback if anything has broken. Given that you've added `"test": "jest",` to `package.json`, the command to have Jest run in "watch" mode is:
+
+```
+npm test -- --watch
+```
+
+Jest can also generate a coverage report showing percentage of lines and files in the project that have been "covered", i.e. exercised by a test. Don't stress about getting this all the way up to 100% as that can be difficult. Instead I use the coverage report to focus on areas of the project that are missing tests and see where test coverage could be improved. The command to run tests and generate the coverage report is:
+
+```
+npm test -- --coverage
+```
+
+## Conclusion
+
+This post has covered how to get started with unit testing on a Gatsby project using Jest and react testing library. It has covered simple snapshot testing, testing components with props, components with children, mocking dependencies globally and per test, user interaction, meta tags, business logic and templates. It has also covered a few different options for how to run the tests. I hope this will encourage everyone who runs a Gatsby site to go ahead and add at least a few tests.
