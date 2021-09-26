@@ -374,9 +374,158 @@ describe("SearchInput", () => {
 
 Notice the use of the special control character `{enter}` to simulate the <kbd>Enter</kbd> key. See the user-event docs for a list of all such [control characters](https://testing-library.com/docs/ecosystem-user-event/#special-characters).
 
+## Meta Tags
+
+Many Gatsby sites will have an `<SEO>` component that gets included in every page. It uses a static query to get the site's metadata such as title, description, url, etc. (defined in `gatsby-config.js`), and also accepts properties to override these. Then it uses `react-helmet` to output meta tags for site description, image, url, and also the social sharing tags so that nice looking cards can be generated on the various social media platforms when someone shares a link to your site.
+
+A full discussion of how to build this component is out of scope for this article as I just want to focus on how to test it, but take a look at [this article](https://www.gatsbyjs.com/docs/add-seo-component/) on the Gatsby site for more information on building an SEO component. Mine looks something like this:
+
+```js
+// src/components/SEO.js
+import React from "react"
+import { Helmet } from "react-helmet"
+import { useStaticQuery, graphql } from "gatsby"
+
+export default function SEO({
+  title,
+  description,
+  image,
+  pathname,
+}) {
+  const data = useStaticQuery(graphql`
+    query SEOQuery {
+      site {
+        siteMetadata {
+          defaultTitle: title
+          titleTemplate
+          defaultDescription: description
+          siteUrl: url
+          defaultImage: image
+        }
+      }
+    }
+  `)
+
+  const seo = {
+    title: title || data.site.siteMetadata.defaultTitle,
+    description: description || data.site.siteMetadata.defaultDescription,
+    image: `${data.site.siteMetadata.siteUrl}${image || data.site.siteMetadata.defaultImage}`,
+    url: `${data.site.siteMetadata.siteUrl}${pathname || "/"}`,
+  }
+
+  return (
+    <Helmet title={seo.title} titleTemplate={data.site.siteMetadata.titleTemplate} >
+      <meta name="description" content={seo.description} />
+      <meta name="image" content={seo.image} />
+      {seo.url && <meta property="og:url" content={seo.url} />}
+      {seo.title && <meta property="og:title" content={seo.title} />}
+      {seo.description && <meta property="og:description" content={seo.description} />}
+      {seo.image && <meta property="og:image" content={seo.image} />}
+      <meta name="twitter:card" content="summary_large_image" />
+      {seo.title && <meta name="twitter:title" content={seo.title} />}
+      {seo.description && <meta name="twitter:description" content={seo.description} /> }
+      {seo.image && <meta name="twitter:image" content={seo.image} />}
+    </Helmet>
+  )
+}
+```
+
+In order to test this component, the `useStaticQuery` hook must be mocked out. This is because the build time GraphQL server may not be running when tests are running and unit tests should not have any external dependencies.
+
+This can be done in the test, or if there's only one component that uses a static query, the mock can be defined in the global `__mocks__/gatsby.js`. Unlike when we mocked the Gatsby `navigate` function earlier, for this test, the returned result matters because the values will be used to generate the meta tag values, therefore Gatsby's `mockImplementation` function will be used to have the mock return a result:
+
+```js
+// __mocks__/gatsby.js
+const React = require("react")
+const gatsby = jest.requireActual("gatsby")
+
+module.exports = {
+  ...gatsby,
+  // other mocks...
+  // +++ ADD NEW MOCK HERE +++
+  useStaticQuery: jest.fn().mockImplementation(() => {
+    // When component calls useStaticQuery(...), this result will be returned
+    return {
+      site: {
+        siteMetadata: {
+          defaultTitle: "Jane Doe Blog",
+          titleTemplate: "%s · Jane Doe",
+          defaultDescription: "Blog description.",
+          siteUrl: "https://someblog.com",
+          defaultImage: "/images/profile.png",
+        },
+      },
+    }
+  }),
+}
+```
+
+The other thing that will be different about this test is that the meta tags are not query-able in react testing library. Instead, the `Helmet.peek` method is used. Here are a few example tests for the Home Page and an Article Page. It gets quite lengthy verifying all the meta tags so will only include a few to demonstrate the idea. See [SEO.spec.js](https://github.com/danielabar/meblog/blob/master/src/components/SEO.spec.js) on my blog project on Github for the complete listing.
+
+```js
+// src/components/SEO.spec.js
+import React from "react"
+import { render } from "@testing-library/react"
+import "@testing-library/jest-dom"
+import Helmet from "react-helmet"
+import SEO from "./SEO"
+
+describe("SEO", () => {
+  it("renders for home page", () => {
+    render(<SEO title="Home" pathname="/" track="NO" />)
+
+    const helmet = Helmet.peek()
+    expect(helmet.title).toEqual("Home · Jane Doe")
+    expect(helmet.metaTags).toEqual(
+      expect.arrayContaining([
+        { content: "Blog description.", name: "description" },
+        { content: "https://someblog.com/images/profile.png", name: "image", },
+        { content: "https://someblog.com/", property: "og:url", },
+        { content: "website", property: "og:type" },
+        { content: "Home", property: "og:title" },
+        { content: "Blog description.", property: "og:description" },
+        { content: "https://someblog.com/images/profile.png", property: "og:image", },
+        { content: "summary_large_image", name: "twitter:card" },
+        { content: "Home", name: "twitter:title" },
+        { content: "Blog description.", name: "twitter:description" },
+        { content: "https://someblog.com/images/profile.png", name: "twitter:image", },
+      ])
+    )
+  })
+
+  it("renders for an article page", () => {
+    render(
+      <SEO
+        title="Article Title"
+        description="Article Description"
+        image="/static/abc123/def/article-image.jpg"
+        pathname="/blog/article-slug/"
+      />
+    )
+
+    const helmet = Helmet.peek()
+    expect(helmet.title).toEqual("Article Title · Jane Doe")
+    expect(helmet.metaTags).toEqual(
+      expect.arrayContaining([
+        { content: "Article Description", name: "description" },
+        { content: "https://someblog.com/static/abc123/def/article-image.jpg", name: "image", },
+        { content: "https://someblog.com/blog/article-slug/", property: "og:url", },
+        { content: "article", property: "og:type" },
+        { content: "Article Title", property: "og:title" },
+        { content: "Article Description", property: "og:description" },
+        { content: "https://someblog.com/static/abc123/def/article-image.jpg", property: "og:image", },
+        { content: "summary_large_image", name: "twitter:card" },
+        { content: "Article Title", name: "twitter:title" },
+        { content: "Article Description", name: "twitter:description" },
+        { content: "https://someblog.com/static/abc123/def/article-image.jpg", name: "twitter:image", },
+      ])
+    )
+  })
+})
+```
+
 ### Temp Outline
 
-- SEO - component that generates meta tags using `react-helmet` for social sharing, static query is mocked. Meta tags not query-able on screen object from react testing library so instead will use `Helmet.peek`
 - business logic: pagination component - given props of prev/next page and is first/last - verify prev/next links enabled/disabled accordingly.
 - template to list paginated lists of articles - blog-list.spec.js, verify pagination links are pointing to correct pages
 - Optional wrap test commands with Makefile - test and exit, test watch, test with coverage, test clean (clean jest cache). Convenient if you work on multiple projects in different languages/tech stacks. Rather than having to remember various build commands, make is universally available on *nix systems so it can be consistent, eg: every project can have a `make test` command.
