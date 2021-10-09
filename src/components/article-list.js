@@ -1,5 +1,5 @@
 import React from "react"
-import styles from "./article-list.module.css"
+import * as styles from "./article-list.module.css"
 import Article from "./article"
 
 export default props => (

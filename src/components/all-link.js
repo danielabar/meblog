@@ -1,6 +1,6 @@
 import React from "react"
 import { Link } from "gatsby"
-import styles from "./all-link.module.css"
+import * as styles from "./all-link.module.css"
 
 export default ({ marginTop }) => (
   <div data-testid="all-wrapper" style={{ marginTop: marginTop }}>

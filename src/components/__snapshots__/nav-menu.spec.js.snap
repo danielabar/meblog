@@ -6,14 +6,11 @@ Object {
   "baseElement": <body>
     <div>
       <nav
-        class="nav"
         data-testid="nav-menu"
       >
-        <ul
-          class="navList"
-        >
+        <ul>
           <li
-            class="headerItem navItem"
+            class="undefined undefined"
           >
             <a
               href="/blog"
@@ -22,7 +19,7 @@ Object {
             </a>
           </li>
           <li
-            class="headerItem navItem"
+            class="undefined undefined"
           >
             <a
               href="/about"
@@ -31,11 +28,9 @@ Object {
             </a>
           </li>
           <li
-            class="headerItem navItem"
+            class="undefined undefined"
           >
-            <div
-              class="wrapper"
-            >
+            <div>
               <svg
                 fill="currentColor"
                 height="1.7rem"
@@ -51,7 +46,6 @@ Object {
               </svg>
               <input
                 aria-label="Search"
-                class="search"
                 data-testid="search-input"
                 placeholder="Search, eg: Rails"
                 type="text"
@@ -64,14 +58,11 @@ Object {
   </body>,
   "container": <div>
     <nav
-      class="nav"
       data-testid="nav-menu"
     >
-      <ul
-        class="navList"
-      >
+      <ul>
         <li
-          class="headerItem navItem"
+          class="undefined undefined"
         >
           <a
             href="/blog"
@@ -80,7 +71,7 @@ Object {
           </a>
         </li>
         <li
-          class="headerItem navItem"
+          class="undefined undefined"
         >
           <a
             href="/about"
@@ -89,11 +80,9 @@ Object {
           </a>
         </li>
         <li
-          class="headerItem navItem"
+          class="undefined undefined"
         >
-          <div
-            class="wrapper"
-          >
+          <div>
             <svg
               fill="currentColor"
               height="1.7rem"
@@ -109,7 +98,6 @@ Object {
             </svg>
             <input
               aria-label="Search"
-              class="search"
               data-testid="search-input"
               placeholder="Search, eg: Rails"
               type="text"

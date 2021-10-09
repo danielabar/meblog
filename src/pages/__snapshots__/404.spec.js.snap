@@ -5,44 +5,33 @@ Object {
   "asFragment": [Function],
   "baseElement": <body>
     <div>
-      <div
-        class="container"
-      >
+      <div>
         <header
-          class="container"
           data-testid="header"
         >
           <a
             href="/"
           >
-            <div
-              class="logo"
-            >
-              <div
-                class="profileWrapper"
-              >
+            <div>
+              <div>
                 <img
                   alt="Profile"
-                  class="profileImg"
                   src="/images/profile.png"
                 />
               </div>
               <div
-                class="headerItem title"
+                class="undefined undefined"
               >
                 Daniela Baron
               </div>
             </div>
           </a>
           <nav
-            class="nav"
             data-testid="nav-menu"
           >
-            <ul
-              class="navList"
-            >
+            <ul>
               <li
-                class="headerItem navItem"
+                class="undefined undefined"
               >
                 <a
                   href="/blog"
@@ -51,7 +40,7 @@ Object {
                 </a>
               </li>
               <li
-                class="headerItem navItem"
+                class="undefined undefined"
               >
                 <a
                   href="/about"
@@ -62,26 +51,16 @@ Object {
             </ul>
           </nav>
         </header>
-        <div
-          class="content"
-        >
+        <div>
           <div />
-          <div
-            class="container"
-          >
-            <div
-              class="main"
-            >
+          <div>
+            <div>
               404
             </div>
-            <div
-              class="submain"
-            >
+            <div>
               Ooops!!
             </div>
-            <div
-              class="message"
-            >
+            <div>
               That page doesn't exist or is unavailable
             </div>
           </div>
@@ -90,7 +69,6 @@ Object {
             style="margin-top: 30px;"
           >
             <a
-              class="allLink"
               href="/blog"
             >
               All Articles
@@ -98,22 +76,14 @@ Object {
           </div>
         </div>
         <footer
-          class="container"
           data-testid="footer"
         >
-          <hr
-            class="sep"
-          />
-          <p
-            class="copy"
-          >
+          <hr />
+          <p>
             All materials © Daniela Baron 2021
           </p>
-          <div
-            class="social"
-          >
+          <div>
             <a
-              class="footerIcon"
               href="https://twitter.com/DanielaMBaron"
             >
               <svg
@@ -131,7 +101,6 @@ Object {
               </svg>
             </a>
             <a
-              class="footerIcon"
               href="https://github.com/danielabar"
             >
               <svg
@@ -149,7 +118,6 @@ Object {
               </svg>
             </a>
             <a
-              class="footerIcon"
               href="https://codepen.io/danielabar"
             >
               <svg
@@ -167,7 +135,6 @@ Object {
               </svg>
             </a>
             <a
-              class="footerIcon"
               href="https://www.linkedin.com/in/danielabaron/"
             >
               <svg
@@ -190,44 +157,33 @@ Object {
     </div>
   </body>,
   "container": <div>
-    <div
-      class="container"
-    >
+    <div>
       <header
-        class="container"
         data-testid="header"
       >
         <a
           href="/"
         >
-          <div
-            class="logo"
-          >
-            <div
-              class="profileWrapper"
-            >
+          <div>
+            <div>
               <img
                 alt="Profile"
-                class="profileImg"
                 src="/images/profile.png"
               />
             </div>
             <div
-              class="headerItem title"
+              class="undefined undefined"
             >
               Daniela Baron
             </div>
           </div>
         </a>
         <nav
-          class="nav"
           data-testid="nav-menu"
         >
-          <ul
-            class="navList"
-          >
+          <ul>
             <li
-              class="headerItem navItem"
+              class="undefined undefined"
             >
               <a
                 href="/blog"
@@ -236,7 +192,7 @@ Object {
               </a>
             </li>
             <li
-              class="headerItem navItem"
+              class="undefined undefined"
             >
               <a
                 href="/about"
@@ -247,26 +203,16 @@ Object {
           </ul>
         </nav>
       </header>
-      <div
-        class="content"
-      >
+      <div>
         <div />
-        <div
-          class="container"
-        >
-          <div
-            class="main"
-          >
+        <div>
+          <div>
             404
           </div>
-          <div
-            class="submain"
-          >
+          <div>
             Ooops!!
           </div>
-          <div
-            class="message"
-          >
+          <div>
             That page doesn't exist or is unavailable
           </div>
         </div>
@@ -275,7 +221,6 @@ Object {
           style="margin-top: 30px;"
         >
           <a
-            class="allLink"
             href="/blog"
           >
             All Articles
@@ -283,22 +228,14 @@ Object {
         </div>
       </div>
       <footer
-        class="container"
         data-testid="footer"
       >
-        <hr
-          class="sep"
-        />
-        <p
-          class="copy"
-        >
+        <hr />
+        <p>
           All materials © Daniela Baron 2021
         </p>
-        <div
-          class="social"
-        >
+        <div>
           <a
-            class="footerIcon"
             href="https://twitter.com/DanielaMBaron"
           >
             <svg
@@ -316,7 +253,6 @@ Object {
             </svg>
           </a>
           <a
-            class="footerIcon"
             href="https://github.com/danielabar"
           >
             <svg
@@ -334,7 +270,6 @@ Object {
             </svg>
           </a>
           <a
-            class="footerIcon"
             href="https://codepen.io/danielabar"
           >
             <svg
@@ -352,7 +287,6 @@ Object {
             </svg>
           </a>
           <a
-            class="footerIcon"
             href="https://www.linkedin.com/in/danielabaron/"
           >
             <svg

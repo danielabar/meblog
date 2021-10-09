@@ -5,17 +5,15 @@ Object {
   "asFragment": [Function],
   "baseElement": <body>
     <div>
-      <div
-        class="container"
-      >
+      <div>
         <div
-          class="prev pagination inactive"
+          class="undefined undefined undefined"
           data-testid="previous-disabled"
         >
           ← prev
         </div>
         <div
-          class="next pagination inactive"
+          class="undefined undefined undefined"
           data-testid="next-disabled"
         >
           next →
@@ -24,17 +22,15 @@ Object {
     </div>
   </body>,
   "container": <div>
-    <div
-      class="container"
-    >
+    <div>
       <div
-        class="prev pagination inactive"
+        class="undefined undefined undefined"
         data-testid="previous-disabled"
       >
         ← prev
       </div>
       <div
-        class="next pagination inactive"
+        class="undefined undefined undefined"
         data-testid="next-disabled"
       >
         next →
@@ -100,17 +96,15 @@ Object {
   "asFragment": [Function],
   "baseElement": <body>
     <div>
-      <div
-        class="container"
-      >
+      <div>
         <div
-          class="prev pagination inactive"
+          class="undefined undefined undefined"
           data-testid="previous-disabled"
         >
           ← prev
         </div>
         <div
-          class="next pagination"
+          class="undefined undefined"
           data-testid="next-enabled"
         >
           <a
@@ -124,17 +118,15 @@ Object {
     </div>
   </body>,
   "container": <div>
-    <div
-      class="container"
-    >
+    <div>
       <div
-        class="prev pagination inactive"
+        class="undefined undefined undefined"
         data-testid="previous-disabled"
       >
         ← prev
       </div>
       <div
-        class="next pagination"
+        class="undefined undefined"
         data-testid="next-enabled"
       >
         <a
@@ -205,11 +197,9 @@ Object {
   "asFragment": [Function],
   "baseElement": <body>
     <div>
-      <div
-        class="container"
-      >
+      <div>
         <div
-          class="prev pagination"
+          class="undefined undefined"
           data-testid="previous-enabled"
         >
           <a
@@ -220,7 +210,7 @@ Object {
           </a>
         </div>
         <div
-          class="next pagination inactive"
+          class="undefined undefined undefined"
           data-testid="next-disabled"
         >
           next →
@@ -229,11 +219,9 @@ Object {
     </div>
   </body>,
   "container": <div>
-    <div
-      class="container"
-    >
+    <div>
       <div
-        class="prev pagination"
+        class="undefined undefined"
         data-testid="previous-enabled"
       >
         <a
@@ -244,7 +232,7 @@ Object {
         </a>
       </div>
       <div
-        class="next pagination inactive"
+        class="undefined undefined undefined"
         data-testid="next-disabled"
       >
         next →
@@ -310,11 +298,9 @@ Object {
   "asFragment": [Function],
   "baseElement": <body>
     <div>
-      <div
-        class="container"
-      >
+      <div>
         <div
-          class="prev pagination"
+          class="undefined undefined"
           data-testid="previous-enabled"
         >
           <a
@@ -325,7 +311,7 @@ Object {
           </a>
         </div>
         <div
-          class="next pagination"
+          class="undefined undefined"
           data-testid="next-enabled"
         >
           <a
@@ -339,11 +325,9 @@ Object {
     </div>
   </body>,
   "container": <div>
-    <div
-      class="container"
-    >
+    <div>
       <div
-        class="prev pagination"
+        class="undefined undefined"
         data-testid="previous-enabled"
       >
         <a
@@ -354,7 +338,7 @@ Object {
         </a>
       </div>
       <div
-        class="next pagination"
+        class="undefined undefined"
         data-testid="next-enabled"
       >
         <a

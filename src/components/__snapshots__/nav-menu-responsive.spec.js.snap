@@ -5,11 +5,9 @@ Object {
   "asFragment": [Function],
   "baseElement": <body>
     <div>
-      <nav
-        class="navOpen"
-      >
+      <nav>
         <button
-          class="menuButton menuButtonClose"
+          class="undefined undefined"
           data-testid="nav-menu-responsive-close"
         >
           <svg
@@ -28,35 +26,30 @@ Object {
           <br />
           close
         </button>
-        <ul
-          class="navList"
-        >
+        <ul>
           <li />
           <li
-            class="headerItem navItem"
+            class="undefined undefined"
           >
             <a
-              class="navLink"
               href="/"
             >
               Home
             </a>
           </li>
           <li
-            class="headerItem navItem"
+            class="undefined undefined"
           >
             <a
-              class="navLink"
               href="/blog"
             >
               Blog
             </a>
           </li>
           <li
-            class="headerItem navItem"
+            class="undefined undefined"
           >
             <a
-              class="navLink"
               href="/about"
             >
               About
@@ -67,11 +60,9 @@ Object {
     </div>
   </body>,
   "container": <div>
-    <nav
-      class="navOpen"
-    >
+    <nav>
       <button
-        class="menuButton menuButtonClose"
+        class="undefined undefined"
         data-testid="nav-menu-responsive-close"
       >
         <svg
@@ -90,35 +81,30 @@ Object {
         <br />
         close
       </button>
-      <ul
-        class="navList"
-      >
+      <ul>
         <li />
         <li
-          class="headerItem navItem"
+          class="undefined undefined"
         >
           <a
-            class="navLink"
             href="/"
           >
             Home
           </a>
         </li>
         <li
-          class="headerItem navItem"
+          class="undefined undefined"
         >
           <a
-            class="navLink"
             href="/blog"
           >
             Blog
           </a>
         </li>
         <li
-          class="headerItem navItem"
+          class="undefined undefined"
         >
           <a
-            class="navLink"
             href="/about"
           >
             About
@@ -187,15 +173,11 @@ Object {
   "baseElement": <body>
     <div>
       <nav
-        class="nav"
         data-testid="nav-menu-responsive"
       >
-        <ul
-          class="navList"
-        >
+        <ul>
           <li>
             <button
-              class="menuButton"
               data-testid="nav-menu-responsive-menu"
             >
               <svg
@@ -221,15 +203,11 @@ Object {
   </body>,
   "container": <div>
     <nav
-      class="nav"
       data-testid="nav-menu-responsive"
     >
-      <ul
-        class="navList"
-      >
+      <ul>
         <li>
           <button
-            class="menuButton"
             data-testid="nav-menu-responsive-menu"
           >
             <svg

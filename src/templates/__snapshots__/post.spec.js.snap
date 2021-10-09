@@ -5,44 +5,33 @@ Object {
   "asFragment": [Function],
   "baseElement": <body>
     <div>
-      <div
-        class="container"
-      >
+      <div>
         <header
-          class="container"
           data-testid="header"
         >
           <a
             href="/"
           >
-            <div
-              class="logo"
-            >
-              <div
-                class="profileWrapper"
-              >
+            <div>
+              <div>
                 <img
                   alt="Profile"
-                  class="profileImg"
                   src="/images/profile.png"
                 />
               </div>
               <div
-                class="headerItem title"
+                class="undefined undefined"
               >
                 Daniela Baron
               </div>
             </div>
           </a>
           <nav
-            class="nav"
             data-testid="nav-menu"
           >
-            <ul
-              class="navList"
-            >
+            <ul>
               <li
-                class="headerItem navItem"
+                class="undefined undefined"
               >
                 <a
                   href="/blog"
@@ -51,7 +40,7 @@ Object {
                 </a>
               </li>
               <li
-                class="headerItem navItem"
+                class="undefined undefined"
               >
                 <a
                   href="/about"
@@ -62,26 +51,18 @@ Object {
             </ul>
           </nav>
         </header>
-        <div
-          class="content"
-        >
+        <div>
           <div />
-          <div
-            class="container"
-          >
-            <h1
-              class="title"
-            >
+          <div>
+            <h1>
               This is the title
             </h1>
-            <div
-              class="published"
-            >
+            <div>
               Published 
               14 Aug 2021
             </div>
             <div
-              class="featureImage gatsby-image-wrapper"
+              class=" gatsby-image-wrapper"
               style="position: relative; overflow: hidden;"
             >
               <div
@@ -112,9 +93,7 @@ Object {
                 &lt;picture&gt;&lt;source srcset="/static/69f6b56407e655dd690ba4b363161733/f836f/faraday-alex-kondratiev-H9t723yPjYI-unsplash.jpg 200w, /static/69f6b56407e655dd690ba4b363161733/2244e/faraday-alex-kondratiev-H9t723yPjYI-unsplash.jpg 400w, /static/69f6b56407e655dd690ba4b363161733/14b42/faraday-alex-kondratiev-H9t723yPjYI-unsplash.jpg 800w, /static/69f6b56407e655dd690ba4b363161733/a7715/faraday-alex-kondratiev-H9t723yPjYI-unsplash.jpg 1000w" sizes="(max-width: 800px) 100vw, 800px" /&gt;&lt;img loading="lazy" sizes="(max-width: 800px) 100vw, 800px" srcset="/static/69f6b56407e655dd690ba4b363161733/f836f/faraday-alex-kondratiev-H9t723yPjYI-unsplash.jpg 200w, /static/69f6b56407e655dd690ba4b363161733/2244e/faraday-alex-kondratiev-H9t723yPjYI-unsplash.jpg 400w, /static/69f6b56407e655dd690ba4b363161733/14b42/faraday-alex-kondratiev-H9t723yPjYI-unsplash.jpg 800w, /static/69f6b56407e655dd690ba4b363161733/a7715/faraday-alex-kondratiev-H9t723yPjYI-unsplash.jpg 1000w" src="/static/69f6b56407e655dd690ba4b363161733/14b42/faraday-alex-kondratiev-H9t723yPjYI-unsplash.jpg" alt="" style="position:absolute;top:0;left:0;opacity:1;width:100%;height:100%;object-fit:cover;object-position:center"/&gt;&lt;/picture&gt;
               </noscript>
             </div>
-            <div
-              class="content"
-            >
+            <div>
               <p>
                 Here is the first paragraph
               </p>
@@ -131,7 +110,6 @@ Object {
             style="margin-top: 60px;"
           >
             <a
-              class="allLink"
               href="/blog"
             >
               All Articles
@@ -139,22 +117,14 @@ Object {
           </div>
         </div>
         <footer
-          class="container"
           data-testid="footer"
         >
-          <hr
-            class="sep"
-          />
-          <p
-            class="copy"
-          >
+          <hr />
+          <p>
             All materials © Daniela Baron 2021
           </p>
-          <div
-            class="social"
-          >
+          <div>
             <a
-              class="footerIcon"
               href="https://twitter.com/DanielaMBaron"
             >
               <svg
@@ -172,7 +142,6 @@ Object {
               </svg>
             </a>
             <a
-              class="footerIcon"
               href="https://github.com/danielabar"
             >
               <svg
@@ -190,7 +159,6 @@ Object {
               </svg>
             </a>
             <a
-              class="footerIcon"
               href="https://codepen.io/danielabar"
             >
               <svg
@@ -208,7 +176,6 @@ Object {
               </svg>
             </a>
             <a
-              class="footerIcon"
               href="https://www.linkedin.com/in/danielabaron/"
             >
               <svg
@@ -231,44 +198,33 @@ Object {
     </div>
   </body>,
   "container": <div>
-    <div
-      class="container"
-    >
+    <div>
       <header
-        class="container"
         data-testid="header"
       >
         <a
           href="/"
         >
-          <div
-            class="logo"
-          >
-            <div
-              class="profileWrapper"
-            >
+          <div>
+            <div>
               <img
                 alt="Profile"
-                class="profileImg"
                 src="/images/profile.png"
               />
             </div>
             <div
-              class="headerItem title"
+              class="undefined undefined"
             >
               Daniela Baron
             </div>
           </div>
         </a>
         <nav
-          class="nav"
           data-testid="nav-menu"
         >
-          <ul
-            class="navList"
-          >
+          <ul>
             <li
-              class="headerItem navItem"
+              class="undefined undefined"
             >
               <a
                 href="/blog"
@@ -277,7 +233,7 @@ Object {
               </a>
             </li>
             <li
-              class="headerItem navItem"
+              class="undefined undefined"
             >
               <a
                 href="/about"
@@ -288,26 +244,18 @@ Object {
           </ul>
         </nav>
       </header>
-      <div
-        class="content"
-      >
+      <div>
         <div />
-        <div
-          class="container"
-        >
-          <h1
-            class="title"
-          >
+        <div>
+          <h1>
             This is the title
           </h1>
-          <div
-            class="published"
-          >
+          <div>
             Published 
             14 Aug 2021
           </div>
           <div
-            class="featureImage gatsby-image-wrapper"
+            class=" gatsby-image-wrapper"
             style="position: relative; overflow: hidden;"
           >
             <div
@@ -338,9 +286,7 @@ Object {
               &lt;picture&gt;&lt;source srcset="/static/69f6b56407e655dd690ba4b363161733/f836f/faraday-alex-kondratiev-H9t723yPjYI-unsplash.jpg 200w, /static/69f6b56407e655dd690ba4b363161733/2244e/faraday-alex-kondratiev-H9t723yPjYI-unsplash.jpg 400w, /static/69f6b56407e655dd690ba4b363161733/14b42/faraday-alex-kondratiev-H9t723yPjYI-unsplash.jpg 800w, /static/69f6b56407e655dd690ba4b363161733/a7715/faraday-alex-kondratiev-H9t723yPjYI-unsplash.jpg 1000w" sizes="(max-width: 800px) 100vw, 800px" /&gt;&lt;img loading="lazy" sizes="(max-width: 800px) 100vw, 800px" srcset="/static/69f6b56407e655dd690ba4b363161733/f836f/faraday-alex-kondratiev-H9t723yPjYI-unsplash.jpg 200w, /static/69f6b56407e655dd690ba4b363161733/2244e/faraday-alex-kondratiev-H9t723yPjYI-unsplash.jpg 400w, /static/69f6b56407e655dd690ba4b363161733/14b42/faraday-alex-kondratiev-H9t723yPjYI-unsplash.jpg 800w, /static/69f6b56407e655dd690ba4b363161733/a7715/faraday-alex-kondratiev-H9t723yPjYI-unsplash.jpg 1000w" src="/static/69f6b56407e655dd690ba4b363161733/14b42/faraday-alex-kondratiev-H9t723yPjYI-unsplash.jpg" alt="" style="position:absolute;top:0;left:0;opacity:1;width:100%;height:100%;object-fit:cover;object-position:center"/&gt;&lt;/picture&gt;
             </noscript>
           </div>
-          <div
-            class="content"
-          >
+          <div>
             <p>
               Here is the first paragraph
             </p>
@@ -357,7 +303,6 @@ Object {
           style="margin-top: 60px;"
         >
           <a
-            class="allLink"
             href="/blog"
           >
             All Articles
@@ -365,22 +310,14 @@ Object {
         </div>
       </div>
       <footer
-        class="container"
         data-testid="footer"
       >
-        <hr
-          class="sep"
-        />
-        <p
-          class="copy"
-        >
+        <hr />
+        <p>
           All materials © Daniela Baron 2021
         </p>
-        <div
-          class="social"
-        >
+        <div>
           <a
-            class="footerIcon"
             href="https://twitter.com/DanielaMBaron"
           >
             <svg
@@ -398,7 +335,6 @@ Object {
             </svg>
           </a>
           <a
-            class="footerIcon"
             href="https://github.com/danielabar"
           >
             <svg
@@ -416,7 +352,6 @@ Object {
             </svg>
           </a>
           <a
-            class="footerIcon"
             href="https://codepen.io/danielabar"
           >
             <svg
@@ -434,7 +369,6 @@ Object {
             </svg>
           </a>
           <a
-            class="footerIcon"
             href="https://www.linkedin.com/in/danielabaron/"
           >
             <svg

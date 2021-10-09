@@ -1,5 +1,5 @@
 import React from "react"
-import styles from "./layout.module.css"
+import * as styles from "./layout.module.css"
 import Header from "./header.js"
 import Footer from "./footer.js"
 

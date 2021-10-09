@@ -7,7 +7,7 @@ import SEO from "../components/SEO"
 import Layout from "../components/layout"
 import ArticleList from "../components/article-list"
 import AllLink from "../components/all-link"
-import styles from "./search-results.module.css"
+import * as styles from "./search-results.module.css"
 
 const SearchResults = () => {
   const location = useLocation()

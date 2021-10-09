@@ -1,6 +1,6 @@
 import React from "react"
 import { Link } from "gatsby"
-import styles from "./nav-menu.module.css"
+import * as styles from "./nav-menu.module.css"
 import SearchInput from "./search-input"
 
 const NavMenu = () => {

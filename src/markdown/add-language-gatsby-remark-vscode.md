@@ -61,7 +61,7 @@ Here's just a few lines from this file - notice the supported `fileTypes` http a
 
 Next, npm install this project from Github, into the Gatsby project:
 
-```shell
+```bash
 npm install Huachao/vscode-restclient --save
 ```
 

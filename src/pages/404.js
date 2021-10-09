@@ -2,7 +2,7 @@ import React from "react"
 import SEO from "../components/SEO"
 import Layout from "../components/layout"
 import AllLink from "../components/all-link"
-import styles from "./404.module.css"
+import * as styles from "./404.module.css"
 
 export default () => (
   <Layout>

@@ -1,7 +1,7 @@
 import React from "react"
 import { navigate } from "gatsby"
 import { MdSearch } from "react-icons/md"
-import styles from "./search-input.module.css"
+import * as styles from "./search-input.module.css"
 
 const ENTER_KEY = "Enter"
 

@@ -1,6 +1,6 @@
 import React from "react"
 import { Link } from "gatsby"
-import styles from "./pagination.module.css"
+import * as styles from "./pagination.module.css"
 
 export default props => (
   <div className={styles.container}>

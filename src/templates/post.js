@@ -4,7 +4,7 @@ import Img from "gatsby-image"
 import SEO from "../components/SEO"
 import Layout from "../components/layout"
 import AllLink from "../components/all-link"
-import styles from "./post.module.css"
+import * as styles from "./post.module.css"
 import "@fontsource/fira-code"
 
 // props.data contains result from query object defined at bottom of this component - needed for featured image
