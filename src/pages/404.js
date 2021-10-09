@@ -1,10 +1,11 @@
+/* eslint-disable react/jsx-pascal-case */
 import React from "react"
 import SEO from "../components/SEO"
 import Layout from "../components/layout"
 import AllLink from "../components/all-link"
 import * as styles from "./404.module.css"
 
-export default () => (
+const Four04 = () => (
   <Layout>
     <SEO title="404" pathname="/404" />
     <div className={styles.container}>
@@ -17,3 +18,5 @@ export default () => (
     <AllLink marginTop="30px" />
   </Layout>
 )
+
+export default Four04

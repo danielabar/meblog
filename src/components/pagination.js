@@ -2,7 +2,7 @@ import React from "react"
 import { Link } from "gatsby"
 import * as styles from "./pagination.module.css"
 
-export default props => (
+const Pagination = (props) => (
   <div className={styles.container}>
     {!props.isFirst && (
       <div
@@ -42,3 +42,5 @@ export default props => (
     )}
   </div>
 )
+
+export default Pagination

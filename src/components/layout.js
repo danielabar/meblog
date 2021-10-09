@@ -3,10 +3,12 @@ import * as styles from "./layout.module.css"
 import Header from "./header.js"
 import Footer from "./footer.js"
 
-export default ({ children }) => (
+const Layout = ({ children }) => (
   <div className={styles.container}>
     <Header />
-    <div className={styles.content}>{children}</div>
+    <div>{children}</div>
     <Footer />
   </div>
 )
+
+export default Layout

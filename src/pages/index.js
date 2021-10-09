@@ -1,3 +1,4 @@
+/* eslint-disable react/jsx-pascal-case */
 import React from "react"
 import { graphql } from "gatsby"
 import "@fontsource/bai-jamjuree/200.css"
@@ -14,7 +15,7 @@ import Intro from "../components/intro"
 import ArticleList from "../components/article-list"
 import AllLink from "../components/all-link"
 
-export default ({ data }) => (
+const Index = ({ data }) => (
   <Layout>
     <SEO title="Home" pathname="/" />
     <Intro />
@@ -22,6 +23,8 @@ export default ({ data }) => (
     <AllLink marginTop="30px" />
   </Layout>
 )
+
+export default Index
 
 export const query = graphql`
   {
