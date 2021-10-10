@@ -89,7 +89,7 @@ Edit the `Gemfile` so it looks as follows:
 
 ```ruby
 # Gemfile
-rubocopsource 'https://rubygems.org/'
+source 'https://rubygems.org/'
 
 gem 'rspec'
 ```

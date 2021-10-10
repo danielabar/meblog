@@ -1,7 +1,7 @@
 /* eslint-disable react/jsx-pascal-case */
 import React from "react"
 import { graphql } from "gatsby"
-import Img from "gatsby-image"
+import { GatsbyImage } from "gatsby-plugin-image";
 import SEO from "../components/SEO"
 import Layout from "../components/layout"
 import AllLink from "../components/all-link"
@@ -13,7 +13,7 @@ const Post = (props) => {
   const markdown = props.data.markdownRemark
   const publishedDate = markdown.frontmatter.date
   const featuredImgFluid =
-    markdown.frontmatter.featuredImage.childImageSharp.fluid
+    markdown.frontmatter.featuredImage.childImageSharp.gatsbyImageData
   const imageSrc = featuredImgFluid.src
   const content = markdown.html
   const title = markdown.frontmatter.title
@@ -32,7 +32,7 @@ const Post = (props) => {
       <div>
         <h1 className={styles.title}>{title}</h1>
         <div className={styles.published}>Published {publishedDate}</div>
-        <Img fluid={featuredImgFluid} className={styles.featureImage} />
+        <GatsbyImage image={featuredImgFluid} className={styles.featureImage} alt={description}/>
         <div
           className={styles.content}
           dangerouslySetInnerHTML={{ __html: content }}
@@ -40,31 +40,28 @@ const Post = (props) => {
       </div>
       <AllLink marginTop="60px" />
     </Layout>
-  )
+  );
 }
 
 export default Post
 
 // query results available to component in props.data
-export const query = graphql`
-  query($slug: String!) {
-    markdownRemark(fields: { slug: { eq: $slug } }) {
-      html
-      frontmatter {
-        title
-        date(formatString: "DD MMM YYYY")
-        description
-        featuredImage {
-          childImageSharp {
-            fluid(maxWidth: 800) {
-              ...GatsbyImageSharpFluid
-            }
-          }
+export const query = graphql`query ($slug: String!) {
+  markdownRemark(fields: {slug: {eq: $slug}}) {
+    html
+    frontmatter {
+      title
+      date(formatString: "DD MMM YYYY")
+      description
+      featuredImage {
+        childImageSharp {
+          gatsbyImageData(width: 800, layout: CONSTRAINED)
         }
       }
-      fields {
-        slug
-      }
+    }
+    fields {
+      slug
     }
   }
+}
 `
