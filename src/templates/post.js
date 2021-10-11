@@ -14,7 +14,7 @@ const Post = (props) => {
   const publishedDate = markdown.frontmatter.date
   const featuredImgFluid =
     markdown.frontmatter.featuredImage.childImageSharp.gatsbyImageData
-  const imageSrc = featuredImgFluid.src
+  const imageSrc = featuredImgFluid.images.fallback.src
   const content = markdown.html
   const title = markdown.frontmatter.title
   const description = markdown.frontmatter.description || title
