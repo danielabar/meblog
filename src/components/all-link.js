@@ -1,11 +1,13 @@
 import React from "react"
 import { Link } from "gatsby"
-import styles from "./all-link.module.css"
+import * as styles from "./all-link.module.css"
 
-export default ({ marginTop }) => (
+const AllLink = ({ marginTop }) => (
   <div data-testid="all-wrapper" style={{ marginTop: marginTop }}>
     <Link to="/blog" className={styles.allLink}>
       All Articles
     </Link>
   </div>
 )
+
+export default AllLink

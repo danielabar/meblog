@@ -1,10 +1,11 @@
+/* eslint-disable react/jsx-pascal-case */
 import React from "react"
 import SEO from "../components/SEO"
 import Layout from "../components/layout"
-import styles from "./about.module.css"
+import * as styles from "./about.module.css"
 import AllLink from "../components/all-link"
 
-export default () => (
+const About = () => (
   <Layout>
     <SEO title="About" pathname="/about" />
     <div className={styles.container}>
@@ -86,3 +87,5 @@ export default () => (
     <AllLink marginTop="30px" />
   </Layout>
 )
+
+export default About

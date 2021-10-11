@@ -10,7 +10,6 @@ Object {
         style="margin-top: 30px;"
       >
         <a
-          class="allLink"
           href="/blog"
         >
           All Articles
@@ -24,7 +23,6 @@ Object {
       style="margin-top: 30px;"
     >
       <a
-        class="allLink"
         href="/blog"
       >
         All Articles

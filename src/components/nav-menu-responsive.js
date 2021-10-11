@@ -1,7 +1,7 @@
 import React, { useState } from "react"
 import { Link } from "gatsby"
 import { MdMenu, MdClose } from "react-icons/md"
-import styles from "./nav-menu-responsive.module.css"
+import * as styles from "./nav-menu-responsive.module.css"
 
 const NavMenuResponsive = () => {
   const [open, setOpen] = useState(false)
@@ -65,7 +65,7 @@ const NavMenuResponsive = () => {
       )
     }
     return (
-      <nav className={styles.nav} data-testid="nav-menu-responsive">
+      <nav data-testid="nav-menu-responsive">
         <ul className={styles.navList}>
           <li>
             <button

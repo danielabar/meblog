@@ -1,3 +1,4 @@
+/* eslint-disable react/jsx-pascal-case */
 import React from "react"
 import { graphql } from "gatsby"
 import SEO from "../components/SEO"

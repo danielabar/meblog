@@ -14,11 +14,13 @@ module.exports = {
     googleSiteVerification: "zmLm6qu34TLdeqUUPDF_K6faoqGqQincxyNZk7VsHgY",
   },
   plugins: [
+    "gatsby-plugin-image",
     "gatsby-plugin-sharp",
     "gatsby-transformer-sharp",
     "gatsby-transformer-remark",
     "gatsby-plugin-react-helmet",
     "gatsby-plugin-sitemap",
+    "gatsby-plugin-workerize-loader",
     {
       resolve: `gatsby-transformer-remark`,
       options: {

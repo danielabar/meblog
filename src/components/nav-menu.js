@@ -1,6 +1,6 @@
 import React from "react"
 import { Link } from "gatsby"
-import styles from "./nav-menu.module.css"
+import * as styles from "./nav-menu.module.css"
 import SearchInput from "./search-input"
 
 const NavMenu = () => {
@@ -14,7 +14,7 @@ const NavMenu = () => {
     }
   }
   return (
-    <nav className={styles.nav} data-testid="nav-menu">
+    <nav data-testid="nav-menu">
       <ul className={styles.navList}>
         <li className={`${styles.headerItem} ${styles.navItem}`}>
           <Link to="/blog" activeClassName={styles.active}>

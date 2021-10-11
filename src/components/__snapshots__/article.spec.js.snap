@@ -5,36 +5,24 @@ Object {
   "asFragment": [Function],
   "baseElement": <body>
     <div>
-      <article
-        class="container"
-      >
-        <div
-          class="subheader"
-        >
-          <div
-            class="date"
-          >
+      <article>
+        <div>
+          <div>
             August 2021
           </div>
-          <div
-            class="category"
-          >
+          <div>
             Rails
           </div>
         </div>
         <a
-          class="title"
           href="/blog/some-article"
         >
           Some Article
         </a>
-        <div
-          class="excerpt"
-        >
+        <div>
           First sentence of the article blah blah blah...
         </div>
         <a
-          class="read"
           href="/blog/some-article"
         >
           Read
@@ -43,36 +31,24 @@ Object {
     </div>
   </body>,
   "container": <div>
-    <article
-      class="container"
-    >
-      <div
-        class="subheader"
-      >
-        <div
-          class="date"
-        >
+    <article>
+      <div>
+        <div>
           August 2021
         </div>
-        <div
-          class="category"
-        >
+        <div>
           Rails
         </div>
       </div>
       <a
-        class="title"
         href="/blog/some-article"
       >
         Some Article
       </a>
-      <div
-        class="excerpt"
-      >
+      <div>
         First sentence of the article blah blah blah...
       </div>
       <a
-        class="read"
         href="/blog/some-article"
       >
         Read

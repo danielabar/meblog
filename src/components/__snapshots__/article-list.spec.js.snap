@@ -6,74 +6,49 @@ Object {
   "baseElement": <body>
     <div>
       <section
-        class="container"
         data-testid="article-list"
       >
-        <article
-          class="container"
-        >
-          <div
-            class="subheader"
-          >
-            <div
-              class="date"
-            >
+        <article>
+          <div>
+            <div>
               August 2021
             </div>
-            <div
-              class="category"
-            >
+            <div>
               Rails
             </div>
           </div>
           <a
-            class="title"
             href="/blog/some-article-1"
           >
             Some Article 1
           </a>
-          <div
-            class="excerpt"
-          >
+          <div>
             First sentence of article 1 blah blah blah...
           </div>
           <a
-            class="read"
             href="/blog/some-article-1"
           >
             Read
           </a>
         </article>
-        <article
-          class="container"
-        >
-          <div
-            class="subheader"
-          >
-            <div
-              class="date"
-            >
+        <article>
+          <div>
+            <div>
               September 2021
             </div>
-            <div
-              class="category"
-            >
+            <div>
               Docker
             </div>
           </div>
           <a
-            class="title"
             href="/blog/some-article-2"
           >
             Some Article 2
           </a>
-          <div
-            class="excerpt"
-          >
+          <div>
             First sentence of article 2 blah blah blah...
           </div>
           <a
-            class="read"
             href="/blog/some-article-2"
           >
             Read
@@ -84,74 +59,49 @@ Object {
   </body>,
   "container": <div>
     <section
-      class="container"
       data-testid="article-list"
     >
-      <article
-        class="container"
-      >
-        <div
-          class="subheader"
-        >
-          <div
-            class="date"
-          >
+      <article>
+        <div>
+          <div>
             August 2021
           </div>
-          <div
-            class="category"
-          >
+          <div>
             Rails
           </div>
         </div>
         <a
-          class="title"
           href="/blog/some-article-1"
         >
           Some Article 1
         </a>
-        <div
-          class="excerpt"
-        >
+        <div>
           First sentence of article 1 blah blah blah...
         </div>
         <a
-          class="read"
           href="/blog/some-article-1"
         >
           Read
         </a>
       </article>
-      <article
-        class="container"
-      >
-        <div
-          class="subheader"
-        >
-          <div
-            class="date"
-          >
+      <article>
+        <div>
+          <div>
             September 2021
           </div>
-          <div
-            class="category"
-          >
+          <div>
             Docker
           </div>
         </div>
         <a
-          class="title"
           href="/blog/some-article-2"
         >
           Some Article 2
         </a>
-        <div
-          class="excerpt"
-        >
+        <div>
           First sentence of article 2 blah blah blah...
         </div>
         <a
-          class="read"
           href="/blog/some-article-2"
         >
           Read

@@ -6,40 +6,31 @@ Object {
   "baseElement": <body>
     <div>
       <header
-        class="container"
         data-testid="header"
       >
         <a
           href="/"
         >
-          <div
-            class="logo"
-          >
-            <div
-              class="profileWrapper"
-            >
+          <div>
+            <div>
               <img
                 alt="Profile"
-                class="profileImg"
                 src="/images/profile.png"
               />
             </div>
             <div
-              class="headerItem title"
+              class="undefined undefined"
             >
               Daniela Baron
             </div>
           </div>
         </a>
         <nav
-          class="nav"
           data-testid="nav-menu"
         >
-          <ul
-            class="navList"
-          >
+          <ul>
             <li
-              class="headerItem navItem"
+              class="undefined undefined"
             >
               <a
                 href="/blog"
@@ -48,7 +39,7 @@ Object {
               </a>
             </li>
             <li
-              class="headerItem navItem"
+              class="undefined undefined"
             >
               <a
                 href="/about"
@@ -63,40 +54,31 @@ Object {
   </body>,
   "container": <div>
     <header
-      class="container"
       data-testid="header"
     >
       <a
         href="/"
       >
-        <div
-          class="logo"
-        >
-          <div
-            class="profileWrapper"
-          >
+        <div>
+          <div>
             <img
               alt="Profile"
-              class="profileImg"
               src="/images/profile.png"
             />
           </div>
           <div
-            class="headerItem title"
+            class="undefined undefined"
           >
             Daniela Baron
           </div>
         </div>
       </a>
       <nav
-        class="nav"
         data-testid="nav-menu"
       >
-        <ul
-          class="navList"
-        >
+        <ul>
           <li
-            class="headerItem navItem"
+            class="undefined undefined"
           >
             <a
               href="/blog"
@@ -105,7 +87,7 @@ Object {
             </a>
           </li>
           <li
-            class="headerItem navItem"
+            class="undefined undefined"
           >
             <a
               href="/about"
@@ -177,41 +159,31 @@ Object {
   "baseElement": <body>
     <div>
       <header
-        class="container"
         data-testid="header"
       >
         <a
           href="/"
         >
-          <div
-            class="logo"
-          >
-            <div
-              class="profileWrapper"
-            >
+          <div>
+            <div>
               <img
                 alt="Profile"
-                class="profileImg"
                 src="/images/profile.png"
               />
             </div>
             <div
-              class="headerItem title"
+              class="undefined undefined"
             >
               Daniela Baron
             </div>
           </div>
         </a>
         <nav
-          class="nav"
           data-testid="nav-menu-responsive"
         >
-          <ul
-            class="navList"
-          >
+          <ul>
             <li>
               <button
-                class="menuButton"
                 data-testid="nav-menu-responsive-menu"
               >
                 <svg
@@ -238,41 +210,31 @@ Object {
   </body>,
   "container": <div>
     <header
-      class="container"
       data-testid="header"
     >
       <a
         href="/"
       >
-        <div
-          class="logo"
-        >
-          <div
-            class="profileWrapper"
-          >
+        <div>
+          <div>
             <img
               alt="Profile"
-              class="profileImg"
               src="/images/profile.png"
             />
           </div>
           <div
-            class="headerItem title"
+            class="undefined undefined"
           >
             Daniela Baron
           </div>
         </div>
       </a>
       <nav
-        class="nav"
         data-testid="nav-menu-responsive"
       >
-        <ul
-          class="navList"
-        >
+        <ul>
           <li>
             <button
-              class="menuButton"
               data-testid="nav-menu-responsive-menu"
             >
               <svg

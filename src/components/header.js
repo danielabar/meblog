@@ -1,7 +1,7 @@
 import React from "react"
 import { Link } from "gatsby"
 import useViewport from "../hooks/useviewport"
-import styles from "./header.module.css"
+import * as styles from "./header.module.css"
 import NavMenuResponsive from "./nav-menu-responsive"
 import NavMenu from "./nav-menu"
 

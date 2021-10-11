@@ -1,7 +1,7 @@
 import React from "react"
-import styles from "./intro.module.css"
+import * as styles from "./intro.module.css"
 
-export default () => (
+const Intro = () => (
   <section className={styles.container}>
     I'm a software engineer based in Toronto, Canada. My interests include
     fullstack development, test automation, personal finance, listening to
@@ -9,3 +9,5 @@ export default () => (
     learning new things.
   </section>
 )
+
+export default Intro

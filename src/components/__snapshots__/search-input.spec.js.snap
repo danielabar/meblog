@@ -5,9 +5,7 @@ Object {
   "asFragment": [Function],
   "baseElement": <body>
     <div>
-      <div
-        class="wrapper"
-      >
+      <div>
         <svg
           fill="currentColor"
           height="1.7rem"
@@ -23,7 +21,6 @@ Object {
         </svg>
         <input
           aria-label="Search"
-          class="search"
           data-testid="search-input"
           placeholder="Search, eg: Rails"
           type="text"
@@ -32,9 +29,7 @@ Object {
     </div>
   </body>,
   "container": <div>
-    <div
-      class="wrapper"
-    >
+    <div>
       <svg
         fill="currentColor"
         height="1.7rem"
@@ -50,7 +45,6 @@ Object {
       </svg>
       <input
         aria-label="Search"
-        class="search"
         data-testid="search-input"
         placeholder="Search, eg: Rails"
         type="text"

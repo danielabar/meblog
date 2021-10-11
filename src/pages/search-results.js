@@ -1,3 +1,4 @@
+/* eslint-disable react/jsx-pascal-case */
 import React, { useEffect, useState } from "react"
 import { Link } from "gatsby"
 import { useLocation } from "@reach/router"
@@ -7,7 +8,7 @@ import SEO from "../components/SEO"
 import Layout from "../components/layout"
 import ArticleList from "../components/article-list"
 import AllLink from "../components/all-link"
-import styles from "./search-results.module.css"
+import * as styles from "./search-results.module.css"
 
 const SearchResults = () => {
   const location = useLocation()
@@ -54,7 +55,7 @@ const SearchResults = () => {
           </h2>
           <p className={styles.suggestion}>
             Try searching for{" "}
-            <Link className={styles.suggest_link} to="/search-results?q=rails">
+            <Link to="/search-results?q=rails">
               Rails
             </Link>
           </p>

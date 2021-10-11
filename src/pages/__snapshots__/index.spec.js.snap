@@ -5,44 +5,33 @@ Object {
   "asFragment": [Function],
   "baseElement": <body>
     <div>
-      <div
-        class="container"
-      >
+      <div>
         <header
-          class="container"
           data-testid="header"
         >
           <a
             href="/"
           >
-            <div
-              class="logo"
-            >
-              <div
-                class="profileWrapper"
-              >
+            <div>
+              <div>
                 <img
                   alt="Profile"
-                  class="profileImg"
                   src="/images/profile.png"
                 />
               </div>
               <div
-                class="headerItem title"
+                class="undefined undefined"
               >
                 Daniela Baron
               </div>
             </div>
           </a>
           <nav
-            class="nav"
             data-testid="nav-menu"
           >
-            <ul
-              class="navList"
-            >
+            <ul>
               <li
-                class="headerItem navItem"
+                class="undefined undefined"
               >
                 <a
                   href="/blog"
@@ -51,7 +40,7 @@ Object {
                 </a>
               </li>
               <li
-                class="headerItem navItem"
+                class="undefined undefined"
               >
                 <a
                   href="/about"
@@ -62,84 +51,55 @@ Object {
             </ul>
           </nav>
         </header>
-        <div
-          class="content"
-        >
+        <div>
           <div />
-          <section
-            class="container"
-          >
+          <section>
             I'm a software engineer based in Toronto, Canada. My interests include fullstack development, test automation, personal finance, listening to podcasts, reading, building side projects, health and fitness, and always learning new things.
           </section>
           <section
-            class="container"
             data-testid="article-list"
           >
-            <article
-              class="container"
-            >
-              <div
-                class="subheader"
-              >
-                <div
-                  class="date"
-                >
+            <article>
+              <div>
+                <div>
                   July 2021
                 </div>
-                <div
-                  class="category"
-                >
+                <div>
                   Rails
                 </div>
               </div>
               <a
-                class="title"
                 href="/blog/some-slug"
               >
                 First Title
               </a>
-              <div
-                class="excerpt"
-              >
+              <div>
                 excerpt for first article
               </div>
               <a
-                class="read"
                 href="/blog/some-slug"
               >
                 Read
               </a>
             </article>
-            <article
-              class="container"
-            >
-              <div
-                class="subheader"
-              >
-                <div
-                  class="date"
-                >
+            <article>
+              <div>
+                <div>
                   August 2021
                 </div>
-                <div
-                  class="category"
-                >
+                <div>
                   Docker
                 </div>
               </div>
               <a
-                class="title"
                 href="/blog/some-other-slug"
               >
                 Second Title
               </a>
-              <div
-                class="excerpt"
-              >
+              <div>
                 excerpt for second article
               </div>
               <a
-                class="read"
                 href="/blog/some-other-slug"
               >
                 Read
@@ -151,7 +111,6 @@ Object {
             style="margin-top: 30px;"
           >
             <a
-              class="allLink"
               href="/blog"
             >
               All Articles
@@ -159,22 +118,14 @@ Object {
           </div>
         </div>
         <footer
-          class="container"
           data-testid="footer"
         >
-          <hr
-            class="sep"
-          />
-          <p
-            class="copy"
-          >
+          <hr />
+          <p>
             All materials © Daniela Baron 2021
           </p>
-          <div
-            class="social"
-          >
+          <div>
             <a
-              class="footerIcon"
               href="https://twitter.com/DanielaMBaron"
             >
               <svg
@@ -192,7 +143,6 @@ Object {
               </svg>
             </a>
             <a
-              class="footerIcon"
               href="https://github.com/danielabar"
             >
               <svg
@@ -210,7 +160,6 @@ Object {
               </svg>
             </a>
             <a
-              class="footerIcon"
               href="https://codepen.io/danielabar"
             >
               <svg
@@ -228,7 +177,6 @@ Object {
               </svg>
             </a>
             <a
-              class="footerIcon"
               href="https://www.linkedin.com/in/danielabaron/"
             >
               <svg
@@ -251,44 +199,33 @@ Object {
     </div>
   </body>,
   "container": <div>
-    <div
-      class="container"
-    >
+    <div>
       <header
-        class="container"
         data-testid="header"
       >
         <a
           href="/"
         >
-          <div
-            class="logo"
-          >
-            <div
-              class="profileWrapper"
-            >
+          <div>
+            <div>
               <img
                 alt="Profile"
-                class="profileImg"
                 src="/images/profile.png"
               />
             </div>
             <div
-              class="headerItem title"
+              class="undefined undefined"
             >
               Daniela Baron
             </div>
           </div>
         </a>
         <nav
-          class="nav"
           data-testid="nav-menu"
         >
-          <ul
-            class="navList"
-          >
+          <ul>
             <li
-              class="headerItem navItem"
+              class="undefined undefined"
             >
               <a
                 href="/blog"
@@ -297,7 +234,7 @@ Object {
               </a>
             </li>
             <li
-              class="headerItem navItem"
+              class="undefined undefined"
             >
               <a
                 href="/about"
@@ -308,84 +245,55 @@ Object {
           </ul>
         </nav>
       </header>
-      <div
-        class="content"
-      >
+      <div>
         <div />
-        <section
-          class="container"
-        >
+        <section>
           I'm a software engineer based in Toronto, Canada. My interests include fullstack development, test automation, personal finance, listening to podcasts, reading, building side projects, health and fitness, and always learning new things.
         </section>
         <section
-          class="container"
           data-testid="article-list"
         >
-          <article
-            class="container"
-          >
-            <div
-              class="subheader"
-            >
-              <div
-                class="date"
-              >
+          <article>
+            <div>
+              <div>
                 July 2021
               </div>
-              <div
-                class="category"
-              >
+              <div>
                 Rails
               </div>
             </div>
             <a
-              class="title"
               href="/blog/some-slug"
             >
               First Title
             </a>
-            <div
-              class="excerpt"
-            >
+            <div>
               excerpt for first article
             </div>
             <a
-              class="read"
               href="/blog/some-slug"
             >
               Read
             </a>
           </article>
-          <article
-            class="container"
-          >
-            <div
-              class="subheader"
-            >
-              <div
-                class="date"
-              >
+          <article>
+            <div>
+              <div>
                 August 2021
               </div>
-              <div
-                class="category"
-              >
+              <div>
                 Docker
               </div>
             </div>
             <a
-              class="title"
               href="/blog/some-other-slug"
             >
               Second Title
             </a>
-            <div
-              class="excerpt"
-            >
+            <div>
               excerpt for second article
             </div>
             <a
-              class="read"
               href="/blog/some-other-slug"
             >
               Read
@@ -397,7 +305,6 @@ Object {
           style="margin-top: 30px;"
         >
           <a
-            class="allLink"
             href="/blog"
           >
             All Articles
@@ -405,22 +312,14 @@ Object {
         </div>
       </div>
       <footer
-        class="container"
         data-testid="footer"
       >
-        <hr
-          class="sep"
-        />
-        <p
-          class="copy"
-        >
+        <hr />
+        <p>
           All materials © Daniela Baron 2021
         </p>
-        <div
-          class="social"
-        >
+        <div>
           <a
-            class="footerIcon"
             href="https://twitter.com/DanielaMBaron"
           >
             <svg
@@ -438,7 +337,6 @@ Object {
             </svg>
           </a>
           <a
-            class="footerIcon"
             href="https://github.com/danielabar"
           >
             <svg
@@ -456,7 +354,6 @@ Object {
             </svg>
           </a>
           <a
-            class="footerIcon"
             href="https://codepen.io/danielabar"
           >
             <svg
@@ -474,7 +371,6 @@ Object {
             </svg>
           </a>
           <a
-            class="footerIcon"
             href="https://www.linkedin.com/in/danielabaron/"
           >
             <svg

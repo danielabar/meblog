@@ -1,8 +1,8 @@
 import React from "react"
 import { Link } from "gatsby"
-import styles from "./article.module.css"
+import * as styles from "./article.module.css"
 
-export default props => (
+const Article = (props) => (
   <article className={styles.container}>
     <div className={styles.subheader}>
       <div className={styles.date}>{props.date}</div>
@@ -17,3 +17,5 @@ export default props => (
     </Link>
   </article>
 )
+
+export default Article

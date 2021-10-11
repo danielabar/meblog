@@ -5,44 +5,33 @@ Object {
   "asFragment": [Function],
   "baseElement": <body>
     <div>
-      <div
-        class="container"
-      >
+      <div>
         <header
-          class="container"
           data-testid="header"
         >
           <a
             href="/"
           >
-            <div
-              class="logo"
-            >
-              <div
-                class="profileWrapper"
-              >
+            <div>
+              <div>
                 <img
                   alt="Profile"
-                  class="profileImg"
                   src="/images/profile.png"
                 />
               </div>
               <div
-                class="headerItem title"
+                class="undefined undefined"
               >
                 Daniela Baron
               </div>
             </div>
           </a>
           <nav
-            class="nav"
             data-testid="nav-menu"
           >
-            <ul
-              class="navList"
-            >
+            <ul>
               <li
-                class="headerItem navItem"
+                class="undefined undefined"
               >
                 <a
                   href="/blog"
@@ -51,7 +40,7 @@ Object {
                 </a>
               </li>
               <li
-                class="headerItem navItem"
+                class="undefined undefined"
               >
                 <a
                   href="/about"
@@ -62,59 +51,63 @@ Object {
             </ul>
           </nav>
         </header>
-        <div
-          class="content"
-        >
+        <div>
           <div />
-          <div
-            class="container"
-          >
-            <h1
-              class="title"
-            >
+          <div>
+            <h1>
               This is the title
             </h1>
-            <div
-              class="published"
-            >
+            <div>
               Published 
               14 Aug 2021
             </div>
             <div
-              class="featureImage gatsby-image-wrapper"
-              style="position: relative; overflow: hidden;"
+              class="gatsby-image-wrapper gatsby-image-wrapper-constrained"
+              data-gatsby-image-wrapper=""
+              style="position: relative; overflow: hidden; display: inline-block; vertical-align: top;"
             >
               <div
+                style="max-width: 800px; display: block;"
+              >
+                <img
+                  alt=""
+                  aria-hidden="true"
+                  role="presentation"
+                  src="data:image/svg+xml;charset=utf-8,%3Csvg height='600' width='800' xmlns='http://www.w3.org/2000/svg' version='1.1'%3E%3C/svg%3E"
+                  style="max-width: 100%; display: block; position: static;"
+                />
+              </div>
+              <div
                 aria-hidden="true"
-                style="width: 100%; padding-bottom: 66.66666666666667%;"
-              />
-              <img
-                alt=""
-                aria-hidden="true"
-                src="data:image/jpeg;base64,/9j/2wBDABALDA4MChAODQ4SERATGCgaGBYWGDEjJR0oOjM9PDkzODdASFxOQERXRTc4UG1RV19iZ2hnPk1xeXBkeFxlZ2P/2wBDARESEhgVGC8aGi9jQjhCY2NjY2NjY2NjY2NjY2NjY2NjY2NjY2NjY2NjY2NjY2NjY2NjY2NjY2NjY2NjY2NjY2P/wgARCAANABQDASIAAhEBAxEB/8QAFwAAAwEAAAAAAAAAAAAAAAAAAAMEAv/EABQBAQAAAAAAAAAAAAAAAAAAAAL/2gAMAwEAAhADEAAAAbLMIDWWDH//xAAZEAEAAwEBAAAAAAAAAAAAAAACAQMRAAT/2gAIAQEAAQUCpsaSickW9kCvzrTvf//EABcRAQADAAAAAAAAAAAAAAAAAAECEBL/2gAIAQMBAT8BBY6r/8QAFhEBAQEAAAAAAAAAAAAAAAAAARBB/9oACAECAQE/ARyf/8QAGRAAAgMBAAAAAAAAAAAAAAAAASEAEBFh/9oACAEBAAY/Am4qOQ8Nf//EABoQAQADAQEBAAAAAAAAAAAAAAEAESFBMWH/2gAIAQEAAT8hpQR3PIinUa418GNExwsHc//aAAwDAQACAAMAAAAQ29//xAAXEQADAQAAAAAAAAAAAAAAAAAAAREx/9oACAEDAQE/EGjMKz//xAAXEQEBAQEAAAAAAAAAAAAAAAABACFB/9oACAECAQE/EEEfbL//xAAbEAEAAwEAAwAAAAAAAAAAAAABABEhMUFRcf/aAAgBAQABPxAYh+A+WMOmHaonHkABgQjqKXXdzsT9cBX2Rjif/9k="
-                style="position: absolute; top: 0px; left: 0px; width: 100%; height: 100%; object-fit: cover; object-position: center; opacity: 1; transition-delay: 500ms;"
+                data-placeholder-image=""
+                style="height: 100%; left: 0px; position: absolute; top: 0px; width: 100%;"
               />
               <picture>
                 <source
-                  sizes="(max-width: 800px) 100vw, 800px"
-                  srcset="/static/69f6b56407e655dd690ba4b363161733/f836f/faraday-alex-kondratiev-H9t723yPjYI-unsplash.jpg 200w, /static/69f6b56407e655dd690ba4b363161733/2244e/faraday-alex-kondratiev-H9t723yPjYI-unsplash.jpg 400w, /static/69f6b56407e655dd690ba4b363161733/14b42/faraday-alex-kondratiev-H9t723yPjYI-unsplash.jpg 800w, /static/69f6b56407e655dd690ba4b363161733/a7715/faraday-alex-kondratiev-H9t723yPjYI-unsplash.jpg 1000w"
+                  data-srcset="/static/41cac534f5048f26531ee516516637b1/b5535/python-interview-question.webp 200w,/static/41cac534f5048f26531ee516516637b1/f5c71/python-interview-question.webp 400w,/static/41cac534f5048f26531ee516516637b1/0d27e/python-interview-question.webp 800w"
+                  sizes="(min-width: 800px) 800px, 100vw"
+                  type="image/webp"
                 />
                 <img
-                  alt=""
+                  alt="This is a description"
+                  data-gatsby-image-ssr=""
+                  data-main-image=""
+                  data-src="/static/41cac534f5048f26531ee516516637b1/d0b9c/python-interview-question.jpg"
+                  data-srcset="/static/41cac534f5048f26531ee516516637b1/90ed1/python-interview-question.jpg 200w,/static/41cac534f5048f26531ee516516637b1/2070e/python-interview-question.jpg 400w,/static/41cac534f5048f26531ee516516637b1/d0b9c/python-interview-question.jpg 800w"
+                  decoding="async"
                   loading="lazy"
-                  sizes="(max-width: 800px) 100vw, 800px"
-                  src="/static/69f6b56407e655dd690ba4b363161733/14b42/faraday-alex-kondratiev-H9t723yPjYI-unsplash.jpg"
-                  srcset="/static/69f6b56407e655dd690ba4b363161733/f836f/faraday-alex-kondratiev-H9t723yPjYI-unsplash.jpg 200w, /static/69f6b56407e655dd690ba4b363161733/2244e/faraday-alex-kondratiev-H9t723yPjYI-unsplash.jpg 400w, /static/69f6b56407e655dd690ba4b363161733/14b42/faraday-alex-kondratiev-H9t723yPjYI-unsplash.jpg 800w, /static/69f6b56407e655dd690ba4b363161733/a7715/faraday-alex-kondratiev-H9t723yPjYI-unsplash.jpg 1000w"
-                  style="position: absolute; top: 0px; left: 0px; width: 100%; height: 100%; object-fit: cover; object-position: center; opacity: 0; transition: opacity 500ms;"
+                  sizes="(min-width: 800px) 800px, 100vw"
+                  style="height: 100%; left: 0px; position: absolute; top: 0px; transform: translateZ(0); transition: opacity 250ms linear; width: 100%; will-change: opacity; opacity: 0;"
                 />
               </picture>
-              <noscript>
-                &lt;picture&gt;&lt;source srcset="/static/69f6b56407e655dd690ba4b363161733/f836f/faraday-alex-kondratiev-H9t723yPjYI-unsplash.jpg 200w, /static/69f6b56407e655dd690ba4b363161733/2244e/faraday-alex-kondratiev-H9t723yPjYI-unsplash.jpg 400w, /static/69f6b56407e655dd690ba4b363161733/14b42/faraday-alex-kondratiev-H9t723yPjYI-unsplash.jpg 800w, /static/69f6b56407e655dd690ba4b363161733/a7715/faraday-alex-kondratiev-H9t723yPjYI-unsplash.jpg 1000w" sizes="(max-width: 800px) 100vw, 800px" /&gt;&lt;img loading="lazy" sizes="(max-width: 800px) 100vw, 800px" srcset="/static/69f6b56407e655dd690ba4b363161733/f836f/faraday-alex-kondratiev-H9t723yPjYI-unsplash.jpg 200w, /static/69f6b56407e655dd690ba4b363161733/2244e/faraday-alex-kondratiev-H9t723yPjYI-unsplash.jpg 400w, /static/69f6b56407e655dd690ba4b363161733/14b42/faraday-alex-kondratiev-H9t723yPjYI-unsplash.jpg 800w, /static/69f6b56407e655dd690ba4b363161733/a7715/faraday-alex-kondratiev-H9t723yPjYI-unsplash.jpg 1000w" src="/static/69f6b56407e655dd690ba4b363161733/14b42/faraday-alex-kondratiev-H9t723yPjYI-unsplash.jpg" alt="" style="position:absolute;top:0;left:0;opacity:1;width:100%;height:100%;object-fit:cover;object-position:center"/&gt;&lt;/picture&gt;
-              </noscript>
+              <noscript />
+              <script
+                type="module"
+              >
+                const t="undefined"!=typeof HTMLImageElement&&"loading"in HTMLImageElement.prototype;if(t){const t=document.querySelectorAll("img[data-main-image]");for(let e of t){e.dataset.src&&(e.setAttribute("src",e.dataset.src),e.removeAttribute("data-src")),e.dataset.srcset&&(e.setAttribute("srcset",e.dataset.srcset),e.removeAttribute("data-srcset"));const t=e.parentNode.querySelectorAll("source[data-srcset]");for(let e of t)e.setAttribute("srcset",e.dataset.srcset),e.removeAttribute("data-srcset");e.complete&&(e.style.opacity=1)}}
+              </script>
             </div>
-            <div
-              class="content"
-            >
+            <div>
               <p>
                 Here is the first paragraph
               </p>
@@ -131,7 +124,6 @@ Object {
             style="margin-top: 60px;"
           >
             <a
-              class="allLink"
               href="/blog"
             >
               All Articles
@@ -139,22 +131,14 @@ Object {
           </div>
         </div>
         <footer
-          class="container"
           data-testid="footer"
         >
-          <hr
-            class="sep"
-          />
-          <p
-            class="copy"
-          >
+          <hr />
+          <p>
             All materials © Daniela Baron 2021
           </p>
-          <div
-            class="social"
-          >
+          <div>
             <a
-              class="footerIcon"
               href="https://twitter.com/DanielaMBaron"
             >
               <svg
@@ -172,7 +156,6 @@ Object {
               </svg>
             </a>
             <a
-              class="footerIcon"
               href="https://github.com/danielabar"
             >
               <svg
@@ -190,7 +173,6 @@ Object {
               </svg>
             </a>
             <a
-              class="footerIcon"
               href="https://codepen.io/danielabar"
             >
               <svg
@@ -208,7 +190,6 @@ Object {
               </svg>
             </a>
             <a
-              class="footerIcon"
               href="https://www.linkedin.com/in/danielabaron/"
             >
               <svg
@@ -231,44 +212,33 @@ Object {
     </div>
   </body>,
   "container": <div>
-    <div
-      class="container"
-    >
+    <div>
       <header
-        class="container"
         data-testid="header"
       >
         <a
           href="/"
         >
-          <div
-            class="logo"
-          >
-            <div
-              class="profileWrapper"
-            >
+          <div>
+            <div>
               <img
                 alt="Profile"
-                class="profileImg"
                 src="/images/profile.png"
               />
             </div>
             <div
-              class="headerItem title"
+              class="undefined undefined"
             >
               Daniela Baron
             </div>
           </div>
         </a>
         <nav
-          class="nav"
           data-testid="nav-menu"
         >
-          <ul
-            class="navList"
-          >
+          <ul>
             <li
-              class="headerItem navItem"
+              class="undefined undefined"
             >
               <a
                 href="/blog"
@@ -277,7 +247,7 @@ Object {
               </a>
             </li>
             <li
-              class="headerItem navItem"
+              class="undefined undefined"
             >
               <a
                 href="/about"
@@ -288,59 +258,63 @@ Object {
           </ul>
         </nav>
       </header>
-      <div
-        class="content"
-      >
+      <div>
         <div />
-        <div
-          class="container"
-        >
-          <h1
-            class="title"
-          >
+        <div>
+          <h1>
             This is the title
           </h1>
-          <div
-            class="published"
-          >
+          <div>
             Published 
             14 Aug 2021
           </div>
           <div
-            class="featureImage gatsby-image-wrapper"
-            style="position: relative; overflow: hidden;"
+            class="gatsby-image-wrapper gatsby-image-wrapper-constrained"
+            data-gatsby-image-wrapper=""
+            style="position: relative; overflow: hidden; display: inline-block; vertical-align: top;"
           >
             <div
+              style="max-width: 800px; display: block;"
+            >
+              <img
+                alt=""
+                aria-hidden="true"
+                role="presentation"
+                src="data:image/svg+xml;charset=utf-8,%3Csvg height='600' width='800' xmlns='http://www.w3.org/2000/svg' version='1.1'%3E%3C/svg%3E"
+                style="max-width: 100%; display: block; position: static;"
+              />
+            </div>
+            <div
               aria-hidden="true"
-              style="width: 100%; padding-bottom: 66.66666666666667%;"
-            />
-            <img
-              alt=""
-              aria-hidden="true"
-              src="data:image/jpeg;base64,/9j/2wBDABALDA4MChAODQ4SERATGCgaGBYWGDEjJR0oOjM9PDkzODdASFxOQERXRTc4UG1RV19iZ2hnPk1xeXBkeFxlZ2P/2wBDARESEhgVGC8aGi9jQjhCY2NjY2NjY2NjY2NjY2NjY2NjY2NjY2NjY2NjY2NjY2NjY2NjY2NjY2NjY2NjY2NjY2P/wgARCAANABQDASIAAhEBAxEB/8QAFwAAAwEAAAAAAAAAAAAAAAAAAAMEAv/EABQBAQAAAAAAAAAAAAAAAAAAAAL/2gAMAwEAAhADEAAAAbLMIDWWDH//xAAZEAEAAwEBAAAAAAAAAAAAAAACAQMRAAT/2gAIAQEAAQUCpsaSickW9kCvzrTvf//EABcRAQADAAAAAAAAAAAAAAAAAAECEBL/2gAIAQMBAT8BBY6r/8QAFhEBAQEAAAAAAAAAAAAAAAAAARBB/9oACAECAQE/ARyf/8QAGRAAAgMBAAAAAAAAAAAAAAAAASEAEBFh/9oACAEBAAY/Am4qOQ8Nf//EABoQAQADAQEBAAAAAAAAAAAAAAEAESFBMWH/2gAIAQEAAT8hpQR3PIinUa418GNExwsHc//aAAwDAQACAAMAAAAQ29//xAAXEQADAQAAAAAAAAAAAAAAAAAAAREx/9oACAEDAQE/EGjMKz//xAAXEQEBAQEAAAAAAAAAAAAAAAABACFB/9oACAECAQE/EEEfbL//xAAbEAEAAwEAAwAAAAAAAAAAAAABABEhMUFRcf/aAAgBAQABPxAYh+A+WMOmHaonHkABgQjqKXXdzsT9cBX2Rjif/9k="
-              style="position: absolute; top: 0px; left: 0px; width: 100%; height: 100%; object-fit: cover; object-position: center; opacity: 1; transition-delay: 500ms;"
+              data-placeholder-image=""
+              style="height: 100%; left: 0px; position: absolute; top: 0px; width: 100%;"
             />
             <picture>
               <source
-                sizes="(max-width: 800px) 100vw, 800px"
-                srcset="/static/69f6b56407e655dd690ba4b363161733/f836f/faraday-alex-kondratiev-H9t723yPjYI-unsplash.jpg 200w, /static/69f6b56407e655dd690ba4b363161733/2244e/faraday-alex-kondratiev-H9t723yPjYI-unsplash.jpg 400w, /static/69f6b56407e655dd690ba4b363161733/14b42/faraday-alex-kondratiev-H9t723yPjYI-unsplash.jpg 800w, /static/69f6b56407e655dd690ba4b363161733/a7715/faraday-alex-kondratiev-H9t723yPjYI-unsplash.jpg 1000w"
+                data-srcset="/static/41cac534f5048f26531ee516516637b1/b5535/python-interview-question.webp 200w,/static/41cac534f5048f26531ee516516637b1/f5c71/python-interview-question.webp 400w,/static/41cac534f5048f26531ee516516637b1/0d27e/python-interview-question.webp 800w"
+                sizes="(min-width: 800px) 800px, 100vw"
+                type="image/webp"
               />
               <img
-                alt=""
+                alt="This is a description"
+                data-gatsby-image-ssr=""
+                data-main-image=""
+                data-src="/static/41cac534f5048f26531ee516516637b1/d0b9c/python-interview-question.jpg"
+                data-srcset="/static/41cac534f5048f26531ee516516637b1/90ed1/python-interview-question.jpg 200w,/static/41cac534f5048f26531ee516516637b1/2070e/python-interview-question.jpg 400w,/static/41cac534f5048f26531ee516516637b1/d0b9c/python-interview-question.jpg 800w"
+                decoding="async"
                 loading="lazy"
-                sizes="(max-width: 800px) 100vw, 800px"
-                src="/static/69f6b56407e655dd690ba4b363161733/14b42/faraday-alex-kondratiev-H9t723yPjYI-unsplash.jpg"
-                srcset="/static/69f6b56407e655dd690ba4b363161733/f836f/faraday-alex-kondratiev-H9t723yPjYI-unsplash.jpg 200w, /static/69f6b56407e655dd690ba4b363161733/2244e/faraday-alex-kondratiev-H9t723yPjYI-unsplash.jpg 400w, /static/69f6b56407e655dd690ba4b363161733/14b42/faraday-alex-kondratiev-H9t723yPjYI-unsplash.jpg 800w, /static/69f6b56407e655dd690ba4b363161733/a7715/faraday-alex-kondratiev-H9t723yPjYI-unsplash.jpg 1000w"
-                style="position: absolute; top: 0px; left: 0px; width: 100%; height: 100%; object-fit: cover; object-position: center; opacity: 0; transition: opacity 500ms;"
+                sizes="(min-width: 800px) 800px, 100vw"
+                style="height: 100%; left: 0px; position: absolute; top: 0px; transform: translateZ(0); transition: opacity 250ms linear; width: 100%; will-change: opacity; opacity: 0;"
               />
             </picture>
-            <noscript>
-              &lt;picture&gt;&lt;source srcset="/static/69f6b56407e655dd690ba4b363161733/f836f/faraday-alex-kondratiev-H9t723yPjYI-unsplash.jpg 200w, /static/69f6b56407e655dd690ba4b363161733/2244e/faraday-alex-kondratiev-H9t723yPjYI-unsplash.jpg 400w, /static/69f6b56407e655dd690ba4b363161733/14b42/faraday-alex-kondratiev-H9t723yPjYI-unsplash.jpg 800w, /static/69f6b56407e655dd690ba4b363161733/a7715/faraday-alex-kondratiev-H9t723yPjYI-unsplash.jpg 1000w" sizes="(max-width: 800px) 100vw, 800px" /&gt;&lt;img loading="lazy" sizes="(max-width: 800px) 100vw, 800px" srcset="/static/69f6b56407e655dd690ba4b363161733/f836f/faraday-alex-kondratiev-H9t723yPjYI-unsplash.jpg 200w, /static/69f6b56407e655dd690ba4b363161733/2244e/faraday-alex-kondratiev-H9t723yPjYI-unsplash.jpg 400w, /static/69f6b56407e655dd690ba4b363161733/14b42/faraday-alex-kondratiev-H9t723yPjYI-unsplash.jpg 800w, /static/69f6b56407e655dd690ba4b363161733/a7715/faraday-alex-kondratiev-H9t723yPjYI-unsplash.jpg 1000w" src="/static/69f6b56407e655dd690ba4b363161733/14b42/faraday-alex-kondratiev-H9t723yPjYI-unsplash.jpg" alt="" style="position:absolute;top:0;left:0;opacity:1;width:100%;height:100%;object-fit:cover;object-position:center"/&gt;&lt;/picture&gt;
-            </noscript>
+            <noscript />
+            <script
+              type="module"
+            >
+              const t="undefined"!=typeof HTMLImageElement&&"loading"in HTMLImageElement.prototype;if(t){const t=document.querySelectorAll("img[data-main-image]");for(let e of t){e.dataset.src&&(e.setAttribute("src",e.dataset.src),e.removeAttribute("data-src")),e.dataset.srcset&&(e.setAttribute("srcset",e.dataset.srcset),e.removeAttribute("data-srcset"));const t=e.parentNode.querySelectorAll("source[data-srcset]");for(let e of t)e.setAttribute("srcset",e.dataset.srcset),e.removeAttribute("data-srcset");e.complete&&(e.style.opacity=1)}}
+            </script>
           </div>
-          <div
-            class="content"
-          >
+          <div>
             <p>
               Here is the first paragraph
             </p>
@@ -357,7 +331,6 @@ Object {
           style="margin-top: 60px;"
         >
           <a
-            class="allLink"
             href="/blog"
           >
             All Articles
@@ -365,22 +338,14 @@ Object {
         </div>
       </div>
       <footer
-        class="container"
         data-testid="footer"
       >
-        <hr
-          class="sep"
-        />
-        <p
-          class="copy"
-        >
+        <hr />
+        <p>
           All materials © Daniela Baron 2021
         </p>
-        <div
-          class="social"
-        >
+        <div>
           <a
-            class="footerIcon"
             href="https://twitter.com/DanielaMBaron"
           >
             <svg
@@ -398,7 +363,6 @@ Object {
             </svg>
           </a>
           <a
-            class="footerIcon"
             href="https://github.com/danielabar"
           >
             <svg
@@ -416,7 +380,6 @@ Object {
             </svg>
           </a>
           <a
-            class="footerIcon"
             href="https://codepen.io/danielabar"
           >
             <svg
@@ -434,7 +397,6 @@ Object {
             </svg>
           </a>
           <a
-            class="footerIcon"
             href="https://www.linkedin.com/in/danielabaron/"
           >
             <svg
