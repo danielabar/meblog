@@ -34,15 +34,17 @@ Next step in building a pipeline is to choose a tool to perform the actions that
 
 For side projects, I used to reach for Travis or Circle CI, but ever since the introduction of [Github Actions](https://github.com/features/actions), that has become my go to solution for any automation required on Github projects. It's a nice choice because it integrates with Github seamlessly, (as it's built by the same company) and there's no need to authorize a third party application to your Github account.
 
+The remainder of this post assumes some working knowledge of Github Actions, if you haven't used it before, checkout the [Quickstart Guide](https://docs.github.com/en/actions/quickstart).
+
 ## Continuous Integration
 
 Let's start with the "CI" part of the process. This should run on every commit, every branch, to ensure the site can build and the tests are passing. This is to provide feedback as early as possible if a bug has been introduced.
 
 To get this going with Github Actions, add a `.github/workflows` directory in the root of your project. Then add a file named `ci.yml` in this directory. It can be named anything, just choose a name that is descriptive as to what this workflow does.
 
-Since this workflow should run on every branch and every commit that gets pushed, the `on: :push` trigger will be used. Workflows run on Github Action runners (specified in the `runs-on` instruction). Keep in mind that unlike a local development environment, these are starting "fresh" each time. This means any dependencies needed by the site such as Node.js and npm packages defined in `package.json` will not be available and need to be installed.
+Since this workflow should run on every branch and every commit that gets pushed, the `on: push` trigger will be used. Workflows run on Github Action runners (specified in the `runs-on` instruction). Keep in mind that unlike a local development environment, these are starting "fresh" each time. This means any dependencies needed by the site such as Node.js and npm packages defined in `package.json` will need to be installed.
 
-Here is an example continuous integration workflow with annotations to explain each step. Steps with `uses` are referring to pre-built actions that are available in the [Actions Marketplace](https://github.com/marketplace?type=actions). The other steps are running commands exactly as specified on the runner machine:
+Here is the continuous integration workflow used on this blog, with annotations to explain each step. Steps with `uses` are referring to pre-built actions that are available in the [Actions Marketplace](https://github.com/marketplace?type=actions). The other steps are running commands exactly as specified on the runner machine:
 
 ```yml
 # .github/workflows/ci.yml
@@ -51,11 +53,14 @@ name: CI
 # Run this workflow on any push to any branch.
 on: push
 
+# A workflow can have one or more jobs.
 jobs:
+  # This workflow has just a single job named `ci`.
   ci:
-    # Run this workflow on a Github hosted action runner with the latest version of ubuntu installed.
+    # Run this job on a Github hosted action runner with the latest version of ubuntu installed.
     runs-on: ubuntu-latest
 
+    # A job has one or more steps.
     steps:
       # Checkout the project source files to the Github Action runner.
       # This is roughly equivalent to running `git checkout`.
@@ -80,4 +85,75 @@ jobs:
       # Run the Jest unit tests and generate a coverage report.
       - name: test
         run: npm test -- --coverage
+```
+
+## Continuous Deployment
+
+This part needs careful consideration because it will deploy new code to production. The first thing to think about is *when* should it run. Clearly the simple `on: push` trigger used for the CI workflow would not be suitable as we don't want just any work-in-progress branch getting deployed.
+
+One solution is to use a trigger filter to limit which branches a workflow will run on. For example, to indicate that a given workflow should only run when commits are pushed to the `main` branch:
+
+```yml
+# .github/workflows/cd.yml
+name: CD
+
+on:
+  push:
+    branches:
+      - main
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    steps:
+      # steps to build and deploy the site...
+```
+
+Given that the only way code should get pushed to `main` is when an approved PR (Pull Request) is merged (either via merge commit or squash & merge), the above workflow trigger would ensure that a deploy only goes out when a PR is merged.
+
+<aside>
+Preventing direct pushes to the default branch can be controlled using Github's <a href="https://docs.github.com/en/repositories/configuring-branches-and-merges-in-your-repository/defining-the-mergeability-of-pull-requests/managing-a-branch-protection-rule">branch protection rules</a>.
+</aside>
+
+However, even if the project is configured to not allow commits to be pushed directly to `main`, there's still a problem. What if the tests fail on `main` as a result of the merge commit (or squash/merge) from the PR? Recall that since the CI workflow has trigger `on: push`, it will also run when a PR gets merged to `main`. Even though the tests would have run on the branch that got merged, there's a chance that something goes wrong as a result of the merge and tests fail on `main`. In this case, the deploy should not run.
+
+So what we want to express is: "Only run this workflow on the main branch, and *after* continuous integration has completed successfully on the main branch." The way to express this with Github Actions is to use the [workflow_run](https://docs.github.com/en/actions/learn-github-actions/events-that-trigger-workflows#workflow_run) trigger, which allows one workflow to be dependent on another.
+
+For example, to indicate that the CD workflow should only run on the `main` branch, after the CI workflow has completed:
+
+```yml
+# .github/workflows/cd.yml
+name: CD
+
+on:
+  workflow_run:
+    workflows: ["CI"]
+    branches: [master]
+    types: [completed]
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    steps:
+      # steps to build and deploy the site...
+```
+
+However, there's still one more complication to deal with, `completed` just means the workflow finished, it does not mean it was successful. Unfortunately, there's no `type` keyword to indicate completed successfully, however, the result of the workflow run is available in the github context and can be used in an `if` expression as follows:
+
+```yml
+# .github/workflows/cd.yml
+name: CD
+
+on:
+  workflow_run:
+    workflows: ["CI"]
+    branches: [master]
+    types: [completed]
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    if: ${{ github.event.workflow_run.conclusion == 'success' }}
+    steps:
+      # steps to build and deploy the site...
 ```
