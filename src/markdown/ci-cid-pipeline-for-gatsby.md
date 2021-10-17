@@ -1,6 +1,6 @@
 ---
 title: "Build a CI/CD Pipeline for a Gatsby Site"
-featuredImage: "../images/ci-cd-pipeline-gatsby-possessed-photography-dRMQiAubdws-unsplash.jpg"
+featuredImage: "../images/ci-cd-pipeline-gatsby-ej-strat-VjWi56AWQ9k-unsplash.jpg"
 description: "Learn how to build a continuous integration and deployment pipeline for a Gatsby site to save time and manual effort."
 date: "2021-10-24"
 category: "gatsby"
