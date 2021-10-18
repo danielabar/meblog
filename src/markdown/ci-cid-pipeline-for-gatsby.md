@@ -6,15 +6,13 @@ date: "2021-10-24"
 category: "gatsby"
 ---
 
-This post will walk through how to set up a CI/CD (Continuous Integration and Continuous Deployment) pipeline for a Gatsby site. But first, why would you want to do this?
-
-This blog is built with Gatsby, with the posts being written in Markdown, and deployed to static Github Pages. A relatively simple workflow, and yet, it was taking some non-trivial amount of time and manual effort to publish each article as it was ready, which I was starting to dread. After all, once an article is finished, there's a sense of "phew, got that done, time to share it with the world", but going through manual effort to deploy is no fun.
-
-This is where a CI/CD pipeline can step in to save the day. [Wikipedia](https://en.wikipedia.org/wiki/CI/CD) defines this as:
+This post will walk through how to set up a CI/CD (Continuous Integration and Continuous Deployment) pipeline for a Gatsby site. Let's start with a definition from [Wikipedia](https://en.wikipedia.org/wiki/CI/CD):
 
 > In software engineering, CI/CD is the combined practices of continuous integration (CI) and either continuous delivery or continuous deployment (CD). CI/CD bridges the gaps between development and operation activities and teams by enforcing automation in building, testing and deployment of applications.
 
-The idea is to automate all the steps that are currently being done manually and trigger this automation at an appropriate point in the workflow, such as when a branch gets merged to the main line. Often, the initial effort to setup this automation will be greater than the amount of time it takes to do one or even several manual deploys. However, over time, the automation wins out. Think of this as an investment of your time now, to save time in the future.
+Why would something like this be needed for a blog? This blog is built with Gatsby, with the posts being written in Markdown, and deployed to static [Github Pages](https://guides.github.com/features/pages/). A relatively simple workflow, and yet, it takes some non-trivial amount of time and manual effort to publish each article as it's ready. Once an article is finished, there's a sense of "phew, got that done, time to share it with the world", but going through manual effort to deploy is no fun.
+
+This is where a CI/CD pipeline can save the day. The idea is to automate all the steps that are currently being done manually and trigger this automation at an appropriate point in the workflow, such as when a branch gets merged to the main line. Often, the initial effort to setup this automation will be greater than the amount of time it takes to do one or even several manual deploys. However, over time, the automation wins out. Think of this as an investment of your time now, to save time in the future.
 
 ## Identify the Steps
 
@@ -25,8 +23,8 @@ First part in building an automated pipeline is to identify the steps that are c
 3. Run the [unit tests](../gatsby-unit-testing) and make sure the entire suite is passing. (Even though the tests were run on the branch when writing the article, it's critical to run them after merging in case a bug gets introduced as a result of the merge).
 4. If the tests fail, stop and investigate. The remaining steps should *only* be performed if the tests pass.
 5. Run the production Gatsby build to generate the optimized bundles for serving the production site.
-6. Ingest the markdown content as documents to the [search service](../roll-your-own-search-service-for-gatsby-part5).
-7. Deploy the production build to Github Pages.
+6. Deploy the production build to Github Pages.
+7. Ingest the markdown content as documents to the [search service](../roll-your-own-search-service-for-gatsby-part5).
 
 ## Choose an Automation Tool
 
@@ -87,7 +85,7 @@ jobs:
         run: npm test -- --coverage
 ```
 
-## Continuous Deployment
+## Continuous Deployment: When
 
 This part needs careful consideration because it will deploy new code to production. The first thing to think about is *when* should it run. Clearly the simple `on: push` trigger used for the CI workflow would not be suitable as we don't want just any work-in-progress branch getting deployed.
 
@@ -138,7 +136,7 @@ jobs:
       # steps to build and deploy the site...
 ```
 
-However, there's still one more complication to deal with, `completed` just means the workflow finished, it does not mean it was successful. Unfortunately, there's no `type` keyword to indicate completed successfully, however, the result of the workflow run is available in the github context and can be used in an `if` expression as follows:
+However, there's still one more complication to deal with, `completed` just means the workflow finished, it does not mean it was successful. Unfortunately, there's no `type` keyword to indicate completed successfully, however, the result of the workflow run is available in the [github context](https://docs.github.com/en/actions/learn-github-actions/contexts) and can be used in an `if` expression as follows:
 
 ```yml
 # .github/workflows/cd.yml
@@ -157,3 +155,100 @@ jobs:
     steps:
       # steps to build and deploy the site...
 ```
+
+## Continuous Deployment: Steps
+
+Now that the "when" part of continuous deployment has been defined, it's time to automate it by scripting all the manual steps into the workflow file. For this blog, it needs some of the same steps as CI (checkout out project source, installing dependencies and running the production build), and then it needs a few other specific steps including generating an `.env` file for production, deploying to Github Pages, and finally ingesting the markdown documents to a [search service](../roll-your-own-search-service-for-gatsby-part5).
+
+Here is the workflow file containing all these steps, with annotations:
+
+```yml
+# .github/workflows/cd.yml
+name: CD
+
+# Run on main branch after CI workflow has completed on main.
+on:
+  workflow_run:
+    workflows: ["CI"]
+    branches: [main]
+    types: [completed]
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    # Only go ahead with the job if CI completed successfully (i.e. tests passed).
+    if: ${{ github.event.workflow_run.conclusion == 'success' }}
+    steps:
+      # Checkout project source
+      - name: Checkout source
+        uses: actions/checkout@v1
+
+      # Install Node.js dependency
+      - name: Setup node
+        uses: actions/setup-node@v2
+        with:
+          node-version: "14"
+          cache: "npm"
+
+      # Install package.json dependencies
+      - name: Install
+        run: npm install
+
+      # A simple bash script to generate the .env file from repository secrets.
+      # This is to avoid hard-coding urls for services such as analytics and search.
+      # For production, its important to run this step BEFORE building the site because
+      # its a static site, and so environment variables are used at build time rather
+      # than run time.
+      - name: Generate prod env file
+        env:
+          HELLO_URL: ${{ secrets.HELLO_URL }}
+          SEARCH_URL: ${{ secrets.SEARCH_URL }}
+          SEARCH_ENABLED: ${{ secrets.SEARCH_ENABLED }}
+        run: |
+          touch .env.production
+          echo HELLO_URL="$HELLO_URL" >> .env.production
+          echo SEARCH_URL="$SEARCH_URL" >> .env.production
+          echo SEARCH_ENABLED="$SEARCH_ENABLED" >> .env.production
+        shell: bash
+
+      # Run the production build - this runs: gatsby build
+      # which generates the "public" directory containing the entire site.
+      - name: Build
+        run: npm run build
+
+      # Use a community action from the Actions Marketplace to deploy
+      # the "public" directory generated by the build to Github Pages.
+      - name: Deploy to Github Pages
+        uses: peaceiris/actions-gh-pages@v3
+        with:
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+          publish_dir: ./public
+
+      # Finally, ingest the search.sql file (also generated by the build)
+      # into the Heroku database for the application hosting the search service.
+      - name: Ingest search docs
+        env:
+          HEROKU_APP_NAME: ${{ secrets.HEROKU_APP_NAME }}
+          HEROKU_API_KEY: ${{ secrets.HEROKU_API_KEY }}
+        run: |
+          HEROKU_API_KEY=$HEROKU_API_KEY cat search.sql | heroku pg:psql --app $HEROKU_APP_NAME
+        shell: bash
+```
+
+Of course your Gatsby site may have some different details. For example, instead of using a custom search service hosted on Heroku, it may be using a commercial service such as Algolia. In that case, it would require researching what are the automation steps to update the search index on Algolia. Or if the site is hosted somewhere other than Github Pages, for example Netlify, it would require some some [automation](https://github.com/netlify/actions) specific to that platform.
+
+## Conclusion
+
+This post has walked through how to think about the process of CI/CD for a Gatsby site. It begins by writing down the current list of manual tasks, figuring out which of these steps need to run when, and setting up Github Action workflows to automate them. It also explained how to use the `workflow_run` trigger to make one workflow dependent on the success of another. I hope this will serve as an inspiration for others to automate some manual tasks they may be doing on their projects.
+
+## Related Content
+
+The following section contains affiliate links for related content you may find useful. I get a small commission from purchases which helps me maintain this site.
+
+Working on a large legacy code base? This book [Working Effectively with Legacy Code](https://amzn.to/3accwHF) is a must read.
+
+Martin Fowler's [Refactoring: Improving the Design of Existing Code](https://amzn.to/2RFC0Xn) is also amazingly useful on this topic.
+
+Is your organization introducing microservices? This book [Building Event-Driven Microservices: Leveraging Organizational Data at Scale](https://amzn.to/3uSxa87) is a fantastic resource on this topic.
+
+Looking to level up on Rails 6? You might like this book: [Agile Web Development with Rails 6](https://amzn.to/3wS8GNA).
