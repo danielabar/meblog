@@ -26,6 +26,31 @@ module.exports = {
       options: {
         plugins: [
           {
+            resolve: `gatsby-remark-classes`,
+            options: {
+              classMap: {
+                "root": "markdown-root",
+                paragraph: "markdown-para",
+                "heading[depth=2]": "markdown-subtitle",
+                "heading[depth=3]": "markdown-sub-subtitle",
+                "blockquote": "markdown-blockquote",
+                "list[ordered=true]": "markdown-list-ordered",
+                "list[ordered=false]": "markdown-list-unordered",
+                "listItem": "markdown-list-item",
+                "html": "markdown-html",
+                "code": "markdown-code",
+                "code[lang=yml]": "markdown-code-yml",
+                emphasis: "markdown-emphasis",
+                strong: "markdown-strong",
+                inlinecode: "markdown-inline-code",
+                link: "markdown-link",
+                image: "markdown-image",
+                linkReference: "markdown-link-ref",
+                imageReference: "markdown-image-ref"
+              }
+            }
+          },
+          {
             resolve: `gatsby-remark-copy-linked-files`,
             // options: {
             //   ignoreFileExtensions: [`png`, `jpg`]

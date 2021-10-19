@@ -1,0 +1,30 @@
+.markdown-subtitle {
+  font-size: 34px;
+  font-weight: 500;
+  letter-spacing: -0.5px;
+  line-height: 2.5rem;
+  margin: 45px 0 15px;
+  opacity: 0.8;
+}
+
+.markdown-link {
+  text-decoration: none;
+  background: linear-gradient(
+    to bottom,
+    var(--post-link-color-hover) 0%,
+    var(--post-link-color-hover) 100%
+  );
+  background-position: 0 100%;
+  background-repeat: repeat-x;
+  background-size: 3px 3px;
+  transition: background-size 0.4s;
+  color: var(--post-link-color);
+  padding: 3px;
+  border-radius: 4px;
+}
+
+.markdown-link:hover {
+  text-decoration: none;
+  color: var(--post-link-color-brighten);
+  background-size: 4px 50px;
+}
