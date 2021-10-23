@@ -2,7 +2,7 @@
 title: "Build a CI/CD Pipeline for a Gatsby Site"
 featuredImage: "../images/ci-cd-pipeline-gatsby-ej-strat-VjWi56AWQ9k-unsplash.jpg"
 description: "Learn how to build a continuous integration and deployment pipeline for a Gatsby site to save time and manual effort."
-date: "2021-10-24"
+date: "2021-10-23"
 category: "gatsby"
 ---
 
@@ -24,7 +24,7 @@ First part in building an automated pipeline is to identify the steps that are c
 4. If the tests fail, stop and investigate. The remaining steps should *only* be performed if the tests pass.
 5. Run the production Gatsby build to generate the optimized bundles for serving the production site.
 6. Deploy the production build to Github Pages.
-7. Ingest the markdown content as documents to the [search service](../roll-your-own-search-service-for-gatsby-part5).
+7. Ingest the markdown content as documents to the [search service](../roll-your-own-search-service-for-gatsby-part5) using Heroku's `pg:psql` command.
 
 ## Choose an Automation Tool
 
@@ -126,7 +126,7 @@ name: CD
 on:
   workflow_run:
     workflows: ["CI"]
-    branches: [master]
+    branches: [main]
     types: [completed]
 
 jobs:
@@ -136,7 +136,7 @@ jobs:
       # steps to build and deploy the site...
 ```
 
-However, there's still one more complication to deal with, `completed` just means the workflow finished, it does not mean it was successful. Unfortunately, there's no `type` keyword to indicate completed successfully, however, the result of the workflow run is available in the [github context](https://docs.github.com/en/actions/learn-github-actions/contexts) and can be used in an `if` expression as follows:
+However, there's still one more complication to deal with, `completed` just means the workflow finished, it does not mean it was successful. i.e. it would run even if the tests in the `CI` workflow failed. Unfortunately, there's no `type` keyword to indicate completed successfully, however, the result of the workflow run is available in the [github context](https://docs.github.com/en/actions/learn-github-actions/contexts) and can be used in an `if` expression as follows:
 
 ```yml
 # .github/workflows/cd.yml
@@ -145,7 +145,7 @@ name: CD
 on:
   workflow_run:
     workflows: ["CI"]
-    branches: [master]
+    branches: [main]
     types: [completed]
 
 jobs:
@@ -156,9 +156,17 @@ jobs:
       # steps to build and deploy the site...
 ```
 
+Putting it all together, the above workflow says: Kick off the `CD` workflow  on the `main` branch, after the `CI` workflow has completed on the `main` branch, but only run the `deploy` job if the `CI` workflow completed successfully.
+
+<aside>
+It seems awkward to implement "If workflow A is successful, then run workflow B" in two different portions of the workflow file. First in the workflow_run -> types section, and second as an if condition in the job. At the time of this writing, this is the only way I could find to do it. I would imagine as Github Actions matures, there will eventually be a more succinct way to express this.
+</aside>
+
 ## Continuous Deployment: Steps
 
 Now that the "when" part of continuous deployment has been defined, it's time to automate it by scripting all the manual steps into the workflow file. For this blog, it needs some of the same steps as CI (checkout out project source, installing dependencies and running the production build), and then it needs a few other specific steps including generating an `.env` file for production, deploying to Github Pages, and finally ingesting the markdown documents to a [search service](../roll-your-own-search-service-for-gatsby-part5).
+
+Some of these steps require "secrets", that is, values that should not be hard-coded in the workflow file (or anywhere in the source code). Secrets can be added to any Github repository to which you've got admin rights. Click on "Settings" from the main repository page on Github, then select the "Secrets" option. Then the secret values can be accessed as `{{ secrets.MY_SECRET }}` in workflow files.
 
 Here is the workflow file containing all these steps, with annotations:
 
