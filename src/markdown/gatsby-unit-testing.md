@@ -272,7 +272,7 @@ This is just one example of Jest mocking, there are many more variations and use
 
 ## User Interaction
 
-The `<SearchInput>` component renders an input text box where user can type in a search term. When they hit <kbd>Enter</kbd>, the UI will navigate to the search results for that page at url `/search-results/?q=searchTermUserTypedIn`:
+The `<SearchInput>` component renders an input text box where user can type in a search term. When they hit <kbd class="markdown-kbd">Enter</kbd>, the UI will navigate to the search results for that page at url `/search-results/?q=searchTermUserTypedIn`:
 
 ```js
 // src/components/search-input.js
@@ -344,7 +344,7 @@ module.exports = {
 }
 ```
 
-And here is the test for the `<SearchInput>` component. It uses the `getByTestId` function to locate the text input element, then uses the `userEvent.type` function to enter some example text into the search box. Finally Jest's `toHaveBeenCalledWith` function is used to verify the mock version of the `navigate` function was called after user hit <kbd>Enter</kbd>.
+And here is the test for the `<SearchInput>` component. It uses the `getByTestId` function to locate the text input element, then uses the `userEvent.type` function to enter some example text into the search box. Finally Jest's `toHaveBeenCalledWith` function is used to verify the mock version of the `navigate` function was called after user hit <kbd class="markdown-kbd">Enter</kbd>.
 
 ```js
 import React from "react"
@@ -367,7 +367,7 @@ describe("SearchInput", () => {
 })
 ```
 
-Notice the use of the special control character `{enter}` to simulate the <kbd>Enter</kbd> key. See the user-event docs for a list of all such [control characters](https://testing-library.com/docs/ecosystem-user-event/#special-characters).
+Notice the use of the special control character `{enter}` to simulate the <kbd class="markdown-kbd">Enter</kbd> key. See the user-event docs for a list of all such [control characters](https://testing-library.com/docs/ecosystem-user-event/#special-characters).
 
 ## Meta Tags
 

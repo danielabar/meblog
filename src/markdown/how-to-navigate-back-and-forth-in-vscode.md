@@ -12,6 +12,6 @@ Turns out there is a keyboard shortcut for this navigation in VS Code but I alwa
 
 The shortcuts for Mac are:
 
-<kbd>Ctrl</kbd> + <kbd>-</kbd> to navigate back
+<kbd class="markdown-kbd">Ctrl</kbd> + <kbd class="markdown-kbd">-</kbd> to navigate back
 
-<kbd>Ctrl</kbd> + <kbd>Shift</kbd> + <kbd>-</kbd> to navigate forward
+<kbd class="markdown-kbd">Ctrl</kbd> + <kbd class="markdown-kbd">Shift</kbd> + <kbd class="markdown-kbd">-</kbd> to navigate forward

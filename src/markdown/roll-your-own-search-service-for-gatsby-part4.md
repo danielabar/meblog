@@ -256,9 +256,9 @@ GET {{host}}/search?q=tdd
 Accept: application/json
 ```
 
-Hit <kbd>Cmd</kbd> + <kbd>Opt</kbd> + <kbd>E</kbd> to select the `local` environment from the environment selector that pops up.
+Hit <kbd class="markdown-kbd">Cmd</kbd> + <kbd class="markdown-kbd">Opt</kbd> + <kbd class="markdown-kbd">E</kbd> to select the `local` environment from the environment selector that pops up.
 
-Then hit <kbd>Cmd</kbd> + <kbd>Opt</kbd> + <kbd>R</kbd> while the cursor is anywhere on the `GET` request line to run it.
+Then hit <kbd class="markdown-kbd">Cmd</kbd> + <kbd class="markdown-kbd">Opt</kbd> + <kbd class="markdown-kbd">R</kbd> while the cursor is anywhere on the `GET` request line to run it.
 
 A new editor tab will open up in a side-by-side view with the results of executing the search request against the local Rails server. Here are the results. These are the same three articles we saw before when invoking the `search_doc` method on the `Document` model, but this time, only the API fields are returned.
 
@@ -373,7 +373,7 @@ cat ~/path/to/search.sql | heroku pg:psql --app app-name
 To test that it's working on Heroku:
 
 * Update the `.vscode/settings.json` file, `production` section with the Heroku host. This will be something like `https://your-app-name.herokuapp.com`.
-* Hit <kbd>Cmd</kbd> + <kbd>Opt</kbd> + <kbd>E</kbd> to select the `production` environment from the environment selector that pops up.
+* Hit <kbd class="markdown-kbd">Cmd</kbd> + <kbd class="markdown-kbd">Opt</kbd> + <kbd class="markdown-kbd">E</kbd> to select the `production` environment from the environment selector that pops up.
 * Run the `GET {{host}}/search?q=tdd` search request, this time it should return the same results but from the production server.
 
 If the production request doesn't succeed, check the Heroku logs with `heroku logs --tail` for further investigation.

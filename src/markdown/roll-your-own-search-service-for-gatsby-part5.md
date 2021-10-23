@@ -68,7 +68,7 @@ Before diving into the search components, the following diagram illustrates the 
 
 ### Step 1
 
-A new `search-input` component is added in the top navigation bar. The user can enter a search term into the input box, and hit <kbd>Enter</kbd> when ready to search.
+A new `search-input` component is added in the top navigation bar. The user can enter a search term into the input box, and hit <kbd class="markdown-kbd">Enter</kbd> when ready to search.
 
 ### Step 2
 
@@ -86,7 +86,7 @@ The search results from the server get converted to a format expected by the exi
 
 Now let's take a closer look at each UI component, starting with the new `search-input`, which is added to the top navigation bar.
 
-The input element has an `onKeyPress` event handler, which invokes a `search` function that checks if the <kbd>Enter</kbd> key has been pressed, and if so, navigates to the new `/search-results` page. This event handler has access to the current character code being entered via `event.charCode` and the complete value of the text entered in the input via `event.target.value`.
+The input element has an `onKeyPress` event handler, which invokes a `search` function that checks if the <kbd class="markdown-kbd">Enter</kbd> key has been pressed, and if so, navigates to the new `/search-results` page. This event handler has access to the current character code being entered via `event.charCode` and the complete value of the text entered in the input via `event.target.value`.
 
 Notice that the argument to the `onKeyPress` attribute of the `<input>` element is a function, *not* the invocation of the function. Also notice that the entire text value is passed to the `/search-results` page with a template string `/search-results/?q=${text}`.
 

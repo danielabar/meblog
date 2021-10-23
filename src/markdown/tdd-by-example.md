@@ -18,7 +18,7 @@ This post will walk you through an example of using TDD that I did recently to a
 
 First, what is Tidysum? Tidysum is a personal finance app that takes in a list of daily expenses and outputs a summary json file with year and month breakdowns of these expenses by category, showing total and average spending per month and per year, and makes savings and spending recommendations. It's written as an npm module and runs as a CLI. The feature I added was a percentage difference calculation for total and by-category spending year over year. The idea is to calculate a personalized rate of inflation based on your actual spending, rather than some theoretical basket of goods determined by government bureaucrats.
 
-<aside>
+<aside class="markdown-aside">
 I was inspired to add this after learning from several finance podcasts that the official government inflation numbers may not reflect reality as they don't include food and energy. As some government benefits are indexed to inflation, as are many employers' annual cost of living increases, it may benefit some to have this number reported as lower than it really is. The inflation number is also used in personal finance for retirement planning and so can be disastrous if incorrect. Of course there's nothing I can do about the big macro, but as a developer, I can improve my software to generate more personalized information to help inform better decision making.
 </aside>
 
