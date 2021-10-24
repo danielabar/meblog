@@ -21,7 +21,6 @@
   line-height: 30px;
 }
 
-/* TODO: Move all .content el to markdown.css with class from gatsby-config.js */
 .content code {
   background-color: rgba(27, 31, 35, 0.05);
   border-radius: 6px;
