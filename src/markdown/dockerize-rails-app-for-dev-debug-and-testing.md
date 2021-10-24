@@ -159,13 +159,13 @@ docker-compose build
 docker-compose up
 ```
 
-At this point, the containers should all start up (run `docker ps` to confirm), but the app won't work yet because the database schema has not been loaded. Hit <kbd>Ctrl</kbd> + <kbd>C</kbd> to stop the containers, then continue to next step.
+At this point, the containers should all start up (run `docker ps` to confirm), but the app won't work yet because the database schema has not been loaded. Hit <kbd class="markdown-kbd">Ctrl</kbd> + <kbd class="markdown-kbd">C</kbd> to stop the containers, then continue to next step.
 
 ## 2. Run one-time database setup
 
 This project makes use of `db/seeds.rb` to initialize the database with some sample data, which should only run on first time setup. The solution is to use an ephemeral container, based on the app image to issue the `rake db:reset` command, if the `INIT_DBS` environment variable is set. This will drop the database if it already exists, then run `db:setup` which will create the database, load the schema (defined in `db/schema.rb` which gets populated every time a new migration is added), and run `db:seed` to populate the database.
 
-<aside>
+<aside class="markdown-aside">
 See this <a href="https://stackoverflow.com/a/10302357/3991687">Stack Overflow Answer</a> for an explanation of what all the various rake db:xxx tasks do.
 </aside>
 
@@ -741,7 +741,7 @@ docker attach myproject_web_1
 
 This will display the console output of the `web` container. It may display nothing at the moment because there's no activity. Let's change that. On your laptop, open a browser and navigate to your project's home page (or any page that will exercise the code where `binding.pry` was added earlier). Keep an eye on the terminal where the `attach` command is running. It will now show the console output, AND pause execution at the line where `binding.pry` was added, and open an interactive pry session. Go ahead and inspect variables.
 
-When finished, type `exit` to end `pry`. Do NOT use <kbd>Ctrl</kbd> + <kbd>C</kbd> to end the attach session because that will cause the process (rails server) in the container to end, which causes the container to exit. Instead, use the detach sequence <kbd>Ctrl</kbd> + <kbd>P</kbd> + <kbd>Q</kbd>.
+When finished, type `exit` to end `pry`. Do NOT use <kbd class="markdown-kbd">Ctrl</kbd> + <kbd class="markdown-kbd">C</kbd> to end the attach session because that will cause the process (rails server) in the container to end, which causes the container to exit. Instead, use the detach sequence <kbd class="markdown-kbd">Ctrl</kbd> + <kbd class="markdown-kbd">P</kbd> + <kbd class="markdown-kbd">Q</kbd>.
 
 ### IDE Debugging
 
@@ -822,7 +822,7 @@ docker-compose run --no-deps --rm web bash -c "your command here"
 
 ## 7. Rails Console
 
-Last thing that's needed to complete the development workflow is to have access to an interactive Rails console. Turns out this is simple, use the same technique as in the previous section to run a command against a temporary container from the same image as `web`. Except this time, since the Rails console is interactive, you will be in a shell in the container until exiting <kbd>Ctrl</kbd> + <kbd>D</kbd>, at which point the container will be removed:
+Last thing that's needed to complete the development workflow is to have access to an interactive Rails console. Turns out this is simple, use the same technique as in the previous section to run a command against a temporary container from the same image as `web`. Except this time, since the Rails console is interactive, you will be in a shell in the container until exiting <kbd class="markdown-kbd">Ctrl</kbd> + <kbd class="markdown-kbd">D</kbd>, at which point the container will be removed:
 
 ```bash
 docker-compose run --no-deps --rm web bash -c "bundle exec rails c"

@@ -93,11 +93,11 @@ Save the changes, then navigate to the third slide in the presentation. Notice t
 
 ### Overview
 
-With a lot of vertical slides, it can be useful to jump out and get a bird's eye view of the entire presentation. To do this, press the <kbd>o</kbd> key from any slide. It should look something like this:
+With a lot of vertical slides, it can be useful to jump out and get a bird's eye view of the entire presentation. To do this, press the <kbd class="markdown-kbd">o</kbd> key from any slide. It should look something like this:
 
 ![presentation overview](../images/presentation-overview.png "presentation overview")
 
-Press the <kbd>esc</kbd> key to return to regular slide mode.
+Press the <kbd class="markdown-kbd">esc</kbd> key to return to regular slide mode.
 
 ## Images
 
@@ -243,7 +243,7 @@ slide, for example:
 </section>
 ```
 
-From the browser where the presentation is being displayed, press <kbd>s</kbd> to reveal the speaker notes in a new browser window. This window also conveniently has a timer, and displays the current and upcoming slide to help keep you on track. It looks something like this:
+From the browser where the presentation is being displayed, press <kbd class="markdown-kbd">s</kbd> to reveal the speaker notes in a new browser window. This window also conveniently has a timer, and displays the current and upcoming slide to help keep you on track. It looks something like this:
 
 ![speaker notes](../images/speaker-notes.png "speaker notes")
 

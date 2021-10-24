@@ -16,7 +16,7 @@ Today I'm going to share a simple technique for making it easier and faster to o
 
 Phew, that's actually a lot of work - all that mouse movement is tedious and slow. Fortunately there is a faster and simpler way by enabling Shell Integration. Here's how to do it:
 
-Enter <kbd>Cmd</kbd> + <kbd>Shift</kbd> + <kbd>P</kbd> (or <kbd>Ctrl</kbd> for Windows users) to bring up the Command Palette. Start typing in the word "shell" and select the option `Shell Command: Install 'code' command in PATH`, it should look something like this:
+Enter <kbd class="markdown-kbd">Cmd</kbd> + <kbd class="markdown-kbd">Shift</kbd> + <kbd class="markdown-kbd">P</kbd> (or <kbd class="markdown-kbd">Ctrl</kbd> for Windows users) to bring up the Command Palette. Start typing in the word "shell" and select the option `Shell Command: Install 'code' command in PATH`, it should look something like this:
 
 ![vscode command palette shell integration](../images/vscode-command-palette-shell-integration.png "vscode command palette shell integration")
 

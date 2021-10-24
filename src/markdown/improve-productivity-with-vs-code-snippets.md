@@ -38,7 +38,7 @@ For example:
 ![dog and cat](../images/dog-and-cat.jpg  "dog and cat")
 ```
 
-Let's build a snippet for this so that it only requires typing `img`, then <kbd>Ctrl</kbd> + <kbd>Space</kbd> to bring up the snippet template, which can then be filled in to specify the alt text, local path to image and a title. The final result will work like this:
+Let's build a snippet for this so that it only requires typing `img`, then <kbd class="markdown-kbd">Ctrl</kbd> + <kbd class="markdown-kbd">Space</kbd> to bring up the snippet template, which can then be filled in to specify the alt text, local path to image and a title. The final result will work like this:
 
 ![user snippet](../images/user-snippet2.gif)
 
@@ -103,7 +103,7 @@ Finally, add a `description` property that will be displayed in the intellisense
 
 ## Try it out
 
-Save the `markdown.json` file. Then open a new or existing markdown file in your project, type `img`, then then <kbd>Ctrl</kbd> + <kbd>Space</kbd> to bring up snippet suggestions and select your new custom snippet. It should replace `img` with the markdown template and you can tab through entering the image alt text, path to image and a title.
+Save the `markdown.json` file. Then open a new or existing markdown file in your project, type `img`, then then <kbd class="markdown-kbd">Ctrl</kbd> + <kbd class="markdown-kbd">Space</kbd> to bring up snippet suggestions and select your new custom snippet. It should replace `img` with the markdown template and you can tab through entering the image alt text, path to image and a title.
 
 ## Further Improvements
 

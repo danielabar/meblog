@@ -68,7 +68,7 @@ iterm2.run_until_complete(main)
 
 Currently, all the `daily-startup.py` script does is to open a new tab in the current terminal window. It doesn't do any real work yet but let's do a quick test and run it just to make sure everything is setup correctly.
 
-There are several different ways to [run a script](https://iterm2.com/python-api/tutorial/running.html) but the easiest is to use the "Open Quickly" window. To launch it, enter <kbd>Cmd</kbd> + <kbd>Shift</kbd> + <kbd>O</kbd>, then start typing the name of the script, when its highlighted, hit <kbd>Enter</kbd> to run it. Make sure the focus is in iTerm when you do this:
+There are several different ways to [run a script](https://iterm2.com/python-api/tutorial/running.html) but the easiest is to use the "Open Quickly" window. To launch it, enter <kbd class="markdown-kbd">Cmd</kbd> + <kbd class="markdown-kbd">Shift</kbd> + <kbd class="markdown-kbd">O</kbd>, then start typing the name of the script, when its highlighted, hit <kbd class="markdown-kbd">Enter</kbd> to run it. Make sure the focus is in iTerm when you do this:
 
 ![open quickly](../images/open-quickly.png "open quickly")
 
@@ -104,7 +104,7 @@ async def main(connection):
 iterm2.run_until_complete(main)
 ```
 
-Go ahead and use the Open Quickly window again (<kbd>Cmd</kbd> + <kbd>Shift</kbd> + <kbd>O</kbd>) to run `daily-startup.py` again.
+Go ahead and use the Open Quickly window again (<kbd class="markdown-kbd">Cmd</kbd> + <kbd class="markdown-kbd">Shift</kbd> + <kbd class="markdown-kbd">O</kbd>) to run `daily-startup.py` again.
 
 This time you should get two tabs opened with the first one having run `echo hello` and the second one having run `echo world`. Of course, echo-ing various text is not that useful, that was just to demonstrate the concept.
 

@@ -30,7 +30,7 @@ The benefit of this approach is it forces you to first think about how the code 
 
 So first things first, let's figure out where in the code this problem with processing potentially invalid data occurs.
 
-<aside>
+<aside class="markdown-aside">
 Some of you may be wondering why write a custom program for expense tracking when there's Excel and countless free apps out there, a <a href="https://github.com/danielabar/tidysum#why-not-use-excel">short explanation here</a>.
 </aside>
 

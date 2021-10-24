@@ -59,7 +59,7 @@ The request is specified with any of the usual HTTP verbs, followed by the resou
 
 Then following an empty line, the request headers are specified in `key: value` format. In this case, the request is accepting a json response, and also specifies a custom headers specific to this application for the api key.
 
-To submit the request, either click on the `Send Request` text that will appear right above the request line (this is added by the extension), or use keyboard shortcut <kbd>Cmd</kbd> + <kbd>Opt</kbd> + <kbd>R</kbd>.
+To submit the request, either click on the `Send Request` text that will appear right above the request line (this is added by the extension), or use keyboard shortcut <kbd class="markdown-kbd">Cmd</kbd> + <kbd class="markdown-kbd">Opt</kbd> + <kbd class="markdown-kbd">R</kbd>.
 
 This will open a new editor tab in a side-by-side view displaying the results. The tab title will contain the HTTP response code, the response headers will be listed in the new editor tab, followed by the response body.
 
@@ -104,7 +104,7 @@ Then configure the variables for each environment you'll be testing against in `
 
 The `$shared` section is for any non-environment specific variables that should be available even when no specific environment is selected.
 
-Now at the bottom right of your editor, an environment selector will appear. Click it to select the environment you want to test with, for example `local`. Or use <kbd>Cmd</kbd> + <kbd>Opt</kbd> + <kbd>E</kbd> to bring up the environment selector.
+Now at the bottom right of your editor, an environment selector will appear. Click it to select the environment you want to test with, for example `local`. Or use <kbd class="markdown-kbd">Cmd</kbd> + <kbd class="markdown-kbd">Opt</kbd> + <kbd class="markdown-kbd">E</kbd> to bring up the environment selector.
 
 Then back in `http/subscriptions.http`, you can hover over the variables and it will show you the value for the selected environment. When submitting the request, the values from `.vscode/settings.json` are filled in for the variables.
 

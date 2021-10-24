@@ -109,7 +109,7 @@ jobs:
 
 Given that the only way code should get pushed to `main` is when an approved PR (Pull Request) is merged (either via merge commit or squash & merge), the above workflow trigger would ensure that a deploy only goes out when a PR is merged.
 
-<aside>
+<aside class="markdown-aside">
 Preventing direct pushes to the default branch can be controlled using Github's <a href="https://docs.github.com/en/repositories/configuring-branches-and-merges-in-your-repository/defining-the-mergeability-of-pull-requests/managing-a-branch-protection-rule">branch protection rules</a>.
 </aside>
 
@@ -158,7 +158,7 @@ jobs:
 
 Putting it all together, the above workflow says: Kick off the `CD` workflow  on the `main` branch, after the `CI` workflow has completed on the `main` branch, but only run the `deploy` job if the `CI` workflow completed successfully.
 
-<aside>
+<aside class="markdown-aside">
 It seems awkward to implement "If workflow A is successful, then run workflow B" in two different portions of the workflow file. First in the workflow_run -> types section, and second as an if condition in the job. At the time of this writing, this is the only way I could find to do it. I would imagine as Github Actions matures, there will eventually be a more succinct way to express this.
 </aside>
 
