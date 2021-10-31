@@ -166,7 +166,7 @@ At this point, the containers should all start up (run `docker ps` to confirm), 
 This project makes use of `db/seeds.rb` to initialize the database with some sample data, which should only run on first time setup. The solution is to use an ephemeral container, based on the app image to issue the `rake db:reset` command, if the `INIT_DBS` environment variable is set. This will drop the database if it already exists, then run `db:setup` which will create the database, load the schema (defined in `db/schema.rb` which gets populated every time a new migration is added), and run `db:seed` to populate the database.
 
 <aside class="markdown-aside">
-See this <a href="https://stackoverflow.com/a/10302357/3991687">Stack Overflow Answer</a> for an explanation of what all the various rake db:xxx tasks do.
+See this <a class="markdown-link" href="https://stackoverflow.com/a/10302357/3991687">Stack Overflow Answer</a> for an explanation of what all the various rake db:xxx tasks do.
 </aside>
 
 One thing to watch out for, is that the `db:reset` command cannot run until the database is available to handle requests. We will use [wait-for-it.sh](https://github.com/vishnubob/wait-for-it) to solve this synchronization issue.
