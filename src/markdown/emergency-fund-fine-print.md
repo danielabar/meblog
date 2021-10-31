@@ -17,7 +17,7 @@ An emergency fund is basically a pile of cash that you sock away somewhere safe 
 Financial experts say you should have approximately 3 - 6 months worth of expenses saved up in an emergency fund. This can be calculated by tracking all your expenses for a few months including fixed expenses such as mortgage/rent, car payments, property taxes, utilities, cell phone/internet, etc, and variable expenses such as groceries, personal care, clothing, gas, restaurants, entertainment etc. (albeit, much less of the latter categories lately). Then take an average of your monthly expenses, multiply by either 3 or 6 and that’s how much you should have saved in an emergency fund.
 
 <aside class="markdown-aside">
-If you’re looking for an app to track your expenses and make recommendations on savings and an emergency fund, check out <a href="https://github.com/danielabar/tidysum">Tidysum</a>, a free, privacy-focused command line tool I wrote.
+If you’re looking for an app to track your expenses and make recommendations on savings and an emergency fund, check out <a class="markdown-link" href="https://github.com/danielabar/tidysum">Tidysum</a>, a free, privacy-focused command line tool I wrote.
 </aside>
 
 I would argue that given the effects of this pandemic, a 1 year or slightly larger emergency fund is more appropriate to provide breathing room in case of a job loss where the entire industry is affected. This probably won’t be the last pandemic we face and who knows what other catastrophes may occur so better safe than sorry.

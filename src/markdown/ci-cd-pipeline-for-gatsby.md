@@ -110,7 +110,7 @@ jobs:
 Given that the only way code should get pushed to `main` is when an approved PR (Pull Request) is merged (either via merge commit or squash & merge), the above workflow trigger would ensure that a deploy only goes out when a PR is merged.
 
 <aside class="markdown-aside">
-Preventing direct pushes to the default branch can be controlled using Github's <a href="https://docs.github.com/en/repositories/configuring-branches-and-merges-in-your-repository/defining-the-mergeability-of-pull-requests/managing-a-branch-protection-rule">branch protection rules</a>.
+Preventing direct pushes to the default branch can be controlled using Github's <a class="markdown-link" href="https://docs.github.com/en/repositories/configuring-branches-and-merges-in-your-repository/defining-the-mergeability-of-pull-requests/managing-a-branch-protection-rule">branch protection rules</a>.
 </aside>
 
 However, even if the project is configured to not allow commits to be pushed directly to `main`, there's still a problem. What if the tests fail on `main` as a result of the merge commit (or squash/merge) from the PR? Recall that since the CI workflow has trigger `on: push`, it will also run when a PR gets merged to `main`. Even though the tests would have run on the branch that got merged, there's a chance that something goes wrong as a result of the merge and tests fail on `main`. In this case, the deploy should not run.
