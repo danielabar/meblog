@@ -119,6 +119,15 @@ Object {
               </p>
             </div>
           </div>
+          <section
+            data-testid="related-posts"
+          >
+            <div
+              id="cc09b42e-b111-566f-889d-27d1a2345f9c"
+            >
+              related post 1
+            </div>
+          </section>
           <div
             data-testid="all-wrapper"
             style="margin-top: 60px;"
@@ -326,6 +335,15 @@ Object {
             </p>
           </div>
         </div>
+        <section
+          data-testid="related-posts"
+        >
+          <div
+            id="cc09b42e-b111-566f-889d-27d1a2345f9c"
+          >
+            related post 1
+          </div>
+        </section>
         <div
           data-testid="all-wrapper"
           style="margin-top: 60px;"

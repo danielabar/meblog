@@ -14,6 +14,12 @@ exports.onCreateNode = ({ node, getNode, actions }) => {
       name: `slug`,
       value: slugValue,
     })
+    // TODO: may not need this if post.js relatedP query can query by frontmatter title
+    createNodeField({
+      node,
+      name: `searchTitle`,
+      value: node.frontmatter.title,
+    })
   }
 }
 
@@ -32,6 +38,7 @@ exports.createPages = ({ graphql, actions }) => {
                 category
                 date(formatString: "YYYY-MM-DD")
                 description
+                related
               }
               fields {
                 slug
@@ -51,6 +58,7 @@ exports.createPages = ({ graphql, actions }) => {
 
       result.data.allMarkdownRemark.edges.forEach(({ node }) => {
         // build individual blog pages
+        // TODO: Get rid of relatedPosts default when all posts have related populated
         createPage({
           path: node.fields.slug,
           component: path.resolve("./src/templates/post.js"),
@@ -59,6 +67,7 @@ exports.createPages = ({ graphql, actions }) => {
             content: node.html,
             title: node.frontmatter.title,
             description: node.frontmatter.description,
+            relatedPosts: node.frontmatter.related || ["Dockerize a Rails Application for Development"],
           },
         })
 

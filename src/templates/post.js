@@ -5,11 +5,13 @@ import { GatsbyImage } from "gatsby-plugin-image";
 import SEO from "../components/SEO"
 import Layout from "../components/layout"
 import AllLink from "../components/all-link"
+import RelatedPosts from "../components/related-posts"
 import * as styles from "./post.module.css"
 import "@fontsource/fira-code"
 
 // props.data contains result from query object defined at bottom of this component - needed for featured image
 const Post = (props) => {
+  console.dir(props)
   const markdown = props.data.markdownRemark
   const publishedDate = markdown.frontmatter.date
   const featuredImgFluid =
@@ -19,6 +21,7 @@ const Post = (props) => {
   const title = markdown.frontmatter.title
   const description = markdown.frontmatter.description || title
   const slug = markdown.fields.slug
+  const related = props.data.relatedP
 
   return (
     <Layout>
@@ -38,6 +41,7 @@ const Post = (props) => {
           dangerouslySetInnerHTML={{ __html: content }}
         />
       </div>
+      <RelatedPosts related={related} />
       <AllLink marginTop="60px" />
     </Layout>
   );
@@ -45,8 +49,12 @@ const Post = (props) => {
 
 export default Post
 
+// https://github.com/sititou70/gatsby-remark-related-posts-example/blob/master/src/templates/blog-post.js
+// https://github.com/gatsbyjs/gatsby/issues/8166
+// https://www.gatsbyjs.com/docs/graphql-reference/#filter
+// TODO: Specify smaller image width in relatedP query
 // query results available to component in props.data
-export const query = graphql`query ($slug: String!) {
+export const query = graphql`query ($slug: String!, $relatedPosts: [String!]!) {
   markdownRemark(fields: {slug: {eq: $slug}}) {
     html
     frontmatter {
@@ -61,6 +69,26 @@ export const query = graphql`query ($slug: String!) {
     }
     fields {
       slug
+    }
+  }
+  relatedP: allMarkdownRemark(
+    filter: { fields: { searchTitle: { in: $relatedPosts } } }
+  ) {
+    edges {
+      node {
+        id
+        frontmatter {
+          title
+          featuredImage {
+            childImageSharp {
+              gatsbyImageData(width: 800, layout: CONSTRAINED)
+            }
+          }
+        }
+        fields {
+          slug
+        }
+      }
     }
   }
 }

@@ -4,6 +4,10 @@ featuredImage: "../images/rails-feature-test-regex-patrick-tomasso-QMDap1TAu0g-u
 description: "An example where regex was a good solution for a Rails feature test."
 date: "2021-11-01"
 category: "rails"
+related:
+  - "Dockerize a Rails Application for Development"
+  - "Rails Strong Params for GET Request"
+  - "Use UUID for primary key with Rails and Postgres"
 ---
 
 If you’ve been programming for awhile, you’ve probably encountered regular expressions, and more specifically, this saying:
