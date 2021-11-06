@@ -2,7 +2,7 @@ import React from "react"
 import { Link } from "gatsby"
 import * as styles from "./article.module.css"
 
-const Article = (props) => (
+const Article = props => (
   <article className={styles.container}>
     <div className={styles.subheader}>
       <div className={styles.date}>{props.date}</div>

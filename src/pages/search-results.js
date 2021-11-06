@@ -54,10 +54,7 @@ const SearchResults = () => {
             No Results Found For: <span className={styles.term}>{query.q}</span>
           </h2>
           <p className={styles.suggestion}>
-            Try searching for{" "}
-            <Link to="/search-results?q=rails">
-              Rails
-            </Link>
+            Try searching for <Link to="/search-results?q=rails">Rails</Link>
           </p>
         </div>
       )

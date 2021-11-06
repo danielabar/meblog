@@ -1,7 +1,7 @@
 /* eslint-disable react/jsx-pascal-case */
 import React from "react"
 import { graphql } from "gatsby"
-import { GatsbyImage } from "gatsby-plugin-image";
+import { GatsbyImage } from "gatsby-plugin-image"
 import SEO from "../components/SEO"
 import Layout from "../components/layout"
 import AllLink from "../components/all-link"
@@ -10,8 +10,7 @@ import * as styles from "./post.module.css"
 import "@fontsource/fira-code"
 
 // props.data contains result from query object defined at bottom of this component - needed for featured image
-const Post = (props) => {
-  console.dir(props)
+const Post = props => {
   const markdown = props.data.markdownRemark
   const publishedDate = markdown.frontmatter.date
   const featuredImgFluid =
@@ -35,7 +34,11 @@ const Post = (props) => {
       <div>
         <h1 className={styles.title}>{title}</h1>
         <div className={styles.published}>Published {publishedDate}</div>
-        <GatsbyImage image={featuredImgFluid} className={styles.featureImage} alt={description}/>
+        <GatsbyImage
+          image={featuredImgFluid}
+          className={styles.featureImage}
+          alt={description}
+        />
         <div
           className={styles.content}
           dangerouslySetInnerHTML={{ __html: content }}
@@ -44,7 +47,7 @@ const Post = (props) => {
       <RelatedPosts related={related} />
       <AllLink marginTop="60px" />
     </Layout>
-  );
+  )
 }
 
 export default Post
@@ -54,42 +57,43 @@ export default Post
 // https://www.gatsbyjs.com/docs/graphql-reference/#filter
 // TODO: Specify smaller image width in relatedP query
 // query results available to component in props.data
-export const query = graphql`query ($slug: String!, $relatedPosts: [String!]!) {
-  markdownRemark(fields: {slug: {eq: $slug}}) {
-    html
-    frontmatter {
-      title
-      date(formatString: "DD MMM YYYY")
-      description
-      featuredImage {
-        childImageSharp {
-          gatsbyImageData(width: 800, layout: CONSTRAINED)
-        }
-      }
-    }
-    fields {
-      slug
-    }
-  }
-  relatedP: allMarkdownRemark(
-    filter: { fields: { searchTitle: { in: $relatedPosts } } }
-  ) {
-    edges {
-      node {
-        id
-        frontmatter {
-          title
-          featuredImage {
-            childImageSharp {
-              gatsbyImageData(width: 800, layout: CONSTRAINED)
-            }
+export const query = graphql`
+  query($slug: String!, $relatedPosts: [String!]!) {
+    markdownRemark(fields: { slug: { eq: $slug } }) {
+      html
+      frontmatter {
+        title
+        date(formatString: "DD MMM YYYY")
+        description
+        featuredImage {
+          childImageSharp {
+            gatsbyImageData(width: 800, layout: CONSTRAINED)
           }
         }
-        fields {
-          slug
+      }
+      fields {
+        slug
+      }
+    }
+    relatedP: allMarkdownRemark(
+      filter: { fields: { searchTitle: { in: $relatedPosts } } }
+    ) {
+      edges {
+        node {
+          id
+          frontmatter {
+            title
+            featuredImage {
+              childImageSharp {
+                gatsbyImageData(width: 270, height: 150, layout: FIXED)
+              }
+            }
+          }
+          fields {
+            slug
+          }
         }
       }
     }
   }
-}
 `

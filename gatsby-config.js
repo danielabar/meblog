@@ -30,16 +30,16 @@ module.exports = {
             options: {
               // https://github.com/syntax-tree/mdast
               classMap: {
-                "root": "markdown-root",
+                root: "markdown-root",
                 paragraph: "markdown-para",
                 "heading[depth=2]": "markdown-subtitle",
                 "heading[depth=3]": "markdown-sub-subtitle",
-                "blockquote": "markdown-blockquote",
+                blockquote: "markdown-blockquote",
                 "list[ordered=true]": "markdown-list-ordered",
                 "list[ordered=false]": "markdown-list-unordered",
-                "listItem": "markdown-list-item",
-                "html": "markdown-html",
-                "code": "markdown-code",
+                listItem: "markdown-list-item",
+                html: "markdown-html",
+                code: "markdown-code",
                 "code[lang=yml]": "markdown-code-yml",
                 emphasis: "markdown-emphasis",
                 strong: "markdown-strong",
@@ -47,9 +47,9 @@ module.exports = {
                 link: "markdown-link",
                 image: "markdown-image",
                 linkReference: "markdown-link-ref",
-                imageReference: "markdown-image-ref"
-              }
-            }
+                imageReference: "markdown-image-ref",
+              },
+            },
           },
           {
             resolve: `gatsby-remark-autolink-headers`,

@@ -2,7 +2,7 @@ import React from "react"
 import * as styles from "./article-list.module.css"
 import Article from "./article"
 
-const ArticleList = (props) => (
+const ArticleList = props => (
   <section className={styles.container} data-testid="article-list">
     {props.articles.map(({ node }) => (
       <Article

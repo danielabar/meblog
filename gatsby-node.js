@@ -67,7 +67,9 @@ exports.createPages = ({ graphql, actions }) => {
             content: node.html,
             title: node.frontmatter.title,
             description: node.frontmatter.description,
-            relatedPosts: node.frontmatter.related || ["Dockerize a Rails Application for Development"],
+            relatedPosts: node.frontmatter.related || [
+              "Dockerize a Rails Application for Development",
+            ],
           },
         })
 
