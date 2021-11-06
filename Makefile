@@ -22,6 +22,9 @@ test:
 testw:
 	npm test -- --watch
 
+testu:
+	npm test -- -u
+
 testc:
 	npm test -- --coverage
 

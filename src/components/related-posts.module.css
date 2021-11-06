@@ -20,16 +20,29 @@
   opacity: 0.8;
 }
 
-.post {
-  /* flex-basis: auto; */
-  /* flex-grow: 1; */
+.postLink {
+  display: inline-block;
 }
 
 .postImage {
   border-radius: 3px;
+  opacity: 0.9;
+  transition: all 0.3s ease;
 }
 
 .postTitle {
-  /* should match image width in post.js relatedP query */
-  max-width: 270px;
+  font-size: 18px;
+  font-weight: 500;
+  max-width: 270px; /* match image width in post.js relatedP query */
+  opacity: 0.9;
+  transition: all 0.3s ease;
+}
+
+.postLink:hover .postImage {
+  opacity: 1;
+}
+
+.postLink:hover .postTitle {
+  text-decoration: underline;
+  opacity: 1;
 }
