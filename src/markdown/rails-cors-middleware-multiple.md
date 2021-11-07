@@ -4,6 +4,10 @@ featuredImage: "../images/rails-middleware-erik-witsoe-bluVshKGwKQ-unsplash.jpg"
 description: "Add multiple blocks to Rails CORS middleware to support multiple endpoints."
 date: "2021-06-04"
 category: "rails"
+related:
+  - "Construct a PATCH request for a JSON API"
+  - "Fix Rails Blocked Host Error with Docker"
+  - "Dockerize a Rails Application for Development"
 ---
 
 A short post for today on a usage of [CORS Middleware](https://github.com/cyu/rack-cors) for Rails (well any Rack application) that wasn't obvious from the docs - how to specify multiple endpoints, or resources?

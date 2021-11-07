@@ -4,6 +4,10 @@ featuredImage: "../images/automation-2-jan-jakub-nanista-UHyrjKPsshk-unsplash.jp
 description: "Speed up your daily workflow with iTerm2 automation."
 date: "2021-02-16"
 category: "terminal"
+related:
+    - "How I Setup my Terminal"
+    - "VS Code Shell Integration"
+    - "Crossword Solver with CentOS"
 ---
 
 Do you find yourself opening many iTerm tabs every day to do the same daily routine such as opening editors, running a build, starting up various services etc? If yes, good news, this tedious daily startup routine can be automated, saving you precious minutes each day. This post will walk you through how to achieve this automation using [iTerm](https://iterm2.com/) and Python.

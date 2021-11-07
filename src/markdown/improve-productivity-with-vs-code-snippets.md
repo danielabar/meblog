@@ -4,6 +4,10 @@ featuredImage: "../images/snippet-riyaz-hyder-czc72SCP5C4-unsplash.jpg"
 description: "Follow along with this tutorial to learn how to create VS Code snippets."
 date: "2020-11-27"
 category: "vscode"
+related:
+  - "Navigate Back & Forth in VS Code"
+  - "A VS Code Alternative to Postman"
+  - "VS Code Shell Integration"
 ---
 
 Have you ever found yourself repeating a certain pattern while coding over and over and thought there's got to be a faster way? For example, if you work with React and hooks, many component file will have this as the first line:

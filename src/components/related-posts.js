@@ -5,7 +5,7 @@ import * as styles from "./related-posts.module.css"
 
 const RelatedPosts = props => (
   <section className={styles.container} data-testid="related-posts">
-    <h2 className={styles.header}>Related:</h2>
+    <h2 className={styles.header}>You may also like:</h2>
     <div className={styles.postsContainer}>
       {props.related.edges.map(post => (
         <Link key={post.node.id} to={post.node.fields.slug} className={styles.postLink}>

@@ -4,6 +4,10 @@ featuredImage: "../images/strong-params-sigmund-f0dJjQMhfXo-unsplash.jpg"
 description: "Learn how to use Rails strong parameters with an HTTP GET request."
 date: "2021-10-03"
 category: "rails"
+related:
+  - "Fix Rails Blocked Host Error with Docker"
+  - "Use UUID for primary key with Rails and Postgres"
+  - "Dockerize a Rails Application for Development"
 ---
 
 If you've been using Rails for a while, you've probably encountered [Strong Parameters](https://api.rubyonrails.org/v6.1.3/classes/ActionController/StrongParameters.html). This feature was introduced in Rails 4 and is intended to prevent mass assignment. The typical use case for this is to protect a POST or PUT/PATCH endpoint, which is invoked when a user submits a form and a controller action tries to create or update the corresponding model.

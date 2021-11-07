@@ -4,6 +4,10 @@ featuredImage: "../images/career-software-markus-spiske-Fa0pTKuoDVY-unsplash.jpg
 description: "Some personality traits that make a good software developer"
 date: "2020-07-26"
 category: "career"
+related:
+  - "How to Learn New Things"
+  - "TDD by Example"
+  - "Off with the Digital Distractions!"
 ---
 
 A career in software development can be very rewarding. Being able to build things that are used in the real world and helping people is amazing. It can be a surprisingly creative field. It's generally well compensated and most jobs come with good benefits such as health/dental, paid vacation, etc. At the time of this writing, demand for developers far outweighs supply, so employment opportunities are very good (although there can be instability within specific companies or even industries).

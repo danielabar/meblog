@@ -4,6 +4,10 @@ featuredImage: "../images/docker-rails-shipping-containers.jpg"
 description: "Learn how to Dockerize a Rails application to support the full development workflow including debugging, testing, and working with databases"
 date: "2020-09-20"
 category: "rails"
+related:
+  - "Use UUID for primary key with Rails and Postgres"
+  - "Roll Your Own Search with Rails and Postgres: Search API"
+  - "Fix Rails Blocked Host Error with Docker"
 ---
 
 At work, I was recently tasked with Dockerizing a Rails monolith. This app has a React front end built with Webpacker, client side dependencies managed with Yarn, runs background jobs with Active Job, and uses a MySQL database and Redis. The existing setup involved developers installing all dependencies on their laptops and took some non-trivial amount of time to get working. The goal of packaging everything with Docker was to make it easier and faster for new developers to get up and running. It was also important to ensure the project could still be run the "old fashioned" way, i.e. all dependencies installed directly on laptop. This was a hedge in case something was found that could not be made to work with Docker.

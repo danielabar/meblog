@@ -4,6 +4,10 @@ featuredImage: "../images/computer-bug.jpg"
 description: "How to use tmate to debug a github action for running CI with Rails and Postgres"
 date: "2021-02-15"
 category: "rails"
+related:
+  - "Dockerize a Rails Application for Development"
+  - "Fix Rails Blocked Host Error with Docker"
+  - "Crossword Solver with CentOS"
 ---
 
 A few weeks ago I was setting up CI (continuous integration) for a Rails project that uses Sidekiq, Redis, and Postgres. Pretty straightforward, just needed to run a build, install and configure the services (Postgres and Redis), initialize the database, then run linting and tests.

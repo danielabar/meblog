@@ -4,6 +4,10 @@ featuredImage: "../images/distraction-charlz-gutierrez-de-pineres-2w_U2-Ah57E-un
 description: "Improve your productivity and focus by reducing digital distractions in your life"
 date: "2020-05-24"
 category: "productivity"
+related:
+  - "Find Jira Tickets Faster"
+  - "Access Chrome Bookmarks with Keyboard"
+  - "Automate Tabs & Commands in iTerm2"
 ---
 
 As a programmer, it's important to have long uninterrupted stretches of time to focus on complex tasks. When working on a difficult task, I often have a lot of "context" in my head, kind of a house of cards. An interruption will cause the cards to come tumbling down. It can take 20 minutes or more to get back in the zone after an interruption, which is a serious hit to productivity, especially considering the source of potential distractions has exploded in recent years. Ever since the ubiquity of smart phones and social media, these digital interruptions have become a normal part of everyone's day.  In this post, I'll share a few things you can do to minimize these, and get your focus back.

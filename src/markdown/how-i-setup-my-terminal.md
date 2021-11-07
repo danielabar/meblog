@@ -4,6 +4,10 @@ featuredImage: "../images/terminal-cookie-the-pom-gySMaocSdqs-unsplash.jpg"
 description: "How to setup your terminal with oh-my-zsh and agnoster theme"
 date: "2019-12-15"
 category: "terminal"
+related:
+  - "Access Chrome Bookmarks with Keyboard"
+  - "Automate Tabs & Commands in iTerm2"
+  - "Crossword Solver with CentOS"
 ---
 
 Have you ever seen a course, tutorial or colleague using their terminal and it looks something like this:

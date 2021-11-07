@@ -4,6 +4,10 @@ featuredImage: "../images/crossword-marjanblan-i9bAvQ57J1k-unsplash.jpg"
 description: "Learn how to use CentOS words package for help solving crossword puzzles"
 date: "2020-03-29"
 category: "just for fun"
+related:
+  - "Off with the Digital Distractions!"
+  - "Automate Tabs & Commands in iTerm2"
+  - "How I Setup my Terminal"
 ---
 
 If you enjoy crossword puzzles but sometimes get stuck on a devious one, here's a fun use of the CentOS [words](https://centos.pkgs.org/7/centos-x86_64/words-3.0-22.el7.noarch.rpm.html) package.

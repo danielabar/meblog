@@ -4,6 +4,10 @@ featuredImage: "../images/money-josh-appel-NeTPASr-bmQ-unsplash.jpg"
 description: "Watch out for the fine print when accepting a bank offer for a promotional interest rate."
 date: "2020-12-18"
 category: "personal finance"
+related:
+  - "Saving on monthly expenses - A Cautionary Tale"
+  - "Hack Your RRSP Tax Refund"
+  - "Off with the Digital Distractions!"
 ---
 
 Taking a break from programming topics to blog about personal finance today. Wanted to share an experience I had recently with one of the banks in Canada that left me feeling deceived, even though strictly speaking, they did nothing wrong.

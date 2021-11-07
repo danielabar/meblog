@@ -4,6 +4,10 @@ featuredImage: "../images/python-interview-question.jpg"
 description: "Learn how to model tuples in Ruby and solve a Python data science interview question in Ruby."
 date: "2021-03-01"
 category: "ruby"
+related:
+  - "Testing Faraday with RSpec"
+  - "Add Rubocop to an Existing Rails Project"
+  - "Construct a PATCH request for a JSON API"
 ---
 
 A few months ago, I came across a tweet posing a technical interview question for a data science position using Python:

@@ -4,6 +4,10 @@ featuredImage: "../images/bookmark-chiara-f-MI8He1NWPWg-unsplash.jpg"
 description: "Improve productivity with keyboard access to Chrome bookmarks using Alfred for Mac."
 date: "2020-04-26"
 category: "productivity"
+related:
+  - "Find Jira Tickets Faster"
+  - "Off with the Digital Distractions!"
+  - "Build and Publish a Presentation with RevealJS and Github"
 ---
 
 If you frequently use [Chrome bookmarks](https://support.google.com/chrome/answer/188842?co=GENIE.Platform%3DDesktop&hl=en), then you probably have long lists of them, possibly nested if they're organized with folders and sub-folders.

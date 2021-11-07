@@ -4,6 +4,10 @@ featuredImage: "../images/blocked-host-fix-markus-spiske-KTuHfak_EEk-unsplash.jp
 description: "Learn how to fix the Rails Blocked Host error when using Docker."
 date: "2021-09-10"
 category: "rails"
+related:
+  - "Dockerize a Rails Application for Development"
+  - "Roll Your Own Search with Rails and Postgres: Search API"
+  - "Use UUID for primary key with Rails and Postgres"
 ---
 
 This post will demonstrate how to solve the Rails Blocked Host error when running a Rails app in a Docker container.

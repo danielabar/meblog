@@ -4,6 +4,10 @@ featuredImage: "../images/tax-season.png"
 description: "Why wait a year to get your RRSP tax refund? Learn a neat trick to get it faster."
 date: "2021-04-11"
 category: "personal finance"
+related:
+  - "Promotional interest rates and the fine print"
+  - "Saving on monthly expenses - A Cautionary Tale"
+  - "What Makes a Good Podcast"
 ---
 
 Ah spring is in the air. A time when Canadians start shedding their winter layers, setting out the patio furniture, and looking forward to their tax refunds after having filed their taxes including RRSP contributions.

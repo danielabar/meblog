@@ -4,6 +4,10 @@ featuredImage: "../images/ci-cd-pipeline-gatsby-ej-strat-VjWi56AWQ9k-unsplash.jp
 description: "Learn how to build a continuous integration and deployment pipeline for a Gatsby site to save time and manual effort."
 date: "2021-10-23"
 category: "gatsby"
+related:
+  - "Get started with Gatsby and Unit Testing"
+  - "Add a Language to gatsby-remark-vscode"
+  - "Roll Your Own Search with Rails and Postgres: Search UI"
 ---
 
 This post will walk through how to set up a CI/CD (Continuous Integration and Continuous Deployment) pipeline for a Gatsby site. Let's start with a definition from [Wikipedia](https://en.wikipedia.org/wiki/CI/CD):

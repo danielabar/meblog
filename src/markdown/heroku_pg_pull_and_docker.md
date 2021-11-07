@@ -4,6 +4,10 @@ featuredImage: "../images/pull-rebecca-campbell-81UDWsR6Ehw-unsplash.jpg"
 description: "Learn how to use Heroku's pg:pull command to get a copy of your production data when running Postgres locally in a Docker container."
 date: "2021-04-01"
 category: "PostgreSQL"
+related:
+  - "Roll Your Own Search with Rails and Postgres: Search Engine"
+  - "Use UUID for primary key with Rails and Postgres"
+  - "Dockerize a Rails Application for Development"
 ---
 
 **TLDR:** Use `PG_HOST=127.0.0.1` when running Heroku's `pg:pull` to a local target database that is running in a Docker container. For a more detailed explanation, read on...

@@ -4,6 +4,10 @@ featuredImage: "../images/rubocop-mark-duffel-U5y077qrMdI-unsplash.jpg"
 description: "Learn how to add Rubocop to an existing Rails project while keeping your sanity."
 date: "2021-07-25"
 category: "rails"
+related:
+  - "Dockerize a Rails Application for Development"
+  - "Start a Rails 6 Project with RSpec"
+  - "Use UUID for primary key with Rails and Postgres"
 ---
 
 I think Rubocop is awesome! There are some that find it (and linters in general) annoying, even leading to git commit messages along the lines of "F@%#^!ng rubocop". But for me, coding with Rubocop is like having a wizard with the entire collective wisdom of the Ruby community sitting beside me, pointing out where improvements could be made, resulting in more idiomatic Ruby.

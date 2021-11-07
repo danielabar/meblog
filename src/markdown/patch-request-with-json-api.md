@@ -4,6 +4,10 @@ featuredImage: "../images/change-leaves.jpg"
 description: "Learn how to Construct a PATCH request when using the jsonapi-resources gem with Rails."
 date: "2020-11-20"
 category: "rails"
+related:
+  - "Dockerize a Rails Application for Development"
+  - "Add Rubocop to an Existing Rails Project"
+  - "Rails Strong Params for GET Request"
 ---
 
 I'm currently building a subscription management and notification microservice in Rails and decided to use the [jsonapi-resources](https://github.com/cerebris/jsonapi-resources) gem to build a JSON spec compliant REST API. This will allow clients of the microservice to submit http requests to do things like add new plans and register new subscriptions for these plans.

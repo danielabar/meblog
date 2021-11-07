@@ -3,7 +3,7 @@ title: "A VS Code Alternative to Postman"
 featuredImage: "../images/rest-aaron-burden-2bg1jPty490-unsplash.jpg"
 description: "Looking for a Postman alternative? This VS Code REST Client extension could be the answer."
 date: "2021-06-13"
-category: "Web Development"
+category: "vscode"
 ---
 
 If you've been doing web development for any length of time, you've probably built or worked on an HTTP REST style API and needed a REST Client to test it. [Postman](https://www.postman.com/product/rest-client/) is a very popular choice and I used to reach for this all the time. However, I'd like to share another tool, a VS Code extension that is working better for me, as an alternative to Postman.
