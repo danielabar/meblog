@@ -49,9 +49,3 @@ The field of software development is constantly evolving - there's always a new 
 ## Conclusion
 
 If you recognize some of these qualities in yourself and have never done any programming, definitely consider taking an introductory workshop or pick up a beginner book. As for what to try, web development (HTML, CSS and JavaScript) is popular and these skills are in demand. Python is also very beginner friendly. But even if none of these qualities resonate with you, if you're curious about programming I would still encourage everyone to try it and find out for themselves if they enjoy it.
-
-## Related Content
-
-The following section contains affiliate links for related content you may find useful. I get a small commission from purchases which helps me maintain this site.
-
-Just wanted to share a book I found really incredible in improving my productivity by figuring out *when* is the best time to do certain types of tasks such as analytical vs insight. The book is [When: The Scientific Secrets of Perfect Timing](https://amzn.to/32dBPF1).

@@ -835,17 +835,3 @@ docker-compose run --no-deps --rm web bash -c "bundle exec rails c"
 ## Conclusion
 
 Phew, that was a lot of work, but well worth it to have a complete development workflow in Docker. This took me several weeks of work to figure out all the details but hopefully will save you some time if you're looking to Dockerize your Rails setup.
-
-## Related Content
-
-The following section contains affiliate links for related content you may find useful. I get a small commission from purchases which helps me maintain this site.
-
-If you're looking for a deeper understanding of Docker, try Nigel Poulton's [Docker Deep Dive](https://amzn.to/3g7LaGt) book.
-
-Looking to level up on Rails 6? You might like this book: [Agile Web Development with Rails 6](https://amzn.to/3wS8GNA).
-
-Working on a large legacy code base? This book [Working Effectively with Legacy Code](https://amzn.to/3accwHF) is a must read.
-
-Martin Fowler's [Refactoring: Improving the Design of Existing Code](https://amzn.to/2RFC0Xn) is also amazingly useful on this topic.
-
-Is your organization introducing microservices? This book [Building Event-Driven Microservices: Leveraging Organizational Data at Scale](https://amzn.to/3uSxa87) is a fantastic resource on this topic.

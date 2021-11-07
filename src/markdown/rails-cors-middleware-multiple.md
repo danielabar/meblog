@@ -86,15 +86,3 @@ Rails.logger.info("Cors Configured to allow origin: #{ENV['ALLOWED_ORIGIN'] || '
 ```
 
 When the Rails server runs locally, don't specify any environment variable and it defaults to allowing `localhost` requests. For production (or any other environment), run the server with the `ALLOWED_ORIGIN` environment variable set to the origin that requires access.
-
-## Related Content
-
-The following section contains affiliate links for related content you may find useful. I get a small commission from purchases which helps me maintain this site.
-
-Looking to level up on Rails 6? You might like this book: [Agile Web Development with Rails 6](https://amzn.to/3wS8GNA).
-
-Working on a large legacy code base? This book [Working Effectively with Legacy Code](https://amzn.to/3accwHF) is a must read.
-
-Martin Fowler's [Refactoring: Improving the Design of Existing Code](https://amzn.to/2RFC0Xn) is also amazingly useful on this topic.
-
-Is your organization introducing microservices? This book [Building Event-Driven Microservices: Leveraging Organizational Data at Scale](https://amzn.to/3uSxa87) is a fantastic resource on this topic.
