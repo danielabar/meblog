@@ -4,6 +4,10 @@ featuredImage: "../images/faraday-alex-kondratiev-H9t723yPjYI-unsplash.jpg"
 description: "Learn two different techniques for testing code that uses Faraday with RSpec."
 date: "2021-08-14"
 category: "ruby"
+related:
+  - "Solving a Python Interview Question in Ruby"
+  - "Debug Github Actions"
+  - "Start a Rails 6 Project with RSpec"
 ---
 
 If you've ever developed code that had to integrate with a third party service that didn't have an up-to-date gem available, there's a good chance you've had to reach for an HTTP client to make requests to the service. [Faraday](https://github.com/lostisland/faraday) is a popular choice. It's easy to use and well documented. However, the way in which it gets used will impact how the code can be tested. This post will go through two different ways it can be tested.

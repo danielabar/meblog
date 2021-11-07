@@ -4,6 +4,10 @@ featuredImage: "../images/tdd-by-example.png"
 description: "A practical example of using TDD to add a new feature to an existing project."
 date: "2021-01-02"
 category: "javascript"
+related:
+  - "Build and Publish a Presentation with RevealJS and Github"
+  - "VS Code Shell Integration"
+  - "TDD by Example: Fixing a Bug"
 ---
 
 If you've been coding for any length of time, you've probably heard that you should test your code, and by that I mean writing automated tests. This can be challenging at first, but with some practice, it becomes easier. When first learning to write tests, it's easier to have already written the production code, then open up another editor tab side by side with that code, and write some tests against that code. However, there's another approach to writing tests called [Test Driven Development](https://en.wikipedia.org/wiki/Test-driven_development), aka TDD. According to Wikipedia, TDD is:

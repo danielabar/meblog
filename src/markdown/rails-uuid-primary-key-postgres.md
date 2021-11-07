@@ -4,6 +4,10 @@ featuredImage: "../images/primary-keyflorian-berger-SzG0ncGBOeo-unsplash.jpg"
 description: "Learn how to use UUID as the primary key instead of a sequence for a Rails project using Postgres."
 date: "2020-11-01"
 category: "rails"
+related:
+  - "Testing Faraday with RSpec"
+  - "Start a Rails 6 Project with RSpec"
+  - "Dockerize a Rails Application for Development"
 ---
 
 When working with Rails and a relational database such as Postgres, the default option for primary key is an auto-incrementing sequence. So the first record inserted would get a primary key of 1, next one 2 and so on. Depending on the system, this can be an issue if these values get exposed in urls, for example `/subscription/265` would reveal that 265 subscriptions have been generated, and that the next one will be id 266.

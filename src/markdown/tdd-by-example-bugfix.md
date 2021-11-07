@@ -4,6 +4,10 @@ featuredImage: "../images/tdd-bug-charlotte-descamps-1sbVyhfdoQM-unsplash.jpg"
 description: "A practical example of using TDD to fix a bug and do some refactoring on an existing project."
 date: "2021-05-16"
 category: "javascript"
+related:
+  - "TDD by Example"
+  - "Improve Productivity with VS Code Snippets"
+  - "View Localhost on Your Phone"
 ---
 
 This post will demonstrate an example of using TDD (test driven development) to fix a bug on an existing project. If you're not familiar with TDD, see an [earlier post](/blog/tdd-by-example/) I wrote on this topic.

@@ -4,6 +4,10 @@ featuredImage: "../images/save-cell-praveen-kumar-mathivanan-yqLrqIsl294-unsplas
 description: "How much effort is it worth to try and save a few dollars on your cell phone bill?"
 date: "2021-04-26"
 category: "personal finance"
+related:
+  - "Promotional interest rates and the fine print"
+  - "Hack Your RRSP Tax Refund"
+  - "What Makes a Good Podcast"
 ---
 
 Today I want to share a cautionary tale about trying to save money on my mobility bill, and how its important to balance time, effort, and aggravation vs dollars saved.

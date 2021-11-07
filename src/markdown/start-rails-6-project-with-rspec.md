@@ -4,6 +4,10 @@ featuredImage: "../images/scaffold-rails-jack-b-S3SU988T13A-unsplash.jpg"
 description: "Learn how to start a new Rails 6 project with RSpec as the default testing library."
 date: "2020-10-18"
 category: "rails"
+related:
+  - "Solving a Python Interview Question in Ruby"
+  - "Testing Faraday with RSpec"
+  - "Rails Feature Test Solved by Regex"
 ---
 
 Currently at work I have one of those rare opportunities to greenfield new project. Since we're a Rails shop, naturally I'm using Rails, and since it's a new project, might as well use the latest and greatest, which at the time of this writing is Rails 6.

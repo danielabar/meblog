@@ -4,6 +4,10 @@ featuredImage: "../images/roll-your-own-luigi-pozzoli-iIS1SIO5_aY-unsplash.jpg"
 description: "Learn how to build search service using Rails and Postgres Full Text Search for a Gatsby blog."
 date: "2021-07-03"
 category: "gatsby"
+related:
+  - "Rails Strong Params for GET Request"
+  - "Testing Faraday with RSpec"
+  - "Fix Rails Blocked Host Error with Docker"
 ---
 
 This is the first in a multi-part series of posts detailing how I built the search feature for this blog.
