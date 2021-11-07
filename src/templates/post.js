@@ -55,7 +55,6 @@ export default Post
 // https://github.com/sititou70/gatsby-remark-related-posts-example/blob/master/src/templates/blog-post.js
 // https://github.com/gatsbyjs/gatsby/issues/8166
 // https://www.gatsbyjs.com/docs/graphql-reference/#filter
-// TODO: Specify smaller image width in relatedP query
 // query results available to component in props.data
 export const query = graphql`
   query($slug: String!, $relatedPosts: [String!]!) {
@@ -76,7 +75,7 @@ export const query = graphql`
       }
     }
     relatedP: allMarkdownRemark(
-      filter: { fields: { searchTitle: { in: $relatedPosts } } }
+      filter: { frontmatter: { title: { in: $relatedPosts } } }
     ) {
       edges {
         node {
