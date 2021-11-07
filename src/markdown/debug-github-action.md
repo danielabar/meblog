@@ -4,6 +4,10 @@ featuredImage: "../images/computer-bug.jpg"
 description: "How to use tmate to debug a github action for running CI with Rails and Postgres"
 date: "2021-02-15"
 category: "rails"
+related:
+  - "Dockerize a Rails Application for Development"
+  - "Fix Rails Blocked Host Error with Docker"
+  - "Crossword Solver with CentOS"
 ---
 
 A few weeks ago I was setting up CI (continuous integration) for a Rails project that uses Sidekiq, Redis, and Postgres. Pretty straightforward, just needed to run a build, install and configure the services (Postgres and Redis), initialize the database, then run linting and tests.
@@ -333,15 +337,3 @@ And this time the workflow did run successfully. The database was initialized wi
 ## Conclusion
 
 If you get stuck on a Github Action workflow not running as you would expect, try adding the [tmate](https://github.com/mxschmitt/action-tmate) action to your workflow file, ssh to the runner machine, and see what you can find. Remember to remove the debug step when the issue has been resolved.
-
-## Related Content
-
-The following section contains affiliate links for related content you may find useful. I get a small commission from purchases which helps me maintain this site.
-
-Working on a large legacy code base? This book [Working Effectively with Legacy Code](https://amzn.to/3accwHF) is a must read.
-
-Martin Fowler's [Refactoring: Improving the Design of Existing Code](https://amzn.to/2RFC0Xn) is also amazingly useful on this topic.
-
-Is your organization introducing microservices? This book [Building Event-Driven Microservices: Leveraging Organizational Data at Scale](https://amzn.to/3uSxa87) is a fantastic resource on this topic.
-
-Looking to level up on Rails 6? You might like this book: [Agile Web Development with Rails 6](https://amzn.to/3wS8GNA).

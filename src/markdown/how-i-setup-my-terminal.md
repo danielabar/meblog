@@ -4,6 +4,10 @@ featuredImage: "../images/terminal-cookie-the-pom-gySMaocSdqs-unsplash.jpg"
 description: "How to setup your terminal with oh-my-zsh and agnoster theme"
 date: "2019-12-15"
 category: "terminal"
+related:
+  - "Access Chrome Bookmarks with Keyboard"
+  - "Automate Tabs & Commands in iTerm2"
+  - "Crossword Solver with CentOS"
 ---
 
 Have you ever seen a course, tutorial or colleague using their terminal and it looks something like this:
@@ -81,15 +85,3 @@ For any other customizations, copy them over from your old profile `~/.bashrc` o
 * Check out the other Oh My Zsh [themes](https://github.com/ohmyzsh/ohmyzsh/wiki/Themes), there's a whole bunch.
 * Learn more about iTerm2 [here](https://www.iterm2.com/documentation.html).
 * Enjoy looking at your awesome terminal.
-
-## Related Content
-
-The following section contains affiliate links for related content you may find useful. I get a small commission from purchases which helps me maintain this site.
-
-Looking to level up on Rails 6? You might like this book: [Agile Web Development with Rails 6](https://amzn.to/3wS8GNA).
-
-Working on a large legacy code base? This book [Working Effectively with Legacy Code](https://amzn.to/3accwHF) is a must read.
-
-Martin Fowler's [Refactoring: Improving the Design of Existing Code](https://amzn.to/2RFC0Xn) is also amazingly useful on this topic.
-
-Is your organization introducing microservices? This book [Building Event-Driven Microservices: Leveraging Organizational Data at Scale](https://amzn.to/3uSxa87) is a fantastic resource on this topic.

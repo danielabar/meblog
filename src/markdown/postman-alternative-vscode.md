@@ -3,7 +3,11 @@ title: "A VS Code Alternative to Postman"
 featuredImage: "../images/rest-aaron-burden-2bg1jPty490-unsplash.jpg"
 description: "Looking for a Postman alternative? This VS Code REST Client extension could be the answer."
 date: "2021-06-13"
-category: "Web Development"
+category: "vscode"
+related:
+  - "VS Code Shell Integration"
+  - "Off with the Digital Distractions!"
+  - "Build and Publish a Presentation with RevealJS and Github"
 ---
 
 If you've been doing web development for any length of time, you've probably built or worked on an HTTP REST style API and needed a REST Client to test it. [Postman](https://www.postman.com/product/rest-client/) is a very popular choice and I used to reach for this all the time. However, I'd like to share another tool, a VS Code extension that is working better for me, as an alternative to Postman.
@@ -167,15 +171,3 @@ Finally if not every developer on the team is using VS Code, will have to invest
 ## Conclusion
 
 If everyone on the team that wants to run requests is able to access version control, and setup VS Code (or another editor that supports the http extension), then this is a great solution and alternative to Postman. I've been using it for nearly a year now, both on work and side projects and am very happy with it. I hope you'll give it a try and see some benefits as well.
-
-## Related Content
-
-The following section contains affiliate links for related content you may find useful. I get a small commission from purchases which helps me maintain this site.
-
-Looking to level up on Rails 6? You might like this book: [Agile Web Development with Rails 6](https://amzn.to/3wS8GNA).
-
-Working on a large legacy code base? This book [Working Effectively with Legacy Code](https://amzn.to/3accwHF) is a must read.
-
-Martin Fowler's [Refactoring: Improving the Design of Existing Code](https://amzn.to/2RFC0Xn) is also amazingly useful on this topic.
-
-Is your organization introducing microservices? This book [Building Event-Driven Microservices: Leveraging Organizational Data at Scale](https://amzn.to/3uSxa87) is a fantastic resource on this topic.

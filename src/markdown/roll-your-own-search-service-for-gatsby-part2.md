@@ -4,6 +4,10 @@ featuredImage: "../images/roll-search-2.png"
 description: "Learn how to build search service using Rails and Postgres Full Text Search for a Gatsby blog."
 date: "2021-07-04"
 category: "web development"
+related:
+  - "Construct a PATCH request for a JSON API"
+  - "Dockerize a Rails Application for Development"
+  - "Debug Github Actions"
 ---
 
 This is the second in a multi-part series of posts detailing how I built the search feature for this blog. In this post, I will explain how I built the search index.

@@ -4,6 +4,10 @@ featuredImage: "../images/scaffold-rails-jack-b-S3SU988T13A-unsplash.jpg"
 description: "Learn how to start a new Rails 6 project with RSpec as the default testing library."
 date: "2020-10-18"
 category: "rails"
+related:
+  - "Solving a Python Interview Question in Ruby"
+  - "Testing Faraday with RSpec"
+  - "Rails Feature Test Solved by Regex"
 ---
 
 Currently at work I have one of those rare opportunities to greenfield new project. Since we're a Rails shop, naturally I'm using Rails, and since it's a new project, might as well use the latest and greatest, which at the time of this writing is Rails 6.
@@ -94,15 +98,3 @@ rm -rf test
 ```
 
 That's it, now you're setup for RSpec testing, happy coding!
-
-## Related Content
-
-The following section contains affiliate links for related content you may find useful. I get a small commission from purchases which helps me maintain this site.
-
-Looking to level up on Rails 6? You might like this book: [Agile Web Development with Rails 6](https://amzn.to/3wS8GNA).
-
-Working on a large legacy code base? This book [Working Effectively with Legacy Code](https://amzn.to/3accwHF) is a must read.
-
-Martin Fowler's [Refactoring: Improving the Design of Existing Code](https://amzn.to/2RFC0Xn) is also amazingly useful on this topic.
-
-Is your organization introducing microservices? This book [Building Event-Driven Microservices: Leveraging Organizational Data at Scale](https://amzn.to/3uSxa87) is a fantastic resource on this topic.

@@ -4,6 +4,10 @@ featuredImage: "../images/gatsby-unit-test-nina-mercado-5Y8NrzPya-w-unsplash.jpg
 description: "Learn how to add unit tests to a Gatsby site with Jest and react-testing-library."
 date: "2021-09-26"
 category: "gatsby"
+related:
+  - "Build a CI/CD Pipeline for a Gatsby Site"
+  - "Add a Language to gatsby-remark-vscode"
+  - "Roll Your Own Search with Rails and Postgres: Search UI"
 ---
 
 This post will demonstrate how to add unit tests to a Gatsby project using Jest and react-testing-library. Gatsby is a static site generator powered by React and GraphQL so the libraries to test it are similar to those used for testing any React project.

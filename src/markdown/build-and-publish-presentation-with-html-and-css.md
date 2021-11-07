@@ -4,6 +4,10 @@ featuredImage: "../images/presentation.jpg"
 description: "Learn how to build and publish a presentation with RevealJS and Github."
 date: "2021-03-28"
 category: "web development"
+related:
+  - "Find Jira Tickets Faster"
+  - "Access Chrome Bookmarks with Keyboard"
+  - "View Localhost on Your Phone"
 ---
 
 If you've ever given a presentation at a conference, meetup, or even a lunch and learn for your colleagues at work, you probably needed some slides to go along with your talk. The standard tools to make these are Microsoft PowerPoint, Apple Keynote, or Google Slides. These will get the job done, with PowerPoint and Keynote being more feature rich than the free Google Slides.

@@ -4,6 +4,10 @@ featuredImage: "../images/save-cell-praveen-kumar-mathivanan-yqLrqIsl294-unsplas
 description: "How much effort is it worth to try and save a few dollars on your cell phone bill?"
 date: "2021-04-26"
 category: "personal finance"
+related:
+  - "Promotional interest rates and the fine print"
+  - "Hack Your RRSP Tax Refund"
+  - "What Makes a Good Podcast"
 ---
 
 Today I want to share a cautionary tale about trying to save money on my mobility bill, and how its important to balance time, effort, and aggravation vs dollars saved.
@@ -57,15 +61,3 @@ Duration: Half hour on the phone.
 ## Final Thoughts
 
 The final tally is 3 hours of work to save $180/year and staying at roughly equivalent service, which works out to $60/hour for my efforts. Was it worth it? Well I'm happy to be saving money but not sure it was worth all the aggravation - potential loss of service, all that time on hold, debating with CSRs. This is something to think about when embarking on a money saving task -  how much money could be saved vs the value and opportunity cost of your time to do it. It may not always be worth it.
-
-## Related Content
-
-The following section contains affiliate links for related content you may find useful. I get a small commission from purchases which helps me maintain this site.
-
-This book [Your Money or Your Life](https://amzn.to/2Q4UboX), completely changed how I view money. Never mind all the economists definitions like money is a "unit of account" or a "store of value". This book will teach you the only definition of money that matters in your life.
-
-Even if you love your job and could never imagine quitting, [Quit Like A Millionaire](https://amzn.to/3hu0xcQ) will teach you how to amass enough wealth to live life on your own terms. Equal parts entertaining and educational, this is one of the most enjoyable personal finance books I have read.
-
-Another book I really enjoyed is [The Psychology of Money: Timeless lessons on wealth, greed, and happiness](https://amzn.to/2Q7BIrT). In it you'll learn that being successful with money depends way more on how you behave than being a so-called financial expert.
-
-Looking for information on Canadian taxes? You might like this book: [The Grumpy Accountant: One Fed-Up Tax Pro's Practical Plan to Fix Canada's Senselessly Complicated Tax System](https://amzn.to/3aaj4qh).

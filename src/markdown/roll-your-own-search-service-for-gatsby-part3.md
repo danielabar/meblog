@@ -4,6 +4,10 @@ featuredImage: "../images/roll-search-3.jpg"
 description: "Learn how to build search service using Rails and Postgres Full Text Search for a Gatsby blog."
 date: "2021-07-10"
 category: "PostgreSQL"
+related:
+  - "Add Rubocop to an Existing Rails Project"
+  - "Start a Rails 6 Project with RSpec"
+  - "Use UUID for primary key with Rails and Postgres"
 ---
 
 This is the third in a multi-part series of posts detailing how I built the search feature for this blog. This post will provide an overview of the search engine, provided by PostgreSQL [Full Text Search](https://www.postgresql.org/docs/13/textsearch.html), and introduce some concepts that will be needed in understanding how to integrate this with Rails.

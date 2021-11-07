@@ -4,6 +4,10 @@ featuredImage: "../images/search-jira-markus-winkler-afW1hht0NSs-unsplash.jpg"
 description: "Use this simple little trick to make finding Jira tickets faster."
 date: "2020-10-11"
 category: "productivity"
+related:
+  - "Off with the Digital Distractions!"
+  - "Access Chrome Bookmarks with Keyboard"
+  - "How to Learn New Things"
 ---
 
 A short blog post for today. Just wanted to share a neat trick my colleague showed me recently to find Jira tickets faster, given that you know the ticket number.

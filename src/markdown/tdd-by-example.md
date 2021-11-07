@@ -4,6 +4,10 @@ featuredImage: "../images/tdd-by-example.png"
 description: "A practical example of using TDD to add a new feature to an existing project."
 date: "2021-01-02"
 category: "javascript"
+related:
+  - "Build and Publish a Presentation with RevealJS and Github"
+  - "VS Code Shell Integration"
+  - "TDD by Example: Fixing a Bug"
 ---
 
 If you've been coding for any length of time, you've probably heard that you should test your code, and by that I mean writing automated tests. This can be challenging at first, but with some practice, it becomes easier. When first learning to write tests, it's easier to have already written the production code, then open up another editor tab side by side with that code, and write some tests against that code. However, there's another approach to writing tests called [Test Driven Development](https://en.wikipedia.org/wiki/Test-driven_development), aka TDD. According to Wikipedia, TDD is:
@@ -857,15 +861,3 @@ One more quick note about the calculator - eagle eyed readers may have observed 
 ## Conclusion
 
 I hope this post has given you some ideas about how to get started with TDD. The TDD approach lends itself really well to cases where the exact requirements are known. I've found this to especially be the case with calculations, validations and transformation type code. Next time you're adding a new feature to a project, if you know exactly how the new feature should behave, try to write a test for it first.
-
-## Related Content
-
-The following section contains affiliate links for related content you may find useful. I get a small commission from purchases which helps me maintain this site.
-
-You've seen a few simple examples of refactoring in this blog post. Martin Fowler's [Refactoring: Improving the Design of Existing Code](https://amzn.to/2RFC0Xn) is the go-to book to learn all about this topic.
-
-Working on a large legacy code base? This book [Working Effectively with Legacy Code](https://amzn.to/3accwHF) is a must read.
-
-Is your organization introducing microservices? This book [Building Event-Driven Microservices: Leveraging Organizational Data at Scale](https://amzn.to/3uSxa87) is a fantastic resource on this topic.
-
-Looking to level up on Rails 6? You might like this book: [Agile Web Development with Rails 6](https://amzn.to/3wS8GNA).

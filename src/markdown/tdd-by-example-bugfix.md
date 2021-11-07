@@ -4,6 +4,10 @@ featuredImage: "../images/tdd-bug-charlotte-descamps-1sbVyhfdoQM-unsplash.jpg"
 description: "A practical example of using TDD to fix a bug and do some refactoring on an existing project."
 date: "2021-05-16"
 category: "javascript"
+related:
+  - "TDD by Example"
+  - "Improve Productivity with VS Code Snippets"
+  - "View Localhost on Your Phone"
 ---
 
 This post will demonstrate an example of using TDD (test driven development) to fix a bug on an existing project. If you're not familiar with TDD, see an [earlier post](/blog/tdd-by-example/) I wrote on this topic.
@@ -881,15 +885,3 @@ This post has walked you through a practical example of using TDD to fix a bug, 
 5. Refactor and re-run tests as needed.
 
 I hope this has inspired you to try out TDD next time you're faced with a bug. Good luck and happy coding!
-
-## Related Content
-
-The following section contains affiliate links for related content you may find useful. I get a small commission from purchases which helps me maintain this site.
-
-You've seen a few simple examples of refactoring in this blog post. Martin Fowler's [Refactoring: Improving the Design of Existing Code](https://amzn.to/2RFC0Xn) is the go-to book to learn all about this topic.
-
-Working on a large legacy code base? This book [Working Effectively with Legacy Code](https://amzn.to/3accwHF) is a must read.
-
-Is your organization introducing microservices? This book [Building Event-Driven Microservices: Leveraging Organizational Data at Scale](https://amzn.to/3uSxa87) is a fantastic resource on this topic.
-
-Looking to level up on Rails 6? You might like this book: [Agile Web Development with Rails 6](https://amzn.to/3wS8GNA).

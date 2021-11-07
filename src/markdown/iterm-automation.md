@@ -4,6 +4,10 @@ featuredImage: "../images/automation-2-jan-jakub-nanista-UHyrjKPsshk-unsplash.jp
 description: "Speed up your daily workflow with iTerm2 automation."
 date: "2021-02-16"
 category: "terminal"
+related:
+    - "How I Setup my Terminal"
+    - "VS Code Shell Integration"
+    - "Crossword Solver with CentOS"
 ---
 
 Do you find yourself opening many iTerm tabs every day to do the same daily routine such as opening editors, running a build, starting up various services etc? If yes, good news, this tedious daily startup routine can be automated, saving you precious minutes each day. This post will walk you through how to achieve this automation using [iTerm](https://iterm2.com/) and Python.
@@ -167,17 +171,3 @@ You can keep customizing until the script is performing all the daily tasks you 
 ## Backup
 
 Last thing to do is to make a backup of the script to avoid losing it should your hard drive crash. The script is located at `/Users/yourusername/Library/Application Support/iTerm2/Scripts/script-name.py`.
-
-## Related Content
-
-The following section contains affiliate links for related content you may find useful. I get a small commission from purchases which helps me maintain this site.
-
-Just wanted to share a book I found really incredible in improving my productivity by figuring out *when* is the best time to do certain types of tasks such as analytical vs insight. The book is [When: The Scientific Secrets of Perfect Timing](https://amzn.to/32dBPF1).
-
-Looking to level up on Rails 6? You might like this book: [Agile Web Development with Rails 6](https://amzn.to/3wS8GNA).
-
-Working on a large legacy code base? This book [Working Effectively with Legacy Code](https://amzn.to/3accwHF) is a must read.
-
-Martin Fowler's [Refactoring: Improving the Design of Existing Code](https://amzn.to/2RFC0Xn) is also amazingly useful on this topic.
-
-Is your organization introducing microservices? This book [Building Event-Driven Microservices: Leveraging Organizational Data at Scale](https://amzn.to/3uSxa87) is a fantastic resource on this topic.

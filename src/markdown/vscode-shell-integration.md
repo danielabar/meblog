@@ -4,6 +4,10 @@ featuredImage: "../images/vscode-shell-integration-michael-dziedzic-qDG7XKJLKbs-
 description: "Open files and folders faster in VS Code with this simple trick to enable shell integration."
 date: "2020-08-23"
 category: "vscode"
+related:
+  - "A VS Code Alternative to Postman"
+  - "Navigate Back & Forth in VS Code"
+  - "Improve Productivity with VS Code Snippets"
 ---
 
 Today I'm going to share a simple technique for making it easier and faster to open projects or individual files with [VS Code](https://code.visualstudio.com/), using your terminal instead of the VS Code editor. By default, the process for opening a folder or file goes something like this:

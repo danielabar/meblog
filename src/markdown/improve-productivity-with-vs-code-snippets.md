@@ -4,6 +4,10 @@ featuredImage: "../images/snippet-riyaz-hyder-czc72SCP5C4-unsplash.jpg"
 description: "Follow along with this tutorial to learn how to create VS Code snippets."
 date: "2020-11-27"
 category: "vscode"
+related:
+  - "Navigate Back & Forth in VS Code"
+  - "A VS Code Alternative to Postman"
+  - "VS Code Shell Integration"
 ---
 
 Have you ever found yourself repeating a certain pattern while coding over and over and thought there's got to be a faster way? For example, if you work with React and hooks, many component file will have this as the first line:
@@ -148,9 +152,3 @@ Again save these changes and try the snippet again in a markdown file. This time
 ## Summary
 
 That's it, your very first custom VS Code snippet. I hope this post has taught you how to continue building more of these to optimize your workflow.
-
-## Related Content
-
-The following section contains affiliate links for related content you may find useful. I get a small commission from purchases which helps me maintain this site.
-
-Speaking of productivity, wanted to share a book I found really incredible in improving my productivity at work by figuring out *when* is the best time to do certain types of tasks such as analytical vs insight. The book is [When: The Scientific Secrets of Perfect Timing](https://amzn.to/32dBPF1).

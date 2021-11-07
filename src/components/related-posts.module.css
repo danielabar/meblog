@@ -1,0 +1,48 @@
+.container {
+  margin-top: 60px;
+}
+
+.postsContainer {
+  align-content: space-around;
+  display: flex;
+  flex-direction: row;
+  flex-wrap: wrap;
+  justify-content: space-between;
+  row-gap: 30px;
+}
+
+.header {
+  font-size: 34px;
+  font-weight: 500;
+  letter-spacing: -0.5px;
+  line-height: 2.5rem;
+  margin: 45px 0 15px;
+  opacity: 0.8;
+}
+
+.postLink {
+  display: inline-block;
+}
+
+.postImage {
+  border-radius: 3px;
+  opacity: 0.9;
+  transition: all 0.3s ease;
+}
+
+.postTitle {
+  font-size: 18px;
+  font-weight: 500;
+  max-width: 270px; /* match image width in post.js relatedP query */
+  opacity: 0.9;
+  transition: all 0.3s ease;
+}
+
+.postLink:hover .postImage {
+  opacity: 1;
+}
+
+.postLink:hover .postTitle {
+  text-decoration: underline;
+  opacity: 1;
+}

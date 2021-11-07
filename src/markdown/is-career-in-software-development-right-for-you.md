@@ -4,6 +4,10 @@ featuredImage: "../images/career-software-markus-spiske-Fa0pTKuoDVY-unsplash.jpg
 description: "Some personality traits that make a good software developer"
 date: "2020-07-26"
 category: "career"
+related:
+  - "How to Learn New Things"
+  - "TDD by Example"
+  - "Off with the Digital Distractions!"
 ---
 
 A career in software development can be very rewarding. Being able to build things that are used in the real world and helping people is amazing. It can be a surprisingly creative field. It's generally well compensated and most jobs come with good benefits such as health/dental, paid vacation, etc. At the time of this writing, demand for developers far outweighs supply, so employment opportunities are very good (although there can be instability within specific companies or even industries).
@@ -45,9 +49,3 @@ The field of software development is constantly evolving - there's always a new 
 ## Conclusion
 
 If you recognize some of these qualities in yourself and have never done any programming, definitely consider taking an introductory workshop or pick up a beginner book. As for what to try, web development (HTML, CSS and JavaScript) is popular and these skills are in demand. Python is also very beginner friendly. But even if none of these qualities resonate with you, if you're curious about programming I would still encourage everyone to try it and find out for themselves if they enjoy it.
-
-## Related Content
-
-The following section contains affiliate links for related content you may find useful. I get a small commission from purchases which helps me maintain this site.
-
-Just wanted to share a book I found really incredible in improving my productivity by figuring out *when* is the best time to do certain types of tasks such as analytical vs insight. The book is [When: The Scientific Secrets of Perfect Timing](https://amzn.to/32dBPF1).

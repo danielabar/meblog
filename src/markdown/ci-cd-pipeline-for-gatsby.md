@@ -4,6 +4,10 @@ featuredImage: "../images/ci-cd-pipeline-gatsby-ej-strat-VjWi56AWQ9k-unsplash.jp
 description: "Learn how to build a continuous integration and deployment pipeline for a Gatsby site to save time and manual effort."
 date: "2021-10-23"
 category: "gatsby"
+related:
+  - "Get started with Gatsby and Unit Testing"
+  - "Add a Language to gatsby-remark-vscode"
+  - "Roll Your Own Search with Rails and Postgres: Search UI"
 ---
 
 This post will walk through how to set up a CI/CD (Continuous Integration and Continuous Deployment) pipeline for a Gatsby site. Let's start with a definition from [Wikipedia](https://en.wikipedia.org/wiki/CI/CD):
@@ -248,15 +252,3 @@ Of course your Gatsby site may have some different details. For example, instead
 ## Conclusion
 
 This post has walked through how to think about the process of CI/CD for a Gatsby site. It begins by writing down the current list of manual tasks, figuring out which of these steps need to run when, and setting up Github Action workflows to automate them. It also explained how to use the `workflow_run` trigger to make one workflow dependent on the success of another. I hope this will serve as an inspiration for others to automate some manual tasks they may be doing on their projects.
-
-## Related Content
-
-The following section contains affiliate links for related content you may find useful. I get a small commission from purchases which helps me maintain this site.
-
-Working on a large legacy code base? This book [Working Effectively with Legacy Code](https://amzn.to/3accwHF) is a must read.
-
-Martin Fowler's [Refactoring: Improving the Design of Existing Code](https://amzn.to/2RFC0Xn) is also amazingly useful on this topic.
-
-Is your organization introducing microservices? This book [Building Event-Driven Microservices: Leveraging Organizational Data at Scale](https://amzn.to/3uSxa87) is a fantastic resource on this topic.
-
-Looking to level up on Rails 6? You might like this book: [Agile Web Development with Rails 6](https://amzn.to/3wS8GNA).

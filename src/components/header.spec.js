@@ -21,7 +21,7 @@ describe("Header", () => {
 
     expect(container).toMatchSnapshot()
     expect(screen.getByTestId("nav-menu")).toBeInTheDocument
-    expect(useViewport).toHaveBeenCalled();
+    expect(useViewport).toHaveBeenCalled()
   })
 
   it("renders nav menu responsive for narrow widths", () => {
@@ -30,6 +30,6 @@ describe("Header", () => {
 
     expect(container).toMatchSnapshot()
     expect(screen.getByTestId("nav-menu-responsive")).toBeInTheDocument
-    expect(useViewport).toHaveBeenCalled();
+    expect(useViewport).toHaveBeenCalled()
   })
 })

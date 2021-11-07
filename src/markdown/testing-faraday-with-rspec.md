@@ -4,6 +4,10 @@ featuredImage: "../images/faraday-alex-kondratiev-H9t723yPjYI-unsplash.jpg"
 description: "Learn two different techniques for testing code that uses Faraday with RSpec."
 date: "2021-08-14"
 category: "ruby"
+related:
+  - "Solving a Python Interview Question in Ruby"
+  - "Debug Github Actions"
+  - "Start a Rails 6 Project with RSpec"
 ---
 
 If you've ever developed code that had to integrate with a third party service that didn't have an up-to-date gem available, there's a good chance you've had to reach for an HTTP client to make requests to the service. [Faraday](https://github.com/lostisland/faraday) is a popular choice. It's easy to use and well documented. However, the way in which it gets used will impact how the code can be tested. This post will go through two different ways it can be tested.
@@ -376,15 +380,3 @@ If on the other hand, you're dealing with legacy code that uses the Faraday clas
 This post has covered two different ways of using and testing Faraday for making HTTP requests to an external service. The first approach is to use Faraday's class helper methods, and test with regular RSpec stubbing. Although this works, it can lead to brittle, difficult to read tests, but may be the safest option when dealing with legacy code. The second approach is to design the client class with dependency injection, then use Faraday's built-in test adapter to inject a stubbed connection into the class for testing. This results in cleaner, easier to read tests.
 
 All the code used in this post can be found on [Github](https://github.com/danielabar/ruby-weather).
-
-## Related Content
-
-The following section contains affiliate links for related content you may find useful. I get a small commission from purchases which helps me maintain this site.
-
-Looking to level up on Rails 6? You might like this book: [Agile Web Development with Rails 6](https://amzn.to/3wS8GNA).
-
-Working on a large legacy code base? This book [Working Effectively with Legacy Code](https://amzn.to/3accwHF) is a must read.
-
-Martin Fowler's [Refactoring: Improving the Design of Existing Code](https://amzn.to/2RFC0Xn) is also amazingly useful on this topic.
-
-Is your organization introducing microservices? This book [Building Event-Driven Microservices: Leveraging Organizational Data at Scale](https://amzn.to/3uSxa87) is a fantastic resource on this topic.

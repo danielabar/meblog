@@ -2,7 +2,7 @@ import React from "react"
 import { Link } from "gatsby"
 import * as styles from "./pagination.module.css"
 
-const Pagination = (props) => (
+const Pagination = props => (
   <div className={styles.container}>
     {!props.isFirst && (
       <div

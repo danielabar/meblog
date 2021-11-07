@@ -4,6 +4,10 @@ featuredImage: "../images/bookmark-chiara-f-MI8He1NWPWg-unsplash.jpg"
 description: "Improve productivity with keyboard access to Chrome bookmarks using Alfred for Mac."
 date: "2020-04-26"
 category: "productivity"
+related:
+  - "Find Jira Tickets Faster"
+  - "Off with the Digital Distractions!"
+  - "Build and Publish a Presentation with RevealJS and Github"
 ---
 
 If you frequently use [Chrome bookmarks](https://support.google.com/chrome/answer/188842?co=GENIE.Platform%3DDesktop&hl=en), then you probably have long lists of them, possibly nested if they're organized with folders and sub-folders.
@@ -35,15 +39,3 @@ For example, I have a bookmark folder named "design", so typing <kbd class="mark
 ![alfred bookmark example](../images/alfred-bookmark-example.png "alfred bookmark example")
 
 Enjoy improved productivity.
-
-## Related Content
-
-The following section contains affiliate links for related content you may find useful. I get a small commission from purchases which helps me maintain this site.
-
-Looking to level up on Rails 6? You might like this book: [Agile Web Development with Rails 6](https://amzn.to/3wS8GNA).
-
-Working on a large legacy code base? This book [Working Effectively with Legacy Code](https://amzn.to/3accwHF) is a must read.
-
-Martin Fowler's [Refactoring: Improving the Design of Existing Code](https://amzn.to/2RFC0Xn) is also amazingly useful on this topic.
-
-Is your organization introducing microservices? This book [Building Event-Driven Microservices: Leveraging Organizational Data at Scale](https://amzn.to/3uSxa87) is a fantastic resource on this topic.

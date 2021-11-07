@@ -4,6 +4,10 @@ featuredImage: "../images/podcast-jonathan-velasquez-c1ZN57GfDB0-unsplash.jpg"
 description: "What Makes a Good Podcast"
 date: "2020-06-28"
 category: "podcasts"
+related:
+  - "Off with the Digital Distractions!"
+  - "Access Chrome Bookmarks with Keyboard"
+  - "Find Jira Tickets Faster"
 ---
 
 I absolutely love podcasts. It's probably safe to assume everyone already knows what a podcast is, but just in case, [Wikipedia](https://en.wikipedia.org/wiki/Podcast) defines it as:

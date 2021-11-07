@@ -3,7 +3,11 @@ title: "Roll Your Own Search with Rails and Postgres: Search API"
 featuredImage: "../images/roll-search-4.jpg"
 description: "Learn how to build search service using Rails and Postgres Full Text Search for a Gatsby blog."
 date: "2021-07-11"
-category: "Rails"
+category: "rails"
+related:
+  - "Rails Feature Test Solved by Regex"
+  - "Solving a Python Interview Question in Ruby"
+  - "Testing Faraday with RSpec"
 ---
 
 This is the fourth in a multi-part series of posts detailing how I built the search feature for this blog. This post will explain how to build a search API with Rails, using the [pg-search](https://github.com/Casecommons/pg_search) gem and how to deploy it to production.

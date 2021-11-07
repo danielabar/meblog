@@ -3,7 +3,11 @@ title: "Roll Your Own Search with Rails and Postgres: Search UI"
 featuredImage: "../images/roll-search-5.jpg"
 description: "Learn how to build search service using Rails and Postgres Full Text Search for a Gatsby blog."
 date: "2021-07-17"
-category: "Gatsby"
+category: "gatsby"
+related:
+  - "Add a Language to gatsby-remark-vscode"
+  - "Build a CI/CD Pipeline for a Gatsby Site"
+  - "TDD by Example: Fixing a Bug"
 ---
 
 This is the fifth and final in a multi-part series of posts detailing how I built the search feature for this blog. This post will explain how to build a search UI with Gatsby, making use of the search service that we've built up throughout the earlier posts in this series.

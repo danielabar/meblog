@@ -4,6 +4,10 @@ featuredImage: "../images/distraction-charlz-gutierrez-de-pineres-2w_U2-Ah57E-un
 description: "Improve your productivity and focus by reducing digital distractions in your life"
 date: "2020-05-24"
 category: "productivity"
+related:
+  - "Find Jira Tickets Faster"
+  - "Access Chrome Bookmarks with Keyboard"
+  - "Automate Tabs & Commands in iTerm2"
 ---
 
 As a programmer, it's important to have long uninterrupted stretches of time to focus on complex tasks. When working on a difficult task, I often have a lot of "context" in my head, kind of a house of cards. An interruption will cause the cards to come tumbling down. It can take 20 minutes or more to get back in the zone after an interruption, which is a serious hit to productivity, especially considering the source of potential distractions has exploded in recent years. Ever since the ubiquity of smart phones and social media, these digital interruptions have become a normal part of everyone's day.  In this post, I'll share a few things you can do to minimize these, and get your focus back.
@@ -47,17 +51,3 @@ Whether you use Outlook or Gmail or any other email client, go to the notificati
 ## Final Thoughts
 
 If you've been losing productivity due to digital distractions, I hope trying some of these tips will help you. Just one final word of caution - before doing any of these, especially the work related apps, check with your manager on expectations around communication. For example, if you receive an email, are you expected to reply within an hour? The next day? How about a Slack message in a team channel? In my opinion, the ideal is a company that values [asynchronous communication](https://blog.doist.com/asynchronous-communication/) but from my experience, this has been the exception rather than the rule.
-
-## Related Content
-
-The following section contains affiliate links for related content you may find useful. I get a small commission from purchases which helps me maintain this site.
-
-Just wanted to share a book I found really incredible in improving my productivity by figuring out *when* is the best time to do certain types of tasks such as analytical vs insight. The book is [When: The Scientific Secrets of Perfect Timing](https://amzn.to/32dBPF1).
-
-Looking to level up on Rails 6? You might like this book: [Agile Web Development with Rails 6](https://amzn.to/3wS8GNA).
-
-Working on a large legacy code base? This book [Working Effectively with Legacy Code](https://amzn.to/3accwHF) is a must read.
-
-Martin Fowler's [Refactoring: Improving the Design of Existing Code](https://amzn.to/2RFC0Xn) is also amazingly useful on this topic.
-
-Is your organization introducing microservices? This book [Building Event-Driven Microservices: Leveraging Organizational Data at Scale](https://amzn.to/3uSxa87) is a fantastic resource on this topic.

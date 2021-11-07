@@ -4,6 +4,10 @@ featuredImage: "../images/python-interview-question.jpg"
 description: "Learn how to model tuples in Ruby and solve a Python data science interview question in Ruby."
 date: "2021-03-01"
 category: "ruby"
+related:
+  - "Testing Faraday with RSpec"
+  - "Add Rubocop to an Existing Rails Project"
+  - "Construct a PATCH request for a JSON API"
 ---
 
 A few months ago, I came across a tweet posing a technical interview question for a data science position using Python:
@@ -394,15 +398,3 @@ To circle back to the original tweet that inspired all this, I didn't time mysel
 * How to setup a plain Ruby project with RSpec tests.
 
 What do you think of all this? Tweet me if you have some thoughts on - is there a faster/better way to implement run length encoding in Ruby? Have I missed some test cases? What do you think of this style of interview question?
-
-## Related Content
-
-The following section contains affiliate links for related content you may find useful. I get a small commission from purchases which helps me maintain this site.
-
-Looking to level up on Rails 6? You might like this book: [Agile Web Development with Rails 6](https://amzn.to/3wS8GNA).
-
-Working on a large legacy code base? This book [Working Effectively with Legacy Code](https://amzn.to/3accwHF) is a must read.
-
-Martin Fowler's [Refactoring: Improving the Design of Existing Code](https://amzn.to/2RFC0Xn) is also amazingly useful on this topic.
-
-Is your organization introducing microservices? This book [Building Event-Driven Microservices: Leveraging Organizational Data at Scale](https://amzn.to/3uSxa87) is a fantastic resource on this topic.

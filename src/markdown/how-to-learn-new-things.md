@@ -4,6 +4,10 @@ featuredImage: "../images/learning-tim-mossholder-WE_Kv_ZB1l0-unsplash.jpg"
 description: "What are all the different ways to learn new things in your programming career"
 date: "2020-01-26"
 category: "career"
+related:
+  - "Is a Career in Software Development Right for You?"
+  - "TDD by Example"
+  - "Off with the Digital Distractions!"
 ---
 
 As a software developer, you constantly have to learn new things to keep up. Some areas, such as front end web development change faster than others but regardless of what area you're working in, there's a good chance that things have changed since you started your career. It's important to keep learning to take advantage of new opportunities and avoid being stuck in the same job forever, or being laid off from that job and struggling to find a new one because your skills have gone out of date.
@@ -145,9 +149,3 @@ No matter which style of learning you choose, you'll get the most out of it by t
 Regarding the expense, some employers will reimburse employees for continuing education. Definitely ask your boss or HR department if there is such a program where you work and what are the requirements. For example, you may be required to pay up front, then present some evidence of successful completion before being reimbursed.
 
 And finally, keep on learning.
-
-## Related Content
-
-The following section contains affiliate links for related content you may find useful. I get a small commission from purchases which helps me maintain this site.
-
-Just wanted to share a book I found really incredible in improving my productivity by figuring out *when* is the best time to do certain types of tasks such as analytical vs insight. The book is [When: The Scientific Secrets of Perfect Timing](https://amzn.to/32dBPF1).

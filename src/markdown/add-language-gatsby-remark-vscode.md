@@ -3,7 +3,11 @@ title: "Add a Language to gatsby-remark-vscode"
 featuredImage: "../images/add-language-pankaj-patel-fvMeP4ml4bU-unsplash.jpg"
 description: "Learn how to add a new language for syntax highlighting to gatsby-remark-vscode."
 date: "2021-06-14"
-category: "web development"
+category: "gatsby"
+related:
+  - "Get started with Gatsby and Unit Testing"
+  - "Build a CI/CD Pipeline for a Gatsby Site"
+  - "Roll Your Own Search with Rails and Postgres: Search UI"
 ---
 
 This blog is built with [Gatsby](https://www.gatsbyjs.com/), and being an engineering blog, naturally requires a syntax higlighter. I'm using `gatsby-remark-vscode` for this, which is a Gatsby plugin that adds syntax highlighting using VS Code's highlighting engine. It comes with [over 50](https://www.gatsbyjs.com/plugins/gatsby-remark-vscode/#built-in-languages-and-themes) built-in languages.

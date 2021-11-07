@@ -4,6 +4,10 @@ featuredImage: "../images/primary-keyflorian-berger-SzG0ncGBOeo-unsplash.jpg"
 description: "Learn how to use UUID as the primary key instead of a sequence for a Rails project using Postgres."
 date: "2020-11-01"
 category: "rails"
+related:
+  - "Testing Faraday with RSpec"
+  - "Start a Rails 6 Project with RSpec"
+  - "Dockerize a Rails Application for Development"
 ---
 
 When working with Rails and a relational database such as Postgres, the default option for primary key is an auto-incrementing sequence. So the first record inserted would get a primary key of 1, next one 2 and so on. Depending on the system, this can be an issue if these values get exposed in urls, for example `/subscription/265` would reveal that 265 subscriptions have been generated, and that the next one will be id 266.
@@ -114,15 +118,3 @@ end
 ```
 
 That's it, now you're all setup to use UUID as the primary key in all your models.
-
-## Related Content
-
-The following section contains affiliate links for related content you may find useful. I get a small commission from purchases which helps me maintain this site.
-
-Looking to level up on Rails 6? You might like this book: [Agile Web Development with Rails 6](https://amzn.to/3wS8GNA).
-
-Working on a large legacy code base? This book [Working Effectively with Legacy Code](https://amzn.to/3accwHF) is a must read.
-
-Martin Fowler's [Refactoring: Improving the Design of Existing Code](https://amzn.to/2RFC0Xn) is also amazingly useful on this topic.
-
-Is your organization introducing microservices? This book [Building Event-Driven Microservices: Leveraging Organizational Data at Scale](https://amzn.to/3uSxa87) is a fantastic resource on this topic.

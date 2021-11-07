@@ -32,6 +32,7 @@ exports.createPages = ({ graphql, actions }) => {
                 category
                 date(formatString: "YYYY-MM-DD")
                 description
+                related
               }
               fields {
                 slug
@@ -49,6 +50,7 @@ exports.createPages = ({ graphql, actions }) => {
         fs.unlinkSync("search.sql")
       }
 
+      // context fields available as query parameters in page templates
       result.data.allMarkdownRemark.edges.forEach(({ node }) => {
         // build individual blog pages
         createPage({
@@ -56,9 +58,7 @@ exports.createPages = ({ graphql, actions }) => {
           component: path.resolve("./src/templates/post.js"),
           context: {
             slug: node.fields.slug,
-            content: node.html,
-            title: node.frontmatter.title,
-            description: node.frontmatter.description,
+            relatedPosts: node.frontmatter.related,
           },
         })
 
