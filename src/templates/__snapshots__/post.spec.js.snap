@@ -123,7 +123,7 @@ Object {
             data-testid="related-posts"
           >
             <h2>
-              Related:
+              You may also like:
             </h2>
             <div>
               <a
@@ -394,7 +394,7 @@ Object {
           data-testid="related-posts"
         >
           <h2>
-            Related:
+            You may also like:
           </h2>
           <div>
             <a
