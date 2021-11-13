@@ -2,7 +2,7 @@
 title: "Migrate Cron Jobs to Nomad the Lazy Way"
 featuredImage: "../images/lazy-david-clode-BCI9_1eJfO0-unsplash.jpg"
 description: "Learn how to use some bash scripting to generate multiple Nomad periodic jobs from a crontab and deploy them."
-date: "2021-11-21"
+date: "2021-11-13"
 category: "devops"
 related:
   - "Build a CI/CD Pipeline for a Gatsby Site"
@@ -18,7 +18,7 @@ The application I'm working on has a custom build and deploy pipeline based on [
 The remainder of this post assumes some familiarity with Hashicorp's Nomad. If you haven't used it before, checkout this excellent <a class="markdown-link" href="https://adri-v.medium.com/just-in-time-nomad-80f57cd403ca">primer</a> and <a class="markdown-link" href="https://adri-v.medium.com/just-in-time-nomad-running-traefik-on-hashiqube-7d6dfd8ef9d8">tutorial</a>.
 </aside>
 
-As part of this migration, 30+ cron jobs from the old xen based build had to be converted to run on Nomad. Nomad has a [periodic](https://www.nomadproject.io/docs/job-specification/periodic) stanza that is designed to run a given task on a particular schedule, so this is perfect for running cron jobs. However, the `periodic` stanza which defines the `cron` schedule can only be placed at the Nomad `job` level. This means that each entry in the application's crontab needs its own `.nomad` job file. Each resulting `.nomad` job file would end up looking very similar, the only differences being in the job/group/task names, the cron schedule, and the command to run.
+As part of this migration, 30+ cron jobs from the old xen based build had to be converted to run on Nomad. Nomad has a [periodic](https://www.nomadproject.io/docs/job-specification/periodic) stanza that is designed to run a given task on a particular schedule, so this is perfect for running cron jobs. However, the `periodic` stanza which defines the `cron` schedule can only be placed at the Nomad `job` level. This means that each entry in the application's crontab needs its own `.nomad` job file. Each resulting `.nomad` job file would end up looking very similar, the only differences being in the job, group, and task names, the cron schedule, and the command to run.
 
 Being a [lazy](https://medium.com/the-lazy-developer/on-laziness-26d7a9f32066) developer, there was no way I wanted to manually write over 30 nomad files. Not only would the initial work be tedious, but what if they all required a change in the future? Even with global find/replace in files, that would still be too much manual effort. Instead, I decided to write a generator - a bash script to parse the existing crontab (well, a modified version of it which I'll discuss soon) and generate each nomad file from a template file.
 
@@ -35,7 +35,9 @@ To start, let's take a look at the existing crontab. This is for a Rails applica
 
 ## Nomad Example
 
-Now let's look at what the first job would look like written as a Nomad file. This project uses the [Github Container Registry](https://github.blog/2020-09-01-introducing-github-container-registry/) to store its Docker images. The same image is used to run the app with Puma, database migrations, and cron jobs, therefore it intentionally doesn't have a `CMD` or `ENTRYPOINT` specified in its `Dockerfile`, rather, each Nomad task specifies the command to run:
+Now let's look at what the first job would look like written as a Nomad file. This project uses the [Github Container Registry](https://github.blog/2020-09-01-introducing-github-container-registry/) to store its Docker images. The same image is used to run the app with Puma, database migrations, and cron jobs, therefore it intentionally doesn't have a `CMD` or `ENTRYPOINT` specified in its `Dockerfile`, rather, each Nomad task specifies the command to run. This is accomplished by specifying `bash` as the command to run, then passing an array of arguments with the actual command to run.
+
+`prohibit_overlap` prevents two instances of the same cron jobs from running at the same time, in the case that the first run takes longer and the second instance would have been scheduled to start.
 
 ```nomad
 job "app_frequent_tasks" {
@@ -52,8 +54,8 @@ job "app_frequent_tasks" {
 
       config {
         image   = "ghcr.io/org/project/app:latest"
-        command = "/bin/sh"
-        args    = ["-c", "bundle exec rake app:frequent_tasks"]
+        command = "bash"
+        args    = ["-c", "RAILS_ENV=production bundle exec rake app:frequent_tasks"]
       }
 
       resources {
@@ -73,6 +75,8 @@ job "app_frequent_tasks" {
   }
 }
 ```
+
+Note the use of `RAILS_ENV=production` in the command args. In theory, this shouldn't be required due to use of the `env` stanza further below, but in practice, the `env` stanza did not work for me so I had to specify it in the command args.
 
 ## Nomad "Template"
 
@@ -96,8 +100,8 @@ job "app_JOB_NAME" {
 
       config {
         image   = "ghcr.io/org/project/app:latest"
-        command = "/bin/sh"
-        args    = ["-c", "bundle exec rake app:JOB_NAME"]
+        command = "bash"
+        args    = ["-c", "RAILS_ENV=production bundle exec rake app:JOB_NAME"]
       }
 
       resources {
@@ -106,7 +110,7 @@ job "app_JOB_NAME" {
       }
 
       env {
-        RAILS_ENV=production
+        RAILS_ENV = production
       }
 
       template {
@@ -177,7 +181,7 @@ while read line; do
 
 done < $INPUT_FILE
 
-# remove temporary .bak files from sed
+# remove temporary .bak files from sed (only needed on mac)
 rm generated/*.bak
 
 # reset original Internal File Separator
@@ -295,4 +299,4 @@ Then run the generator script again to regenerate the nomad files, then they can
 
 ## Conclusion
 
-This post has explained why, when faced with a large repetitive task, it's good to embrace your inner laziness and find an automated way to perform this task. Specifically we've covered how to automate generation of Nomad periodic jobs from multiple cron jobs from a legacy platform and how to deploy them all in one script.
+This post has explained why, when faced with a large repetitive task, it's good to embrace your inner laziness and find an automated way to perform this task. Specifically we've covered how to automate generation of Nomad periodic jobs from multiple cron jobs from a legacy platform and how to deploy them via scripts.
