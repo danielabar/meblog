@@ -96,6 +96,10 @@
   content: "python";
 }
 
+.content pre[data-language="nomad"]::before {
+  content: "nomad";
+}
+
 /* tablet landscape */
 @media (max-width: 1280px) {
   .content ul {
