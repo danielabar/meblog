@@ -18,7 +18,7 @@ The application I'm working on has a custom build and deploy pipeline based on [
 The remainder of this post assumes some familiarity with Hashicorp's Nomad. If you haven't used it before, checkout this excellent <a class="markdown-link" href="https://adri-v.medium.com/just-in-time-nomad-80f57cd403ca">primer</a> and <a class="markdown-link" href="https://adri-v.medium.com/just-in-time-nomad-running-traefik-on-hashiqube-7d6dfd8ef9d8">tutorial</a>.
 </aside>
 
-As part of this migration, 30+ cron jobs from the old xen based build had to be converted to run on Nomad. Nomad has a [periodic](https://www.nomadproject.io/docs/job-specification/periodic) stanza that is designed to run a given task on a particular schedule, so this is perfect for running cron jobs. However, the `periodic` stanza which defines the `cron` schedule can only be placed at the Nomad `job` level. This means that each entry in the application's crontab needs its own `.nomad` job file. Each resulting `.nomad` job file would end up looking very similar, the only differences being in the job, group, and task names, the cron schedule, and the command to run.
+As part of this migration, 30+ cron jobs from the old xen based build had to be converted to run on Nomad. Nomad has a [periodic](https://www.nomadproject.io/docs/job-specification/periodic) stanza that is designed to run a given task on a particular schedule, so this is perfect for running cron jobs. However, the `periodic` stanza which defines the `cron` schedule can only be placed at the Nomad `job` level. This means that each entry in the application's former crontab needs its own `.nomad` job file. Each resulting `.nomad` job file would end up looking very similar, the only differences being in the job, group, and task names, the cron schedule, and the command to run.
 
 Being a [lazy](https://medium.com/the-lazy-developer/on-laziness-26d7a9f32066) developer, there was no way I wanted to manually write over 30 nomad files. Not only would the initial work be tedious, but what if they all required a change in the future? Even with global find/replace in files, that would still be too much manual effort. Instead, I decided to write a generator - a bash script to parse the existing crontab (well, a modified version of it which I'll discuss soon) and generate each nomad file from a template file.
 
@@ -41,7 +41,7 @@ Now let's look at what the first job would look like written as a Nomad file. Th
 
 ```nomad
 job "app_frequent_tasks" {
-  datacenters = ["us-east-1"]
+  datacenters = ["dc1"]
 
   periodic {
     cron = "* * * * *"
@@ -87,7 +87,7 @@ In order to write a script that will generate these Nomad files for each cron, s
 ```nomad
 # template.nomad
 job "app_JOB_NAME" {
-  datacenters = ["us-east-1"]
+  datacenters = ["dc1"]
 
   periodic {
     cron = "CRON_VALUE"
@@ -201,18 +201,18 @@ Running this script will result in a `.nomad` file being generated for each entr
 
 ## Deploy
 
-It's not enough to generate the files, they also need to be deployed to Nomad so that it can start scheduling each periodic job to run based on the given cron schedule. For just a single file, the command is:
+It's not enough to generate the files, they also need to be deployed to Nomad so that it can start scheduling each periodic job to run based on the specified cron schedule. For just a single file, the command is:
 
 ```
 nomad job run generated/frequent_tasks.nomad
 ```
 
-However, since the theme of this post is laziness, there's no way anyone wants to enter 30+ commands like the above to submit each job. Instead, the following script can be used to iterate over each nomad file in the generated directory:
+However, since the theme of this post is laziness, I'm not going to enter 30+ commands like the above to submit each job. Instead, the following script can be used to iterate over each nomad file in the generated directory:
 
 ```bash
 #!/bin/bash
 
-# This directory should contain all the generated nomad files from previous step
+# Contains generated nomad files from previous step
 GENERATED_DIR=/path/to/generated
 
 # Iterate over each file in generated directory and submit it to nomad
@@ -273,7 +273,7 @@ jobs:
 ```
 
 <aside class="markdown-aside">
-The workflow_run event is used to trigger a workflow, only when another workflow has completed. In this case, the Deploy workflow will only run after the CI (Continuous Integration) workflow has completed. See my post on <a class="markdown-link" href="https://danielabaron.me/blog/ci-cd-pipeline-for-gatsby/#Continuous-Deployment-When">CI/CD</a> to learn more about the workflow_run event.
+The workflow_run event is used to trigger a workflow when another workflow has completed. In this case, the Deploy workflow will only run after the CI (Continuous Integration) workflow has completed. See my post on <a class="markdown-link" href="https://danielabaron.me/blog/ci-cd-pipeline-for-gatsby/#Continuous-Deployment-When">CI/CD</a> to learn more about the workflow_run event.
 </aside>
 
 ## Maintenance
@@ -283,8 +283,8 @@ Here's where the power of laziness really shines. Suppose a change is needed to 
 ```nomad
 # template.nomad
 job "app_JOB_NAME" {
-  # was us-east-1
-  datacenters = ["us-west-1"]
+  # was dc1
+  datacenters = ["dc2"]
 
   periodic {
     cron = "CRON_VALUE"
