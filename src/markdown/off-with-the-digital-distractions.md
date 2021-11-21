@@ -42,7 +42,7 @@ This is the nuclear option - block absolutely everything, no exceptions. This co
 
 ## 6. Laptop: Slack
 
-Digital disrputions are not limited to the phone, your work laptop can also be a source of these. The biggest culprit here is Slack (or Teams if you're a Microsoft shop). By default, you'll get a banner and sound notification for every message posted on every channel you're part of, in addition to DMs. The first thing I do when configuring a new work laptop, is to disable ALL sounds from Slack, and disable all notifications except for DMs. I'll also mute less critical channels like social/news/classified etc, and just check them periodically, for example on a lunch break.
+Digital disruptions are not limited to the phone, your work laptop can also be a source of these. The biggest culprit here is Slack (or Teams if you're a Microsoft shop). By default, you'll get a banner and sound notification for every message posted on every channel you're part of, in addition to DMs. The first thing I do when configuring a new work laptop, is to disable ALL sounds from Slack, and disable all notifications except for DMs. I'll also mute less critical channels like social/news/classified etc, and just check them periodically, for example on a lunch break.
 
 ## 7. Laptop: Email
 
