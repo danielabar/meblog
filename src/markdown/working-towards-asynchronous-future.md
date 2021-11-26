@@ -16,7 +16,7 @@ To this end, our team has moved increasingly to an asynchronous work style and t
 
 ## Background
 
-But first, a little background. Our team is composed of three senior engineers (and looking for a fourth at the time of this writing), and a product manager. We also have an engineering manager who manages several teams. There is no QA as the product has a thorough suite of end-to-end tests that cover just about every feature and workflow. The product consists of several publicly accessible web apps, built with Rails and MySQL. Our team is in full control over the product direction, features to be added and tech debt that should be addressed. The code base is very large, having been developed and iterated on over 10 years.
+But first, a little background. Our team is composed of three senior engineers (looking for a fourth at the time of this writing), and a product manager. We also have an engineering manager who manages several teams. There is no QA as the product has a thorough suite of end-to-end tests that cover just about every feature and workflow. The product consists of several publicly accessible web apps, built with Rails and MySQL. Our team is in full control over the product direction, features to be added and tech debt that should be addressed. The code base is very large, having been developed and iterated on over 10 years.
 
 We're part of a mid-sized company that delivers a number of other products and services. Prior to the pandemic, most people worked in office, with a few work-from-home days here and there. After the pandemic, the company went fully remote and will remain that way going forward.
 
@@ -28,9 +28,13 @@ This all came to a head one day when our manager seemed really stressed out in s
 
 Some terminology to clarify before moving on. Sometimes the terms remote working and asynchronous working get used interchangeably but they're quite different.
 
-Remote working is when the entire team is not co-located in a physical office, and instead is working from home or some other location such as a coffee shop. However, they are still required to all be online and working during official business hours, typically 9am - 5pm. Some companies may have a variation on this where everyone is required to be online during "core hours", say 10am - 4pm, then provide a little flexibility for those that wish to start and finish earlier, or start and finish later. For example an early bird may wish to start at 8am and finish at 4pm, whereas a night owl may prefer to start later in the morning at 10am and work into the evening, finishing at 6pm. This results in the majority of the teams work hours overlapping so it's easy to book meetings because there's an expectation that every one is available at the same times.
+Remote working is when the entire team is not co-located in a physical office, and instead is working from home or some other location such as a coffee shop. However, they are still required to all be online and working during official business hours, typically 9am - 5pm. Some companies may have a variation on this where everyone is required to be online during "core hours", say 10am - 4pm, then provide a little flexibility for those that wish to start and finish earlier or later by about an hour. This results in the majority of the teams' work hours overlapping so it's easy to book meetings because there's an expectation that every one is available at the same times.
 
 Asynchronous working is a whole other level of this. In addition to the team not being co-located, there is no expectation of overlapping work hours at all. Each team member picks their own working hours that suit them best. Furthermore, these hours don't have to be contiguous or the same times each day. For example, someone may find their optimal focus time is in the very early hours of the morning, then take the afternoon off for exercise, running errands, picking up kids from school etc. and then log back in later in the evening to complete some tasks. Someone else may prefer start around midday or later, and work late into the night because that's when they're at their most productive.
+
+<aside class="markdown-aside">
+If you'd like to learn more about planning your day for optimal focus time, and when you'll get the best results from focusing on certain kinds of problems, the book <a class="markdown-link"href="https://www.danpink.com/books/when/">When: The Scientific Secrets of Perfect Timing</a> presents compelling research on this, told in an entertaining story telling format.
+</aside>
 
 There can also be a spectrum, where a team may still want some real-time meetings such as weekly one on ones with managers, but the rest of the week everyone is free to manage their time however suits them. This is where our team has landed.
 
@@ -38,24 +42,28 @@ Now that the definitions are out of the way, how does a team go from everyone wo
 
 ## Communication
 
-One thing we realized in moving to async is that we would all have to hone our written communication skills. Not only can effective writing can replace a lot of meetings, there's also a benefit to the company in that decisions and discussions in a written format are easily accessible to everyone, not just whoever happened to participate in the meeting that day. This is also helpful to the team in an environment of shifting priorities, where people may not remember what was discussed in a meeting several months ago. When decisions are written down, this is no longer a problem.
+One thing we realized in moving to async is that we would all have to hone our written communication skills, since this would be taking the place of verbal communication. Not only can effective writing can replace a lot of meetings, there's also a benefit to the company in that decisions and discussions in a written format are easily accessible to everyone, not just whoever happened to participate in the meeting that day. This is also helpful to the team in an environment of shifting priorities, where people may not remember what was discussed in a meeting several months ago. When decisions are written down, this is no longer a problem.
 
 Here are a few examples of the type of writing our team has been doing to reduce the need for all of us to be online at the same time. We try as much as possible to choose writing tools that support markdown, which is more developer friendly than WYSIWG editors, but that's just our team preference.
+
+<aside class="markdown-aside">
+The topic of documentation - how to write it, what should get documented, how to maintain it etc. is enough to make an entirely separate blog post. See this excellent <a class="markdown-link" href="https://chelseatroy.com/2021/09/14/the-art-of-documentation/">post</a> for thorough coverage of this topic.
+</aside>
 
 ### Pull Requests
 
 When a pull request is submitted for review, the developer writes a detailed description including what the new code does, what areas of the project were modified, and most importantly, step by step instructions for the reviewer how they can exercise the code. Our review process includes not just providing feedback on the code, but also having the reviewer check out the branch and try out the new feature or bug fix on their laptops.
 
-This level of detail in the PR description eliminates the need for real-time chatter on Slack about the PR. And having the reviewer try it out means at least one other person besides the original developer gains an understanding of this feature beyond what merely scanning the code can provide.
+This level of detail in the PR description eliminates the need for real-time about the PR. And having the reviewer try it out means at least one other person besides the original developer gains an understanding of this feature beyond what merely scanning the code can provide.
 
 ### Project Docs
 
 The main project `README.md` file contains project setup instructions which we strive to maintain whenever there's a change, such as some new configuration or external dependency required. The idea being that a new developer should be able to spin up a working dev environment without getting stuck and needing real time help from someone else on the team. If something is discovered that's missing from the setup instructions, then that's a great first PR for the new developer to submit to update the readme.
 
-Further, whenever a new feature is added, we add or update the project documentation as part of the PR. This takes the form of markdown files in a `/docs` directory of the project, and a link to this doc from the `Further Reading` section of the main project `README.md` file. The benefit of maintaining these docs is it spreads the knowledge of each feature so if someone has a question, they can find the answer in the docs rather than requiring the original developer to be online to answer.
+When a new feature is added such as a third party integration, we add or update the project documentation as part of the PR as needed. This takes the form of markdown files in a `/docs` directory of the project, and a link to this doc from the `Further Reading` section of the main project `README.md` file. The benefit of maintaining these docs is it spreads the knowledge of each feature so if someone has a question, they can find the answer in the docs rather than requiring the original developer to be online to answer. Keeping the docs with the project source means they're more likely to turn up in a search when someone is making a change, and therefore get maintained along with the code as it evolves.
 
 <aside class="markdown-aside ">
-Even for a non async team, including docs with each PR is helpful because the original developer may be on vacation or have left the company, and this knowledge could otherwise be forever lost.
+Even for a non async team, maintaining docs along with the code is helpful because the original developer may be on vacation or have left the company, and this knowledge could otherwise be forever lost.
 </aside >
 
 ### Jira
@@ -90,9 +98,13 @@ In addition to effective writing, another thing that's required to make async wo
 
 This doesn't mean "cowboy" style coding, there's still room for questions and discussion as described in the previous section on writing, but we leave it to the engineer's judgement to decide if something is significant enough to require team input, or if its something they can make an "executive" decision on.
 
+<aside class="markdown-aside">
+Having every engineer on the team be an equal and effective owner is easy to accomplish when the size of the team is small relative to the size of the code base. This allows each person to work independently without risk of stepping on someone else's toes.
+</aside>
+
 ## Trust
 
-Related to the ownership point, is trust. I don't think it would be possible for a team to work asynchronously without a high degree of trust. We trust that each team member is intrinsically motivated to move the project forward without any monitoring of their online status and that they can manage their time effectively to complete their tasks.
+Related to the ownership point, is trust. I don't think it would be possible for a team to work asynchronously without a high degree of trust. We trust that each team member is intrinsically motivated to move the project forward without any monitoring of their online status and that they can manage their time effectively to complete their tasks. We also trust that if someone is stuck on something, they'll reach out for help, or if they finish a task, they'll take the initiative to go into th epic list and pick up another one rather than waiting to be assigned.
 
 ## Objections
 
@@ -100,18 +112,43 @@ This post is not to suggest that everyone should stop what they're doing and swi
 
 TBD Objections
 
-- Scrum ceremonies (standup, planning, grooming, retro)
-  - Spirit of agile vs waterfall rebranding (reference AV's linkedin post)
-- We don't have time to do all this writing
 - I'm not a good writer
 - Onboarding
 - Social connection
 - Manager says: How do I know people are really working
   - Gets back to trust...
+- What if there's an emergency?
+  - Need everyone in a huddle?
+  - The way to answer this is to ask yourself, "what happens if there's an emergency outside of 9-5?"
 
-### TBD Objection 1...
+### But our team does Scrum
 
-...
+I'm going to tread carefully here as this post is not intended as a scrum good or bad discussion.
+
+![Bart Simpson writing lines](../images/bart-simpson-scrum.png "Bart Simpson writing lines")
+
+If your team believes that scrum is the best thing since sliced bread and you're all feeling happy and healthy doing it, then by all means, keep on scrumming! However, strict adherence to the [scrum methodology](https://scrumexplainer.com/scrum/scrum-methodology/) is incompatible with asynchronous work. This is due to the numerous ceremonial meetings required every week or other week.
+
+Our team intentionally rejects scrum in favour of a flow approach. Our PM  has a strong sense of product direction and is able to express this well in writing. We break down tasks as small as possible, putting them behind feature flags where appropriate. This allows us to deliver small increments of value continuously, without any big bang planning meetings.
+
+For estimates, we use the T-shirt sizing approach (S/M/L). For tricky problems requiring team input, we use the writing approaches described earlier in this post. This eliminates the need for backlog grooming meetings and [planning poker](https://www.simplilearn.com/what-is-planning-poker-article) games.
+
+We use a slack channel to post our daily updates. This has worked out better than real-time standup because seeing the updates in writing is easier to absorb and reply if someone is having a blocker, without holding up the whole team. How often has it happened that you're trying to remember your tasks so that you can recite them when its your turn, so much so that you miss what others are saying.
+
+Finally, if there's a process improvement someone would like to explore, for example, turning on auto-merge on PR's, we just try it, no need to wait for official "end of sprint" retrospective meeting. We provide each other feedback continuously which eliminates that ceremony as well.
+
+<aside class="markdown-aside">
+I actually started my career before Scrum was a thing. Back then, it was Waterfall all the way. Over the years as Scrum became increasingly trendy, I've noticed some surprising similarities between the two. This post on <a class="markdown-link" href="https://medium.com/serious-scrum/the-unmistakable-signs-you-are-participating-in-fake-agile-theater-a7d1bd6a5dbc">Agile Theatre</a> goes into this topic in more depth.
+</aside>
+
+### We don't have time for all that writing
+
+This reminds me of a similar argument against automated testing. It goes something like this: "We don't have time to write tests, we're too rushed meeting the deadlines". To which my answer is: "Well then you must have plenty of time for fixing bugs and putting out production fires". In a similar way, if you don't have time to write, then you must have plenty of time to have the whole team holed up in meetings and not getting actual development work done.
+
+Take an example of a single developer stuck on a problem. The seemingly easy approach is to reach out to the team, i.e. "let's hop on a call". Let's say there's 4 engineers on the team and they all get caught up in real time trying to solve this problem, I've seen these types of meetings run on for 3 hours or even more. That's at least 12 hours of people time!
+
+Now, imagine the original developer taking the time to write it down in a wiki discussion doc or ADR. This could include description of the problem, approaches that have been tried and didn't work, and consideration of a few alternatives with their pros and cons. A practiced writer may be able to accomplish this in about an hour. Then the doc is shared with the team where others who have knowledge in this area can share their feedback in the document. Since the problem is now well laid out, let's say the 3 other engineers on the team take an hour each to provide feedback. Then the original developer can review this for another hour to arrive at the solution. That's 5 hours total rather than 12, *and*, there's a written artifact for anyone else that may later want to understand why that particular solution was chosen.
+
 
 TBD Maybe belongs in Conclusion: What team does this work best for?
 - Small team size *relative* to size of code base. Needs to be large enough that every developer can work on a feature without stepping on someone else's toes, otherwise, will need more real time co-ordination.
