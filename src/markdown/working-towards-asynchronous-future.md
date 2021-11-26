@@ -47,7 +47,7 @@ One thing we realized in moving to async is that we would all have to hone our w
 Here are a few examples of the type of writing our team has been doing to reduce the need for all of us to be online at the same time. We try as much as possible to choose writing tools that support markdown, which is more developer friendly than WYSIWG editors, but that's just our team preference.
 
 <aside class="markdown-aside">
-The topic of documentation - how to write it, what should get documented, how to maintain it etc. is enough to make an entirely separate blog post. See this excellent <a class="markdown-link" href="https://chelseatroy.com/2021/09/14/the-art-of-documentation/">post</a> for thorough coverage of this topic.
+The topic of documentation - how to write it, what should get documented, how to maintain it etc. is enough for a whole blog post on its own. See this excellent <a class="markdown-link" href="https://chelseatroy.com/2021/09/14/the-art-of-documentation/">post</a> for thorough coverage of this topic.
 </aside>
 
 ### Pull Requests
@@ -104,22 +104,11 @@ Having every engineer on the team be an equal and effective owner is easy to acc
 
 ## Trust
 
-Related to the ownership point, is trust. I don't think it would be possible for a team to work asynchronously without a high degree of trust. We trust that each team member is intrinsically motivated to move the project forward without any monitoring of their online status and that they can manage their time effectively to complete their tasks. We also trust that if someone is stuck on something, they'll reach out for help, or if they finish a task, they'll take the initiative to go into th epic list and pick up another one rather than waiting to be assigned.
+Related to the ownership point, is trust. I don't think it would be possible for a team to work asynchronously without a high degree of trust. We trust that each team member is intrinsically motivated to move the project forward without any monitoring of their online status and that they can manage their time effectively to complete their tasks. We also trust that if someone is stuck on something, they'll reach out for help, or if they finish a task, they'll take the initiative to go into the epic list and pick up another one rather than waiting to be assigned.
 
 ## Objections
 
 This post is not to suggest that everyone should stop what they're doing and switch to this approach. If your team feels happy and productive working fixed hours and having regular meetings, then by all means, continue. But for those feeling burned out by all the meetings or open to exploring a more flexible way of working, you may have some concerns like "what about..." or "our team could never...". This next section will address some common concerns with async working.
-
-TBD Objections
-
-- I'm not a good writer
-- Onboarding
-- Social connection
-- Manager says: How do I know people are really working
-  - Gets back to trust...
-- What if there's an emergency?
-  - Need everyone in a huddle?
-  - The way to answer this is to ask yourself, "what happens if there's an emergency outside of 9-5?"
 
 ### But our team does Scrum
 
@@ -138,7 +127,7 @@ We use a slack channel to post our daily updates. This has worked out better tha
 Finally, if there's a process improvement someone would like to explore, for example, turning on auto-merge on PR's, we just try it, no need to wait for official "end of sprint" retrospective meeting. We provide each other feedback continuously which eliminates that ceremony as well.
 
 <aside class="markdown-aside">
-I actually started my career before Scrum was a thing. Back then, it was Waterfall all the way. Over the years as Scrum became increasingly trendy, I've noticed some surprising similarities between the two. This post on <a class="markdown-link" href="https://medium.com/serious-scrum/the-unmistakable-signs-you-are-participating-in-fake-agile-theater-a7d1bd6a5dbc">Agile Theatre</a> goes into this topic in more depth.
+I actually started my career before Scrum was a thing. Back then, it was Waterfall all the way. Over the years as Scrum became increasingly trendy, I've noticed some surprising similarities between the two. This post on <a class="markdown-link" href="https://medium.com/serious-scrum/the-unmistakable-signs-you-are-participating-in-fake-agile-theater-a7d1bd6a5dbc">Agile Theatre</a> is a fascinating look at that.
 </aside>
 
 ### We don't have time for all that writing
@@ -147,8 +136,51 @@ This reminds me of a similar argument against automated testing. It goes somethi
 
 Take an example of a single developer stuck on a problem. The seemingly easy approach is to reach out to the team, i.e. "let's hop on a call". Let's say there's 4 engineers on the team and they all get caught up in real time trying to solve this problem, I've seen these types of meetings run on for 3 hours or even more. That's at least 12 hours of people time!
 
-Now, imagine the original developer taking the time to write it down in a wiki discussion doc or ADR. This could include description of the problem, approaches that have been tried and didn't work, and consideration of a few alternatives with their pros and cons. A practiced writer may be able to accomplish this in about an hour. Then the doc is shared with the team where others who have knowledge in this area can share their feedback in the document. Since the problem is now well laid out, let's say the 3 other engineers on the team take an hour each to provide feedback. Then the original developer can review this for another hour to arrive at the solution. That's 5 hours total rather than 12, *and*, there's a written artifact for anyone else that may later want to understand why that particular solution was chosen.
+Now, imagine the original developer taking the time to articulate the problem in a wiki discussion doc or ADR. This could include a description of the problem, approaches that have been tried and didn't work, and consideration of a few alternatives with their pros and cons. A practiced writer may be able to accomplish this in about an hour. Then the doc is shared with the team where others who have knowledge in this area can share their feedback in the document. Since the problem is now well laid out, let's say the 3 other engineers on the team take an hour each to provide feedback. Then the original developer can review this for another hour to arrive at the solution. That's 5 hours total rather than 12, *and*, there's a written artifact for anyone else that may later want to understand why that particular solution was chosen.
 
+### I'm not a good writer
+
+Notice the emphasis has been on *effective* writing rather than *good* writing. This isn't about making the New York Times bestseller list or being nominated for a [Pulitzer Prize](https://en.wikipedia.org/wiki/Pulitzer_Prize). The goal is to make yourself understood to the rest of the team. Yes this takes some practice, but so does anything worth doing. It takes time to develop programming skills, and so it also takes time to develop writing skills. As long as everyone on the team is willing to try this, I don't think it's a blocker.
+
+### What about Onboarding?
+
+Full disclosure: Since going asynchronous, our team has not yet on-boarded a new team member, so this process may need some work. There are three aspects to consider here:
+
+**Technical Setup:** The project `README.md` should be sufficiently detailed and up to date so that a new team member can install all dependencies they need, get the project running and tests passing without getting on a call with another engineer. Ideally, the project docs also contain some "What's next" steps like how to run through a typical workflow in the application.
+
+**Domain Knowledge:** It's not enough to have knowledge of the tech stack and familiarity with the code. An engineer also needs to understand the business domain. In my experience, this has been done by having the new person book 1-1 meetings with various domain experts in the company. This hasn't been a good experience because I've found myself furiously scribbling (or typing) notes trying to absorb all the important information being given and missing about half of it due to talking speed being faster than note taking speed.
+
+This process would be more optimal if the domain experts would write down their knowledge such as what their products are doing, critical workflows, business rules, what are the primary sources of revenue etc. Then the new person could review these and reach out to each expert with follow-on questions. The answers to these questions could then be used to update the business docs, leaving them improved for everyone.
+
+**Team Introduction:** The initial introduction to the team might be a case where its nice to have a real time meeting. No specific agenda other than for everyone to introduce themselves and "shoot the breeze" a bit. In the event that it's not possible to get everyone online all at the same time, this could be scheduled as individual 1-1 short meetings with team members.
+
+### What about human connection?
+
+Connection with others is an important part of being human, we are social creatures. Having said that, different people vary in the amount of social connections they need to feel fulfilled and function effectively. This can depend on introversion/extroversion and other dimensions of personality. Some people thrive on developing friendships with colleagues while others may prefer to keep emotional distance between their work and social lives. There is no right or wrong here, and I don't think this is something that companies should mandate. The role a company can play is to provide some social opportunities (such as in-person or virtual events, depending on where things land with the pandemic and [variants](https://www.who.int/westernpacific/emergencies/covid-19/information/covid-19-variants)), while keeping attendance optional.
+
+Another way of thinking of this is how connected do you really feel to your colleagues from attending scrum ceremonies and other work-related meetings? I don't believe even daily stand-ups are meaningfully connecting people. If you want to try an experiment with this - next time your spouse or a good friend asks you how was your day, try responding with: Yesterday I... Today I'm planning to... Blockers are...
+
+### How do I know people are working?
+
+This is a question some managers might have, and it goes back to the point about [trust](#Trust). I would argue that without trust, it's going to be difficult for any team to effectively deliver software, whether asynchronous or not.
+
+There may be an old school approach among some managers that they feel the need to "see" the team at all times at their desk either physically, or with surveillance software, but there's no need for this. There are many ways that managers can have visibility into engineering *output* including git commits, pull requests, and jira. Slack integration with these tools can make it even easier to see what's going on. There is absolutely no need to monitor anyone's *input* (i.e. time spent on laptop).
+
+Another angle on the trust issue - many engineers are put on a rotating on-call schedule to handle production issues. So think about that for a moment - an organization trusts someone with access to production but not with the ability to get their work done on their own schedule?
+
+### What if there's an emergency?
+
+This is the situation where everyone needs to get on a real-time call to resolve some urgent issue. I like to answer this concern with another question: What is the team doing if there's an emergency *outside* of standard business hours? A well organized team will have:
+
+* A rotating on-call schedule, ideally with a primary and secondary person to take the calls.
+* A monitoring and alerting system to inform the on-call person of an issue.
+* A playbook and/or troubleshooting guide for common problems.
+* A maintenance procedure where if the on-call person encounters a new problem, they add the solution to the troubleshooting guide after its resolved. This increases the body of knowledge for everyone.
+* Compensation for people when they're on call.
+
+Given that the above is in place, then that's the same procedure to follow if there's an emergency at any time. Otherwise its not sustainable to require the entire team to be in potential emergency mode, even for a standard workday.
+
+## Who does this work best for?
 
 TBD Maybe belongs in Conclusion: What team does this work best for?
 - Small team size *relative* to size of code base. Needs to be large enough that every developer can work on a feature without stepping on someone else's toes, otherwise, will need more real time co-ordination.
