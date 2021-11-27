@@ -16,7 +16,7 @@ To this end, our team has moved increasingly to an asynchronous work style and t
 
 ## Background
 
-But first, a little background. Our team is composed of three senior engineers (looking for a fourth at the time of this writing), and a product manager. We also have an engineering manager who manages several teams. There is no QA as the product has a thorough suite of end-to-end tests that cover just about every feature and workflow.
+But first, a little background. Our team is composed of three engineers (looking for a fourth at the time of this writing), and a product manager. We also have an engineering manager who manages several teams. There is no QA as the product has a thorough suite of end-to-end tests that cover just about every feature and workflow.
 
 The product consists of several publicly accessible web apps, built with Rails and MySQL. Our team is in full control over the product direction, features to be added and tech debt that should be addressed. The code base is very large, having been developed and iterated on over 10 years.
 
@@ -24,7 +24,7 @@ We're part of a mid-sized company that delivers a number of other products and s
 
 Our team has never been big fans of the official scrum methodology, preferring a more kanban/flow approach to delivering features. So we were fairly light on the ceremonial meetings, but we did have some regular meetings including a daily standup and some planning meetings. We were also in the habit of "let's hop on a call" type meetings, for example to deal with a tricky production bug or figure out how a new feature should be integrated into the existing product.
 
-This all came to a head one day when our manager seemed really stressed out in standup and remarked that he was in too many meetings. Since none of us were fans of meetings to start with (is any engineer really??), we decided right there and then to move standup to an async channel using Slack and to generally try and work more asynchronously. Although this wouldn't solve the issue of numerous other meetings our manager had, it could at least get rid of one of them.
+This all came to a head one day when our manager seemed really stressed out in standup and remarked that he was in too many meetings. Since none of us were fans of meetings to start with (is any engineer really??), we decided right there and then to move standup to an async channel using Slack and to generally try and work more asynchronously.
 
 ## Remote !== Async
 
@@ -32,7 +32,7 @@ Some terminology to clarify before moving on. Sometimes the terms remote working
 
 Remote working is when the entire team is not co-located in a physical office, and instead is working from home or some other location such as a coffee shop. However, they are still required to all be online and working during official business hours, typically 9am - 5pm. Some companies may have a variation on this where everyone is required to be online during "core hours", say 10am - 4pm, then provide a little flexibility for those that wish to start and finish earlier or later by about an hour. This results in the majority of the teams' work hours overlapping so it's easy to book meetings because there's an expectation that every one is available at the same times.
 
-Asynchronous working is a whole other level of this. In addition to the team not being co-located, there is no expectation of overlapping work hours at all. Each team member picks their own working hours that suit them best. Furthermore, these hours don't have to be contiguous or the same times each day. For example, someone may find their optimal focus time is in the very early hours of the morning, then take the afternoon off for exercise, running errands, picking up kids from school etc. and then log back in later in the evening to complete some tasks. Someone else may prefer start around midday or later, and work late into the night because that's when they're at their most productive.
+Asynchronous working takes this to another level. In addition to the team not being co-located, there is no expectation of overlapping work hours at all. Each team member picks their own working hours that suit them best. Furthermore, these hours don't have to be contiguous or the same times each day. For example, someone may find their optimal focus time is in the very early hours of the morning, then take the afternoon off for exercise, running errands, picking up kids from school etc. and then log back in later in the evening to complete some tasks. Someone else may prefer start around midday or later, and work late into the night because that's when they're at their most productive.
 
 <aside class="markdown-aside">
 If you'd like to learn more about planning your day for optimal focus time, and when you'll get the best results from focusing on certain kinds of problems, the book <a class="markdown-link"href="https://www.danpink.com/books/when/">When: The Scientific Secrets of Perfect Timing</a> presents compelling research and stories on this. I also gave a <a class="markdown-link" href="https://danielabar.github.io/when/#/">presentation</a> on this topic.
@@ -40,7 +40,7 @@ If you'd like to learn more about planning your day for optimal focus time, and 
 
 There can also be a spectrum, where a team may still want some real-time meetings such as weekly one on ones with managers, but the rest of the week everyone is free to manage their time however suits them. This is where our team has landed.
 
-Now that the definitions are out of the way, how does a team go from everyone working more or less the same hours to async?
+Now that the definitions are out of the way, how does a team go from everyone working pretty much the same hours to async?
 
 ## Communication
 
@@ -90,7 +90,7 @@ The meeting equivalent of this is where some participants say says "umm... let m
 
 ### Architecture Decision Records
 
-[ADR](https://adr.github.io/) is a more formal written document to be used when someone would like to propose a significant architectural decision or change to the project. It gets submitted as a markdown document in a PR, then team members can discuss via PR comments. This is a new format we're experimenting with so I can't yet comment on how effective its been.
+[ADR](https://adr.github.io/) is a more formal written document to be used when someone would like to propose a significant architectural change to the project. It gets submitted as a markdown document in a PR, then team members can discuss via PR comments. This is a new format we're experimenting with so I can't yet comment on how effective its been.
 
 What brought this about is since the project code is ~10 years old, we sometimes come across areas of the code where the original developer is long gone and it's not well understood why that particular implementation was chosen. There may have been a meeting at that time to discuss the approach, but of course, the conclusions of that meeting are forever lost. The idea with ADR docs is to generate discussion about proposed changes *and* have the the reasoning and final decisions captured in writing for posterity.
 
@@ -101,7 +101,7 @@ In addition to effective writing, another thing that's required to make async wo
 This doesn't mean "cowboy" style coding, there's still room for questions and discussion as described in the previous section on writing, but we leave it to the engineer's judgement to decide if something is significant enough to require team input, or if its something they can make an "executive" decision on.
 
 <aside class="markdown-aside">
-Having every engineer on the team be an equal and effective owner is easy to accomplish when the size of the team is small relative to the size of the code base. This allows each person to work independently without risk of stepping on someone else's toes.
+Having every engineer on the team be an equal and effective owner is easy to accomplish when the size of the team is small relative to the size of the code base. This allows each person to work independently, minimizing the chance of stepping on someone else's toes.
 </aside>
 
 ## Trust
@@ -129,12 +129,20 @@ We use a slack channel to post our daily updates. This has worked out better tha
 Finally, if there's a process improvement someone would like to explore, for example, turning on auto-merge on PR's, we just try it, no need to wait for official "end of sprint" retrospective meeting. We provide each other feedback continuously which eliminates that ceremony as well.
 
 <aside class="markdown-aside">
-I started my career before Scrum was a thing. Back then, it was Waterfall all the way. Over the years as Scrum became increasingly trendy, I've noticed some surprising similarities between the two. This post on <a class="markdown-link" href="https://medium.com/serious-scrum/the-unmistakable-signs-you-are-participating-in-fake-agile-theater-a7d1bd6a5dbc">Agile Theatre</a> is a fascinating look at that.
+I started my career before Scrum was a thing and Waterfall was the only option. Over the years as Scrum became increasingly trendy, I've noticed some surprising similarities between the two. This post on <a class="markdown-link" href="https://medium.com/serious-scrum/the-unmistakable-signs-you-are-participating-in-fake-agile-theater-a7d1bd6a5dbc">Agile Theatre</a> is a fascinating look at that.
 </aside>
 
 ### We don't have time for all that writing
 
-This reminds me of a similar argument against automated testing. It goes something like this: "We don't have time to write tests, we're too rushed meeting the deadlines". To which my answer is: "Well then you must have plenty of time for fixing bugs and putting out production fires". In a similar way, if you don't have time to write, then you must have plenty of time for developers to sit around in endless meetings rather than focusing on their work.
+This reminds me of a similar argument against automated testing. It goes something like this:
+
+"We don't have time to write tests, we're too rushed meeting the deadlines".
+
+To which my answer is:
+
+"Well then there must be plenty of time for fixing bugs and putting out production fires".
+
+In a similar way, if a team doesn't have time to write, then there must be plenty of time for developers to sit around in endless meetings rather than focusing on their work.
 
 Take an example of a single developer stuck on a problem. The seemingly easy approach is to reach out to the team, i.e. "let's hop on a call". Let's say there's 4 engineers on the team and they all get caught up in real time trying to solve this problem, I've seen these types of meetings run on for 3 hours or even more. That's at least 12 hours of people time!
 
@@ -142,7 +150,9 @@ Now, imagine the original developer taking the time to articulate the problem in
 
 ### I'm not a good writer
 
-Notice the emphasis has been on *effective* writing rather than *good* writing. This isn't about making the New York Times bestseller list or being nominated for a [Pulitzer Prize](https://en.wikipedia.org/wiki/Pulitzer_Prize). The goal is to make yourself understood to the rest of the team. Yes this takes some practice, but so does anything worth doing. It takes time to develop programming skills, and so it also takes time to develop writing skills. As long as everyone on the team is willing to try this, I don't think it's a blocker.
+Notice the emphasis has been on *effective* writing rather than *good* writing. This isn't about making the New York Times bestseller list or being nominated for a [Pulitzer Prize](https://en.wikipedia.org/wiki/Pulitzer_Prize). The goal is to make yourself understood to the rest of the team. Yes this takes some practice, but so does anything worth doing. Just as it takes time to develop effective programming skills, so too does it take time to develop writing skills.
+
+As long as everyone on the team is willing to work on this, it shouldn't be a blocker. Also those team members that are stronger writers should remember to be kind to others with respect to spelling and grammar errors. Personally I don't think this is such a big deal for internal docs as long as the overall meaning of the document is clear.
 
 ### What about Onboarding?
 
@@ -158,7 +168,7 @@ This process would be more optimal if the domain experts would write down their 
 
 ### What about human connection?
 
-Connection with others is an important part of being human, we are social creatures. Having said that, different people vary in the amount of social connections they need to feel fulfilled and function effectively. This can depend on introversion/extroversion and other dimensions of personality. Some people thrive on socializing at work and developing friendships with colleagues, while others may prefer to keep emotional distance between their work and social lives. There is no right or wrong here, and I don't think this is something that companies should mandate. The role a company can play is to provide some social opportunities (such as in-person or virtual events, depending on where things land with the pandemic and [variants](https://www.who.int/westernpacific/emergencies/covid-19/information/covid-19-variants)), while keeping attendance optional.
+Connection with others is an important part of being human, we are social creatures. Having said that, different people vary in the amount of social connections they need to feel fulfilled and function effectively. This can depend on introversion/extroversion and other dimensions of personality. Some people thrive on socializing at work and developing friendships with colleagues, while others may prefer to keep emotional distance between their work and social lives. There is no right or wrong here, and I don't think this is something that companies can mandate. The role a company can play is to provide some social opportunities (such as in-person or virtual events, depending on where things land with the pandemic and [variants](https://www.who.int/westernpacific/emergencies/covid-19/information/covid-19-variants)), while keeping attendance optional.
 
 Another way of thinking of this is how connected do you really feel to your colleagues from attending scrum ceremonies and other work-related meetings? I don't believe even daily stand-ups are meaningfully connecting people. If you want to try an experiment with this - next time your spouse or a good friend asks you how was your day, try responding with: Yesterday I... Today I'm planning to... Blockers are...
 
