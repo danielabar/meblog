@@ -72,11 +72,11 @@ Even for a non async team, maintaining docs along with the code is helpful becau
 
 Hear me out, please don't close this tab. Jira is painful when used as a management tool. Like those dreaded sprint review meetings where the scrum master is closing out the sprint, and there's one lonely ticket in the Done column and all the others are scattered throughout the Not Started, In Progress, and In Review columns. Or when developers have to track actual hours vs estimate hours in Jira, shudder!
 
-But our use of Jira is simply to use the epics to write down an overall goal, and the individual tickets within an epic serve as our todo list. We write detailed descriptions in each ticket, including context and scope. Links are used to identify dependencies between tickets. Bug reports include steps to reproduce and actual vs expected results. This way everyone knows the big picture, what everyone else is working on, and can pick up work without a planning meeting or any other real-time co-ordination.
+But our use of Jira is simply to use the epics to write down an overall goal, and the individual tickets within an epic serve as our todo list. We write detailed descriptions in each ticket, including context and scope. Links are used to identify dependencies between tickets. Bug reports include steps to reproduce and actual vs expected results. This way everyone knows the big picture, what everyone else is working on, and can pick up work without a planning meeting or any other real-time coordination.
 
 ### Slack Async
 
-For simple question and answer communication, we use Slack but in an async fashion. Effectively this means there's no expectation of an immediately reply and we don't monitor whether someone's dot is green on Slack. We mostly disable notifications to make this type of communication less disruptive to focus time.
+For simple question and answer communication, we use Slack but in an async fashion. Effectively this means there's no expectation of an immediate reply and we don't monitor whether someone's dot is green on Slack. We mostly disable notifications to make this type of communication less disruptive to focus time.
 
 <aside class="markdown-aside">
 Regardless of your team being async or not, it's a good idea to minimize notifications and other <a class="markdown-link" href ="https://danielabaron.me/blog/off-with-the-digital-distractions/">digital distractions</a> to get the most out of your focus time.
@@ -86,19 +86,19 @@ Regardless of your team being async or not, it's a good idea to minimize notific
 
 We use Github to host our project source, which also has a Wiki. If a team member has something they'd like to discuss that is a little more involved than a Slack question, they can add a page and write up a discussion topic in markdown, and then share it with the team via Slack. Then team members can update the document with their thoughts on the topic on their own time. This replaces the "let's hop on a call" type of meetings and has helped us resolve a number of issues. The benefit of this written approach over a real-time meeting is each developer can do some analysis on the code before piping in to the "conversation". This results in more accurate and thoughtful points being made.
 
-The meeting equivalent of this is where some participants say says "umm... let me check...", clackety clack of keyboards, while other participants watch and wait. The async version of this has been more effective for our team and leaves a searchable artifact for ourselves and future team members.
+The meeting equivalent of this is where some participants say "umm... let me check...", clackety clack of keyboards, while other participants watch and wait. The async version of this has been more effective for our team and leaves a searchable artifact for ourselves and future team members.
 
 ### Architecture Decision Records
 
 [ADR](https://adr.github.io/) is a more formal written document to be used when someone would like to propose a significant architectural change to the project. It gets submitted as a markdown document in a PR, then team members can discuss via PR comments. This is a new format we're experimenting with so it's too early to report on its effectiveness.
 
-What brought this about is since the project code is ~10 years old, we sometimes come across areas of the code where the original developer is long gone and it's not well understood why that particular implementation was chosen. There may have been a meeting at that time to discuss the approach, but of course, the conclusions of that meeting are forever lost. The idea with ADR docs is to generate discussion about proposed changes *and* have the the reasoning and final decisions captured in writing for posterity.
+What brought this about is since the project code is ~10 years old, we sometimes come across areas of the code where the original developer is long gone and it's not well understood why that particular implementation was chosen. There may have been a meeting at that time to discuss the approach, but of course, the conclusions of that meeting are forever lost. The idea with ADR docs is to generate discussion about proposed changes *and* have the reasoning and final decisions captured in writing for posterity.
 
 ## Ownership
 
-In addition to effective writing, another thing that's required to make async work is that each engineer has full ownership of their tasks. This means they are responsible for the entire feature end to end and have freedom to make all implementation decisions. This minimizes real time co-ordination with other engineers. For example, rather than splitting a feature into back end assigned to one engineer, and another gets the front end, one person would be responsible for the entire vertical slice.
+In addition to effective writing, another thing that's required to make async work is that each engineer has full ownership of their tasks. This means they are responsible for the entire feature end to end and have freedom to make all implementation decisions. This minimizes real time coordination with other engineers. For example, rather than splitting a feature into back end assigned to one engineer, and another gets the front end, one person would be responsible for the entire vertical slice.
 
-This doesn't mean "cowboy" style coding, there's still room for questions and discussion as described in the previous section on writing. But it's left to the engineer's judgement as to whether something is significant enough to require team input, or if its something they can make an "executive" decision on.
+This doesn't mean "cowboy" style coding, there's still room for questions and discussion as described in the previous section on writing. But it's left to the engineer's judgement as to whether something is significant enough to require team input, or if it's something they can make an "executive" decision on.
 
 <aside class="markdown-aside">
 Having every engineer on the team be an equal and effective owner is easy to accomplish when the size of the team is small relative to the size of the code base. This allows each person to work independently, minimizing the chance of stepping on someone else's toes.
@@ -126,7 +126,7 @@ Our team intentionally rejects scrum in favour of a flow approach. Our PM  has a
 
 For estimates, we use the T-shirt sizing approach. For tricky problems requiring team input, we use the writing approaches described earlier in this post. This eliminates the need for backlog grooming meetings and [planning poker](https://www.simplilearn.com/what-is-planning-poker-article) games.
 
-We use a slack channel to post our daily updates. This has worked out better than real-time standup because seeing the updates in writing is easier to absorb and reply if someone is having a blocker, without holding up the whole team. How often has it happened that you're trying to remember your tasks so that you can recite them when its your turn, so much so that you miss what others are saying.
+We use a slack channel to post our daily updates. This has worked out better than real-time standup because seeing the updates in writing is easier to absorb and reply if someone is having a blocker, without holding up the whole team. How often has it happened that you're trying to remember your tasks so that you can recite them when it's your turn, so much so that you miss what others are saying.
 
 Finally, if there's a process improvement someone would like to explore, for example, turning on auto-merge on PR's, we just try it, no need to wait for official "end of sprint" retrospective meeting. We provide each other feedback continuously which eliminates that ceremony as well.
 
@@ -146,9 +146,9 @@ To which my answer is:
 
 In a similar way, if a team doesn't have time to write, then there must be plenty of time for developers to sit around in endless meetings rather than focusing on their work.
 
-Take an example of a single developer stuck on a problem. The seemingly quick approach is to reach out to the team, i.e. "let's hop on a call". Let's say there's 4 engineers on the team and they all get caught up in real time trying to solve this problem, I've seen these types of meetings run on for 3 hours or even more. That's at least 12 hours of people time!
+Take an example of a single developer stuck on a problem. The seemingly quick approach is to reach out to the team, i.e. "let's hop on a call". Let's say there's 4 engineers on the team and they all get caught up in real time trying to solve this problem. I've seen these types of meetings run on for 3 hours or even more. That's at least 12 hours of people time!
 
-Now, imagine the original developer taking the time to articulate the problem in a wiki discussion doc or ADR. This could include a description of the problem, approaches that have been tried and didn't work, and consideration of a few alternatives with their pros and cons. A practiced writer may be able to accomplish this in about an hour. Then the doc is shared with the team where others who have knowledge in this area can share their feedback in the document. Since the problem is now well laid out, let's say the 3 other engineers on the team take an hour each to provide feedback. Then the original developer can review this for another hour to arrive at the solution. That's 5 hours rather than 12, *and*, there's a written artifact for anyone else that may later want to understand why that particular solution was chosen.
+Now, imagine the original developer taking the time to articulate the problem in a wiki discussion doc or ADR. This could include a description of the problem, approaches that have been tried and didn't work, and consideration of a few alternatives with their pros and cons. A practiced writer may be able to accomplish this in about an hour. Then the doc is shared with the team where others who have knowledge in this area can share their feedback in the document. Since the problem is now well laid out, let's say the 3 other engineers on the team take an hour each to provide feedback. Then the original developer can review this for another hour to arrive at the solution. That's 5 hours rather than 12, *and* there's a written artifact for anyone else that may later want to understand why that particular solution was chosen.
 
 The effects compound further when considering that many initiatives get put on the back burner for some other higher priority, then get restarted in 6 months to a year. Even if by some good fortune, the original engineers that had that meeting are still at the company, what are the chances anyone will remember the details and outcome of a meeting from about a year ago? This can lead to yet another meeting and the original 12 hours were wasted.
 
@@ -168,11 +168,11 @@ Full disclosure: Since going asynchronous, our team has not yet on-boarded a new
 
 **Technical Setup:** The project `README.md` should be sufficiently detailed and up to date so that a new team member can install all dependencies they need, get the project running and tests passing without getting on a call with another engineer. Ideally, the project docs also contain some "What's next" steps like how to run through a typical workflow in the application.
 
-**Domain Knowledge:** It's not enough to have knowledge of the tech stack and familiarity with the code. An engineer also needs to understand the business domain. In my experience, this has been done by having the new person book 1-1 meetings with various domain experts in the company. This hasn't been a good experience because I've found myself furiously scribbling (or typing) notes trying to absorb all the important information being given and missing about half of it due to talking speed being faster than note taking speed.
+**Domain Knowledge:** It's not enough to have knowledge of the tech stack and familiarity with the code. An engineer also needs to understand the business domain. In my experience, this has been done by having the new person book 1-1 meetings with various domain experts in the company. This hasn't been a good experience because I've found myself furiously scribbling (or typing) notes trying to absorb all the important information being given and missing about half of it due to talking speed being faster than note taking speed. It's also sub-optimal for the domain experts because they need to spend this time repeating the same things every time a new person starts.
 
 This process would be more optimal if the domain experts would write down their knowledge such as what the products are doing, critical workflows, business rules, what are the primary sources of revenue etc. Then the new person could review these and reach out to each expert with follow-on questions. The answers to these questions could then be used to update the business docs, leaving them improved for everyone.
 
-**Team Introduction:** The initial introduction to the team might be a case where its nice to have a real time meeting. No specific agenda other than for everyone to introduce themselves and "shoot the breeze" a bit. In the event that it's not possible to get everyone online all at the same time, this could be scheduled as individual 1-1 short meetings with team members.
+**Team Introduction:** The initial introduction to the team might be a case where it's nice to have a real time meeting. No specific agenda other than for everyone to introduce themselves and "shoot the breeze" a bit. In the event that it's not possible to get everyone online all at the same time, this could be scheduled as individual 1-1 short meetings with team members.
 
 ### What about human connection?
 
@@ -195,17 +195,17 @@ This is the situation where everyone needs to get on a real-time call to resolve
 * A rotating on-call schedule, ideally with a primary and secondary person to take the calls.
 * A monitoring and alerting system to inform the on-call person of an issue.
 * A playbook/troubleshooting guide for common problems.
-* A maintenance procedure where if the on-call person encounters a new problem, they add the solution to the troubleshooting guide after its resolved. This increases the body of knowledge for everyone.
+* A maintenance procedure where if the on-call person encounters a new problem, they add the solution to the troubleshooting guide after it's resolved. This increases the body of knowledge for everyone.
 * Compensation for people when they're on call.
 
-Given that the above is in place, then that's the same procedure to follow if there's an emergency at any time. Its not sustainable to require the entire team to be in potential emergency mode, even for a standard workday.
+Given that the above is in place, then that's the same procedure to follow if there's an emergency at any time. It's not sustainable to require the entire team to be in potential emergency mode, even for a standard workday.
 
 ## Who does this work best for?
 
 To wrap this up, here are some attributes of a team for whom this style of working may be best:
 
 - A team of effective writers, or at the very least, everyone's willing to spend time developing this skill.
-- Small team size *relative* to size of code base. The project should be large enough that every developer can work independently on a feature without requiring real time co-ordination.
+- Small team size *relative* to size of code base. The project should be large enough that every developer can work independently on a feature without requiring real time coordination.
 - It's not necessary that all team members be senior, but a recent graduate or junior developer may require some real time guidance and mentoring.
 - Great for product and SAAS companies where teams have full control over the product or service. May be more challenging to implement with project based consulting as it would require "selling" each client on the idea.
 
