@@ -10,7 +10,7 @@ related:
   - "Off with the Digital Distractions!"
 ---
 
-I was inspired to write this after reading a post about how big tech companies organize their software engineering processes and the [curious absence of scrum](https://blog.pragmaticengineer.com/project-management-at-big-tech/) at these companies. While I don't work at a FAANG (or MAANA given some company renames!), I am fortunate to be working on a team where engineers are empowered to be self organizing, and try different ways of working to optimize for results, developer productivity, and overall quality of life.
+I was inspired to write this after reading a post about how big tech companies organize their software engineering processes and the [curious absence of scrum](https://blog.pragmaticengineer.com/project-management-at-big-tech/) at these companies. While I don't work at a FAANG (or MAANA given some company renames), I am fortunate to be working on a team where engineers are empowered to be self organizing, and try different ways of working to optimize for results, developer productivity, and overall quality of life.
 
 To this end, our team has moved increasingly to an asynchronous work style and the results have been fantastic. This post will walk through why we decided to try this, how we're doing it, and address some common concerns.
 
@@ -22,7 +22,7 @@ The product consists of several publicly accessible web apps, built with Rails a
 
 We're part of a mid-sized company that delivers a number of other products and services. Prior to the pandemic, most people worked in office, with occasional work-from-home days. After the pandemic, the company went fully remote and will remain that way going forward.
 
-Our team has never been big fans of the official scrum methodology, preferring a more kanban/flow approach to delivering features. So we were fairly light on the ceremonial meetings, but we did have some regular meetings including a daily standup and some planning meetings. We were also in the habit of "let's hop on a call" type meetings, for example to deal with a tricky production bug or figure out how a new feature should be integrated into the existing product.
+Our team has never been big fans of the official scrum methodology, preferring a more kanban/flow approach to delivering features. So we were fairly light on ceremonial meetings, but we did have some regular meetings including a daily standup and some planning meetings. We were also in the habit of "let's hop on a call" type meetings, for example to deal with a tricky production bug or figure out how a new feature should be integrated into the existing product.
 
 This all came to a head one day when our manager seemed really stressed out in standup and remarked that he was in too many meetings. Since none of us were fans of meetings to start with (is any engineer really??), we decided right there and then to move standup to an async channel using Slack and to generally try and work more asynchronously.
 
@@ -44,9 +44,11 @@ Now that the definitions are out of the way, how does a team go from everyone wo
 
 ## Communication
 
-One thing we realized in moving to async is that we would all have to hone our written communication skills, since this would be taking the place of verbal communication. Not only can effective writing replace a lot of meetings, there's also a benefit to the company in that decisions and discussions in a written format are easily accessible to everyone, not just whoever happened to participate in the meeting that day. This is also helpful to the team in an environment of shifting priorities, where people may not remember what was discussed in a meeting several months ago. When decisions are written down, this is no longer a problem.
+One thing we realized in moving to async is that we would all have to hone our written communication skills, since this would be taking the place of verbal communication. Not only can effective writing replace a lot of meetings, there's also a benefit to the company. Decisions and discussions in a written format are easily accessible to everyone, not just whoever happened to participate in the meeting that day. This is also helpful to the team in an environment of shifting priorities, where people may not remember what was discussed in a meeting several months ago. When decisions are written down, this is no longer a problem.
 
 Here are a few examples of the type of writing our team has been doing to reduce the need for all of us to be online at the same time. We try as much as possible to choose writing tools that support markdown, which is more developer friendly than WYSIWG editors, but that's just our team preference.
+
+![markdown all the things](../images/markdown-all-the-things.jpg "markdown all the things")
 
 <aside class="markdown-aside">
 The topic of documentation, such as how to write it, what should get documented, how to maintain it etc. is enough for a whole blog post on its own. See this excellent <a class="markdown-link" href="https://chelseatroy.com/2021/09/14/the-art-of-documentation/">post</a> for thorough coverage of this topic.
@@ -82,9 +84,9 @@ For simple question and answer communication, we use Slack but in an async fashi
 Regardless of your team being async or not, it's a good idea to minimize notifications and other <a class="markdown-link" href ="https://danielabaron.me/blog/off-with-the-digital-distractions/">digital distractions</a> to get the most out of your focus time.
 </aside>
 
-### Wiki Adhoc Discussions
+### Wiki Discussions
 
-We use Github to host our project source, which also has a Wiki. If a team member has something they'd like to discuss that is a little more involved than a Slack question, they can add a page and write up a discussion topic in markdown, and then share it with the team via Slack. Then team members can update the document with their thoughts on the topic on their own time. This replaces the "let's hop on a call" type of meetings and has helped us resolve a number of issues. The benefit of this written approach over a real-time meeting is each developer can do some analysis on the code before piping in to the "conversation". This results in more accurate and thoughtful points being made.
+We use Github to host our project source, which also has a Wiki. We use this when a team member has something they'd like to discuss that is more involved than what could be covered with a Slack question. They can add a page and write up a discussion topic in markdown, and share it with the team via Slack. Then team members can update the document with their thoughts on the topic on their own time. This replaces the "let's hop on a call" type of meetings and has helped us resolve a number of issues. The benefit of this written approach over a real-time meeting is each developer can do some analysis on the code before piping in to the "conversation". This results in more accurate and thoughtful points being made.
 
 The meeting equivalent of this is where some participants say "umm... let me check...", clackety clack of keyboards, while other participants watch and wait. The async version of this has been more effective for our team and leaves a searchable artifact for ourselves and future team members.
 
@@ -153,14 +155,14 @@ Now, imagine the original developer taking the time to articulate the problem in
 The effects compound further when considering that many initiatives get put on the back burner for some other higher priority, then get restarted in 6 months to a year. Even if by some good fortune, the original engineers that had that meeting are still at the company, what are the chances anyone will remember the details and outcome of a meeting from about a year ago? This can lead to yet another meeting and the original 12 hours were wasted.
 
 <aside class="markdown-aside">
-One "solution" I've seen to the forgotten outcome of meetings problem, is to designate one participant to take notes. The problem with this is that when someone is tasked with note taking, it's difficult to be an active participant in the technical problem solving. This results in highly skilled, highly paid engineers doing secretarial duties. Not only can it create resentment if the same person tends to be selected for this task (especially insidious if assigned to the only female engineer), but it's not the most effective use of engineering time.
+One "solution" I've seen to the forgotten outcome of meetings problem, is to designate one participant to take notes. However, when someone is tasked with note taking, it's difficult for that person to be an active participant in the technical problem solving. This results in highly skilled, highly paid engineers doing secretarial duties. Not only can it create resentment if the same person tends to be selected for this task (especially insidious if assigned to the only female engineer), but it's not the most effective use of engineering time.
 </aside>
 
 ### I'm not a good writer
 
 Notice the emphasis has been on *effective* writing rather than *good* writing. This isn't about making the New York Times bestseller list or being nominated for a [Pulitzer Prize](https://en.wikipedia.org/wiki/Pulitzer_Prize). The goal is to make yourself understood to the rest of the team. Yes this takes some practice, but so does anything worth doing. Just as it takes time to develop effective programming skills, so too does it take time to develop writing skills.
 
-As long as everyone on the team is willing to work on this, it shouldn't be a blocker. Also those team members that are stronger writers should remember to be kind to others with respect to spelling and grammar errors. Personally I don't think this matters much for internal docs as long as the overall meaning of the document is clear.
+As long as everyone on the team is willing to work on this, it shouldn't be a blocker. Those team members that are stronger writers should remember to be kind to others with respect to spelling and grammar errors. Personally I don't think this matters much for internal docs as long as the overall meaning of the document is clear.
 
 ### What about Onboarding?
 
@@ -170,7 +172,7 @@ Full disclosure: Since going asynchronous, our team has not yet on-boarded a new
 
 **Domain Knowledge:** It's not enough to have knowledge of the tech stack and familiarity with the code. An engineer also needs to understand the business domain. In my experience, this has been done by having the new person book 1-1 meetings with various domain experts in the company. This hasn't been a good experience because I've found myself furiously scribbling (or typing) notes trying to absorb all the important information being given and missing about half of it due to talking speed being faster than note taking speed. It's also sub-optimal for the domain experts because they need to spend this time repeating the same things every time a new person starts.
 
-This process would be more optimal if the domain experts would write down their knowledge such as what the products are doing, critical workflows, business rules, what are the primary sources of revenue etc. Then the new person could review these and reach out to each expert with follow-on questions. The answers to these questions could then be used to update the business docs, leaving them improved for everyone.
+This process could be optimized by having domain experts would write down their knowledge such as what the products are doing, critical workflows, business rules, what are the primary sources of revenue etc. Then the new person could review these and reach out to each expert with follow-on questions. The answers to these questions could then be used to update the business docs, leaving them improved for everyone.
 
 **Team Introduction:** The initial introduction to the team might be a case where it's nice to have a real time meeting. No specific agenda other than for everyone to introduce themselves and "shoot the breeze" a bit. In the event that it's not possible to get everyone online all at the same time, this could be scheduled as individual 1-1 short meetings with team members.
 
@@ -202,12 +204,12 @@ Given that the above is in place, then that's the same procedure to follow if th
 
 ## Who does this work best for?
 
-To wrap this up, here are some attributes of a team for whom this style of working may be best:
+Wrapping this all up, here are some characteristics of a team for which the async style of working is likely to succeed:
 
 - A team of effective writers, or at the very least, everyone's willing to spend time developing this skill.
 - Small team size *relative* to size of code base. The project should be large enough that every developer can work independently on a feature without requiring real time coordination.
 - It's not necessary that all team members be senior, but a recent graduate or junior developer may require some real time guidance and mentoring.
-- Great for product and SAAS companies where teams have full control over the product or service. May be more challenging to implement with project based consulting as it would require "selling" each client on the idea.
+- Great for product and SaaS companies where teams have full control over the product or service. May be more challenging to implement with project based consulting as it would require "selling" each client on the idea.
 
 ## Final Thoughts
 
