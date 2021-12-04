@@ -1,7 +1,7 @@
 ---
 title: "Working Towards an Asynchronous Future"
 featuredImage: "../images/work-async-jon-tyson-dm9EHhIZm-k-unsplash.jpg"
-description: "TBD..."
+description: "What is asynchronous work and is it right for your team?"
 date: "2021-12-05"
 category: "career"
 related:
