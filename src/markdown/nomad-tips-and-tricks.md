@@ -10,12 +10,12 @@ related:
   - "Debug Github Actions"
 ---
 
-I've been working on a platform migration project to containerize and move several web applications and associated services from a custom home grown system to Hashicorp's [Nomad](https://www.nomadproject.io/). Nomad is a workload orchestration tool designed to make it (relatively) easy to deploy, manage and scale containers on private and public clouds. It is [comparable](https://www.nomadproject.io/docs/nomad-vs-kubernetes) to Kubernetes, but focuses on a smaller scope, delegating features such as service discovery and secrets management to other tools such as Consul and Vault, while providing integration with these. It's also newer than Kubernetes.
+I've been working on a platform migration project to containerize and move several web applications and associated services from a home grown system to Hashicorp's [Nomad](https://www.nomadproject.io/). Nomad is a workload orchestration tool designed to make it (relatively) easy to deploy, manage and scale containers on private and public clouds. It's [comparable](https://www.nomadproject.io/docs/nomad-vs-kubernetes) to Kubernetes, but focuses on a smaller scope, delegating features including discovery and secrets management to other tools such as Consul and Vault, while providing integration with these. It's also newer than Kubernetes.
 
 One of the challenges in working with a newer platform is a smaller community, and finding online help. Many of my web searches lead to the official Nomad docs. While they are well written, if I'm doing a search, it's because I couldn't find the solution the docs. In the spirit of increasing the body of online knowledge, this post will share a few tips and tricks I've picked up going through this migration.
 
 <aside class="markdown-aside">
-The remainder of this post assumes some familiarity with Hashicorp's Nomad. If you haven't used it before, checkout this excellent <a class="markdown-link" href="https://adri-v.medium.com/just-in-time-nomad-80f57cd403ca">primer</a> and <a class="markdown-link" href="https://adri-v.medium.com/just-in-time-nomad-running-traefik-on-hashiqube-7d6dfd8ef9d8">tutorial</a>.
+The remainder of this post assumes some working knowledge of Hashicorp's Nomad. If you haven't used it before, checkout this excellent <a class="markdown-link" href="https://adri-v.medium.com/just-in-time-nomad-80f57cd403ca">primer</a> and <a class="markdown-link" href="https://adri-v.medium.com/just-in-time-nomad-running-traefik-on-hashiqube-7d6dfd8ef9d8">tutorial</a>.
 </aside>
 
 ## Job Specification
@@ -34,8 +34,7 @@ job "web" {
     task "webapp" {
       driver = "docker"
       config {
-        image = "registry/path/to/image:latest"
-        command = "/path/to/command"
+        image = "ghcr.io/org/project/app:latest"
       }
     }
   }
@@ -44,7 +43,7 @@ job "web" {
 
 But what happens if there's a networking issue resulting in a longer than usual amount of time to pull the image? In this case, Nomad will timeout the docker pull after 5 minutes and restart according to the `restart` stanza. If the networking issues are not resolved, the job will eventually fail.
 
-To avoid having the job fail when docker pull is taking longer than usual, use `image_pull_timeout` to override Nomad's default timeout. For example, to increase it to 10 minutes:
+To avoid having the job fail when docker pull is taking longer than usual, use the `image_pull_timeout` property of the docker `config` stanza to override Nomad's default timeout. For example, to increase it to 10 minutes:
 
 ```nomad
 job "web" {
@@ -52,8 +51,7 @@ job "web" {
     task "web" {
       driver = "docker"
       config {
-        image = "registry/path/to/image:tag"
-        command = "/path/to/command"
+        image = "ghcr.io/org/project/app:latest"
         image_pull_timeout = "10m"
       }
     }
@@ -63,7 +61,7 @@ job "web" {
 
 ### Reuse Docker Tag for Development
 
-When using Docker to run a Nomad task, the Nomad client will use an existing image if the image:tag specified in the docker driver config section of the job specification has already been pulled. However, during development, you may be making changes to a dev version of the Docker image and re-using the same tag.
+When using Docker to run a Nomad task, the Nomad client will use a cached image if the image:tag specified in the docker driver config stanza of the jobspec has already been pulled. However, during development, you may be making changes to a dev version of the Docker image and re-using the same tag.
 
 For example when developing a new feature, I'll switch to a git feature branch on my laptop, build an image tagged with the feature branch name, push it to the container registry, and deploy it to the Nomad dev environment (we use multiple [namespaces](https://learn.hashicorp.com/tutorials/nomad/namespaces) to isolate dev, staging, and production environments). In this case, I don't want Nomad to use the cached image from my last deploy, but to always pull a "fresh" version of the image. This can be accomplished using `force_pull` as shown below:
 
@@ -73,8 +71,7 @@ job "web" {
     task "web" {
       driver = "docker"
       config {
-        image = "registry/path/to/image:tag"
-        command = "/path/to/command"
+        image = "ghcr.io/org/project/app:my-feature"
         force_pull = true
       }
     }
@@ -84,11 +81,11 @@ job "web" {
 
 ### Always deploy a new job version
 
-The command to deploy a new version of a job is `nomad job run path/to/nomad/job_spec_file`. However, if nothing has changed in the job spec file since the last deploy, then Nomad assumes nothing has changed and will not take any action. This is fine for production where there will be a new Docker image tag (we use the main line git commit sha) for each deploy, which effectively changes the contents of the Nomad file, thus triggering a new deploy.
+The command to deploy a new version of a job is `nomad job run path/to/nomad/job_spec_file`. However, if nothing has changed in the jobspec file since the last deploy, then Nomad assumes nothing has changed and will not take any action. This is fine for production where there will be a new Docker image tag (we use the main line git commit sha) for each deploy, which effectively changes the contents of the Nomad file, thus triggering a new deploy.
 
-But for development, we use the same image tag (branch name) so Nomad thinks nothing has changed, even if the image has been updated. Even the `force_pull` explained in the previous section won't help because Nomad won't get as far as evaluating the job spec file.
+But for development, we use the same image tag (branch name) so Nomad thinks nothing has changed, even if the image has been updated. Even the `force_pull` explained in the previous section won't help because Nomad won't get as far as evaluating the jobspec file.
 
-To force Nomad to always run a deploy, set a `meta` block that is populated with the return value from a uuid function that always generates a unique value. Meta blocks allow user-defined arbitrary key-value pairs. Nomad is written in Golang and so Go functions such as `uuidv4()` can be interpolated in the Nomad file as shown below. The `meta` block should be placed directly in the `job` stanza:
+To force Nomad to always run a deploy, use a [meta](https://www.nomadproject.io/docs/job-specification/meta) stanza that is populated with the return value from a uuid function that always generates a unique value. The `meta` stanza allow user-defined arbitrary key-value pairs. Nomad is written in Golang and so Go functions such as `uuidv4()` can be interpolated in the Nomad file as shown below. The `meta` stanza should be placed directly in the `job` stanza:
 
 ```nomad
 job "web" {
@@ -100,21 +97,17 @@ job "web" {
 
 ### Resiliency
 
-This one is not so much a tip, rather a summary of important stanzas in the jobspec file to understand in order to achieve application resiliency.
+This one is not so much a tip, rather a summary of important stanzas in the jobspec file. One of the many benefits of using an orchestration tool like Nomad is it can handle updates and failures gracefully without manual intervention. In order to take advantage of these features, you must understand and make use of the following stanzas in the job spec file.
 
-One of the many benefits of using an orechestration tool like Nomad is it can handle updates and failures gracefully without manual intervention. In order to take advantage of these features, you must understand and make use of the following stanzas in the job spec file.
+[update](https://www.nomadproject.io/docs/job-specification/update) Specifies update strategy Nomad uses when deploying a new version of the task group. i.e. when `nomad job run path/to/jobspec` is run. For example, perform rolling updates 3 at a time and wait until all tasks for an allocation are running and their Consul health checks are passing for at least 10 seconds before considering the allocation healthy.
 
-TBD: English sentence example for each with hcl
+[restart](https://www.nomadproject.io/docs/job-specification/restart) Specifies strategy for Nomad to restart failed tasks on the same nomad client. For example, if the application server has crashed, attempt 2 restarts within 30 minutes, delay 15s between each restart, and don't try anymore restarts after those are exhausted.
 
-* `update` Specifies update strategy Nomad uses when deploying a new version of the task group. i.e. when `nomad job run path/to/nomad_job_spec_file` is run.
+[check_restart](https://www.nomadproject.io/docs/job-specification/check_restart) Specifies how Nomad should restart a task that is not yet failing, but has become unresponsive or otherwise unhealthy. Works together with Consul health checks. Nomad restarts tasks when a health check has failed. For example, restart the Redis task after its health check has failed 3 consecutive times, and wait 90 seconds after restarting the task to resume health checking.
 
-* `restart` Specifies strategy for Nomad to restart failed tasks on the same node (eg: attempt 2 restarts within 30 minutes, delay 15s between each restart, and don't try anymore restarts after those are exhausted).
+[reschedule](https://www.nomadproject.io/docs/job-specification/reschedule) This handles the case where the specified number of restarts have been attempted and the task still isn't running. This suggests the issue could be with the Nomad client such as a hardware failure or kernel deadlock. The `reschedule` stanza is used to specify details for rescheduling a failing task to another nomad client. For example, reschedule the task group an unlimited number of times and increase the delay between subsequent attempts exponentially, with a starting delay of 30 seconds up to a maximum of 1 hour.
 
-* `check_restart` Specifies how Nomad should restart a task that is not yet failing, but has become unresponsive or otherwise unhealthy. Works together with Consul health checks. Nomad restarts tasks when a health check has failed.
-
-* `reschedule` Tells Nomad under what circumstances to reschedule failing jobs to another node (eg: after configured number of restarts, if task still not running successfully, could be issue with node such as failed hardware, kernel deadlocks, etc.).
-
-* `migrate` When a node needs to come out of service, it gets marked for draining and Nomad will no longer schedule tasks on that node. Nomad will migrate all existing jobs to other nodes. This stanza specifies the strategy for migrating tasks off of draining nodes. Not needed for jobs with `count` 1 because the single instance will bemigrated immediately.
+[migrate](https://www.nomadproject.io/docs/job-specification/migrate) When a Nomad client needs to come out of service, it gets marked for draining and tasks will no longer be scheduled on it. Then Nomad will migrate all existing jobs to other clients. The `migrate` stanza specifies the strategy for migrating tasks off of draining nodes. For example, migrate one allocation at a time, and mark migrated allocations healthy once all their tasks are running and associated health checks are passing for 10 seconds or more within a 5 minute deadline.
 
 ### Prestart hook for Rails migrations
 
@@ -134,7 +127,7 @@ job "web" {
 
       driver = "docker"
       config {
-        image = "registry/image:tag"
+        image = "ghcr.io/org/project/app:latest"
         command = "bash"
         args    = ["-c", "bundle exec rake db:migrate"]
       }
@@ -143,7 +136,7 @@ job "web" {
     task "puma" {
       driver = "docker"
       config {
-        image = "registry/image:tag"
+        image = "ghcr.io/org/project/app:latest"
         command = "bash"
         args    = ["-c", "bundle exec puma"]
       }
@@ -197,7 +190,7 @@ job "web" {
 
 Where `/usr/bin/run-db-migrations` is a custom script that is added to the Docker image. It checks the value of the `NOMAD_ALLOC_INDEX` environment variable. Database migrations will only be run when this is `z0`, the first allocation, and will not be run for any others.
 
-```console
+```bash
 #!/bin/bash
 
 if [ "z$NOMAD_ALLOC_INDEX" == "z0" ]; then
@@ -218,15 +211,15 @@ For example, given the following crontab for a job that runs daily at 10:30:
 It can be replaced with the following jobspec:
 
 ```nomad
-job "app_daily_task" {
+job "cron_daily" {
   periodic {
     cron = "30 10 * * *"
   }
-  group "daily_task" {
-    task "daily_task" {
+  group "daily" {
+    task "daily" {
       driver = "docker"
       config {
-        image   = "registry/image:latest"
+        image   = "ghcr.io/org/project/app:latest"
         command = "bash"
         args    = ["-c", "RAILS_ENV=production bundle exec rake app:some_daily_task"]
       }
@@ -240,16 +233,16 @@ One challenge with cron jobs, especially for those that run frequently, is how t
 Here's an example of this property for a job that runs every minute:
 
 ```nomad
-job "app_frequent_task" {
+job "cron_frequent_task" {
   periodic {
     cron = "* * * * *"
     prohibit_overlap = true
   }
-  group "frequent_task" {
-    task "frequent_task" {
+  group "frequent" {
+    task "frequent" {
       driver = "docker"
       config {
-        image   = "registry/image:latest"
+        image   = "ghcr.io/org/project/app:latest"
         command = "bash"
         args    = ["-c", "RAILS_ENV=production bundle exec rake app:frequent_task"]
       }
@@ -320,7 +313,7 @@ job "example" {
 
 It can be validated as follows:
 
-```console
+```
 nomad job validate example.nomad
 ```
 
@@ -360,9 +353,9 @@ Job validation errors:
 	* Invalid job type: "services"
 ```
 
-### Job and Allocation Status
+### Allocation Status
 
-Even after deploying a job (`nomad job run /path/to/jobspec_file`), the output of this command may indicate that it's complete, but it's possible that some tasks may have failed to start. In order to get more insight into this, you'll want to query the job and *allocation* status.
+After deploying a job (`nomad job run /path/to/jobspec_file`), the output of this command may indicate that it's complete, but it's possible that some tasks may have failed to start. In order to get more insight into this, you'll want to query the job and *allocation* status.
 
 Before showing the CLI command for allocation status, let's take a brief detour to define it. An allocation is how Nomad declares that some tasks in a given job should be run on a particular node, aka Nomad client machine.
 
@@ -403,7 +396,7 @@ job "rails-app" {
 
 After submitting the job via `nomad job run railsapp.nomad`, the console output will show that submission is complete. But to check whether things are actually working, first check the job status:
 
-```console
+```
 nomad job status rails-app
 ```
 
@@ -420,11 +413,9 @@ fa2b2ed6  4163a6ca  background   1       run      running  1d6h ago  1d6h ago
 
 There are 4 allocations - 3 are for the `web` group because the jobspec indicated a `count` property of 3 for these, and 1 for the `background` group because this jobspec only indicated 1 sidekiq process (the `count` property defaults to 1).
 
-### Allocation Status
-
 In the previous example, all allocations were successfully started, but sometimes you may see the status as `failed`. In this case, you can inspect the allocation to investigate by passing the allocation ID (first column of previous output) to the `nomad alloc status` command. For example, to inspect the first `web` allocation:
 
-```console
+```
 nomad alloc status dac34c14
 ```
 
@@ -449,9 +440,9 @@ Time                       Type        Description
 
 If something went wrong such as the Nomad client could not download the Docker image, the error would be shown in the events.
 
-Bonus: The Nomad CLI supports tab completion. Simply run `nomad -autocomplete-install` to enable it.
+**Bonus:** The Nomad CLI supports tab completion. Simply run `nomad -autocomplete-install` to enable it.
 
-For example, given a list of allocations displayed from the `nomad status some-job` command:
+For example, given a list of allocations displayed from the `nomad status rails-app` command:
 
 ```
 Allocations
@@ -470,7 +461,7 @@ Sometimes you'll want to shell into a running container to troubleshoot somethin
 
 To launch a shell in the sidekiq container from the previous example:
 
-```console
+```bash
 nomad alloc exec -i -t -task sidekiq fa2b2ed6 /bin/bash
 ```
 
@@ -482,14 +473,15 @@ Taking it one step further, you might want to run a specific command from a shel
 
 The two step way to do this is to run a shell as before, then type in your command from within the shell, for example:
 
-```console
+```bash
 nomad alloc exec -i -t -task puma fa2b2ed6 /bin/bash
 root@725b3752ada5: bundle exec rails c
+# do rails console things...
 ```
 
 Shorten this to one step with the `-c` flag to pass a command to the shell:
 
-```console
+```bash
 nomad alloc exec -i -t -task puma fa2b2ed6 /bin/bash -c "bundle exec rails c"
 ```
 
@@ -508,11 +500,11 @@ df7e2471  4163a6ca  web          1       run      running  1d6h ago  1d6h ago
 fa2b2ed6  4163a6ca  background   1       run      running  1d6h ago  1d6h ago
 ```
 
-We've been looking at the allocations, but you can also get more information about the node (aka Nomad client machine) that the allocation is running on. This is done by passing the Node ID (second column in the Allocations table) to the `nomad node status` command. In the above table, we can see that two of the `web` task groups and the `background` group are running on the sane node, whereas the third `web` group got allocated to a different node.
+We've been looking at the allocations, but you can also get more information about the node (aka Nomad client machine) that the allocation is running on. This is done by passing the Node ID (second column in the Allocations table) to the `nomad node status` command. In the above table, we can see that two of the `web` task groups and the `background` group are running on the same node, whereas the third `web` group got allocated to a different node.
 
 To get information about the node that's running the two web and background groups:
 
-```console
+```
 nomad node status 4163a6ca
 ```
 
@@ -541,19 +533,19 @@ CPU            Memory          Disk
 
 ### Job Version - What's Changed?
 
-Every time you run `nomad job run /path/to/spec_file`, Nomad will create a new version of the job. It can be useful to know what was changed.
+Every time you run `nomad job run /path/to/jobspec`, Nomad will create a new version of the job. It can be useful to know what was changed between versions.
 
 The following command will display the complete version history for a job:
 
-```console
+```
 nomad job history -p job_name
 ```
 
-However, if you've done a lot of deploys, the output of this can be too verbose. You can also get history for just one specific version number, which will show the diff between that version and the previous version.
+However, if there have been a lot of deploys, the output of this can be too verbose. It's also possible to get history for just one specific version number, which will show the diff between that version and the previous version.
 
 For example, the `rails-app` job from the previous section has 50 versions. To see the difference between version 50 and 49 that came before it:
 
-```console
+```
 nomad job history -version 50 -p rails-app
 ```
 
@@ -619,7 +611,7 @@ When using multiple namespaces and having to switch between them, it's tedious t
 
 [direnv](https://direnv.net/) is a shell extension that makes this more convenient. It will load/unload environment variables based on presence of a `.envrc` file in the current directory. Here's how I've organized to support easily switching between our dev, staging, and prod environments.
 
-```console
+```
 nomad-env
 ├── dev
 │   └── .envrc
@@ -637,20 +629,18 @@ NOMAD_TOKEN=acl_token (for the current env)
 NOMAD_NAMESPACE=dev (or staging or prod)
 ```
 
-Note that `direnv` is not Nomad specific, use this anywhere you need to easily switch between sets of environment variables.
+<aside class="markdown-aside">
+Note that direnv is not Nomad specific. This tool can be used anywhere you need to easily switch between sets of environment variables.
+</aside>
 
 ## Conclusion
 
-TBD
+This post has covered a number of useful tips for working with Nomad including working with the jobspec HCL file and making use of the Nomad CLI. Here are some resources for further reading and bookmarking if you're going to be using Nomad:
 
-## References
-
-Job Spec
-
-Command line reference
-
-Environment variables
-
-3 blog posts on Hashicorps site for building resilient infrastructure
-
-https://github.com/angrycub/nomad_example_jobs
+* [Job Specification](https://www.nomadproject.io/docs/job-specification)
+* [Command Line Reference](https://www.nomadproject.io/docs/commands)
+* [Environment Variables](https://www.nomadproject.io/docs/runtime/environment)
+* [Building Resilient Infrastructure: Restarting Tasks](https://www.hashicorp.com/blog/resilient-infrastructure-with-nomad-restarting-tasks)
+* [Building Resilient Infrastructure: Scheduling](https://www.hashicorp.com/blog/resilient-infrastructure-with-nomad-scheduling)
+* [Building Resilient Infrastructure: Job Lifecycle](https://www.hashicorp.com/blog/building-resilient-infrastructure-with-nomad-job-lifecycle)
+* [Github Repo with Numerous Example Jobs](https://github.com/angrycub/nomad_example_jobs)
