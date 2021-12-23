@@ -145,7 +145,7 @@ job "web" {
 }
 ```
 
-### Nomad environment variables
+### Nomad Environment Variables
 
 Nomad ships with a number of [environment variables](https://www.nomadproject.io/docs/runtime/environment) that are available in the job file *and* in any command/scripts that are run in Docker containers as part of the job.
 
@@ -200,9 +200,7 @@ fi
 
 ### Replace Cron Jobs
 
-If your application also has cron jobs, these can easily be replaced with Nomad's [periodic](https://www.nomadproject.io/docs/job-specification/periodic) jobs.
-
-For example, given the following crontab for a job that runs daily at 10:30:
+If your application also has cron jobs, these can easily be replaced with Nomad's [periodic](https://www.nomadproject.io/docs/job-specification/periodic) jobs. For example, given the following crontab for a job that runs daily at 10:30:
 
 ```
 30 10 * * * nobody bundle exec rake app:some_daily_task
@@ -257,7 +255,7 @@ If you have a lot of cron jobs to convert to Nomad, it can be tedious to write u
 
 ### Turn off auto restart
 
-One of the many fantastic features of Nomad is integration with Vault. From a job spec file, you can read in secrets from Vault, and have them loaded as environment variables in the application. Without a platform managing this, if an environment variable is changed, the application must manually be restarted to pick up the new value. With Nomad's Vault integration, any change to a secret in Vault will cause all jobs that use this secret to automatically be restated.
+One of the many fantastic features of Nomad is integration with Vault for secrets management. From a job spec file, you can read in secrets from Vault, and have them loaded as environment variables in the application. Without a platform managing this, if an environment variable is changed, the application must manually be restarted to pick up the new value. With Nomad's Vault integration, any change to a secret in Vault will cause all jobs that use this secret to automatically be restated.
 
 However, there may be times where this is undesirable. One such case is for cron jobs (called periodic jobs in Nomad). For example, the application I'm working on has an autorenew cron job that picks up all subscriptions that are due for renewal and renews them, which includes billing the customer and sending a confirmation email. We would not want this job stopped in the middle and restarted just because a setting had been changed, it would be better for the job to complete and have the change be picked up next time the job runs.
 
@@ -272,8 +270,7 @@ job "autorenew" {
         env = true
         change_mode = "noop"
         data = <<EOH
-{{ with secret "path/in/vault" }}
-APP_SECRET={{ .Data.data }}
+API_KEY="{{with secret "secret/data/api-key"}}{{.Data.value}}{{end}}"
 EOH
       }
     }
@@ -282,6 +279,155 @@ EOH
 ```
 
 The `destination` file is still updated when the secrets change and so the updated value will be used the next time the cron job is scheduled.
+
+### Populate Environment Variables from Vault
+
+As mentioned in the previous section, Nomad integrates with Vault for secrets management, which can be used to set environment variables for the containerized application that Nomad is running as a task. This is accomplished with the [template](https://www.nomadproject.io/docs/job-specification/template) stanza. This stanza has a few parameters. Most significant is the `data`  parameter which can take either a single line string, or multi-line using a heredoc. This string is written using a [Go template](https://learn.hashicorp.com/tutorials/nomad/go-template-syntax) and is one of the least intuitive aspects of Nomad.
+
+Let's start with a simple example. Suppose the application has a single secret such as DB_PASSWORD that the application expects to be provided as an environment variable to connect to the database. Given that the [Vault CLI](https://learn.hashicorp.com/tutorials/vault/getting-started-install?in=vault/getting-started) has been installed and configured, the database password would be persisted in Vault as follows:
+
+```bash
+vault kv put kv/secret/config DB_PASSWORD=veryverysecretpassword
+```
+
+Then the following jobspec would read in this secret (when being deployed by Nomad) and expose it as an environment variable to the application:
+
+```nomad
+job "example" {
+  type = "service"
+
+  group "web" {
+    task "frontend" {
+      driver = "docker"
+      config {
+        image = "ghcr.io/org/project/app:latest"
+      }
+
+      # Here is where the Vault integration happens
+      template {
+        # result of data template will be populated in this file
+        destination = "secrets/file.env"
+
+        # all key/value pairs read will be exposed as environment variables to the frontend task
+        env = true
+
+        # read secret from Vault
+        data = <<EOH
+{{with secret "kv/secret/config"}}
+DB_PASSWORD={{.Data.data.DB_PASSWORD | toJSON}}
+{{end}}
+EOH
+      }
+    }
+  }
+}
+```
+
+If you're thinking "whaaaat the heck is that data thing???", don't worry. Like I mentioned earlier, this part of Nomad is not very intuitive. While a full coverage of the [template syntax]((https://learn.hashicorp.com/tutorials/nomad/go-template-syntax)) is out of scope for this post, here's a brief explanation of what's going on:
+
+The `<<IDENTIFIER ... IDENTIFIER` denotes the beginning and end of the heredoc, which is a multiline template string. Think of the content in the heredoc as a function that outputs some value. Whatever is output will get written to the `destination` file, which is `secrets/file.env` in the above example.
+
+Any plain string literals such as `DB_PASSWORD` will get output exactly as they appear.
+
+Anything between double curly braces `{{ ... }}` represents a dynamic portion of the template, these contain actions.
+
+`with` is an action that redefines the context available to the template. I couldn't find a good explanation of what `with secret` does but from observation, it reads in the secret stored in Vault at the given location (`kv/secret/config` in the above example). Now the value from Vault can be traversed using `.Data.data.DB_PASSWORD`. The reason for `.Data.data` has to do with how Vault stores the data.
+
+The pipe symbol `|` is used to chain together one or more commands. Since the database password could contain special characters, it's recommended to run all values extracted from Vault through the `toJSON` function to ensure they're properly parsed.
+
+The result of all this is the following contents written to the destination file `secrets/file.env`:
+
+```
+DB_PASSWORD=veryverysecretpassword
+```
+
+And if you were to shell in the container (next section on Nomad CLI will explain how to do that) and run `env`, the `DB_PASSWORD` environment variable would be listed.
+
+Well that's all well and good for a single environment variable, but what if your application has many environment variables? For example, it could be using multiple databases, and integrate with third party services for transactional email, marketing campaigns, payment provider etc., all of which require configuring secrets.
+
+Of course you could populate multiple key/value pairs in Vault like this:
+
+```bash
+vault kv put kv/secret/config DB_PASSWORD=veryverysecretpassword OTHER_DB_PASSWORD=anothersecret EMAIL_PROVIDER_API_KEY=abc123...
+```
+
+And update the template data with a row for each secret.
+
+```nomad
+job "example" {
+  group "web" {
+    task "frontend" {
+      template {
+        destination = "secrets/file.env
+        env = true
+
+        # read multiple secrets from Vault
+        data = <<EOH
+{{with secret "kv/secret/config"}}
+DB_PASSWORD={{.Data.data.DB_PASSWORD | toJSON}}
+OTHER_DB_PASSWORD={{.Data.data.OTHER_DB_PASSWORD | toJSON}}
+EMAIL_PROVIDER_API_KEY={{.Data.data.EMAIL_PROVIDER_API_KEY | toJSON}}
+...
+{{end}}
+EOH
+      }
+    }
+  }
+}
+```
+
+The problem  with this is the `template` stanza will get quite lengthy. Also maintenance becomes an issue because the `template` stanza can only be placed in the `task` stanza. So if the jobspec has multiple groups/tasks, the lengthy template needs to occur in all of them, and if a new secret is added, multiple template stanzas need to be updated.
+
+Fortunately there's a more efficient way to do this. It involves populating Vault with a JSON file rather than individual key/value pairs. Then using the `range` action in the template stanza, to iterate over the key/value map from Vault, and dynamically create all environment variables from the json that was loaded in Vault.
+
+To start, create a json file with all the secrets, this is just temporary and can be deleted after its loaded into Vault. For example:
+
+```json
+# data.json
+{
+  "DB_PASSWORD": "veryverysecretpassword",
+  "OTHER_DB_PASSWORD": "anothersecret",
+  "EMAIL_PROVIDER_API_KEY": "abc123",
+  ...
+}
+```
+
+Run the following command to load this file into Vault:
+
+```bash
+vault kv put kv/secret/config @data.json
+```
+
+Update the template stanza in the jobspec to use the `range` action to iterate over each key/value pair in Vault. Since the value being read from Vault is a map, two variables `$key` and `$value` can be assigned with the result of each key/value pair, i.e. environment variable and its value:
+
+```nomad
+job "example" {
+  group "web" {
+    task "frontend" {
+      template {
+        destination = "secrets/file.env
+        env = true
+
+        # read multiple secrets from Vault
+        data = <<EOH
+{{with secret "kv/hover/config"}}
+{{range $key, $value := .Data.data}}
+{{$key}}={{$value | toJSON}}{{end}}
+{{end}}
+EOH
+      }
+    }
+  }
+}
+```
+
+After this job is deployed, the destination file `secrets/file.env` will be populated as follows:
+
+```
+DB_PASSWORDveryverysecretpassword
+OTHER_DB_PASSWORDanothersecret
+EMAIL_PROVIDER_API_KEYabc123
+```
 
 ## Nomad CLI
 
