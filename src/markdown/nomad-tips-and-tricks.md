@@ -10,19 +10,19 @@ related:
   - "Debug Github Actions"
 ---
 
-I've been working on a platform migration project to containerize and move several web applications and associated services from a home grown system to Hashicorp's [Nomad](https://www.nomadproject.io/). Nomad is a workload orchestration tool designed to make it (relatively) easy to deploy, manage and scale containers on private and public clouds. It's [comparable](https://www.nomadproject.io/docs/nomad-vs-kubernetes) to Kubernetes, but focuses on a smaller scope, delegating features including discovery and secrets management to other tools such as Consul and Vault, while providing integration with these. It's also newer than Kubernetes.
+I've been working on a platform migration project to containerize and move several web applications and associated services from a home grown system to Hashicorp's [Nomad](https://www.nomadproject.io/). Nomad is a workload orchestration tool designed to make it (relatively) easy to deploy, manage and scale containers on private and public clouds. It's [comparable](https://www.nomadproject.io/docs/nomad-vs-kubernetes) to Kubernetes, but focuses on a smaller scope, delegating features including discovery and secrets management to other tools such as [Consul](https://www.consul.io/) and [Vault](https://www.vaultproject.io/), while providing integration with these. It's also newer than Kubernetes.
 
 One of the challenges in working with a newer platform is a smaller community, and finding online help. Many of my web searches lead to the official Nomad docs. While they are well written, if I'm doing a search, it's because I couldn't find the solution the docs. In the spirit of increasing the body of online knowledge, this post will share a few tips and tricks I've picked up going through this migration.
 
 <aside class="markdown-aside">
-The remainder of this post assumes some working knowledge of Hashicorp's Nomad. If you haven't used it before, checkout this excellent <a class="markdown-link" href="https://adri-v.medium.com/just-in-time-nomad-80f57cd403ca">primer</a> and <a class="markdown-link" href="https://adri-v.medium.com/just-in-time-nomad-running-traefik-on-hashiqube-7d6dfd8ef9d8">tutorial</a>.
+This post assumes some working knowledge of Hashicorp's Nomad. If you haven't used it before, checkout this excellent <a class="markdown-link" href="https://adri-v.medium.com/just-in-time-nomad-80f57cd403ca">primer</a> and <a class="markdown-link" href="https://adri-v.medium.com/just-in-time-nomad-running-traefik-on-hashiqube-7d6dfd8ef9d8">tutorial</a>.
 </aside>
 
 ## Job Specification
 
 The first set of tips are for working with the job specification file (aka jobspec). This is a declarative way of telling Nomad about your application and its resource requirements. The jobspec file is written in [HCL](https://github.com/hashicorp/hcl), which stands for Hashicorp Configuration Language.
 
-Although it can be irritataing when frameworks require learning a framework-specific (i.e. non portable) language, HCL is similar enough to JSON and YAML that anyone familiar with these will pick it up easily. In fact, if JSON and YAML had a baby it might look something like HCL.
+Although it can be irritating when tools require learning a framework-specific (i.e. non portable) language, HCL is similar enough to JSON and YAML that anyone familiar with these will pick it up easily. In fact, if JSON and YAML had a baby it might look something like HCL.
 
 ### Increase Docker Pull Timeout
 
@@ -81,7 +81,7 @@ job "web" {
 
 ### Always deploy a new job version
 
-The command to deploy a new version of a job is `nomad job run path/to/nomad/job_spec_file`. However, if nothing has changed in the jobspec file since the last deploy, then Nomad assumes nothing has changed and will not take any action. This is fine for production where there will be a new Docker image tag (we use the main line git commit sha) for each deploy, which effectively changes the contents of the Nomad file, thus triggering a new deploy.
+The command to deploy a new version of a job is `nomad job run path/to/nomad/jobspec`. However, if nothing has changed in the jobspec file since the last deploy, then Nomad will not take any action. This is fine for production where there will be a new Docker image tag (we use the main line git commit sha) for each deploy, which effectively changes the contents of the Nomad file, thus triggering a new deploy.
 
 But for development, we use the same image tag (branch name) so Nomad thinks nothing has changed, even if the image has been updated. Even the `force_pull` explained in the previous section won't help because Nomad won't get as far as evaluating the jobspec file.
 
@@ -109,7 +109,13 @@ This one is not so much a tip, rather a summary of important stanzas in the jobs
 
 [migrate](https://www.nomadproject.io/docs/job-specification/migrate) When a Nomad client needs to come out of service, it gets marked for draining and tasks will no longer be scheduled on it. Then Nomad will migrate all existing jobs to other clients. The `migrate` stanza specifies the strategy for migrating tasks off of draining nodes. For example, migrate one allocation at a time, and mark migrated allocations healthy once all their tasks are running and associated health checks are passing for 10 seconds or more within a 5 minute deadline.
 
-### Prestart hook for Rails migrations
+For further details on how these stanzas are used with examples, I recommend these blog posts from Hashicorp's site:
+
+* [Building Resilient Infrastructure: Restarting Tasks](https://www.hashicorp.com/blog/resilient-infrastructure-with-nomad-restarting-tasks)
+* [Building Resilient Infrastructure: Scheduling](https://www.hashicorp.com/blog/resilient-infrastructure-with-nomad-scheduling)
+* [Building Resilient Infrastructure: Job Lifecycle](https://www.hashicorp.com/blog/building-resilient-infrastructure-with-nomad-job-lifecycle)
+
+### Prestart hook for one-time initialization
 
 An application may have some one-time initialization task that needs to be completed before the main application can start. For example, before starting a Rails app, the database migrations should be run. This can be accomplished in Nomad using the [lifecycle](https://www.nomadproject.io/docs/job-specification/lifecycle) stanza.
 
@@ -255,11 +261,11 @@ If you have a lot of cron jobs to convert to Nomad, it can be tedious to write u
 
 ### Turn off auto restart
 
-One of the many fantastic features of Nomad is integration with Vault for secrets management. From a job spec file, you can read in secrets from Vault, and have them loaded as environment variables in the application. Without a platform managing this, if an environment variable is changed, the application must manually be restarted to pick up the new value. With Nomad's Vault integration, any change to a secret in Vault will cause all jobs that use this secret to automatically be restated.
+One of the many fantastic features of Nomad is integration with Vault for secrets management. From a jobspec file, you can read in secrets from Vault, and have them loaded as environment variables in the application. Without a platform managing this, if an environment variable is changed, the application must manually be restarted to pick up the new value. With Nomad's Vault integration, any change to a secret in Vault will cause all jobs that use this secret to automatically be restated.
 
 However, there may be times where this is undesirable. One such case is for cron jobs (called periodic jobs in Nomad). For example, the application I'm working on has an autorenew cron job that picks up all subscriptions that are due for renewal and renews them, which includes billing the customer and sending a confirmation email. We would not want this job stopped in the middle and restarted just because a setting had been changed, it would be better for the job to complete and have the change be picked up next time the job runs.
 
-In order to implement this behaviour, set `change_mode = "noop"` in the `template` stanza that reads in the secrets.
+In order to implement this behaviour, set `change_mode = "noop"` in the `template` stanza that reads in the secrets (default is `restart`):
 
 ```nomad
 job "autorenew" {
@@ -323,7 +329,7 @@ EOH
 }
 ```
 
-If you're thinking "whaaaat the heck is that data thing???", don't worry. Like I mentioned earlier, this part of Nomad is not very intuitive. While a full coverage of the [template syntax]((https://learn.hashicorp.com/tutorials/nomad/go-template-syntax)) is out of scope for this post, here's a brief explanation of what's going on:
+If you're thinking "whaaaat the heck is that data thing???", don't worry. Like I mentioned earlier, this part of Nomad is not very intuitive. While a full coverage of the [template syntax](https://learn.hashicorp.com/tutorials/nomad/go-template-syntax) is out of scope for this post, here's a brief explanation of what's going on:
 
 The `<<IDENTIFIER ... IDENTIFIER` denotes the beginning and end of the heredoc, which is a multiline template string. Think of the content in the heredoc as a function that outputs some value. Whatever is output will get written to the `destination` file, which is `secrets/file.env` in the above example.
 
@@ -398,7 +404,7 @@ Run the following command to load this file into Vault:
 vault kv put kv/secret/config @data.json
 ```
 
-Update the template stanza in the jobspec to use the `range` action to iterate over each key/value pair in Vault. Since the value being read from Vault is a map, two variables `$key` and `$value` can be assigned with the result of each key/value pair, i.e. environment variable and its value:
+Update the template stanza in the jobspec to use the `range` action to iterate over each key/value pair in Vault. Since the value being read from Vault is a map, two variables `$key` and `$value` can be assigned with the result of each key/value pair, i.e. environment variable and its value. These then get written out with a literal equals sign `=` between them, with the value being piped through the `toJSON` function as explained previously:
 
 ```nomad
 job "example" {
@@ -786,7 +792,4 @@ This post has covered a number of useful tips for working with Nomad including w
 * [Job Specification](https://www.nomadproject.io/docs/job-specification)
 * [Command Line Reference](https://www.nomadproject.io/docs/commands)
 * [Environment Variables](https://www.nomadproject.io/docs/runtime/environment)
-* [Building Resilient Infrastructure: Restarting Tasks](https://www.hashicorp.com/blog/resilient-infrastructure-with-nomad-restarting-tasks)
-* [Building Resilient Infrastructure: Scheduling](https://www.hashicorp.com/blog/resilient-infrastructure-with-nomad-scheduling)
-* [Building Resilient Infrastructure: Job Lifecycle](https://www.hashicorp.com/blog/building-resilient-infrastructure-with-nomad-job-lifecycle)
 * [Github Repo with Numerous Example Jobs](https://github.com/angrycub/nomad_example_jobs)
