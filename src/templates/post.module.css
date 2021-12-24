@@ -56,6 +56,10 @@
   padding: 3px;
 }
 
+.content pre[data-language="applescript"]::before {
+  content: "applescript";
+}
+
 .content pre[data-language="bash"]::before {
   content: "bash";
 }
