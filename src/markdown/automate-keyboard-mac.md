@@ -2,8 +2,8 @@
 title: "Automate Keyboard with Mac"
 featuredImage: "../images/automate-keyboard-macbradyn-trollip-pxVOztBa6mY-unsplash.jpg"
 description: "Automate key press sequences and assign a keyboard shortcut with a Mac."
-date: "2021-12-31"
-category: "automation"
+date: "2021-12-29"
+category: "OSX"
 related:
   - "Find Jira Tickets Faster"
   - "Automate Tabs & Commands in iTerm2"
