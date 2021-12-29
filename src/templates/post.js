@@ -17,6 +17,7 @@ const Post = props => {
     markdown.frontmatter.featuredImage.childImageSharp.gatsbyImageData
   const imageSrc = featuredImgFluid.images.fallback.src
   const content = markdown.html
+  const toc = markdown.tableOfContents
   const title = markdown.frontmatter.title
   const description = markdown.frontmatter.description || title
   const slug = markdown.fields.slug
@@ -32,17 +33,25 @@ const Post = props => {
         image={imageSrc}
       />
       <div className={styles.container}>
-        <h1 className={styles.title}>{title}</h1>
-        <div className={styles.published}>Published {publishedDate}</div>
-        <GatsbyImage
-          image={featuredImgFluid}
-          className={styles.featureImage}
-          alt={description}
-        />
-        <div
-          className={styles.content}
-          dangerouslySetInnerHTML={{ __html: content }}
-        />
+        <div className={styles.wrapper}>
+          <main className={styles.main}>
+            <h1 className={styles.title}>{title}</h1>
+            <div className={styles.published}>Published {publishedDate}</div>
+            <GatsbyImage
+              image={featuredImgFluid}
+              className={styles.featureImage}
+              alt={description}
+            />
+            <div
+              className={styles.content}
+              dangerouslySetInnerHTML={{ __html: content }}
+            />
+          </main>
+          <div className={styles.toc}>
+            <div className={styles.toclist} dangerouslySetInnerHTML={{ __html: toc }}
+            />
+          </div>
+        </div>
         <RelatedPosts related={related} />
         <AllLink marginTop="60px" />
       </div>
@@ -60,6 +69,7 @@ export const query = graphql`
   query($slug: String!, $relatedPosts: [String!]!) {
     markdownRemark(fields: { slug: { eq: $slug } }) {
       html
+      tableOfContents
       frontmatter {
         title
         date(formatString: "DD MMM YYYY")

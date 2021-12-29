@@ -1,6 +1,44 @@
 .container {
   margin: 0 auto;
-  max-width: 900px;
+  max-width: 1000px;
+}
+
+.wrapper {
+  display: flex;
+}
+
+.main {
+  /* 100% on mobile */
+  width: 85%;
+}
+
+.toc {
+  margin-left: 35px;
+  margin-top: 20px;
+}
+
+.toclist {
+  border-left: 1px solid var(--brand-grey-medium);
+  font-size: 14px;
+}
+
+/* https://stackoverflow.com/questions/9670383/css-override-line-height-on-word-wrap */
+.toclist li {
+  padding: 5px 0 0 0;
+  margin: 5px 0;
+  line-height: 15px;
+}
+
+.toclist > ul > li {
+  margin-left: 15px;
+}
+
+.toclist > ul > li > ul > li {
+  margin-left: 20px;
+}
+
+.toclist a:hover {
+  color: var(--brand-darken-10);
 }
 
 .title {
@@ -22,7 +60,7 @@
 }
 
 .content {
-  font-size: 20px;
+  font-size: 18px;
   line-height: 30px;
 }
 
@@ -123,6 +161,18 @@
 
 /* mobile landscape */
 @media (max-width: 768px) {
+  .wrapper {
+    display: block;
+  }
+
+  .main {
+    width: 100%;
+  }
+
+  .toc {
+    display: none;
+  }
+
   .title {
     font-size: 2.3rem;
     line-height: 40px;
@@ -131,6 +181,18 @@
 
 /* mobile portrait */
 @media (max-width: 640px) {
+  .wrapper {
+    display: block;
+  }
+
+  .main {
+    width: 100%;
+  }
+
+  .toc {
+    display: none;
+  }
+
   .title {
     font-size: 2rem;
     line-height: 40px;

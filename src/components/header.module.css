@@ -1,6 +1,5 @@
 .container {
-  /* TODO make this a color var in global.css */
-  border-bottom: 1px solid #ededed;
+  border-bottom: 1px solid var(--brand-grey-light);
 }
 
 .inner {
