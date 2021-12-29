@@ -22,6 +22,7 @@
     "@fontsource/bai-jamjuree": "4.2.1",
     "@fontsource/fira-code": "4.5.1",
     "HCL": "github:wholroyd/vscode-hcl",
+    "applescript": "git+https://github.com/danielabar/vscode-applescript.git",
     "gatsby": "3.14.2",
     "gatsby-plugin-image": "1.14.1",
     "gatsby-plugin-react-helmet": "4.13.0",
