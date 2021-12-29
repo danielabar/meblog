@@ -1,3 +1,8 @@
+.outer {
+  margin: 0 auto;
+  max-width: 900px;
+}
+
 .container {
   margin: 30px 0;
 }

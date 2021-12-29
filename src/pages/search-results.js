@@ -64,8 +64,10 @@ const SearchResults = () => {
   return (
     <Layout>
       <SEO title="Search Results" pathname="/search-results" track={track} />
-      {renderHelper()}
-      <AllLink marginTop="30px" />
+      <div className={styles.outer}>
+        {renderHelper()}
+        <AllLink marginTop="30px" />
+      </div>
     </Layout>
   )
 }

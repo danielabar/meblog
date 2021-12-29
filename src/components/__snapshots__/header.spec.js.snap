@@ -8,6 +8,57 @@ Object {
       <header
         data-testid="header"
       >
+        <div>
+          <a
+            href="/"
+          >
+            <div>
+              <div>
+                <img
+                  alt="Profile"
+                  src="/images/profile.png"
+                />
+              </div>
+              <div
+                class="undefined undefined"
+              >
+                Daniela Baron
+              </div>
+            </div>
+          </a>
+          <nav
+            data-testid="nav-menu"
+          >
+            <ul>
+              <li
+                class="undefined undefined"
+              >
+                <a
+                  href="/blog"
+                >
+                  Blog
+                </a>
+              </li>
+              <li
+                class="undefined undefined"
+              >
+                <a
+                  href="/about"
+                >
+                  About
+                </a>
+              </li>
+            </ul>
+          </nav>
+        </div>
+      </header>
+    </div>
+  </body>,
+  "container": <div>
+    <header
+      data-testid="header"
+    >
+      <div>
         <a
           href="/"
         >
@@ -49,54 +100,7 @@ Object {
             </li>
           </ul>
         </nav>
-      </header>
-    </div>
-  </body>,
-  "container": <div>
-    <header
-      data-testid="header"
-    >
-      <a
-        href="/"
-      >
-        <div>
-          <div>
-            <img
-              alt="Profile"
-              src="/images/profile.png"
-            />
-          </div>
-          <div
-            class="undefined undefined"
-          >
-            Daniela Baron
-          </div>
-        </div>
-      </a>
-      <nav
-        data-testid="nav-menu"
-      >
-        <ul>
-          <li
-            class="undefined undefined"
-          >
-            <a
-              href="/blog"
-            >
-              Blog
-            </a>
-          </li>
-          <li
-            class="undefined undefined"
-          >
-            <a
-              href="/about"
-            >
-              About
-            </a>
-          </li>
-        </ul>
-      </nav>
+      </div>
     </header>
   </div>,
   "debug": [Function],
@@ -161,6 +165,60 @@ Object {
       <header
         data-testid="header"
       >
+        <div>
+          <a
+            href="/"
+          >
+            <div>
+              <div>
+                <img
+                  alt="Profile"
+                  src="/images/profile.png"
+                />
+              </div>
+              <div
+                class="undefined undefined"
+              >
+                Daniela Baron
+              </div>
+            </div>
+          </a>
+          <nav
+            data-testid="nav-menu-responsive"
+          >
+            <ul>
+              <li>
+                <button
+                  data-testid="nav-menu-responsive-menu"
+                >
+                  <svg
+                    fill="currentColor"
+                    height="1.7rem"
+                    stroke="currentColor"
+                    stroke-width="0"
+                    viewBox="0 0 24 24"
+                    width="1.7rem"
+                    xmlns="http://www.w3.org/2000/svg"
+                  >
+                    <path
+                      d="M3 18h18v-2H3v2zm0-5h18v-2H3v2zm0-7v2h18V6H3z"
+                    />
+                  </svg>
+                  <br />
+                  menu
+                </button>
+              </li>
+            </ul>
+          </nav>
+        </div>
+      </header>
+    </div>
+  </body>,
+  "container": <div>
+    <header
+      data-testid="header"
+    >
+      <div>
         <a
           href="/"
         >
@@ -205,57 +263,7 @@ Object {
             </li>
           </ul>
         </nav>
-      </header>
-    </div>
-  </body>,
-  "container": <div>
-    <header
-      data-testid="header"
-    >
-      <a
-        href="/"
-      >
-        <div>
-          <div>
-            <img
-              alt="Profile"
-              src="/images/profile.png"
-            />
-          </div>
-          <div
-            class="undefined undefined"
-          >
-            Daniela Baron
-          </div>
-        </div>
-      </a>
-      <nav
-        data-testid="nav-menu-responsive"
-      >
-        <ul>
-          <li>
-            <button
-              data-testid="nav-menu-responsive-menu"
-            >
-              <svg
-                fill="currentColor"
-                height="1.7rem"
-                stroke="currentColor"
-                stroke-width="0"
-                viewBox="0 0 24 24"
-                width="1.7rem"
-                xmlns="http://www.w3.org/2000/svg"
-              >
-                <path
-                  d="M3 18h18v-2H3v2zm0-5h18v-2H3v2zm0-7v2h18V6H3z"
-                />
-              </svg>
-              <br />
-              menu
-            </button>
-          </li>
-        </ul>
-      </nav>
+      </div>
     </header>
   </div>,
   "debug": [Function],

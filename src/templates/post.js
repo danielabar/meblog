@@ -31,7 +31,7 @@ const Post = props => {
         description={description}
         image={imageSrc}
       />
-      <div>
+      <div className={styles.container}>
         <h1 className={styles.title}>{title}</h1>
         <div className={styles.published}>Published {publishedDate}</div>
         <GatsbyImage
@@ -43,9 +43,9 @@ const Post = props => {
           className={styles.content}
           dangerouslySetInnerHTML={{ __html: content }}
         />
+        <RelatedPosts related={related} />
+        <AllLink marginTop="60px" />
       </div>
-      <RelatedPosts related={related} />
-      <AllLink marginTop="60px" />
     </Layout>
   )
 }

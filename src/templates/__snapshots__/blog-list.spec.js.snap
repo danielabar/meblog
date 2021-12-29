@@ -9,122 +9,126 @@ Object {
         <header
           data-testid="header"
         >
-          <a
-            href="/"
-          >
-            <div>
+          <div>
+            <a
+              href="/"
+            >
               <div>
-                <img
-                  alt="Profile"
-                  src="/images/profile.png"
-                />
-              </div>
-              <div
-                class="undefined undefined"
-              >
-                Daniela Baron
-              </div>
-            </div>
-          </a>
-          <nav
-            data-testid="nav-menu"
-          >
-            <ul>
-              <li
-                class="undefined undefined"
-              >
-                <a
-                  href="/blog"
+                <div>
+                  <img
+                    alt="Profile"
+                    src="/images/profile.png"
+                  />
+                </div>
+                <div
+                  class="undefined undefined"
                 >
-                  Blog
-                </a>
-              </li>
-              <li
-                class="undefined undefined"
-              >
-                <a
-                  href="/about"
+                  Daniela Baron
+                </div>
+              </div>
+            </a>
+            <nav
+              data-testid="nav-menu"
+            >
+              <ul>
+                <li
+                  class="undefined undefined"
                 >
-                  About
-                </a>
-              </li>
-            </ul>
-          </nav>
+                  <a
+                    href="/blog"
+                  >
+                    Blog
+                  </a>
+                </li>
+                <li
+                  class="undefined undefined"
+                >
+                  <a
+                    href="/about"
+                  >
+                    About
+                  </a>
+                </li>
+              </ul>
+            </nav>
+          </div>
         </header>
         <div>
           <div />
-          <section
-            data-testid="article-list"
-          >
-            <article>
-              <div>
-                <div>
-                  July 2021
-                </div>
-                <div>
-                  Rails
-                </div>
-              </div>
-              <a
-                href="/blog/some-slug"
-              >
-                First Title
-              </a>
-              <div>
-                excerpt for first article
-              </div>
-              <a
-                href="/blog/some-slug"
-              >
-                Read
-              </a>
-            </article>
-            <article>
-              <div>
-                <div>
-                  August 2021
-                </div>
-                <div>
-                  Docker
-                </div>
-              </div>
-              <a
-                href="/blog/some-other-slug"
-              >
-                Second Title
-              </a>
-              <div>
-                excerpt for second article
-              </div>
-              <a
-                href="/blog/some-other-slug"
-              >
-                Read
-              </a>
-            </article>
-          </section>
           <div>
-            <div
-              class="undefined undefined"
-              data-testid="previous-enabled"
+            <section
+              data-testid="article-list"
             >
-              <a
-                href="/blog"
-                rel="prev"
+              <article>
+                <div>
+                  <div>
+                    July 2021
+                  </div>
+                  <div>
+                    Rails
+                  </div>
+                </div>
+                <a
+                  href="/blog/some-slug"
+                >
+                  First Title
+                </a>
+                <div>
+                  excerpt for first article
+                </div>
+                <a
+                  href="/blog/some-slug"
+                >
+                  Read
+                </a>
+              </article>
+              <article>
+                <div>
+                  <div>
+                    August 2021
+                  </div>
+                  <div>
+                    Docker
+                  </div>
+                </div>
+                <a
+                  href="/blog/some-other-slug"
+                >
+                  Second Title
+                </a>
+                <div>
+                  excerpt for second article
+                </div>
+                <a
+                  href="/blog/some-other-slug"
+                >
+                  Read
+                </a>
+              </article>
+            </section>
+            <div>
+              <div
+                class="undefined undefined"
+                data-testid="previous-enabled"
               >
-                ← prev
-              </a>
-            </div>
-            <div
-              class="undefined undefined"
-              data-testid="next-enabled"
-            >
-              <a
-                href="/blog/3"
-                rel="next"
+                <a
+                  href="/blog"
+                  rel="prev"
+                >
+                  ← prev
+                </a>
+              </div>
+              <div
+                class="undefined undefined"
+                data-testid="next-enabled"
               >
-                next →
-              </a>
+                <a
+                  href="/blog/3"
+                  rel="next"
+                >
+                  next →
+                </a>
+              </div>
             </div>
           </div>
         </div>
@@ -214,122 +218,126 @@ Object {
       <header
         data-testid="header"
       >
-        <a
-          href="/"
-        >
-          <div>
+        <div>
+          <a
+            href="/"
+          >
             <div>
-              <img
-                alt="Profile"
-                src="/images/profile.png"
-              />
-            </div>
-            <div
-              class="undefined undefined"
-            >
-              Daniela Baron
-            </div>
-          </div>
-        </a>
-        <nav
-          data-testid="nav-menu"
-        >
-          <ul>
-            <li
-              class="undefined undefined"
-            >
-              <a
-                href="/blog"
+              <div>
+                <img
+                  alt="Profile"
+                  src="/images/profile.png"
+                />
+              </div>
+              <div
+                class="undefined undefined"
               >
-                Blog
-              </a>
-            </li>
-            <li
-              class="undefined undefined"
-            >
-              <a
-                href="/about"
+                Daniela Baron
+              </div>
+            </div>
+          </a>
+          <nav
+            data-testid="nav-menu"
+          >
+            <ul>
+              <li
+                class="undefined undefined"
               >
-                About
-              </a>
-            </li>
-          </ul>
-        </nav>
+                <a
+                  href="/blog"
+                >
+                  Blog
+                </a>
+              </li>
+              <li
+                class="undefined undefined"
+              >
+                <a
+                  href="/about"
+                >
+                  About
+                </a>
+              </li>
+            </ul>
+          </nav>
+        </div>
       </header>
       <div>
         <div />
-        <section
-          data-testid="article-list"
-        >
-          <article>
-            <div>
-              <div>
-                July 2021
-              </div>
-              <div>
-                Rails
-              </div>
-            </div>
-            <a
-              href="/blog/some-slug"
-            >
-              First Title
-            </a>
-            <div>
-              excerpt for first article
-            </div>
-            <a
-              href="/blog/some-slug"
-            >
-              Read
-            </a>
-          </article>
-          <article>
-            <div>
-              <div>
-                August 2021
-              </div>
-              <div>
-                Docker
-              </div>
-            </div>
-            <a
-              href="/blog/some-other-slug"
-            >
-              Second Title
-            </a>
-            <div>
-              excerpt for second article
-            </div>
-            <a
-              href="/blog/some-other-slug"
-            >
-              Read
-            </a>
-          </article>
-        </section>
         <div>
-          <div
-            class="undefined undefined"
-            data-testid="previous-enabled"
+          <section
+            data-testid="article-list"
           >
-            <a
-              href="/blog"
-              rel="prev"
+            <article>
+              <div>
+                <div>
+                  July 2021
+                </div>
+                <div>
+                  Rails
+                </div>
+              </div>
+              <a
+                href="/blog/some-slug"
+              >
+                First Title
+              </a>
+              <div>
+                excerpt for first article
+              </div>
+              <a
+                href="/blog/some-slug"
+              >
+                Read
+              </a>
+            </article>
+            <article>
+              <div>
+                <div>
+                  August 2021
+                </div>
+                <div>
+                  Docker
+                </div>
+              </div>
+              <a
+                href="/blog/some-other-slug"
+              >
+                Second Title
+              </a>
+              <div>
+                excerpt for second article
+              </div>
+              <a
+                href="/blog/some-other-slug"
+              >
+                Read
+              </a>
+            </article>
+          </section>
+          <div>
+            <div
+              class="undefined undefined"
+              data-testid="previous-enabled"
             >
-              ← prev
-            </a>
-          </div>
-          <div
-            class="undefined undefined"
-            data-testid="next-enabled"
-          >
-            <a
-              href="/blog/3"
-              rel="next"
+              <a
+                href="/blog"
+                rel="prev"
+              >
+                ← prev
+              </a>
+            </div>
+            <div
+              class="undefined undefined"
+              data-testid="next-enabled"
             >
-              next →
-            </a>
+              <a
+                href="/blog/3"
+                rel="next"
+              >
+                next →
+              </a>
+            </div>
           </div>
         </div>
       </div>
@@ -476,122 +484,126 @@ Object {
         <header
           data-testid="header"
         >
-          <a
-            href="/"
-          >
-            <div>
+          <div>
+            <a
+              href="/"
+            >
               <div>
-                <img
-                  alt="Profile"
-                  src="/images/profile.png"
-                />
-              </div>
-              <div
-                class="undefined undefined"
-              >
-                Daniela Baron
-              </div>
-            </div>
-          </a>
-          <nav
-            data-testid="nav-menu"
-          >
-            <ul>
-              <li
-                class="undefined undefined"
-              >
-                <a
-                  href="/blog"
+                <div>
+                  <img
+                    alt="Profile"
+                    src="/images/profile.png"
+                  />
+                </div>
+                <div
+                  class="undefined undefined"
                 >
-                  Blog
-                </a>
-              </li>
-              <li
-                class="undefined undefined"
-              >
-                <a
-                  href="/about"
+                  Daniela Baron
+                </div>
+              </div>
+            </a>
+            <nav
+              data-testid="nav-menu"
+            >
+              <ul>
+                <li
+                  class="undefined undefined"
                 >
-                  About
-                </a>
-              </li>
-            </ul>
-          </nav>
+                  <a
+                    href="/blog"
+                  >
+                    Blog
+                  </a>
+                </li>
+                <li
+                  class="undefined undefined"
+                >
+                  <a
+                    href="/about"
+                  >
+                    About
+                  </a>
+                </li>
+              </ul>
+            </nav>
+          </div>
         </header>
         <div>
           <div />
-          <section
-            data-testid="article-list"
-          >
-            <article>
-              <div>
-                <div>
-                  July 2021
-                </div>
-                <div>
-                  Rails
-                </div>
-              </div>
-              <a
-                href="/blog/some-slug"
-              >
-                First Title
-              </a>
-              <div>
-                excerpt for first article
-              </div>
-              <a
-                href="/blog/some-slug"
-              >
-                Read
-              </a>
-            </article>
-            <article>
-              <div>
-                <div>
-                  August 2021
-                </div>
-                <div>
-                  Docker
-                </div>
-              </div>
-              <a
-                href="/blog/some-other-slug"
-              >
-                Second Title
-              </a>
-              <div>
-                excerpt for second article
-              </div>
-              <a
-                href="/blog/some-other-slug"
-              >
-                Read
-              </a>
-            </article>
-          </section>
           <div>
-            <div
-              class="undefined undefined"
-              data-testid="previous-enabled"
+            <section
+              data-testid="article-list"
             >
-              <a
-                href="/blog/2"
-                rel="prev"
+              <article>
+                <div>
+                  <div>
+                    July 2021
+                  </div>
+                  <div>
+                    Rails
+                  </div>
+                </div>
+                <a
+                  href="/blog/some-slug"
+                >
+                  First Title
+                </a>
+                <div>
+                  excerpt for first article
+                </div>
+                <a
+                  href="/blog/some-slug"
+                >
+                  Read
+                </a>
+              </article>
+              <article>
+                <div>
+                  <div>
+                    August 2021
+                  </div>
+                  <div>
+                    Docker
+                  </div>
+                </div>
+                <a
+                  href="/blog/some-other-slug"
+                >
+                  Second Title
+                </a>
+                <div>
+                  excerpt for second article
+                </div>
+                <a
+                  href="/blog/some-other-slug"
+                >
+                  Read
+                </a>
+              </article>
+            </section>
+            <div>
+              <div
+                class="undefined undefined"
+                data-testid="previous-enabled"
               >
-                ← prev
-              </a>
-            </div>
-            <div
-              class="undefined undefined"
-              data-testid="next-enabled"
-            >
-              <a
-                href="/blog/4"
-                rel="next"
+                <a
+                  href="/blog/2"
+                  rel="prev"
+                >
+                  ← prev
+                </a>
+              </div>
+              <div
+                class="undefined undefined"
+                data-testid="next-enabled"
               >
-                next →
-              </a>
+                <a
+                  href="/blog/4"
+                  rel="next"
+                >
+                  next →
+                </a>
+              </div>
             </div>
           </div>
         </div>
@@ -681,122 +693,126 @@ Object {
       <header
         data-testid="header"
       >
-        <a
-          href="/"
-        >
-          <div>
+        <div>
+          <a
+            href="/"
+          >
             <div>
-              <img
-                alt="Profile"
-                src="/images/profile.png"
-              />
-            </div>
-            <div
-              class="undefined undefined"
-            >
-              Daniela Baron
-            </div>
-          </div>
-        </a>
-        <nav
-          data-testid="nav-menu"
-        >
-          <ul>
-            <li
-              class="undefined undefined"
-            >
-              <a
-                href="/blog"
+              <div>
+                <img
+                  alt="Profile"
+                  src="/images/profile.png"
+                />
+              </div>
+              <div
+                class="undefined undefined"
               >
-                Blog
-              </a>
-            </li>
-            <li
-              class="undefined undefined"
-            >
-              <a
-                href="/about"
+                Daniela Baron
+              </div>
+            </div>
+          </a>
+          <nav
+            data-testid="nav-menu"
+          >
+            <ul>
+              <li
+                class="undefined undefined"
               >
-                About
-              </a>
-            </li>
-          </ul>
-        </nav>
+                <a
+                  href="/blog"
+                >
+                  Blog
+                </a>
+              </li>
+              <li
+                class="undefined undefined"
+              >
+                <a
+                  href="/about"
+                >
+                  About
+                </a>
+              </li>
+            </ul>
+          </nav>
+        </div>
       </header>
       <div>
         <div />
-        <section
-          data-testid="article-list"
-        >
-          <article>
-            <div>
-              <div>
-                July 2021
-              </div>
-              <div>
-                Rails
-              </div>
-            </div>
-            <a
-              href="/blog/some-slug"
-            >
-              First Title
-            </a>
-            <div>
-              excerpt for first article
-            </div>
-            <a
-              href="/blog/some-slug"
-            >
-              Read
-            </a>
-          </article>
-          <article>
-            <div>
-              <div>
-                August 2021
-              </div>
-              <div>
-                Docker
-              </div>
-            </div>
-            <a
-              href="/blog/some-other-slug"
-            >
-              Second Title
-            </a>
-            <div>
-              excerpt for second article
-            </div>
-            <a
-              href="/blog/some-other-slug"
-            >
-              Read
-            </a>
-          </article>
-        </section>
         <div>
-          <div
-            class="undefined undefined"
-            data-testid="previous-enabled"
+          <section
+            data-testid="article-list"
           >
-            <a
-              href="/blog/2"
-              rel="prev"
+            <article>
+              <div>
+                <div>
+                  July 2021
+                </div>
+                <div>
+                  Rails
+                </div>
+              </div>
+              <a
+                href="/blog/some-slug"
+              >
+                First Title
+              </a>
+              <div>
+                excerpt for first article
+              </div>
+              <a
+                href="/blog/some-slug"
+              >
+                Read
+              </a>
+            </article>
+            <article>
+              <div>
+                <div>
+                  August 2021
+                </div>
+                <div>
+                  Docker
+                </div>
+              </div>
+              <a
+                href="/blog/some-other-slug"
+              >
+                Second Title
+              </a>
+              <div>
+                excerpt for second article
+              </div>
+              <a
+                href="/blog/some-other-slug"
+              >
+                Read
+              </a>
+            </article>
+          </section>
+          <div>
+            <div
+              class="undefined undefined"
+              data-testid="previous-enabled"
             >
-              ← prev
-            </a>
-          </div>
-          <div
-            class="undefined undefined"
-            data-testid="next-enabled"
-          >
-            <a
-              href="/blog/4"
-              rel="next"
+              <a
+                href="/blog/2"
+                rel="prev"
+              >
+                ← prev
+              </a>
+            </div>
+            <div
+              class="undefined undefined"
+              data-testid="next-enabled"
             >
-              next →
-            </a>
+              <a
+                href="/blog/4"
+                rel="next"
+              >
+                next →
+              </a>
+            </div>
           </div>
         </div>
       </div>

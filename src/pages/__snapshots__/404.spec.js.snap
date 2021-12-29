@@ -9,47 +9,49 @@ Object {
         <header
           data-testid="header"
         >
-          <a
-            href="/"
-          >
-            <div>
+          <div>
+            <a
+              href="/"
+            >
               <div>
-                <img
-                  alt="Profile"
-                  src="/images/profile.png"
-                />
-              </div>
-              <div
-                class="undefined undefined"
-              >
-                Daniela Baron
-              </div>
-            </div>
-          </a>
-          <nav
-            data-testid="nav-menu"
-          >
-            <ul>
-              <li
-                class="undefined undefined"
-              >
-                <a
-                  href="/blog"
+                <div>
+                  <img
+                    alt="Profile"
+                    src="/images/profile.png"
+                  />
+                </div>
+                <div
+                  class="undefined undefined"
                 >
-                  Blog
-                </a>
-              </li>
-              <li
-                class="undefined undefined"
-              >
-                <a
-                  href="/about"
+                  Daniela Baron
+                </div>
+              </div>
+            </a>
+            <nav
+              data-testid="nav-menu"
+            >
+              <ul>
+                <li
+                  class="undefined undefined"
                 >
-                  About
-                </a>
-              </li>
-            </ul>
-          </nav>
+                  <a
+                    href="/blog"
+                  >
+                    Blog
+                  </a>
+                </li>
+                <li
+                  class="undefined undefined"
+                >
+                  <a
+                    href="/about"
+                  >
+                    About
+                  </a>
+                </li>
+              </ul>
+            </nav>
+          </div>
         </header>
         <div>
           <div />
@@ -63,16 +65,16 @@ Object {
             <div>
               That page doesn't exist or is unavailable
             </div>
-          </div>
-          <div
-            data-testid="all-wrapper"
-            style="margin-top: 30px;"
-          >
-            <a
-              href="/blog"
+            <div
+              data-testid="all-wrapper"
+              style="margin-top: 30px;"
             >
-              All Articles
-            </a>
+              <a
+                href="/blog"
+              >
+                All Articles
+              </a>
+            </div>
           </div>
         </div>
         <footer
@@ -161,47 +163,49 @@ Object {
       <header
         data-testid="header"
       >
-        <a
-          href="/"
-        >
-          <div>
+        <div>
+          <a
+            href="/"
+          >
             <div>
-              <img
-                alt="Profile"
-                src="/images/profile.png"
-              />
-            </div>
-            <div
-              class="undefined undefined"
-            >
-              Daniela Baron
-            </div>
-          </div>
-        </a>
-        <nav
-          data-testid="nav-menu"
-        >
-          <ul>
-            <li
-              class="undefined undefined"
-            >
-              <a
-                href="/blog"
+              <div>
+                <img
+                  alt="Profile"
+                  src="/images/profile.png"
+                />
+              </div>
+              <div
+                class="undefined undefined"
               >
-                Blog
-              </a>
-            </li>
-            <li
-              class="undefined undefined"
-            >
-              <a
-                href="/about"
+                Daniela Baron
+              </div>
+            </div>
+          </a>
+          <nav
+            data-testid="nav-menu"
+          >
+            <ul>
+              <li
+                class="undefined undefined"
               >
-                About
-              </a>
-            </li>
-          </ul>
-        </nav>
+                <a
+                  href="/blog"
+                >
+                  Blog
+                </a>
+              </li>
+              <li
+                class="undefined undefined"
+              >
+                <a
+                  href="/about"
+                >
+                  About
+                </a>
+              </li>
+            </ul>
+          </nav>
+        </div>
       </header>
       <div>
         <div />
@@ -215,16 +219,16 @@ Object {
           <div>
             That page doesn't exist or is unavailable
           </div>
-        </div>
-        <div
-          data-testid="all-wrapper"
-          style="margin-top: 30px;"
-        >
-          <a
-            href="/blog"
+          <div
+            data-testid="all-wrapper"
+            style="margin-top: 30px;"
           >
-            All Articles
-          </a>
+            <a
+              href="/blog"
+            >
+              All Articles
+            </a>
+          </div>
         </div>
       </div>
       <footer

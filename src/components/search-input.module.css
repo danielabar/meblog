@@ -4,14 +4,14 @@
 }
 
 .wrapper svg {
-  left: 5px;
+  left: 8px;
   position: absolute;
   top: 5px;
 }
 
 .search {
   border: 1px solid var(--brand-desaturate-39);
-  border-radius: 3px;
+  border-radius: 30px;
   box-shadow: inset 1px 1px 2px 0px rgba(0, 0, 0, 0.3);
   -webkit-box-shadow: inset 1px 1px 2px 0px rgba(0, 0, 0, 0.3);
   -moz-box-shadow: inset 1px 1px 2px 0px rgba(0, 0, 0, 0.3);

@@ -1,7 +1,13 @@
 .container {
+  /* TODO make this a color var in global.css */
+  border-bottom: 1px solid #ededed;
+}
+
+.inner {
   align-items: center;
   display: flex;
   justify-content: space-between;
+  margin: 0 20px 10px;
 }
 
 .logo {
@@ -47,4 +53,15 @@
 .nav-item {
   font-weight: 500;
   margin-left: 15px;
+}
+
+/* mobile portrait */
+@media (max-width: 640px) {
+  .container {
+    border-bottom: none;
+  }
+
+  .inner {
+    margin: 0;
+  }
 }

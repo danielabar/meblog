@@ -83,8 +83,8 @@ const About = () => (
         required for a blog is a nice challenge to improve my creative writing
         skills. I hope others will find my posts helpful.
       </p>
+      <AllLink marginTop="30px" />
     </div>
-    <AllLink marginTop="30px" />
   </Layout>
 )
 
