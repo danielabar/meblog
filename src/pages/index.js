@@ -14,13 +14,16 @@ import Layout from "../components/layout"
 import Intro from "../components/intro"
 import ArticleList from "../components/article-list"
 import AllLink from "../components/all-link"
+import * as styles from "./index.module.css"
 
 const Index = ({ data }) => (
   <Layout>
-    <SEO title="Home" pathname="/" />
-    <Intro />
-    <ArticleList articles={data.allMarkdownRemark.edges} />
-    <AllLink marginTop="30px" />
+    <div className={styles.container}>
+      <SEO title="Home" pathname="/" />
+      <Intro />
+      <ArticleList articles={data.allMarkdownRemark.edges} />
+      <AllLink marginTop="30px" />
+    </div>
   </Layout>
 )
 

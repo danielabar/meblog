@@ -14,8 +14,8 @@ const Four04 = () => (
       <div className={styles.message}>
         That page doesn't exist or is unavailable
       </div>
+      <AllLink marginTop="30px" />
     </div>
-    <AllLink marginTop="30px" />
   </Layout>
 )
 

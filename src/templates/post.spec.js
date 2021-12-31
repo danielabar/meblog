@@ -54,6 +54,8 @@ describe("Post", () => {
         },
         html:
           "<p>Here is the first paragraph</p><h2>Sub Heading</h2><p>And another paragraph</p>",
+        timeToRead: 5,
+        tableOfContents: "<ul>\n<li><a href=\"#someheading\">Some Heading</a></li>\n<li><a href=\"#anotherheading\">Another Heading</a></li>\n</ul>"
       },
       relatedP: {
         edges: [

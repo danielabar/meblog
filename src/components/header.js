@@ -15,22 +15,24 @@ const Header = () => {
 
   return (
     <header className={styles.container} data-testid="header">
-      <Link to="/">
-        <div className={styles.logo}>
-          <div className={styles.profileWrapper}>
-            <img
-              className={styles.profileImg}
-              src={"/images/profile.png"}
-              alt="Profile"
-            />
+      <div className={styles.inner} >
+        <Link to="/">
+          <div className={styles.logo}>
+            <div className={styles.profileWrapper}>
+              <img
+                className={styles.profileImg}
+                src={"/images/profile.png"}
+                alt="Profile"
+              />
+            </div>
+            <div className={`${styles.headerItem} ${styles.title}`}>
+              Daniela Baron
+            </div>
           </div>
-          <div className={`${styles.headerItem} ${styles.title}`}>
-            Daniela Baron
-          </div>
-        </div>
-      </Link>
+        </Link>
 
-      {menuHelper()}
+        {menuHelper()}
+      </div>
     </header>
   )
 }

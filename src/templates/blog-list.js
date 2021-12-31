@@ -5,6 +5,7 @@ import SEO from "../components/SEO"
 import Layout from "../components/layout"
 import ArticleList from "../components/article-list"
 import Pagination from "../components/pagination"
+import * as styles from "./blog-list.module.css"
 
 export default class BlogList extends React.Component {
   render() {
@@ -20,15 +21,17 @@ export default class BlogList extends React.Component {
     return (
       <Layout>
         <SEO title="Blog" pathname={seoPath} track={visitTrack} />
-        <ArticleList
-          articles={this.props.data.allMarkdownRemark.edges}
-        ></ArticleList>
-        <Pagination
-          isFirst={isFirst}
-          prevPage={prevPage}
-          isLast={isLast}
-          nextPage={nextPage}
-        />
+        <div className={styles.container}>
+          <ArticleList
+            articles={this.props.data.allMarkdownRemark.edges}
+          ></ArticleList>
+          <Pagination
+            isFirst={isFirst}
+            prevPage={prevPage}
+            isLast={isLast}
+            nextPage={nextPage}
+          />
+        </div>
       </Layout>
     )
   }

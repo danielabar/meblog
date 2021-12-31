@@ -9,189 +9,224 @@ Object {
         <header
           data-testid="header"
         >
-          <a
-            href="/"
-          >
-            <div>
+          <div>
+            <a
+              href="/"
+            >
               <div>
-                <img
-                  alt="Profile"
-                  src="/images/profile.png"
-                />
-              </div>
-              <div
-                class="undefined undefined"
-              >
-                Daniela Baron
-              </div>
-            </div>
-          </a>
-          <nav
-            data-testid="nav-menu"
-          >
-            <ul>
-              <li
-                class="undefined undefined"
-              >
-                <a
-                  href="/blog"
+                <div>
+                  <img
+                    alt="Profile"
+                    src="/images/profile.png"
+                  />
+                </div>
+                <div
+                  class="undefined undefined"
                 >
-                  Blog
-                </a>
-              </li>
-              <li
-                class="undefined undefined"
-              >
-                <a
-                  href="/about"
+                  Daniela Baron
+                </div>
+              </div>
+            </a>
+            <nav
+              data-testid="nav-menu"
+            >
+              <ul>
+                <li
+                  class="undefined undefined"
                 >
-                  About
-                </a>
-              </li>
-            </ul>
-          </nav>
+                  <a
+                    href="/blog"
+                  >
+                    Blog
+                  </a>
+                </li>
+                <li
+                  class="undefined undefined"
+                >
+                  <a
+                    href="/about"
+                  >
+                    About
+                  </a>
+                </li>
+              </ul>
+            </nav>
+          </div>
         </header>
         <div>
           <div />
           <div>
-            <h1>
-              This is the title
-            </h1>
             <div>
-              Published 
-              14 Aug 2021
-            </div>
-            <div
-              class="gatsby-image-wrapper gatsby-image-wrapper-constrained"
-              data-gatsby-image-wrapper=""
-              style="position: relative; overflow: hidden; display: inline-block; vertical-align: top;"
-            >
-              <div
-                style="max-width: 800px; display: block;"
-              >
-                <img
-                  alt=""
-                  aria-hidden="true"
-                  role="presentation"
-                  src="data:image/svg+xml;charset=utf-8,%3Csvg height='600' width='800' xmlns='http://www.w3.org/2000/svg' version='1.1'%3E%3C/svg%3E"
-                  style="max-width: 100%; display: block; position: static;"
-                />
-              </div>
-              <div
-                aria-hidden="true"
-                data-placeholder-image=""
-                style="height: 100%; left: 0px; position: absolute; top: 0px; width: 100%;"
-              />
-              <picture>
-                <source
-                  data-srcset="/static/41cac534f5048f26531ee516516637b1/b5535/python-interview-question.webp 200w,/static/41cac534f5048f26531ee516516637b1/f5c71/python-interview-question.webp 400w,/static/41cac534f5048f26531ee516516637b1/0d27e/python-interview-question.webp 800w"
-                  sizes="(min-width: 800px) 800px, 100vw"
-                  type="image/webp"
-                />
-                <img
-                  alt="This is a description"
-                  data-gatsby-image-ssr=""
-                  data-main-image=""
-                  data-src="/static/41cac534f5048f26531ee516516637b1/d0b9c/python-interview-question.jpg"
-                  data-srcset="/static/41cac534f5048f26531ee516516637b1/90ed1/python-interview-question.jpg 200w,/static/41cac534f5048f26531ee516516637b1/2070e/python-interview-question.jpg 400w,/static/41cac534f5048f26531ee516516637b1/d0b9c/python-interview-question.jpg 800w"
-                  decoding="async"
-                  loading="lazy"
-                  sizes="(min-width: 800px) 800px, 100vw"
-                  style="height: 100%; left: 0px; position: absolute; top: 0px; transform: translateZ(0); transition: opacity 250ms linear; width: 100%; will-change: opacity; opacity: 0;"
-                />
-              </picture>
-              <noscript />
-              <script
-                type="module"
-              >
-                const t="undefined"!=typeof HTMLImageElement&&"loading"in HTMLImageElement.prototype;if(t){const t=document.querySelectorAll("img[data-main-image]");for(let e of t){e.dataset.src&&(e.setAttribute("src",e.dataset.src),e.removeAttribute("data-src")),e.dataset.srcset&&(e.setAttribute("srcset",e.dataset.srcset),e.removeAttribute("data-srcset"));const t=e.parentNode.querySelectorAll("source[data-srcset]");for(let e of t)e.setAttribute("srcset",e.dataset.srcset),e.removeAttribute("data-srcset");e.complete&&(e.style.opacity=1)}}
-              </script>
-            </div>
-            <div>
-              <p>
-                Here is the first paragraph
-              </p>
-              <h2>
-                Sub Heading
-              </h2>
-              <p>
-                And another paragraph
-              </p>
-            </div>
-          </div>
-          <section
-            data-testid="related-posts"
-          >
-            <h2>
-              You may also like...
-            </h2>
-            <div>
-              <a
-                href="/blog/related-post-1/"
-              >
+              <main>
+                <h1>
+                  This is the title
+                </h1>
                 <div>
+                  Published 
+                  14 Aug 2021
+                   · 
+                  5
+                   min read
+                </div>
+                <div
+                  class="gatsby-image-wrapper gatsby-image-wrapper-constrained"
+                  data-gatsby-image-wrapper=""
+                  style="position: relative; overflow: hidden; display: inline-block; vertical-align: top;"
+                >
                   <div
-                    class="gatsby-image-wrapper gatsby-image-wrapper-constrained"
-                    data-gatsby-image-wrapper=""
-                    style="position: relative; overflow: hidden; display: inline-block; vertical-align: top;"
+                    style="max-width: 800px; display: block;"
                   >
-                    <div
-                      style="max-width: 800px; display: block;"
-                    >
-                      <img
-                        alt=""
-                        aria-hidden="true"
-                        role="presentation"
-                        src="data:image/svg+xml;charset=utf-8,%3Csvg height='600' width='800' xmlns='http://www.w3.org/2000/svg' version='1.1'%3E%3C/svg%3E"
-                        style="max-width: 100%; display: block; position: static;"
-                      />
-                    </div>
-                    <div
+                    <img
+                      alt=""
                       aria-hidden="true"
-                      data-placeholder-image=""
-                      style="height: 100%; left: 0px; position: absolute; top: 0px; width: 100%;"
+                      role="presentation"
+                      src="data:image/svg+xml;charset=utf-8,%3Csvg height='600' width='800' xmlns='http://www.w3.org/2000/svg' version='1.1'%3E%3C/svg%3E"
+                      style="max-width: 100%; display: block; position: static;"
                     />
-                    <picture>
-                      <source
-                        data-srcset="/static/41cac534f5048f26531ee516516637b1/b5535/prelated-post-1-image.webp 200w,/static/41cac534f5048f26531ee516516637b1/f5c71/prelated-post-1-image.webp 400w,/static/41cac534f5048f26531ee516516637b1/0d27e/prelated-post-1-image.webp 800w"
-                        sizes="(min-width: 800px) 800px, 100vw"
-                        type="image/webp"
-                      />
-                      <img
-                        alt="related post 1"
-                        data-gatsby-image-ssr=""
-                        data-main-image=""
-                        data-src="/static/41cac534f5048f26531ee516516637b1/d0b9c/prelated-post-1-image.jpg"
-                        data-srcset="/static/41cac534f5048f26531ee516516637b1/90ed1/prelated-post-1-image.jpg 200w,/static/41cac534f5048f26531ee516516637b1/2070e/prelated-post-1-image.jpg 400w,/static/41cac534f5048f26531ee516516637b1/d0b9c/prelated-post-1-image.jpg 800w"
-                        decoding="async"
-                        loading="lazy"
-                        sizes="(min-width: 800px) 800px, 100vw"
-                        style="height: 100%; left: 0px; position: absolute; top: 0px; transform: translateZ(0); transition: opacity 250ms linear; width: 100%; will-change: opacity; opacity: 0;"
-                      />
-                    </picture>
-                    <noscript />
-                    <script
-                      type="module"
-                    >
-                      const t="undefined"!=typeof HTMLImageElement&&"loading"in HTMLImageElement.prototype;if(t){const t=document.querySelectorAll("img[data-main-image]");for(let e of t){e.dataset.src&&(e.setAttribute("src",e.dataset.src),e.removeAttribute("data-src")),e.dataset.srcset&&(e.setAttribute("srcset",e.dataset.srcset),e.removeAttribute("data-srcset"));const t=e.parentNode.querySelectorAll("source[data-srcset]");for(let e of t)e.setAttribute("srcset",e.dataset.srcset),e.removeAttribute("data-srcset");e.complete&&(e.style.opacity=1)}}
-                    </script>
                   </div>
+                  <div
+                    aria-hidden="true"
+                    data-placeholder-image=""
+                    style="height: 100%; left: 0px; position: absolute; top: 0px; width: 100%;"
+                  />
+                  <picture>
+                    <source
+                      data-srcset="/static/41cac534f5048f26531ee516516637b1/b5535/python-interview-question.webp 200w,/static/41cac534f5048f26531ee516516637b1/f5c71/python-interview-question.webp 400w,/static/41cac534f5048f26531ee516516637b1/0d27e/python-interview-question.webp 800w"
+                      sizes="(min-width: 800px) 800px, 100vw"
+                      type="image/webp"
+                    />
+                    <img
+                      alt="This is a description"
+                      data-gatsby-image-ssr=""
+                      data-main-image=""
+                      data-src="/static/41cac534f5048f26531ee516516637b1/d0b9c/python-interview-question.jpg"
+                      data-srcset="/static/41cac534f5048f26531ee516516637b1/90ed1/python-interview-question.jpg 200w,/static/41cac534f5048f26531ee516516637b1/2070e/python-interview-question.jpg 400w,/static/41cac534f5048f26531ee516516637b1/d0b9c/python-interview-question.jpg 800w"
+                      decoding="async"
+                      loading="lazy"
+                      sizes="(min-width: 800px) 800px, 100vw"
+                      style="height: 100%; left: 0px; position: absolute; top: 0px; transform: translateZ(0); transition: opacity 250ms linear; width: 100%; will-change: opacity; opacity: 0;"
+                    />
+                  </picture>
+                  <noscript />
+                  <script
+                    type="module"
+                  >
+                    const t="undefined"!=typeof HTMLImageElement&&"loading"in HTMLImageElement.prototype;if(t){const t=document.querySelectorAll("img[data-main-image]");for(let e of t){e.dataset.src&&(e.setAttribute("src",e.dataset.src),e.removeAttribute("data-src")),e.dataset.srcset&&(e.setAttribute("srcset",e.dataset.srcset),e.removeAttribute("data-srcset"));const t=e.parentNode.querySelectorAll("source[data-srcset]");for(let e of t)e.setAttribute("srcset",e.dataset.srcset),e.removeAttribute("data-srcset");e.complete&&(e.style.opacity=1)}}
+                  </script>
+                </div>
+                <div>
                   <p>
-                    related post 1
+                    Here is the first paragraph
+                  </p>
+                  <h2>
+                    Sub Heading
+                  </h2>
+                  <p>
+                    And another paragraph
                   </p>
                 </div>
+              </main>
+              <div>
+                <div>
+                  <ul>
+                    
+
+                    <li>
+                      <a
+                        href="#someheading"
+                      >
+                        Some Heading
+                      </a>
+                    </li>
+                    
+
+                    <li>
+                      <a
+                        href="#anotherheading"
+                      >
+                        Another Heading
+                      </a>
+                    </li>
+                    
+
+                  </ul>
+                </div>
+              </div>
+            </div>
+            <section
+              data-testid="related-posts"
+            >
+              <h2>
+                You may also like...
+              </h2>
+              <div>
+                <a
+                  href="/blog/related-post-1/"
+                >
+                  <div>
+                    <div
+                      class="gatsby-image-wrapper gatsby-image-wrapper-constrained"
+                      data-gatsby-image-wrapper=""
+                      style="position: relative; overflow: hidden; display: inline-block; vertical-align: top;"
+                    >
+                      <div
+                        style="max-width: 800px; display: block;"
+                      >
+                        <img
+                          alt=""
+                          aria-hidden="true"
+                          role="presentation"
+                          src="data:image/svg+xml;charset=utf-8,%3Csvg height='600' width='800' xmlns='http://www.w3.org/2000/svg' version='1.1'%3E%3C/svg%3E"
+                          style="max-width: 100%; display: block; position: static;"
+                        />
+                      </div>
+                      <div
+                        aria-hidden="true"
+                        data-placeholder-image=""
+                        style="height: 100%; left: 0px; position: absolute; top: 0px; width: 100%;"
+                      />
+                      <picture>
+                        <source
+                          data-srcset="/static/41cac534f5048f26531ee516516637b1/b5535/prelated-post-1-image.webp 200w,/static/41cac534f5048f26531ee516516637b1/f5c71/prelated-post-1-image.webp 400w,/static/41cac534f5048f26531ee516516637b1/0d27e/prelated-post-1-image.webp 800w"
+                          sizes="(min-width: 800px) 800px, 100vw"
+                          type="image/webp"
+                        />
+                        <img
+                          alt="related post 1"
+                          data-gatsby-image-ssr=""
+                          data-main-image=""
+                          data-src="/static/41cac534f5048f26531ee516516637b1/d0b9c/prelated-post-1-image.jpg"
+                          data-srcset="/static/41cac534f5048f26531ee516516637b1/90ed1/prelated-post-1-image.jpg 200w,/static/41cac534f5048f26531ee516516637b1/2070e/prelated-post-1-image.jpg 400w,/static/41cac534f5048f26531ee516516637b1/d0b9c/prelated-post-1-image.jpg 800w"
+                          decoding="async"
+                          loading="lazy"
+                          sizes="(min-width: 800px) 800px, 100vw"
+                          style="height: 100%; left: 0px; position: absolute; top: 0px; transform: translateZ(0); transition: opacity 250ms linear; width: 100%; will-change: opacity; opacity: 0;"
+                        />
+                      </picture>
+                      <noscript />
+                      <script
+                        type="module"
+                      >
+                        const t="undefined"!=typeof HTMLImageElement&&"loading"in HTMLImageElement.prototype;if(t){const t=document.querySelectorAll("img[data-main-image]");for(let e of t){e.dataset.src&&(e.setAttribute("src",e.dataset.src),e.removeAttribute("data-src")),e.dataset.srcset&&(e.setAttribute("srcset",e.dataset.srcset),e.removeAttribute("data-srcset"));const t=e.parentNode.querySelectorAll("source[data-srcset]");for(let e of t)e.setAttribute("srcset",e.dataset.srcset),e.removeAttribute("data-srcset");e.complete&&(e.style.opacity=1)}}
+                      </script>
+                    </div>
+                    <p>
+                      related post 1
+                    </p>
+                  </div>
+                </a>
+              </div>
+            </section>
+            <div
+              data-testid="all-wrapper"
+              style="margin-top: 60px;"
+            >
+              <a
+                href="/blog"
+              >
+                All Articles
               </a>
             </div>
-          </section>
-          <div
-            data-testid="all-wrapper"
-            style="margin-top: 60px;"
-          >
-            <a
-              href="/blog"
-            >
-              All Articles
-            </a>
           </div>
         </div>
         <footer
@@ -280,189 +315,224 @@ Object {
       <header
         data-testid="header"
       >
-        <a
-          href="/"
-        >
-          <div>
+        <div>
+          <a
+            href="/"
+          >
             <div>
-              <img
-                alt="Profile"
-                src="/images/profile.png"
-              />
-            </div>
-            <div
-              class="undefined undefined"
-            >
-              Daniela Baron
-            </div>
-          </div>
-        </a>
-        <nav
-          data-testid="nav-menu"
-        >
-          <ul>
-            <li
-              class="undefined undefined"
-            >
-              <a
-                href="/blog"
+              <div>
+                <img
+                  alt="Profile"
+                  src="/images/profile.png"
+                />
+              </div>
+              <div
+                class="undefined undefined"
               >
-                Blog
-              </a>
-            </li>
-            <li
-              class="undefined undefined"
-            >
-              <a
-                href="/about"
+                Daniela Baron
+              </div>
+            </div>
+          </a>
+          <nav
+            data-testid="nav-menu"
+          >
+            <ul>
+              <li
+                class="undefined undefined"
               >
-                About
-              </a>
-            </li>
-          </ul>
-        </nav>
+                <a
+                  href="/blog"
+                >
+                  Blog
+                </a>
+              </li>
+              <li
+                class="undefined undefined"
+              >
+                <a
+                  href="/about"
+                >
+                  About
+                </a>
+              </li>
+            </ul>
+          </nav>
+        </div>
       </header>
       <div>
         <div />
         <div>
-          <h1>
-            This is the title
-          </h1>
           <div>
-            Published 
-            14 Aug 2021
-          </div>
-          <div
-            class="gatsby-image-wrapper gatsby-image-wrapper-constrained"
-            data-gatsby-image-wrapper=""
-            style="position: relative; overflow: hidden; display: inline-block; vertical-align: top;"
-          >
-            <div
-              style="max-width: 800px; display: block;"
-            >
-              <img
-                alt=""
-                aria-hidden="true"
-                role="presentation"
-                src="data:image/svg+xml;charset=utf-8,%3Csvg height='600' width='800' xmlns='http://www.w3.org/2000/svg' version='1.1'%3E%3C/svg%3E"
-                style="max-width: 100%; display: block; position: static;"
-              />
-            </div>
-            <div
-              aria-hidden="true"
-              data-placeholder-image=""
-              style="height: 100%; left: 0px; position: absolute; top: 0px; width: 100%;"
-            />
-            <picture>
-              <source
-                data-srcset="/static/41cac534f5048f26531ee516516637b1/b5535/python-interview-question.webp 200w,/static/41cac534f5048f26531ee516516637b1/f5c71/python-interview-question.webp 400w,/static/41cac534f5048f26531ee516516637b1/0d27e/python-interview-question.webp 800w"
-                sizes="(min-width: 800px) 800px, 100vw"
-                type="image/webp"
-              />
-              <img
-                alt="This is a description"
-                data-gatsby-image-ssr=""
-                data-main-image=""
-                data-src="/static/41cac534f5048f26531ee516516637b1/d0b9c/python-interview-question.jpg"
-                data-srcset="/static/41cac534f5048f26531ee516516637b1/90ed1/python-interview-question.jpg 200w,/static/41cac534f5048f26531ee516516637b1/2070e/python-interview-question.jpg 400w,/static/41cac534f5048f26531ee516516637b1/d0b9c/python-interview-question.jpg 800w"
-                decoding="async"
-                loading="lazy"
-                sizes="(min-width: 800px) 800px, 100vw"
-                style="height: 100%; left: 0px; position: absolute; top: 0px; transform: translateZ(0); transition: opacity 250ms linear; width: 100%; will-change: opacity; opacity: 0;"
-              />
-            </picture>
-            <noscript />
-            <script
-              type="module"
-            >
-              const t="undefined"!=typeof HTMLImageElement&&"loading"in HTMLImageElement.prototype;if(t){const t=document.querySelectorAll("img[data-main-image]");for(let e of t){e.dataset.src&&(e.setAttribute("src",e.dataset.src),e.removeAttribute("data-src")),e.dataset.srcset&&(e.setAttribute("srcset",e.dataset.srcset),e.removeAttribute("data-srcset"));const t=e.parentNode.querySelectorAll("source[data-srcset]");for(let e of t)e.setAttribute("srcset",e.dataset.srcset),e.removeAttribute("data-srcset");e.complete&&(e.style.opacity=1)}}
-            </script>
-          </div>
-          <div>
-            <p>
-              Here is the first paragraph
-            </p>
-            <h2>
-              Sub Heading
-            </h2>
-            <p>
-              And another paragraph
-            </p>
-          </div>
-        </div>
-        <section
-          data-testid="related-posts"
-        >
-          <h2>
-            You may also like...
-          </h2>
-          <div>
-            <a
-              href="/blog/related-post-1/"
-            >
+            <main>
+              <h1>
+                This is the title
+              </h1>
               <div>
+                Published 
+                14 Aug 2021
+                 · 
+                5
+                 min read
+              </div>
+              <div
+                class="gatsby-image-wrapper gatsby-image-wrapper-constrained"
+                data-gatsby-image-wrapper=""
+                style="position: relative; overflow: hidden; display: inline-block; vertical-align: top;"
+              >
                 <div
-                  class="gatsby-image-wrapper gatsby-image-wrapper-constrained"
-                  data-gatsby-image-wrapper=""
-                  style="position: relative; overflow: hidden; display: inline-block; vertical-align: top;"
+                  style="max-width: 800px; display: block;"
                 >
-                  <div
-                    style="max-width: 800px; display: block;"
-                  >
-                    <img
-                      alt=""
-                      aria-hidden="true"
-                      role="presentation"
-                      src="data:image/svg+xml;charset=utf-8,%3Csvg height='600' width='800' xmlns='http://www.w3.org/2000/svg' version='1.1'%3E%3C/svg%3E"
-                      style="max-width: 100%; display: block; position: static;"
-                    />
-                  </div>
-                  <div
+                  <img
+                    alt=""
                     aria-hidden="true"
-                    data-placeholder-image=""
-                    style="height: 100%; left: 0px; position: absolute; top: 0px; width: 100%;"
+                    role="presentation"
+                    src="data:image/svg+xml;charset=utf-8,%3Csvg height='600' width='800' xmlns='http://www.w3.org/2000/svg' version='1.1'%3E%3C/svg%3E"
+                    style="max-width: 100%; display: block; position: static;"
                   />
-                  <picture>
-                    <source
-                      data-srcset="/static/41cac534f5048f26531ee516516637b1/b5535/prelated-post-1-image.webp 200w,/static/41cac534f5048f26531ee516516637b1/f5c71/prelated-post-1-image.webp 400w,/static/41cac534f5048f26531ee516516637b1/0d27e/prelated-post-1-image.webp 800w"
-                      sizes="(min-width: 800px) 800px, 100vw"
-                      type="image/webp"
-                    />
-                    <img
-                      alt="related post 1"
-                      data-gatsby-image-ssr=""
-                      data-main-image=""
-                      data-src="/static/41cac534f5048f26531ee516516637b1/d0b9c/prelated-post-1-image.jpg"
-                      data-srcset="/static/41cac534f5048f26531ee516516637b1/90ed1/prelated-post-1-image.jpg 200w,/static/41cac534f5048f26531ee516516637b1/2070e/prelated-post-1-image.jpg 400w,/static/41cac534f5048f26531ee516516637b1/d0b9c/prelated-post-1-image.jpg 800w"
-                      decoding="async"
-                      loading="lazy"
-                      sizes="(min-width: 800px) 800px, 100vw"
-                      style="height: 100%; left: 0px; position: absolute; top: 0px; transform: translateZ(0); transition: opacity 250ms linear; width: 100%; will-change: opacity; opacity: 0;"
-                    />
-                  </picture>
-                  <noscript />
-                  <script
-                    type="module"
-                  >
-                    const t="undefined"!=typeof HTMLImageElement&&"loading"in HTMLImageElement.prototype;if(t){const t=document.querySelectorAll("img[data-main-image]");for(let e of t){e.dataset.src&&(e.setAttribute("src",e.dataset.src),e.removeAttribute("data-src")),e.dataset.srcset&&(e.setAttribute("srcset",e.dataset.srcset),e.removeAttribute("data-srcset"));const t=e.parentNode.querySelectorAll("source[data-srcset]");for(let e of t)e.setAttribute("srcset",e.dataset.srcset),e.removeAttribute("data-srcset");e.complete&&(e.style.opacity=1)}}
-                  </script>
                 </div>
+                <div
+                  aria-hidden="true"
+                  data-placeholder-image=""
+                  style="height: 100%; left: 0px; position: absolute; top: 0px; width: 100%;"
+                />
+                <picture>
+                  <source
+                    data-srcset="/static/41cac534f5048f26531ee516516637b1/b5535/python-interview-question.webp 200w,/static/41cac534f5048f26531ee516516637b1/f5c71/python-interview-question.webp 400w,/static/41cac534f5048f26531ee516516637b1/0d27e/python-interview-question.webp 800w"
+                    sizes="(min-width: 800px) 800px, 100vw"
+                    type="image/webp"
+                  />
+                  <img
+                    alt="This is a description"
+                    data-gatsby-image-ssr=""
+                    data-main-image=""
+                    data-src="/static/41cac534f5048f26531ee516516637b1/d0b9c/python-interview-question.jpg"
+                    data-srcset="/static/41cac534f5048f26531ee516516637b1/90ed1/python-interview-question.jpg 200w,/static/41cac534f5048f26531ee516516637b1/2070e/python-interview-question.jpg 400w,/static/41cac534f5048f26531ee516516637b1/d0b9c/python-interview-question.jpg 800w"
+                    decoding="async"
+                    loading="lazy"
+                    sizes="(min-width: 800px) 800px, 100vw"
+                    style="height: 100%; left: 0px; position: absolute; top: 0px; transform: translateZ(0); transition: opacity 250ms linear; width: 100%; will-change: opacity; opacity: 0;"
+                  />
+                </picture>
+                <noscript />
+                <script
+                  type="module"
+                >
+                  const t="undefined"!=typeof HTMLImageElement&&"loading"in HTMLImageElement.prototype;if(t){const t=document.querySelectorAll("img[data-main-image]");for(let e of t){e.dataset.src&&(e.setAttribute("src",e.dataset.src),e.removeAttribute("data-src")),e.dataset.srcset&&(e.setAttribute("srcset",e.dataset.srcset),e.removeAttribute("data-srcset"));const t=e.parentNode.querySelectorAll("source[data-srcset]");for(let e of t)e.setAttribute("srcset",e.dataset.srcset),e.removeAttribute("data-srcset");e.complete&&(e.style.opacity=1)}}
+                </script>
+              </div>
+              <div>
                 <p>
-                  related post 1
+                  Here is the first paragraph
+                </p>
+                <h2>
+                  Sub Heading
+                </h2>
+                <p>
+                  And another paragraph
                 </p>
               </div>
+            </main>
+            <div>
+              <div>
+                <ul>
+                  
+
+                  <li>
+                    <a
+                      href="#someheading"
+                    >
+                      Some Heading
+                    </a>
+                  </li>
+                  
+
+                  <li>
+                    <a
+                      href="#anotherheading"
+                    >
+                      Another Heading
+                    </a>
+                  </li>
+                  
+
+                </ul>
+              </div>
+            </div>
+          </div>
+          <section
+            data-testid="related-posts"
+          >
+            <h2>
+              You may also like...
+            </h2>
+            <div>
+              <a
+                href="/blog/related-post-1/"
+              >
+                <div>
+                  <div
+                    class="gatsby-image-wrapper gatsby-image-wrapper-constrained"
+                    data-gatsby-image-wrapper=""
+                    style="position: relative; overflow: hidden; display: inline-block; vertical-align: top;"
+                  >
+                    <div
+                      style="max-width: 800px; display: block;"
+                    >
+                      <img
+                        alt=""
+                        aria-hidden="true"
+                        role="presentation"
+                        src="data:image/svg+xml;charset=utf-8,%3Csvg height='600' width='800' xmlns='http://www.w3.org/2000/svg' version='1.1'%3E%3C/svg%3E"
+                        style="max-width: 100%; display: block; position: static;"
+                      />
+                    </div>
+                    <div
+                      aria-hidden="true"
+                      data-placeholder-image=""
+                      style="height: 100%; left: 0px; position: absolute; top: 0px; width: 100%;"
+                    />
+                    <picture>
+                      <source
+                        data-srcset="/static/41cac534f5048f26531ee516516637b1/b5535/prelated-post-1-image.webp 200w,/static/41cac534f5048f26531ee516516637b1/f5c71/prelated-post-1-image.webp 400w,/static/41cac534f5048f26531ee516516637b1/0d27e/prelated-post-1-image.webp 800w"
+                        sizes="(min-width: 800px) 800px, 100vw"
+                        type="image/webp"
+                      />
+                      <img
+                        alt="related post 1"
+                        data-gatsby-image-ssr=""
+                        data-main-image=""
+                        data-src="/static/41cac534f5048f26531ee516516637b1/d0b9c/prelated-post-1-image.jpg"
+                        data-srcset="/static/41cac534f5048f26531ee516516637b1/90ed1/prelated-post-1-image.jpg 200w,/static/41cac534f5048f26531ee516516637b1/2070e/prelated-post-1-image.jpg 400w,/static/41cac534f5048f26531ee516516637b1/d0b9c/prelated-post-1-image.jpg 800w"
+                        decoding="async"
+                        loading="lazy"
+                        sizes="(min-width: 800px) 800px, 100vw"
+                        style="height: 100%; left: 0px; position: absolute; top: 0px; transform: translateZ(0); transition: opacity 250ms linear; width: 100%; will-change: opacity; opacity: 0;"
+                      />
+                    </picture>
+                    <noscript />
+                    <script
+                      type="module"
+                    >
+                      const t="undefined"!=typeof HTMLImageElement&&"loading"in HTMLImageElement.prototype;if(t){const t=document.querySelectorAll("img[data-main-image]");for(let e of t){e.dataset.src&&(e.setAttribute("src",e.dataset.src),e.removeAttribute("data-src")),e.dataset.srcset&&(e.setAttribute("srcset",e.dataset.srcset),e.removeAttribute("data-srcset"));const t=e.parentNode.querySelectorAll("source[data-srcset]");for(let e of t)e.setAttribute("srcset",e.dataset.srcset),e.removeAttribute("data-srcset");e.complete&&(e.style.opacity=1)}}
+                    </script>
+                  </div>
+                  <p>
+                    related post 1
+                  </p>
+                </div>
+              </a>
+            </div>
+          </section>
+          <div
+            data-testid="all-wrapper"
+            style="margin-top: 60px;"
+          >
+            <a
+              href="/blog"
+            >
+              All Articles
             </a>
           </div>
-        </section>
-        <div
-          data-testid="all-wrapper"
-          style="margin-top: 60px;"
-        >
-          <a
-            href="/blog"
-          >
-            All Articles
-          </a>
         </div>
       </div>
       <footer
