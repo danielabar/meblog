@@ -20,6 +20,9 @@
 .toclist {
   border-left: 1px solid var(--brand-grey-medium);
   font-size: 14px;
+  overflow-y: auto;
+  position: sticky;
+  top: 25px;
 }
 
 /* https://stackoverflow.com/questions/9670383/css-override-line-height-on-word-wrap */
