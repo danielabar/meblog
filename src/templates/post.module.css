@@ -40,8 +40,12 @@
   margin-left: 20px;
 }
 
+.toclist a {
+  transition: all 0.3s ease;
+}
+
 .toclist a:hover {
-  color: var(--brand-darken-10);
+  color: var(--brand-saturate-60);
 }
 
 .title {
