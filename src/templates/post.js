@@ -18,6 +18,7 @@ const Post = props => {
   const imageSrc = featuredImgFluid.images.fallback.src
   const content = markdown.html
   const toc = markdown.tableOfContents
+  const timeToRead = markdown.timeToRead
   const title = markdown.frontmatter.title
   const description = markdown.frontmatter.description || title
   const slug = markdown.fields.slug
@@ -36,7 +37,7 @@ const Post = props => {
         <div className={styles.wrapper}>
           <main className={styles.main}>
             <h1 className={styles.title}>{title}</h1>
-            <div className={styles.published}>Published {publishedDate}</div>
+            <div className={styles.published}>Published {publishedDate} &middot; {timeToRead} min read</div>
             <GatsbyImage
               image={featuredImgFluid}
               className={styles.featureImage}
@@ -69,6 +70,7 @@ export const query = graphql`
   query($slug: String!, $relatedPosts: [String!]!) {
     markdownRemark(fields: { slug: { eq: $slug } }) {
       html
+      timeToRead
       tableOfContents
       frontmatter {
         title
