@@ -65,6 +65,7 @@ Object {
                   Published 
                   14 Aug 2021
                    · 
+                  5
                    min read
                 </div>
                 <div
@@ -126,7 +127,30 @@ Object {
                 </div>
               </main>
               <div>
-                <div />
+                <div>
+                  <ul>
+                    
+
+                    <li>
+                      <a
+                        href="#someheading"
+                      >
+                        Some Heading
+                      </a>
+                    </li>
+                    
+
+                    <li>
+                      <a
+                        href="#anotherheading"
+                      >
+                        Another Heading
+                      </a>
+                    </li>
+                    
+
+                  </ul>
+                </div>
               </div>
             </div>
             <section
@@ -347,6 +371,7 @@ Object {
                 Published 
                 14 Aug 2021
                  · 
+                5
                  min read
               </div>
               <div
@@ -408,7 +433,30 @@ Object {
               </div>
             </main>
             <div>
-              <div />
+              <div>
+                <ul>
+                  
+
+                  <li>
+                    <a
+                      href="#someheading"
+                    >
+                      Some Heading
+                    </a>
+                  </li>
+                  
+
+                  <li>
+                    <a
+                      href="#anotherheading"
+                    >
+                      Another Heading
+                    </a>
+                  </li>
+                  
+
+                </ul>
+              </div>
             </div>
           </div>
           <section
