@@ -10,7 +10,8 @@
 }
 
 .search {
-  border: 1px solid var(--brand-desaturate-39);
+  background-color: var(--brand-grey-light);
+  border: 1px solid transparent;
   border-radius: 30px;
   box-shadow: inset 1px 1px 2px 0px rgba(0, 0, 0, 0.3);
   -webkit-box-shadow: inset 1px 1px 2px 0px rgba(0, 0, 0, 0.3);
