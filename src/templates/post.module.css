@@ -155,6 +155,10 @@
   content: "nomad";
 }
 
+.content pre[data-language="graphql"]::before {
+  content: "graphql";
+}
+
 /* tablet landscape */
 @media (max-width: 1280px) {
   .content ul {
