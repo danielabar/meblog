@@ -612,7 +612,7 @@ export const query = graphql`
 
 Notice that the new `relatedP` section is being defined as a sibling to the existing `markdownRemark` section. The resulting response object will still be wrapped in a `data` field as before, but will now contain both a `markdownRemark` field containing the current post content, and a `relatedP` section, containing an array of `edges`, representing the list of related posts. This is the power of GraphQL that you can define any structure you'd like the response object to have.
 
-Just to visualize the data that is now available to the page template, we can execute an example query that the template would be running for one specific post, leaving out the generated `html` and image fields for simplicity:
+Just to visualize the data that is now available to the page template, we can execute an example query that the template would be running for one specific post, leaving out the generated `html` and image fields for simplicity. Sorry about all the brackets, that's the syntax of the GraphQL filter:
 
 ```graphql
 {
@@ -773,4 +773,4 @@ export default RelatedPosts
 
 ## Conclusion
 
-This post has covered the basics of building blog post pages using Gatsby and the [gatsby-transformer-remark](https://www.npmjs.com/package/gatsby-transformer-remark) plugin. It then covered how to modify the process to add a related posts feature. This involves customizing the markdown frontmatter to include an array of post titles that are related to the current post, modifying the outer query run by the `gatsby-node.js` build process to pass the related content to the post template, then modifying the post template query and rendering to retrieve and render the related posts.
+This post has covered the basics of building blog post pages using Gatsby and the [gatsby-transformer-remark](https://www.npmjs.com/package/gatsby-transformer-remark) plugin and how to modify the process to add a related posts feature. This involves customizing the markdown frontmatter to include an array of post titles that are related to the current post, modifying the outer query run by the `gatsby-node.js` build process to pass the related content to the post template, then modifying the post template query and rendering to retrieve and render the related posts.
