@@ -14,6 +14,8 @@ This post will explain how to add a Related Posts feature to a Gatsby blog. The 
 
 ![gatsby related posts example](../images/gatsby-related-posts-example.png "gatsby related posts example")
 
+The related posts will be curated, that is, the author of the blog is responsible for selecting related articles for each post and populating them in the markdown (we'll be getting into the details of this shortly). If you are looking for a more automated solution, checkout the [gatsby-remark-related-posts](https://www.npmjs.com/package/gatsby-remark-related-posts) plugin. This plugin didn't suit my use case as I wanted the flexibility to occasionally choose tangential content that a similarity based algorithm may not select. I also found it valuable as a learning exercise to build this out myself rather than relying on a plugin.
+
 ## Existing Post Page
 
 Before getting into adding Related Posts, let's briefly look at how a typical post page is built with Gatsby using the [gatsby-transformer-remark](https://www.npmjs.com/package/gatsby-transformer-remark) plugin. If you already have a solid understanding of Gatsby and the remark plugin, feel free to skip ahead to the [adding related posts](../gatsby-related-posts#adding-related-posts) section.
@@ -58,7 +60,7 @@ featuredImage: "../images/example.jpg"
 And here is the sample post. Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. In nulla posuere sollicitudin aliquam ultrices sagittis orci a scelerisque.
 ```
 
-The following GraphQL query would find this post and return all its data. Notice that all the fields in the markdown frontmatter can be exposed from the schema via `edges -> node -> frontmatter`. To execute queries in Gatsby during development, navigate to `http://localhost:8000/___graphql`:
+The following GraphQL query would find this post and return all its data. Notice that all the fields in the markdown frontmatter can be exposed from the schema via `edges -> node -> frontmatter`. To execute queries in Gatsby during development, navigate to [http://localhost:8000/___graphql](http://localhost:8000/___graphql):
 
 ```graphql
 {
@@ -262,6 +264,10 @@ export const query = graphql`
 ```
 
 Now that we have an understanding of how a basic post page gets rendered from Markdown content in Gatsby, we can move on to enhancing this process with a Related Posts feature.
+
+<aside class="markdown-aside">
+If this all seems like a lot of work to get a basic blog post up, it is! A full discussion of the pros and cons of various blogging solutions is outside the scope of this article, but suffice to say, if you like building things and especially love React, Gatsby is a great choice for a blog. However, if you just want to hit the ground publishing articles and not worry about building an entire website, including design, layout, search, SEO etc, then an online platform such as <a class="markdown-link" href="https://medium.com/">Medium</a> or <a class="markdown-link" href="https://dev.to/">dev.to</a> may be a better choice.
+</aside>
 
 ## Adding Related Posts
 
@@ -475,7 +481,7 @@ exports.createPages = ({ graphql, actions }) => {
 
 The [post template](../gatsby-related-posts#post-template), will need to have its page query modified. In addition to querying for the specific markdown content to be displayed, now it must also query the `relatedPosts` field (provided by `gatsby-node.js`) to fetch each related posts title, featured image, and slug for linking.
 
-Up until now, the example queries I've been showing you have either retrieved all posts (as used by `gatsby-node.js`) or have retrieved just a single post using the GraphQL `eq` filter. But now, the post template must query for the related posts, which is an array of string post titles. Fortunately, GraphQL has an `in` filter to do this. For example, the following query will fetch post information for the three related posts:
+Up until now, the example queries I've been showing you have either retrieved all posts (as used by `gatsby-node.js`) or have retrieved just a single post using the GraphQL `eq` filter. But now, the post template must query for the related posts, which is an array of string post titles. Fortunately, GraphQL has an `in` [filter](https://www.gatsbyjs.com/docs/graphql-reference/#filter) to do this. For example, the following query will fetch post information for the three related posts:
 
 ```graphql
 {
@@ -739,10 +745,32 @@ export const query = graphql`
 
 ### Related Posts Component
 
-The last step in the process is to define a `RelatedPosts` component.
+The last step in the process is to define a `RelatedPosts` component. This component will iterate over the posts it receives as props from the post template page and render their titles and images as links, with the target of the link being the post slug:
 
-TBD:
-* Somewhere mention this is hand curated list of related posts, if want "smart" auto generated, see plugin...
-* Somewhere reference Gatsby graphql query filters: https://www.gatsbyjs.com/docs/graphql-reference/#filter
-* Aside "If that seems like a lot of work to generate some blog pages, it is! If you're looking to start a blog and just want to hit the ground writing without "programming your blog", Gatsby may not be the optimal choice for this, consider platforms like Medium or dev.to. A full discussion of pros/cons of various blogging platforms could probably be the topic of a blog post.
-* WIP: new RelatedPosts component to iterate over each related post and display image and title, linking to slug.
+```js
+// src/components/related-posts.js
+
+import React from "react"
+import { Link } from "gatsby"
+import { GatsbyImage } from "gatsby-plugin-image"
+
+const RelatedPosts = props => (
+  <section>
+    <h2>You may also like...</h2>
+    <div>
+      {props.related.edges.map(post => (
+        <Link key={post.node.id} to={post.node.fields.slug}>
+          <GatsbyImage image={post.node.frontmatter.featuredImage.childImageSharp.gatsbyImageData} />
+          <p>{post.node.frontmatter.title}</p>
+        </Link>
+      ))}
+    </div>
+  </section>
+)
+
+export default RelatedPosts
+```
+
+## Conclusion
+
+This post has covered the basics of building blog post pages using Gatsby and the [gatsby-transformer-remark](https://www.npmjs.com/package/gatsby-transformer-remark) plugin. It then covered how to modify the process to add a related posts feature. This involves customizing the markdown frontmatter to include an array of post titles that are related to the current post, modifying the outer query run by the `gatsby-node.js` build process to pass the related content to the post template, then modifying the post template query and rendering to retrieve and render the related posts.
