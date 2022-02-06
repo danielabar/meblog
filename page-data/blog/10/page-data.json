@@ -1,0 +1,5 @@
+{
+    "componentChunkName": "component---src-templates-blog-list-js",
+    "path": "/blog/10",
+    "result": {"data":{"allMarkdownRemark":{"edges":[{"node":{"id":"d28e59ce-a5a4-5fb8-806f-c6d46d07ca4f","fields":{"slug":"/blog/how-i-setup-my-terminal/"},"frontmatter":{"title":"How I Setup my Terminal","date":"December 2019","category":"terminal"},"excerpt":"Have you ever seen a course, tutorial or colleague using their terminal and it looks something like this:  and wondered \"how do they make it…"}}]}},"pageContext":{"limit":5,"skip":45,"numPages":10,"currentPage":10}},
+    "staticQueryHashes": ["163244226"]}
