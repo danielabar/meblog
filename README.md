@@ -84,10 +84,6 @@ make testw
 - [run just one test](https://stackoverflow.com/questions/28725955/how-do-i-test-a-single-file-using-jest)
 - [Gatsby and Cypress](https://www.gatsbyjs.com/docs/how-to/testing/end-to-end-testing/)
 
-## TODO
-
-Use [Fira Code](https://fontsource.org/fonts/fira-code) for code blocks.
-
 ## Original Docs from Starter
 
 <!-- AUTO-GENERATED-CONTENT:START (STARTER) -->
