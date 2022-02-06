@@ -16,7 +16,7 @@ This post will explain how to add a Related Posts feature to a Gatsby blog. The 
 
 ## Existing Post Page
 
-Before getting into adding Related Posts, let's briefly look at how a typical post page is built with Gatsby using the [gatsby-transformer-remark](https://www.npmjs.com/package/gatsby-transformer-remark) plugin. If you already have a solid understanding of Gatsby and the remark plugin, feel free to jump ahead to the [related posts](../gatsby-related-posts#related-posts) section.
+Before getting into adding Related Posts, let's briefly look at how a typical post page is built with Gatsby using the [gatsby-transformer-remark](https://www.npmjs.com/package/gatsby-transformer-remark) plugin. If you already have a solid understanding of Gatsby and the remark plugin, feel free to skip ahead to the [adding related posts](../gatsby-related-posts#adding-related-posts) section.
 
 This plugin allows you to write posts in markdown, and then exposes fields that it generates such as `html` and `excerpt` in the GraphQL server during development, under the node type `allMarkdownRemark`. It also exposes any frontmatter fields you add at the top of your markdown (content delimited by `--` symbols).
 
@@ -64,7 +64,7 @@ The following GraphQL query would find this post and return all its data. Notice
 {
   allMarkdownRemark(
     # limit results to only the example post
-    filter: { frontmatter: { title: { in: "Here is an example markdown post" } } }
+    filter: { frontmatter: { title: { eq: "Here is an example markdown post" } } }
   ) {
     edges {
       node {
@@ -138,7 +138,9 @@ While it's easy to understand how the frontmatter text fields are populated, the
 
 ### Retrieve all Posts
 
-We've just seen an example GraphQL query and JSON response to retrieve a single post. But for building a blog, all the posts must be retrieved, and then fed one at a time to the post template for rendering. This is performed by `gatsby-node.js`, a file that sits at the project root. It should export a `createPages` function, which the Gatsby build process will invoke:
+We've just seen an example GraphQL query and JSON response to retrieve a single post. But for building a blog, all the posts must be retrieved, and then fed one at a time to the post template for rendering. This is performed by `gatsby-node.js`, a file that sits at the project root. It should export a `createPages` function, which the Gatsby build process will invoke.
+
+Notice the result handler invokes a Gatsby function `createPage`. This function receives an object specifying the `component`, which is the path to the template to be rendered, and a `context`, which can contain anything, but practically speaking will contain some results of the GraphQL query that has just resolved. In this case, we're passing in the post `slug`, which will then be available to the template to execute a GraphQL query to lookup details about just this `$slug`.
 
 ```js
 // gatsby-node.js
@@ -183,7 +185,7 @@ exports.createPages = ({ graphql, actions }) => {
 
 ### Post Template
 
-The Post template, which is a React component, receives this JSON data as props and renders it. It does so by running a GraphQL page query at build time, using the `slug` field  provided to it by the `createPages` function implemented in `gatsby-node.js`. This query is doing the GraphQL equivalent of something like this SQL statement: `SELECT html, title, date... FROM markdown WHERE slug = $slug`.
+The Post template, which is a React component, receives this JSON data as props and renders it. It does so by running a GraphQL page query at build time, using the `slug` field  provided to it by the `createPage` function implemented in `gatsby-node.js`. This query is doing the GraphQL equivalent of something like this SQL statement: `SELECT html, title, date... FROM markdown WHERE slug = $slug`.
 
 Somewhat confusingly, the page query is written *after* the rendering code in the template. I'm going to focus in on just the query, and come back to the rendering code in a bit:
 
@@ -261,12 +263,486 @@ export const query = graphql`
 
 Now that we have an understanding of how a basic post page gets rendered from Markdown content in Gatsby, we can move on to enhancing this process with a Related Posts feature.
 
-## Related Posts
+## Adding Related Posts
+
+Probably the most important aspect to understand when adding a new feature to a Gatsby/Markdown site is that you can add anything you want to the frontmatter fields (top section of markdown file contained  within `---`). There's nothing special about the fields I've shown you so far such as `title`, `description`, etc.
+
+### Customizing Frontmatter
+
+To demonstrate this, let's add a nonsense field that has nothing to do with blogging such as `favColor` to the example post shown earlier:
+
+```markdown
+---
+title: "Here is an example markdown post"
+description: "This is a sample description for the post."
+date: "2022-02-15"
+category: "example"
+featuredImage: "../images/example.jpg"
+favColor: "purple"
+---
+
+And here is the sample post. Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. In nulla posuere sollicitudin aliquam ultrices sagittis orci a scelerisque.
+```
+
+Now let's modify the GraphQL query shown earlier that fetches this markdown post, to include the nonsense field `favColor`. I'm leaving out the generated `html` field and image field for simplicity:
+
+```graphql
+{
+  allMarkdownRemark(
+    # limit results to only the example post
+    filter: { frontmatter: { title: { eq: "Here is an example markdown post" } } }
+  ) {
+    edges {
+      node {
+        # These fields come from the top of markdown/here-is-a-post.md
+        frontmatter {
+          title
+          description
+          category
+          date
+          favColor
+        }
+      }
+    }
+  }
+}
+```
+
+And here is the result - notice the new field `favColor` in the results:
+
+```json
+{
+  "data": {
+    "allMarkdownRemark": {
+      "edges": [
+        {
+          "node": {
+            "frontmatter": {
+              "title": "Here is an example markdown post",
+              "description": "This is a sample description for the post.",
+              "category": "example",
+              "date": "2022-02-15",
+              "favColor": "purple"
+            }
+          }
+        }
+      ]
+    }
+  }
+}
+```
+
+Now that we've verified anything can be added to the frontmatter fields, let's add something useful.
+
+### Frontmatter Arrays
+
+Another important concept to understand is the frontmatter field values are not limited to strings. An array value can be created by nesting a list of values with `-`. This is exactly what's needed to define a `related` field, as each markdown post will have three related posts.
+
+Here is the `markdown/here-is-a-post.md` markdown file, with the nonsense field `favColor` replaced with a `related` field containing an array value, which specifies the title of three other markdown posts:
+
+```markdown
+---
+title: "Here is an example markdown post"
+featuredImage: "../images/example.jpg"
+description: "This is a sample description for the post."
+date: "2022-02-15"
+category: "example"
+related:
+  - "Related Post 1"
+  - "Related Post 2"
+  - "Related Post 3"
+---
+
+And here is the sample post. Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. In nulla posuere sollicitudin aliquam ultrices sagittis orci a scelerisque.
+```
+
+Now let's run a query to fetch the example post, this time including the new `related` array field:
+
+```graphql
+{
+  allMarkdownRemark(
+    # limit results to only the example post
+    filter: { frontmatter: { title: { eq: "Here is an example markdown post" } } }
+  ) {
+    edges {
+      node {
+        # These fields come from the top of markdown/here-is-a-post.md
+        frontmatter {
+          title
+          description
+          category
+          date
+          related
+        }
+      }
+    }
+  }
+}
+```
+
+And here are the results - notice that the `related` field contains an Array of strings, representing the titles of the related posts:
+
+```json
+{
+  "data": {
+    "allMarkdownRemark": {
+      "edges": [
+        {
+          "node": {
+            "frontmatter": {
+              "title": "Here is an example markdown post",
+              "description": "This is a sample description for the post.",
+              "category": "example",
+              "date": "2022-02-15",
+              "related": [
+                "Related Post 1",
+                "Related Post 2",
+                "Related Post 3"
+              ]
+            }
+          }
+        }
+      ]
+    }
+  }
+}
+```
+
+Assume there are an additional three markdown files titled "Related Post 1", 2 and 3 such as:
+
+```markdown
+---
+title: "Related Post 1"
+featuredImage: "../images/example.jpg"
+description: "This is a sample description for related post 1."
+date: "2022-02-14"
+category: "example"
+---
+
+And here is the sample post. Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. In nulla posuere sollicitudin aliquam ultrices sagittis orci a scelerisque.
+```
+
+### Update Retrieval of all Posts
+
+Recall the post template contains a page query that queries for the current content using the `$slug` value that was passed in from `gatsby-node.js`. The template will also need to query for the related posts. In order for this information to be available, `gatsby-node.js` must be modified to include the `related` field when its fetching all posts, and then provide this as `context` to the post template:
+
+```js
+// gatsby-node.js
+
+exports.createPages = ({ graphql, actions }) => {
+  // A Gatsby function which will be used to create the post pages from GraphQL data and a template.
+  const { createPage } = actions
+
+  // This gets ALL markdown posts, sorting by most recent date first.
+  // ### NEW: Retrieve custom frontmatter field `related` here ###
+  return new Promise(resolve => {
+    graphql(`
+      {
+        allMarkdownRemark(sort: { fields: [frontmatter___date], order: DESC }) {
+          edges {
+            node {
+              fields {
+                slug
+              },
+              frontmatter {
+                related
+              }
+            }
+          }
+        }
+      }
+    `).then(result => {
+      result.data.allMarkdownRemark.edges.forEach(({ node }) => {
+        createPage({
+          path: node.fields.slug,
+          component: path.resolve("./src/templates/post.js"),
+          // any field provided here in context will be available to the post.js template
+          // to be used in a page query to retrieve further details about this post.
+          context: {
+            slug: node.fields.slug,
+            // ### NEW: Pass relatedPosts array to the template here ###
+            relatedPosts: node.frontmatter.related
+          },
+        })
+      })
+      resolve()
+    })
+  })
+}
+```
+
+### Querying for Multiple Results
+
+The [post template](../gatsby-related-posts#post-template), will need to have its page query modified. In addition to querying for the specific markdown content to be displayed, now it must also query the `relatedPosts` field (provided by `gatsby-node.js`) to fetch each related posts title, featured image, and slug for linking.
+
+Up until now, the example queries I've been showing you have either retrieved all posts (as used by `gatsby-node.js`) or have retrieved just a single post using the GraphQL `eq` filter. But now, the post template must query for the related posts, which is an array of string post titles. Fortunately, GraphQL has an `in` filter to do this. For example, the following query will fetch post information for the three related posts:
+
+```graphql
+{
+  allMarkdownRemark(
+    # limit results to the specified posts using `in` filter
+    filter: { frontmatter: { title: { in: [
+      "Related Post 1",
+      "Related Post 2",
+      "Related Post 3"
+    ] } } }
+  ) {
+    edges {
+      node {
+        frontmatter {
+          title
+          description
+          category
+          date
+        }
+      }
+    }
+  }
+}
+```
+
+Here are the results. Notice that the `edges` array now contains multiple results, whereas previously when using the `eq` filter, it contained a list of only a single result:
+
+```json
+{
+  "data": {
+    "allMarkdownRemark": {
+      "edges": [
+        {
+          "node": {
+            "frontmatter": {
+              "title": "Related Post 1",
+              "description": "This is a sample description for related post 1.",
+              "category": "example",
+              "date": "2022-02-14"
+            }
+          }
+        },
+        {
+          "node": {
+            "frontmatter": {
+              "title": "Related Post 2",
+              "description": "This is a sample description for related post 2.",
+              "category": "example",
+              "date": "2022-02-13"
+            }
+          }
+        },
+        {
+          "node": {
+            "frontmatter": {
+              "title": "Related Post 3",
+              "description": "This is a sample description for related post 3.",
+              "category": "example",
+              "date": "2022-02-12"
+            }
+          }
+        }
+      ]
+    }
+  }
+}
+```
+
+### Update Post Template Page Query
+
+Armed with all this knowledge, we can now update the [post template](../gatsby-related-posts#post-template) page query to fetch each related post title, featured image, and slug for linking. There is no need to fetch the html content as the related posts only display an image and title. It will use the `in` filter as described in the previous section.
+
+Notice that the `query` now accepts two parameters - the `$slug` as before, and `$relatedPosts`, which is denoted as an array with `[String!]`. This is possible because earlier we modified the [retrieval of all posts](../gatsby-related-posts#update-retrieval-of-all-posts) to provide this as context.
+
+```js
+// src/templates/post.js
+
+const Post = props => {
+  return (
+    ...
+  )
+}
+export default Post
+
+// This is called once for each markdown file from gatsby-node.js.
+// $slug and $relatedPosts paramters are available because of the context that was
+// passed in to the createPage function in gatsby-node.js.
+export const query = graphql`
+  query($slug: String!, $relatedPosts: [String!]!) {
+    markdownRemark(fields: { slug: { eq: $slug } }) {
+      html
+      frontmatter {
+        title
+        date
+        featuredImage {
+          childImageSharp {
+            gatsbyImageData(width: 900, layout: CONSTRAINED)
+          }
+        }
+      }
+      fields {
+        slug
+      }
+    }
+    relatedP: allMarkdownRemark(
+      filter: { frontmatter: { title: { in: $relatedPosts } } }
+    ) {
+      edges {
+        node {
+          id
+          frontmatter {
+            title
+            featuredImage {
+              childImageSharp {
+                gatsbyImageData(width: 270, height: 150, layout: FIXED)
+              }
+            }
+          }
+          fields {
+            slug
+          }
+        }
+      }
+    }
+  }
+`
+```
+
+Notice that the new `relatedP` section is being defined as a sibling to the existing `markdownRemark` section. The resulting response object will still be wrapped in a `data` field as before, but will now contain both a `markdownRemark` field containing the current post content, and a `relatedP` section, containing an array of `edges`, representing the list of related posts. This is the power of GraphQL that you can define any structure you'd like the response object to have.
+
+Just to visualize the data that is now available to the page template, we can execute an example query that the template would be running for one specific post, leaving out the generated `html` and image fields for simplicity:
+
+```graphql
+{
+  markdownRemark(fields: { slug: { eq: "/blog/here-is-a-post/" } }) {
+    frontmatter {
+      title
+      date
+      description
+    }
+    fields {
+      slug
+    }
+  }
+  relatedP: allMarkdownRemark(
+    filter: { frontmatter: { title: { in: [
+      "Related Post 1",
+      "Related Post 2",
+      "Related Post 3"
+    ] } } }
+  ) {
+    edges {
+      node {
+        frontmatter {
+          title
+        }
+        fields {
+          slug
+        }
+      }
+    }
+  }
+}
+```
+
+Here is the result of the above query:
+
+```json
+{
+  "data": {
+    "markdownRemark": {
+      "frontmatter": {
+        "title": "Here is an example markdown post",
+        "date": "2022-02-15",
+        "description": "This is a sample description for the post."
+      },
+      "fields": {
+        "slug": "/blog/here-is-a-post/"
+      }
+    },
+    "relatedP": {
+      "edges": [
+        {
+          "node": {
+            "frontmatter": {
+              "title": "Related Post 1"
+            },
+            "fields": {
+              "slug": "/blog/related-post-1/"
+            }
+          }
+        },
+        {
+          "node": {
+            "frontmatter": {
+              "title": "Related Post 2"
+            },
+            "fields": {
+              "slug": "/blog/related-post-2/"
+            }
+          }
+        },
+        {
+          "node": {
+            "frontmatter": {
+              "title": "Related Post 3"
+            },
+            "fields": {
+              "slug": "/blog/related-post-3/"
+            }
+          }
+        }
+      ]
+    }
+  }
+}
+```
+
+### Update Post Template JSX
+
+Now that we know the shape of the new data available to the post template from its page query, the template JSX can be updated to render it. Specifically, we will pass the data as props to a new `RelatedPosts` component (described in next section), to prevent the existing Post Template from getting too cluttered:
+
+```js
+// src/templates/post.js
+import React from "react"
+import { graphql } from "gatsby"
+import { GatsbyImage } from "gatsby-plugin-image"
+import Layout from "../components/layout"
+// ### NEW: Component to render related posts
+import RelatedPosts from "../components/related-posts"
+
+const Post = props => {
+  const markdown = props.data.markdownRemark
+  const title = markdown.frontmatter.title
+  const publishedDate = markdown.frontmatter.date
+  const featuredImgFluid = markdown.frontmatter.featuredImage.childImageSharp.gatsbyImageData
+  const content = markdown.html
+  // ### NEW: Extract related posts from page query
+  const related = props.data.relatedP
+
+  return (
+    <Layout>
+      <article>
+        <h1>{title}</h1>
+        <div>Published {publishedDate}</div>
+        <GatsbyImage image={featuredImgFluid} />
+        <div dangerouslySetInnerHTML={{ __html: content }} />
+      </article>
+      <RelatedPosts related={related} />
+    </Layout>
+  )
+}
+export default Post
+
+export const query = graphql`
+  query($slug: String!, $relatedPosts: [String!]!) {
+    ...
+  }
+`
+```
+
+### Related Posts Component
+
+The last step in the process is to define a `RelatedPosts` component.
 
 TBD:
-* Maybe: aside like "If that seems like a lot of work to generate some blog pages, it is! If you're looking to start a blog and just want to hit the ground writing without "programming your blog", Gatsby may not be the optimal choice for this, consider platforms like Medium or dev.to. A full discussion of pros/cons of various blogging platforms could probably be the topic of a blog post.
-* section: Adding related posts (note: frontmatter fields are not constrained, you can add anything you like and its available in the schema)
-  * update markdown frontmatter with list of related posts (nested bulleted list generates array)
-  * update post template query
-  * update post template JSX to extract the related posts data from the query results and pass to a new RelatedPosts component (covered in next section)
-  * new RelatedPosts component to iterate over each related post and display image and title, linking to slug.
+* Somewhere mention this is hand curated list of related posts, if want "smart" auto generated, see plugin...
+* Somewhere reference Gatsby graphql query filters: https://www.gatsbyjs.com/docs/graphql-reference/#filter
+* Aside "If that seems like a lot of work to generate some blog pages, it is! If you're looking to start a blog and just want to hit the ground writing without "programming your blog", Gatsby may not be the optimal choice for this, consider platforms like Medium or dev.to. A full discussion of pros/cons of various blogging platforms could probably be the topic of a blog post.
+* WIP: new RelatedPosts component to iterate over each related post and display image and title, linking to slug.
