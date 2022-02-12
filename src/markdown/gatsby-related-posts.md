@@ -14,13 +14,13 @@ This post will explain how to add a Related Posts feature to a Gatsby blog. The 
 
 ![gatsby related posts example](../images/gatsby-related-posts-example.png "gatsby related posts example")
 
-The related posts will be curated, that is, the author of the blog is responsible for selecting related articles for each post and populating them in the markdown (we'll be getting into the details of this shortly). If you are looking for a more automated solution, checkout the [gatsby-remark-related-posts](https://www.npmjs.com/package/gatsby-remark-related-posts) plugin. This plugin didn't suit my use case as I wanted the flexibility to occasionally choose tangential content that a similarity based algorithm may not select. I also found it valuable as a learning exercise to build this out myself rather than relying on a plugin.
+The related posts will be curated, that is, the author of the blog is responsible for selecting related articles for each post and populating them in the markdown (we'll be getting into the details of this shortly). If you are looking for a more automated solution, checkout the [gatsby-remark-related-posts](https://www.npmjs.com/package/gatsby-remark-related-posts) plugin. This plugin didn't suit my use case as I wanted the flexibility to occasionally choose tangential content that a text-based similarity algorithm may not select. I also found it valuable as a learning exercise to build this out myself rather than relying on a plugin.
 
 ## Existing Post Page
 
 Before getting into adding Related Posts, let's briefly look at how a typical post page is built with Gatsby using the [gatsby-transformer-remark](https://www.npmjs.com/package/gatsby-transformer-remark) plugin. If you already have a solid understanding of Gatsby and the remark plugin, feel free to skip ahead to the [adding related posts](../gatsby-related-posts#adding-related-posts) section.
 
-This plugin allows you to write posts in markdown, and then exposes fields that it generates such as `html` and `excerpt` in the GraphQL server during development, under the node type `allMarkdownRemark`. It also exposes any frontmatter fields you add at the top of your markdown (content delimited by `--` symbols).
+This remark plugin allows you to write posts in markdown, and then exposes fields that it generates such as `html` and `excerpt` in the GraphQL server during development, under the node type `allMarkdownRemark`. It also exposes any frontmatter fields you add at the top of your markdown (content delimited by `--` symbols).
 
 For example, given the following project layout:
 
@@ -140,9 +140,9 @@ While it's easy to understand how the frontmatter text fields are populated, the
 
 ### Retrieve all Posts
 
-We've just seen an example GraphQL query and JSON response to retrieve a single post. But for building a blog, all the posts must be retrieved, and then fed one at a time to the post template for rendering. This is performed by `gatsby-node.js`, a file that sits at the project root. It should export a `createPages` function, which the Gatsby build process will invoke.
+We've just seen an example GraphQL query and JSON response to retrieve a single post. But for building a blog, all the posts must be retrieved, and then fed one at a time to the post template for rendering. This is performed by `gatsby-node.js`, a file that sits at the project root. It exports a `createPages` function, which the Gatsby build process will invoke.
 
-Notice the result handler invokes a Gatsby function `createPage`. This function receives an object specifying the `component`, which is the path to the template to be rendered, and a `context`, which can contain anything, but practically speaking will contain some results of the GraphQL query that has just resolved. In this case, we're passing in the post `slug`, which will then be available to the template to execute a GraphQL query to lookup details about just this `$slug`.
+The `createPages` function runs a GraphQL query via a promise, to retrieve all post content in the markdown files. The promise result handler will pass these results one at a time to the `createPage` function. This function receives an object specifying the `component`, which is the path to the template to be rendered, and a `context`, which can contain anything, but practically speaking will contain some results of the GraphQL query that has just resolved. In this case, the post `slug` is passed in via context, which will then be available to the template to execute a GraphQL query to lookup details about just this `$slug`.
 
 ```js
 // gatsby-node.js
