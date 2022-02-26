@@ -2,7 +2,7 @@
 title: "Use Ruby to Parse Command Line Output"
 featuredImage: "../images/chain-ruby-one-liners-karine-avetisyan-ipuiM-36tAg-unsplash.jpg"
 description: "Chain Ruby one-liners to parse command line output and execute system commands."
-date: "2022-03-20"
+date: "2022-03-01"
 category: "ruby"
 related:
   - "Rails Feature Test Solved by Regex"
@@ -215,7 +215,7 @@ To express this as a regex, let's break down that sentence into sections and wri
 * Followed by a series of space characters: `\s+`
 * Followed by the word sidekiq: `sidekiq`
 * Followed by any number of any characters: `.*` (dot `.` means any character, `*` means 0 or more times)
-* And then capture the first series of letters and numbers: Update first part to `^(\w+)`
+* And then capture the first series of letters and numbers: Add parents to first part: `^(\w+)`
 
 Putting this all together results in the following regex to be used in the script:
 
