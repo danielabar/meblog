@@ -1,7 +1,7 @@
 ---
 title: "About Those Docs"
-featuredImage: "../images/documentation-keyboard-button.jpeg"
-description: "What to include for useful engineering documentation."
+featuredImage: "../images/documentation-david-bruno-silva-Z19vToWBDIc-unsplash.jpg"
+description: "What to include and how to write useful engineering documentation."
 date: "2022-04-01"
 category: "productivity"
 related:
@@ -10,7 +10,7 @@ related:
   - "Crossword Solver with CentOS"
 ---
 
-Today I want to write about engineering documentation. That is, docs that are written by engineers, for engineers that are or will be working on the same project. It's known that despite the many benefits of having good project documentation, engineers generally dislike writing it. This means useful docs tend to be lacking on projects. Before we get into how to rectify this, let's first discuss what *not* to do.
+Today I want to write about engineering documentation. That is, docs that are written by engineers, for engineers that are working on the same project. It's known that despite the many benefits of having good project documentation, engineers generally dislike writing it. This means useful docs tend to be lacking on projects. Before we get into how to rectify this, let's first discuss what *not* to do.
 
 ## What Not To Do
 
@@ -73,19 +73,21 @@ A personal benefit of documenting your knowledge is it makes it easier to move o
 
 Now that we're in the right frame of mind to write, what should get documented? Below are some general principles, and then we'll get into specifics.
 
-As a general rule, document the non-obvious things. For example, if its a Rails project, following all the conventions, there's no need to document where the router is located, or where the models, views and controllers should go. All Rails developers will already know this, and even Rails newbies can read the [Rails Guides](https://guides.rubyonrails.org/getting_started.html) and quickly learn about the conventions.
-
-On the other hand, if the project is written in an "anything goes" style framework, or not following conventions, or for example, using a library that auto generates an API such as [json-resources](https://jsonapi-resources.com/v0.10/guide/index.html), then this should be documented.
+As a general rule, document the non-obvious things. For example, for a Rails project following all the conventions, there's no need to document where the router is located, or where the models, views and controllers should go. Rails developers will already know this, and newbies can read the [Rails Guides](https://guides.rubyonrails.org/getting_started.html) to learn the conventions.
 
 <aside class="markdown-aside">
 This is one of the many benefits of choosing a well structured, convention based framework for your project. It reduces the amount of documentation you have to write as every project will have the same structure and any developer familiar with the framework will be able to dive in quickly.
 </aside>
 
+On the other hand, if the project is written in an "anything goes" style framework, or not following conventions, or for example, using a library that [automagically](https://www.dictionary.com/browse/automagically) generates an API such as [json-resources](https://jsonapi-resources.com/v0.10/guide/index.html), then this should be documented.
+
 Also document anything where questions or misunderstandings frequently arise. For example, if there are multiple sources for configuration information but everyone tends to assume it can only come from environment variables, document this.
+
+Now let's get into some specific documents that should be in the project.
 
 ### Architecture Decision Records
 
-Write up an [ADR](https://adr.github.io/) for proposed architectural changes to the project. This is a markdown document that gets created in a `decisions` dir in the project. Here is an optional [template](https://github.com/tucowsinc/hover/blob/master/mainsite/doc/architecture/decisions/optional-template.md) but feel free to add/remove sections as appropriate to the change being proposed.
+Write up an [ADR](https://adr.github.io/) for proposed architectural changes to the project. This is a markdown document that gets created in a `/decisions` directory in the project. Here is an optional [template](https://github.com/tucowsinc/hover/blob/master/mainsite/doc/architecture/decisions/optional-template.md) but feel free to add or remove sections as appropriate to the change being proposed.
 
 In the early days of a project, there will be many architectural decisions to be made such as choice of server side framework, client side framework, database, background job processing, monolith vs microservices etc. For example, if you would like to propose that the project should use Rails 7, and eschew any JavaScript SPA in favor of [Turbo, Stimulus, and Hotwire](https://world.hey.com/dhh/rails-7-will-have-three-great-answers-to-javascript-in-2021-8d68191b), you would write an ADR explaining why you think that would be optimal for the project, technical details, and potential drawbacks.
 
@@ -99,7 +101,7 @@ Use ADRs for large, high impact decisions that are difficult to change later. Do
 
 ### Readme.md Project Setup
 
-The `README.md` is a markdown file located in the project root. The main purpose is to ensure a new engineer can follow the setup instructions within the readme to get the project checked out, built and successfully running, without getting on a call with anyone else on the team. This is especially critical in a fully distributed or [asynchronous](../markdown/working-towards-asynchronous-future) team where people may be working non-overlapping hours.
+The `README.md` is a markdown file located in the project root. The main purpose is to ensure a new engineer can follow the setup instructions within the readme to get the project checked out, built and successfully running, without getting on a call with anyone else on the team. This is especially critical in fully distributed or [asynchronous](../markdown/working-towards-asynchronous-future) teams where people may be working non-overlapping hours.
 
 Here are some sections the readme should contain:
 
@@ -124,17 +126,17 @@ This should include errors that may be encountered when setting up the project a
 
 ### Workflows
 
-Given that a new developer has a working project running on their laptop, this document should explain how to go through the most common workflows in the application. An example for a domain registrar application might include: Login as a test user, search for a domain, purchase the domain with a test credit card, and update dns records.
+Given that a new developer has the project running on their laptop, this document should explain how to go through the most common workflows in the application. An example for a domain registrar application might include: Login as a test user, search for a domain, purchase the domain with a test credit card, and update dns records.
 
-### 3rd party integrations
+### 3rd Party Integrations
 
-For each service that the project integrates with (eg: Braintree, Stripe, Mandrill, etc) add a document explaining:
+For each service that the project integrates with (eg: Braintree, Stripe, Mandrill, etc.) add a document explaining:
 
 * What the service does and why the project is using it.
 * Differences in local vs deployed use (eg: is there a fake version of it for local use? How to update laptop config to use a real version, does the service provide a sandbox vs production mode?).
-* Where/how its configured.
+* Where/how it's configured.
 * How to get an account/credentials to the service.
-* Does the service use webhooks? If yes, document the project endpoints that implement these.
+* Does the service use webhooks? If yes, document the project endpoints that receive these.
 * Link to the docs for the client library that's being used to communicate with the service.
 * Troubleshooting - for example, is all communication with service logged somewhere?
 
@@ -150,27 +152,29 @@ This document should explain where and how continuous integration (CI) is being 
 
 * What tooling/services are being used for continuous integration? (Github Actions, Circle CI, Travis CI, Jenkins, etc.)
 * Where is the CI script(s) located in project?
+* Where are notifications sent in the event of a CI failure? (eg: email, Slack)
 * How to troubleshoot if a commit results in a CI failure?
 
 ### Environments
 
 This document should cover:
 
-* What are all the deployed environments (eg. dev, staging, production) and where to find them, how to ssh into the server, etc.
+* What are all the deployed environments (eg. dev, staging, production) and where to find them, how to get credentials to ssh into the server, where are the log files, etc.
 * How to deploy branch code to each environment (if supported).
 * How to monitor deployments.
+* How to access/query database(s) in each environment.
 
-## Code Comments as Documentation
+## Code Comments
 
-So far, we've covered what kind of documents to write, that are separate from the code. But there are a few other ways that important project information can be conveyed from within the code itself. The first of these is code comments.
+So far, we've covered what kind of documents to write. But there are a few other ways that important project information can be conveyed from within the code itself. The first of these is code comments.
 
-This one can be controversial. If you've read [Clean Code](https://www.goodreads.com/book/show/3735293-clean-code), then you know the recommendation is to think carefully about naming things (variables, methods, classes etc), and to structure your code into smaller, single-purpose methods so that the intention is clear from the names and structure. The idea is this eliminates the need for code comments.
+This one can be controversial. If you've read [Clean Code](https://www.oreilly.com/library/view/clean-code-a/9780136083238/), then you know the recommendation is to think carefully about naming things (variables, methods, classes etc), and to structure your code into smaller, single-purpose methods so that the intention is clear from the names and structure. The idea is this eliminates the need for code comments.
 
-However, there's still a place for code comments, and this has to do with the *why* rather than *what*. For example, suppose some section of code is storing the same information in two different places. It may be obvious from reading it that's what its doing. But the natural question an engineer will have when reading that code is *why* is this necessary? Perhaps the answer has to do with compliance requirements for the industry this project is involved in. Adding in the why as a code comment will be helpful, and prevent future developers from shooting themselves in the foot!
+However, there's still a place for code comments, and this has to do with the *why* rather than *what*. For example, suppose some section of code is storing the same information in two different places. It may be obvious from reading it that's what its doing. But the natural question an engineer will have when reading that code is *why* is this necessary? Perhaps the answer has to do with compliance requirements for the industry this project is involved in. Adding in the why as a code comment will be helpful, and prevent future developers from shooting themselves in the foot.
 
 When doing this, follow the documentation conventions for the programming language the project is written in, and add the comment at the method or class level rather than inline, where it can get messy as the code is refactored.
 
-## Automated Tests as Documentation
+## Automated Tests
 
 Another way that documentation can be written is through the use of automated tests.
 
@@ -190,18 +194,18 @@ The reason for using markdown is it's a lightweight, developer-friendly text for
 
 For example, suppose you just finished adding Stripe integration into a project and are now adding a document explaining how it's integrated into the project. Using VS Code the process would be:
 
-* `Ctrl` + backtick to open the integrated terminal
-* Enter in terminal: `touch docs/working-with-stripe.md`
-* `Cmd` + `P` to launch fuzzy search by name
-* Start typing `working` or `stripe` until the new markdown file is selected and hit `Enter`
-* Start typing information about working with Stripe in the doc
-* Edit `README.md`, under the "Further Reading" section, add a link to your new doc, for example: `[Working with Stripe](docs/working-with-stripe.md)`
-* Follow your usual git process to add/commit
+* Hotkey to open the integrated terminal (for me it's <kbd class="markdown-kbd">Ctrl</kbd> + <kbd class="markdown-kbd">`</kbd> )
+* Enter in terminal: `touch docs/working-with-stripe.md`.
+* Hotkey to launch fuzzy file search (for me it's <kbd class="markdown-kbd">Cmd</kbd> + <kbd class="markdown-kbd">P</kbd> ).
+* Start typing `working` or `stripe` until the new markdown file is selected and hit <kbd class="markdown-kbd">Enter</kbd>.
+* Start typing information about working with Stripe in the doc.
+* Edit `README.md`, under the "Further Reading" section, add a link to your new doc, for example: `[Working with Stripe](docs/working-with-stripe.md)`.
+* Follow your usual git process to add/commit.
 
 Never even had to leave the editor, beautiful! The above makes creating/maintaining docs follow the same flow developers are already used to for code.
 
 ## Conclusion
 
-This document has covered what not to do for documentation, how to put yourself in the right frame of mind for writing, what areas of a project should be documented, and a process to make it as easy and natural as possible. But don't limit yourself to just the suggested areas covered here. As your project grows, you will discover other areas that require documentation, add them as you go.
+This document has covered avoiding a process-based prescription for documentation, how to put yourself in the right frame of mind for writing, what areas of a project should be documented, and recommendations to make it as easy and natural as possible. But don't limit yourself to just the suggested areas covered here. As your project grows, you will discover other areas that require documentation, add them as you go.
 
-Finally, I'd like to leave you with a few more references. Having good documentation also supports asynchronous work. When all information is "self serve", it eliminates the need for the entire team to be [online at the same time](https://danielabaron.me/blog/working-towards-asynchronous-future/). Also, here is another [take](https://chelseatroy.com/2021/09/14/the-art-of-documentation/) on the topic of documentation.
+Finally, I'd like to leave you with a few more references. Having good documentation also supports asynchronous work. When all information is "self serve", it eliminates the need for the entire team to be [online at the same time](https://danielabaron.me/blog/working-towards-asynchronous-future/), which can greatly improve quality of life. Also, here is another [take](https://chelseatroy.com/2021/09/14/the-art-of-documentation/) on the topic of documentation, which among other things, takes a closer look at the value of code comments.
