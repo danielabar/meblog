@@ -21,7 +21,7 @@ const Header = () => {
             <div className={styles.profileWrapper}>
               <img
                 className={styles.profileImg}
-                src={"/images/profile.png"}
+              src={"/images/dbaron_profile.png"}
                 alt="Profile"
               />
             </div>
