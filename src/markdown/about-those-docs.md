@@ -2,12 +2,12 @@
 title: "About Those Docs"
 featuredImage: "../images/documentation-david-bruno-silva-Z19vToWBDIc-unsplash.jpg"
 description: "What to include and how to write useful engineering documentation."
-date: "2022-04-01"
+date: "2022-04-02"
 category: "productivity"
 related:
   - "Working Towards an Asynchronous Future"
   - "Find Jira Tickets Faster"
-  - "Crossword Solver with CentOS"
+  - "Access Chrome Bookmarks with Keyboard"
 ---
 
 Today I want to write about engineering documentation. That is, docs that are written by engineers, for engineers that are working on the same project. It's known that despite the many benefits of having good project documentation, engineers generally dislike writing it. This means useful docs tend to be lacking on projects. Before we get into how to rectify this, let's first discuss what *not* to do.
@@ -87,9 +87,9 @@ Now let's get into some specific documents that should be in the project.
 
 ### Architecture Decision Records
 
-Write up an [ADR](https://adr.github.io/) for proposed architectural changes to the project. This is a markdown document that gets created in a `/decisions` directory in the project. Here is an optional [template](https://github.com/tucowsinc/hover/blob/master/mainsite/doc/architecture/decisions/optional-template.md) but feel free to add or remove sections as appropriate to the change being proposed.
+Write up an [ADR](https://adr.github.io/) for proposed architectural changes to the project. This is a markdown document that gets created in a `/decisions` directory in the project. Here are some suggested [templates](https://github.com/joelparkerhenderson/architecture-decision-record) but feel free to add or remove sections as appropriate to the change being proposed.
 
-In the early days of a project, there will be many architectural decisions to be made such as choice of server side framework, client side framework, database, background job processing, monolith vs microservices etc. For example, if you would like to propose that the project should use Rails 7, and eschew any JavaScript SPA in favor of [Turbo, Stimulus, and Hotwire](https://world.hey.com/dhh/rails-7-will-have-three-great-answers-to-javascript-in-2021-8d68191b), you would write an ADR explaining why you think that would be optimal for the project, technical details, and potential drawbacks.
+In the early days of a project, there will be many architectural decisions to be made such as choice of server side framework, client side framework, database, background job processing, monolith vs microservices etc. For example, if you would like to propose that the project should use Rails 7, and eschew any JavaScript SPA in favor of [Turbo, Stimulus, and Hotwire](https://turbo.hotwired.dev/), you would write an ADR explaining why you think that would be optimal for the project, technical details, and potential drawbacks.
 
 This document gets submitted as a Pull Request, which the rest of the team can review and provide their feedback. For example, someone may be aware of a specific business requirement that wouldn't be well served by the proposed solution, it's important to capture that information. When all the feedback has been addressed and team is in agreement, the PR gets merged, which means its been approved, and the project proceeds with that decision.
 
@@ -101,7 +101,7 @@ Use ADRs for large, high impact decisions that are difficult to change later. Do
 
 ### Readme.md Project Setup
 
-The `README.md` is a markdown file located in the project root. The main purpose is to ensure a new engineer can follow the setup instructions within the readme to get the project checked out, built and successfully running, without getting on a call with anyone else on the team. This is especially critical in fully distributed or [asynchronous](../markdown/working-towards-asynchronous-future) teams where people may be working non-overlapping hours.
+The `README.md` is a markdown file located in the project root. The main purpose is to ensure a new engineer can follow the setup instructions within the readme to get the project checked out, built and successfully running, without getting on a call with anyone else on the team. This is especially critical in fully distributed or [asynchronous](../working-towards-asynchronous-future) teams where people may be working non-overlapping hours.
 
 Here are some sections the readme should contain:
 
@@ -126,7 +126,7 @@ This should include errors that may be encountered when setting up the project a
 
 ### Workflows
 
-Given that a new developer has the project running on their laptop, this document should explain how to go through the most common workflows in the application. An example for a domain registrar application might include: Login as a test user, search for a domain, purchase the domain with a test credit card, and update dns records.
+Given that a new developer has the project running on their laptop, this document should explain how to go through the most common workflows in the application. An example for an e-commerce application might include login as a test user, search for a product, and purchase it with a test credit card.
 
 ### 3rd Party Integrations
 
@@ -138,7 +138,7 @@ For each service that the project integrates with (eg: Braintree, Stripe, Mandri
 * How to get an account/credentials to the service.
 * Does the service use webhooks? If yes, document the project endpoints that receive these.
 * Link to the docs for the client library that's being used to communicate with the service.
-* Troubleshooting - for example, is all communication with service logged somewhere?
+* Troubleshooting - for example, is all communication with the service logged somewhere?
 
 ### Configuration
 
@@ -161,6 +161,7 @@ This document should cover:
 
 * What are all the deployed environments (eg. dev, staging, production) and where to find them, how to get credentials to ssh into the server, where are the log files, etc.
 * How to deploy branch code to each environment (if supported).
+* How to access server logs.
 * How to monitor deployments.
 * How to access/query database(s) in each environment.
 
