@@ -24,13 +24,64 @@ The first step to implement an enum in your Rails project will be to generate a 
 bin/rails generate migration AddRecurringIntervalToPlans
 ```
 
-This will generate a file similar to the following (your ActiveRecord version may be different depending on your Rails version):
+This will generate a file similar to the following, your ActiveRecord version may be different depending on your Rails version:
 
 ```ruby
-# db/migrate/20220407103112_add_recurring_interval_to_plans.rb\
+# db/migrate/20220407103112_add_recurring_interval_to_plans.rb
 
 class AddRecurringIntervalToPlans < ActiveRecord::Migration[6.0]
   def change
   end
 end
 ```
+
+The syntax required to use enums is not supported by the Ruby migration DSL, therefore, it requires use of `execute` to run raw SQL. We also have to explicitly define the `up` and `down` methods since Rails won't automatically know how to reverse the raw SQL in the `execute` block.
+
+Update the generated migration as follows for MySQL:
+
+```ruby
+# db/migrate/20220407103112_add_recurring_interval_to_plans.rb
+
+# MySQL
+class AddRecurringIntervalToPlans < ActiveRecord::Migration[6.0]
+  def up
+    execute <<-SQL
+      ALTER TABLE plans ADD recurring_interval ENUM('year', 'month', 'week', 'day');
+    SQL
+  end
+
+  def down
+    remove_column :plans, :recurring_interval
+  end
+end
+```
+
+The syntax for PostgreSQL is a little different as it first requires creating a custom [data type](https://www.postgresql.org/docs/14/sql-createtype.html) to define the enum, and then it can be added as a column to the table. Just like with MySQL, `execute` and explicit `up/down` methods are required:
+
+```ruby
+# db/migrate/20220407103112_add_recurring_interval_to_plans.rb
+
+# PostgreSQL
+class AddRecurringIntervalToPlans < ActiveRecord::Migration[6.0]
+  def up
+    execute <<-SQL
+      CREATE TYPE plan_recurring_interval AS ENUM ('year', 'month', 'week', 'day');
+    SQL
+    add_column :plans, :recurring_interval, :plan_recurring_interval
+    add_index :plans, :recurring_interval
+  end
+
+  def down
+    remove_column :plans, :recurring_interval
+    execute <<-SQL
+      DROP TYPE plan_recurring_interval;
+    SQL
+  end
+end
+```
+
+<aside class="markdown-aside">
+If you're using the <a href="https://docs.rubocop.org/rubocop-rails/" class="markdown-link">rubocop-rails</a> gem with the default settings, you may encounter a lint error on the SQL heredoc not using the <a href="https://docs.rubocop.org/rubocop-rails/cops_rails.html#railssquishedsqlheredocs" class="markdown-link">squish</a> method. In this case, you can go ahead and append ".squish" to the SQL heredocs in the migration as suggested by the linter to. Just be aware that some PostgreSQL syntax such as comments and functions do require newlines to be preserved so you may not always want this, but that's not an issue for the simple syntax used in this migration. See the Ruby <a href="https://www.rubydoc.info/github/rubyworks/facets/String%3Asquish" class="markdown-link">String docs</a> for more details about the squish method.
+</aside>
+
+Next up: before running migration, set `config.active_record.schema_format = :sql`...
