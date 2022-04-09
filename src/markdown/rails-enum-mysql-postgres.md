@@ -18,7 +18,7 @@ In this case, it's important that the `recurring_interval` only contain one of a
 
 ## Database Migration
 
-The first step to implement an enum in your Rails project will be to generate a migration to add the column. I'm assuming the Plan table and model already exist. Start from a terminal and enter the following command to generate a migration to add the `recurring_interval` column to the `Plans` table:
+The first step to implement an enum in your Rails project will be to generate a migration to add the column. I'm assuming the `Plan` table and model already exist. Start from a terminal and enter the following command to generate a migration to add the `recurring_interval` column to the `Plans` table:
 
 ```
 bin/rails generate migration AddRecurringIntervalToPlans
@@ -68,7 +68,6 @@ class AddRecurringIntervalToPlans < ActiveRecord::Migration[6.0]
       CREATE TYPE plan_recurring_interval AS ENUM ('year', 'month', 'week', 'day');
     SQL
     add_column :plans, :recurring_interval, :plan_recurring_interval
-    add_index :plans, :recurring_interval
   end
 
   def down
@@ -84,4 +83,55 @@ end
 If you're using the <a href="https://docs.rubocop.org/rubocop-rails/" class="markdown-link">rubocop-rails</a> gem with the default settings, you may encounter a lint error on the SQL heredoc not using the <a href="https://docs.rubocop.org/rubocop-rails/cops_rails.html#railssquishedsqlheredocs" class="markdown-link">squish</a> method. In this case, you can go ahead and append ".squish" to the SQL heredocs in the migration as suggested by the linter to. Just be aware that some PostgreSQL syntax such as comments and functions do require newlines to be preserved so you may not always want this, but that's not an issue for the simple syntax used in this migration. See the Ruby <a href="https://www.rubydoc.info/github/rubyworks/facets/String%3Asquish" class="markdown-link">String docs</a> for more details about the squish method.
 </aside>
 
-Next up: before running migration, set `config.active_record.schema_format = :sql`...
+One last thing to know before running the migration, is that you must set the `schema_format` to be `:sql` in your application config in order for the enum definition to be captured in the schema file:
+
+```ruby
+# config/application.rb
+config.active_record.schema_format = :sql
+```
+
+This will generate file `db/structure.sql` instead of the default `db/schema.rb` file, which should be committed. This has to do with the use of raw SQL in the migration. The [Active Record Migrations Guide](https://edgeguides.rubyonrails.org/active_record_migrations.html) has a great explanation:
+
+> `db/schema.rb` cannot express everything your database may support such as triggers, sequences, stored procedures, etc. While migrations may use execute to create database constructs that are not supported by the Ruby migration DSL, these constructs may not be able to be reconstituted by the schema dumper. If you are using features like these, you should set the schema format to :sql in order to get an accurate schema file that is useful to create new database instances.
+
+After running the migration, the generated `db/structure.sql` file should specify the newly added enum column for the `plans` table.
+
+If you're using MySQL:
+
+```sql
+-- db/structure.sql
+CREATE TABLE `plans` (
+  -- other columns...
+  `recurring_interval` enum('year','month','week','day') DEFAULT NULL,
+)
+...
+```
+
+And PostgreSQL - note the `CREATE` statement to first create the custom type, and then it can be used as a table column:
+
+```sql
+-- db/structure.sql
+CREATE TYPE public.plan_recurring_interval AS ENUM (
+    'year',
+    'month',
+    'week',
+    'day'
+);
+
+CREATE TABLE public.plans (
+    -- other columns...
+    recurring_interval public.plan_recurring_interval,
+);
+```
+
+## Data Integrity
+
+Ok, now that the enum is defined in the database, let's see the effect on model creation in the Rails console.
+
+TBD:
+Create a model with a valid recurring_type, check valid?, save - good.
+Create a model with an invalid recurring_type, check valid? save - bad - model looks valid according to rails but get sql error. Will fix in next section...
+
+## Model Validation
+
+TBD: Use ActiveRecord `enum` macro...
