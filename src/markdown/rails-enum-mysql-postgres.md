@@ -18,18 +18,37 @@ In this case, it's important that the `recurring_interval` only contain one of a
 
 ## Database Migration
 
-The first step to implement an enum in your Rails project will be to generate a migration to add the column. I'm assuming the `Plan` table and model already exist. Start from a terminal and enter the following command to generate a migration to add the `recurring_interval` column to the `Plans` table:
+I'm assuming the `Plan` table and model already exist as follows:
+
+```ruby
+# db/migrate/20220406145959_create_plans.rb
+
+class CreatePlans < ActiveRecord::Migration
+  def change
+    create_table :plans do |t|
+      t.string :name, null: false
+      t.boolean :active, null: false, default: true
+      t.string :currency, null: false, default: "USD"
+      t.decimal :unit_amount, precision: 11, scale: 2, null: false, default: 0
+
+      t.timestamps
+    end
+  end
+end
+```
+
+The first step to implement an enum in your Rails project will be to generate a migration to add the column. Start from a terminal and enter the following command to generate a migration to add the `recurring_interval` column to the `Plans` table:
 
 ```
 bin/rails generate migration AddRecurringIntervalToPlans
 ```
 
-This will generate a file similar to the following, your ActiveRecord version may be different depending on your Rails version:
+This will generate a file similar to the following:
 
 ```ruby
 # db/migrate/20220407103112_add_recurring_interval_to_plans.rb
 
-class AddRecurringIntervalToPlans < ActiveRecord::Migration[6.0]
+class AddRecurringIntervalToPlans < ActiveRecord::Migration
   def change
   end
 end
@@ -43,7 +62,7 @@ Update the generated migration as follows for MySQL:
 # db/migrate/20220407103112_add_recurring_interval_to_plans.rb
 
 # MySQL
-class AddRecurringIntervalToPlans < ActiveRecord::Migration[6.0]
+class AddRecurringIntervalToPlans < ActiveRecord::Migration
   def up
     execute <<-SQL
       ALTER TABLE plans ADD recurring_interval ENUM('year', 'month', 'week', 'day');
@@ -62,7 +81,7 @@ The syntax for PostgreSQL is a little different as it first requires creating a 
 # db/migrate/20220407103112_add_recurring_interval_to_plans.rb
 
 # PostgreSQL
-class AddRecurringIntervalToPlans < ActiveRecord::Migration[6.0]
+class AddRecurringIntervalToPlans < ActiveRecord::Migration
   def up
     execute <<-SQL
       CREATE TYPE plan_recurring_interval AS ENUM ('year', 'month', 'week', 'day');
@@ -126,11 +145,37 @@ CREATE TABLE public.plans (
 
 ## Data Integrity
 
-Ok, now that the enum is defined in the database, let's see the effect on model creation in the Rails console.
+Ok, now that the enum is defined in the database, let's see the effect on model creation in the Rails console. Launch a Rails console and enter the following to create a new Plan model, set a few attributes, check for validity and save to the database:
 
-TBD:
-Create a model with a valid recurring_type, check valid?, save - good.
-Create a model with an invalid recurring_type, check valid? save - bad - model looks valid according to rails but get sql error. Will fix in next section...
+```ruby
+plan = Plan.new
+plan.name = "My Test Plan"
+plan.recurring_interval = "week"
+plan.valid? # => true
+plan.save!  # => plan saved successfully to database
+```
+
+So far so good, we created a new plan with an allowed `recurring_interval` of `week`, and it was successfully saved to the database. But what happens if we try to save an unknown `recurring_interval`, for example `fortnight`? Back in the Rails console, let's try this:
+
+```ruby
+plan2 = Plan.new
+plan2.name = "Another Plan"
+plan2.recurring_interval = "fortnight"
+plan2.valid? # => true, hmmm... that's not right
+plan2.save! # => error
+```
+
+This time, our experience is not so great. We intentionally set an invalid value in the `recurring_interval` property of the Plan model, ActiveRecord tells us its valid when checking the `plan2.valid?` method, but then the transaction is rolled back when trying to save the model to the database with the following error message:
+
+```
+[PID:1]    (0.4ms)  ROLLBACK
+Traceback (most recent call last):
+ActiveRecord::StatementInvalid (Mysql2::Error: Data truncated for column 'recurring_interval' at row 1:
+INSERT INTO `plans` (`name`, `created_at`, `updated_at`, `recurring_interval`)
+VALUES ('Another plan', '2022-04-10 12:03:11', '2022-04-10 12:03:11', 'fortnight'))
+```
+
+What's happening here is we've achieved data integrity at the database level with the use of the `enum` column type. However, for a good developer experience, we also need *application* level data integrity, i.e. we want ActiveRecord to tell us the model is invalid with a useful error message rather than having to catch a MySQL (or PostgreSQL) exception. This is what we'll cover in the next section.
 
 ## Model Validation
 
