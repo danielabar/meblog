@@ -158,14 +158,14 @@ plan.save!  # => plan saved successfully to database
 So far so good, we created a new plan with an allowed `recurring_interval` of `week`, and it was successfully saved to the database. But what happens if we try to save an unknown `recurring_interval`, for example `fortnight`? Back in the Rails console, let's try this:
 
 ```ruby
-plan2 = Plan.new
-plan2.name = "Another Plan"
-plan2.recurring_interval = "fortnight"
-plan2.valid? # => true, hmmm... that's not right
-plan2.save! # => error
+plan_2 = Plan.new
+plan_2.name = "Another Plan"
+plan_2.recurring_interval = "fortnight"
+plan_2.valid? # => true, hmmm... that's not right
+plan_2.save! # => error
 ```
 
-This time, our experience is not so great. We intentionally set an invalid value in the `recurring_interval` property of the Plan model, ActiveRecord tells us its valid when checking the `plan2.valid?` method, but then the transaction is rolled back when trying to save the model to the database with the following error message:
+This time, our experience is not so great. We intentionally set an invalid value in the `recurring_interval` property of the Plan model, ActiveRecord tells us its valid when checking the `plan_2.valid?` method, but then the transaction is rolled back when trying to save the model to the database with the following error message:
 
 ```
 [PID:1]    (0.4ms)  ROLLBACK
@@ -179,4 +179,83 @@ What's happening here is we've achieved data integrity at the database level wit
 
 ## Model Validation
 
-TBD: Use ActiveRecord `enum` macro...
+To get ActiveRecord support, the [enum](https://edgeapi.rubyonrails.org/classes/ActiveRecord/Enum.html) macro (class level declaration) must be added to the model. Since we're persisting strings in the database, we'll pass in a hash to map the enum attribute values to strings. Add the following the the `Plan` model:
+
+```ruby
+# app/models/plan.rb
+
+class Plan < ApplicationRecord
+  enum recurring_interval: {
+    year: "year",
+    month: "month",
+    week: "week",
+    day: "day"
+  }
+end
+```
+
+Now let's try to create a plan in the Rails console as before, with an invalid `recurring_interval`:
+
+```ruby
+plan_2 = Plan.new
+plan_2.name = "Another Plan"
+plan_2.recurring_interval = "fortnight"
+# Traceback (most recent call last):
+# ArgumentError ('fortnight' is not a valid recurring_interval)
+```
+
+Much better, this time we get an error from ActiveRecord when trying to set an invalid value for the `recurring_interval` field. ActiveRecord can tell us this value is invalid with a useful error message, without having to try to save to the database and waiting for a SQL error.
+
+## Enum Methods
+
+In addition to validation, the enum macro also exposes a few convenience instance methods to check and modify values. For example, given a monthly plan has been created:
+
+```ruby
+plan = Plan.create(name: "A Plan", recurring_interval: "month")
+```
+
+The `plan` instance now has boolean methods for each possible value of the `recurring_interval` enum: `year?`, `month?`, `week?`, and `day?`. Usage is as follows:
+
+```ruby
+plan.month?
+=> true
+
+plan.year?
+=> false
+```
+
+The `plan` instance now also has bang methods to update the value of `recurring_interval`: `year!`, `month!`, `week!`, and `day!`. For example:
+
+```ruby
+# Update the monthly plan to be a weekly plan
+plan.week!
+# Plan Update (0.3ms) UPDATE `plans` SET `updated_at` = '2022-04-11 11:31:38', `recurring_interval` = 'week' WHERE `plans`.`id` = 3
+=> true
+
+plan.week?
+=> true
+
+plan.month?
+=> false
+```
+
+Note that if you call an update method when the model instance already has that value, no database update will run and the method will still return true. For example, calling `plan.week!` again will not result in an error.
+
+## Enum Scopes
+
+The enum macro also adds [scopes](https://www.rubyguides.com/2019/10/scopes-in-ruby-on-rails/) to the model class, one for each possible value of the enum. So the `Plan` class will have: `Plan.year`, `Plan.month`, `Plan.week`, and `Plan.day`. This allows for easy querying, such as retrieving all the monthly plans. Note that these generated scopes, like all scopes, return an [ActiveRecord::Relation](https://edgeapi.rubyonrails.org/classes/ActiveRecord/Relation.html) object.
+
+```ruby
+plan_1 = Plan.create(name: "Plan 1", recurring_interval: "month")
+plan_2 = Plan.create(name: "Plan 2", recurring_interval: "month")
+
+monthly_plans = Plan.month
+# Plan Load (0.6ms) SELECT `plans`.* FROM `plans` WHERE `plans`.`recurring_interval` = `month` LIMIT 11
+=> #<ActiveRecord::Relation> [...plans...]
+```
+
+## Testing
+
+At this point, we have a fully functioning model with both database and application level validation of the `recurring_interval` value. But we're not done yet, let's add some tests to finish up this feature. I'm using [RSpec](https://rspec.info/) and the [Shoulda Matchers](https://matchers.shoulda.io/) gem, which contains a lot of convenient one-liners to express common validations in Rails.
+
+WIP...
