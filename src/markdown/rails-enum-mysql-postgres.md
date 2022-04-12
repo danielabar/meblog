@@ -16,8 +16,6 @@ Suppose you're building a recurring subscription service. This will need a `Plan
 
 In this case, it's important that the `recurring_interval` only contain one of a specific list of values: `year`, `month`, `week`, or `day`. If an unexpected value such as `foo` or `fortnight` was persisted in the `Plans` table, then the code wouldn't know how to calculate the subscriptions' renewal date. This is a perfect use case for enums. On the database side, enums provide data integrity to restrict a column to one of a list of values. Here is the official definition for [MySQL](https://dev.mysql.com/doc/refman/5.7/en/enum.html) and [PostgreSQL](https://www.postgresql.org/docs/14/datatype-enum.html).
 
-## Database Migration
-
 I'm assuming the `Plan` table and model already exist as follows:
 
 ```ruby
@@ -36,6 +34,8 @@ class CreatePlans < ActiveRecord::Migration
   end
 end
 ```
+
+## Database Migration
 
 The first step to implement an enum in your Rails project will be to generate a migration to add the column. Start from a terminal and enter the following command to generate a migration to add the `recurring_interval` column to the `Plans` table:
 
@@ -168,7 +168,7 @@ plan_2.save! # => error
 This time, our experience is not so great. We intentionally set an invalid value in the `recurring_interval` property of the Plan model, ActiveRecord tells us its valid when checking the `plan_2.valid?` method, but then the transaction is rolled back when trying to save the model to the database with the following error message:
 
 ```
-[PID:1]    (0.4ms)  ROLLBACK
+ROLLBACK
 Traceback (most recent call last):
 ActiveRecord::StatementInvalid (Mysql2::Error: Data truncated for column 'recurring_interval' at row 1:
 INSERT INTO `plans` (`name`, `created_at`, `updated_at`, `recurring_interval`)
@@ -179,7 +179,7 @@ What's happening here is we've achieved data integrity at the database level wit
 
 ## Model Validation
 
-To get ActiveRecord support, the [enum](https://edgeapi.rubyonrails.org/classes/ActiveRecord/Enum.html) macro (class level declaration) must be added to the model. Since we're persisting strings in the database, we'll pass in a hash to map the enum attribute values to strings. Add the following the the `Plan` model:
+To get ActiveRecord support, the [enum](https://edgeapi.rubyonrails.org/classes/ActiveRecord/Enum.html) macro (class level declaration) must be added to the model. Since we want these mapped as strings (rather than the default integer), we'll pass in a hash to map the enum attribute values to strings. Add the following the the `Plan` model:
 
 ```ruby
 # app/models/plan.rb
@@ -224,7 +224,7 @@ plan.year?
 => false
 ```
 
-The `plan` instance now also has bang methods to update the value of `recurring_interval`: `year!`, `month!`, `week!`, and `day!`. For example:
+The `plan` instance now also has bang methods to update the value of `recurring_interval`: `year!`, `month!`, `week!`, and `day!` and save to the database. For example:
 
 ```ruby
 # Update the monthly plan to be a weekly plan
@@ -256,6 +256,51 @@ monthly_plans = Plan.month
 
 ## Testing
 
-At this point, we have a fully functioning model with both database and application level validation of the `recurring_interval` value. But we're not done yet, let's add some tests to finish up this feature. I'm using [RSpec](https://rspec.info/) and the [Shoulda Matchers](https://matchers.shoulda.io/) gem, which contains a lot of convenient one-liners to express common validations in Rails.
+At this point, we have a fully functioning model with both database and application level validation of the `recurring_interval` value. But we're not done yet, let's add some tests to verify this feature. I'm using [RSpec](https://rspec.info/) and the [Shoulda Matchers](https://matchers.shoulda.io/) gem, which contains a lot of convenient matchers to express common validations in Rails.
+
+The test uses the [define enum for](https://github.com/thoughtbot/shoulda-matchers/blob/main/lib/shoulda/matchers/active_record/define_enum_for_matcher.rb) matcher, together with the `with_values` qualifier to pass in a hash of the expected allowed values for the `recurring_interval` column. Finally, `backed_by_column_of_type` is appended to the matcher to assert that the column type is a string (rather than the default integer).
+
+```ruby
+# spec/models/plan_spec
+
+describe Plan, type: :model do
+  describe "validations" do
+    it do
+      should define_enum_for(:recurring_interval)
+        .with_values(
+          year: "year",
+          month: "month",
+          week: "week",
+          day: "day"
+        ).backed_by_column_of_type(:string)
+    end
+  end
+end
+```
+
+Note that if using MySQL, the test will pass with `.backed_by_column_of_type(:string)`, however, for PostgreSQL, use `.backed_by_column_of_type(:enum)`.
+
+<aside class="markdown-aside">
+For the TDD purists in the crowd, of course you could write this test before adding the migration and enum macro to the model class, run the test, it will fail, then add the migration and update the model class, run the test again and it will pass. If you're interested in TDD, I've written about a few examples where its useful including <a class="markdown-link" href="https://danielabaron.me/blog/tdd-by-example/">Adding a New Feature</a> and <a class="markdown-link" href="https://danielabaron.me/blog/tdd-by-example-bugfix/">Fixing a Bug</a>.
+</aside>
+
+## Add a New Value
+
+One last consideration with enums is future maintenance. What happens if a new value needs to be supported? In our Plans case, suppose there's a new business requirement to support "fortnight" (every two weeks) as a valid `recurring_interval`. This can be implemented with another migration. The new value should be added to the end of the list.
+
+```
+bin/rails generate migration ModifyRecurringIntervalForPlans
+```
+
+```ruby
+class ModifyRecurringIntervalForPlans
+end
+```
+
+WIP...
+
+And of course, don't forget to maintain the test, This is left as an exercise for the reader!
+
+## Conclusion
 
 WIP...
