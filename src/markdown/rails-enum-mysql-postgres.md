@@ -14,7 +14,7 @@ This post will walk you through the steps to add an enum to a Rails model, backe
 
 Suppose you're building a recurring subscription service. This will need a `Plan` model that each subscription is associated with. The plan will have a column `recurring_interval` to indicate how frequently the plan renews. Specifically, the service offers yearly, monthly, weekly and daily plans. When a customer purchases a subscription, the code must calculate the renewal date based on the Plan's `recurring_interval`. You can imagine some conditional logic checking the value of this column, if it's `year`, add a year to the purchase date, if it's `month`, add a month and so on.
 
-In this case, it's important that the `recurring_interval` only contain one of a specific list of values: `year`, `month`, `week`, or `day`. If an unexpected value such as `foo` or `fortnight` was persisted in the `Plans` table, then the code wouldn't know how to calculate the subscriptions' renewal date. This is a perfect use case for enums. On the database side, enums provide data integrity to restrict a column to one of a list of values. Here is the official definition for [MySQL](https://dev.mysql.com/doc/refman/5.7/en/enum.html) and [PostgreSQL](https://www.postgresql.org/docs/14/datatype-enum.html).
+In this case, it's important that the `recurring_interval` only contain one of a specific list of values: `year`, `month`, `week`, or `day`. If an unexpected value such as `foo` or `fortnight` was persisted in the `Plans` table, then the code wouldn't know how to calculate the subscriptions' renewal date. This is a perfect use case for enums. On the database side, enums provide data integrity to restrict a column to one of a list of values. See the [MySQL](https://dev.mysql.com/doc/refman/5.7/en/enum.html) and [PostgreSQL](https://www.postgresql.org/docs/14/datatype-enum.html) docs for a more formal definition.
 
 I'm assuming the `Plan` table and model already exist as follows:
 
@@ -27,7 +27,7 @@ class CreatePlans < ActiveRecord::Migration
       t.string :name, null: false
       t.boolean :active, null: false, default: true
       t.string :currency, null: false, default: "USD"
-      t.decimal :unit_amount, precision: 11, scale: 2, null: false, default: 0
+      t.integer :unit_amount_cents, null: false, default: 0
 
       t.timestamps
     end
@@ -112,6 +112,13 @@ config.active_record.schema_format = :sql
 This will generate file `db/structure.sql` instead of the default `db/schema.rb` file, which should be committed. This has to do with the use of raw SQL in the migration. The [Active Record Migrations Guide](https://edgeguides.rubyonrails.org/active_record_migrations.html) has a great explanation:
 
 > `db/schema.rb` cannot express everything your database may support such as triggers, sequences, stored procedures, etc. While migrations may use execute to create database constructs that are not supported by the Ruby migration DSL, these constructs may not be able to be reconstituted by the schema dumper. If you are using features like these, you should set the schema format to :sql in order to get an accurate schema file that is useful to create new database instances.
+
+At this point, you should be able to run the migration (and optionally roll it back) with:
+
+```
+bundle exec rails db:migrate
+bundle exec rails db:rollback
+```
 
 After running the migration, the generated `db/structure.sql` file should specify the newly added enum column for the `plans` table.
 
@@ -293,14 +300,57 @@ bin/rails generate migration ModifyRecurringIntervalForPlans
 ```
 
 ```ruby
-class ModifyRecurringIntervalForPlans
+# MySQL
+class ModifyRecurringIntervalForPlans < ActiveRecord::Migration
+  def up
+    execute <<-SQL
+        ALTER TABLE plans MODIFY recurring_interval ENUM('year', 'month', 'week', 'day', 'fortnight');
+    SQL
+  end
+
+  def down
+    change_column :plans, :recurring_interval, :string
+  end
 end
 ```
 
-WIP...
+PostgreSQL enum's can be modified through the use of [ALTER TYPE](https://www.postgresql.org/docs/14/sql-altertype.html), which supports specifying the position of the new enum value. There is no support for removing a value, therefore the catalog tables must be used for the `down` migration:
 
-And of course, don't forget to maintain the test, This is left as an exercise for the reader!
+```ruby
+# PostgreSQL
+class ModifyRecurringIntervalForPlans < ActiveRecord::Migration
+  def up
+    execute <<-SQL
+        ALTER TYPE plan_recurring_interval ADD VALUE 'fortnight' AFTER 'day';
+    SQL
+  end
+
+  def down
+    execute <<-SQL
+      DELETE FROM pg_enum WHERE enumlabel = 'fortnight' AND enumtypid = (SELECT oid FROM pg_type WHERE typname = 'plan_recurring_interval');
+    SQL
+  end
+end
+```
+
+The model class must be modified to tell ActiveRecord that the new value should be considered valid:
+
+```ruby
+# app/models/plan.rb
+
+class Plan < ApplicationRecord
+  enum recurring_interval: {
+    year: "year",
+    month: "month",
+    week: "week",
+    fortnight: "fortnight",   # new value
+    day: "day"
+  }
+end
+```
+
+And of course, don't forget to maintain the test. This is left as an exercise for the reader!
 
 ## Conclusion
 
-WIP...
+This post has covered working with enums on a Rails project, backed by either a MySQL or PostgreSQL database. We've learned what enums are, why they're useful, how to achieve data integrity from both the database and application via ActiveRecord support, how to test, and maintain enum values. Here's another useful [blog post](https://sipsandbits.com/2018/04/30/using-database-native-enums-with-rails/) on working with enums in Rails. Finally, if you're working with PostgreSQL and would prefer to stick with `db/schema.rb`, you might like to give the [activerecord-postgres_enum](https://github.com/bibendi/activerecord-postgres_enum) gem a try. It enhances the Ruby migration DSL to support PostgreSQL enum types.
