@@ -99,7 +99,7 @@ end
 ```
 
 <aside class="markdown-aside">
-If you're using the <a href="https://docs.rubocop.org/rubocop-rails/" class="markdown-link">rubocop-rails</a> gem with the default settings, you may encounter a lint error on the SQL heredoc not using the <a href="https://docs.rubocop.org/rubocop-rails/cops_rails.html#railssquishedsqlheredocs" class="markdown-link">squish</a> method. In this case, you can go ahead and append ".squish" to the SQL heredocs in the migration as suggested by the linter to. Just be aware that some PostgreSQL syntax such as comments and functions do require newlines to be preserved so you may not always want this, but that's not an issue for the simple syntax used in this migration. See the Ruby <a href="https://www.rubydoc.info/github/rubyworks/facets/String%3Asquish" class="markdown-link">String docs</a> for more details about the squish method.
+If you're using the <a href="https://docs.rubocop.org/rubocop-rails/" class="markdown-link">rubocop-rails</a> gem with the default settings, you may encounter a lint error <a href="https://docs.rubocop.org/rubocop-rails/cops_rails.html#railssquishedsqlheredocs" class="markdown-link">Rails/SquishedSQLHeredocs</a>, because the SQL heredoc is not using the squish method. In this case, you can go ahead and append ".squish" to the SQL heredocs in the migration as suggested by the linter to. Just be aware that some PostgreSQL syntax such as comments and functions do require newlines to be preserved so you may not always want this, but that's not an issue for the simple syntax used in this migration. See the Ruby <a href="https://www.rubydoc.info/github/rubyworks/facets/String%3Asquish" class="markdown-link">String docs</a> for more details about the squish method.
 </aside>
 
 One last thing to know before running the migration, is that you must set the `schema_format` to be `:sql` in your application config in order for the enum definition to be captured in the schema file:
@@ -182,7 +182,7 @@ INSERT INTO `plans` (`name`, `created_at`, `updated_at`, `recurring_interval`)
 VALUES ('Another plan', '2022-04-10 12:03:11', '2022-04-10 12:03:11', 'fortnight'))
 ```
 
-What's happening here is we've achieved data integrity at the database level with the use of the `enum` column type. However, for a good developer experience, we also need *application* level data integrity, i.e. we want ActiveRecord to tell us the model is invalid with a useful error message rather than having to catch a MySQL (or PostgreSQL) exception. This is what we'll cover in the next section.
+What's happening here is we've achieved data integrity at the database level with the use of the `enum` column type. However, ActiveRecord is not aware of the existence of the enum and so it's allowing a model to be created with invalid data. For a complete experience, we also need *application* level data integrity, i.e. we want ActiveRecord to tell us the model is invalid with a useful error message rather than having to catch a MySQL (or PostgreSQL) exception. This is what we'll cover in the next section.
 
 ## Model Validation
 
@@ -293,7 +293,7 @@ For the TDD purists in the crowd, of course you could write this test before add
 
 ## Add a New Value
 
-One last consideration with enums is future maintenance. What happens if a new value needs to be supported? In our Plans case, suppose there's a new business requirement to support "fortnight" (every two weeks) as a valid `recurring_interval`. This can be implemented with another migration. The new value should be added to the end of the list.
+One last consideration with enums is future maintenance. What happens if a new value needs to be supported? In our Plans case, suppose there's a new business requirement to support "fortnight" (every two weeks) as a valid `recurring_interval`. This can be implemented with another migration. The new value should be added to the end of the list (for MySQL):
 
 ```
 bin/rails generate migration ModifyRecurringIntervalForPlans
@@ -343,8 +343,8 @@ class Plan < ApplicationRecord
     year: "year",
     month: "month",
     week: "week",
-    fortnight: "fortnight",   # new value
-    day: "day"
+    day: "day",
+    fortnight: "fortnight"   # new value
   }
 end
 ```
