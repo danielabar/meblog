@@ -12,7 +12,7 @@ related:
 
 This post will walk you through the steps to add an enum to a Rails model, backed by either a MySQL or Postgres database. If you're not familiar with enums, an example will be more illuminating than the official definition.
 
-Suppose you're building a recurring subscription service. This will need a `Plan` model that each subscription is associated with. The plan will have a column `recurring_interval` to indicate how frequently the plan renews. Specifically, the service offers yearly, monthly, weekly and daily plans. When a customer purchases a subscription, the code must calculate the renewal date based on the Plan's `recurring_interval`. You can imagine some conditional logic checking the value of this column, if it's `year`, add a year to the purchase date, if it's `month`, add a month and so on.
+Suppose you're building a recurring subscription service. This will need a `Plan` model that each subscription is associated with. The plan will have a column `recurring_interval` to indicate how frequently the plan renews. Specifically, the service offers yearly, monthly, weekly and daily plans. When a customer purchases a subscription, the code must calculate the renewal date based on the Plan's `recurring_interval`. Imagine some conditional logic checking the value of this column, if it's `year`, add a year to the purchase date, if it's `month`, add a month and so on.
 
 In this case, it's important that the `recurring_interval` only contain one of a specific list of values: `year`, `month`, `week`, or `day`. If an unexpected value such as `foo` or `fortnight` was persisted in the `Plans` table, then the code wouldn't know how to calculate the subscriptions' renewal date. This is a perfect use case for enums. On the database side, enums provide data integrity to restrict a column to one of a list of values. See the [MySQL](https://dev.mysql.com/doc/refman/5.7/en/enum.html) and [PostgreSQL](https://www.postgresql.org/docs/14/datatype-enum.html) docs for a more formal definition.
 
@@ -182,11 +182,11 @@ INSERT INTO `plans` (`name`, `created_at`, `updated_at`, `recurring_interval`)
 VALUES ('Another plan', '2022-04-10 12:03:11', '2022-04-10 12:03:11', 'fortnight'))
 ```
 
-What's happening here is we've achieved data integrity at the database level with the use of the `enum` column type. However, ActiveRecord is not aware of the existence of the enum and so it's allowing a model to be created with invalid data. For a complete experience, we also need *application* level data integrity, i.e. we want ActiveRecord to tell us the model is invalid with a useful error message rather than having to catch a MySQL (or PostgreSQL) exception. This is what we'll cover in the next section.
+What's happening here is we've achieved data integrity at the database level with the use of the `enum` column type. However, ActiveRecord is not aware of the existence of the enum and so it's allowing a model to be created with invalid data. For complete validation, we also need *application* level data integrity, i.e. we want ActiveRecord to tell us the model is invalid with a useful error message rather than having to catch a MySQL (or PostgreSQL) exception. This is what we'll cover in the next section.
 
 ## Model Validation
 
-To get ActiveRecord support, the [enum](https://edgeapi.rubyonrails.org/classes/ActiveRecord/Enum.html) macro (class level declaration) must be added to the model. Since we want these mapped as strings (rather than the default integer), we'll pass in a hash to map the enum attribute values to strings. Add the following the the `Plan` model:
+To get ActiveRecord support, the [enum](https://edgeapi.rubyonrails.org/classes/ActiveRecord/Enum.html) macro (class level declaration) must be added to the model. Since we want these mapped as strings (rather than the default integer), we'll pass in a hash to map the enum attribute values to strings. Add the following to the `Plan` model:
 
 ```ruby
 # app/models/plan.rb
