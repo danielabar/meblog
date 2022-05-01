@@ -16,7 +16,7 @@ On the podcast I was listening to, the hosts suggestion was to close the tabs wh
 
 ## A Mess of Tabs
 
-To start, suppose you currently have a `localhost` tab open for development, with many other tabs that you've opened for various research and problem solving. The top of your browser will look something like this - a whole mess of tiny tabs, the more you open, the "squishier" they appear to try and fit in:
+To start, suppose you currently have a tab open at `http://localhost:8000`  for local development, with many other tabs that you've opened for various research and problem solving. The top of your browser will look something like this - a whole mess of tiny tabs, the more you open, the "squishier" they appear to try and fit in:
 ![Multiple Browser Tabs Top](../images/multiple-browser-tabs-top.png "Multiple Browser Tabs Top")
 
 ## Search Tabs
@@ -61,7 +61,7 @@ There are some other ways to manage browser tabs including [tab groups](https://
 
 I find tab groups too much overhead as it requires use of the mouse and manual management. Such as thinking about what to name the tab groups, what tab belongs in what group, and then remembering what I put where! The kind of research required for fullstack dev is too fluid to fit into the group model.
 
-As for vertical or tree style tabs, while this improves the ability to visually scan a list of tabs, I find the search feature more useful than being concerned about how the tabs are laid out.
+As for vertical or tree style tabs, while this improves the ability to visually scan a list of tabs, I find the search feature more useful than being concerned about how the tabs are laid out. Essentially, the search tabs feature is creating a searchable vertical listing on demand.
 
 ## Conclusion
 
