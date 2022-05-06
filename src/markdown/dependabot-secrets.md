@@ -24,7 +24,7 @@ However, if *all* the Dependabot PRs are failing CI, it's unlikely that every si
 Braintree::ConfigurationError: Braintree::Configuration.merchant_id needs to be set
 ```
 
-Indeed, this project does use Braintree to process payments, with a "sandbox" environment being used for tests. An initializer is used to configure Braintree, and the values are populated from environment variables. Even in test mode, it's good practice to avoid hard-coding 3rd party configuration. Note this is a Rails project.
+Indeed, this project does use Braintree to process payments, with a [sandbox](https://developer.paypal.com/braintree/articles/get-started/try-it-out#sandbox-vs.-production) environment being used for tests. An initializer is used to configure Braintree, and the values are populated from environment variables. Even in test mode, it's good practice to avoid hard-coding 3rd party configuration. Note this is a Rails project:
 
 ```ruby
 # config/initializers/braintree.rb
@@ -39,7 +39,7 @@ To understand why the tests were complaining about Braintree configuration not b
 
 Locally, the values of all environment variables come from a git ignored `.env` file that developers populate on their laptops during project setup.
 
-For the Continuous Integration workflow that runs on Github, this value is populated in the Github repository secrets, so all the developers' PRs use it and pass. Secrets can be set in Github by anyone with administrator access to the project by going to Settings -> Secrets -> Actions, and then clicking on the "New repository secret" button. For example to add a secret named `SOME_SECRET`:
+For the Continuous Integration workflow that runs with Github Actions, this environment variables are populated in the Github repository secrets. Secrets can be set in Github by anyone with administrator access to the project by going to Settings -> Secrets -> Actions, and then clicking on the "New repository secret" button. For example to add a secret named `SOME_SECRET`:
 
 ![Github Add Secret](../images/github-add-secret.png "Github Add Secret")
 
@@ -67,14 +67,14 @@ Given the above, any code that runs as part of the workflow on the Github Action
 
 ## Dependabot Secrets
 
-However, it turns out, Dependabot doesn't have access to the main repository secrets. Essentially, it was as if the initializer had the following:
+However, it turns out, Dependabot doesn't have permission to read the main repository secrets. This means when any Dependabot PR is running the Continuous Integration check and attempts to run initializers, it's as if the code had the following:
 
 ```ruby
 Braintree::Configuration.merchant_id = nil
 # other config...
 ```
 
-Which would cause all tests that need to communicate with the Braintree sandbox to fail.
+Which would cause all tests that need to communicate with the Braintree sandbox to fail. Essentially, anywhere `ENV["SOMETHING"]` is referenced would return `nil`.
 
 The solution is to specify a set of secrets specifically for Dependabot. This can be done in the Github UI by going to your repository's Settings, then in the Secrets section, selecting Dependabot. Note that the secrets specified in the Actions section are only available to your own PRs. Anything that the Dependabot PRs need to run must be specified in the Dependabot section.
 
@@ -87,3 +87,7 @@ The UI to add a secret in the Dependabot section is the same as adding in the Ac
 ![Github List Depbot Secrets](../images/github-list-depbot-secrets.png "Github List Depbot Secrets")
 
 In the example above, the Dependabot PRs will now have access to `SOME_SECRET`. After specifying all the actual secrets needed, re-run the failed Dependabot checks and this time they should pass.
+
+## Conclusion
+
+This post has covered a simple reason why your Dependabot PRs may be failing required checks on Github, and how to fix it by configuring secrets specifically for Dependabot.
