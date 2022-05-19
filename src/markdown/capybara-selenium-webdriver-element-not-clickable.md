@@ -62,7 +62,7 @@ Looking more closely at the error message, it indicates that Chrome v101 is bein
 ...
 ```
 
-The next question to ask is: What version is being used locally on my laptop (recall this test was passing locally). The tests are run against a headless Chrome browser which requires a local installation of chromedriver. We use the [webdrivers](https://github.com/titusfortner/webdrivers/) gem which automatically downloads the latest version of the driver for the browser being used by the tests. This gem by default downloads drivers to the `~/.webdrivers` directory so you can check what it installed. From my laptop:
+The next question to ask is: What version is being used locally on my laptop (recall this test was passing locally). The tests are run against a headless Chrome browser which requires a local installation of chromedriver. This project uses the [webdrivers](https://github.com/titusfortner/webdrivers/) gem which automatically downloads the latest version of the driver for the browser being used by the tests. This gem by default downloads drivers to the `~/.webdrivers` directory so you can check what it installed. From my laptop:
 
 ```bash
 ls ~/.webdrivers
@@ -72,9 +72,9 @@ cat ~/.webdrivers/chromedriver.version
 100.0.4896.60
 ```
 
-Aha, my local had one version (v100) older of chromedriver. In order for webdriver to update to the latest, I opened Chrome on my laptop and selected from the menu: Chrome -> About Google Chrome, which kicked off an update to the latest 101. Yes Chrome is auto updating, but I've found that sometimes it requires a little "kick" to get going to the next version.
+Aha! My local had one version (v100) older of chromedriver. In order for webdriver to update to the latest, I opened Chrome on my laptop and selected from the menu: Chrome -> About Google Chrome, which triggered an update to the latest 101. Yes Chrome is auto updating, but I've found that sometimes it requires a little "kick" to get going to the next version.
 
-I then ran this test locally, and this time the webdrivers gem detected Chrome 101, and so installed an updated driver for this version. This caused the test to fail, with the same error message as was displayed on CI. This was progress, at least there was consistent behaviour between my laptop and the CI system.
+I then ran the test locally, and this time the webdrivers gem detected Chrome 101, and installed an updated driver for this version. This caused the test to fail, with the same error message as was displayed on CI. This was progress, at least there was consistent behaviour between my laptop and the CI system.
 
 ## Coordinates
 
@@ -144,21 +144,48 @@ width=670,
 height=40>
 ```
 
-Here's a visual putting together everything we've learned about this element so far:
+The output is showing that the top left position of the label element occurs at `x` position 365 and `y` position 205. Further, the element is 670 wide by 40 tall. Here's a visual putting this all together, along with the point the text is actually clicking on (x of 700 and y of 225):
 
-TBD: Image from beginning, marked up with x/y point at top left, x/y point of test click
+![capybara edit forward with points](../images/capybara-edit-forward-with-points.png "capybara edit forward with points")
 
-WIP...
+It *looks* like the test is clicking in the center of the element, but is it really? Some quick arithmetic shows that it is. Starting at the left, the `x` position of 365, plus half the width (670 / 2 = 335) is 700. And starting at the top, the `y` position of 205, plus half the height (40 / 2 = 20) is 225. Recall the error message:
 
-Interesting that x + half width and y + half height = 700, 225 - exact center of label. Why is test clicking here?
+```
+Element <label class="forward-toggle">...</label> is not clickable at point (700, 225).
+```
 
+So this explains where the point co-ordinates in the error message come from. The next question is *why* does the test click in the center of the element? Recall the line of the test that performs the click is:
+
+```ruby
+find("label", text: "FORWARDING").click
+```
+
+The `find` method returns an instance of `Capybara::Node::Element`, and then the test invokes the `click` method on the found element. Let's see what the Capybara API docs say about the [click](https://rubydoc.info/github/teamcapybara/capybara/master/Capybara%2FNode%2FElement:click) method:
+
+![capybara click api docs](../images/capybara-click-api-docs.png "capybara click api docs")
+
+Aha! Another mystery solved, the documentation clearly states that the element will be clicked in the middle unless offsets are specified:
+
+> Both x: and y: must be specified if an offset is wanted, if not specified the click will occur at the middle of the element.
 ## Solution
 
-WIP...
+Now finally we're in a position to solve the problem. If we want the test to click on an element in anywhere other than the center position, the x and y offsets must be provided to the click method. Since the particular UI this test is driving has the actual toggle input near the top left corner, a small amount of offset can resolve this:
 
-Read [click](https://rubydoc.info/github/teamcapybara/capybara/master/Capybara/Node/Element#click-instance_method) method api docs wrt x/y offsets, otherwise clicks in center.
+```ruby
+find("label", text: "FORWARDING").click(x: 5, y: 5)
+```
 
+And indeed, running the test with this updated code, both on laptop and the continuous integration workflow passed.
 
 TBD:
-* Add sentence near beginning linking to solution for those in a hurry.
+* Explain testing stack
 * Better feature image related to broken click? https://unsplash.com/photos/cGXdjyP6-NU, https://unsplash.com/photos/Vqg809B-SrE
+* Unresolved mystery: Why was click working without offsets prior to Chrome v101? Any clue in ChromeDriver release notes? https://chromedriver.chromium.org/downloads
+
+```
+Supports Chrome version 101
+
+Resolved issue 4046: DCHECK hit when appending empty fenced frame [Pri-]
+
+Resolved issue 4080: Switching to nested frame fails [Pri-]
+```
