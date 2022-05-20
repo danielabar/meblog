@@ -36,7 +36,7 @@ Here is the UI that is exercised for this test. This app allows users to manage 
 
 ![capybara edit forward 1](../images/capybara-edit-forward-1.png "capybara edit forward 1")
 
-After the test clicks the forwarding toggle, the UI updates to allow entering an email address to forward to and saving changes:
+After the test clicks the forwarding toggle, the expected result is that the UI updates to allow entering an email address to forward to and saving changes:
 
 ![capybara edit forward 2](../images/capybara-edit-forward-2.png "capybara edit forward 2")
 
@@ -44,17 +44,21 @@ It was very strange that this test started failing, as the mailbox management ar
 
 ## Testing Stack
 
-WIP...
+Before getting further into troubleshooting, a brief description of this projects' testing stack:
 
-Before getting further into troubleshooting, a brief description of our testing stack...
+This is a Rails project which uses [Capybara](http://teamcapybara.github.io/capybara/) to write the feature tests. Capybara is capable of launching a real browser (either visual or headless), navigating to pages of the application, interacting with elements just like a human user would, and executing assertions to verify that expected elements are on the page.
 
-This being a Rails project, Capybara is used for the feature tests, with Selenium as the driver...
+Capybara requires a [driver](https://github.com/teamcapybara/capybara#drivers) to control the browser. By default, it uses the `:rack_test` driver, which is fast, but only suitable for pure fullstack Rails projects (i.e. no front end JavaScript). Since this project uses React for the front end, the [Selenium](https://www.selenium.dev/projects/) driver is used instead. Specifically, `:selenium_chrome` when running the tests against visual Chrome, and `:selenium_chrome_headless` for running against headless Chrome.
+
+Use of Selenium also requires that the browser-specific drivers are installed on the machine where the tests are running. For example, if running tests against Chrome, then Selenium expects to find [ChromeDriver](https://chromedriver.chromium.org/) installed, whose version must be compatible with the version of the Chrome browser that the tests are running against.
+
+To avoid developers having to manually install and maintain browser driver versions, this project uses the [webdrivers](https://github.com/titusfortner/webdrivers/) gem, which automatically installs and updates the browser drivers.
 
 ## What's Changed?
 
 When encountering this type of situation (test fails on CI but passes locally), the first thing to do is determine what's different between CI and laptop setup? My first thought went to browser and driver versions. The code itself hadn't changed, but browser/driver versions are updated constantly so this is a likely culprit.
 
-Looking more closely at the error message, it indicates that Chrome v101 is being used on the Github runner:
+Looking more closely at the error message, it indicates that Chrome 101 is being used on the Github runner:
 
 ```
 ...
@@ -72,7 +76,7 @@ cat ~/.webdrivers/chromedriver.version
 100.0.4896.60
 ```
 
-Aha! My local had one version (v100) older of chromedriver. In order for webdriver to update to the latest, I opened Chrome on my laptop and selected from the menu: Chrome -> About Google Chrome, which triggered an update to the latest 101. Yes Chrome is auto updating, but I've found that sometimes it requires a little "kick" to get going to the next version.
+Aha! My local had one version (100) older of chromedriver. In order for webdriver to update to the latest, I opened Chrome on my laptop and selected from the menu: Chrome -> About Google Chrome, which triggered an update to the latest 101. Yes Chrome is auto updating, but I've found that sometimes it requires a little "kick" to get going to the next version.
 
 I then ran the test locally, and this time the webdrivers gem detected Chrome 101, and installed an updated driver for this version. This caused the test to fail, with the same error message as was displayed on CI. This was progress, at least there was consistent behaviour between my laptop and the CI system.
 
@@ -123,7 +127,7 @@ It was at this point that I started to wonder whether the larger than expected s
 
 Next I wanted to understand where the coordinates from the error message `is not clickable at point (700, 225)` fit in with respect to the label element selected by the test.
 
-Selenium can provide more details about a selected element using the [rect](https://rubydoc.info/github/teamcapybara/capybara/master/Capybara/Node/Element#rect-instance_method) method. This method returns the x and y coordinates of the top left corner of the element, along with its width and height. Here's a temporary modification of the test to output the results of the `rect` method:
+Selenium can provide more details about a selected element using the [rect](https://rubydoc.info/github/teamcapybara/capybara/master/Capybara/Node/Element#rect-instance_method) method. This method returns the `x` and `y` coordinates of the top left corner of the element, along with its width and height. Here's a temporary modification of the test to output the results of the `rect` method:
 
 ```ruby
 # temporary debug code to learn more about the element
@@ -144,7 +148,9 @@ width=670,
 height=40>
 ```
 
-The output is showing that the top left position of the label element occurs at `x` position 365 and `y` position 205. Further, the element is 670 wide by 40 tall. Here's a visual putting this all together, along with the point the text is actually clicking on (x of 700 and y of 225):
+The output is showing that the top left position of the label element occurs at `x` position 365 and `y` position 205. Further, the element is 670 wide by 40 tall.
+
+Here's a visual putting this all together, along with the point the text is actually clicking on (x of 700 and y of 225):
 
 ![capybara edit forward with points](../images/capybara-edit-forward-with-points.png "capybara edit forward with points")
 
@@ -169,18 +175,25 @@ Aha! Another mystery solved, the documentation clearly states that the element w
 > Both x: and y: must be specified if an offset is wanted, if not specified the click will occur at the middle of the element.
 ## Solution
 
-Now finally we're in a position to solve the problem. If we want the test to click on an element in anywhere other than the center position, the x and y offsets must be provided to the click method. Since the particular UI this test is driving has the actual toggle input near the top left corner, a small amount of offset can resolve this:
+Now finally we're in a position to solve the problem. If we want the test to click on an element on anywhere other than the center position, the `x` and `y` offsets must be provided to the click method, where `x` is the number of pixels to the right, starting from the left-most edge, and `y` is the number of pixels down from the top of the element.
+
+Since the particular UI this test is driving has the actual toggle input near the top left corner, a small amount of offset can resolve this:
 
 ```ruby
 find("label", text: "FORWARDING").click(x: 5, y: 5)
 ```
 
-And indeed, running the test with this updated code, both on laptop and the continuous integration workflow passed.
+![capybara edit forward click solution](../images/capybara-edit-forward-click-solution.png "capybara edit forward click solution")
 
-TBD:
-* Explain testing stack
-* Better feature image related to broken click? https://unsplash.com/photos/cGXdjyP6-NU, https://unsplash.com/photos/Vqg809B-SrE
-* Unresolved mystery: Why was click working without offsets prior to Chrome v101? Any clue in ChromeDriver release notes? https://chromedriver.chromium.org/downloads
+And indeed, running the test with this updated code, both locally and the continuous integration workflow passed.
+
+## Unexplained
+
+![one missing piece of puzzle](../images/capybara-puzzle-sigmund-B-x4VaIriRc-unsplash.jpg "one missing piece of puzzle")
+
+There does remain one unexplained piece of this puzzle.
+
+*Why* was this test passing on all older Chrome versions up to 100, and only started failing on 101? Is it possible that older versions of ChromeDriver were actually clicking at the top left of elements, and that center clicking was only implemented in v101? It's not clear from the [release notes](https://chromedriver.chromium.org/downloads):
 
 ```
 Supports Chrome version 101
@@ -189,3 +202,9 @@ Resolved issue 4046: DCHECK hit when appending empty fenced frame [Pri-]
 
 Resolved issue 4080: Switching to nested frame fails [Pri-]
 ```
+
+
+TBD:
+* double check nested labels in markup
+* Conclusion
+* Better feature image related to broken click? https://unsplash.com/photos/cGXdjyP6-NU, https://unsplash.com/photos/Vqg809B-SrE
