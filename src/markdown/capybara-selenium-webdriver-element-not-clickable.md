@@ -1,6 +1,6 @@
 ---
 title: "Capybara Webdriver Element not Clickable Resolved"
-featuredImage: "../images/capybara-brian-mcgowan-P1-6ioOcGNU-unsplash.jpg"
+featuredImage: "../images/capybara-jackson-simmer-Vqg809B-SrE-unsplash.jpg"
 description: "Learn how to troubleshoot the Capybara Selenium Webdriver error: element not clickable at point."
 date: "2022-08-01"
 category: "rails"
@@ -66,7 +66,7 @@ Looking more closely at the error message, it indicates that Chrome 101 is being
 ...
 ```
 
-The next question to ask is: What version is being used locally on my laptop (recall this test was passing locally). The tests are run against a headless Chrome browser which requires a local installation of chromedriver. This project uses the [webdrivers](https://github.com/titusfortner/webdrivers/) gem which automatically downloads the latest version of the driver for the browser being used by the tests. This gem by default downloads drivers to the `~/.webdrivers` directory so you can check what it installed. From my laptop:
+The next question to ask is: What version is being used locally on my laptop (recall this test was passing locally). The tests are run against a headless Chrome browser which requires a local installation of chromedriver. This project uses the [webdrivers](https://github.com/titusfortner/webdrivers/) gem which automatically downloads the latest version of the driver for the browser being used by the tests. This gem by default downloads drivers to the `~/.webdrivers` diory so you can check what it installed. From my laptop:
 
 ```bash
 ls ~/.webdrivers
@@ -76,7 +76,7 @@ cat ~/.webdrivers/chromedriver.version
 100.0.4896.60
 ```
 
-Aha! My local had one version (100) older of chromedriver. In order for webdriver to update to the latest, I opened Chrome on my laptop and selected from the menu: Chrome -> About Google Chrome, which triggered an update to the latest 101. Yes Chrome is auto updating, but I've found that sometimes it requires a little "kick" to get going to the next version.
+Aha! My local had one version (100) older of chromedriver. In order for webdriver to update to the latest, I opened Chrome on my laptop and selected from the menu: Chrome -> About Google Chrome, which triggered an update to the latest 101. Yes Chrome is auto updating, but sometimes it requires a little "kick" to get going to the next version.
 
 I then ran the test locally, and this time the webdrivers gem detected Chrome 101, and installed an updated driver for this version. This caused the test to fail, with the same error message as was displayed on CI. This was progress, at least there was consistent behaviour between my laptop and the CI system.
 
@@ -88,13 +88,13 @@ Next step was to dig in more into the error, I was curious about the specific po
 Element <label class="forward-toggle">...</label> is not clickable at point (700, 225).
 ```
 
-This means the test is trying to click at `x` position 700 and `y` position 225 on the page and not finding anything clickable such as an input or link. In terms of Capybara selectors, none of the tests use co-ordinates to select elements because it would be too brittle. Any design change or layout shift would break a test that expected an element to be in a specific location on the page. So why was the test reporting an error about a specific point reference?
+This means the test is trying to click at `x` position `700` and `y` position `225` on the page and not finding anything clickable such as an input or link. None of the tests use co-ordinates to select elements because it would be too brittle. Any design change or layout shift would break a test that expected an element to be in a specific location on the page. So why was the test reporting an error about a specific point reference?
 
 To find where this point was on the page, I installed the [coordinates](https://chrome.google.com/webstore/detail/coordinates/bpflbjmbfccblbhlcmlgkajdpoiepmkd) Chrome extension, navigated to the Email Forwarding area of the app and enabled the extension. Here is where point `(700, 225)` occurs on the page:
 
 ![capybara edit forward click point](../images/capybara-edit-forward-click-point.png "capybara edit forward click point")
 
-Indeed this is a point of "white space" with nothing clickable in that area. The actual toggle that should be clicked occurs way more to the left and slightly above this point. So that explains why the test reports `not clickable at point (700, 225)`. But *why* is the test trying to click there rather than the toggle that is selected by the test?
+Indeed this is a point of "white space" with nothing clickable in that area. The actual toggle that should be clicked occurs way more to the left and slightly above this point. So that explains why the test reports `not clickable at point (700, 225)`. But *why* is the test trying to click at this specific point rather than the toggle that is selected by the test?
 
 ## Markup
 
@@ -107,16 +107,16 @@ This toggle control is not a native element. The implementation to achieve this 
 ```html
 <div class="row">
   <label class="forward-toggle"> <!-- test tries to click this element -->
-    <div class="caption">Enable Forwarding</div>
+    <div class="caption">Enable Forwarding</div> <!-- styled as upper case -->
     <div class="onoff_slide">
         <input type="checkbox" id="forward">
-        <label for="forward">...</label>
+        <label for="forward">...</label> <!-- toggle styles applied here -->
     </div>
   </label>
 </div>
 ```
 
-Recall that the test is trying to click on the `<label>` element. Let's see what this element looks like when selected in Chrome Developer Tools:
+Recall that the test is trying to click on the `<label>` element that contains "FORWARDING" text. Let's see what this element looks like when selected in Chrome Developer Tools:
 
 ![capybara label selected in dev tools](../images/capybara-label-selected-in-dev-tools.png "capybara label selected in dev tools")
 
@@ -149,6 +149,10 @@ height=40>
 ```
 
 The output is showing that the top left position of the label element occurs at `x` position 365 and `y` position 205. Further, the element is 670 wide by 40 tall.
+
+<aside class="markdown-aside">
+The Capybara docs link for the <a class="markdown-link" href="https://rubydoc.info/github/teamcapybara/capybara/master/Capybara/Node/Element#rect-instance_method">rect method</a>, doesn't have any details about what this method does. It can be intuitively deduced from running it on an element as I've done above and inspecting the output. However, if you're curious as to what it actually does, see the Appendix at the end of this post.
+</aside>
 
 Here's a visual putting this all together, along with the point the text is actually clicking on (x of 700 and y of 225):
 
@@ -203,8 +207,56 @@ Resolved issue 4046: DCHECK hit when appending empty fenced frame [Pri-]
 Resolved issue 4080: Switching to nested frame fails [Pri-]
 ```
 
+## Conclusion
 
-TBD:
-* double check nested labels in markup
-* Conclusion
-* Better feature image related to broken click? https://unsplash.com/photos/cGXdjyP6-NU, https://unsplash.com/photos/Vqg809B-SrE
+This post has covered how to debug and solve the "Element is not clickable at point... Other element would receive the click" error when running Selenium based tests with Capybara. The process was to compare dependency versions on CI vs local, setup the conditions to reproduce the issue locally, inspect the co-ordinates reported by the failing test, compare this to the markup and element in developer tools, and some careful review of the Capybara documentation to understand the nuances of the click method.
+
+## Appendix:  Rect Method
+
+WIP...
+
+As part of debugging this issue, the `rect` method was helpful in identifying details of the element selected by the test. However, the Capybara documentation for this [method](https://rubydoc.info/github/teamcapybara/capybara/master/Capybara/Node/Element#rect-instance_method) doesn't contain any explanation as to what it does:
+
+![capybara rect doc empty](../images/capybara-rect-doc-empty.png "capybara rect doc empty")
+
+Intuitively it can be understood from calling it that it returns size and positioning details of the element, but my curiosity was piqued as to exactly what it does so I went down a little rabbit hole to trace it through.
+
+Following the [View on Github](https://github.com/teamcapybara/capybara/blob/master/lib/capybara/node/element.rb#L380) link from the Capybara documentation site led to the following code:
+
+```ruby
+module Capybara
+  module Node
+    class Element < Base
+      # ...
+      def
+        synchronize { base.rect }
+      end
+      # ...
+    end
+  end
+end
+```
+
+What is `synchronize` - Monitor mixin: https://docs.ruby-lang.org/en/2.7.0/MonitorMixin.html#method-i-mon_synchronize OR custom definition: https://github.com/teamcapybara/capybara/blob/d08e88dadd44b7572b1ae37f44649d42180e8000/lib/capybara/node/base.rb#L76
+
+Where the implementation of the rect method is defined in [Capybara::Selenium::Node](https://github.com/teamcapybara/capybara/blob/98e367d9f9f4b56652b3e7dd41996c9a1d5ae26a/lib/capybara/selenium/node.rb#L216):
+
+```ruby
+class Capybara::Selenium::Node < Capybara::Driver::Node
+  # ...
+  def rect
+    native.rect
+  end
+  # ...
+end
+```
+
+According to [this discussion](https://github.com/teamcapybara/capybara/issues/2419#issuecomment-832076535), `native` is an instance of `::Selenium::WebDriver::Element`, so to understand what the `rect` method does requires finding this implementation. However, this class isn't in the Capybara project, rather, it's in a runtime dependency `selenium-webdriver`. This means the `rect` method is actually implemented in selenium-webdriver.
+
+Capybara uses this gem: https://rubygems.org/gems/selenium-webdriver (runtime dependency? https://github.com/teamcapybara/capybara/commit/3f53e82ed9b9717505e998a4127ab3577d87b0a2)
+
+Looking through the Selenium Webdriver documentation for Elements, found the definition: https://www.selenium.dev/documentation/webdriver/elements/information/#size-and-position:
+
+![capybara selenium webdriver rect doc](../images/capybara-selenium-webdriver-rect-doc.png "capybara selenium webdriver rect doc")
+
+And that ultimately explains what the rect method returns. It matches my intuition about it from seeing the returned result but it was good to confirm this with the official documentation.
