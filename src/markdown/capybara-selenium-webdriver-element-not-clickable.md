@@ -50,15 +50,13 @@ This is a Rails project which uses [Capybara](http://teamcapybara.github.io/capy
 
 Capybara requires a [driver](https://github.com/teamcapybara/capybara#drivers) to control the browser. By default, it uses the `:rack_test` driver, which is fast, but only suitable for pure fullstack Rails projects (i.e. no front end JavaScript). Since this project uses React for the front end, the [Selenium](https://www.selenium.dev/projects/) driver is used instead. Specifically, `:selenium_chrome` when running the tests against visual Chrome, and `:selenium_chrome_headless` for running against headless Chrome.
 
-Use of Selenium also requires that the browser-specific drivers are installed on the machine where the tests are running. For example, if running tests against Chrome, then Selenium expects to find [ChromeDriver](https://chromedriver.chromium.org/) installed, whose version must be compatible with the version of the Chrome browser that the tests are running against.
-
-To avoid developers having to manually install and maintain browser driver versions, this project uses the [webdrivers](https://github.com/titusfortner/webdrivers/) gem, which automatically installs and updates the browser drivers.
+In order to use Selenium with Capybara, the [selenium-webdriver](https://github.com/SeleniumHQ/selenium/tree/trunk/rb) gem, which provides Ruby bindings, is required. It also requires that the browser-specific drivers are installed on the machine where the tests are running. For example, if running tests against Chrome, then Selenium expects to find [ChromeDriver](https://chromedriver.chromium.org/) installed, whose version must be compatible with the version of the Chrome browser that the tests are running against. To avoid developers having to manually install and maintain browser driver versions, this project uses the [webdrivers](https://github.com/titusfortner/webdrivers/) gem, which automatically installs and updates the browser drivers.
 
 ## What's Changed?
 
-When encountering this type of situation (test fails on CI but passes locally), the first thing to do is determine what's different between CI and laptop setup? My first thought went to browser and driver versions. The code itself hadn't changed, but browser/driver versions are updated constantly so this is a likely culprit.
+When encountering this type of situation (test fails on CI but passes locally), the first thing to do is determine what's different between CI and laptop setup. My first thought went to browser and driver versions. The code itself hadn't changed, but browser/driver versions are updated constantly so this is a likely culprit.
 
-Looking more closely at the error message, it indicates that Chrome 101 is being used on the Github runner:
+Looking more closely at the error message, it indicates that Chrome 101 is being used on the Github Action runner:
 
 ```
 ...
@@ -66,7 +64,7 @@ Looking more closely at the error message, it indicates that Chrome 101 is being
 ...
 ```
 
-The next question to ask is: What version is being used locally on my laptop (recall this test was passing locally). The tests are run against a headless Chrome browser which requires a local installation of chromedriver. This project uses the [webdrivers](https://github.com/titusfortner/webdrivers/) gem which automatically downloads the latest version of the driver for the browser being used by the tests. This gem by default downloads drivers to the `~/.webdrivers` diory so you can check what it installed. From my laptop:
+The next question to ask is: What version is being used locally on my laptop? Recall this test was passing locally. The tests are run against a headless Chrome browser which requires a local installation of chromedriver. The [webdrivers](https://github.com/titusfortner/webdrivers/) gem automatically downloads the latest version of the driver for the browser being used by the tests. This gem by default downloads drivers to the `~/.webdrivers` directory so you can check what it installed. From my laptop:
 
 ```bash
 ls ~/.webdrivers
@@ -127,7 +125,7 @@ It was at this point that I started to wonder whether the larger than expected s
 
 Next I wanted to understand where the coordinates from the error message `is not clickable at point (700, 225)` fit in with respect to the label element selected by the test.
 
-Selenium can provide more details about a selected element using the [rect](https://rubydoc.info/github/teamcapybara/capybara/master/Capybara/Node/Element#rect-instance_method) method. This method returns the `x` and `y` coordinates of the top left corner of the element, along with its width and height. Here's a temporary modification of the test to output the results of the `rect` method:
+Capybara can provide more details about a selected element using the [rect](https://rubydoc.info/github/teamcapybara/capybara/master/Capybara/Node/Element#rect-instance_method) method. This method returns the `x` and `y` coordinates of the top left corner of the element, along with its width and height. Here's a temporary modification of the test to output the results of the `rect` method:
 
 ```ruby
 # temporary debug code to learn more about the element
@@ -151,7 +149,7 @@ height=40>
 The output is showing that the top left position of the label element occurs at `x` position 365 and `y` position 205. Further, the element is 670 wide by 40 tall.
 
 <aside class="markdown-aside">
-The Capybara docs link for the <a class="markdown-link" href="https://rubydoc.info/github/teamcapybara/capybara/master/Capybara/Node/Element#rect-instance_method">rect method</a>, doesn't have any details about what this method does. It can be intuitively deduced from running it on an element as I've done above and inspecting the output. However, if you're curious as to what it actually does, see the Appendix at the end of this post.
+The Capybara docs link for the <a class="markdown-link" href="https://rubydoc.info/github/teamcapybara/capybara/master/Capybara/Node/Element#rect-instance_method">rect method</a>, doesn't have any details about what this method does. It can be intuitively deduced from running it on an element as I've done above and inspecting the output. However, if you're curious as to what it actually does, see the <a class="markdown-link" href="../capybara-selenium-webdriver-element-not-clickable/#appendix--rect-method">Appendix</a> at the end of this post.
 </aside>
 
 Here's a visual putting this all together, along with the point the text is actually clicking on (x of 700 and y of 225):
@@ -174,7 +172,7 @@ The `find` method returns an instance of `Capybara::Node::Element`, and then the
 
 ![capybara click api docs](../images/capybara-click-api-docs.png "capybara click api docs")
 
-Aha! Another mystery solved, the documentation clearly states that the element will be clicked in the middle unless offsets are specified:
+Aha! Another mystery solved, the documentation states that the element will be clicked in the middle unless offsets are specified:
 
 > Both x: and y: must be specified if an offset is wanted, if not specified the click will occur at the middle of the element.
 ## Solution
@@ -213,13 +211,13 @@ This post has covered how to debug and solve the "Element is not clickable at po
 
 ## Appendix:  Rect Method
 
-WIP...
-
-As part of debugging this issue, the `rect` method was helpful in identifying details of the element selected by the test. However, the Capybara documentation for this [method](https://rubydoc.info/github/teamcapybara/capybara/master/Capybara/Node/Element#rect-instance_method) doesn't contain any explanation as to what it does:
+As part of debugging this issue, the `Capybara::Node::Element#rect` method was helpful in identifying details of the element selected by the test. However, the Capybara documentation for this [method](https://rubydoc.info/github/teamcapybara/capybara/master/Capybara/Node/Element#rect-instance_method) only contains links to the source, without any further details:
 
 ![capybara rect doc empty](../images/capybara-rect-doc-empty.png "capybara rect doc empty")
 
 Intuitively it can be understood from calling it that it returns size and positioning details of the element, but my curiosity was piqued as to exactly what it does so I went down a little rabbit hole to trace it through.
+
+![capybara rabbit hole](../images/capybara-rabbit-hole.jpg "capybara rabbit hole")
 
 Following the [View on Github](https://github.com/teamcapybara/capybara/blob/master/lib/capybara/node/element.rb#L380) link from the Capybara documentation site led to the following code:
 
@@ -237,9 +235,7 @@ module Capybara
 end
 ```
 
-What is `synchronize` - Monitor mixin: https://docs.ruby-lang.org/en/2.7.0/MonitorMixin.html#method-i-mon_synchronize OR custom definition: https://github.com/teamcapybara/capybara/blob/d08e88dadd44b7572b1ae37f44649d42180e8000/lib/capybara/node/base.rb#L76
-
-Where the implementation of the rect method is defined in [Capybara::Selenium::Node](https://github.com/teamcapybara/capybara/blob/98e367d9f9f4b56652b3e7dd41996c9a1d5ae26a/lib/capybara/selenium/node.rb#L216):
+`synchronize` is a method defined in the [base class](https://github.com/teamcapybara/capybara/blob/d08e88dadd44b7572b1ae37f44649d42180e8000/lib/capybara/node/base.rb#L76) to resolve timing issues but will not dig into this as its not related to the `rect` method. I found the implementation of the rect method in [Capybara::Selenium::Node](https://github.com/teamcapybara/capybara/blob/98e367d9f9f4b56652b3e7dd41996c9a1d5ae26a/lib/capybara/selenium/node.rb#L216):
 
 ```ruby
 class Capybara::Selenium::Node < Capybara::Driver::Node
@@ -251,12 +247,14 @@ class Capybara::Selenium::Node < Capybara::Driver::Node
 end
 ```
 
-According to [this discussion](https://github.com/teamcapybara/capybara/issues/2419#issuecomment-832076535), `native` is an instance of `::Selenium::WebDriver::Element`, so to understand what the `rect` method does requires finding this implementation. However, this class isn't in the Capybara project, rather, it's in a runtime dependency `selenium-webdriver`. This means the `rect` method is actually implemented in selenium-webdriver.
+According to [this discussion](https://github.com/teamcapybara/capybara/issues/2419#issuecomment-832076535), `native` is an instance of `::Selenium::WebDriver::Element`, so to understand what the `rect` method does requires finding this implementation. However, this class isn't in the Capybara project, it's defined in the [selenium-webdriver](https://github.com/SeleniumHQ/selenium/tree/trunk/rb) gem that is a required dependency when using Capybara with Selenium.
 
-Capybara uses this gem: https://rubygems.org/gems/selenium-webdriver (runtime dependency? https://github.com/teamcapybara/capybara/commit/3f53e82ed9b9717505e998a4127ab3577d87b0a2)
+Looking in the selenium-webdriver's [api documentation](https://www.selenium.dev/selenium/docs/api/rb/Selenium/WebDriver/Element.html#rect-instance_method), there is some information about the `::Selenium::WebDriver::Element#rect` method, although rather brief:
 
-Looking through the Selenium Webdriver documentation for Elements, found the definition: https://www.selenium.dev/documentation/webdriver/elements/information/#size-and-position:
+![capybara webdriver rect doc](../images/capybara-webdriver-rect-doc.png "capybara webdriver rect doc")
+
+I was also able to find more detailed documentation for the [Selenium Browser Automation Project](https://www.selenium.dev/documentation/). Navigating through WebDriver -> Elements -> Information -> [Size and Position](https://www.selenium.dev/documentation/webdriver/elements/information/#size-and-position) leads to this more detailed explanation:
 
 ![capybara selenium webdriver rect doc](../images/capybara-selenium-webdriver-rect-doc.png "capybara selenium webdriver rect doc")
 
-And that ultimately explains what the rect method returns. It matches my intuition about it from seeing the returned result but it was good to confirm this with the official documentation.
+And that ultimately explains what the rect method returns. It matches my intuition about it from seeing the returned result from invoking this method in a test, but it was good to confirm this with the official documentation.
