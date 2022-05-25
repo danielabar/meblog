@@ -30,7 +30,7 @@ The error message was coming from this line in the test:
 find("label", text: "FORWARDING").click
 ```
 
-Which means find an html element `<label>...</label>` on the page that contains the text `FORWARDING` and click on it. See the [Capybara Docs](https://rubydoc.info/github/teamcapybara/capybara/master/Capybara/Node/Finders#find-instance_method) for more details about the `find` method.
+Which means find an html element `<label>...</label>` on the page that contains the text `FORWARDING` and click on it. The Capybara documentation has more details about the [find](https://rubydoc.info/github/teamcapybara/capybara/master/Capybara/Node/Finders#find-instance_method) method.
 
 Here is the UI that is exercised for this test. This app allows users to manage email mailboxes and optionally update forward settings:
 
@@ -41,6 +41,8 @@ After the test clicks the forwarding toggle, the expected result is that the UI 
 ![capybara edit forward 2](../images/capybara-edit-forward-2.png "capybara edit forward 2")
 
 It was very strange that this test started failing, as the mailbox management area of the code hadn't changed in years, *and* the test was passing when run locally on my laptop.
+
+At this point, those in a hurry can jump straight to the [solution](../capybara-selenium-webdriver-element-not-clickable#solution). Otherwise, read on for step by step debugging of this issue.
 
 ## Testing Stack
 
@@ -118,7 +120,7 @@ Recall that the test is trying to click on the `<label>` element that contains "
 
 ![capybara label selected in dev tools](../images/capybara-label-selected-in-dev-tools.png "capybara label selected in dev tools")
 
-Well that's a surprise, look how wide it is! But actually, this makes sense given the markup. The label is contained in a div that's styled as a row, so it's taking up the entire width of its parent container.
+Well that's a surprise, look how wide it is! But actually, this makes sense given the markup. The label is contained in a div that's styled as a row, so it's taking up the entire width of its parent container (together with some other styles in the css that make this happen).
 
 It was at this point that I started to wonder whether the larger than expected size of the label element might have something to do with Capybara reporting there was nothing clickable here.
 ## Position and Size
@@ -149,10 +151,10 @@ height=40>
 The output is showing that the top left position of the label element occurs at `x` position 365 and `y` position 205. Further, the element is 670 wide by 40 tall.
 
 <aside class="markdown-aside">
-The Capybara docs link for the <a class="markdown-link" href="https://rubydoc.info/github/teamcapybara/capybara/master/Capybara/Node/Element#rect-instance_method">rect method</a>, doesn't have any details about what this method does. It can be intuitively deduced from running it on an element as I've done above and inspecting the output. However, if you're curious as to what it actually does, see the <a class="markdown-link" href="../capybara-selenium-webdriver-element-not-clickable/#appendix--rect-method">Appendix</a> at the end of this post.
+The Capybara docs link for the <a class="markdown-link" href="https://rubydoc.info/github/teamcapybara/capybara/master/Capybara/Node/Element#rect-instance_method">rect method</a>, doesn't have any details about what this method does. It can be deduced from running it on an element as I've done above and inspecting the output. However, if you're curious as to what it actually does, see the <a class="markdown-link" href="../capybara-selenium-webdriver-element-not-clickable/#appendix--rect-method">Appendix</a> at the end of this post.
 </aside>
 
-Here's a visual putting this all together, along with the point the text is actually clicking on (x of 700 and y of 225):
+Here's a visual putting this all together, along with the point the text is actually clicking on:
 
 ![capybara edit forward with points](../images/capybara-edit-forward-with-points.png "capybara edit forward with points")
 
@@ -168,7 +170,7 @@ So this explains where the point co-ordinates in the error message come from. Th
 find("label", text: "FORWARDING").click
 ```
 
-The `find` method returns an instance of `Capybara::Node::Element`, and then the test invokes the `click` method on the found element. Let's see what the Capybara API docs say about the [click](https://rubydoc.info/github/teamcapybara/capybara/master/Capybara%2FNode%2FElement:click) method:
+The `find` method returns an instance of `Capybara::Node::Element`, and then the test invokes the `click` method on the found element. Let's see what the Capybara API docs say about the [Capybara::Node::Element#click](https://rubydoc.info/github/teamcapybara/capybara/master/Capybara%2FNode%2FElement:click) method:
 
 ![capybara click api docs](../images/capybara-click-api-docs.png "capybara click api docs")
 
@@ -189,6 +191,10 @@ find("label", text: "FORWARDING").click(x: 5, y: 5)
 
 And indeed, running the test with this updated code, both locally and the continuous integration workflow passed.
 
+<aside class="markdown-aside">
+When dealing with the vertical y co-ordinate, note that it starts at 0 at the top of the page, and increases in a downwards direction. This is different from the graphs taught in elementary school math class where the 0 position starts at the bottom and increases upwards. The reason for this has to do with the <a class="markdown-link" href="https://gamedev.stackexchange.com/questions/83570/why-is-the-origin-in-computer-graphics-coordinates-at-the-top-left">history</a> of CRTs.
+</aside>
+
 ## Unexplained
 
 ![one missing piece of puzzle](../images/capybara-puzzle-sigmund-B-x4VaIriRc-unsplash.jpg "one missing piece of puzzle")
@@ -204,6 +210,8 @@ Resolved issue 4046: DCHECK hit when appending empty fenced frame [Pri-]
 
 Resolved issue 4080: Switching to nested frame fails [Pri-]
 ```
+
+If anyone has an explanation, would be great to hear about it.
 
 ## Conclusion
 
