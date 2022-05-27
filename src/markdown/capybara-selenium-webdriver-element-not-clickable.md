@@ -10,7 +10,7 @@ related:
   - "Rails Feature Test Solved by Regex"
 ---
 
-This post will walk you through how to troubleshoot the "Element is not clickable at point... Other element would receive the click" error when running Selenium based tests with Capybara. I encountered this recently when a feature test started breaking when running as part of the Continuous Integration checks on a project I'm working on, which is run with a Github Actions workflow.
+This post will walk you through how to troubleshoot the "Element is not clickable at point... Other element would receive the click" error when running Selenium based tests with Capybara. I encountered this recently when a feature test that had been passing for years, suddenly started breaking when running as part of the Continuous Integration checks on a project I'm working on, which is run with a Github Actions workflow.
 
 ## Test Failure
 
@@ -48,7 +48,7 @@ At this point, those in a hurry can jump straight to the [solution](../capybara-
 
 Before getting further into troubleshooting, a brief description of this projects' testing stack:
 
-This is a Rails project which uses [Capybara](http://teamcapybara.github.io/capybara/) to write the feature tests. Capybara is capable of launching a real browser (either visual or headless), navigating to pages of the application, interacting with elements just like a human user would, and executing assertions to verify that expected elements are on the page.
+This is a Rails project which uses [Capybara](http://teamcapybara.github.io/capybara/) to write the feature tests. Capybara is capable of launching a real browser (either visual or headless), navigating to pages of the application, interacting with elements just like a human user would, and executing assertions to verify that expected elements or text is displayed on the page.
 
 Capybara requires a [driver](https://github.com/teamcapybara/capybara#drivers) to control the browser. By default, it uses the `:rack_test` driver, which is fast, but only suitable for pure fullstack Rails projects (i.e. no front end JavaScript). Since this project uses React for the front end, the [Selenium](https://www.selenium.dev/projects/) driver is used instead. Specifically, `:selenium_chrome` when running the tests against visual Chrome, and `:selenium_chrome_headless` for running against headless Chrome.
 
@@ -82,7 +82,7 @@ I then ran the test locally, and this time the webdrivers gem detected Chrome 10
 
 ## Coordinates
 
-Next step was to dig in more into the error, I was curious about the specific point reference:
+The next step was to dig in more into the error, I was curious about the specific point reference:
 
 ```
 Element <label class="forward-toggle">...</label> is not clickable at point (700, 225).
@@ -148,17 +148,17 @@ width=670,
 height=40>
 ```
 
-The output is showing that the top left position of the label element occurs at `x` position 365 and `y` position 205. Further, the element is 670 wide by 40 tall.
+The output is showing that the top left position of the label element occurs at `x` position `365` and `y` position `205`. Further, the element is `670` wide by `40` tall.
 
 <aside class="markdown-aside">
-The Capybara docs link for the <a class="markdown-link" href="https://rubydoc.info/github/teamcapybara/capybara/master/Capybara/Node/Element#rect-instance_method">rect method</a>, doesn't have any details about what this method does. It can be deduced from running it on an element as I've done above and inspecting the output. However, if you're curious as to what it actually does, see the <a class="markdown-link" href="../capybara-selenium-webdriver-element-not-clickable/#appendix--rect-method">Appendix</a> at the end of this post.
+The Capybara docs link for the <a class="markdown-link" href="https://rubydoc.info/github/teamcapybara/capybara/master/Capybara/Node/Element#rect-instance_method">rect</a> method doesn't have any details about what this method does. It can be deduced from running it on an element as I've done above and inspecting the output. However, if you're curious as to what it actually does, see the <a class="markdown-link" href="../capybara-selenium-webdriver-element-not-clickable/#appendix--rect-method">Appendix</a> at the end of this post.
 </aside>
 
 Here's a visual putting this all together, along with the point the text is actually clicking on:
 
 ![capybara edit forward with points](../images/capybara-edit-forward-with-points.png "capybara edit forward with points")
 
-It *looks* like the test is clicking in the center of the element, but is it really? Some quick arithmetic shows that it is. Starting at the left, the `x` position of 365, plus half the width (670 / 2 = 335) is 700. And starting at the top, the `y` position of 205, plus half the height (40 / 2 = 20) is 225. Recall the error message:
+It *looks* like the test is clicking in the center of the element, but is it really? Some quick arithmetic shows that it is. Starting at the left, the `x` position of `365`, plus half the width (670 / 2 = 335) is 700. And starting at the top, the `y` position of `205`, plus half the height (40 / 2 = 20) is 225. Recall the error message:
 
 ```
 Element <label class="forward-toggle">...</label> is not clickable at point (700, 225).
@@ -181,7 +181,7 @@ Aha! Another mystery solved, the documentation states that the element will be c
 
 Now finally we're in a position to solve the problem. If we want the test to click on an element on anywhere other than the center position, the `x` and `y` offsets must be provided to the click method, where `x` is the number of pixels to the right, starting from the left-most edge, and `y` is the number of pixels down from the top of the element.
 
-Since the particular UI this test is driving has the actual toggle input near the top left corner, a small amount of offset can resolve this:
+Since the particular UI this test is driving has the actual toggle input near the top left corner, a small amount of offset from this point should resolve this:
 
 ```ruby
 find("label", text: "FORWARDING").click(x: 5, y: 5)
@@ -211,7 +211,7 @@ Resolved issue 4046: DCHECK hit when appending empty fenced frame [Pri-]
 Resolved issue 4080: Switching to nested frame fails [Pri-]
 ```
 
-If anyone has an explanation, would be great to hear about it.
+If anyone has an explanation, I would be very interested to hear about it.
 
 ## Conclusion
 
