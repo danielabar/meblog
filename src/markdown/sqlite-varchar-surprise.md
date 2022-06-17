@@ -14,9 +14,9 @@ I recently completed the [Getting Started with Rails 6](https://app.pluralsight.
 
 ## Setup
 
-The course uses Ruby 2.7.2 and Rails 6.1.4 to build a wiki application where users can create, view, and edit posts. There's a single model `WikiPost` to persist the author, title, and description.
+The course uses Ruby 2.7.2 and Rails 6.1.4 to build a Wiki application where users can create, view, and edit posts. There's a single model `WikiPost` to persist the author, title, and description.
 
-To get started, the `scaffold` option of the `generate` command is used to generate not just a migration for the model, but also the model class, controller, views, view helpers, styles, routes and tests. For the purposes of this post, we will only be focusing on the migration:
+To get started, the `scaffold` option of the `generate` command is used to generate not just a migration for the model, but also the model class, controller, views, view helpers, styles, routes and tests. For the purposes of this post, we will only be focusing on the migration and model.
 
 ```
 bin/rails generate scaffold WikiPost title:string description:string author:string
@@ -38,7 +38,14 @@ class CreateWikiPosts < ActiveRecord::Migration[6.1]
 end
 ```
 
-After running the migration with `bin/rails db:migrate`, we can use the [sqlite3](https://www.sqlite.org/cli.html) command line tool that ships with SQLite to see what schema got created for this table. To work with any SQLite database from the terminal, run `sqlite3` passing in the path to the database file. In a Rails project, it will be in `db/{env}.sqlite3`. So to open the development database:
+And this model:
+
+```ruby
+class WikiPost < ApplicationRecord
+end
+```
+
+After running the migration with `bin/rails db:migrate`, we can use the [sqlite3](https://www.sqlite.org/cli.html) command line tool that ships with SQLite to see what schema got created for this table. To work with any SQLite database from the terminal, run `sqlite3` passing in the path to the database file. In a Rails project, it will be in `db/{env}.sqlite3`. To open the development database, the command is:
 
 ```bash
 # cd to the project root
@@ -61,7 +68,7 @@ CREATE TABLE IF NOT EXISTS "wiki_posts"(
 
 ## Limit Length
 
-After trying out the generated UI and adding some styles, it's determined that it would be better to limit the title length. In the course we set it to 50 characters, but for easier demonstration purposes, I will use 10 here. To modify the table definition, we first need to generate a new migration:
+After trying out the generated UI and adding some styles, it's determined that it would be better to limit the title length. In the course it gets set to 50 characters, but for easier demonstration purposes, I will use 10 here. To modify the table definition, we first need to generate a new migration:
 
 ```
 bin/rails generate migration update_wiki_post_title
@@ -149,21 +156,67 @@ Me:
 
 ## Solution
 
-What can be done instead if the database won't enforce the column length limit? We could instead use the [length](https://guides.rubyonrails.org/active_record_validations.html#length) validator from ActiveRecord as follows:
+If the database won't enforce the column length limit, we could instead enhance the `WikiPost` model to use the [length](https://guides.rubyonrails.org/active_record_validations.html#length) validator from ActiveRecord as follows:
 
-TOOD: Example of model class + Rails console to verify
+```ruby
+class WikiPost < ApplicationRecord
+  validates :title, length: { maximum: 10 }
+end
+```
 
-However, this will only be enforced via Rails app. No data integrity at database level, invalid data can still be inserted by someone with access to the database.
+Let's see how this behaves in the console (start with `bin/rails c`):
+
+```ruby
+# Create a new post with a title of 11 characters
+a_post = WikiPost.new(title: "abcdefghijk")
+
+# Try to save it to the database - this time it fails!
+a_post.save
+# => false
+
+# Is the object valid? No!
+a_post.valid?
+# => false
+
+# Show the error
+a_post.errors[:title]
+# => ["is too long (maximum is 10 characters)"]
+```
+
+However, this will only be enforced via the Rails app. There is no data integrity at database level. Invalid data could still be inserted by someone with access to the database.
 
 ## Postgres Comparison
 
-Connect to the Postgres database using the [psql](https://www.postgresql.org/docs/current/app-psql.html) command line tool. For example, if the database name is `wiki` and Postgres is running locally:
+I was curious to see how [Postgres](https://www.postgresql.org/) compares in enforcing length limits on string columns. So I scaffolded another project using Postgres instead of SQLite by passing `-d=postgresql` to the `rails new...` and setup the same `WikiPost` model and migration.
 
-```bash
-psql -U wiki
+Quick reminder, here is the original migration that creates the `wiki_posts` table, and the simple model class with no ActiveRecord validations:
+
+```ruby
+class CreateWikiPosts < ActiveRecord::Migration[6.1]
+  def change
+    create_table :wiki_posts do |t|
+      t.string :title
+      t.string :description
+      t.string :author
+
+      t.timestamps
+    end
+  end
+end
 ```
 
-Use the `\d` command to view a table schema. The same initial migration to create the WikiPost model results in the following table in Postgres:
+```ruby
+class WikiPost < ApplicationRecord
+end
+```
+
+First let's see the schema that got created for this table. Connect to the Postgres database using the [psql](https://www.postgresql.org/docs/current/app-psql.html) command line tool. For example, if the database name is `wiki` and Postgres is running locally:
+
+```bash
+psql -U wiki -d wiki
+```
+
+At the database prompt, Use the `\d` command to view a table schema. The same initial migration to create the WikiPost model results in the following table in Postgres. Notice the `title` column is of type `character varying`:
 
 ```
 wiki=> \d wiki_posts
@@ -180,7 +233,21 @@ Indexes:
     "wiki_posts_pkey" PRIMARY KEY, btree (id)
 ```
 
-After running the update migration that limits the title column to 10 characters, the updated schema looks as follows:
+Now apply the migration that limits the `title` length to 10 characters:
+
+```ruby
+class UpdateWikiPostTitle < ActiveRecord::Migration[6.1]
+  def up
+    change_column :wiki_posts, :title, :string, :limit => 10
+  end
+
+  def down
+    change_column :wiki_posts, :title, :string
+  end
+end
+```
+
+And check the schema again using `psql`. Notice the `title` column now has a data type of `character varying(10)`:
 
 ```
 hello=> \d wiki_posts
@@ -197,13 +264,18 @@ Indexes:
     "wiki_posts_pkey" PRIMARY KEY, btree (id)
 ```
 
-Notice the `title` column is now of type `character varying(10)` whereas before it was just `character varying`.
-
-Let's exercise the updated model in a Rails console:
+Let's exercise the model in a Rails console. Remember, there are no ActiveRecord validations defined on the model.
 
 ```ruby
+# Create a new post with a title of 11 characters
 a_post = WikiPost.new(title: "abcdefghijk")
+
+# Try to save it to the database
 a_post.save
+```
+
+Unlike with SQLite, the save fails when using Postgres. As shown in the output below, the transaction gets rolled back because the string title length violates the specified limit of 10:
+```
    (4.4ms)  BEGIN
   WikiPost Create (7.4ms)  INSERT INTO "wiki_posts" ("title", "created_at", "updated_at") VALUES ($1, $2, $3) RETURNING "id"  [["title", "abcdefghijk"], ["created_at", "2022-06-15 11:11:05.725757"], ["updated_at", "2022-06-15 11:11:05.725757"]]
    (1.9ms)  ROLLBACK
@@ -212,13 +284,15 @@ Traceback (most recent call last):
 ActiveRecord::ValueTooLong (PG::StringDataRightTruncation: ERROR:  value too long for type character varying(10))
 ```
 
+Much better (and less surprising!). This is the behaviour I would expect from a table column that has a length limit.
+
+<aside class="markdown-aside">
+Throughout this post, I've been using the command line tools provided by the databases such as <a class="markdown-link" href="https://www.sqlite.org/cli.html">sqlite3</a> and <a class="markdown-link" href="https://www.postgresql.org/docs/current/app-psql.html">psql</a>. This isn't usually part of Rails courses or tutorials as all access to the database is handled by ActiveRecord. However, I started my career before <a class="markdown-link" href="https://stackoverflow.com/a/1279678/3991687">ORMs</a> were a thing, and have developed the habit of always going one level deeper than the application to check what's going on directly in the database.
+</aside>
+
 ## Conclusion
 
-SQLite ok for demo/learning app where not as concerned with data integrity, but otherwise consider something more robust such as Postgres or MySQL.
+SQLite may be an ok choice of database for a demo/learning app or for something where data integrity is not such a big concern. But otherwise consider something more robust such as Postgres or MySQL.
 
 TODO:
-- Example of length validator with ActiveRecord
-- Fill in paragraphs for Postgres comparison
-- Fill in conclusion paragraph
-- Aside: Using sql cli not part of Rails courses but I started my career before ORMs were a thing so I always like to go one level lower than application to verify things at database level.
-- compare how it works on MySQL?
+* Somewhere mention need to have sqlite installed (homebrew for mac users)
