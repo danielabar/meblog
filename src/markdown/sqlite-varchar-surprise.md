@@ -10,13 +10,13 @@ related:
   - "Roll Your Own Search with Rails and Postgres: Search Engine"
 ---
 
-I recently completed the [Getting Started with Rails 6](https://app.pluralsight.com/library/courses/getting-started-ruby-rails/table-of-contents) course on Pluralsight and ran into a surprise with the use of SQLite and string column lengths. SQLite is a popular choice in Rails courses as its the default database used when running the `rails new...` command and very easy to use. However, I was surprised by how it handles string column lengths as this post will explain.
+I recently completed the [Getting Started with Rails 6](https://app.pluralsight.com/library/courses/getting-started-ruby-rails/table-of-contents) course on Pluralsight and ran into a surprise with the use of SQLite and string column lengths. SQLite is a popular choice in Rails courses as its the default database when starting an app with the `rails new...` command and very easy to use. However, I was surprised by how it handles string column lengths as this post will explain.
 
 ## Setup
 
-The course uses Ruby 2.7.2 and Rails 6.1.4 to build a Wiki application where users can create, view, and edit posts. There's a single model `WikiPost` to persist the author, title, and description.
+The course uses Ruby 2.7.2 and Rails 6.1.4 to build a Wiki application where users can create, view, and edit posts. It also assumes that [sqlite](https://formulae.brew.sh/formula/sqlite) is installed on the local machine. There's a single model `WikiPost` to persist the author, title, and description.
 
-To get started, the `scaffold` option of the `generate` command is used to generate not just a migration for the model, but also the model class, controller, views, view helpers, styles, routes and tests. For the purposes of this post, we will only be focusing on the migration and model.
+To get started, the `scaffold` option of the `generate` command is used to generate not just a migration for the model, but also the model class, controller, views, view helpers, styles, routes and tests. For the purpose of this post, we will only be focusing on the migration and model.
 
 ```
 bin/rails generate scaffold WikiPost title:string description:string author:string
@@ -54,7 +54,7 @@ sqlite3 db/development.sqlite3
 
 From the sqlite prompt, the `.schema table_name` command can be used to display the schema for the given table name. By default, the display is all on line line which is hard to read. Passing in the `--indent` option produces more human readable output:
 
-```
+```sql
 sqlite> .schema wiki_posts --indent
 CREATE TABLE IF NOT EXISTS "wiki_posts"(
   "id" integer NOT NULL PRIMARY KEY,
@@ -90,7 +90,7 @@ end
 
 After running this migration with `bin/rails db:migrate`, run the `sqlite3` command line tool again to verify the `wiki_posts` table schema has been updated to limit the title length:
 
-```
+```sql
 sqlite> .schema wiki_posts --indent
 CREATE TABLE IF NOT EXISTS "wiki_posts"(
   "id" integer NOT NULL PRIMARY KEY,
@@ -120,7 +120,9 @@ I was expecting an error at this point, however, the output from saving the mode
 
 ```
   TRANSACTION (0.1ms)  begin transaction
-  WikiPost Create (3.3ms)  INSERT INTO "wiki_posts" ("created_at", "updated_at", "title") VALUES (?, ?, ?)  [["created_at", "2022-06-15 11:14:59.474262"], ["updated_at", "2022-06-15 11:14:59.474262"], ["title", "abcdefghijk"]]
+  WikiPost Create (3.3ms)  INSERT INTO "wiki_posts" ("created_at", "updated_at", "title") VALUES (?, ?, ?)
+  [["created_at", "2022-06-15 11:14:59.474262"], ["updated_at", "2022-06-15 11:14:59.474262"],
+  ["title", "abcdefghijk"]]
   TRANSACTION (1.4ms)  commit transaction
 => true
 ```
@@ -154,7 +156,7 @@ Me:
 
 ![sqlite surprise wow](../images/sqlite-surprise-wow.png "sqlite surprise wow")
 
-## Solution
+## A Solution
 
 If the database won't enforce the column length limit, we could instead enhance the `WikiPost` model to use the [length](https://guides.rubyonrails.org/active_record_validations.html#length) validator from ActiveRecord as follows:
 
@@ -286,13 +288,39 @@ ActiveRecord::ValueTooLong (PG::StringDataRightTruncation: ERROR:  value too lon
 
 Much better (and less surprising!). This is the behaviour I would expect from a table column that has a length limit.
 
+## MySQL Comparison
+
+For completeness sake, I also did a quick check on how MySQL handles string column length limits. Just focusing on direct database access as we've already learned this is not an issue with Rails. I'm using the [MySQL Command-Line client](https://dev.mysql.com/doc/refman/8.0/en/mysql.html).
+
+Running the two migrations to create the `wiki_posts` table and modify the `title` column to have a length of 10 results in the following table schema created. Notice the `title` column has a data type of `varchar(10)`:
+
+```
+mysql -u root -D wiki
+mysql> DESCRIBE wiki_posts;
++-------------+--------------+------+-----+---------+----------------+
+| Field       | Type         | Null | Key | Default | Extra          |
++-------------+--------------+------+-----+---------+----------------+
+| id          | bigint(20)   | NO   | PRI | NULL    | auto_increment |
+| title       | varchar(10)  | YES  |     | NULL    |                |
+| description | varchar(255) | YES  |     | NULL    |                |
+| author      | varchar(255) | YES  |     | NULL    |                |
+| created_at  | datetime     | NO   |     | NULL    |                |
+| updated_at  | datetime     | NO   |     | NULL    |                |
++-------------+--------------+------+-----+---------+----------------+
+```
+
+And trying to insert a title that's greater than 10 characters long results in an error, which is what we would expect:
+
+```sql
+mysql> INSERT INTO wiki_posts(title, created_at, updated_at)
+  VALUES("abcdefghijk", CURRENT_TIMESTAMP(), CURRENT_TIMESTAMP());
+-- ERROR 1406 (22001): Data too long for column 'title' at row 1
+```
+
 <aside class="markdown-aside">
-Throughout this post, I've been using the command line tools provided by the databases such as <a class="markdown-link" href="https://www.sqlite.org/cli.html">sqlite3</a> and <a class="markdown-link" href="https://www.postgresql.org/docs/current/app-psql.html">psql</a>. This isn't usually part of Rails courses or tutorials as all access to the database is handled by ActiveRecord. However, I started my career before <a class="markdown-link" href="https://stackoverflow.com/a/1279678/3991687">ORMs</a> were a thing, and have developed the habit of always going one level deeper than the application to check what's going on directly in the database.
+Throughout this post, I've been using command line tools provided by the databases such as <a class="markdown-link" href="https://www.sqlite.org/cli.html">sqlite3</a>, <a class="markdown-link" href="https://www.postgresql.org/docs/current/app-psql.html">psql</a>, and <a class="markdown-link" href="https://dev.mysql.com/doc/refman/8.0/en/mysql.html">mysql</a>. This isn't usually part of Rails courses or tutorials as all access to the database is handled by ActiveRecord. However, I started my career before <a class="markdown-link" href="https://stackoverflow.com/a/1279678/3991687">ORMs</a> were a thing, and have developed the habit of always going one level deeper than the application to check what's going on directly in the database.
 </aside>
 
 ## Conclusion
 
-SQLite may be an ok choice of database for a demo/learning app or for something where data integrity is not such a big concern. But otherwise consider something more robust such as Postgres or MySQL.
-
-TODO:
-* Somewhere mention need to have sqlite installed (homebrew for mac users)
+This post has covered some troubleshooting techniques you can use when getting an unexpected result from ActiveRecord by interacting directly with the database. SQLite may be an ok choice of database for a demo/learning app or for something where data integrity is not such a big concern. But otherwise consider something more robust such as Postgres or MySQL.
