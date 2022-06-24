@@ -10,13 +10,13 @@ related:
   - "Roll Your Own Search with Rails and Postgres: Search Engine"
 ---
 
-This post will cover how to troubleshoot when the postgresql service installed via Homebrew on a Mac isn't starting. If you work on a Mac, it's likely you use [Homebrew](https://brew.sh/) to install packages. In addition to installing, you can also manage services using Homebrew's [services](https://docs.brew.sh/Manpage#services-subcommand) subcommand. A common usage of the services subcommand is to start and stop databases.
+This post will cover how to troubleshoot when the postgresql service installed via Homebrew on a Mac isn't starting. If you work on a Mac, it's likely you use [Homebrew](https://brew.sh/) to install packages. In addition to installing, you can also manage services using Homebrew's [services](https://docs.brew.sh/Manpage#services-subcommand) subcommand, a wrapper for `launchctl`. A common usage of the services subcommand is to start and stop databases.
 
 ## What's Running
 
 This all started when I wanted to follow along with a Rails tutorial that required scaffolding a new project with [Postgresql](https://www.postgresql.org/) as the database. For production projects, I prefer to setup all databases in [Docker](https://www.docker.com/) containers, but for a simple tutorial, it's fine to use a local service, which I had installed some time ago via `brew install postgresql`.
 
-To get information about services that are currently being managed by Homebrew, use the `list` option of the `services` subcommand:
+However, I couldn't remember whether the database server was running. To get information about services that are currently being managed by Homebrew, use the `list` option of the `services` subcommand:
 
 ```
 brew services list
@@ -44,7 +44,7 @@ The output of this command showed it was successful:
 
 ## The Problem
 
-But before pressing the [easy](https://www.staples.com/Staples-Easy-Button/product_606396) button for finding such a quick fix, I wanted to check that a connection worked. PostgreSQL comes with [psql](https://www.postgresql.org/docs/current/app-psql.html), a command line tool to interact with the database. Let's try to connect to the default `postgres` database:
+But before pressing the [easy](https://www.staples.com/Staples-Easy-Button/product_606396) button for finding such a quick fix, I wanted to check that a connection worked. PostgreSQL comes with [psql](https://www.postgresql.org/docs/current/app-psql.html), a command line tool to interact with the database. You can connect to the default `postgres` database as follows:
 
 ```
 psql -d postgres
@@ -57,11 +57,18 @@ psql: error: connection to server on socket "/tmp/.s.PGSQL.5432" failed: No such
 Is the server running locally and accepting connections on that socket?
 ```
 
-So much for the easy button. Time to debug...
+A further check with `lsof` (list open files belonging to active processes) confirmed there was no process listening on port 5432, which is the default port used by postgresql. The `-nP` options indicate not to include host and port names in the Node Name column and `+c 15` increases the command width display, which otherwise defaults to 9:
+
+```bash
+lsof -nP +c 15 | grep LISTEN
+# no output for 5432
+```
+
+So much for the easy button.
 
 ## Debugging
 
-There's another command that can be used to get more detailed information about a specific service, running it for `postgresql`:
+The `info` command that can be used to get more detailed information about a specific service, running it for `postgresql`:
 
 ```
 brew services info postgresql
@@ -138,7 +145,7 @@ psql (PostgreSQL) 14.3
 
 ## Solution
 
-When the Postgres data directory was first created, I must have been on older Postgres version 13, and at some point updated the brew formula to 14. Fortunately, there's a formula you can run to [migrate](https://formulae.brew.sh/formula/postgresql) the data from a previous major version:
+When the Postgres data directory was first created, I must have been on older Postgres version 13, and at some point updated the brew formula to 14. This version mismatch makes postgresql fail to start. Fortunately, there's a homebrew formula that can be run to [migrate](https://formulae.brew.sh/formula/postgresql) the data from a previous major version:
 
 ```
 brew postgresql-upgrade-database
@@ -147,11 +154,14 @@ brew postgresql-upgrade-database
 There will be a whole lot of output from this command, but here are some highlights of what it does:
 
 ```
-Runs: brew install postgresql@13
-Runs: Upgrading postgresql data from 13 to 14..
-Runs: Moving postgresql data from /usr/local/var/postgres to /usr/local/var/postgres.old...
-Runs: Migrating and upgrading data...
-Finally success:
+brew install postgresql@13
+...
+Upgrading postgresql data from 13 to 14..
+...
+Moving postgresql data from /usr/local/var/postgres to /usr/local/var/postgres.old...
+...
+Migrating and upgrading data...
+...
 ==> Upgraded postgresql data from 13 to 14!
 ==> Your postgresql 13 data remains at /usr/local/var/postgres.old
 ==> Successfully started `postgresql` (label: homebrew.mxcl.postgresql)
@@ -169,6 +179,20 @@ postgresql started    dbaron ~/Library/LaunchAgents/homebrew.mxcl.postgresql.pli
 redis      started    dbaron ~/Library/LaunchAgents/homebrew.mxcl.redis.plist
 ```
 
+And re-run the `lsof` command from earlier to confirm there's a postgres process listening on 5432:
+
+```bash
+lsof -nP +c 15 | grep LISTEN
+```
+
+Output includes postgres, so far so good:
+
+```
+COMMAND          PID   USER   FD      TYPE             DEVICE  SIZE/OFF    NODE NAME
+postgres        1788 dbaron    7u     IPv6 0x696b8fad0ce2d7bd       0t0    TCP [::1]:5432 (LISTEN)
+...
+```
+
 Last check is to ensure we can connect:
 
 ```
@@ -184,6 +208,3 @@ This time the `psql` connection command goes to the `postgres` prompt, which mea
 ## Conclusion
 
 This post has walked through how to fix an issue with the postgresql service not starting on a Mac when managed by homebrew. In general when debugging homebrew services, use the `brew services list` command to get information about managed services and their plist files which contain configuration for the service. Then inspect the contents of the plist file to see if it specifies any log files. Then check the log file(s) for reason why service won't start and fix that.
-
-TODO
-* another debug technique - is anything listening on port `lsof -nP +c 15 | grep LISTEN`. See for more explanation of the cli options https://linuxhandbook.com/lsof-command/
