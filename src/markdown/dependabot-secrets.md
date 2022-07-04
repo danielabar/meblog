@@ -39,7 +39,7 @@ To understand why the tests were complaining about Braintree configuration not b
 
 Locally, the values of all environment variables come from a git ignored `.env` file that developers populate on their laptops during project setup.
 
-For the Continuous Integration workflow that runs with Github Actions, this environment variables are populated in the Github repository secrets. Secrets can be set in Github by anyone with administrator access to the project by going to Settings -> Secrets -> Actions, and then clicking on the "New repository secret" button. For example to add a secret named `SOME_SECRET`:
+For the Continuous Integration workflow that runs with Github Actions, environment variables are populated in Github repository secrets. Secrets can be set in Github by anyone with administrator access to the project by going to Settings -> Secrets -> Actions, and then clicking on the "New repository secret" button. For example to add a secret named `SOME_SECRET`:
 
 ![Github Add Secret](../images/github-add-secret.png "Github Add Secret")
 
