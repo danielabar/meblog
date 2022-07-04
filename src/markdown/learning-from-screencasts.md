@@ -12,7 +12,7 @@ related:
 
 Intro WIP...
 
-This post will cover some techniques to get the most out of the online learning experience using screencasts. There are many services offering this including Pluralsight, Wes Bos, Learn UI and UX, TBD to name just a few.
+This post will cover some techniques to get the most out of the online learning experience using screencasts. There are many services offering this including Pluralsight, Wes Bos, Learn UI and UX, TBD to name just a few. I happen to have the most experience with Pluralsight, but the advice in this post applies to all screencast style courses.
 
 TODO: Briefly explain what/how it works - course broken up until short video segments, you can pause, go back, skip forwards, no time limit to complete...
 
@@ -28,4 +28,12 @@ Instead, I recommend active learning. This requires more explicit effort on the 
 
 ## Take Notes
 
-Start a folder for the course ...
+The key to retaining what you've learned is to write it down, but this requires some organization. Before starting a new course, create a folder. I suggest having one folder for all learning, then subfolders for each course. For example, if taking a course on Idiomatic Ruby from Pluralsight:
+
+```bash
+cd ~/path/to/courses
+mkdir idiomatic-ruby-pluralsight
+cd idiomatic-ruby-pluralsight
+mkdir exercises
+touch README.md
+```
