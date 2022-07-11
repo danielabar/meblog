@@ -16,7 +16,7 @@ Even prior to the pandemic, I've found this style of learning to be optimal as i
 
 ## Don't be Passive
 
-Let's start with what not to do. Since the course format is video, it's tempting to treat this like a Netflix entertainment series, pop some popcorn, sit back, relax and binge watch. This is the passive approach, and while not a complete waste of time, it's not the most effective way of learning. Most likely you'll forget most of what's covered.
+Let's start with what not to do. Since the course format is video, it's tempting to treat this like a Netflix entertainment series, pop some popcorn, sit back, and binge watch. This is the passive approach, and while not a complete waste of time, it's not the most effective way of learning. You're likely to forget most of what was covered.
 
 ![popcorn](../images/popcorn-linus-mimietz-uWjBqbCHY7g-unsplash.jpg "popcorn")
 
@@ -24,7 +24,7 @@ Instead, I recommend active learning. This requires more explicit effort on the 
 
 ## Organize
 
-One of the most effective ways to retain what you've learned is to write it down as you go. This requires a little prior organization so you'll be able to find your notes later.
+One of the most effective ways to retain what you've learned is to write it down as you go. This requires prior organization so you'll be able to find your notes later.
 
 When starting a new course, create a directory. I suggest having one directory for all courses, then sub-directories for each course you take. For example, if taking a course on Idiomatic Ruby from Pluralsight:
 
@@ -35,7 +35,7 @@ mkdir exercises doc-images
 touch README.md
 ```
 
-It will look something like this:
+The resulting directory will be something like this:
 
 ```
 courses
@@ -49,7 +49,7 @@ The `README.md` is where the course notes will go. It doesn't have to be markdow
 
 The `exercises` folder will be used for saving any code examples developed during the course. The `doc-images` folder is where you will place any screenshots - for example, if developing a web app, it will be useful to save screenshots of what the app looks like as you build it up, and then reference these images in `README.md`.
 
-Most courses are broken up into major sections, with each major section having several smaller subsections with a short video for each section. A good place to start organizing your notes is to create headings and subheadings matching the course structure. This way you'll know where to add your notes as you're watching each video.
+Most courses are broken up into major sections, with each section having several smaller subsections with a short video for each. A good place to start organizing your notes is to create headings and subheadings matching the course structure. This way you'll know where to add your notes as you're watching each video.
 
 For example, here's the table of contents from the Idiomatic Ruby course on Pluralsight:
 
@@ -77,11 +77,17 @@ In this case, I would create headings in `courses/idiomatic-ruby-pluralsight/REA
 
 ## Take Notes
 
-Now that you're organized for note taking, it's time to start watching the videos. But you're not going to be sitting back and relaxing like watching funny cat videos on Youtube. Every time a significant point is covered in the course, pause the video, and write down what you just learned *in your own words*. This is key, do not simply transcribe the instructor's words. Make sure you understand the concept enough that you could explain it to someone else, then write down that explanation. In fact, that someone else is "future you", who will look back on these notes several months from now to reference the material.
+Now that you're organized for note taking, it's time to start watching the videos. But you're not going to be sitting back and relaxing like watching funny cat videos on Youtube.
+
+![funny cat](../images/funny-cat.png "funny cat")
+
+Every time a significant point is covered in the course, pause the video, and write down what you just learned in the appropriate heading/subheading section of `README.md` *in your own words*. This is key, do not simply transcribe the instructor's words. Make sure you understand the concept enough that you could explain it to someone else, then write down that explanation. In fact, that someone else is "future you", who will look back on these notes several months from now to reference the material.
 
 ## Write Code
 
-Since these are technical courses, there will be many sections where the instructor writes some code and explains it. This is another good place to pause the video, and write the code yourself in the `exercises` directory you created earlier. Do not just watch the instructor code, it won't stick. There's something very powerful about typing out the code yourself. After each section you type out, look back on it and make sure you understand every line. Go ahead and add explanatory comments, this is not the time to worry about "clean code" should there be comments or not. This is educational material - add any comments that will help future you understand the code.
+Since these are technical courses, there will be many sections where the instructor writes some code and explains it. This is another good place to pause the video. Write the code yourself in the `exercises` directory you created earlier, make sure it compiles/runs and returns the same result as shown in the course.
+
+Do not just watch the instructor code or copy/paste from the solutions (if provided), it won't stick. There's something very powerful about typing out the code yourself. After each section you type out, look back on it and make sure you understand every line. Go ahead and add explanatory comments, this is not the time to worry about "clean code" should there be comments or not. This is educational material - add any comments that will help future you understand the code.
 
 Another variation on this is sometimes the instructor will announce the next problem that will be solved in code. This is a good time to pause the video and try to write out the code yourself *before* the instructor shows how to do it. Then compare your solution to the instructors.
 
@@ -101,7 +107,49 @@ After the issue is fixed, add some notes about what you encountered and how you 
 
 ## Tangents
 
-One of the benefits of asynchronous learning over real-time/in-classroom, is the ability to go on tangents when something in the course piques your curiosity, but isn't the main topic.
+One of the benefits of asynchronous learning over real-time/in-classroom, is the ability to explore something that piques your curiosity in more detail, but isn't the main topic. This could be an API that's used, or maybe the course only covers the happy path and you want to see what happens during some exceptional conditions.
+
+Some examples from my experience - a Rails course I took was using the SQLite database, and added a length constraint to one of the fields but didn't test it. When I tried it though, the length limit wasn't enforced. Doing some research revealed that although SQLite supports the SQL syntax for setting length limits on `VARCHAR` fields, it's not enforced.
+
+Another course I took invoked the `authenticate` method on a User model, which returns the user instance if authentication passed, or false otherwise. I got curious about where this method is defined as we hadn't written any code for it. Digging into this I learned about the `inspect` method to find more information about a method in Ruby, and eventually traced through the location in the Rails source code.
+
+When finished exploring a tangent, make sure to add the results of this exploration to the `README.md`. This will solidify what you've just learned.
+
+## Publish
+
+This step is optional, but I recommend saving/publishing your notes somewhere they'll be easily searchable across devices. This could be any cloud storage such as Dropbox, OneDrive, Google Drive etc. My preference is to push the entire course folder to a Github repository. This is especially a good option when writing the notes in Markdown as they'll be automatically rendered on Github.
+
+For example, given the following directory structure:
+
+```
+courses
+└── idiomatic-ruby-pluralsight
+    ├── README.md
+    ├── doc-images
+    └── exercises
+```
+
+I would create a new *empty* Github repository named "idiomatic-ruby-pluralsight" on [Github](https://github.com/), with no generated files such as readme or license). It's up to you if you want to make the repo public or private.
+
+Then from the terminal:
+
+```bash
+cd idiomatic-ruby-pluralsight
+
+# Create a local git repository
+git init
+git add .
+gc -m "Initial commit"
+
+# Connect it to the remote repository on Github
+git remote add origin git@github.com:danielabar/idiomatic-ruby-pluralsight.git
+git branch -M main
+git push -u origin main
+```
+
+You don't need to wait until you're finished the course to publish your notes. I work on small amounts at a time and publish as I go (more on this in the next section). This is to avoid the catastrophic situation of hard drive crashing and losing all the precious notes.
+
+## Make it a Habit
 
 **TODO**
 
@@ -114,8 +162,6 @@ One of the benefits of asynchronous learning over real-time/in-classroom, is the
   - Aside: Some course platforms have a Note taking section where you can enter your own notes but I don't recommend using this. What if they go away or if you no longer wish to pay for the service. It's better to own your own content.
 - Links for version managers
 - Other sections
-  - Go on tangents
-  - Save/publish notes - easily searchable
   - Make learning a habit (small amount each regular interval, habit stacking, reference: Atomic Habits)
   - Who is this for? (not absolute beginner, no real-time help if get stuck, need some discipline - no one's taking attendance)
   - Eliminate distractions (does this fit in?)
