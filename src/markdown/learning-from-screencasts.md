@@ -1,5 +1,5 @@
 ---
-title: "How to Maximize Learning from Screencasts"
+title: "Maximize Learning from Screencasts"
 featuredImage: "../images/active-learning-deepmind-ZJKE4XVlKIA-unsplash.jpg"
 description: "Learn techniques to get the most out of your time spent online learning with screencasts."
 date: "2022-11-01"
@@ -10,17 +10,23 @@ related:
   - "Off with the Digital Distractions!"
 ---
 
-This post will cover some techniques to get the most out of online learning with screencasts. There are many services offering this including Pluralsight, Linkedin Learning, Wes Bos, Learn UI and UX to name just a few. I happen to have the most experience with Pluralsight, but the advice in this post applies to all screencast style courses.
+This post will cover some techniques to get the most out of online learning with screencasts. There are many services offering this including [Pluralsight](https://www.pluralsight.com/product/skills), [LinkedIn Learning](https://www.linkedin.com/learning/subscription/topics), [Wes Bos Courses](https://wesbos.com/courses), and Erik Kennedy's [Learn UI Design](https://www.learnui.design/) to name just a few. I happen to have the most experience with Pluralsight, but the advice in this post applies to all screencast style courses. Note that these are generally paid services.
 
-Even prior to the pandemic, I've found this style of learning to be optimal as it supports an async lifestyle. No need to commute to a particular location or be online at a specific hour. You login whenever you have time and go at your own pace. However, there are some pitfalls that can derail the learning experience if you're not careful.
+## Definition
 
-## Don't be Passive
+A screencast is a digital video recording of a computer screen while someone is using it, and usually includes audio narration. A course based on screencasts will have the instructor recording their screen while they run through presentation slides, terminal commands, setting up a development environment, writing code in an editor, running code, etc.
 
-Let's start with what not to do. Since the course format is video, it's tempting to treat this like a Netflix entertainment series, pop some popcorn, sit back, and binge watch. This is the passive approach, and while not a complete waste of time, it's not the most effective way of learning. You're likely to forget most of what was covered.
+Typically these will be broken down into smaller sections rather than one massive recording. When taking the course, you can select which video to watch, then use the video player controls to pause, go forward, go back, speed up and so on. There is no time limit to complete the course, and no one is taking attendance.
+
+Even prior to the pandemic, I've found this style of learning to be optimal as it supports an [async lifestyle](../working-towards-asynchronous-future). No need to commute to a particular location or be online at a specific hour. You login whenever you have time and go at your own pace. However, there are some pitfalls that can derail the learning experience.
+
+## Passive Learning
+
+Let's start with what not to do. Since the course format is video, it's tempting to treat this like a Netflix entertainment series, pop some popcorn, sit back, and binge watch.
 
 ![popcorn](../images/popcorn-linus-mimietz-uWjBqbCHY7g-unsplash.jpg "popcorn")
 
-Instead, I recommend active learning. This requires more explicit effort on the part of the learner and takes longer, but the payoff is more information retained and a higher quality learning experience.
+This is the passive approach, and while not a complete waste of time, it's not the most effective way of learning. You're likely to forget most of what was covered. Instead, I recommend active learning. This requires more explicit effort on the part of the learner and takes longer, but the payoff is more information retained and a higher quality learning experience.
 
 ## Organize
 
@@ -45,7 +51,7 @@ courses
     └── exercises
 ```
 
-The `README.md` is where the course notes will go. It doesn't have to be markdown, you could write in a plain text file, or even a Google/Microsoft/Libre Office document. But I've found that markdown is optimal for technical writing as it supports syntax highlighted code blocks.
+The `README.md` is where the course notes will go. It doesn't have to be markdown, you could write in a plain text file, or even a Google/Microsoft/Libre Office document. But I've found that [markdown](https://en.wikipedia.org/wiki/Markdown) is optimal for technical writing as it supports syntax highlighted code blocks.
 
 The `exercises` folder will be used for saving any code examples developed during the course. The `doc-images` folder is where you will place any screenshots - for example, if developing a web app, it will be useful to save screenshots of what the app looks like as you build it up, and then reference these images in `README.md`.
 
@@ -95,9 +101,9 @@ Another variation on this is sometimes the instructor will announce the next pro
 
 Sometimes you'll run into an issue where your code doesn't produce the same result as the instructor's or errors, doesn't compile etc. There are several reasons for this. Don't shrug and skip over this. It's important to investigate why your result is different. Here are some possible reasons:
 
-**Bug in your code:** Review your code carefully and compare it to instructors for any typos. This is the root cause of many issues I've encountered in my years of doing screencasts.
+**Bug in your code:** Review your code carefully and compare it to instructors for any typos. This is the root cause of many issues I've encountered in my years of learning from screencasts.
 
-**Version mismatches:** It's possible that you have a different version of the language, library, framework etc. than what the instructor has installed. Go back to the beginning of the course and check if it mentions what version(s) are being used, then make sure to install those on your system. Many languages have version managers to make it easy to switch between projects using different versions such as nvm, pyenv, rbenv, etc. Use these wherever possible.
+**Version mismatches:** It's possible that you have a different version of the language, library, framework etc. than what the instructor has installed. Go back to the beginning of the course and check if it mentions what version(s) are being used, then make sure to install those on your system. Many languages have version managers to make it easy to switch between projects using different versions such as [nvm](https://github.com/nvm-sh/nvm), [pyenv](https://github.com/pyenv/pyenv), [rbenv](https://github.com/rbenv/rbenv), etc. Use these wherever possible.
 
 **Operating system mismatch:** You'll be able to tell what operating system the instructor is using from the video recordings of their screen. Windows and Mac are the most common, with the occasional instructor using Linux. It can happen that some code could be operating-system specific such as file paths and line endings. If you encounter this, update the code for your OS.
 
@@ -149,18 +155,22 @@ git push -u origin main
 
 You don't need to wait until you're finished the course to publish your notes. I work on small amounts at a time and publish as I go (more on this in the next section). This is to avoid the catastrophic situation of hard drive crashing and losing all the precious notes.
 
+## Break it Up
+
+I do not advise attempting to complete the course in a single session. For example, many courses on Pluralsight are approximately 2 to 3 hours in duration. This sounds like it could be completed in a morning or afternoon. However, remember you're going to be stopping to take notes, do the exercises, go on tangents, and fix issues. This will extend the actual time it takes to complete the course significantly.
+
+There's also a limit to how much new information the brain can absorb all at once. This varies by person, but I've found that doing 1 to 2 subsections in a single learning session is just the right amount to optimize absorbing new information. This also avoids exhaustion so I'm looking forward to returning for a session another day.
+
 ## Make it a Habit
+
+TBD...
 
 **TODO**
 
-- Intro para tidyup
-  - Link to few services
-  - Emphasize this post not promoting any particular one but I have the most experience with Pluralsight
-  - Briefly explain what/how it works - course broken up until short video segments, you can pause, go back, skip forwards, no time limit to complete...
 - Note taking:
   - More reasoning for "This requires a little organization so you'll be able to find your notes later." - mise en place for learning - https://en.wikipedia.org/wiki/Mise_en_place
+  - Example of how to screeshot, save and link in readme
   - Aside: Some course platforms have a Note taking section where you can enter your own notes but I don't recommend using this. What if they go away or if you no longer wish to pay for the service. It's better to own your own content.
-- Links for version managers
 - Other sections
   - Make learning a habit (small amount each regular interval, habit stacking, reference: Atomic Habits)
   - Who is this for? (not absolute beginner, no real-time help if get stuck, need some discipline - no one's taking attendance)
