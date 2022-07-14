@@ -97,6 +97,30 @@ Do not just watch the instructor code or copy/paste from the solutions (if provi
 
 Another variation on this is sometimes the instructor will announce the next problem that will be solved in code. This is a good time to pause the video and try to write out the code yourself *before* the instructor shows how to do it. Then compare your solution to the instructors.
 
+## Arrange Windows
+
+If your monitor is wide enough, I've found the optimal window arrangement for watching course videos and taking notes and the same time is to have the video playing on the right half of the monitor, and the editor open on the left half. For example, here's a screenshot from when I was learning Idiomatic Ruby with Pluralsight, at the section where we're learning about Enumerable methods:
+
+![screencast notes and video side by side](../images/screencast-notes-and-video-side-by-side.png "screencast notes and video side by side")
+
+If that's awkward for you, try different arrangements or even put each one one a different monitor if using multiple monitors. Once you find an optimal window layout, stick with that for video learning.
+
+<aside class="markdown-aside">
+One way to arrange windows is to use the mouse, hovering over the corner of any window to drag it to resize, and drag to move a window from the top bar. However, it's more efficient to use a windows manager to quickly "snap" windows to various positions such as left half, right half, top half, etc. Mac users can try <a class="markdown-link" href="https://www.spectacleapp.com/">Spectacle</a> or <a class="markdown-link" href="https://rectangleapp.com/">Rectangle</a>. Windows users check out this <a class="markdown-link" href="https://support.microsoft.com/en-us/windows/snap-your-windows-885a9b1e-a983-a3b1-16cd-c531795e6241">support</a> article.
+</aside>
+
+## Keyboard Shortcuts
+
+The process of taking notes and writing code exercises from the video requires frequent pausing of the video player in the browser tab, where the course is hosted, switching to your code editor, then going back to the video player, possibly rewinding back a few seconds if you missed something. Trying to do all this with a mouse will be very tedious and could lead to wrist and shoulder pain due to frequency of switching.
+
+I highly recommend learning keyboard shortcuts to control all these activities. The majority of video players I've used support the following:
+
+* <kbd class="markdown-kbd">Space</kbd> Pause video playback (or resume if currently paused).
+* <kbd class="markdown-kbd">Left Arrow</kbd> Go back 10 seconds.
+* <kbd class="markdown-kbd">Right Arrow</kbd> Go forward 10 seconds.
+
+For switching between applications such as browser and code editor, use <kbd class="markdown-kbd">Command</kbd> + <kbd class="markdown-kbd">Tab</kbd> for Mac, or <kbd class="markdown-kbd">Alt</kbd> + <kbd class="markdown-kbd">Tab</kbd> for Windows.
+
 ## Expect Issues
 
 Sometimes you'll run into an issue where your code doesn't produce the same result as the instructor's or errors, doesn't compile etc. There are several reasons for this. Don't shrug and skip over this. It's important to investigate why your result is different. Here are some possible reasons:
@@ -157,13 +181,25 @@ You don't need to wait until you're finished the course to publish your notes. I
 
 ## Break it Up
 
-I do not advise attempting to complete the course in a single session. For example, many courses on Pluralsight are approximately 2 to 3 hours in duration. This sounds like it could be completed in a morning or afternoon. However, remember you're going to be stopping to take notes, do the exercises, go on tangents, and fix issues. This will extend the actual time it takes to complete the course significantly.
+I do not advise attempting to complete a course in a single session. For example, many courses on Pluralsight are approximately 2 to 3 hours in duration. This sounds like it could be completed in a morning or afternoon. However, remember you're going to be stopping to take notes, do the exercises, go on tangents, and fix issues. Not only does this extend the time to complete the course, it also consumes significantly more mental energy than passively watching.
 
-There's also a limit to how much new information the brain can absorb all at once. This varies by person, but I've found that doing 1 to 2 subsections in a single learning session is just the right amount to optimize absorbing new information. This also avoids exhaustion so I'm looking forward to returning for a session another day.
+There's also a limit to how much new information the brain can absorb all at once. This varies by person, but I've found that doing one or at most two subsections in a single learning session is just the right amount to optimize absorbing new information. This avoids exhaustion so I'm looking forward to returning for a session another day.
 
 ## Make it a Habit
 
-TBD...
+One problem that can occur when the videos can be watched at any time, is that after an initial bout of enthusiasm, learning drops off. Somehow there's never enough time in the day to get around to sitting down with the videos and your notes. Or you wait to feel inspired/energized but by the time it occurs to you to do some learning, its late and you're tired.
+
+The solution to this is to make learning a *habit*. A habit is a routine or practice performed regularly; an automatic response to a specific situation.
+
+TBD: One way to cultivate a new habit...
+
+These could be subsections?
+
+Habit Stacking
+
+Small amounts each day
+
+Make it easy (leave your editor open with the course folder you're working on, use browser bookmark to quickly open the course screencasts, learn )
 
 **TODO**
 
@@ -171,7 +207,8 @@ TBD...
   - More reasoning for "This requires a little organization so you'll be able to find your notes later." - mise en place for learning - https://en.wikipedia.org/wiki/Mise_en_place
   - Example of how to screeshot, save and link in readme
   - Aside: Some course platforms have a Note taking section where you can enter your own notes but I don't recommend using this. What if they go away or if you no longer wish to pay for the service. It's better to own your own content.
+- Should Publish section be last?
 - Other sections
-  - Make learning a habit (small amount each regular interval, habit stacking, reference: Atomic Habits)
+  - WIP: Make learning a habit (small amount each regular interval, habit stacking, reference: Atomic Habits)
   - Who is this for? (not absolute beginner, no real-time help if get stuck, need some discipline - no one's taking attendance)
   - Eliminate distractions (does this fit in?)
