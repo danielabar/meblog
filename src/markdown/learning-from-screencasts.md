@@ -145,7 +145,7 @@ Another course I took invoked the `authenticate` method on a User model, which r
 
 When finished exploring a tangent, make sure to add the results of this exploration to the `README.md`. This will solidify what you've just learned.
 
-## Publish
+## Publish (Optional)
 
 This step is optional, but I recommend saving/publishing your notes somewhere they'll be easily searchable across devices. This could be any cloud storage such as Dropbox, OneDrive, Google Drive etc. My preference is to push the entire course folder to a Github repository. This is especially a good option when writing the notes in Markdown as they'll be automatically rendered on Github.
 
@@ -181,34 +181,51 @@ You don't need to wait until you're finished the course to publish your notes. I
 
 ## Break it Up
 
-I do not advise attempting to complete a course in a single session. For example, many courses on Pluralsight are approximately 2 to 3 hours in duration. This sounds like it could be completed in a morning or afternoon. However, remember you're going to be stopping to take notes, do the exercises, go on tangents, and fix issues. Not only does this extend the time to complete the course, it also consumes significantly more mental energy than passively watching.
+I do not advise attempting to complete a course in a single session. For example, many courses on Pluralsight are approximately 2 to 3 hours in duration. This sounds like it could be completed in a morning or afternoon. However, remember you're going to be stopping to take notes, do the exercises, go on tangents, and fix issues. Not only does this extend the time to complete the course, it consumes significantly more mental energy than passively watching.
 
-There's also a limit to how much new information the brain can absorb all at once. This varies by person, but I've found that doing one or at most two subsections in a single learning session is just the right amount to optimize absorbing new information. This avoids exhaustion so I'm looking forward to returning for a session another day.
+There's also a limit to how much new information the brain can absorb all at once. This varies by person, but I've found that doing one or at most two subsections in a single learning session is just the right amount to optimize absorbing new information. This avoids exhaustion so I'm looking forward to returning for a session another day. More on this in the next section on habits.
 
 ## Make it a Habit
 
-One problem that can occur when the videos can be watched at any time, is that after an initial bout of enthusiasm, learning drops off. Somehow there's never enough time in the day to get around to sitting down with the videos and your notes. Or you wait to feel inspired/energized but by the time it occurs to you to do some learning, its late and you're tired.
+One problem that can occur when the videos can be watched at any time, is that after an initial bout of enthusiasm, learning drops off. Somehow there's never enough time in the day to get around to sitting down with the videos and writing your notes. Or you wait to feel inspired/energized but by the time it occurs to you to do some learning, its late and you're tired.
 
-The solution to this is to make learning a *habit*. A habit is a routine or practice performed regularly; an automatic response to a specific situation.
+The solution to this is to make learning a *habit*. A habit is a routine or practice performed regularly; an automatic response to a specific situation. Here are a few techniques for cultivating the habit of learning.
 
-TBD: One way to cultivate a new habit...
+### Small amounts regularly
 
-These could be subsections?
+It can be overwhelming to find an hour or more in a typical day to fit in learning. Instead, start with a very small amount, even 5 - 10 minutes, and commit to this several days a week. For example, Tuesday, Wednesday, and Thursday of each week, after dinner, you'll sit down for just 10 minutes with your code editor and the video player to listen and take notes. That's just an example, pick whichever days and times work for you, as long as its regularly occurring.
 
-Habit Stacking
+You might be thinking what difference could 10 minutes possibly make? The key here is making the learning activity happen regularly. Those small increments will add up surprisingly quickly. For example, 10 minutes a day, 3 times per week is a half hour. In a year (let's say approximately 50 weeks, accounting for some vacation), that's 25 hours. Furthermore, with enough repetition, you may find that 10 minute session stretch out to 20 minutes of even a half hour, especially if you're enjoying what you're learning. That would get you to 75 hours per year! Imagine how much learning you can cover in that time.
 
-Small amounts each day
+It's fine if you don't get through an entire subsection, add a line to your notes such as "Left off at 2:35 of Map: Transforming Collections". This makes it easy to pick up again in your next learning session.
 
-Make it easy (leave your editor open with the course folder you're working on, use browser bookmark to quickly open the course screencasts, learn )
+### Make it easy
+
+Speaking of making things easy, this is another key to habit formation, if you have to overcome too many hurdles to start the activity, it won't get done. Think of trying to start an exercise program but the gym is an hour's drive away, vs an at home workout or a park in your neighborhood. Similarly with screencast video learning, there's a few things you can do to make it easier to get each learning session started.
+
+Leave your editor open with the course folder you've started. On a Mac, next time your computer boots up, the editor will be open waiting for you. For Windows users, I don't think remembering open apps and files is a native feature, although you could check out some [suggestions](https://www.pcworld.com/article/410688/how-to-have-windows-re-open-active-windows-and-programs-on-reboot.html).
+
+Leave the course url open in a browser tab, and enable remember previously open tabs in your browser so the videos will always be there waiting for you.
+
+An alternative if you don't want to always have the tab open is to bookmark the course url, then [index your browser bookmarks](../how-to-access-chrome-bookmarks-via-keyboard) to load it quickly via keyboard.
+
+### Habit Stacking
+
+TBD...
 
 **TODO**
 
+- Tangents:
+  - fit in "it's the journey, not the destination"
 - Note taking:
   - More reasoning for "This requires a little organization so you'll be able to find your notes later." - mise en place for learning - https://en.wikipedia.org/wiki/Mise_en_place
+  - Readme example include link to course
   - Example of how to screeshot, save and link in readme
   - Aside: Some course platforms have a Note taking section where you can enter your own notes but I don't recommend using this. What if they go away or if you no longer wish to pay for the service. It's better to own your own content.
 - Should Publish section be last?
 - Other sections
-  - WIP: Make learning a habit (small amount each regular interval, habit stacking, reference: Atomic Habits)
+  - Why screencasts? (constantly changing tech landscape, want to pick up a new language, tool, framework, higher quality than free tutorial?)
+  - Habit Stacking: Reference Atomic Habits book
   - Who is this for? (not absolute beginner, no real-time help if get stuck, need some discipline - no one's taking attendance)
   - Eliminate distractions (does this fit in?)
+  - Conclusion/Summary
