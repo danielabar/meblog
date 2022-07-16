@@ -89,6 +89,8 @@ Now that you're organized for note taking, it's time to start watching the video
 
 Every time a significant point is covered in the course, pause the video, and write down what you just learned in the appropriate heading/subheading section of `README.md` *in your own words*. This is key, do not simply transcribe the instructor's words. Make sure you understand the concept enough that you could explain it to someone else, then write down that explanation. In fact, that someone else is "future you", who will look back on these notes several months from now to reference the material.
 
+TBD: Writing makes you remember that you learned a topic, even if you don't remember all the details. Then you can use your notes as a reference next time you need that detail. eg: negative indexing in Python, splat operator in Ruby...
+
 ## Write Code
 
 Since these are technical courses, there will be many sections where the instructor writes some code and explains it. This is another good place to pause the video. Write the code yourself in the `exercises` directory you created earlier, make sure it compiles/runs and returns the same result as shown in the course.
@@ -223,6 +225,7 @@ TBD...
   - Example of how to screeshot, save and link in readme
   - Aside: Some course platforms have a Note taking section where you can enter your own notes but I don't recommend using this. What if they go away or if you no longer wish to pay for the service. It's better to own your own content.
 - Should Publish section be last?
+- Break it up: Add example of my git history from idiomatic pluralsight course (custom glog format to include commit date)
 - Other sections
   - Why screencasts? (constantly changing tech landscape, want to pick up a new language, tool, framework, higher quality than free tutorial?)
   - Habit Stacking: Reference Atomic Habits book
