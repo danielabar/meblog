@@ -22,7 +22,7 @@ Even prior to the pandemic, I've found this style of learning to be optimal as i
 
 ## Passive Learning
 
-Let's start with what not to do. Since the course format is video, it's tempting to treat this like a Netflix entertainment series, pop some popcorn, sit back, and binge watch.
+Let's start with what not to do. Since the course format is video, it's tempting to treat this like a Netflix series, pop some popcorn, sit back, and binge watch.
 
 ![popcorn](../images/popcorn-linus-mimietz-uWjBqbCHY7g-unsplash.jpg "popcorn")
 
@@ -30,7 +30,7 @@ This is the passive approach, and while not a complete waste of time, it's not t
 
 ## Organize
 
-One of the most effective ways to retain what you've learned is to write it down as you go. This requires prior organization so you'll be able to find your notes later.
+One of the most effective ways to retain what you've learned is to write it down as you go. This requires prior organization so you'll be able to find your notes later. Think of this as [mise en place](https://en.wikipedia.org/wiki/Mise_en_place) for techies.
 
 When starting a new course, create a directory. I suggest having one directory for all courses, then sub-directories for each course you take. For example, if taking a course on Idiomatic Ruby from Pluralsight:
 
@@ -53,7 +53,7 @@ courses
 
 The `README.md` is where the course notes will go. It doesn't have to be markdown, you could write in a plain text file, or even a Google/Microsoft/Libre Office document. But I've found that [markdown](https://en.wikipedia.org/wiki/Markdown) is optimal for technical writing as it supports syntax highlighted code blocks.
 
-The `exercises` folder will be used for saving any code examples developed during the course. The `doc-images` folder is where you will place any screenshots - for example, if developing a web app, it will be useful to save screenshots of what the app looks like as you build it up, and then reference these images in `README.md`.
+The `exercises` folder will be used for saving any code examples developed during the course. The `doc-images` folder is where you will place any screenshots - for example, if taking a course on css, svg, or developing a web app, it will be useful to save screenshots of what the app looks like as you build it up, and then reference these images in `README.md`.
 
 Most courses are broken up into major sections, with each section having several smaller subsections with a short video for each. A good place to start organizing your notes is to create headings and subheadings matching the course structure. This way you'll know where to add your notes as you're watching each video.
 
@@ -83,13 +83,13 @@ In this case, I would create headings in `courses/idiomatic-ruby-pluralsight/REA
 
 ## Take Notes
 
-Now that you're organized for note taking, it's time to start watching the videos. But you're not going to be sitting back and relaxing like watching funny cat videos on Youtube.
+Now that you're organized for note taking, it's time to start watching the videos. But this is not the same as watching funny cat videos on Youtube.
 
 ![funny cat](../images/funny-cat.png "funny cat")
 
 Every time a significant point is covered in the course, pause the video, and write down what you just learned in the appropriate heading/subheading section of `README.md` *in your own words*. This is key, do not simply transcribe the instructor's words. Make sure you understand the concept enough that you could explain it to someone else, then write down that explanation. In fact, that someone else is "future you", who will look back on these notes several months from now to reference the material.
 
-TBD: Writing makes you remember that you learned a topic, even if you don't remember all the details. Then you can use your notes as a reference next time you need that detail. eg: negative indexing in Python, splat operator in Ruby...
+The power of writing is that it makes you remember that you learned a topic, even if you don't remember the details. Next time you need to recall that information, you'll be able to pull up your notes and find the section where you wrote it down. Some examples from my experience include negative indexing in Python and the splat operator in Ruby. I haven't used either of these often enough to have memorized the details, but distinctly remember learning about them in courses and can quickly find these topics in my notes whenever I encounter some code that uses these.
 
 ## Write Code
 
@@ -141,11 +141,15 @@ After the issue is fixed, add some notes about what you encountered and how you 
 
 One of the benefits of asynchronous learning over real-time/in-classroom, is the ability to explore something that piques your curiosity in more detail, but isn't the main topic. This could be an API that's used, or maybe the course only covers the happy path and you want to see what happens during some exceptional conditions.
 
-Some examples from my experience - a Rails course I took was using the SQLite database, and added a length constraint to one of the fields but didn't test it. When I tried it though, the length limit wasn't enforced. Doing some research revealed that although SQLite supports the SQL syntax for setting length limits on `VARCHAR` fields, it's not enforced.
+Some examples from my experience - a Rails course I took was using the SQLite database, and added a length constraint to one of the fields but didn't test it. When I tried it, the length limit wasn't enforced. Doing some research revealed that although SQLite supports the SQL syntax for setting length limits on `VARCHAR` fields, it's not enforced.
 
 Another course I took invoked the `authenticate` method on a User model, which returns the user instance if authentication passed, or false otherwise. I got curious about where this method is defined as we hadn't written any code for it. Digging into this I learned about the `inspect` method to find more information about a method in Ruby, and eventually traced through the location in the Rails source code.
 
 When finished exploring a tangent, make sure to add the results of this exploration to the `README.md`. This will solidify what you've just learned.
+
+<aside class="markdown-aside">
+At this point, some of you might be thinking - wow, with all this note taking, problem solving and exploring tangents, it's going to take forever to complete a course. The way I think about this is not to focus on the number of courses completed in a year, but rather, the enjoyment and quality of the learning experience. In other words, <a class="markdown-link", href="https://pubmed.ncbi.nlm.nih.gov/31233318/">it's the journey, not the destination</a>.
+</aside>
 
 ## Publish (Optional)
 
@@ -189,13 +193,13 @@ There's also a limit to how much new information the brain can absorb all at onc
 
 ## Make it a Habit
 
-One problem that can occur when the videos can be watched at any time, is that after an initial bout of enthusiasm, learning drops off. Somehow there's never enough time in the day to get around to sitting down with the videos and writing your notes. Or you wait to feel inspired/energized but by the time it occurs to you to do some learning, its late and you're tired.
+One problem that can occur when the videos can be watched at any time, is that after an initial bout of enthusiasm, learning drops off. Somehow there's never enough time in the day to get around to sitting down with the videos and writing your notes. Or you wait to feel inspired but by the time it occurs to you to do some learning, its late and you're tired.
 
 The solution to this is to make learning a *habit*. A habit is a routine or practice performed regularly; an automatic response to a specific situation. Here are a few techniques for cultivating the habit of learning.
 
 ### Small amounts regularly
 
-It can be overwhelming to find an hour or more in a typical day to fit in learning. Instead, start with a very small amount, even 5 - 10 minutes, and commit to this several days a week. For example, Tuesday, Wednesday, and Thursday of each week, after dinner, you'll sit down for just 10 minutes with your code editor and the video player to listen and take notes. That's just an example, pick whichever days and times work for you, as long as its regularly occurring.
+It can be overwhelming to find an hour or more in a typical day to fit in learning. Instead, start with a very small amount, even 5 - 10 minutes, and commit to this several days a week. For example, Tuesday, Wednesday, and Thursday of each week, after dinner, you'll sit down for just 10 minutes with your code editor and the video course to listen and take notes. That's just an example, pick whichever days and times work for you, as long as its regularly occurring.
 
 You might be thinking what difference could 10 minutes possibly make? The key here is making the learning activity happen regularly. Those small increments will add up surprisingly quickly. For example, 10 minutes a day, 3 times per week is a half hour. In a year (let's say approximately 50 weeks, accounting for some vacation), that's 25 hours. Furthermore, with enough repetition, you may find that 10 minute session stretch out to 20 minutes of even a half hour, especially if you're enjoying what you're learning. That would get you to 75 hours per year! Imagine how much learning you can cover in that time.
 
@@ -203,32 +207,40 @@ It's fine if you don't get through an entire subsection, add a line to your note
 
 ### Make it easy
 
-Speaking of making things easy, this is another key to habit formation, if you have to overcome too many hurdles to start the activity, it won't get done. Think of trying to start an exercise program but the gym is an hour's drive away, vs an at home workout or a park in your neighborhood. Similarly with screencast video learning, there's a few things you can do to make it easier to get each learning session started.
+Speaking of making things easy, this is another key to habit formation, if you have to overcome too many hurdles to start the activity, it won't get done. Think of trying to start an exercise program but the gym is an hour's drive away and your workout clothes are in the bottom of the laundry hamper, vs an at home workout or a park in your neighborhood and clean workout clothes ready to go. Similarly with screencast video learning, there's a few things you can do to make it easier to get each learning session started.
 
-Leave your editor open with the course folder you've started. On a Mac, next time your computer boots up, the editor will be open waiting for you. For Windows users, I don't think remembering open apps and files is a native feature, although you could check out some [suggestions](https://www.pcworld.com/article/410688/how-to-have-windows-re-open-active-windows-and-programs-on-reboot.html).
+Leave your editor open with the course folder you've started. On a Mac, next time your computer boots up, the editor will be open waiting for you. For Windows users, remembering open apps and files is not a native feature, although you could check out some [suggestions](https://www.pcworld.com/article/410688/how-to-have-windows-re-open-active-windows-and-programs-on-reboot.html).
 
-Leave the course url open in a browser tab, and enable remember previously open tabs in your browser so the videos will always be there waiting for you.
-
-An alternative if you don't want to always have the tab open is to bookmark the course url, then [index your browser bookmarks](../how-to-access-chrome-bookmarks-via-keyboard) to load it quickly via keyboard.
+Leave the course url open in a browser tab, and enable remember previously open tabs in your browser so the videos will always be there waiting for you. An alternative if you don't want to always have the tab open is to bookmark the course url, then [index your browser bookmarks](../how-to-access-chrome-bookmarks-via-keyboard) to load it quickly via keyboard.
 
 ### Habit Stacking
 
-TBD...
+This is a technique where you identify a current habit you already do each day, and then "stack" a new habit on top. The general form of this is:
+
+"After I `CURRENT_HABIT`, I will `NEW_HABIT`".
+
+For example, someone trying to establish a gratitude habit might say: "After I sit down to dinner, I will say one thing I'm grateful for that happened today".
+
+In this case, `NEW_HABIT` will be learning from screencasts. For me, I identified `CURRENT_HABIT` as making coffee first thing in the morning, which I've been doing for over 20 years! This leads to: "After I make coffee each morning, I will set down my mug at my computer desk, and have coffee while doing some screencast learning".
+
+This works because it's tying a desired new behaviour (learning from video courses) to something you already do every day, such as making coffee. Think about a typical day in your schedule, identify `CURRENT_HABIT`, then stack it with the learning habit.
+
+<aside class="markdown-aside">
+The advice presented above just scratches the surface on the science of habit formation. It comes from the book <a class="markdown-link" href="https://jamesclear.com/atomic-habits">Atomic Habits</a>. This book draws on research from the fields of biology, psychology, and neuroscience and converts these to practical, actionable advice that anyone can start right away. It sounds cliche to say this book is a game changer, but in this case, it's accurate. Whether you're trying to cultivate a new habit, or drop a bad one, I highly recommend reading this book to learn how you can improve 1% each day.
+</aside>
 
 **TODO**
 
-- Tangents:
-  - fit in "it's the journey, not the destination"
 - Note taking:
-  - More reasoning for "This requires a little organization so you'll be able to find your notes later." - mise en place for learning - https://en.wikipedia.org/wiki/Mise_en_place
   - Readme example include link to course
   - Example of how to screeshot, save and link in readme
   - Aside: Some course platforms have a Note taking section where you can enter your own notes but I don't recommend using this. What if they go away or if you no longer wish to pay for the service. It's better to own your own content.
 - Should Publish section be last?
 - Break it up: Add example of my git history from idiomatic pluralsight course (custom glog format to include commit date)
+- Other items from my sync Notes
+- Reduce popcorn image size
 - Other sections
   - Why screencasts? (constantly changing tech landscape, want to pick up a new language, tool, framework, higher quality than free tutorial?)
-  - Habit Stacking: Reference Atomic Habits book
   - Who is this for? (not absolute beginner, no real-time help if get stuck, need some discipline - no one's taking attendance)
   - Eliminate distractions (does this fit in?)
   - Conclusion/Summary
