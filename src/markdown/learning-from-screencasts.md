@@ -55,7 +55,7 @@ The `README.md` is where the course notes will go. It doesn't have to be markdow
 
 The `exercises` folder will be used for saving any code examples developed during the course. The `doc-images` folder is where you will place any screenshots - for example, if taking a course on css, svg, or developing a web app, it will be useful to save screenshots of what the app looks like as you build it up, and then reference these images in `README.md`.
 
-Most courses are broken up into major sections, with each section having several smaller subsections with a short video for each. A good place to start organizing your notes is to create headings and subheadings matching the course structure. This way you'll know where to add your notes as you're watching each video.
+Most courses are broken up into major sections, with each section having several smaller subsections with a short video for each. A good place to start organizing your notes is to create headings and subheadings matching the course structure. This way you'll know where to add your notes as you're watching each video. It's also useful to link to the course videos.
 
 For example, here's the table of contents from the Idiomatic Ruby course on Pluralsight:
 
@@ -65,6 +65,8 @@ In this case, I would create headings in `courses/idiomatic-ruby-pluralsight/REA
 
 ```markdown
 # Idiomatic Ruby
+
+My notes from Pluralsight [course](https://app.pluralsight.com/library/courses/ruby-idiomatic/table-of-contents).
 
 ## Blocks, Conditionals, and Symbols
 
@@ -81,24 +83,6 @@ In this case, I would create headings in `courses/idiomatic-ruby-pluralsight/REA
 ...
 ```
 
-## Take Notes
-
-Now that you're organized for note taking, it's time to start watching the videos. But this is not the same as watching funny cat videos on Youtube.
-
-![funny cat](../images/funny-cat.png "funny cat")
-
-Every time a significant point is covered in the course, pause the video, and write down what you just learned in the appropriate heading/subheading section of `README.md` *in your own words*. This is key, do not simply transcribe the instructor's words. Make sure you understand the concept enough that you could explain it to someone else, then write down that explanation. In fact, that someone else is "future you", who will look back on these notes several months from now to reference the material.
-
-The power of writing is that it makes you remember that you learned a topic, even if you don't remember the details. Next time you need to recall that information, you'll be able to pull up your notes and find the section where you wrote it down. Some examples from my experience include negative indexing in Python and the splat operator in Ruby. I haven't used either of these often enough to have memorized the details, but distinctly remember learning about them in courses and can quickly find these topics in my notes whenever I encounter some code that uses these.
-
-## Write Code
-
-Since these are technical courses, there will be many sections where the instructor writes some code and explains it. This is another good place to pause the video. Write the code yourself in the `exercises` directory you created earlier, make sure it compiles/runs and returns the same result as shown in the course.
-
-Do not just watch the instructor code or copy/paste from the solutions (if provided), it won't stick. There's something very powerful about typing out the code yourself. After each section you type out, look back on it and make sure you understand every line. Go ahead and add explanatory comments, this is not the time to worry about "clean code" should there be comments or not. This is educational material - add any comments that will help future you understand the code.
-
-Another variation on this is sometimes the instructor will announce the next problem that will be solved in code. This is a good time to pause the video and try to write out the code yourself *before* the instructor shows how to do it. Then compare your solution to the instructors.
-
 ## Arrange Windows
 
 If your monitor is wide enough, I've found the optimal window arrangement for watching course videos and taking notes and the same time is to have the video playing on the right half of the monitor, and the editor open on the left half. For example, here's a screenshot from when I was learning Idiomatic Ruby with Pluralsight, at the section where we're learning about Enumerable methods:
@@ -110,6 +94,54 @@ If that's awkward for you, try different arrangements or even put each one one a
 <aside class="markdown-aside">
 One way to arrange windows is to use the mouse, hovering over the corner of any window to drag it to resize, and drag to move a window from the top bar. However, it's more efficient to use a windows manager to quickly "snap" windows to various positions such as left half, right half, top half, etc. Mac users can try <a class="markdown-link" href="https://www.spectacleapp.com/">Spectacle</a> or <a class="markdown-link" href="https://rectangleapp.com/">Rectangle</a>. Windows users check out this <a class="markdown-link" href="https://support.microsoft.com/en-us/windows/snap-your-windows-885a9b1e-a983-a3b1-16cd-c531795e6241">support</a> article.
 </aside>
+
+## Take Notes
+
+Now that you're organized for note taking, it's time to start watching the videos. But this is not the same as watching funny cat videos on Youtube.
+
+![funny cat](../images/funny-cat.png "funny cat")
+
+Every time a significant point is covered in the course, pause the video, and write down what you just learned in the appropriate heading/subheading section of `README.md` *in your own words*. This is key, do not simply transcribe the instructor's words. Make sure you understand the concept enough that you could explain it to someone else, then write down that explanation. In fact, that someone else is "future you", who will look back on these notes several months from now to reference the material.
+
+The power of writing is that it makes you remember that you learned a topic, even if you don't remember the details. Next time you need to recall that information, you'll be able to pull up your notes and find the section where you wrote it down. Some examples from my experience include negative indexing in Python and the splat operator in Ruby. I haven't used either of these often enough to have memorized the details, but distinctly remember learning about them in courses and can quickly find these topics in my notes whenever I encounter some code that uses these.
+
+Furthermore, while video is a great medium for learning, it's slow for recall. Later at work, if you need to pull up a detail that was covered in the course, it would be too slow to try and find in which video section this detail was covered and watch the video again. Or your membership might have expired or the course is no longer available. Your notes serve as a permanent reference.
+
+## Write Code
+
+Since these are technical courses, there will be many sections where the instructor writes some code and explains it. This is another good place to pause the video. Write the code yourself in the `exercises` directory you created earlier, make sure it compiles/runs and returns the same result as shown in the course.
+
+Do not just watch the instructor code or copy/paste from the solutions (if provided), it won't stick. There's something very powerful about typing out the code yourself. After each section you type out, look back on it and make sure you understand every line. Go ahead and add explanatory comments, this is not the time to worry about "clean code" should there be comments or not. This is educational material - add any comments that will help future you understand the code.
+
+Another variation on this is sometimes the instructor will announce the next problem that will be solved in code. This is a good time to pause the video and try to write out the code yourself *before* the instructor shows how to do it. Then compare your solution to the instructors.
+
+Finally, you'll want to link up the code you wrote to the `README.md` notes so the explanations you've been writing flow with the code. One way is to place relevant snippets of code directly in the `README.md` using fenced code blocks. For example:
+
+TBD example
+
+Another way is to link from the `README.md` to the specific file in the `exercises` dir, for example:
+
+TBD example
+
+## Screenshot Flow
+
+For courses that have a visual component - such as learning a framework for building a web app, css, svg, etc, you'll want to take screenshots of what you're building and save these as part of your notes. Here's the flow I use for Mac:
+
+1. <kbd class="markdown-kbd">Cmd</kbd> + <kbd class="markdown-kbd">Control</kbd> + <kbd class="markdown-kbd">Shift</kbd> + <kbd class="markdown-kbd">4</kbd> to turn cursor into a crosshair. Right click on the mouse and drag and capture the relevant portion of the screen. When you release the mouse, the selection will be saved to the clipboard.
+2. Open the Preview app using either Alfred or Spotlight Search.
+3. Hit <kbd class="markdown-kbd">Cmd</kbd> + <kbd class="markdown-kbd">N</kbd> to create a new file. It will automatically place the contents of the clipboard into the new file.
+4. Hit <kbd class="markdown-kbd">Cmd</kbd> + <kbd class="markdown-kbd">S</kbd> to save the file to `/path/to/course/doc-images`.
+5. Update `README.md` to link to the newly created image, for example:
+
+```markdown
+Here is what the homepage looks like:
+
+![brief description of image](doc-images/my-screenshot.png "brief description of image")
+```
+
+It seems like a lot of steps but since most of this flow uses keyboard shortcuts, you'll get very efficient after doing it a few times.
+
+Windows users see this [support article](https://support.microsoft.com/en-us/windows/use-snipping-tool-to-capture-screenshots-00246869-1843-655f-f220-97299b865f6b) on using the Snipping Tool to capture screenshots.
 
 ## Keyboard Shortcuts
 
@@ -231,9 +263,9 @@ The advice presented above just scratches the surface on the science of habit fo
 
 **TODO**
 
+- Screenshot flow: Hotkeys for Alfred and Spotlight Search
+- Write code: example of fenced code block, and linking to code in exercises
 - Note taking:
-  - Readme example include link to course
-  - Example of how to screeshot, save and link in readme
   - Aside: Some course platforms have a Note taking section where you can enter your own notes but I don't recommend using this. What if they go away or if you no longer wish to pay for the service. It's better to own your own content.
 - Should Publish section be last?
 - Break it up: Add example of my git history from idiomatic pluralsight course (custom glog format to include commit date)
@@ -244,3 +276,7 @@ The advice presented above just scratches the surface on the science of habit fo
   - Who is this for? (not absolute beginner, no real-time help if get stuck, need some discipline - no one's taking attendance)
   - Eliminate distractions (does this fit in?)
   - Conclusion/Summary
+    - Benefits of writing:
+      * Helps you remember what you've learned
+      * Faster recall than video
+      * Useful reference even if no longer have access to the course
