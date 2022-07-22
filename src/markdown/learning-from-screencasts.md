@@ -18,7 +18,7 @@ A screencast is a digital video recording of a computer screen while someone is 
 
 Typically these will be broken down into smaller sections rather than one massive recording. When taking the course, you can select which video to watch, then use the video player controls to pause, go forward, go back, speed up and so on. There is no time limit to complete the course, and no one is taking attendance.
 
-Even prior to the pandemic, I've found this style of learning to be optimal as it supports an [async lifestyle](../working-towards-asynchronous-future). No need to commute to a particular location or be online at a specific hour. You login whenever you have time and go at your own pace. However, there are some pitfalls that can derail the learning experience.
+After experimenting with many different [learning approaches](../how-to-learn-new-things), I've found this style of learning to be optimal as it supports an [async lifestyle](../working-towards-asynchronous-future). No need to commute to a particular location or be online at a specific hour. You login whenever you have time and go at your own pace. However, there are some pitfalls that can derail the learning experience.
 
 ## Passive Learning
 
@@ -107,6 +107,10 @@ The power of writing is that it makes you remember that you learned a topic, eve
 
 Furthermore, while video is a great medium for learning, it's slow for recall. Later at work, if you need to pull up a detail that was covered in the course, it would be too slow to try and find in which video section this detail was covered and watch the video again. Or your membership might have expired or the course is no longer available. Your notes serve as a permanent reference.
 
+<aside class="markdown-aside">
+Some course platforms have a note taking feature built in, but I don't recommend using this. What if the service goes out of business or you no longer wish to pay for it, then your notes would disappear. It's better to own your own content and have full control over the formatting.
+</aside>
+
 ## Write Code
 
 Since these are technical courses, there will be many sections where the instructor writes some code and explains it. This is another good place to pause the video. Write the code yourself in the `exercises` directory you created earlier, make sure it compiles/runs and returns the same result as shown in the course.
@@ -115,22 +119,18 @@ Do not just watch the instructor code or copy/paste from the solutions (if provi
 
 Another variation on this is sometimes the instructor will announce the next problem that will be solved in code. This is a good time to pause the video and try to write out the code yourself *before* the instructor shows how to do it. Then compare your solution to the instructors.
 
-Finally, you'll want to link up the code you wrote to the `README.md` notes so the explanations you've been writing flow with the code. One way is to place relevant snippets of code directly in the `README.md` using fenced code blocks. For example:
+Finally, you'll want to link up the code you wrote to the `README.md` notes so the explanations you've been writing flow with the code. One way is to place relevant snippets of code directly in the `README.md` using fenced code blocks. Another way is to link from the `README.md` to the specific file in the `exercises` directory. For example:
 
-TBD example
-
-Another way is to link from the `README.md` to the specific file in the `exercises` dir, for example:
-
-TBD example
+![screencast example code](../images/screencast-example-code.png "screencast example code")
 
 ## Screenshot Flow
 
 For courses that have a visual component - such as learning a framework for building a web app, css, svg, etc, you'll want to take screenshots of what you're building and save these as part of your notes. Here's the flow I use for Mac:
 
-1. <kbd class="markdown-kbd">Cmd</kbd> + <kbd class="markdown-kbd">Control</kbd> + <kbd class="markdown-kbd">Shift</kbd> + <kbd class="markdown-kbd">4</kbd> to turn cursor into a crosshair. Right click on the mouse and drag and capture the relevant portion of the screen. When you release the mouse, the selection will be saved to the clipboard.
-2. Open the Preview app using either Alfred or Spotlight Search.
+1. <kbd class="markdown-kbd">Cmd</kbd> + <kbd class="markdown-kbd">Control</kbd> + <kbd class="markdown-kbd">Shift</kbd> + <kbd class="markdown-kbd">4</kbd> to turn cursor into a crosshair. Right click on the mouse and drag to capture the relevant portion of the screen. When you release the mouse, the selection will be saved to the clipboard.
+2. Open the Preview app using either [Alfred](https://www.alfredapp.com/) or [Spotlight Search](https://support.apple.com/en-ca/guide/mac-help/mchlp1008/mac). Default hot key for Alfred is <kbd class="markdown-kbd">Option</kbd> + <kbd class="markdown-kbd">Space</kbd>. For Spotlight Search it's <kbd class="markdown-kbd">Command</kbd> + <kbd class="markdown-kbd">Space</kbd>.
 3. Hit <kbd class="markdown-kbd">Cmd</kbd> + <kbd class="markdown-kbd">N</kbd> to create a new file. It will automatically place the contents of the clipboard into the new file.
-4. Hit <kbd class="markdown-kbd">Cmd</kbd> + <kbd class="markdown-kbd">S</kbd> to save the file to `/path/to/course/doc-images`.
+4. Hit <kbd class="markdown-kbd">Cmd</kbd> + <kbd class="markdown-kbd">S</kbd> and save the file to `/path/to/course/doc-images`.
 5. Update `README.md` to link to the newly created image, for example:
 
 ```markdown
@@ -139,9 +139,9 @@ Here is what the homepage looks like:
 ![brief description of image](doc-images/my-screenshot.png "brief description of image")
 ```
 
-It seems like a lot of steps but since most of this flow uses keyboard shortcuts, you'll get very efficient after doing it a few times.
-
 Windows users see this [support article](https://support.microsoft.com/en-us/windows/use-snipping-tool-to-capture-screenshots-00246869-1843-655f-f220-97299b865f6b) on using the Snipping Tool to capture screenshots.
+
+It seems like a lot of steps but since most of this flow uses keyboard shortcuts, you'll get very efficient after doing it a few times. More on keyboard shortcuts in the next section.
 
 ## Keyboard Shortcuts
 
@@ -217,6 +217,10 @@ git push -u origin main
 
 You don't need to wait until you're finished the course to publish your notes. I work on small amounts at a time and publish as I go (more on this in the next section). This is to avoid the catastrophic situation of hard drive crashing and losing all the precious notes.
 
+<aside class="markdown-aside">
+If your notes have a lot of sections and subsections, it can be useful to add a table of contents to make it even easier to find details later. If the notes are written in markdown, the <a class="markdown-link" href="https://www.npmjs.com/package/doctoc">DocToc</a> package on npm does a great job of this.
+</aside>
+
 ## Break it Up
 
 I do not advise attempting to complete a course in a single session. For example, many courses on Pluralsight are approximately 2 to 3 hours in duration. This sounds like it could be completed in a morning or afternoon. However, remember you're going to be stopping to take notes, do the exercises, go on tangents, and fix issues. Not only does this extend the time to complete the course, it consumes significantly more mental energy than passively watching.
@@ -225,9 +229,11 @@ There's also a limit to how much new information the brain can absorb all at onc
 
 ## Make it a Habit
 
-One problem that can occur when the videos can be watched at any time, is that after an initial bout of enthusiasm, learning drops off. Somehow there's never enough time in the day to get around to sitting down with the videos and writing your notes. Or you wait to feel inspired but by the time it occurs to you to do some learning, its late and you're tired.
+One problem that can occur when the videos can be watched at any time, is that after an initial bout of enthusiasm, learning drops off. Somehow there's never enough time in the day to get around to sitting down with the videos and writing your notes. Or you wait to feel inspired but by the time it occurs to you to do some learning, its late and you're tired. The solution to this is to make learning a *habit*:
 
-The solution to this is to make learning a *habit*. A habit is a routine or practice performed regularly; an automatic response to a specific situation. Here are a few techniques for cultivating the habit of learning.
+> A habit is a routine or practice performed regularly; an automatic response to a specific situation.
+
+Here are a few techniques for cultivating the habit of learning.
 
 ### Small amounts regularly
 
@@ -249,7 +255,7 @@ Leave the course url open in a browser tab, and enable remember previously open 
 
 This is a technique where you identify a current habit you already do each day, and then "stack" a new habit on top. The general form of this is:
 
-"After I `CURRENT_HABIT`, I will `NEW_HABIT`".
+"After I `CURRENT_HABIT`, I will `NEW_HABIT`."
 
 For example, someone trying to establish a gratitude habit might say: "After I sit down to dinner, I will say one thing I'm grateful for that happened today".
 
@@ -258,25 +264,19 @@ In this case, `NEW_HABIT` will be learning from screencasts. For me, I identifie
 This works because it's tying a desired new behaviour (learning from video courses) to something you already do every day, such as making coffee. Think about a typical day in your schedule, identify `CURRENT_HABIT`, then stack it with the learning habit.
 
 <aside class="markdown-aside">
-The advice presented above just scratches the surface on the science of habit formation. It comes from the book <a class="markdown-link" href="https://jamesclear.com/atomic-habits">Atomic Habits</a>. This book draws on research from the fields of biology, psychology, and neuroscience and converts these to practical, actionable advice that anyone can start right away. It sounds cliche to say this book is a game changer, but in this case, it's accurate. Whether you're trying to cultivate a new habit, or drop a bad one, I highly recommend reading this book to learn how you can improve 1% each day.
+The advice presented above just scratches the surface on the science of habit formation. It comes from the book <a class="markdown-link" href="https://jamesclear.com/atomic-habits">Atomic Habits</a>, which will teach you how to get 1% better each day. This book draws on research from the fields of biology, psychology, and neuroscience and converts these to practical, actionable advice that anyone can start right away. It sounds cliche to say this book is a game changer, but in this case, it's accurate. Whether you're trying to cultivate a new habit, or drop a bad one, I highly recommend reading this book.
 </aside>
 
 **TODO**
 
-- Screenshot flow: Hotkeys for Alfred and Spotlight Search
-- Write code: example of fenced code block, and linking to code in exercises
-- Note taking:
-  - Aside: Some course platforms have a Note taking section where you can enter your own notes but I don't recommend using this. What if they go away or if you no longer wish to pay for the service. It's better to own your own content.
-- Should Publish section be last?
+- Better image for side by side workflow, make windows smaller before screenshotting
 - Break it up: Add example of my git history from idiomatic pluralsight course (custom glog format to include commit date)
-- Other items from my sync Notes
 - Reduce popcorn image size
-- Other sections
-  - Why screencasts? (constantly changing tech landscape, want to pick up a new language, tool, framework, higher quality than free tutorial?)
-  - Who is this for? (not absolute beginner, no real-time help if get stuck, need some discipline - no one's taking attendance)
-  - Eliminate distractions (does this fit in?)
-  - Conclusion/Summary
-    - Benefits of writing:
-      * Helps you remember what you've learned
-      * Faster recall than video
-      * Useful reference even if no longer have access to the course
+- Why screencasts? (constantly changing tech landscape, want to pick up a new language, tool, framework, higher quality than free tutorial?)
+- Who is this for? (not absolute beginner, no real-time help if get stuck, need some discipline - no one's taking attendance)
+- Eliminate distractions (does this fit in?)
+- Conclusion/Summary
+  - Benefits of writing:
+    * Helps you remember what you've learned
+    * Faster recall than video
+    * Useful reference even if no longer have access to the course
