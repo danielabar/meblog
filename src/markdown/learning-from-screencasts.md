@@ -10,7 +10,7 @@ related:
   - "Off with the Digital Distractions!"
 ---
 
-This post will cover some techniques to get the most out of online learning with screencasts. There are many services offering this including [Pluralsight](https://www.pluralsight.com/product/skills), [LinkedIn Learning](https://www.linkedin.com/learning/subscription/topics), [Wes Bos Courses](https://wesbos.com/courses), and Erik Kennedy's [Learn UI Design](https://www.learnui.design/) to name just a few. I happen to have the most experience with Pluralsight, but the advice in this post applies to all screencast style courses. Note that these are generally paid services.
+This post will cover some techniques to get the most out of online learning with screencasts. There are many services offering this including [Pluralsight](https://www.pluralsight.com/product/skills), [LinkedIn Learning](https://www.linkedin.com/learning/subscription/topics), [Wes Bos Courses](https://wesbos.com/courses), and [Learn UI Design](https://www.learnui.design/) to name just a few. I happen to have the most experience with Pluralsight, but the advice in this post applies to all screencast style courses. Note that these are generally paid services.
 
 ## Definition
 
@@ -18,7 +18,9 @@ A screencast is a digital video recording of a computer screen while someone is 
 
 Typically these will be broken down into smaller sections rather than one massive recording. When taking the course, you can select which video to watch, then use the video player controls to pause, go forward, go back, speed up and so on. There is no time limit to complete the course, and no one is taking attendance.
 
-After experimenting with many different [learning approaches](../how-to-learn-new-things), I've found this style of learning to be optimal as it supports an [async lifestyle](../working-towards-asynchronous-future). No need to commute to a particular location or be online at a specific hour. You login whenever you have time and go at your own pace. However, there are some pitfalls that can derail the learning experience.
+<aside class="markdown-aside">
+In an ever changing tech landscape, it's beneficial to one's career to keep on learning - whether it be a new language, framework, tool, etc. Video screencasts are just one of many different ways to do this. I've written about different types of learning I've experienced and <a class="markdown-link" href="../how-to-learn-new-things">pros and cons</a> of each.
+</aside>
 
 ## Passive Learning
 
@@ -30,7 +32,7 @@ This is the passive approach, and while not a complete waste of time, it's not t
 
 ## Organize
 
-One of the most effective ways to retain what you've learned is to write it down as you go. This requires prior organization so you'll be able to find your notes later. Think of this as [mise en place](https://en.wikipedia.org/wiki/Mise_en_place) for techies.
+One of the most effective ways to retain what you've learned is to write it down as you go. This requires some organization, a kind of [mise en place](https://en.wikipedia.org/wiki/Mise_en_place) for techies.
 
 When starting a new course, create a directory. I suggest having one directory for all courses, then sub-directories for each course you take. For example, if taking a course on Idiomatic Ruby from Pluralsight:
 
@@ -55,13 +57,13 @@ The `README.md` is where the course notes will go. It doesn't have to be markdow
 
 The `exercises` folder will be used for saving any code examples developed during the course. The `doc-images` folder is where you will place any screenshots - for example, if taking a course on css, svg, or developing a web app, it will be useful to save screenshots of what the app looks like as you build it up, and then reference these images in `README.md`.
 
-Most courses are broken up into major sections, with each section having several smaller subsections with a short video for each. A good place to start organizing your notes is to create headings and subheadings matching the course structure. This way you'll know where to add your notes as you're watching each video. It's also useful to link to the course videos.
+Most courses are broken up into major sections, with each section having several smaller subsections with a short video for each. A good place to start organizing your notes is to create headings and subheadings matching the course structure. This way you'll know where to add your notes as you're watching each video.
 
 For example, here's the table of contents from the Idiomatic Ruby course on Pluralsight:
 
 ![idiomatic Ruby course TOC](../images/idiomatic-ruby-course-toc.png "idiomatic Ruby course TOC")
 
-In this case, I would create headings in `courses/idiomatic-ruby-pluralsight/README.md` as follows:
+In this case, I would create headings in `courses/idiomatic-ruby-pluralsight/README.md` as follows. I also link to the main course website:
 
 ```markdown
 # Idiomatic Ruby
@@ -128,7 +130,7 @@ Finally, you'll want to link up the code you wrote to the `README.md` notes so t
 For courses that have a visual component - such as learning a framework for building a web app, css, svg, etc, you'll want to take screenshots of what you're building and save these as part of your notes. Here's the flow I use for Mac:
 
 1. <kbd class="markdown-kbd">Cmd</kbd> + <kbd class="markdown-kbd">Control</kbd> + <kbd class="markdown-kbd">Shift</kbd> + <kbd class="markdown-kbd">4</kbd> to turn cursor into a crosshair. Right click on the mouse and drag to capture the relevant portion of the screen. When you release the mouse, the selection will be saved to the clipboard.
-2. Open the Preview app using either [Alfred](https://www.alfredapp.com/) or [Spotlight Search](https://support.apple.com/en-ca/guide/mac-help/mchlp1008/mac). Default hot key for Alfred is <kbd class="markdown-kbd">Option</kbd> + <kbd class="markdown-kbd">Space</kbd>. For Spotlight Search it's <kbd class="markdown-kbd">Command</kbd> + <kbd class="markdown-kbd">Space</kbd>.
+2. Open the [Preview app](https://support.apple.com/en-ca/guide/preview/welcome/mac) using either [Alfred](https://www.alfredapp.com/) or [Spotlight Search](https://support.apple.com/en-ca/guide/mac-help/mchlp1008/mac). Default hot key for Alfred is <kbd class="markdown-kbd">Option</kbd> + <kbd class="markdown-kbd">Space</kbd>. For Spotlight Search it's <kbd class="markdown-kbd">Command</kbd> + <kbd class="markdown-kbd">Space</kbd>.
 3. Hit <kbd class="markdown-kbd">Cmd</kbd> + <kbd class="markdown-kbd">N</kbd> to create a new file. It will automatically place the contents of the clipboard into the new file.
 4. Hit <kbd class="markdown-kbd">Cmd</kbd> + <kbd class="markdown-kbd">S</kbd> and save the file to `/path/to/course/doc-images`.
 5. Update `README.md` to link to the newly created image, for example:
@@ -210,7 +212,7 @@ git add .
 gc -m "Initial commit"
 
 # Connect it to the remote repository on Github
-git remote add origin git@github.com:danielabar/idiomatic-ruby-pluralsight.git
+git remote add origin git@github.com:your-github-username/idiomatic-ruby-pluralsight.git
 git branch -M main
 git push -u origin main
 ```
@@ -267,16 +269,6 @@ This works because it's tying a desired new behaviour (learning from video cours
 The advice presented above just scratches the surface on the science of habit formation. It comes from the book <a class="markdown-link" href="https://jamesclear.com/atomic-habits">Atomic Habits</a>, which will teach you how to get 1% better each day. This book draws on research from the fields of biology, psychology, and neuroscience and converts these to practical, actionable advice that anyone can start right away. It sounds cliche to say this book is a game changer, but in this case, it's accurate. Whether you're trying to cultivate a new habit, or drop a bad one, I highly recommend reading this book.
 </aside>
 
-**TODO**
+## Conclusion
 
-- Better image for side by side workflow, make windows smaller before screenshotting
-- Break it up: Add example of my git history from idiomatic pluralsight course (custom glog format to include commit date)
-- Reduce popcorn image size
-- Why screencasts? (constantly changing tech landscape, want to pick up a new language, tool, framework, higher quality than free tutorial?)
-- Who is this for? (not absolute beginner, no real-time help if get stuck, need some discipline - no one's taking attendance)
-- Eliminate distractions (does this fit in?)
-- Conclusion/Summary
-  - Benefits of writing:
-    * Helps you remember what you've learned
-    * Faster recall than video
-    * Useful reference even if no longer have access to the course
+This post has covered a number of active learning techniques to get the most out of video screencast courses, and why that's more beneficial than passive learning. If you only get one thing out of this, it's to write down what you're learning. Writing helps you remember what you've learned, provides a medium for faster recall than video, and is a useful reference even if you no longer have access to the course videos.
