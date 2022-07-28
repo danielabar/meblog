@@ -28,7 +28,7 @@ Let's start with what not to do. Since the course format is video, it's tempting
 
 ![popcorn](../images/popcorn-linus-mimietz-uWjBqbCHY7g-unsplash.jpg "popcorn")
 
-This is the passive approach, and while not a complete waste of time, it's not the most effective way of learning. You're likely to forget most of what was covered. Instead, I recommend active learning. This requires more explicit effort on the part of the learner and takes longer, but the payoff is more information retained and a higher quality learning experience.
+This is the passive approach, and while not a complete waste of time, it's not the most effective way of learning. You're likely to forget most of what was covered. Instead, I recommend active learning. This requires more effort and takes longer, but the payoff is more information retained and a higher quality learning experience.
 
 ## Organize
 
@@ -103,14 +103,14 @@ Now that you're organized for note taking, it's time to start watching the video
 
 ![funny cat](../images/funny-cat.png "funny cat")
 
-Every time a significant point is covered in the course, pause the video, and write down what you just learned in the appropriate heading/subheading section of `README.md` *in your own words*. This is key, do not simply transcribe the instructor's words. Make sure you understand the concept enough that you could explain it to someone else, then write down that explanation. In fact, that someone else is "future you", who will look back on these notes several months from now to reference the material.
+Every time a significant point is covered in the course, pause the video, and write down what you just learned in the corresponding section of `README.md` *in your own words*. This is key, do not simply transcribe the instructor's words. Make sure you understand the concept enough that you could explain it to someone else, then write down that explanation. In fact, that someone else is "future you", who will look back on these notes several months from now to reference the material.
 
 The power of writing is that it makes you remember that you learned a topic, even if you don't remember the details. Next time you need to recall that information, you'll be able to pull up your notes and find the section where you wrote it down. Some examples from my experience include negative indexing in Python and the splat operator in Ruby. I haven't used either of these often enough to have memorized the details, but distinctly remember learning about them in courses and can quickly find these topics in my notes whenever I encounter some code that uses these.
 
 Furthermore, while video is a great medium for learning, it's slow for recall. Later at work, if you need to pull up a detail that was covered in the course, it would be too slow to try and find in which video section this detail was covered and watch the video again. Or your membership might have expired or the course is no longer available. Your notes serve as a permanent reference.
 
 <aside class="markdown-aside">
-Some course platforms have a note taking feature built in, but I don't recommend using this. What if the service goes out of business or you no longer wish to pay for it, then your notes would disappear. It's better to own your own content and have full control over the formatting.
+Some course platforms have a note taking feature built in, but I don't recommend using this. What if the service goes out of business or you no longer wish to pay for it? Then your notes would disappear. It's better to own your own content and have full control over the formatting.
 </aside>
 
 ## Write Code
@@ -129,8 +129,8 @@ Finally, you'll want to link up the code you wrote to the `README.md` notes so t
 
 For courses that have a visual component - such as learning a framework for building a web app, css, svg, etc, you'll want to take screenshots of what you're building and save these as part of your notes. Here's the flow I use for Mac:
 
-1. <kbd class="markdown-kbd">Cmd</kbd> + <kbd class="markdown-kbd">Control</kbd> + <kbd class="markdown-kbd">Shift</kbd> + <kbd class="markdown-kbd">4</kbd> to turn cursor into a crosshair. Right click on the mouse and drag to capture the relevant portion of the screen. When you release the mouse, the selection will be saved to the clipboard.
-2. Open the [Preview app](https://support.apple.com/en-ca/guide/preview/welcome/mac) using either [Alfred](https://www.alfredapp.com/) or [Spotlight Search](https://support.apple.com/en-ca/guide/mac-help/mchlp1008/mac). Default hot key for Alfred is <kbd class="markdown-kbd">Option</kbd> + <kbd class="markdown-kbd">Space</kbd>. For Spotlight Search it's <kbd class="markdown-kbd">Command</kbd> + <kbd class="markdown-kbd">Space</kbd>.
+1. <kbd class="markdown-kbd">Cmd</kbd> + <kbd class="markdown-kbd">Control</kbd> + <kbd class="markdown-kbd">Shift</kbd> + <kbd class="markdown-kbd">4</kbd> to turn the cursor into a crosshair. Right click on the mouse and drag to capture the relevant portion of the screen. When you release the mouse, the selection will be saved to the clipboard.
+2. Open the [Preview app](https://support.apple.com/en-ca/guide/preview/welcome/mac) using either [Alfred](https://www.alfredapp.com/) or [Spotlight Search](https://support.apple.com/en-ca/guide/mac-help/mchlp1008/mac). The default hot key for Alfred is <kbd class="markdown-kbd">Option</kbd> + <kbd class="markdown-kbd">Space</kbd>. For Spotlight Search it's <kbd class="markdown-kbd">Command</kbd> + <kbd class="markdown-kbd">Space</kbd>.
 3. Hit <kbd class="markdown-kbd">Cmd</kbd> + <kbd class="markdown-kbd">N</kbd> to create a new file. It will automatically place the contents of the clipboard into the new file.
 4. Hit <kbd class="markdown-kbd">Cmd</kbd> + <kbd class="markdown-kbd">S</kbd> and save the file to `/path/to/course/doc-images`.
 5. Update `README.md` to link to the newly created image, for example:
@@ -159,7 +159,7 @@ For switching between applications such as browser and code editor, use <kbd cla
 
 ## Expect Issues
 
-Sometimes you'll run into an issue where your code doesn't produce the same result as the instructor's or errors, doesn't compile etc. There are several reasons for this. Don't shrug and skip over this. It's important to investigate why your result is different. Here are some possible reasons:
+Sometimes you'll run into an issue where your code doesn't produce the same result as the instructor's or errors, doesn't compile etc. Don't shrug and skip over this. It's important to investigate why your result is different. Here are some possible reasons:
 
 **Bug in your code:** Review your code carefully and compare it to instructors for any typos. This is the root cause of many issues I've encountered in my years of learning from screencasts.
 
@@ -199,7 +199,7 @@ courses
     └── exercises
 ```
 
-I would create a new *empty* Github repository named "idiomatic-ruby-pluralsight" on [Github](https://github.com/), with no generated files such as readme or license). It's up to you if you want to make the repo public or private.
+I would create a new *empty* Github repository named `idiomatic-ruby-pluralsight` on [Github](https://github.com/), with no generated files such as readme or license). It's up to you if you want to make the repo public or private.
 
 Then from the terminal:
 
@@ -217,7 +217,7 @@ git branch -M main
 git push -u origin main
 ```
 
-You don't need to wait until you're finished the course to publish your notes. I work on small amounts at a time and publish as I go (more on this in the next section). This is to avoid the catastrophic situation of hard drive crashing and losing all the precious notes.
+You don't need to wait until you're finished the course to publish your notes. I work on small amounts at a time and publish as I go (more on this in the next section). This is to avoid the catastrophic situation of a hard drive crash and losing all the precious notes.
 
 <aside class="markdown-aside">
 If your notes have a lot of sections and subsections, it can be useful to add a table of contents to make it even easier to find details later. If the notes are written in markdown, the <a class="markdown-link" href="https://www.npmjs.com/package/doctoc">DocToc</a> package on npm does a great job of this.
@@ -243,7 +243,7 @@ It can be overwhelming to find an hour or more in a typical day to fit in learni
 
 You might be thinking what difference could 10 minutes possibly make? The key here is making the learning activity happen regularly. Those small increments will add up surprisingly quickly. For example, 10 minutes a day, 3 times per week is a half hour. In a year (let's say approximately 50 weeks, accounting for some vacation), that's 25 hours. Furthermore, with enough repetition, you may find that 10 minute session stretch out to 20 minutes of even a half hour, especially if you're enjoying what you're learning. That would get you to 75 hours per year! Imagine how much learning you can cover in that time.
 
-It's fine if you don't get through an entire subsection, add a line to your notes such as "Left off at 2:35 of Map: Transforming Collections". This makes it easy to pick up again in your next learning session.
+It's fine if you don't get through an entire subsection. Simply add a line to your notes such as `Left off at 2:35 of Map: Transforming Collections`. This makes it easy to pick up again in your next learning session.
 
 ### Make it easy
 
@@ -261,7 +261,7 @@ This is a technique where you identify a current habit you already do each day, 
 
 For example, someone trying to establish a gratitude habit might say: "After I sit down to dinner, I will say one thing I'm grateful for that happened today".
 
-In this case, `NEW_HABIT` will be learning from screencasts. For me, I identified `CURRENT_HABIT` as making coffee first thing in the morning, which I've been doing for over 20 years! This leads to: "After I make coffee each morning, I will set down my mug at my computer desk, and have coffee while doing some screencast learning".
+In this case, `NEW_HABIT` will be learning from screencasts. For me, I identified `CURRENT_HABIT` as making coffee first thing in the morning, which I've been doing for over 20 years! This leads to: "After I make coffee each morning, I will set down my mug at my desk, and have coffee while doing some screencast learning".
 
 This works because it's tying a desired new behaviour (learning from video courses) to something you already do every day, such as making coffee. Think about a typical day in your schedule, identify `CURRENT_HABIT`, then stack it with the learning habit.
 
@@ -271,4 +271,4 @@ The advice presented above just scratches the surface on the science of habit fo
 
 ## Conclusion
 
-This post has covered a number of active learning techniques to get the most out of video screencast courses, and why that's more beneficial than passive learning. If you only get one thing out of this, it's to write down what you're learning. Writing helps you remember what you've learned, provides a medium for faster recall than video, and is a useful reference even if you no longer have access to the course videos.
+This post has covered a number of active learning techniques to get the most out of video screencast courses, and why that's more beneficial than passive learning. It's also covered some advice to make learning a habit. If you only get one thing out of this, it's to write down what you're learning. Writing helps you remember what you've learned, provides a medium for faster recall than video, and is a useful reference even if you no longer have access to the course videos.
