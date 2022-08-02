@@ -68,6 +68,20 @@ Run tests in watch mode:
 make testw
 ```
 
+## Markdown Links
+
+To another post:
+
+```markdown
+[Part 1: Search Introduction](../roll-your-own-search-service-for-gatsby-part1)
+```
+
+To a specific section (within same or other post):
+
+```markdown
+[post template](../gatsby-related-posts#post-template)
+```
+
 ### References
 
 - [Gatsby Unit Testing](https://www.gatsbyjs.com/docs/how-to/testing/unit-testing/)
