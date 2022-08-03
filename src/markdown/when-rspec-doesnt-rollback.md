@@ -14,9 +14,9 @@ This post will walk you through some troubleshooting techniques when [RSpec](htt
 
 ## Setup
 
-The RSpec tests are part of a Rails project, and use [FactoryBot](https://github.com/thoughtbot/factory_bot) to create test data. This post assumes some familiarity with these tools. The other thing to know is I listen to the [Bike Shed](https://www.bikeshed.fm/) podcast, and recently there have been some discussions about not using [let](https://relishapp.com/rspec/rspec-core/docs/helper-methods/let-and-let), or at least, avoid [overusing](https://thoughtbot.com/blog/lets-not) it.
+The RSpec tests are part of a Rails project using the [rspec-rails](https://github.com/rspec/rspec-rails) gem. The tests also make use of the [FactoryBot](https://github.com/thoughtbot/factory_bot) and [faker](https://github.com/faker-ruby/faker) gems to create test data. This post assumes some familiarity with these tools. The other thing to know is I listen to the [Bike Shed](https://www.bikeshed.fm/) podcast, and recently there have been some discussions about not using [let](https://relishapp.com/rspec/rspec-core/docs/helper-methods/let-and-let), or at least, avoid [overusing](https://thoughtbot.com/blog/lets-not) it.
 
-The `rails_helper.rb`, which is included in every spec file configures the use of transactional fixtures as follows:
+The `rails_helper.rb`, which is included in every spec file specifies the use of transactional fixtures as follows:
 
 ```ruby
 # spec/rails_helper.rb
@@ -26,7 +26,7 @@ RSpec.configure do |config|
 end
 ```
 
-My understanding of this setting was that any data inserted into the test database *anywhere* in a test would always get rolled back, leaving the database nice and clean for the next test.
+My understanding of this setting was that data inserted into the test database *anywhere* in a test would always get rolled back, leaving the database nice and clean for the next test.
 
 ## Failing Test
 
@@ -62,9 +62,71 @@ That's not right, the count should have returned 0. I ran the test again, then t
 
 ## Test Log
 
-Next step in troubleshooting was to inspect the `log/test.log` file. By default, when tests run, all activity that would normally be displayed in the terminal when a Rails server is running, gets saved in this log file. This includes database inserts so maybe it will have some clues as to what's going on with the database when this test is running.
+Next step in troubleshooting was to inspect the `log/test.log` file at the project root. By default, when tests run, all activity that would normally be displayed in the terminal when a Rails server is running, gets saved in this log file. This includes database inserts. Let's see if it reveals any clues as to what's going on with the database when this test is running.
+
+Here is the relevant portion of the file from running this test:
+
+```
+ (0.3ms)  BEGIN
+Plan Create (0.7ms)  INSERT INTO `plans` (`service_type`, `recurring_interval`, `created_at`, `updated_at`)
+                      VALUES ('email', 'month', '2022-07-27 19:59:17', '2022-07-27 19:59:17')
+ (1.9ms)  COMMIT
+ (0.3ms)  BEGIN
+Plan Create (0.4ms)  INSERT INTO `plans` (`service_type`, `recurring_interval`, `created_at`, `updated_at`)
+                      VALUES ('email', 'year', '2022-07-27 19:59:17', '2022-07-27 19:59:17')
+ (1.7ms)  COMMIT
+```
+
+That doesn't look right, the `INSERT` statements are wrapped in a transaction as expected, but they're being committed rather than rolled back.
+
+## Where is data created?
+
+Doing some research led me to this Stack Overflow [answer](https://stackoverflow.com/questions/3333743/factory-girl-rspec-doesnt-seem-to-roll-back-changes-after-each-example/24372747#24372747). The key here being:
+
+> ... will clear the DB as long as your created the data in the example itself. before :all do ... end is considered outside of the example, because the data remains untouched across multiple examples. Whatever you create in before :all you have to delete in after :all.
+
+This got me wondering whether data created in a `describe` block is considered outside of the example. To answer this question, I modified the test to move the data creation into the `it` block:
+
+```ruby
+describe "my test class" do
+  it "some test" do
+    FactoryBot.create(:plan, recurring_interval: "month", service_type: "email")
+    FactoryBot.create(:plan, recurring_interval: "year", service_type: "email")
+
+    result = Plan.generate_options(service_type: "email")
+    # expects exactly two options: a monthly plan and a yearly plan
+  end
+end
+```
+
+After running this version of the test, I checked the test database to see if it was clean - and it was, you can see this time there were no records left in the `plans` table after the test run:
+
+```
+mysql -u root -D myapp_test
+mysql> SELECT COUNT(*) FROM plans;
+0
+```
+
+I also checked what got generated in the `log/test.log` file. This time you can see that both inserts into the `plans` table are wrapped in a transaction which gets rolled back at the end of the test:
+
+```
+ (0.6ms)  BEGIN
+ (0.3ms)  SAVEPOINT active_record_1
+Plan Create (0.7ms)  INSERT INTO `plans` (`service_type`, `recurring_interval`, `created_at`, `updated_at`)
+                      VALUES ('email', 'month', '2022-07-27 20:59:17', '2022-07-27 20:59:17')
+ (0.3ms)  (0.3ms)  RELEASE SAVEPOINT active_record_1
+ (0.3ms)  SAVEPOINT active_record_1
+Plan Create (0.4ms)  INSERT INTO `plans` (`service_type`, `recurring_interval`, `created_at`, `updated_at`)
+                      VALUES ('email', 'year', '2022-07-27 20:59:17', '2022-07-27 20:59:17')
+ (0.4ms)  RELEASE SAVEPOINT active_record_1
+ (1.3ms)  ROLLBACK
+```
+
+## Multiple Tests with Same Data
+
+Good, so creating the data in the `it` block solves this problem. But what if there are other tests in the same test file and `describe` block that also need this data?
 
 **TBD**
 
-- check constraints/unique on Plan model
+- check constraints/unique on Plan model (unique on name but also using Faker as name wasn't important to these tests)
 - mention about resetting test db after each run during troubleshooting to get a clean start
