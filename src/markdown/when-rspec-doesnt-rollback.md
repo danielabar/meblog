@@ -256,9 +256,12 @@ Given the [DRY](https://en.wikipedia.org/wiki/Don%27t_repeat_yourself) principle
 
 Also "DRYing" up the tests can make them harder to read as it requires scrolling up to the top of the test file to understand where data, variables etc were defined. For a small test file maybe this isn't a big deal but can become an issue as the number of tests grow.
 
+<aside class="markdown-aside">
+The issue of optimal test design, is a little outside the scope of this post, but if you're interested in this topic, check out this Stack Overflow discussion on <a class="markdown-link" href="https://stackoverflow.com/questions/6453235/what-does-damp-not-dry-mean-when-talking-about-unit-tests">DAMP vs DRY</a>
+</aside>
+
 **TBD**
 
-- reference DAMP vs DRY: https://stackoverflow.com/questions/6453235/what-does-damp-not-dry-mean-when-talking-about-unit-tests
 - check constraints/unique on Plan model (unique on name but also using Faker as name wasn't important to these tests)
 - mention about resetting test db after each run during troubleshooting to get a clean start
 - Conclusion: Use of connecting to test database and checking test.log file for troubleshooting tests
