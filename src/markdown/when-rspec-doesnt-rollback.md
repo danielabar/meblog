@@ -86,7 +86,7 @@ The insert statements are a result of the `FactoryBot.create(:plan...)` methods 
 
 Doing some research on RSpec and rollbacks led me to this Stack Overflow [answer](https://stackoverflow.com/questions/3333743/factory-girl-rspec-doesnt-seem-to-roll-back-changes-after-each-example/24372747#24372747). The sentence in particular:
 
-> ... use transactional fixtures will clear the DB as long as your created the data in the example itself. before :all do ... end is considered outside of the example, because the data remains untouched across multiple examples. Whatever you create in before :all you have to delete in after :all.
+> ... use transactional fixtures will clear the DB as long as you created the data in the example itself. before :all do ... end is considered outside of the example, because the data remains untouched across multiple examples. Whatever you create in before :all you have to delete in after :all.
 
 Although my test wasn't using a `before` block, this got me wondering whether data created in a `describe` block is considered outside of the example? To answer this question, I modified the test to move the data creation into the `it` block:
 
@@ -112,7 +112,7 @@ mysql> SELECT COUNT(*) FROM plans;
 0
 ```
 
-I also checked what got generated in the `log/test.log` file. This time you can see that both inserts into the `plans` table are wrapped in a transaction which gets rolled back at the end of the test:
+I also checked what got generated in the `log/test.log` file. This time both inserts into the `plans` table are wrapped in named transactions using [SAVEPOINT](https://dev.mysql.com/doc/refman/8.0/en/savepoint.html), and rolled back at the end of the test:
 
 ```
 BEGIN
@@ -132,7 +132,11 @@ ROLLBACK
 
 ## Multiple Tests with Same Data
 
-Good, so creating the data in the `it` block solves this problem. But what if there are other tests in the same test file and `describe` block that also need this data? One way to solve for this would be to repeat the test data creation in each test that needs it. Since transactional fixtures are enabled, the database inserts will be rolled back at the end of each example so each test will get a clean start. To help in reading the test log file, I've also added some temporary logging statements at the beginning of each test:
+Good, so creating the data in the `it` block solves this problem. But what if there are other tests in the same test file and `describe` block that also need this data?
+
+### Repeat Data Creation
+
+One way to solve for this would be to repeat the test data creation in each test that needs it. Since transactional fixtures are enabled, the database inserts will be rolled back at the end of each example so each test will get a clean start. To help in reading the test log file, I've also added some temporary logging statements at the beginning of each test:
 
 ```ruby
 require "rails_helper"
@@ -186,6 +190,8 @@ RELEASE SAVEPOINT active_record_1
 ROLLBACK
 ```
 
+### Use Describe and Let
+
 But then I wondered whether use of the [let](https://relishapp.com/rspec/rspec-core/docs/helper-methods/let-and-let) helper method could also solve for this, to avoid having to repeat the data creation statements in each example. In the test below, the data creation has been moved out of each `it` block and into the `describe` block, but using the `let!` helper method. I'm using the "bang" version of it to force execution because these tests need the data to already be there. Otherwise, the regular version `let` is lazily evaluated:
 
 ```ruby
@@ -208,7 +214,7 @@ describe "my test class" do
 end
 ```
 
-This version of the test also passed. Taking a look at the `log/test.log` after this test run, you can see the data creation happens before the logging statements and is repeated for each test, but this time, it does get included in the transaction, even though it occurs in the `describe` block.
+This version of the test also passed, even on repeated runs. Taking a look at the `log/test.log` after this test run, the data creation happens before the logging statements and is repeated for each test, but this time, it does get included in the transaction, even though it occurs in the `describe` block. This is the effect of using the `let!` helper:
 
 ```
 BEGIN
@@ -240,12 +246,19 @@ The [docs](https://relishapp.com/rspec/rspec-core/docs/helper-methods/let-and-le
 
 > The value will be cached across multiple calls in the same example but not across examples.
 
-Which explains why the inserts are running repeatedly for each test. But what was less clear to me was that using the `let/let!` helper moves the execution of the logic into the transaction and thus gets rolled back. Recall when the data creation was run in the `describe` block without the use of `let/let!` helper, it ran outside of each test transaction and got committed.
+Which explains why the inserts are running repeatedly for each test. But what was less clear to me was that using the `let/let!` helper moves the execution of the logic into the transaction and therefore gets rolled back. Recall when the data creation was run in the `describe` block without the use of `let/let!` helper, it ran outside of each test transaction and got committed.
+
+## Which is Better?
+
+So the problem of ensuring created data is rolled back can be solved in two ways. Either specify the data creation right in each example that needs it, i.e. in the `it` block, OR, if multiple tests need the same data, it can be created up one level in the `describe`, but then it must use the `let/let!` helper methods.
+
+Given the [DRY](https://en.wikipedia.org/wiki/Don%27t_repeat_yourself) principle, it's tempting to say the better solution is to move the data creation up into `describe` block so it doesn't need to be repeated for each test. However, this has no impact on test performance because the data will still be created and rolled back for each example (as we saw earlier in the `log/test.log` file).
+
+Also "DRYing" up the tests can make them harder to read as it requires scrolling up to the top of the test file to understand where data, variables etc were defined. For a small test file maybe this isn't a big deal but can become an issue as the number of tests grow.
 
 **TBD**
 
-- two ways to solve problem: repeat data creation lines in each example, or once in describe block but then need let helper
-- which is better? maybe don't DRY tests too much, can make it difficult to read if need to scroll up and down within test file to see where/how data got created
+- reference DAMP vs DRY: https://stackoverflow.com/questions/6453235/what-does-damp-not-dry-mean-when-talking-about-unit-tests
 - check constraints/unique on Plan model (unique on name but also using Faker as name wasn't important to these tests)
 - mention about resetting test db after each run during troubleshooting to get a clean start
 - Conclusion: Use of connecting to test database and checking test.log file for troubleshooting tests
