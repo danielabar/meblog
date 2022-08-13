@@ -14,9 +14,9 @@ This post will walk you through some troubleshooting techniques when [RSpec](htt
 
 ## Setup
 
-The RSpec tests are part of a Rails project using the [rspec-rails](https://github.com/rspec/rspec-rails) gem. The tests also make use of the [FactoryBot](https://github.com/thoughtbot/factory_bot) and [faker](https://github.com/faker-ruby/faker) gems to create test data. This post assumes some familiarity with these tools. The other thing to know is I listen to the [Bike Shed](https://www.bikeshed.fm/) podcast, and recently there have been some discussions about not using let, or at least, avoid [overusing](https://thoughtbot.com/blog/lets-not) it.
+The RSpec tests are part of a Rails project using the [rspec-rails](https://github.com/rspec/rspec-rails) gem. The tests also make use of the [FactoryBot](https://github.com/thoughtbot/factory_bot) and [faker](https://github.com/faker-ruby/faker) gems to create test data. This post assumes some familiarity with these tools. The other thing to know is I listen to the [Bike Shed](https://www.bikeshed.fm/) podcast, and recently there have been some discussions about not using `let`, or at least, avoid [overusing](https://thoughtbot.com/blog/lets-not) it.
 
-The `rails_helper.rb`, which is included in every spec file specifies the use of transactional fixtures as follows:
+The `rails_helper.rb`, which is included in every spec file configures transactions as follows:
 
 ```ruby
 # spec/rails_helper.rb
@@ -47,6 +47,16 @@ end
 ```
 
 This test would pass when run individually and the first time but fail on subsequent runs. Also when run as part of a suite, other tests that also depended on exactly two options being available were failing. The failures were all due to more plans being available in the database than expected. For example, 4 instead of 2, and on the next run, 6 instead of 2, and so on.
+
+Before moving on with troubleshooting, there's a command you can run to reset the test database. This is needed to reproduce the problem of "run the test first time, it passes, subsequent runs, it fails":
+
+```bash
+# Rails 5+
+bundle exec rails db:reset RAILS_ENV=test
+
+# Older versions
+bundle exec rake db:reset RAILS_ENV=test
+```
 
 ## Test Database
 
@@ -84,11 +94,15 @@ The insert statements are a result of the `FactoryBot.create(:plan...)` methods 
 
 ## Where is data created?
 
-Doing some research on RSpec and rollbacks led me to this Stack Overflow [answer](https://stackoverflow.com/questions/3333743/factory-girl-rspec-doesnt-seem-to-roll-back-changes-after-each-example/24372747#24372747). The sentence in particular:
+Taking a closer look at what the RSpec docs have to say about [transactions](https://relishapp.com/rspec/rspec-rails/docs/transactions):
+
+> What it really means in Rails is "run every test method within a transaction." In the context of rspec-rails, it means "run every example within a transaction."
+
+So any data created within an example will be run within a transaction and rolled back. However, is data created within a `describe` block considered part of the example? Doing some research on RSpec and rollbacks led me to this Stack Overflow [answer](https://stackoverflow.com/questions/3333743/factory-girl-rspec-doesnt-seem-to-roll-back-changes-after-each-example/24372747#24372747). The sentence in particular:
 
 > ... use transactional fixtures will clear the DB as long as you created the data in the example itself. before :all do ... end is considered outside of the example, because the data remains untouched across multiple examples. Whatever you create in before :all you have to delete in after :all.
 
-Although my test wasn't using a `before` block, this got me wondering whether data created in a `describe` block is considered outside of the example? To answer this question, I modified the test to move the data creation into the `it` block:
+Although my test wasn't using a `before` block, this got me wondering whether data created in a `describe` block is considered *outside* of the example? To answer this question, I modified the test to move the data creation into the `it` block:
 
 ```ruby
 require "rails_helper"
@@ -136,7 +150,7 @@ Good, so creating the data in the `it` block solves this problem. But what if th
 
 ### Repeat Data Creation
 
-One way to solve for this would be to repeat the test data creation in each test that needs it. Since transactional fixtures are enabled, the database inserts will be rolled back at the end of each example so each test will get a clean start. To help in reading the test log file, I've also added some temporary logging statements at the beginning of each test:
+One way to solve for this would be to repeat the test data creation in each test that needs it. Since transactional fixtures are enabled, the database inserts will be rolled back at the end of each example so each test will get a clean start. I've also added some temporary logging statements at the beginning of each test, which will help in identifying each run in the `log/test.log`:
 
 ```ruby
 require "rails_helper"
@@ -257,11 +271,9 @@ Given the [DRY](https://en.wikipedia.org/wiki/Don%27t_repeat_yourself) principle
 Also "DRYing" up the tests can make them harder to read as it requires scrolling up to the top of the test file to understand where data, variables etc were defined. For a small test file maybe this isn't a big deal but can become an issue as the number of tests grow.
 
 <aside class="markdown-aside">
-The issue of optimal test design, is a little outside the scope of this post, but if you're interested in this topic, check out this Stack Overflow discussion on <a class="markdown-link" href="https://stackoverflow.com/questions/6453235/what-does-damp-not-dry-mean-when-talking-about-unit-tests">DAMP vs DRY</a>
+A full discussion of optimal test design, is outside the scope of this post, but if you're interested in this topic, check out this Stack Overflow discussion on <a class="markdown-link" href="https://stackoverflow.com/questions/6453235/what-does-damp-not-dry-mean-when-talking-about-unit-tests">DAMP vs DRY</a> and an <a class="markdown-link" href="https://www.globalapptesting.com/engineering/lets-take-a-closer-look-at-the-tests-created-in-rspec">RSpec specific take</a> on DRY and let.
 </aside>
 
-**TBD**
+## Conclusion
 
-- check constraints/unique on Plan model (unique on name but also using Faker as name wasn't important to these tests)
-- mention about resetting test db after each run during troubleshooting to get a clean start
-- Conclusion: Use of connecting to test database and checking test.log file for troubleshooting tests
+This post has covered some troubleshooting techniques you can use when RSpec tests are failing due to data not being cleaned up from the test database. Using these techniques, we have discovered that the `let/let!` helper methods have the effect of including any data created as part of the example's transaction. We also briefly touched on test design as to where data creation should be located.
