@@ -2,7 +2,7 @@
 title: "When RSpec Doesn't Rollback"
 featuredImage: "../images/rspec-rollback-mihaly-koles-Ec_WHv4aAno-unsplash.jpg"
 description: "Learn some troubleshooting techniques with RSpec and database transactions."
-date: "2022-11-01"
+date: "2022-12-01"
 category: "rails"
 related:
   - "Start a Rails 6 Project with RSpec"
