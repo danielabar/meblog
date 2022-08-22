@@ -12,20 +12,24 @@ describe("SearchInput", () => {
     expect(container).toMatchSnapshot()
   })
 
-  it("navigates to search results on Enter key press", () => {
+  it("navigates to search results on Enter key press", async () => {
+    const user = userEvent.setup()
     render(<SearchInput />)
 
     const inputEl = screen.getByTestId("search-input")
-    userEvent.type(inputEl, "Rails{enter}")
+    user.clear(inputEl)
+    await user.keyboard('Rails{enter}')
 
     expect(navigate).toHaveBeenCalledWith("/search-results/?q=Rails")
   })
 
-  it("navigates to search results on Enter key press for a different term", () => {
+  it("navigates to search results on Enter key press for a different term", async () => {
+    const user = userEvent.setup()
     render(<SearchInput />)
 
     const inputEl = screen.getByTestId("search-input")
-    userEvent.type(inputEl, "docker{enter}")
+    user.clear(inputEl)
+    await user.keyboard('docker{enter}')
 
     expect(navigate).toHaveBeenCalledWith("/search-results/?q=docker")
   })
