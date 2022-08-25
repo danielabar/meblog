@@ -12,6 +12,8 @@ related:
 
 If you're using Docker for development with a Rails application, and want to introduce a private gem registry hosted with [Github Packages](https://docs.github.com/en/packages/working-with-a-github-packages-registry/working-with-the-rubygems-registry), you may encounter an authentication error when building the development Docker image, at the point where it tries to pull the private gem(s). This post will walk you through the steps to resolve this.
 
+An important note before moving on - the solution presented in this post is only suitable for a *development* Docker image. That is, an image that remains on the developer's laptop and *never* gets pushed to production or any registry.
+
 ## Configure Bundler
 
 The Github documentation on configuring bundler so that you can pull private gems specifies the following command:
@@ -24,9 +26,9 @@ Where:
 
 * `OWNER` is the user or organization account that owns the repository that contains the gem project source.
 * `USERNAME` is in the individual user (Github account) that would like to pull the gem when building the Rails app that depends on it.
-* `TOKEN` is a Github personal access token (aka PAT) that each user running the project needs to create.
+* `TOKEN` is a Github personal access token (aka [PAT](https://docs.github.com/en/authentication/keeping-your-account-and-data-secure/creating-a-personal-access-token)) that each user running the project needs to create.
 
-If everyone on your team was running the Rails project natively on their laptops, you would just update the `README.md` telling each developer to create their PAT, run the `bundle config...` command locally, then run `bundle install` which will pull the new private gem(s) specified in `Gemfile`. You do keep your [project setup docs](../about-those-docs) up to date right?
+If everyone on your team was running the Rails project natively on their laptops, you would just update the `README.md` telling each developer to create their [PAT](https://docs.github.com/en/authentication/keeping-your-account-and-data-secure/creating-a-personal-access-token), run the `bundle config...` command locally, then run `bundle install` which will pull the new private gem(s) specified in `Gemfile`. You do keep your [project setup docs](../about-those-docs) up to date right?
 
 ## Dockerized Development
 
@@ -38,7 +40,7 @@ FROM ruby:whatever-version
 RUN bundle install
 ```
 
-However, if any of the gems in the `Gemfile` are coming from a private registry (specifically, the Github Packages RubyGems registry), trying to build this image will fail with the following authentication error:
+However, if any of the gems in the `Gemfile` are coming from a private registry, such as [Github Packages RubyGems](https://docs.github.com/en/packages/working-with-a-github-packages-registry/working-with-the-rubygems-registry), trying to build this image will fail with the following authentication error:
 
 ```
 Authentication is required for rubygems.pkg.github.com.
@@ -61,7 +63,7 @@ The problem with the above is that the `Dockerfile` is committed in the project.
 
 ## Dockerfile ARG
 
-What we need to solve this problem is *dynamic* values during the Docker build process. The [ARG](https://docs.docker.com/engine/reference/builder/#arg) command in a Dockerfile can be used for exactly this. Specify the `ARG`s at beginning of Dockerfile, just after the `FROM` command. Rather than `USERNAME` and `TOKEN` from the Github documentation, I'm going to name these to be more specific as to what they're used for as shown below:
+What we need to solve this problem is *dynamic* values during the Docker build process. The [ARG](https://docs.docker.com/engine/reference/builder/#arg) command in a Dockerfile can be used for exactly this. Specify the `ARG`s at beginning of the `Dockerfile`, just after the `FROM` command. Rather than `USERNAME` and `TOKEN` from the Github documentation, I'm going to name these to be more specific as to what they're used for:
 
 ```Dockerfile
 FROM ruby:your-base-image
@@ -93,15 +95,17 @@ docker build -t app-image:latest
   .
 ```
 
+To re-emphasize the note from the beginning of this post, using `ARG` in this way is only suitable for a development image that will never be made public. This is because the `ARG` values become part of the image and are viewable in the output of the `docker history` command. If you need build-time secrets for a production image, see the Docker documentation on [BuildKit](https://docs.docker.com/develop/develop-images/build_enhancements/#new-docker-build-secret-information).
+
 <aside class="markdown-aside">
 You may be wondering why not use <a class="markdown-link" href="https://docs.docker.com/engine/reference/builder/#env">ENV</a>? The reason is Docker does not provide a way to dynamically set ENV values during the build process, and these values are only needed during the image build time, not container run time. Read this <a class="markdown-link" href="https://www.baeldung.com/ops/dockerfile-env-variable">blog post</a> for more on this topic.
 </aside>
 
 ## Docker Compose
 
-This project however uses several other services including MySQL and Redis, therefore, [Docker Compose](https://docs.docker.com/compose/) is used to build the image and run all the containers together. This means we need to be able to pass through the Docker `ARG`s from the `docker-compose.yml` file to the Dockerfile. Fortunately, docker compose provides the [args](https://docs.docker.com/compose/compose-file/compose-file-v3/#args) keyword for the `build` command for just this purpose.
+This project uses several other services including MySQL and Redis, therefore, [Docker Compose](https://docs.docker.com/compose/) is used to build the image and run all the containers together. This means we need to be able to pass through the Docker `ARG`s from the `docker-compose.yml` file to the Dockerfile. Fortunately, docker compose provides the [args](https://docs.docker.com/compose/compose-file/compose-file-v3/#args) keyword for the `build` command for just this purpose.
 
-Trying it out, this poses a new problem as shown below:
+Trying it out however poses a new problem as shown below:
 
 ```yml
 # docker-compose.yml
@@ -123,7 +127,7 @@ services:
     # ...
 ```
 
-Since the `docker-compose.yml` file is also committed into the project, we do not want to hard-code Github user names and PAT in this file either. Fortunately, docker compose supports the use of [environment variables](https://docs.docker.com/compose/environment-variables/). Here's how to specify the Github username and PAT as environment variables in the compose file:
+Since the `docker-compose.yml` file is also committed into the project, we do not want to hard-code Github user names and tokens in this file either. Fortunately, docker compose supports the use of [environment variables](https://docs.docker.com/compose/environment-variables/). Here's how to specify the Github username and PAT as environment variables in the compose file:
 
 ```yml
 # docker-compose.yml
@@ -151,7 +155,7 @@ Next step is being able to pass the values of these environment variables to doc
 docker-compose --env-file .env.dockercompose.local build
 ```
 
-Where `.env.dockercompose.local` is a gitignored file that specifies the secrets. You can name this whatever you want, just make sure its in the [gitignore](https://git-scm.com/docs/gitignore) file so it doesn't get committed:
+Where `.env.dockercompose.local` is a gitignored file that specifies the secrets. You can name the .env file whatever you want, just make sure its in the [gitignore](https://git-scm.com/docs/gitignore) file so it doesn't get committed. Here's what the env file will look like:
 
 ```
 GITHUB_USERNAME=your-github-username
@@ -175,10 +179,14 @@ Now whenever you need to build the image (such as when new gems have been added 
 make build
 ```
 
+Remember to also update the project's `README.md` with the new setup instructions that everyone wanting to build the image on their laptop needs to create a `.env.dockercompose.local` file and populate it with their Github username and personal access token.
+
+## Conclusion
+
+This post has covered how to authenticate to the Github Packages RubyGems private registry when using Docker for Rails development. The technique involves use of Docker `ARG`s to specify dynamic build time values, docker compose environment variables to pass them through to the build, and a gitignored env file to avoid committing the secrets. Again a reminder that this should only be used for a development image that will never leave the developer's laptop.
+
 ## TODO
 
-* link to github docs on PAT and spell it out: personal access token
-* Remind update readme for docker setup re: create pat, create env file, optionally save pat in company approved secrets manager
 * Include example line from Gemfile using a private gem
 ```
 source 'https://gem.fury.io/depfu/' do
@@ -186,5 +194,3 @@ source 'https://gem.fury.io/depfu/' do
 end
 ```
 * Note that there's also ~/.gemrc config but that's only if you need to *publish* a gem to private registry. For pulling with bundler, you need to run the `bundle config...` command.
-* WARNING this is only suitable for a development image that never gets pushed to production because the secrets become part of the image, and are also viewable in `docker history...`. From docs: "It is not recommended to use build-time variables for passing secrets like github keys, user credentials etc. Build-time variable values are visible to any user of the image with the docker history command."
-* conclusion
