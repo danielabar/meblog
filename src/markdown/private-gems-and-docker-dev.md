@@ -1,6 +1,6 @@
 ---
 title: "Private Gems and Docker for Development"
-featuredImage: "../images/private-gem-adrian-diaz-sieckel-bO_dICSqaIg-unsplash.jpg"
+featuredImage: "../images/private-gem-ilze-lucero-jLWLxX6i3R8-unsplash.jpg"
 description: "Use a private gem registry with a Dockerized Rails application for development."
 date: "2023-01-01"
 category: "ruby"
@@ -16,7 +16,15 @@ An important note before moving on - the solution presented in this post is only
 
 ## Configure Bundler
 
-The Github documentation on configuring bundler so that you can pull private gems specifies the following command:
+Given that your projects `Gemfile` is pulling some gems from Github Packages private gem registry, for example:
+
+```
+source 'https://rubygems.pkg.github.com/some-project/' do
+  gem 'myprivate_gem'
+end
+```
+
+The Github documentation on configuring bundler so that you can pull private gems specifies that you must first run the following command:
 
 ```
 $ bundle config https://rubygems.pkg.github.com/OWNER USERNAME:TOKEN
@@ -28,7 +36,11 @@ Where:
 * `USERNAME` is in the individual user (Github account) that would like to pull the gem when building the Rails app that depends on it.
 * `TOKEN` is a Github personal access token (aka [PAT](https://docs.github.com/en/authentication/keeping-your-account-and-data-secure/creating-a-personal-access-token)) that each user running the project needs to create.
 
-If everyone on your team was running the Rails project natively on their laptops, you would just update the `README.md` telling each developer to create their [PAT](https://docs.github.com/en/authentication/keeping-your-account-and-data-secure/creating-a-personal-access-token), run the `bundle config...` command locally, then run `bundle install` which will pull the new private gem(s) specified in `Gemfile`. You do keep your [project setup docs](../about-those-docs) up to date right?
+If everyone on your team was running the Rails project natively on their laptops, you would just update the `README.md` telling each developer to create their [PAT](https://docs.github.com/en/authentication/keeping-your-account-and-data-secure/creating-a-personal-access-token), run the `bundle config...` command locally, then run `bundle install` which will pull the new private gem(s) specified in `Gemfile`. You keep your [project setup docs](../about-those-docs) up to date right?
+
+<aside class="markdown-aside">
+The Github documentation on private gems also refers to creating or updating your ~/.gemrc file, including the Github credentials in this file. However, this is only required for publishing gems, and will not be covered in this post.
+</aside>
 
 ## Dockerized Development
 
@@ -59,7 +71,7 @@ RUN bundle config https://rubygems.pkg.github.com/OWNER USERNAME:TOKEN
 RUN bundle install
 ```
 
-The problem with the above is that the `Dockerfile` is committed in the project. You wouldn't  want to commit this line as is, because `USERNAME` will be different for each developer on the team and `TOKEN` is a user-specific secret that provides some access to the developer's Github account so that definitely should not be committed.
+The problem with the above is that the `Dockerfile` is committed in the project. You wouldn't  want to commit this line as is, because `USERNAME` will be different for each developer working on the project. `TOKEN` is a user-specific secret that provides some access to the developer's Github account so that definitely should not be committed.
 
 ## Dockerfile ARG
 
@@ -155,14 +167,14 @@ Next step is being able to pass the values of these environment variables to doc
 docker-compose --env-file .env.dockercompose.local build
 ```
 
-Where `.env.dockercompose.local` is a gitignored file that specifies the secrets. You can name the .env file whatever you want, just make sure its in the [gitignore](https://git-scm.com/docs/gitignore) file so it doesn't get committed. Here's what the env file will look like:
+Where `.env.dockercompose.local` is a gitignored file that specifies the secrets. You can name the .env file whatever you want, just make sure its in the [gitignore](https://git-scm.com/docs/gitignore) so it doesn't get committed. Here's what the env file will look like:
 
 ```
 GITHUB_USERNAME=your-github-username
 GITHUB_PAT_GEMS=your-github-pat
 ```
 
-This will make the values of `GITHUB_USERNAME` and `GITHUB_PAT_GEMS` from the .env file available to docker compose, which will then pass these on to the Dockerfile as ARG's, where they can then be used for the build.
+Now, when the docker-compose build command is run, it will have access to the values of `GITHUB_USERNAME` and `GITHUB_PAT_GEMS` from the .env file. Then these will get passed on to the Dockerfile as ARG's, where they can be used in building the image.
 
 ## Makefile
 
@@ -184,13 +196,3 @@ Remember to also update the project's `README.md` with the new setup instruction
 ## Conclusion
 
 This post has covered how to authenticate to the Github Packages RubyGems private registry when using Docker for Rails development. The technique involves use of Docker `ARG`s to specify dynamic build time values, docker compose environment variables to pass them through to the build, and a gitignored env file to avoid committing the secrets. Again a reminder that this should only be used for a development image that will never leave the developer's laptop.
-
-## TODO
-
-* Include example line from Gemfile using a private gem
-```
-source 'https://gem.fury.io/depfu/' do
-  gem 'myprivate_gem', '~> 3.7'
-end
-```
-* Note that there's also ~/.gemrc config but that's only if you need to *publish* a gem to private registry. For pulling with bundler, you need to run the `bundle config...` command.
