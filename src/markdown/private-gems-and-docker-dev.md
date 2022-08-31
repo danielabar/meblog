@@ -12,11 +12,11 @@ related:
 
 If you're using Docker for development with a Rails application, and want to introduce a private gem registry hosted with [Github Packages](https://docs.github.com/en/packages/working-with-a-github-packages-registry/working-with-the-rubygems-registry), you may encounter an authentication error when building the development Docker image, at the point where it tries to pull the private gem(s). This post will walk you through the steps to resolve this.
 
-An important note before moving on - the solution presented in this post is only suitable for a *development* Docker image. That is, an image that remains on the developer's laptop and *never* gets pushed to production or any registry.
+An important note before moving on - the solution presented in this post is only suitable for a *development* Docker image. That is, an image that remains on the developer's laptop and *never* gets pushed to production or made public.
 
 ## Configure Bundler
 
-Given that your projects `Gemfile` is pulling some gems from Github Packages private gem registry, for example:
+Given that your projects `Gemfile` is pulling some gems from Github Packages, for example:
 
 ```
 source 'https://rubygems.pkg.github.com/some-project/' do
@@ -36,7 +36,7 @@ Where:
 * `USERNAME` is in the individual user (Github account) that would like to pull the gem when building the Rails app that depends on it.
 * `TOKEN` is a Github personal access token (aka [PAT](https://docs.github.com/en/authentication/keeping-your-account-and-data-secure/creating-a-personal-access-token)) that each user running the project needs to create.
 
-If everyone on your team was running the Rails project natively on their laptops, you would just update the `README.md` telling each developer to create their [PAT](https://docs.github.com/en/authentication/keeping-your-account-and-data-secure/creating-a-personal-access-token), run the `bundle config...` command locally, then run `bundle install` which will pull the new private gem(s) specified in `Gemfile`. You keep your [project setup docs](../about-those-docs) up to date right?
+If everyone on your team was running the Rails project natively on their laptops, you would just update the `README.md` telling each developer to create their  PAT, run the `bundle config...` command locally, then run `bundle install` which will pull the new private gem(s) specified in `Gemfile`. You keep your [project setup docs](../about-those-docs) up to date right?
 
 <aside class="markdown-aside">
 The Github documentation on private gems also refers to creating or updating your ~/.gemrc file, including the Github credentials in this file. However, this is only required for publishing gems, and will not be covered in this post.
@@ -84,7 +84,7 @@ ARG GITHUB_USERNAME
 ARG GITHUB_PAT_GEMS
 ```
 
-Then later in Dockerfile, just before bundle install is run, add the `bundle config...` command from the Github documentation, but this time, using the `ARG` variables. Replace `project` with project name where the private gem is hosted:
+Then later in Dockerfile, just before bundle install is run, add the `bundle config...` command from the Github documentation, but this time, using the `ARG` variables. Replace `project` with project name where the private gem source is located:
 
 ```Dockerfile
 FROM ruby:whatever-version
@@ -101,9 +101,9 @@ RUN bundle install
 Now if you were building the Docker image directly, you could run:
 
 ```
-docker build -t app-image:latest
-  --build-arg GITHUB_USERNAME=your-github-username
-  --build-arg GITHUB_PAT_GEMS=your-github-pat
+docker build -t app-image:latest \
+  --build-arg GITHUB_USERNAME=your-github-username \
+  --build-arg GITHUB_PAT_GEMS=your-github-pat \
   .
 ```
 
@@ -115,7 +115,7 @@ You may be wondering why not use <a class="markdown-link" href="https://docs.doc
 
 ## Docker Compose
 
-This project uses several other services including MySQL and Redis, therefore, [Docker Compose](https://docs.docker.com/compose/) is used to build the image and run all the containers together. This means we need to be able to pass through the Docker `ARG`s from the `docker-compose.yml` file to the Dockerfile. Fortunately, docker compose provides the [args](https://docs.docker.com/compose/compose-file/compose-file-v3/#args) keyword for the `build` command for just this purpose.
+This project uses several other services including MySQL and Redis, therefore, [Docker Compose](https://docs.docker.com/compose/) is used to build the image and run all the containers together. This means we need to be able to pass through the Docker `ARG`s from the `docker-compose.yml` file to the `Dockerfile`. Fortunately, docker compose provides the [args](https://docs.docker.com/compose/compose-file/compose-file-v3/#args) keyword for the `build` command for just this purpose.
 
 Trying it out however poses a new problem as shown below:
 
@@ -161,7 +161,7 @@ services:
     # ...
 ```
 
-Next step is being able to pass the values of these environment variables to docker compose via the CLI. You can do this using the `--env-file` argument, passing in a path to a file containing the values:
+Next step is being able to pass the values of these environment variables to docker compose via the command line. This can be accomplished with the `--env-file` argument, passing in a path to a file containing the values:
 
 ```
 docker-compose --env-file .env.dockercompose.local build
@@ -174,11 +174,11 @@ GITHUB_USERNAME=your-github-username
 GITHUB_PAT_GEMS=your-github-pat
 ```
 
-Now, when the docker-compose build command is run, it will have access to the values of `GITHUB_USERNAME` and `GITHUB_PAT_GEMS` from the .env file. Then these will get passed on to the Dockerfile as ARG's, where they can be used in building the image.
+Now, when the docker-compose build command is run, it will have access to the values of `GITHUB_USERNAME` and `GITHUB_PAT_GEMS` from the .env file. Then these will get passed on to the `Dockerfile` as ARG's, where they can be used in building the image.
 
 ## Makefile
 
-To save yourself all that typing of the docker compose command with the env file, if your project uses a Makefile, you can add the following task:
+To save yourself all that typing of the docker compose command with the env file, if your project uses a `Makefile`, you can add the following task:
 
 ```makefile
 build:
@@ -193,6 +193,10 @@ make build
 
 Remember to also update the project's `README.md` with the new setup instructions that everyone wanting to build the image on their laptop needs to create a `.env.dockercompose.local` file and populate it with their Github username and personal access token.
 
+<aside class="markdown-aside">
+I've mentioned a few times about keeping the README.md up to date when making changes to the setup process that impact all the other developers working on the project. Although almost no one likes writing engineering documentation, they certainly appreciate having good, up to date docs. See my post on <a class="markdown-link" href="https://danielabaron.me/blog/about-those-docs/">engineering documentation</a> for what kinds of things should get documented and how to get in a good frame of mind for writing it.
+</aside>
+
 ## Conclusion
 
-This post has covered how to authenticate to the Github Packages RubyGems private registry when using Docker for Rails development. The technique involves use of Docker `ARG`s to specify dynamic build time values, docker compose environment variables to pass them through to the build, and a gitignored env file to avoid committing the secrets. Again a reminder that this should only be used for a development image that will never leave the developer's laptop.
+This post has covered how to authenticate to the Github Packages RubyGems private registry when using Docker for Rails development. The technique involves use of Docker `ARG`s to specify dynamic build time values, docker compose environment variables to pass them through to the build, and a gitignored env file to avoid committing the secrets. Again a reminder that this technique should only be used for a development image that will never leave the developer's laptop.
