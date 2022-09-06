@@ -18,25 +18,118 @@ Install Postgres locally. Even though the Postgres database server will be run i
 brew install postgresql@14
 ```
 
-Scaffold a new Rails app, but specify that you want the database to be Postgres. Otherwise, the default option will use the SQLite database:
+Scaffold a new Rails app, but specify that you want the database to be Postgres. Otherwise, the default option will use a SQLite database:
 
 ```
 rails new blogpg --database=postgresql
-cd blogpg
-bundle install
 ```
 
-Introduce a docker compose file... Explain about port mapping, host mount for one-time init, named volume for data persistence. Explain that even though there's only one service, its still more convenient to use docker compose than docker directly, less to type when starting, and we may add more services in the future such as Redis, Elasticsearch, Sidekiq etc.
+Introduce a docker compose file... Explain about port mapping, host mount for one-time init, named volume for data persistence. Explain that even though there's only one service, its still more convenient to use docker compose than docker directly, less to type when starting, and we may add more services in the future such as Redis, Elasticsearch, Sidekiq etc. Also preference for using official images from Docker Hub where possible. Specify version rather than `latest` to match database version used in production.
 
-Introduce init.sql to create role. Making use of Postgres image feature that any sql file mounted to init dir will run one time for initialization. It only runs if it detects that no database exists yet.
+```yml
+version: "3.8"
 
-Modify database.yml... Explain about ENV || syntax so that for prod, it can use defaults. We're only using Docker for the database in development mode.
+services:
+  database:
+    image: postgres:14
+    volumes:
+      - db_pg_data:/var/lib/postgresql/data
+      - ./init.sql:/docker-entrypoint-initdb.d/init.sql
+    ports:
+      # Map to something other than default 5432 on host in case Postgres is also running natively on host.
+      - "5434:5432"
+    environment:
+      # Sets the superuser password for PostgreSQL
+      POSTGRES_PASSWORD: shhhhItsASecret
+
+volumes:
+  db_pg_data:
+```
+
+Introduce init.sql to create role. Making use of Postgres image feature that any sql file mounted to init dir will run one time for initialization. It only runs if it detects that no database exists yet. This will create the role (aka user in Postgres):
+
+```sql
+-- Only used for development where Postgres is run in Docker
+create role blogpg with createdb login password 'blogpg';
+```
+
+Modify database.yml... Explain about ENV || syntax so that for prod, it can use defaults. We're only using Docker for the database in development mode. Notice the port `5434` for development and test databases is from the port mapping in `docker-compose.yml`:
+
+```yml
+default: &default
+  adapter: postgresql
+  encoding: unicode
+  pool: <%= ENV.fetch("RAILS_MAX_THREADS") { 5 } %>
+  database: <%= ENV['DATABASE_NAME'] || "blogpg" %>
+  username: <%= ENV['DATABASE_USER'] || "blogpg" %>
+  password: <%= ENV['DATABASE_PASSWORD'] || "blogpg" %>
+  port: <%= ENV['DATABASE_PORT'] || "5432" %>
+  host: <%= ENV['DATABASE_HOST'] || "127.0.0.1" %>
+
+development:
+  <<: *default
+  port: 5434
+
+test:
+  <<: *default
+  database: blogpg_test
+  port: 5434
+
+production:
+  <<: *default
+  database: blogpg_production
+  username: blogpg
+  password: <%= ENV['BLOGPG_DATABASE_PASSWORD'] %>
+```
 
 Start container(s) with docker compose.
+
+```
+docker-compose up
+```
+
+Since we haven't yet created the `blogpg` database, the console output should show that the `init.sql` script was run to create the `blogpg` role:
+
+```
+database_1  | /usr/local/bin/docker-entrypoint.sh: running /docker-entrypoint-initdb.d/init.sql
+database_1  | CREATE ROLE
+...
+database_1  | 2022-09-06 10:33:56.184 UTC [1] LOG:  database system is ready to accept connections
+```
 
 Create database with `bin/rails db:create`
 
 Verify with `psql` command line tool (got installed with homebrew earlier)
+
+```bash
+psql -h 127.0.0.1 -p 5434 -U postgres
+psql -h 127.0.0.1 -p 5434 -U blogpg
+# enter password from init.sql
+```
+
+List all databases:
+
+```
+blogpg=> \l
+                                  List of databases
+    Name     |  Owner   | Encoding |  Collate   |   Ctype    |   Access privileges
+-------------+----------+----------+------------+------------+-----------------------
+ blogpg      | blogpg   | UTF8     | en_US.utf8 | en_US.utf8 |
+ blogpg_test | blogpg   | UTF8     | en_US.utf8 | en_US.utf8 |
+ postgres    | postgres | UTF8     | en_US.utf8 | en_US.utf8 |
+ template0   | postgres | UTF8     | en_US.utf8 | en_US.utf8 | =c/postgres          +
+             |          |          |            |            | postgres=CTc/postgres
+ template1   | postgres | UTF8     | en_US.utf8 | en_US.utf8 | =c/postgres          +
+             |          |          |            |            | postgres=CTc/postgres
+(5 rows)
+```
+
+TODO: Do this later after create some models and migrate, there's no tables right now!
+List all tables in `blogpg` database (where we're connected currently):
+
+```
+\dt
+```
 
 Using Rails Guide, generate model with `bin/rails generate model Article title:string body:text`. First - do the steps in router and generate Articles controller so we can be at same point that Rails Guide is.
 
@@ -47,6 +140,8 @@ Using Rails Guide, generate model with `bin/rails generate model Article title:s
 * [Rails Getting Started Building Blog App](https://guides.rubyonrails.org/getting_started.html)
 * [Rails Command Line Option for Database](https://guides.rubyonrails.org/command_line.html#rails-with-databases-and-scm)
 * [Postgres Official Image on Docker Hub](https://hub.docker.com/_/postgres)
+* [Postgres Docker Image Full Readme](https://github.com/docker-library/docs/blob/master/postgres/README.md)
+* [Postgres user vs role](https://stackoverflow.com/questions/27709456/what-is-the-difference-between-a-user-and-a-role)
 
 ## TODO
 
