@@ -1,6 +1,6 @@
 ---
 title: "Setup a Rails Project with Postgres and Docker"
-featuredImage: "../images/multiple-tabs-cake-annie-spratt-6SHd7Q-l1UQ-unsplash.jpg"
+featuredImage: "../images/rails-postgres-docker-guillaume-bolduc-uBe2mknURG4-unsplash.jpg"
 description: "Learn how to scaffold a new Rails project with Postgres running in a Docker container for development."
 date: "2023-02-01"
 category: "rails"
@@ -53,7 +53,7 @@ Introduce init.sql to create role. Making use of Postgres image feature that any
 create role blogpg with createdb login password 'blogpg';
 ```
 
-Modify database.yml... Explain about ENV || syntax so that for prod, it can use defaults. We're only using Docker for the database in development mode. Notice the port `5434` for development and test databases is from the port mapping in `docker-compose.yml`:
+Modify database.yml... Explain about ENV || syntax so that for prod, it can use defaults. We're only using Docker for the database in development mode. Notice the port `5434` for development and test databases is from the port mapping in `docker-compose.yml`.
 
 ```yml
 default: &default
@@ -102,7 +102,6 @@ Create database with `bin/rails db:create`
 Verify with `psql` command line tool (got installed with homebrew earlier)
 
 ```bash
-psql -h 127.0.0.1 -p 5434 -U postgres
 psql -h 127.0.0.1 -p 5434 -U blogpg
 # enter password from init.sql
 ```
@@ -135,19 +134,76 @@ Rails.application.routes.draw do
 end
 ```
 
-Generate controller with `bin/rails generate controller Articles index --skip-routes`.
-
-Generate model with `bin/rails generate model Article title:string body:text`.
-TODO: Why is this frozen?
-
-Verify `articles` table got created in the Postgres database running within Docker container.
-List all tables in `blogpg` database (where we're connected currently):
+Generate an Articles controller, model and run the migration to create the `articles` table in the database:
 
 ```
-\dt
+bin/rails generate controller Articles index --skip-routes
+bin/rails generate model Article title:string body:text
+bin/rails db:migrate
 ```
 
+Go back to the tab where `psql` is running and verify `articles` table got created in the Postgres database running within Docker container. The `\dt` command lists all tables in the database you're connected to:
 
+```
+blogpg=> \dt
+               List of relations
+ Schema |         Name         | Type  | Owner
+--------+----------------------+-------+--------
+ public | ar_internal_metadata | table | blogpg
+ public | articles             | table | blogpg
+ public | schema_migrations    | table | blogpg
+(3 rows)
+```
+
+We can see the `articles` table got created as well as the `schema_migrations` Rails uses to keep track of migrations.
+
+Now let's launch a Rails console with `bin/rails console` and create a new article:
+
+```ruby
+Article.create(title: "Hello Postgres Docker", body: "I'm being created in Postgres running in a Docker container")
+```
+
+Go back to the tab where `psql` is running and verify the new article record has been created in the database in the Docker container:
+
+```
+blogpg=> select * from articles;
+ id |         title         |                            body                             |         created_at         |         updated_at
+----+-----------------------+-------------------------------------------------------------+----------------------------+----------------------------
+  1 | Hello Postgres Docker | I'm being created in Postgres running in a Docker container | 2022-09-09 10:31:13.032458 | 2022-09-09 10:31:13.032458
+(1 row)
+```
+
+To tie this all together, let's update the Articles controller `index` method and the Articles index view to display the articles so we can verify the full stack is working with the Dockerized database:
+
+```ruby
+# app/controllers/articles_controller.rb
+class ArticlesController < ApplicationController
+  def index
+    @articles = Article.all
+  end
+end
+```
+
+```erb
+<!-- app/views/articles/index.html.erb -->
+<h1>Articles</h1>
+<table>
+  <tr>
+    <th>Title</th>
+    <th>Body</th>
+  </tr>
+  <% @articles.each do |article| %>
+    <tr>
+      <td><%= article.title %></td>
+      <td><%= article.body %></td>
+    </tr>
+  <% end %>
+</table>
+```
+
+Start the server with `bin/rails s` and navigate to `http://localhost:3000` and you should see:
+
+![rails postgres docker articles index](../images/rails-postgres-docker-articles-index.png "rails postgres docker articles index")
 
 ## References
 
@@ -162,12 +218,15 @@ List all tables in `blogpg` database (where we're connected currently):
 ## TODO
 
 * Intro para - something like: By default, when running `rails new...` will use SQLite database. This can be changed to specify a different database but will assume that the database is running on localhost. If you want the database running in a Docker container rather than locally, need to do a few more steps, this post will walk you through how to do this. We'll do this by going through the Rails Getting Started Guide which builds a blog application, but rather than using the default SQLite database, we'll setup Postgres running in a Docker container.
-* Mention that if you stop docker-compose and start up again, should not init role again, should see `PostgreSQL Database directory appears to contain a database; Skipping initialization`. This is because you ran create db and still have the named volume. If you delete the volume and start container again, role will be created again.
-* Organize into subsections
-* Feature image
-* Specify what Ruby, Rails, and Node versions I'm using.
 * Why would you want database in container for development? If switch between multiple projects, using different versions of database, or simply don't want a mess of databases always on and running locally (or have to remember to start/stop them).
+* Specify what Ruby, Rails, and Node versions I'm using.
+* css for `erb`
+* Organize into subsections
+* Mention that if you stop docker-compose and start up again, should not init role again, should see `PostgreSQL Database directory appears to contain a database; Skipping initialization`. This is because you ran create db and still have the named volume. If you delete the volume and start container again, role will be created again.
 * Explain port mapping to a different port than default 3306 in case someone does have Postgres running natively on laptop, avoid port conflict or strange situation where Rails app is attempting to read from the wrong database.
 * Explain Postgres role === user
+* WATCH OUT: Host mount option to init ROLE referencing sql file in project does not work on Github Actions using `services` because service started before source checked out in workflow. Ref: Debug Github Actions for more details.
+* Mention no password option with other env var from postgres image (development only!)
 * Note that running database in Docker container only recommended for development, not production (performance).
+* Push blogpg project to Github as companion to this post for reference.
 * Conclusion para
