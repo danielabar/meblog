@@ -10,6 +10,20 @@ related:
   - "Use UUID for primary key with Rails and Postgres"
 ---
 
+When scaffolding a new Rails project, the database flag can be used to specify a database other than the default SQLite, such as Postgres. However, the generated configuration will assume that the database is running on localhost, i.e. installed directly on your laptop or development machine. If instead you'd like the database running in a Docker container, a few more steps are necessary. This post will walk you through how to setup a new Rails project with a Postgres database running in a Docker container rather than the default SQLite running on localhost. It will be demonstrated using the Rails Getting Started Guide which builds an example blog application.
+
+## Why?
+
+But first, why would you want to use Docker to run your development database rather than simply installing it on your machine? There are a few benefits including:
+
+**Version consistency:** You want everyone on the team to be running the same version locally as what's used in production. Suppose the production version gets upgraded, then every developer needs to remember to also upgrade their local installation. When the service is dockerized and run with Docker Compose, an upgrade just involves bumping the version tag in the docker-compose.yml file and pushing to version control. Next time everyone pulls that change and runs `docker-compose up`, they'll automatically get the upgraded version. This also ensures every developer on the team is using the same version, eliminating one potential source of [works on my machine](https://dzone.com/articles/works-on-my-machine) problems.
+
+**Configuration consistency:** If your project requires some custom database configuration, it can be committed into the project and set in the container with a host mount. This leads to faster local setup as compared to adding an instruction in the readme telling each developer to configure their database manually.
+
+**Multiple versions and services:**: For a developer that works on multiple projects, they could be using different database versions and it would be tedious to have to constantly uninstall/re-install versions every time you switch projects. Also as you work on multiple projects, each may have different service requirements such as Postgres, MySQL, Elasticsearch, Redis, etc. I'd rather not have all of those always running on my laptop when not needed, or have to remember to start/stop them for each project. Using Docker, with Docker Compose simplifies this.
+
+Now that we've covered some benefits of using Docker locally for services, let's see how to setup Postgres in a container for a new Rails project.
+
 ## Steps
 
 Install Postgres locally. Even though the Postgres database server will be run inside a Docker container, we still need the client installed on our laptop to connect to it. For a Mac, the easiest way is to use Homebrew. Note that you need to select your version, for example:
@@ -217,8 +231,6 @@ Start the server with `bin/rails s` and navigate to `http://localhost:3000` and 
 
 ## TODO
 
-* Intro para - something like: By default, when running `rails new...` will use SQLite database. This can be changed to specify a different database but will assume that the database is running on localhost. If you want the database running in a Docker container rather than locally, need to do a few more steps, this post will walk you through how to do this. We'll do this by going through the Rails Getting Started Guide which builds a blog application, but rather than using the default SQLite database, we'll setup Postgres running in a Docker container.
-* Why would you want database in container for development? If switch between multiple projects, using different versions of database, or simply don't want a mess of databases always on and running locally (or have to remember to start/stop them).
 * Specify what Ruby, Rails, and Node versions I'm using.
 * css for `erb`
 * Organize into subsections
