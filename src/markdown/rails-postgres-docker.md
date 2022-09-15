@@ -24,7 +24,7 @@ But first, why would you want to use Docker to run your development database rat
 
 Now that we've covered some benefits of using Docker locally for services, let's see how to setup Postgres in a container for a new Rails project.
 
-## Steps
+## Getting Started
 
 Install Postgres locally. Even though the Postgres database server will be run inside a Docker container, we still need the client installed on our laptop to connect to it. For a Mac, the easiest way is to use Homebrew. Note that you need to select your version, for example:
 
@@ -38,7 +38,9 @@ Scaffold a new Rails app, but specify that you want the database to be Postgres.
 rails new blogpg --database=postgresql
 ```
 
-Introduce a docker compose file... Explain about port mapping, host mount for one-time init, named volume for data persistence. Explain that even though there's only one service, its still more convenient to use docker compose than docker directly, less to type when starting, and we may add more services in the future such as Redis, Elasticsearch, Sidekiq etc. Also preference for using official images from Docker Hub where possible. Specify version rather than `latest` to match database version used in production.
+## Docker Compose
+
+We'll use [Docker Compose](https://docs.docker.com/compose/) to manage starting and stopping containers. Add the following `docker-compose.yml` file to the root of the project:
 
 ```yml
 version: "3.8"
@@ -51,6 +53,7 @@ services:
       - ./init.sql:/docker-entrypoint-initdb.d/init.sql
     ports:
       # Map to something other than default 5432 on host in case Postgres is also running natively on host.
+      # Format is "host:container"
       - "5434:5432"
     environment:
       # Sets the superuser password for PostgreSQL
@@ -60,12 +63,34 @@ volumes:
   db_pg_data:
 ```
 
+A few things to note here:
+
+**image:** This specifies what image to use. By default, it will pull from the [Docker Hub](https://index.docker.io/search?q=) public registry.
+
+**ports:** By default, Postgres listens on port 5432. However, when the database is running in a container rather than directly on the local machine, this port must be mapped to another port on the host, in order for the Rails application to be able to connect to it. Typically, you'll see the container port mapped to same port number on the host such as `"5432:5432"`. I prefer to choose a different port to map to on the host in case anyone on the team happens to be running Postgres locally on the default port, maybe from an earlier tutorial, or even just installing the client via homebrew, they may have chosen to start the service. The idea here is to avoid a port conflict where Docker is trying to use a port that's already in use by the host.
+
+Learn more about ports here: https://docs.docker.com/compose/compose-file/#ports
+
+**volumes:** We're making use of two entries here. The first is a named volume `db_pg_data:/var/lib/postgresql/data`. This maps the directory inside the container where Postgres stores all the data to a Docker volume named `db_pg_data`, which is defined at the end of the file in the `volumes` section. This will save all data outside of the container (you can list your volumes with the `docker volume ls` command). This means even if the container is removed, your data is still available.
+
+The second is a host mount `./init.sql:/docker-entrypoint-initdb.d/init.sql`. It maps a file `./init.sql` from the project root (we'll create it in the next section) to a special directory in the container `docker-entrypoint-initdb.d`. This is a property of the official Postgres Docker image. Any sql files located in this directory can be used for one-time initialization. That is, when the container starts, it checks if the `postgres` database already exists, if not, it runs all sql scripts found in the initdb directory. If a database already exists, then the files are ignored.
+
+Learn more about volumes here: https://docs.docker.com/compose/compose-file/#volumes
+
+**environment:** TBD...
+
+Explain that even though there's only one service, its still more convenient to use docker compose than docker directly, less to type when starting, and we may add more services in the future such as Redis, Elasticsearch, Sidekiq etc. Also preference for using official images from Docker Hub where possible. Specify version rather than `latest` to match database version used in production.
+
+## Initialization
+
 Introduce init.sql to create role. Making use of Postgres image feature that any sql file mounted to init dir will run one time for initialization. It only runs if it detects that no database exists yet. This will create the role (aka user in Postgres):
 
 ```sql
 -- Only used for development where Postgres is run in Docker
 create role blogpg with createdb login password 'blogpg';
 ```
+
+## Rails Database Config
 
 Modify database.yml... Explain about ENV || syntax so that for prod, it can use defaults. We're only using Docker for the database in development mode. Notice the port `5434` for development and test databases is from the port mapping in `docker-compose.yml`.
 
@@ -96,6 +121,8 @@ production:
   password: <%= ENV['BLOGPG_DATABASE_PASSWORD'] %>
 ```
 
+## Start Container
+
 Start container(s) with docker compose.
 
 ```
@@ -110,6 +137,8 @@ database_1  | CREATE ROLE
 ...
 database_1  | 2022-09-06 10:33:56.184 UTC [1] LOG:  database system is ready to accept connections
 ```
+
+## Create Database
 
 Create database with `bin/rails db:create`
 
@@ -138,6 +167,8 @@ blogpg=> \l
 ```
 
 Keep this tab open, we'll come back to it to verify tables after creating and populating some models.
+
+## Add Articles
 
 Now let's follow along with the Getting Started Rails Guide. Add the following to `config/routes.rb`:
 
@@ -187,6 +218,8 @@ blogpg=> select * from articles;
 (1 row)
 ```
 
+## Verify Full Stack
+
 To tie this all together, let's update the Articles controller `index` method and the Articles index view to display the articles so we can verify the full stack is working with the Dockerized database:
 
 ```ruby
@@ -219,6 +252,10 @@ Start the server with `bin/rails s` and navigate to `http://localhost:3000` and 
 
 ![rails postgres docker articles index](../images/rails-postgres-docker-articles-index.png "rails postgres docker articles index")
 
+## Conclusion
+
+TBD
+
 ## References
 
 * [Homebrew Package Manager for Mac](https://brew.sh/)
@@ -231,14 +268,13 @@ Start the server with `bin/rails s` and navigate to `http://localhost:3000` and 
 
 ## TODO
 
+* Para: This post assumes some basic familiarity with Docker, Docker Compose, and Rails. If you're new to these, checkout this learning path from Pluralsight (paid service): https://www.pluralsight.com/paths/docker-fundamentals-for-developers
 * Specify what Ruby, Rails, and Node versions I'm using.
 * css for `erb`
-* Organize into subsections
 * Mention that if you stop docker-compose and start up again, should not init role again, should see `PostgreSQL Database directory appears to contain a database; Skipping initialization`. This is because you ran create db and still have the named volume. If you delete the volume and start container again, role will be created again.
-* Explain port mapping to a different port than default 3306 in case someone does have Postgres running natively on laptop, avoid port conflict or strange situation where Rails app is attempting to read from the wrong database.
 * Explain Postgres role === user
 * WATCH OUT: Host mount option to init ROLE referencing sql file in project does not work on Github Actions using `services` because service started before source checked out in workflow. Ref: Debug Github Actions for more details.
-* Mention no password option with other env var from postgres image (development only!)
+* Mention no password option with other env var from postgres image (development only!) - put this in environments subsection where explaining docker compose details
 * Note that running database in Docker container only recommended for development, not production (performance).
 * Push blogpg project to Github as companion to this post for reference.
 * Conclusion para
