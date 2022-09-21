@@ -42,6 +42,19 @@ Scaffold a new Rails app, but specify that you want the database to be Postgres.
 rails new blogpg --database=postgresql
 ```
 
+Here are the versions I'm using:
+
+```
+$ ruby -v
+ruby 2.7.2p137
+
+$ rails -v
+Rails 6.1.6.1
+
+$ node -v
+v14.16.0
+```
+
 ## Docker Compose
 
 We'll use [Docker Compose](https://docs.docker.com/compose/) to manage starting and stopping containers. Typically Docker Compose is used to manage multiple services, but there's still benefits to using it even if you only have one service as in this case. It's more convenient to start a container with a simple command `docker-compose up` than to use the equivalent `docker run...` because the compose file handles passing in all arguments such as volumes, port mapping and environment variables. Also as the project grows, more services such as Redis, Sidekiq, etc may be added that will each require their own container.
@@ -98,11 +111,37 @@ We'll use this feature of the Postgres image to [create a role](https://www.post
 create role blogpg with createdb login password 'blogpg';
 ```
 
+
 ## Rails Database Config
 
-The next step is to modify `config/database.yml` in the Rails project so that it can connect to the database running in the Docker container for `development` and `test`. It also needs the flexibility to connect to a different database for `production`. We'll make use of environment variables for this, together with the logical or operator `||` to use a default when the environment variable is not specified. This way the environment variables can be specified for production, and defaults for development and test.
+The next step is to modify `config/database.yml` in the Rails project so that it can connect to the database running in the Docker container for `development` and `test`. It also needs the flexibility to connect to a different database for `production`. Before making changes to this file, let's take a look at what gets generated from running the `rails new blogpg --database=postgresql` command:
 
-TODO: Notice the port `5434` for development and test databases is from the port mapping in `docker-compose.yml`.
+```yml
+default: &default
+  adapter: postgresql
+  encoding: unicode
+  pool: <%= ENV.fetch("RAILS_MAX_THREADS") { 5 } %>
+
+development:
+  <<: *default
+  database: blogpg_development
+
+test:
+  <<: *default
+  database: blogpg_test
+
+production:
+  <<: *default
+  database: blogpg_production
+  username: blogpg
+  password: <%= ENV['BLOGPG_DATABASE_PASSWORD'] %>
+```
+
+Notice that there's no `host` or `port` specified in the default database configuration. This is because it's assumed that the database is running on `localhost`, i.e. the same machine as the Rails app is running on, and listening on the default Postgres port of `5432`. In our case, the database is running on the same machine, but inside a Docker container therefore `localhost` will not resolve. Instead we'll need to specify a host of `127.0.0.1`. As for the port, recall we mapped the default Postgres port of `5432` in the container to `5434` on the host so we'll also need to tell Rails about this.
+
+We also need to make sure that different values can be specified in production. We'll make use of environment variables for this, together with the logical or operator `||` to use a default when the environment variable is not specified.
+
+Here is the modified config file to support connecting to Postgres in a Docker container for development and test, and flexibility to specify a different database host, password, etc with environment variables for production:
 
 ```yml
 default: &default
@@ -133,13 +172,13 @@ production:
 
 ## Start Container
 
-Start container(s) with docker compose.
+Now it's time to try all this out and make sure everything's connected. Start the container(s) with docker compose:
 
 ```
 docker-compose up
 ```
 
-Since we haven't yet created the `blogpg` database, the console output should show that the `init.sql` script was run to create the `blogpg` role:
+Since this is the first time this container is running, the default `postgres` database doesn't yet exist, so the console output should show that the `init.sql` script was run to create the `blogpg` role:
 
 ```
 database_1  | /usr/local/bin/docker-entrypoint.sh: running /docker-entrypoint-initdb.d/init.sql
@@ -150,16 +189,20 @@ database_1  | 2022-09-06 10:33:56.184 UTC [1] LOG:  database system is ready to 
 
 ## Create Database
 
-Create database with `bin/rails db:create`
+Next step is to create the Rails application database. Run the usual Rails command to do so:
 
-Verify with `psql` command line tool (got installed with homebrew earlier)
+```
+bin/rails db:create
+```
+
+Use the `psql` command line tool (this got installed with homebrew earlier) to connect to Postgres running in the Docker container to verify the application database got created. Notice this command specifies `127.0.0.1` as the host and `5434` as the port because we need to connect to the Docker container rather than a database running directly on the laptop:
 
 ```bash
 psql -h 127.0.0.1 -p 5434 -U blogpg
 # enter password from init.sql
 ```
 
-List all databases:
+Use the `\l` command to list all databases - you should see `blogpg` and `blogpg_test` in the listing, which were created from running the `bin/rails db:create` command:
 
 ```
 blogpg=> \l
@@ -178,9 +221,9 @@ blogpg=> \l
 
 Keep this tab open, we'll come back to it to verify tables after creating and populating some models.
 
-## Add Articles
+## Create and Populate Table
 
-Now let's follow along with the Getting Started Rails Guide. Add the following to `config/routes.rb`:
+Now let's follow along with the Getting Started Rails Guide so we can get to the point of creating a table and populating it. Add the following to `config/routes.rb` to expose a route that will list all articles in the application:
 
 ```ruby
 Rails.application.routes.draw do
@@ -189,7 +232,7 @@ Rails.application.routes.draw do
 end
 ```
 
-Generate an Articles controller, model and run the migration to create the `articles` table in the database:
+Use the Rails generator tool to scaffold an Articles controller and model, then run the migration (migration file got generated by the model generator) to create the `articles` table in the database:
 
 ```
 bin/rails generate controller Articles index --skip-routes
@@ -215,7 +258,10 @@ We can see the `articles` table got created as well as the `schema_migrations` R
 Now let's launch a Rails console with `bin/rails console` and create a new article:
 
 ```ruby
-Article.create(title: "Hello Postgres Docker", body: "I'm being created in Postgres running in a Docker container")
+Article.create(
+  title: "Hello Postgres Docker",
+  body: "I'm being created in Postgres running in a Docker container"
+)
 ```
 
 Go back to the tab where `psql` is running and verify the new article record has been created in the database in the Docker container:
@@ -258,7 +304,7 @@ end
 </table>
 ```
 
-Start the server with `bin/rails s` and navigate to `http://localhost:3000` and you should see:
+Start the server with `bin/rails s` and navigate to `http://localhost:3000` and you should see an unstyled HTML table listing the one article created earlier:
 
 ![rails postgres docker articles index](../images/rails-postgres-docker-articles-index.png "rails postgres docker articles index")
 
@@ -278,13 +324,10 @@ TBD
 
 ## TODO
 
-* More explanation of port in database yml config
-* Specify what Ruby, Rails, and Node versions I'm using.
 * css for `erb`
 * Mention that if you stop docker-compose and start up again, should not init role again, should see `PostgreSQL Database directory appears to contain a database; Skipping initialization`. This is because you ran create db and still have the named volume. If you delete the volume and start container again, role will be created again.
 * Explain Postgres role === user
 * WATCH OUT: Host mount option to init ROLE referencing sql file in project does not work on Github Actions using `services` because service started before source checked out in workflow. Ref: Debug Github Actions for more details.
-* Mention no password option with other env var from postgres image (development only!) - put this in environments subsection where explaining docker compose details
-* Note that running database in Docker container only recommended for development, not production (performance).
+* Note that running database in Docker container only recommended for development, not production (performance). Maybe put this in the database config yml section when explaining that will need different values for production. Could be an aside?
 * Push blogpg project to Github as companion to this post for reference.
 * Conclusion para
