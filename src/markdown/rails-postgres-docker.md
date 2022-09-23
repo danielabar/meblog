@@ -325,7 +325,6 @@ This post has walked through the steps required to setup a Rails application wit
 
 ## TODO
 
-* css for `erb`
 * Mention that if you stop docker-compose and start up again, should not init role again, should see `PostgreSQL Database directory appears to contain a database; Skipping initialization`. This is because you ran create db and still have the named volume. If you delete the volume and start container again, role will be created again.
 * Explain Postgres role === user
 * WATCH OUT: Host mount option to init ROLE referencing sql file in project does not work on Github Actions using `services` because service started before source checked out in workflow. Ref: Debug Github Actions for more details.
