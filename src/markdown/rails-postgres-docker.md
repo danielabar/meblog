@@ -10,7 +10,11 @@ related:
   - "Use UUID for primary key with Rails and Postgres"
 ---
 
-When scaffolding a new Rails project, the database flag can be used to specify a database other than the default SQLite, such as Postgres. However, the generated configuration will assume that the database is running on localhost, i.e. installed directly on your laptop or development machine. If instead you'd like the database running in a Docker container, a few more steps are necessary. This post will walk you through how to setup a new Rails project with a Postgres database running in a Docker container rather than the default SQLite running on localhost. It will be demonstrated using the Rails Getting Started Guide which builds an example blog application.
+When scaffolding a new Rails project, the database flag can be used to specify a database other than the default SQLite, such as Postgres. However, the generated configuration will assume that the database is running on localhost, i.e. installed directly on your laptop or development machine. If instead you'd like the database running in a Docker container, a few more steps are necessary. This post will walk you through how to setup a new Rails project with a Postgres database running in a Docker container rather than the default SQLite running on localhost. It will be demonstrated using the [Rails Getting Started Guide](https://guides.rubyonrails.org/getting_started.html) which builds an example blog application.
+
+<aside class="markdown-aside">
+This post assumes some familiarity with Docker and Docker Compose. If you're new to these, checkout this <a class="markdown-link" href="https://www.pluralsight.com/paths/docker-fundamentals-for-developers">learning path</a> from Pluralsight (paid service). There's also a number of <a class="markdown-link" href="https://docs.docker.com/get-started/resources/">educational resources</a> listed on the Docker website.
+</aside>
 
 ## Why?
 
@@ -22,11 +26,11 @@ But first, why would you want to use Docker to run your development database rat
 
 **Multiple versions and services:**: For a developer that works on multiple projects, they could be using different database versions and it would be tedious to have to constantly uninstall/re-install versions every time you switch projects. Also as you work on multiple projects, each may have different service requirements such as Postgres, MySQL, Elasticsearch, Redis, etc. I'd rather not have all of those always running on my laptop when not needed, or have to remember to start/stop them for each project. Using Docker, with Docker Compose simplifies this.
 
-Now that we've covered some benefits of using Docker locally for services, let's see how to setup Postgres in a container for a new Rails project.
-
 <aside class="markdown-aside">
-This post assumes some basic familiarity with Docker and Docker Compose. If you're new to these, checkout this <a class="markdown-link" href="https://www.pluralsight.com/paths/docker-fundamentals-for-developers">learning path</a> from Pluralsight (paid service). There's also a number of <a class="markdown-link" href="https://docs.docker.com/get-started/resources/">educational resources</a> listed on the Docker website.
+All the benefits discussed above are for development, not production. The issue of whether a production database should be run in a container or not is outside the scope of this post. See some discussion <a class="markdown-link" href="https://stackoverflow.com/questions/48515460/is-it-recommended-to-use-database-as-a-container-in-production-environment">here</a> and follow the links to referenced blog posts if you want to learn more about this.
 </aside>
+
+Now that we've covered some benefits of using Docker locally for services, let's see how to setup Postgres in a container for a new Rails project.
 
 ## Getting Started
 
@@ -57,7 +61,7 @@ v14.16.0
 
 ## Docker Compose
 
-We'll use [Docker Compose](https://docs.docker.com/compose/) to manage starting and stopping containers. Typically Docker Compose is used to manage multiple services, but there's still benefits to using it even if you only have one service as in this case. It's more convenient to start a container with a simple command `docker-compose up` than to use the equivalent `docker run...` because the compose file handles passing in all arguments such as volumes, port mapping and environment variables. Also as the project grows, more services such as Redis, Sidekiq, etc may be added that will each require their own container.
+We'll use [Docker Compose](https://docs.docker.com/compose/) to manage starting and stopping containers. Typically Docker Compose is used to manage multiple services, but there's still benefits to using it even if you only have one service as in this case. It's more convenient to start a container with a simple command `docker-compose up` than to use the equivalent `docker run...` because the compose file handles passing in all arguments such as volumes, port mapping and environment variables. Also as the project grows, more services such as Redis, Sidekiq, etc may be added that will each require their own container. Using Docker Compose means they can all be started with a single command.
 
 Add the following `docker-compose.yml` file to the root of the project:
 
@@ -92,7 +96,7 @@ Learn more about ports here: https://docs.docker.com/compose/compose-file/#ports
 
 **volumes:** We're making use of two entries in the services - volumes section. The first is a named volume `db_pg_data:/var/lib/postgresql/data`. This maps the directory inside the container where Postgres stores all the data to a Docker volume named `db_pg_data`, which is defined at the end of the file in the `volumes` section. This will save all data outside of the container (you can list your volumes with the `docker volume ls` command). This means even if the container is removed, your data is still available.
 
-The second is a host mount `./init.sql:/docker-entrypoint-initdb.d/init.sql`. It maps a file `./init.sql` from the project root (we'll create it in the next section) to a special directory in the container `docker-entrypoint-initdb.d`. This is a property of the official Postgres Docker image. Any sql files located in this directory can be used for one-time initialization. That is, when the container starts, it checks if the `postgres` database already exists, if not, it runs all sql scripts found in the initdb directory. If a database already exists, then the files are ignored.
+The second is a host mount `./init.sql:/docker-entrypoint-initdb.d/init.sql`. It maps a file `./init.sql` from the project root (we'll create it in the next section) to a special directory in the container `docker-entrypoint-initdb.d`. This is a property of the official Postgres Docker image. Any sql files located in this directory can be used for one-time initialization. That is, when the container starts, it checks if the default `postgres` database already exists, if not, it runs all sql scripts found in the initdb directory. If a database does exist, then the files are ignored.
 
 Learn more about volumes here: https://docs.docker.com/compose/compose-file/#volumes
 
@@ -111,10 +115,15 @@ We'll use this feature of the Postgres image to [create a role](https://www.post
 create role blogpg with createdb login password 'blogpg';
 ```
 
+<aside class="markdown-aside">
+Roles and users are similar concepts in Postgres, although there are some differences. A full discussion of this topic is outside the scope of this post, see this <a class="markdown-link" href="https://dba.stackexchange.com/questions/82271/postgresql-roles-versus-users-grant-permissions">question on DBA Stack Exchange</a> for more details.
+</aside>
 
 ## Rails Database Config
 
-The next step is to modify `config/database.yml` in the Rails project so that it can connect to the database running in the Docker container for `development` and `test`. It also needs the flexibility to connect to a different database for `production`. Before making changes to this file, let's take a look at what gets generated from running the `rails new blogpg --database=postgresql` command:
+The next step is to modify `config/database.yml` in the Rails project so that it can connect to the database running in the Docker container for `development` and `test`. It also needs the flexibility to connect to a different database for `production`.
+
+Before making changes to this file, let's take a look at what gets generated from running the `rails new blogpg --database=postgresql` command:
 
 ```yml
 default: &default
@@ -170,6 +179,8 @@ production:
   password: <%= ENV['BLOGPG_DATABASE_PASSWORD'] %>
 ```
 
+Note that there's nothing Docker-specific in the `config/database.yml` file. All we've done is make it more flexible than what the Rails scaffold generated so that development and test can connect to databases other than that running on localhost and the default port.
+
 ## Start Container
 
 Now it's time to try all this out and make sure everything's connected. Start the container(s) with docker compose:
@@ -185,6 +196,33 @@ database_1  | /usr/local/bin/docker-entrypoint.sh: running /docker-entrypoint-in
 database_1  | CREATE ROLE
 ...
 database_1  | 2022-09-06 10:33:56.184 UTC [1] LOG:  database system is ready to accept connections
+```
+
+Note that you can stop the database at any time with `docker-compose stop` and then use the `up` command to restart it. The `CREATE ROLE` from `init.sql` will not run again because the default `postgres` database already exists. Next time you start the database, the following message will be displayed:
+
+```
+PostgreSQL Database directory appears to contain a database; Skipping initialization
+```
+
+### Force Init
+
+This section is optional. If you made a typo in `init.sql` or for whatever reason want to force it to run again, this can be accomplished by removing the named volume that contains the Postgres data (make sure there's nothing important saved there or back it up first!). Since a container exists that is using the volume, it must be stopped and removed first, here are the steps to force init to run again:
+
+```bash
+# stop the running Postgres container
+docker-compose stop
+
+# remove the container (otherwise the volume cannot be removed)
+docker-compose rm -f
+
+# list all volumes - should see blogpg_db_pg_data in the output
+docker volume ls
+
+# remove the named volume
+docker volume rm blogpg_db_pg_data
+
+# start database container again - should show its running CREATE ROLE
+docker-compose up
 ```
 
 ## Create Database
@@ -308,7 +346,12 @@ Start the server with `bin/rails s`, navigate to `http://localhost:3000` and you
 
 ![rails postgres docker articles index](../images/rails-postgres-docker-articles-index.png "rails postgres docker articles index")
 
-You now have a running Rails application that is using a Dockerized Postgres database.
+Congratulations! You now have a running Rails application that is using a Dockerized Postgres database.
+
+<aside class="markdown-aside">
+Since the test database is also running in a Docker container, this will require Docker-specific setup to work on whatever CI (continuous integration) system your project is using. If using <a class="markdown-link" href="https://github.com/features/actions">Github Actions</a>, the host mount to the project source for initializing the database role doesn't work due to the order of how services and source checkout works. See my post on <a class="markdown-link" href="https://danielabaron.me/blog/debug-github-action/">Debugging Github Actions</a> for more details.
+</aside>
+
 ## Conclusion
 
 This post has walked through the steps required to setup a Rails application with a Postgres database running in a Docker container. It requires adding a `docker-compose.yml` file to the project. This file defines the database service including what Docker image to use, port mapping, volumes, and environment variables. Then the Rails project file `config/database.yml` must be modified so that the development and test databases are configured to point to the Dockerized database rather than assuming they're available on localhost. Finally the `psql` command line tool can be used to connect to the database in the container to verify the Rails application is populating it as expected.
@@ -325,8 +368,5 @@ This post has walked through the steps required to setup a Rails application wit
 
 ## TODO
 
-* Mention that if you stop docker-compose and start up again, should not init role again, should see `PostgreSQL Database directory appears to contain a database; Skipping initialization`. This is because you ran create db and still have the named volume. If you delete the volume and start container again, role will be created again.
-* Explain Postgres role === user
-* WATCH OUT: Host mount option to init ROLE referencing sql file in project does not work on Github Actions using `services` because service started before source checked out in workflow. Ref: Debug Github Actions for more details.
-* Note that running database in Docker container only recommended for development, not production (performance). Maybe put this in the database config yml section when explaining that will need different values for production. Could be an aside?
+* Organize references and various links
 * Push blogpg project to Github as companion to this post for reference.
