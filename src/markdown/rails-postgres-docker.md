@@ -20,9 +20,9 @@ This post assumes some familiarity with Docker and Docker Compose. If you're new
 
 But first, why would you want to use Docker to run your development database rather than simply installing it on your machine? There are a few benefits including:
 
-**Version consistency:** You want everyone on the team to be running the same version locally as what's used in production. Suppose the production version gets upgraded, then every developer needs to remember to also upgrade their local installation. When the service is dockerized and run with Docker Compose, an upgrade just involves bumping the version tag in the docker-compose.yml file and pushing to version control. Next time everyone pulls that change and runs `docker-compose up`, they'll automatically get the upgraded version. This also ensures every developer on the team is using the same version, eliminating one potential source of [works on my machine](https://dzone.com/articles/works-on-my-machine) problems.
+**Version consistency:** Ideally, everyone on the team is running the same version locally as what's used in production. Suppose the production version gets upgraded, then every developer needs to remember to also upgrade their local installation. When the service is dockerized and run with Docker Compose, an upgrade just involves updating the image tag in the `docker-compose.yml` file and pushing to version control. Next time everyone pulls that change and runs `docker-compose up`, they'll automatically get the upgraded version. Version consistency also eliminates a source of [works on my machine](https://dzone.com/articles/works-on-my-machine) problems.
 
-**Configuration consistency:** If your project requires some custom database configuration, it can be committed into the project and set in the container with a host mount. This leads to faster local setup as compared to adding an instruction in the readme telling each developer to configure their database manually.
+**Configuration consistency:** If your project requires some custom database configuration, it can be committed into the project and set in the container with a host mount. This leads to faster local setup as compared to adding an instruction in the `README.md` telling each developer to configure their database manually.
 
 **Multiple versions and services:**: For a developer that works on multiple projects, they could be using different database versions and it would be tedious to have to constantly uninstall/re-install versions every time you switch projects. Also as you work on multiple projects, each may have different service requirements such as Postgres, MySQL, Elasticsearch, Redis, etc. I'd rather not have all of those always running on my laptop when not needed, or have to remember to start/stop them for each project. Using Docker, with Docker Compose simplifies this.
 
@@ -34,7 +34,7 @@ Now that we've covered some benefits of using Docker locally for services, let's
 
 ## Getting Started
 
-Install Postgres locally. Even though the Postgres database server will be run inside a Docker container, we still need the client installed on our laptop to connect to it. For a Mac, the easiest way is to use Homebrew. Note that you need to select your version, for example:
+Install Postgres locally. Even though the Postgres database server will be run inside a Docker container, we still need the client installed on our laptop to connect to it. For a Mac, the easiest way is to use Homebrew. Note that you need to select your version. It's not necessary to start the service, so ignore the instruction at the end of the installation about starting Postgres.
 
 ```
 brew install postgresql@14
@@ -44,19 +44,6 @@ Scaffold a new Rails app, but specify that you want the database to be Postgres.
 
 ```
 rails new blogpg --database=postgresql
-```
-
-Here are the versions I'm using:
-
-```
-$ ruby -v
-ruby 2.7.2p137
-
-$ rails -v
-Rails 6.1.6.1
-
-$ node -v
-v14.16.0
 ```
 
 ## Docker Compose
@@ -72,10 +59,16 @@ services:
   database:
     image: postgres:14
     volumes:
+      # Named volume to persist database data outside of container.
+      # Format is "named_volume:path/in/container"
       - db_pg_data:/var/lib/postgresql/data
+
+      # Host mount for one-time initialization.
+      # Format is "./path/on/host:/path/in/container"
       - ./init.sql:/docker-entrypoint-initdb.d/init.sql
     ports:
-      # Map to something other than default 5432 on host in case Postgres is also running natively on host.
+      # Map to something other than default 5432 on host in case Postgres
+      # is also running natively on host.
       # Format is "host:container"
       - "5434:5432"
     environment:
@@ -88,21 +81,15 @@ volumes:
 
 A few things to note here:
 
-**image:** This specifies what image to use. By default, it will pull from the [Docker Hub](https://index.docker.io/search?q=) public registry. The `postgres` image refers to the [Official Postgres Image](https://hub.docker.com/_/postgres). Notice that the version tag `14` is specified. If you don't specify a tag, `latest` will be pulled which may not be what you want.
+**image:** This specifies what image to use. By default, it will pull from the [Docker Hub](https://index.docker.io/search?q=) public registry. The `postgres` image refers to the [Official Postgres Image](https://hub.docker.com/_/postgres). Notice that the version tag `14` is specified. If you don't specify a tag, `latest` will be pulled which may not be what you want. Optionally you can use the `14-alpine` tag for a more minimal image.
 
-**ports:** By default, Postgres listens on port 5432. When the database is running in a container rather than directly on the local machine, this port must be mapped to a port on the host, in order for the Rails application to be able to connect to it. Typically, you'll see the container port mapped to same port number on the host such as `"5432:5432"`. I prefer to choose a different port to map to on the host in case anyone on the team happens to be running Postgres locally on the default port, maybe from an earlier tutorial, or even just installing the client via homebrew, they may have chosen to start the service. The idea here is to avoid a port conflict where Docker is trying to use a port that's already in use by the host.
+**ports:** By default, Postgres listens on port 5432. When the database is running in a container rather than directly on the local machine, this port must be mapped to a port on the host, in order for the Rails application to be able to connect to it. Typically, you'll see the container port mapped to same port number on the host such as `"5432:5432"`. I prefer to choose a different port to map to on the host in case anyone on the team happens to be running Postgres locally on the default port, maybe from an earlier tutorial, or even just installing the client via homebrew, they may have chosen to start the service. The idea here is to avoid a port conflict where Docker is trying to use a port that's already in use by the host. Learn more about [ports](https://docs.docker.com/compose/compose-file/#ports).
 
-Learn more about ports here: https://docs.docker.com/compose/compose-file/#ports
+**volumes:** There are two entries in the services - volumes section. The first is a named volume `db_pg_data:/var/lib/postgresql/data`. This maps the directory inside the container where Postgres stores all the data to a Docker volume named `db_pg_data`, which is defined at the end of the file in the `volumes` section. This will save all data outside of the container (you can list your volumes with the `docker volume ls` command). This means even if the container is removed, your data is still available.
 
-**volumes:** We're making use of two entries in the services - volumes section. The first is a named volume `db_pg_data:/var/lib/postgresql/data`. This maps the directory inside the container where Postgres stores all the data to a Docker volume named `db_pg_data`, which is defined at the end of the file in the `volumes` section. This will save all data outside of the container (you can list your volumes with the `docker volume ls` command). This means even if the container is removed, your data is still available.
+The second is a host mount `./init.sql:/docker-entrypoint-initdb.d/init.sql`. It maps a file `./init.sql` from the project root (we'll create it in the next section) to a special directory in the container `docker-entrypoint-initdb.d`. This is a property of the official Postgres Docker image. Any sql files located in this directory can be used for one-time initialization. That is, when the container starts, it checks if the default `postgres` database already exists, if not, it runs all sql scripts found in the initdb directory. If a database does exist, then the files are ignored. Learn more about [volumes](https://docs.docker.com/compose/compose-file/#volumes).
 
-The second is a host mount `./init.sql:/docker-entrypoint-initdb.d/init.sql`. It maps a file `./init.sql` from the project root (we'll create it in the next section) to a special directory in the container `docker-entrypoint-initdb.d`. This is a property of the official Postgres Docker image. Any sql files located in this directory can be used for one-time initialization. That is, when the container starts, it checks if the default `postgres` database already exists, if not, it runs all sql scripts found in the initdb directory. If a database does exist, then the files are ignored.
-
-Learn more about volumes here: https://docs.docker.com/compose/compose-file/#volumes
-
-**environment:** This section is used to set environment variables that will be available within the container. `POSTGRES_PASSWORD` sets the superuser password for the `postgres` user. Remember this is only a development image so this password isn't being used to protect production data. Optionally, you can set the `POSTGRES_HOST_AUTH_METHOD` to `trust`, and then the `POSTGRES_PASSWORD` environment variable is not required.
-
-Learn more about environment here: https://docs.docker.com/compose/compose-file/#environment
+**environment:** This section is used to set environment variables that will be available within the container. `POSTGRES_PASSWORD` sets the superuser password for the `postgres` user. Remember this is only a development image so this password isn't being used to protect production data. Optionally, you can set the `POSTGRES_HOST_AUTH_METHOD` to `trust`, and then the `POSTGRES_PASSWORD` environment variable is not required. Learn more about setting [environment variables](https://docs.docker.com/compose/compose-file/#environment) in Docker Compose.
 
 ## Initialization
 
@@ -126,6 +113,7 @@ The next step is to modify `config/database.yml` in the Rails project so that it
 Before making changes to this file, let's take a look at what gets generated from running the `rails new blogpg --database=postgresql` command:
 
 ```yml
+# config/database.yml
 default: &default
   adapter: postgresql
   encoding: unicode
@@ -278,7 +266,7 @@ bin/rails generate model Article title:string body:text
 bin/rails db:migrate
 ```
 
-Go back to the tab where `psql` is running and verify `articles` table got created in the Postgres database running within Docker container. The `\dt` command lists all tables in the database you're connected to:
+Go back to the tab where `psql` is running and verify the `articles` table got created in the Postgres database running within Docker container. The `\dt` command lists all tables in the database you're connected to:
 
 ```
 blogpg=> \dt
@@ -291,7 +279,7 @@ blogpg=> \dt
 (3 rows)
 ```
 
-We can see the `articles` table got created as well as the `schema_migrations` Rails uses to keep track of migrations.
+We can see the `articles` table got created as well as the `schema_migrations` table Rails uses to keep track of migrations.
 
 Now launch a Rails console with `bin/rails console` and create a new article:
 
@@ -302,7 +290,7 @@ Article.create(
 )
 ```
 
-Go back to the tab where `psql` is running and verify the new article record has been created in the database in the Docker container:
+Go back to the tab where `psql` is running and verify the new article record has been created:
 
 ```
 blogpg=> select * from articles;
@@ -365,8 +353,3 @@ This post has walked through the steps required to setup a Rails application wit
 * [Postgres Official Image on Docker Hub](https://hub.docker.com/_/postgres)
 * [Postgres Docker Image Full Readme](https://github.com/docker-library/docs/blob/master/postgres/README.md)
 * [Postgres user vs role](https://stackoverflow.com/questions/27709456/what-is-the-difference-between-a-user-and-a-role)
-
-## TODO
-
-* Organize references and various links
-* Push blogpg project to Github as companion to this post for reference.
