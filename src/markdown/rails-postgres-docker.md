@@ -10,7 +10,7 @@ related:
   - "Use UUID for primary key with Rails and Postgres"
 ---
 
-When scaffolding a new Rails project, the database flag can be used to specify a database other than the default SQLite, such as Postgres. However, the generated configuration will assume that the database is running on localhost, i.e. installed directly on your laptop or development machine. If instead you'd like the database running in a Docker container, a few more steps are necessary. This post will walk you through how to setup a new Rails project with a Postgres database running in a Docker container rather than the default SQLite running on localhost. It will be demonstrated using the [Rails Getting Started Guide](https://guides.rubyonrails.org/getting_started.html) which builds an example blog application.
+When scaffolding a new Rails project, the database flag can be used to specify a database other than the default SQLite, such as Postgres. However, the generated configuration will assume that the database is running on localhost, i.e. installed directly on your laptop or development machine. If instead you'd like the database running in a Docker container, a few more steps are necessary. This post will walk you through how to setup a new Rails project with a Postgres database running in a Docker container rather than the default SQLite running on localhost. It will be demonstrated using the [Rails Getting Started Guide](https://guides.rubyonrails.org/getting_started.html) which builds an example blog application. All the code explained in this post can be found in this [blogpg project](https://github.com/danielabar/blogpg) on Github.
 
 <aside class="markdown-aside">
 This post assumes some familiarity with Docker and Docker Compose. If you're new to these, checkout this <a class="markdown-link" href="https://www.pluralsight.com/paths/docker-fundamentals-for-developers">learning path</a> from Pluralsight (paid service). There's also a number of <a class="markdown-link" href="https://docs.docker.com/get-started/resources/">educational resources</a> listed on the Docker website.
@@ -346,6 +346,7 @@ This post has walked through the steps required to setup a Rails application wit
 
 ## References
 
+* [Example Rails Project with Postgres in Docker](https://github.com/danielabar/blogpg)
 * [Homebrew Package Manager for Mac](https://brew.sh/)
 * [Postgresql on Homebrew](https://formulae.brew.sh/formula/postgresql@14) - notice they're all versioned now!
 * [Rails Getting Started Building Blog App](https://guides.rubyonrails.org/getting_started.html)
