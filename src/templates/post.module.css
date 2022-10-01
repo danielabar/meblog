@@ -159,6 +159,10 @@
   content: "graphql";
 }
 
+.content pre[data-language="xml"]::before {
+  content: "xml";
+}
+
 /* tablet landscape */
 @media (max-width: 1280px) {
   .content ul {
