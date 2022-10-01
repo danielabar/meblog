@@ -68,13 +68,13 @@ So much for the easy button.
 
 ## Debugging
 
-The `info` command that can be used to get more detailed information about a specific service, running it for `postgresql`:
+The `info` command can be used to get more detailed information about a specific service. Running it for `postgresql`:
 
 ```
 brew services info postgresql
 ```
 
-Output shows that the `postgresql` service is loaded, but not running:
+The output shows that the `postgresql` service is loaded, but not running:
 
 ```
 postgresql (homebrew.mxcl.postgresql)
@@ -145,13 +145,13 @@ psql (PostgreSQL) 14.3
 
 ## Solution
 
-When the Postgres data directory was first created, I must have been on older Postgres version 13, and at some point updated the brew formula to 14. This version mismatch makes postgresql fail to start. Fortunately, there's a homebrew formula that can be run to [migrate](https://formulae.brew.sh/formula/postgresql) the data from a previous major version:
+When the Postgres data directory was first created, I must have been on older Postgres version 13, and at some point updated the brew formula to 14. This version mismatch makes postgresql fail to start. Fortunately, there's a homebrew [command](https://github.com/Homebrew/homebrew-core/blob/master/cmd/postgresql-upgrade-database.rb) that can be run to migrate the data from a previous major version:
 
 ```
 brew postgresql-upgrade-database
 ```
 
-There will be a whole lot of output from this command, but here are some highlights of what it does:
+There will be a lot of output from this command, but here are some highlights of what it does:
 
 ```
 brew install postgresql@13
