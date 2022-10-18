@@ -134,7 +134,7 @@ irb(main):004:0> p2.delete
  updated_at: Sun, 16 Oct 2022 11:46:36.168748000 UTC +00:00>
 ```
 
-## Associations
+## Belongs To and Has Many Dependency Matrix
 
 Let's look at typical use case `belongs_to` and `has_many`. For example, Author has many books, and each book belongs to one author. Putting together all the `dependent` options (including not specifying it at all), yields a matrix:
 
@@ -323,7 +323,9 @@ end
 
 Book model is the same as before.
 
-Load an author with multiple books and then call `author.destroy`. This time it deletes all the author's books in a single DELETE statement and does not invoke the book model's `before_destroy` callback. It does however invoke the author's `before_destroy` callback because we called `author.destroy`:
+Load an author with multiple books and then call `author.destroy`. This time it deletes all the author's books in a single DELETE statement and does not invoke the book model's `before_destroy` callback. It does however invoke the author's `before_destroy` callback because we called `author.destroy`.
+
+Could be better for performance if Author has a lot of books - deleting in a single statement rather than executing multiple. But will not have a chance to invoke the `before_destroy` callback of each associated Book model.
 
 ```ruby
 irb(main):001:0> a = Author.find_by(name: "Andrew Park")
@@ -337,6 +339,114 @@ Author model 1 will be destroyed
   TRANSACTION (0.9ms)  commit transaction
 ```
 
+### Scenario 4: belongs_to not specified, has_many nullify
+
+Book model unchanged.
+
+```ruby
+class Author < ApplicationRecord
+  has_many :books, dependent: :nullify
+  before_destroy :one_last_thing
+  def one_last_thing
+    puts "Author model #{id} will be destroyed"
+  end
+end
+```
+
+Destroy an author - it attempts to set `author_id` on all of this author's books to `nil` but fails on a SQL `NOT NULL` constraint on the foreign key.
+
+```ruby
+a = Author.find_by(name: "Andrew Park")
+a.destroy
+TRANSACTION (0.1ms)  begin transaction
+  Book Update All (1.2ms)  UPDATE "books" SET "author_id" = ? WHERE "books"."author_id" = ?  [["author_id", nil], ["author_id", 1]]
+  TRANSACTION (0.1ms)  rollback transaction
+/Users/dbaron/.rbenv/versions/3.1.2/lib/ruby/gems/3.1.0/gems/sqlite3-1.5.3-x86_64-darwin/lib/sqlite3/statement.rb:108:in `step': SQLite3::ConstraintException: NOT NULL constraint failed: books.author_id (ActiveRecord::NotNullViolation)
+```
+
+The NOT NULL constraint comes from the database migration that created the `books` table. Recall the book migration and model were created with a generator as follows:
+
+```
+bin/rails generate model book title:string published_at:date author:references
+```
+
+Which created this migration that indicates the reference to author cannot be null.
+
+```ruby
+class CreateBooks < ActiveRecord::Migration[7.0]
+  def change
+    create_table :books do |t|
+      t.string :title
+      t.date :published_at
+      t.references :author, null: false, foreign_key: true
+
+      t.timestamps
+    end
+  end
+end
+```
+
+In this case, if we want to use `has_many :books, dependent: :nullify` on the `Author` model, then the associated `books` table must allow a null reference for its `author_id` column.
+
+To verify, we can modify the migration to remove the null constraint, then drop and recreate the database and run migrations and seeds again. (this is just a demo app, obviously in a production app you'd have to add a new migration to remove the constraint):
+
+```ruby
+class CreateBooks < ActiveRecord::Migration[7.0]
+  def change
+    create_table :books do |t|
+      t.string :title
+      t.date :published_at
+      # t.references :author, null: false, foreign_key: true
+      t.references :author, foreign_key: true
+
+      t.timestamps
+    end
+  end
+end
+```
+
+Now let's try to destroy an author again and see what the impact is on its related books, remembering that the author model has `has_many :books, dependent: :nullify`:
+
+```ruby
+a = Author.find_by(name: "Andrew Park")
+a.destroy
+  TRANSACTION (0.3ms)  begin transaction
+  Book Update All (0.7ms)  UPDATE "books" SET "author_id" = ? WHERE "books"."author_id" = ?  [["author_id", nil], ["author_id", 1]]
+Author model 1 will be destroyed
+  Author Destroy (0.2ms)  DELETE FROM "authors" WHERE "authors"."id" = ?  [["id", 1]]
+  TRANSACTION (2.0ms)  commit transaction
+```
+
+This time all the author's books are successfully updated to have their `author_id` column set to `nil`. Calling `.books` on the author now returns an empty array:
+
+```ruby
+a.books
+# => []
+```
+
+Let's load up one of Andrew Park's books to see what happened to its author association. Recall the Book model has `belongs_to :author`:
+
+```ruby
+b = Book.find_by(title: "Python Programming for Beginners")
+b.author
+# => nil
+```
+
+Before moving on to other scenarios, restore the null constraint on the books table author_id column.
+
+### Scenario 5: belongs_to not specified, has_many restrict_with_exception
+
+Author model:
+
+```ruby
+class Author < ApplicationRecord
+  has_many :books, dependent: :restrict_with_exception
+  before_destroy :one_last_thing
+  def one_last_thing
+    puts "Author model #{id} will be destroyed"
+  end
+end
+```
 ### belongs_to
 
 Each instance of declaring model "belongs to" one instance of the other model.
@@ -383,7 +493,9 @@ Skipping this for now to focus on belongs_to/has_many
 * Intro para: Want to understand all the dependent options on ActiveRecord associations. Before GDPR/privacy days, would just never delete anything, but now, may be legally required therefore have to think about impact of deletion and maintaining referential integrity.
 * First, discuss difference between delete and destroy (simple model with no associations) [SO](https://stackoverflow.com/questions/22757450/difference-between-destroy-and-delete)
 * Information hierarchy?
-* Starting with belongs_to/has_many pair (common use case, eg: Book belongs to Author, Author has many Books) - run through all scenarios in the matrix
+* WIP: Starting with belongs_to/has_many pair (common use case, eg: Book belongs to Author, Author has many Books) - run through all scenarios in the matrix
+* Somewhere mention since the `dependent` options can be used in combination on each side of the associations, its tricky to understand from the docs how they will behave together. That's the purpose of this post to try out each.
+* Add Rails Guides sentence describing each option before trying it out.
 * Cleanup Rails console output to only highlight the relevant parts
 * Try to get to "orphaned records" warning as described in guide - what causes this?
 * What about all the other association types - maybe too much for one blog post - do a multi part?
