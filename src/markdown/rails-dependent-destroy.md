@@ -447,6 +447,80 @@ class Author < ApplicationRecord
   end
 end
 ```
+
+Book model unchanged.
+
+Trying to destroy an author that has books raises [ActiveRecord::DeleteRestrictionError](https://rdoc.info/docs/rails/ActiveRecord/DeleteRestrictionError) exception.
+
+```ruby
+a = Author.find_by(name: "Andrew Park")
+a.destroy
+#   TRANSACTION (0.1ms)  begin transaction
+#   Book Exists? (0.4ms)  SELECT 1 AS one FROM "books" WHERE "books"."author_id" = ? LIMIT ?  [["author_id", 1], ["LIMIT", 1]]
+#   TRANSACTION (0.1ms)  rollback transaction
+# /Users/dbaron/.rbenv/versions/3.1.2/lib/ruby/gems/3.1.0/gems/activerecord-7.0.4/lib/active_record/associations/has_many_association.rb:16:in `handle_dependency': Cannot delete record because of dependent books (ActiveRecord::DeleteRestrictionError)
+```
+
+On the other hand, trying to destroy an author that has no books succeeds. Notice that it still checks the dependent `books` table for associated records, and if there are none, then the other is destroyed:
+
+```ruby
+a = Author.find_by(name: "John Doe")
+a.destroy
+#   TRANSACTION (0.1ms)  begin transaction
+#   Book Exists? (0.2ms)  SELECT 1 AS one FROM "books" WHERE "books"."author_id" = ? LIMIT ?  [["author_id", 3], ["LIMIT", 1]]
+# Author model 3 will be destroyed
+#   Author Destroy (2.1ms)  DELETE FROM "authors" WHERE "authors"."id" = ?  [["id", 3]]
+#   TRANSACTION (8.8ms)  commit transaction
+```
+
+### Scenario 6: belongs_to not specified, has_many restrict_with_error
+
+Author model:
+
+```ruby
+class Author < ApplicationRecord
+  has_many :books, dependent: :restrict_with_exception
+  before_destroy :one_last_thing
+  def one_last_thing
+    puts "Author model #{id} will be destroyed"
+  end
+end
+```
+
+Book model unchanged.
+
+Try to destroy an author with books - like with the `restrict_with_exception` case, the transaction is rolled back due to this author having dependent books, but instead of raising an error, the `destroy` method returns false and populates the `errors` property of the model instance that was attempted to be removed:
+
+```ruby
+a = Author.find_by(name: "John Doe")
+a.destroy
+#   TRANSACTION (0.1ms)  begin transaction
+#   Book Exists? (0.1ms)  SELECT 1 AS one FROM "books" WHERE "books"."author_id" = ? LIMIT ?  [["author_id", 1], ["LIMIT", 1]]
+#   TRANSACTION (0.2ms)  rollback transaction
+# => false
+
+a.errors.full_messages
+=> ["Cannot delete record because dependent books exist"]
+```
+
+Interestingly, calling `delete` on a model instance raises a foreign key constraint error and does not populate the `errors` property:
+
+```ruby
+a = Author.find_by(name: "John Doe")
+a.delete
+#   Author Destroy (2.2ms)  DELETE FROM "authors" WHERE "authors"."id" = ?  [["id", 1]]
+# /Users/dbaron/.rbenv/versions/3.1.2/lib/ruby/gems/3.1.0/gems/sqlite3-1.5.3-x86_64-darwin/lib/sqlite3/statement.rb:108:in `step': SQLite3::ConstraintException: FOREIGN KEY constraint failed (ActiveRecord::InvalidForeignKey)
+
+a.errors.full_messages
+=> []
+```
+
+### Scenario 7: belongs_to destroy, has_many not specified
+
+Now we're going to start investigating the effect of various `dependent` options on the `belongs_to` side of the relationship.
+
+## Other Associations TBD
+
 ### belongs_to
 
 Each instance of declaring model "belongs to" one instance of the other model.
