@@ -10,7 +10,20 @@ related:
   - "Roll Your Own Search with Rails and Postgres: Search Engine"
 ---
 
-[ref](https://guides.rubyonrails.org/association_basics.html#options-for-belongs-to-dependent)
+Ignoring async options as ActiveJob is not enabled on sample project.
+
+[belongs_to dependent options](https://guides.rubyonrails.org/association_basics.html#options-for-belongs-to-dependent)
+
+* `:destroy` when the object is destroyed, destroy will be called on its associated objects.
+* `:delete` when the object is destroyed, all its associated objects will be deleted directly from the database without calling their destroy method.
+
+[has_many dependent options](https://guides.rubyonrails.org/association_basics.html#dependent)
+
+* `:destroy` causes all the associated objects to also be destroyed
+* `:delete_all` causes all the associated objects to be deleted directly from the database (so callbacks will not execute)
+* `:nullify` causes the foreign key to be set to NULL. Polymorphic type column is also nullified on polymorphic associations. Callbacks are not executed.
+* `:restrict_with_exception` causes an ActiveRecord::DeleteRestrictionError exception to be raised if there are any associated records
+* `:restrict_with_error` causes an error to be added to the owner if there are any associated objects
 
 ## Setup
 
@@ -64,6 +77,8 @@ p "Created #{Author.count} authors"
 p "Created #{Book.count} books"
 ```
 
+Create and seed database:
+
 ```
 bin/rails db:create
 bin/rails db:migrate
@@ -101,37 +116,15 @@ TODO: Try without the destroy callback first - both methods appear to behave the
 TODO: Tidy up Rails console output to focus on the important concept.
 
 ```ruby
-irb(main):001:0> p1 = Post.first
-  Post Load (0.4ms)  SELECT "posts".* FROM "posts" ORDER BY "posts"."id" ASC LIMIT ?  [["LIMIT", 1]]
-=>
-#<Post:0x000000010b7a02e0
-...
-irb(main):002:0> p2 = Post.second
-  Post Load (0.2ms)  SELECT "posts".* FROM "posts" ORDER BY "posts"."id" ASC LIMIT ? OFFSET ?  [["LIMIT", 1], ["OFFSET", 1]]
-=>
-#<Post:0x000000010ade95f8
-...
-irb(main):003:0> p1.destroy
-Post model 1 will be destroyed
-  TRANSACTION (0.1ms)  begin transaction
-  Post Destroy (0.7ms)  DELETE FROM "posts" WHERE "posts"."id" = ?  [["id", 1]]
-  TRANSACTION (1.4ms)  commit transaction
-=>
-#<Post:0x000000010b7a02e0
- id: 1,
- title: "Hello Post",
- body: "Learning about destroy and delete in Rails.",
- created_at: Sun, 16 Oct 2022 11:46:36.164680000 UTC +00:00,
- updated_at: Sun, 16 Oct 2022 11:46:36.164680000 UTC +00:00>
-irb(main):004:0> p2.delete
-  Post Destroy (1.5ms)  DELETE FROM "posts" WHERE "posts"."id" = ?  [["id", 2]]
-=>
-#<Post:0x000000010ade95f8
- id: 2,
- title: "Another Post",
- body: "Lorem ipsum dolor sit amet, consectetur adipiscing elit.",
- created_at: Sun, 16 Oct 2022 11:46:36.168748000 UTC +00:00,
- updated_at: Sun, 16 Oct 2022 11:46:36.168748000 UTC +00:00>
+p1 = Post.first
+p2 = Post.second
+p1.destroy
+# Post model 1 will be destroyed
+#   TRANSACTION (0.1ms)  begin transaction
+#   Post Destroy (0.7ms)  DELETE FROM "posts" WHERE "posts"."id" = ?  [["id", 1]]
+#   TRANSACTION (1.4ms)  commit transaction
+p2.delete
+  # Post Destroy (1.5ms)  DELETE FROM "posts" WHERE "posts"."id" = ?  [["id", 2]]
 ```
 
 ## Belongs To and Has Many Dependency Matrix
@@ -159,13 +152,21 @@ Let's look at typical use case `belongs_to` and `has_many`. For example, Author 
 | 17       | :delete       | :restrict_with_exception |
 | 18       | :delete       | :restrict_with_error     |
 
+Let's try setting up each of these scenarios on the Book (belongs_to) and Author (has_many) models. Then for each scenario we'll try the following:
+1. Remove an author that has multiple books.
+2. Remove an author that that has a single book.
+3. Remove an author that has no books.
+4. Remove a book that belongs to an author that has other books.
+5. Remove a book that belongs to an author that only has that one book.
+
+In tests, use `destroy!` rather than `destroy`: "Instead of returning false on failure, it will raise ActiveRecord::RecordNotDestroyed"
+
 ### Scenario 1: dependent not specified on either side of relationship
 
 ```ruby
 class Book < ApplicationRecord
   belongs_to :author
   before_destroy :one_last_thing
-
   def one_last_thing
     puts "Book model #{id} will be destroyed"
   end
@@ -176,7 +177,6 @@ end
 class Author < ApplicationRecord
   has_many :books
   before_destroy :one_last_thing
-
   def one_last_thing
     puts "Author model #{id} will be destroyed"
   end
@@ -186,20 +186,16 @@ end
 Console, load an Author, then try to destroy - it calls the before_destroy callback, then attempts to delete the author, but then rolls back the transaction due to the foreign key constraint from books to authors:
 
 ```ruby
-irb(main):001:0> a = Author.find_by(name: "Andrew Park")
-  Author Load (0.2ms)  SELECT "authors".* FROM "authors" WHERE "authors"."name" = ? LIMIT ?  [["name", "Andrew Park"], ["LIMIT", 1]]
-=>
-#<Author:0x00000001155b8130
-...
-irb(main):002:0> a.destroy
-Author model 1 will be destroyed
-  TRANSACTION (0.1ms)  begin transaction
-  Author Destroy (0.8ms)  DELETE FROM "authors" WHERE "authors"."id" = ?  [["id", 1]]
-  TRANSACTION (0.7ms)  rollback transaction
-/Users/dbaron/.rbenv/versions/3.1.2/lib/ruby/gems/3.1.0/gems/sqlite3-1.5.3-x86_64-darwin/lib/sqlite3/statement.rb:108:in `step': SQLite3::ConstraintException: FOREIGN KEY constraint failed (ActiveRecord::InvalidForeignKey)
+author = Author.find_by(name: "Andrew Park")
+author.destroy
+# Author model 1 will be destroyed
+#   TRANSACTION (0.1ms)  begin transaction
+#   Author Destroy (0.8ms)  DELETE FROM "authors" WHERE "authors"."id" = ?  [["id", 1]]
+#   TRANSACTION (0.7ms)  rollback transaction
+# /Users/dbaron/.rbenv/versions/3.1.2/lib/ruby/gems/3.1.0/gems/sqlite3-1.5.3-x86_64-darwin/lib/sqlite3/statement.rb:108:in `step': SQLite3::ConstraintException: FOREIGN KEY constraint failed (ActiveRecord::InvalidForeignKey)
 ```
 
-Trying to delete author with `a.delete` leads to same error, except it doesn't call the `before_destroy` callback.
+Trying to delete author with `author.delete` leads to same error, except it doesn't call the `before_destroy` callback.
 
 How about destroy/delete a book? No problem - book records can be removed from the database with no errors.
 
@@ -617,7 +613,50 @@ author.errors.full_messages
 # => []
 ```
 
-Like with Scenario 2 where the Author (has_many side of relationship) specified `dependent: :destroy`, destroying the author is first attempting to destroy this author's books one at a time, but the transaction is rolled back. However, it doesn't raise any exceptions and the author model's `error` array is empty. So it's not clear what went wrong but clearly this is an invalid scenario. i.e. don't use this combination if you ever need to delete things.
+Like with Scenario 2 where the Author (has_many side of relationship) specified `dependent: :destroy`, destroying the author is first attempting to destroy this author's books one at a time, but the transaction is rolled back. However, it doesn't raise any exceptions and the author model's `error` array is empty. Also it looks like the author's destroy callback wasn't invoked. It's not clear what went wrong but clearly this is an invalid scenario. i.e. don't use this combination if you ever need to delete things.
+
+What about destroying a book written by an author that has several other books in this case?
+
+```ruby
+book = Book.find_by(title: "Python Programming for Beginners")
+book.destroy
+# Book model 1 will be destroyed
+#   TRANSACTION (0.1ms)  begin transaction
+#   Book Destroy (0.7ms)  DELETE FROM "books" WHERE "books"."id" = ?  [["id", 1]]
+#   Author Load (0.2ms)  SELECT "authors".* FROM "authors" WHERE "authors"."id" = ? LIMIT ?  [["id", 1], ["LIMIT", 1]]
+#   Book Load (0.2ms)  SELECT "books".* FROM "books" WHERE "books"."author_id" = ?  [["author_id", 1]]
+# Book model 2 will be destroyed
+#   Book Destroy (0.1ms)  DELETE FROM "books" WHERE "books"."id" = ?  [["id", 2]]
+#   TRANSACTION (1.1ms)  rollback transaction
+
+book.errors.full_messages
+# => []
+```
+
+It calls the book's destroy callback outside of the transaction, then opens a transaction to delete the specific book we called destroy on, find its associated author, then find that author's other books, then attempt to delete the first of these other books, then rolls back the transaction. Just like when we tried to destroy an author, no exception is raised and the model's `error` property is not populated, and yet, clearly something went wrong.
+
+Finally let's try to destroy a book written by an author that only has that one book:
+
+```ruby
+book = Book.find_by(title: "Computer Programming Crash Course: 7 Books in 1")
+book.destroy
+# Book model 4 will be destroyed
+#   TRANSACTION (0.1ms)  begin transaction
+#   Book Destroy (1.2ms)  DELETE FROM "books" WHERE "books"."id" = ?  [["id", 4]]
+#   Author Load (0.1ms)  SELECT "authors".* FROM "authors" WHERE "authors"."id" = ? LIMIT ?  [["id", 2], ["LIMIT", 1]]
+#   Book Load (1.2ms)  SELECT "books".* FROM "books" WHERE "books"."author_id" = ?  [["author_id", 2]]
+# Author model 2 will be destroyed
+#   Author Destroy (0.3ms)  DELETE FROM "authors" WHERE "authors"."id" = ?  [["id", 2]]
+#   TRANSACTION (3.4ms)  commit transaction
+```
+
+In this case, it deletes both the book and its associated author, also invoking each model's `before_destroy` callback, and the transaction is committed. This looks the same as Scenario 7 where destroy was specified on belongs_to and nothing was specified on has_many. But given the cases where the transaction is rolled back but no exception is raised nor model errors populated, I wouldn't use this combination.
+
+### Scenario 9: belongs_to destroy, has_many delete_all
+
+:destroy      | :delete_all
+
+In this case we specify `destroy` on the Book model (i.e. when destroy is called on a book instance, it should also call destroy on the author it belongs to), and `delete_all` on the Author model (i.e. when Author model is removed from the database, all its books should also be deleted).
 
 ## Other Associations TBD
 
@@ -664,6 +703,7 @@ Skipping this for now to focus on belongs_to/has_many
 
 ## TODO
 
+* Setup RSpec - too much work to do manually in console.
 * Intro para: Want to understand all the dependent options on ActiveRecord associations. Before GDPR/privacy days, would just never delete anything, but now, may be legally required therefore have to think about impact of deletion and maintaining referential integrity.
 * First, discuss difference between delete and destroy (simple model with no associations) [SO](https://stackoverflow.com/questions/22757450/difference-between-destroy-and-delete)
 * Information hierarchy?
