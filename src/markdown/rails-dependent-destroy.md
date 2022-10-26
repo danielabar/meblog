@@ -152,12 +152,14 @@ Let's look at typical use case `belongs_to` and `has_many`. For example, Author 
 | 17       | :delete       | :restrict_with_exception |
 | 18       | :delete       | :restrict_with_error     |
 
-Let's try setting up each of these scenarios on the Book (belongs_to) and Author (has_many) models. Then for each scenario we'll try the following:
+Let's try setting up each of these scenarios on the Book (belongs_to) and Author (has_many) models. Then for each scenario we'll try the following.
 1. Remove an author that has multiple books.
 2. Remove an author that that has a single book.
 3. Remove an author that has no books.
 4. Remove a book that belongs to an author that has other books.
 5. Remove a book that belongs to an author that only has that one book.
+
+Remove has multiple meanings - could be either `destroy!` or `delete` so will try both.
 
 In tests, use `destroy!` rather than `destroy`: "Instead of returning false on failure, it will raise ActiveRecord::RecordNotDestroyed"
 
