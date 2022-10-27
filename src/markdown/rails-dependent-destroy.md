@@ -10,7 +10,46 @@ related:
   - "Roll Your Own Search with Rails and Postgres: Search Engine"
 ---
 
-Ignoring async options as ActiveJob is not enabled on sample project.
+Rails makes defining relationships between models using Active Record associations super easy. Simply add a macro style declaration such as `has_one`, `has_many`, `belongs_to` etc. to your model and Rails will take care of maintaining the relationship. However, some thought is required when it comes to *removing* data from the database, while maintaining data integrity such as foreign key constraints. All the Rails courses and tutorials I've done so far cover adding associations, but none have covered what happens when a record with associations needs to be removed.
+
+Many years ago, before the likes of GDPR and privacy concerns, the "solution" was to never remove any data or use logical, a.k.a [soft delete](https://stackoverflow.com/questions/378331/physical-vs-logical-hard-vs-soft-delete-of-database-record). But with increased privacy regulations and the [Right to be Forgotten](https://en.wikipedia.org/wiki/Right_to_be_forgotten), applications need the ability to safely remove certain data.
+
+The Rails Guide on [Active Record Associations](https://guides.rubyonrails.org/association_basics.html) does cover deletion options. However, since there are so many options besides just for deletion, found myself scrolling up and down through the docs and losing track of which side of the association was being referred to. Also, since different options can be specified on each side of an association, it can be tricky to reason about what would happen with various *combinations* of options.
+
+A further complexity is that there are two different ways to remove an ActiveRecord model in rails: Delete and Destroy. They sound similar but do slightly different things (more on this later). If you add that into the mix of removal options, the number of scenarios grows even further.
+
+In the vein of "a picture is worth a thousand words", I decided to build a sample Rails application and do a deep dive on all the removal options for a couple commonly used associations and how they behave when deleting or destroying a record. This post will walk through the results of this.
+
+## Setup
+
+I started by scaffolding a new Rails project with Ruby 3 and Rails 7, using the default SQLite database:
+
+```
+rbenv install 3.1.2
+rbenv local 3.1.2
+gem install rails -v 7.0.4
+rails new learn-associations
+cd learn-associations
+```
+
+Then generated several models to study the `belongs_to` and `has_many` associations. This is a very common use case. For example, in an e-commerce application a Customer has many Orders, and an Order belongs to a single Customer. Or a Product has many Sku variations, and a Sku belongs to a Product. For this sample application, I used the Book and Author models from the [Active Record Associations Guide](https://guides.rubyonrails.org/association_basics.html#the-belongs-to-association):
+
+![association book belongs to author](../images/association-book-belongs-to-author.png "association book belongs to author")
+
+![association author has many books](../images/association-author-has-many-books.png "association author has many books")
+
+I also added a `title` attribute to the `Book` model to make it easier to look up individual books for removal.
+
+Here are the commands to generate the models, which also generate the migrations to create the tables. I also generated a `Post` model that is not associated with anything, to demonstrate the difference between destroy and delete in a simple case where there are no associated models.
+
+```bash
+# simple model with no associations to demonstrate difference between destroy and delete
+bin/rails generate model post title:string body:text
+
+# models with associations
+bin/rails generate model author name:string
+bin/rails generate model book title:string published_at:date author:references
+```
 
 [belongs_to dependent options](https://guides.rubyonrails.org/association_basics.html#options-for-belongs-to-dependent)
 
@@ -705,8 +744,6 @@ Skipping this for now to focus on belongs_to/has_many
 
 ## TODO
 
-* Setup RSpec - too much work to do manually in console.
-* Intro para: Want to understand all the dependent options on ActiveRecord associations. Before GDPR/privacy days, would just never delete anything, but now, may be legally required therefore have to think about impact of deletion and maintaining referential integrity.
 * First, discuss difference between delete and destroy (simple model with no associations) [SO](https://stackoverflow.com/questions/22757450/difference-between-destroy-and-delete)
 * Information hierarchy?
 * WIP: Starting with belongs_to/has_many pair (common use case, eg: Book belongs to Author, Author has many Books) - run through all scenarios in the matrix
