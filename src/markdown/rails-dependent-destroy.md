@@ -20,7 +20,7 @@ A further complexity is that there are two different ways to remove an ActiveRec
 
 In the vein of "a picture is worth a thousand words", I decided to build a sample Rails application and do a deep dive on all the removal options for a couple commonly used associations and how they behave when deleting or destroying a record. This post will walk through the results of this.
 
-## Setup
+## Project Setup
 
 I started by scaffolding a new Rails project with Ruby 3 and Rails 7, using the default SQLite database:
 
@@ -32,7 +32,9 @@ rails new learn-associations
 cd learn-associations
 ```
 
-Then generated several models to study the `belongs_to` and `has_many` associations. This is a very common use case. For example, in an e-commerce application a Customer has many Orders, and an Order belongs to a single Customer. Or a Product has many Sku variations, and a Sku belongs to a Product. For this sample application, I used the Book and Author models from the [Active Record Associations Guide](https://guides.rubyonrails.org/association_basics.html#the-belongs-to-association):
+I added the [annotate](https://github.com/ctran/annotate_models) gem to add the corresponding table schema as code comments above each model class.
+
+I then generated several models to study the `belongs_to` and `has_many` associations. This is a very common use case. For example, in an e-commerce application a Customer has many Orders, and an Order belongs to a single Customer. Or a Product has many Sku variations, and a Sku belongs to a Product. For this sample application, I used the Book and Author models from the [Active Record Associations Guide](https://guides.rubyonrails.org/association_basics.html#the-belongs-to-association):
 
 ![association book belongs to author](../images/association-book-belongs-to-author.png "association book belongs to author")
 
@@ -50,6 +52,184 @@ bin/rails generate model post title:string body:text
 bin/rails generate model author name:string
 bin/rails generate model book title:string published_at:date author:references
 ```
+
+Here are the migrations that are generated. Notice that the Book model has a foreign key reference to an Author since each Book belongs to one Author. The Post model is not related to anything:
+
+```ruby
+class CreatePosts < ActiveRecord::Migration[7.0]
+  def change
+    create_table :posts do |t|
+      t.string :title
+      t.text :body
+
+      t.timestamps
+    end
+  end
+end
+```
+
+```ruby
+class CreateAuthors < ActiveRecord::Migration[7.0]
+  def change
+    create_table :authors do |t|
+      t.string :name
+
+      t.timestamps
+    end
+  end
+end
+```
+
+```ruby
+class CreateBooks < ActiveRecord::Migration[7.0]
+  def change
+    create_table :books do |t|
+      t.string :title
+      t.date :published_at
+      t.references :author, null: false, foreign_key: true
+
+      t.timestamps
+    end
+  end
+end
+```
+
+After running the migrations, here are the model classes showing that an Author has many Books and a Book belongs to an Author. The Post model has no associations. The schema information was added by the [annotate](https://github.com/ctran/annotate_models) gem:
+
+```ruby
+# == Schema Information
+#
+# Table name: posts
+#
+#  id         :integer          not null, primary key
+#  body       :text
+#  title      :string
+#  created_at :datetime         not null
+#  updated_at :datetime         not null
+#
+class Post < ApplicationRecord
+end
+```
+
+```ruby
+# == Schema Information
+#
+# Table name: authors
+#
+#  id         :integer          not null, primary key
+#  name       :string
+#  created_at :datetime         not null
+#  updated_at :datetime         not null
+#
+class Author < ApplicationRecord
+  has_many :books
+end
+```
+
+```ruby
+# == Schema Information
+#
+# Table name: books
+#
+#  id           :integer          not null, primary key
+#  published_at :date
+#  title        :string
+#  created_at   :datetime         not null
+#  updated_at   :datetime         not null
+#  author_id    :integer          not null
+#
+# Indexes
+#
+#  index_books_on_author_id  (author_id)
+#
+# Foreign Keys
+#
+#  author_id  (author_id => authors.id)
+#
+class Book < ApplicationRecord
+  belongs_to :author
+end
+```
+
+Let's seed some example Posts, Authors, and Books so that we can test what happens when trying to remove them:
+
+```ruby
+# Post is a simple model with no associations to demonstrate the difference between
+# ActiveRecord methods destroy and delete
+Post.create!(title: "Hello Post", body: "Learning about destroy and delete in Rails.")
+Post.create!(title: "Another Post", body: "Lorem ipsum dolor sit amet, consectetur adipiscing elit.")
+
+# Author with multiple books
+author_ap = Author.create!(name: "Andrew Park")
+
+# Author with a single book
+author_jjk = Author.create!(name: "Julian James McKinnon")
+
+# Author with no books
+Author.create!(name: "John Doe")
+
+# Create 3 books for Andrew Park and just one book for Julian James McKinnon
+Book.create!(
+  [
+    { title: "Python Programming for Beginners", published_at: "2022-07-20", author: author_ap },
+    { title: "Machine Learning: 4 Books in 1", published_at: "2020-01-20", author: author_ap },
+    { title: "Python for Data Analysis", published_at: "2021-01-20", author: author_ap },
+    { title: "Computer Programming Crash Course: 7 Books in 1", published_at: "2021-01-20", author: author_jjk }
+  ]
+)
+```
+
+Run the seeds in both the development and test databases. We'll be using the development database to experiment a little, and later the test database to automate all the experiments:
+
+```
+bin/rails db:seed
+RAILS_ENV=test bin/rails db:seed
+```
+
+## Delete vs Destroy
+
+Now I wanted to understand what would happen when attempting to remove various Author or Book records from the database with respect to their associations. However, there's an additional complexity in that there's two different methods to remove a record, which sound similar, but do slightly different things. From the [Rails API Documentation](https://api.rubyonrails.org/):
+
+* [delete](https://api.rubyonrails.org/classes/ActiveRecord/Persistence.html#method-i-delete): Deletes the record in the database and freezes this instance to reflect that no changes should be made (since they can't be persisted). Returns the frozen instance. The row is simply removed with an SQL `DELETE` statement on the record's primary key, and no callbacks are executed.
+* [destroy](https://api.rubyonrails.org/classes/ActiveRecord/Persistence.html#method-i-destroy): Deletes the record in the database and freezes this instance to reflect that no changes should be made (since they can't be persisted). There's a series of callbacks associated with destroy. If the `before_destroy` callback throws `:abort` the action is cancelled and destroy returns `false`.
+* [destroy!](https://api.rubyonrails.org/classes/ActiveRecord/Persistence.html#method-i-destroy-21): Similar to `destroy`, except raises `ActiveRecord::RecordNotDestroyed` rather than returning false if the record is not destroyed.
+
+To summarize the difference, `delete` immediately invokes SQL to remove the record from the database, whereas `destroy/destroy!` first invokes the model's `before_destroy` callback which can potentially stop the deletion. I'm assuming this could be a place for any extra cleanup code could be added.
+
+To understand this with a simple case, let's modify the `Post` model, which has no associations, to add a `before_destroy` callback. This callback will simply output a message:
+
+```ruby
+class Post < ApplicationRecord
+  before_destroy :one_last_thing
+
+  def one_last_thing
+    puts "Post model #{id} will be destroyed"
+  end
+end
+```
+
+Launch a Rails console with `bin/rails c` and let's see how the removal methods behave:
+
+```ruby
+post = Post.find_by(title: "Hello Post")
+post.delete
+# Post Destroy (3.8ms)  DELETE FROM "posts" WHERE "posts"."id" = ?  [["id", 5]]
+post.frozen?
+# true
+
+another_post = Post.find_by(title: "Another Post")
+another_post.destroy
+# Post model 6 will be destroyed
+# TRANSACTION (0.1ms)  begin transaction
+# Post Destroy (0.5ms)  DELETE FROM "posts" WHERE "posts"."id" = ?  [["id", 6]]
+# TRANSACTION (1.1ms)  commit transaction
+```
+
+From the above, we can see that `delete` immediately invokes the SQL `DELETE` statement whereas `destroy` first invokes the `before_destroy` callback. Now with this understood, we can move on to removal of records with associations.
+
+## Dependent Options
+
+## Rough...
 
 [belongs_to dependent options](https://guides.rubyonrails.org/association_basics.html#options-for-belongs-to-dependent)
 
@@ -744,9 +924,8 @@ Skipping this for now to focus on belongs_to/has_many
 
 ## TODO
 
-* First, discuss difference between delete and destroy (simple model with no associations) [SO](https://stackoverflow.com/questions/22757450/difference-between-destroy-and-delete)
 * Information hierarchy?
-* WIP: Starting with belongs_to/has_many pair (common use case, eg: Book belongs to Author, Author has many Books) - run through all scenarios in the matrix
+* Starting with belongs_to/has_many pair (common use case, eg: Book belongs to Author, Author has many Books) - run through all scenarios in the matrix
 * Somewhere mention since the `dependent` options can be used in combination on each side of the associations, its tricky to understand from the docs how they will behave together. That's the purpose of this post to try out each.
 * Add Rails Guides sentence describing each option before trying it out.
 * Cleanup Rails console output to only highlight the relevant parts
