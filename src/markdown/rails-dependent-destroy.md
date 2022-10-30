@@ -12,13 +12,13 @@ related:
 
 Rails makes defining relationships between models using Active Record associations super easy. Simply add a macro style declaration such as `has_one`, `has_many`, `belongs_to` etc. to your model and Rails will take care of maintaining the relationship. However, some thought is required when it comes to *removing* data from the database, while maintaining data integrity such as foreign key constraints. All the Rails courses and tutorials I've done so far cover adding associations, but none have covered what happens when a record with associations needs to be removed.
 
-Many years ago, before the likes of GDPR and privacy concerns, the "solution" was to never remove any data or use logical, a.k.a [soft delete](https://stackoverflow.com/questions/378331/physical-vs-logical-hard-vs-soft-delete-of-database-record). But with increased privacy regulations and the [Right to be Forgotten](https://en.wikipedia.org/wiki/Right_to_be_forgotten), applications need the ability to safely remove certain data.
+Many years ago, before the likes of GDPR and privacy concerns, the "solution" was to never remove any data or use logical, a.k.a [soft delete](https://stackoverflow.com/questions/378331/physical-vs-logical-hard-vs-soft-delete-of-database-record). But with increased privacy regulations and the [right to be forgotten](https://en.wikipedia.org/wiki/Right_to_be_forgotten), applications need the ability to safely remove certain data.
 
 The Rails Guide on [Active Record Associations](https://guides.rubyonrails.org/association_basics.html) does cover deletion options. However, since there are so many options besides just for deletion, found myself scrolling up and down through the docs and losing track of which side of the association was being referred to. Also, since different options can be specified on each side of an association, it can be tricky to reason about what would happen with various *combinations* of options.
 
 A further complexity is that there are two different ways to remove an ActiveRecord model in rails: Delete and Destroy. They sound similar but do slightly different things (more on this later). If you add that into the mix of removal options, the number of scenarios grows even further.
 
-In the vein of "a picture is worth a thousand words", I decided to build a sample Rails application and do a deep dive on all the removal options for a couple commonly used associations and how they behave when deleting or destroying a record. This post will walk through the results of this.
+In the vein of "a picture is worth a thousand words", I decided to build a sample Rails application and do a deep dive on all the removal options for some commonly used associations and how they behave when deleting or destroying a record. This post will walk through the results of this.
 
 ## Project Setup
 
@@ -32,7 +32,14 @@ rails new learn-associations
 cd learn-associations
 ```
 
-I added the [annotate](https://github.com/ctran/annotate_models) gem to add the corresponding table schema as code comments above each model class.
+I added the [annotate](https://github.com/ctran/annotate_models) gem to add the corresponding table schema as code comments above each model class:
+
+```ruby
+# Gemfile
+group :development do
+  gem "annotate"
+end
+```
 
 I then generated several models to study the `belongs_to` and `has_many` associations. This is a very common use case. For example, in an e-commerce application a Customer has many Orders, and an Order belongs to a single Customer. Or a Product has many Sku variations, and a Sku belongs to a Product. For this sample application, I used the Book and Author models from the [Active Record Associations Guide](https://guides.rubyonrails.org/association_basics.html#the-belongs-to-association):
 
@@ -229,14 +236,24 @@ From the above, we can see that `delete` immediately invokes the SQL `DELETE` st
 
 ## Dependent Options
 
-## Rough...
-
-[belongs_to dependent options](https://guides.rubyonrails.org/association_basics.html#options-for-belongs-to-dependent)
+Recall we have Books that `belong_to` an Author, and Author's `have_many` books. Let's start by looking at the dependent options for [belongs_to](https://guides.rubyonrails.org/association_basics.html#options-for-belongs-to-dependent):
 
 * `:destroy` when the object is destroyed, destroy will be called on its associated objects.
 * `:delete` when the object is destroyed, all its associated objects will be deleted directly from the database without calling their destroy method.
 
-[has_many dependent options](https://guides.rubyonrails.org/association_basics.html#dependent)
+For example, to use the `destroy` option, the Book model would look like this to indicate that whenever a Book is destroyed, its associated Author should also be destroyed:
+
+```ruby
+class Book < ApplicationRecord
+  belongs_to :author, dependent: :destroy
+  before_destroy :one_last_thing
+  def one_last_thing
+    Rails.logger.warn("Book model #{id} will be destroyed")
+  end
+end
+```
+
+And the dependent options for [has_many](https://guides.rubyonrails.org/association_basics.html#dependent):
 
 * `:destroy` causes all the associated objects to also be destroyed
 * `:delete_all` causes all the associated objects to be deleted directly from the database (so callbacks will not execute)
@@ -244,111 +261,19 @@ From the above, we can see that `delete` immediately invokes the SQL `DELETE` st
 * `:restrict_with_exception` causes an ActiveRecord::DeleteRestrictionError exception to be raised if there are any associated records
 * `:restrict_with_error` causes an error to be added to the owner if there are any associated objects
 
-## Setup
-
-Try latest releases of [rails](https://rubygems.org/gems/rails/versions/7.0.4) and [Ruby](https://www.ruby-lang.org/en/downloads/releases/) as of 2022-10-13
-
-```
-rbenv install 3.1.2
-rbenv local 3.1.2
-gem install rails -v 7.0.4
-rails new learn-associations
-```
-
-## Models
-
-```bash
-# simple model with no associations to demonstrate difference between destroy and delete
-bin/rails generate model post title:string body:text
-
-# models with associations
-bin/rails generate model author name:string
-bin/rails generate model book title:string published_at:date author:references
-```
-
-Seeds.rb:
+For example, to use the `destroy` option, the Author model would look like this to indicate that whenever an Author is destroyed, its Books should also be destroyed:
 
 ```ruby
-# Post is a simple model with no associations to demonstrate the difference between
-# ActiveRecord methods destroy and delete
-Post.create!(title: "Hello Post", body: "Learning about destroy and delete in Rails.")
-Post.create!(title: "Another Post", body: "Lorem ipsum dolor sit amet, consectetur adipiscing elit.")
-
-# Authors with at least one book each
-author_ap = Author.create!(name: "Andrew Park")
-author_jjk = Author.create!(name: "Julian James McKinnon")
-
-# Author with no books in the system
-Author.create!(name: "John Doe")
-
-# Create 3 books for Andrew Park and just one book for Julian James McKinnon
-Book.create!(
-  [
-    { title: "Python Programming for Beginners", published_at: "2022-07-20", author: author_ap },
-    { title: "Machine Learning: 4 Books in 1", published_at: "2020-01-20", author: author_ap },
-    { title: "Python for Data Analysis", published_at: "2021-01-20", author: author_ap },
-    { title: "Computer Programming Crash Course: 7 Books in 1", published_at: "2021-01-20", author: author_jjk }
-  ]
-)
-
-p "Created #{Post.count} posts"
-p "Created #{Author.count} authors"
-p "Created #{Book.count} books"
-```
-
-Create and seed database:
-
-```
-bin/rails db:create
-bin/rails db:migrate
-bin/rails db:seed
-```
-
-## Destroy vs Delete
-
-One concept to clear up first. When looking at the various `dependent` options, the words "destroy" and "delete" show up in different options. These words sound the same but there is an important difference. Let's understand this with a simple model with no associations before moving on to more complicated cases.
-
-Given a simple `Post` model:
-
-```ruby
-# == Schema Information
-#
-# Table name: posts
-#
-#  id         :integer          not null, primary key
-#  body       :text
-#  title      :string
-#  created_at :datetime         not null
-#  updated_at :datetime         not null
-#
-class Post < ApplicationRecord
+class Author < ApplicationRecord
+  has_many :books, dependent: :destroy
   before_destroy :one_last_thing
-
   def one_last_thing
-    puts "Post model #{id} will be destroyed"
+    Rails.logger.warn("Author model #{id} will be destroyed")
   end
 end
 ```
 
-TODO: Try without the destroy callback first - both methods appear to behave the same. Then add destroy callback to observe the difference.
-
-TODO: Tidy up Rails console output to focus on the important concept.
-
-```ruby
-p1 = Post.first
-p2 = Post.second
-p1.destroy
-# Post model 1 will be destroyed
-#   TRANSACTION (0.1ms)  begin transaction
-#   Post Destroy (0.7ms)  DELETE FROM "posts" WHERE "posts"."id" = ?  [["id", 1]]
-#   TRANSACTION (1.4ms)  commit transaction
-p2.delete
-  # Post Destroy (1.5ms)  DELETE FROM "posts" WHERE "posts"."id" = ?  [["id", 2]]
-```
-
-## Belongs To and Has Many Dependency Matrix
-
-Let's look at typical use case `belongs_to` and `has_many`. For example, Author has many books, and each book belongs to one author. Putting together all the `dependent` options (including not specifying it at all), yields a matrix:
+Summing up the options, there are 2 dependent options on the `belongs_to` association, plus the "option" to not specify anything which makes 3. And there are 5 dependent options on the `has_many` association, plus the do nothing "option" which makes 6. This means there are 3 * 6 = 18 possible combinations of dependent options:
 
 | Scenario | belongs_to    | has_many                 |
 |----------|---------------|--------------------------|
@@ -371,14 +296,19 @@ Let's look at typical use case `belongs_to` and `has_many`. For example, Author 
 | 17       | :delete       | :restrict_with_exception |
 | 18       | :delete       | :restrict_with_error     |
 
-Let's try setting up each of these scenarios on the Book (belongs_to) and Author (has_many) models. Then for each scenario we'll try the following.
-1. Remove an author that has multiple books.
-2. Remove an author that that has a single book.
-3. Remove an author that has no books.
-4. Remove a book that belongs to an author that has other books.
-5. Remove a book that belongs to an author that only has that one book.
+For each combination, let's call it a scenario, I want to understand what happens given the following:
 
-Remove has multiple meanings - could be either `destroy!` or `delete` so will try both.
+1. An Author with no books is destroyed.
+2. An Author with a single book is destroyed.
+3. An Author with multiple books is destroyed.
+4. 1 through 3 above but deleted instead of destroyed.
+5. A book belonging to an Author that only has that one book is destroyed.
+6. A book belonging to an Author that has multiple other books is destroyed.
+7. 5 through 6 above but deleted instead of destroyed.
+
+So that's 7 actions * 18 scenarios = 126 actions. Definitely too much work to do manually in the console, but easily handled by a test framework. I'll use [RSpec](https://rspec.info/) as that's what I'm familiar with, and it automatically resets the database after each example.
+
+## Rough...
 
 In tests, use `destroy!` rather than `destroy`: "Instead of returning false on failure, it will raise ActiveRecord::RecordNotDestroyed"
 
@@ -924,6 +854,7 @@ Skipping this for now to focus on belongs_to/has_many
 
 ## TODO
 
+* Nice to have: Hover/click table row jumps to that scenario sub section
 * Information hierarchy?
 * Starting with belongs_to/has_many pair (common use case, eg: Book belongs to Author, Author has many Books) - run through all scenarios in the matrix
 * Somewhere mention since the `dependent` options can be used in combination on each side of the associations, its tricky to understand from the docs how they will behave together. That's the purpose of this post to try out each.
