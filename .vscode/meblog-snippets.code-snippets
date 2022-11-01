@@ -19,5 +19,22 @@
 		"prefix": "kbd",
 		"body": "<kbd class=\"markdown-kbd\">${1:key}</kbd> $0",
 		"description": "Keyboard key for my blog"
+	},
+	"dsc": {
+		"prefix": "dsc",
+		"body": [
+			"<details class=\"markdown-details\">",
+			"<summary class=\"markdown-summary\">",
+			"View test log",
+			"</summary>",
+			"<pre class=\"grvsc-container gatsby-highlight-monokai\" data-language>",
+			"<code class=\"grvsc-code\">",
+			" ",
+			"${1:content}",
+			"</code>",
+			"</pre>",
+			"</details>"
+		],
+		"description": "Detail Summary Code for my blog"
 	}
 }

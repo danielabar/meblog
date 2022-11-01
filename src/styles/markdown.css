@@ -135,3 +135,8 @@
   font-family: sans-serif;
   text-decoration: line-through wavy var(--post-strikethrough-color);
 }
+
+.markdown-details {
+  cursor: pointer;
+  margin-bottom: 15px;
+}
