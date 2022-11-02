@@ -140,3 +140,8 @@
   cursor: pointer;
   margin-bottom: 15px;
 }
+
+/* experiment */
+.rails-log-delete {
+  color: red;
+}

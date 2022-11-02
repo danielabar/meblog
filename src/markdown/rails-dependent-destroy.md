@@ -1,5 +1,5 @@
 ---
-title: "A Deep Dive on ActiveRecord Dependent options"
+title: "A Deep Dive on ActiveRecord Dependent Options"
 featuredImage: "../images/enum-jake-hills-0hgiQQEi4ic-unsplash.jpg"
 description: "TBD..."
 date: "2023-03-01"
@@ -590,8 +590,8 @@ ActiveRecord::InvalidForeignKey - SQLite3::ConstraintException: FOREIGN KEY cons
 Test Log Summary:
 
 * Author (i.e. model on the `has_many` side of the relationship) with one or more books cannot be removed. Both `destroy!` and `delete` methods raise `ActiveRecord::InvalidForeignKey`.
-* Author with no books can be successfully removed.
-* Removing any Book (i.e. model on the `belongs_to` side of the relationship) works just fine.
+* Author with no books can be successfully removed with either `destroy!` or `delete` methods.
+* Book instances (`belongs_to` side of relationship) can be destroyed or deleted with no errors and this action only affects the book, not the related author.
 
 If your system never needs to delete any instance of the model on the `has_many` side, then not specifying any `dependent` options is ok, otherwise, consider one of the other scenarios.
 
@@ -624,32 +624,245 @@ View test log
 <pre class="grvsc-container gatsby-highlight-monokai" data-language>
 <code class="grvsc-code">
 
-=== BEGIN TEST Book#delete remove a book from author that only has that book ===
-  Book Load (0.5ms)  SELECT "books".* FROM "books" WHERE "books"."title" = ? LIMIT ?  [["title", "Computer Programming Crash Course: 7 Books in 1"], ["LIMIT", 1]]
-  Book Destroy (1.1ms)  DELETE FROM "books" WHERE "books"."id" = ?  [["id", 4]]
+=== BEGIN TEST Author#destroy! remove an author with no books ===
+  Author Load (0.5ms)  SELECT "authors".* FROM "authors" WHERE "authors"."name" = ? LIMIT ?  [["name", "John Doe"], ["LIMIT", 1]]
+  TRANSACTION (0.1ms)  SAVEPOINT active_record_1
+  Book Load (0.4ms)  SELECT "books".* FROM "books" WHERE "books"."author_id" = ?  [["author_id", 3]]
+  Author model 3 will be destroyed
+  <span class="rails-log-delete">Author Destroy (0.5ms)  DELETE FROM "authors" WHERE "authors"."id" = ?</span>  [["id", 3]]
+  TRANSACTION (0.1ms)  RELEASE SAVEPOINT active_record_1
   Author Count (0.4ms)  SELECT COUNT(*) FROM "authors"
   Book Count (0.1ms)  SELECT COUNT(*) FROM "books"
-  NUMBER AUTHORS DELETED: 0; NUMBER BOOKS DELETED: 1
+  NUMBER AUTHORS DELETED: 1; NUMBER BOOKS DELETED: 0
 === END TEST ===
 
-=== BEGIN TEST Book#delete remove a book from author that has multiple books ===
-  Book Load (0.1ms)  SELECT "books".* FROM "books" WHERE "books"."title" = ? LIMIT ?  [["title", "Python Programming for Beginners"], ["LIMIT", 1]]
-  Book Destroy (0.4ms)  DELETE FROM "books" WHERE "books"."id" = ?  [["id", 1]]
+=== BEGIN TEST Author#destroy! remove an author with a single book ===
+  Author Load (0.1ms)  SELECT "authors".* FROM "authors" WHERE "authors"."name" = ? LIMIT ?  [["name", "Julian James McKinnon"], ["LIMIT", 1]]
+  TRANSACTION (0.1ms)  SAVEPOINT active_record_1
+  Book Load (0.3ms)  SELECT "books".* FROM "books" WHERE "books"."author_id" = ?  [["author_id", 2]]
+  Book model 4 will be destroyed
+  Book Destroy (0.5ms)  DELETE FROM "books" WHERE "books"."id" = ?  [["id", 4]]
+  Author model 2 will be destroyed
+  Author Destroy (0.3ms)  DELETE FROM "authors" WHERE "authors"."id" = ?  [["id", 2]]
+  TRANSACTION (0.0ms)  RELEASE SAVEPOINT active_record_1
   Author Count (0.1ms)  SELECT COUNT(*) FROM "authors"
   Book Count (0.0ms)  SELECT COUNT(*) FROM "books"
-  NUMBER AUTHORS DELETED: 0; NUMBER BOOKS DELETED: 1
+  NUMBER AUTHORS DELETED: 1; NUMBER BOOKS DELETED: 1
+=== END TEST ===
+
+=== BEGIN TEST Author#destroy! remove an author with multiple books ===
+  Author Load (0.1ms)  SELECT "authors".* FROM "authors" WHERE "authors"."name" = ? LIMIT ?  [["name", "Andrew Park"], ["LIMIT", 1]]
+  TRANSACTION (0.0ms)  SAVEPOINT active_record_1
+  Book Load (0.1ms)  SELECT "books".* FROM "books" WHERE "books"."author_id" = ?  [["author_id", 1]]
+  Book model 1 will be destroyed
+  Book Destroy (0.3ms)  DELETE FROM "books" WHERE "books"."id" = ?  [["id", 1]]
+  Book model 2 will be destroyed
+  Book Destroy (0.0ms)  DELETE FROM "books" WHERE "books"."id" = ?  [["id", 2]]
+  Book model 3 will be destroyed
+  Book Destroy (0.0ms)  DELETE FROM "books" WHERE "books"."id" = ?  [["id", 3]]
+  Author model 1 will be destroyed
+  Author Destroy (0.1ms)  DELETE FROM "authors" WHERE "authors"."id" = ?  [["id", 1]]
+  TRANSACTION (0.0ms)  RELEASE SAVEPOINT active_record_1
+  Author Count (0.0ms)  SELECT COUNT(*) FROM "authors"
+  Book Count (0.0ms)  SELECT COUNT(*) FROM "books"
+  NUMBER AUTHORS DELETED: 1; NUMBER BOOKS DELETED: 3
+=== END TEST ===
+
+=== BEGIN TEST Author#delete remove an author with no books ===
+  Author Load (0.1ms)  SELECT "authors".* FROM "authors" WHERE "authors"."name" = ? LIMIT ?  [["name", "John Doe"], ["LIMIT", 1]]
+  Author Destroy (0.5ms)  DELETE FROM "authors" WHERE "authors"."id" = ?  [["id", 3]]
+  Author Count (0.1ms)  SELECT COUNT(*) FROM "authors"
+  Book Count (0.1ms)  SELECT COUNT(*) FROM "books"
+  NUMBER AUTHORS DELETED: 1; NUMBER BOOKS DELETED: 0
+=== END TEST ===
+
+=== BEGIN TEST Author#delete remove an author with a single book ===
+  Author Load (0.3ms)  SELECT "authors".* FROM "authors" WHERE "authors"."name" = ? LIMIT ?  [["name", "Julian James McKinnon"], ["LIMIT", 1]]
+  Author Destroy (0.7ms)  DELETE FROM "authors" WHERE "authors"."id" = ?  [["id", 2]]
+ActiveRecord::InvalidForeignKey - SQLite3::ConstraintException: FOREIGN KEY constraint failed
+  Author Count (0.1ms)  SELECT COUNT(*) FROM "authors"
+  Book Count (0.0ms)  SELECT COUNT(*) FROM "books"
+  NUMBER AUTHORS DELETED: 0; NUMBER BOOKS DELETED: 0
+=== END TEST ===
+
+=== BEGIN TEST Author#delete remove an author with multiple books ===
+  Author Load (0.1ms)  SELECT "authors".* FROM "authors" WHERE "authors"."name" = ? LIMIT ?  [["name", "Andrew Park"], ["LIMIT", 1]]
+  Author Destroy (0.5ms)  DELETE FROM "authors" WHERE "authors"."id" = ?  [["id", 1]]
+ActiveRecord::InvalidForeignKey - SQLite3::ConstraintException: FOREIGN KEY constraint failed
+  Author Count (0.1ms)  SELECT COUNT(*) FROM "authors"
+  Book Count (0.0ms)  SELECT COUNT(*) FROM "books"
+  NUMBER AUTHORS DELETED: 0; NUMBER BOOKS DELETED: 0
 === END TEST ===
 
 === BEGIN TEST Book#destroy! remove a book from author that only has that book ===
-  Book Load (0.1ms)  SELECT "books".* FROM "books" WHERE "books"."title" = ? LIMIT ?  [["title", "Computer Programming Crash Course: 7 Books in 1"], ["LIMIT", 1]]
+  Book Load (0.2ms)  SELECT "books".* FROM "books" WHERE "books"."title" = ? LIMIT ?  [["title", "Computer Programming Crash Course: 7 Books in 1"], ["LIMIT", 1]]
   Book model 4 will be destroyed
-  TRANSACTION (0.0ms)  SAVEPOINT active_record_1
+  TRANSACTION (0.1ms)  SAVEPOINT active_record_1
   Book Destroy (0.3ms)  DELETE FROM "books" WHERE "books"."id" = ?  [["id", 4]]
   TRANSACTION (0.0ms)  RELEASE SAVEPOINT active_record_1
   Author Count (0.0ms)  SELECT COUNT(*) FROM "authors"
   Book Count (0.0ms)  SELECT COUNT(*) FROM "books"
   NUMBER AUTHORS DELETED: 0; NUMBER BOOKS DELETED: 1
 === END TEST ===
+
+=== BEGIN TEST Book#destroy! remove a book from author that has multiple books ===
+  Book Load (0.1ms)  SELECT "books".* FROM "books" WHERE "books"."title" = ? LIMIT ?  [["title", "Python Programming for Beginners"], ["LIMIT", 1]]
+  Book model 1 will be destroyed
+  TRANSACTION (0.1ms)  SAVEPOINT active_record_1
+  Book Destroy (0.5ms)  DELETE FROM "books" WHERE "books"."id" = ?  [["id", 1]]
+  TRANSACTION (0.0ms)  RELEASE SAVEPOINT active_record_1
+  Author Count (0.1ms)  SELECT COUNT(*) FROM "authors"
+  Book Count (0.1ms)  SELECT COUNT(*) FROM "books"
+  NUMBER AUTHORS DELETED: 0; NUMBER BOOKS DELETED: 1
+=== END TEST ===
+
+=== BEGIN TEST Book#delete remove a book from author that only has that book ===
+  Book Load (0.1ms)  SELECT "books".* FROM "books" WHERE "books"."title" = ? LIMIT ?  [["title", "Computer Programming Crash Course: 7 Books in 1"], ["LIMIT", 1]]
+  Book Destroy (1.5ms)  DELETE FROM "books" WHERE "books"."id" = ?  [["id", 4]]
+  Author Count (0.3ms)  SELECT COUNT(*) FROM "authors"
+  Book Count (0.1ms)  SELECT COUNT(*) FROM "books"
+  NUMBER AUTHORS DELETED: 0; NUMBER BOOKS DELETED: 1
+=== END TEST ===
+
+=== BEGIN TEST Book#delete remove a book from author that has multiple books ===
+  Book Load (0.1ms)  SELECT "books".* FROM "books" WHERE "books"."title" = ? LIMIT ?  [["title", "Python Programming for Beginners"], ["LIMIT", 1]]
+  Book Destroy (0.3ms)  DELETE FROM "books" WHERE "books"."id" = ?  [["id", 1]]
+  Author Count (0.1ms)  SELECT COUNT(*) FROM "authors"
+  Book Count (0.1ms)  SELECT COUNT(*) FROM "books"
+  NUMBER AUTHORS DELETED: 0; NUMBER BOOKS DELETED: 1
+=== END TEST ===
+</code>
+</pre>
+</details>
+
+Test log summary:
+
+* Calling `destroy/destroy!` on Author model (`has_many` side of relationship) instance works to delete that author *and* also destroys each of the author's books. That is, each associated book has its `before_destroy` callback invoked, and then is deleted from the database with a SQL DELETE statement.
+* Calling `delete` on Author model fails on foreign key constraint for author instances that have one or more associated books.
+* Book instances (`belongs_to` side of relationship) can be destroyed or deleted with no errors and this action only affects the book, not the related author.
+
+## Scenario 3: Belongs to not specified and Has Many Delete All
+
+In this case, we leave the Book model with no dependent option, and specify `delete_all` on the Author model:
+
+```ruby
+class Book < ApplicationRecord
+  belongs_to :author
+  before_destroy :one_last_thing
+  def one_last_thing
+    Rails.logger.warn("  Book model #{id} will be destroyed")
+  end
+end
+
+class Author < ApplicationRecord
+  has_many :books, dependent: :delete_all
+  before_destroy :one_last_thing
+  def one_last_thing
+    Rails.logger.warn("  Author model #{id} will be destroyed")
+  end
+end
+```
+
+<details class="markdown-details">
+<summary class="markdown-summary">
+View test log
+</summary>
+<pre class="grvsc-container gatsby-highlight-monokai" data-language>
+<code class="grvsc-code">
+
+=== BEGIN TEST Author#destroy! remove an author with no books ===
+  Author Load (0.5ms)  SELECT "authors".* FROM "authors" WHERE "authors"."name" = ? LIMIT ?  [["name", "John Doe"], ["LIMIT", 1]]
+  TRANSACTION (0.1ms)  SAVEPOINT active_record_1
+  Book Delete All (0.4ms)  DELETE FROM "books" WHERE "books"."author_id" = ?  [["author_id", 3]]
+  Author model 3 will be destroyed
+  Author Destroy (0.9ms)  DELETE FROM "authors" WHERE "authors"."id" = ?  [["id", 3]]
+  TRANSACTION (0.2ms)  RELEASE SAVEPOINT active_record_1
+  Author Count (0.3ms)  SELECT COUNT(*) FROM "authors"
+  Book Count (0.1ms)  SELECT COUNT(*) FROM "books"
+  NUMBER AUTHORS DELETED: 1; NUMBER BOOKS DELETED: 0
+=== END TEST ===
+
+  TRANSACTION (0.5ms)  rollback transaction
+  TRANSACTION (0.1ms)  begin transaction
+
+=== BEGIN TEST Author#destroy! remove an author with a single book ===
+  Author Load (0.2ms)  SELECT "authors".* FROM "authors" WHERE "authors"."name" = ? LIMIT ?  [["name", "Julian James McKinnon"], ["LIMIT", 1]]
+  TRANSACTION (0.1ms)  SAVEPOINT active_record_1
+  Book Delete All (1.0ms)  DELETE FROM "books" WHERE "books"."author_id" = ?  [["author_id", 2]]
+  Author model 2 will be destroyed
+  Author Destroy (0.1ms)  DELETE FROM "authors" WHERE "authors"."id" = ?  [["id", 2]]
+  TRANSACTION (0.0ms)  RELEASE SAVEPOINT active_record_1
+  Author Count (0.1ms)  SELECT COUNT(*) FROM "authors"
+  Book Count (0.0ms)  SELECT COUNT(*) FROM "books"
+  NUMBER AUTHORS DELETED: 1; NUMBER BOOKS DELETED: 1
+=== END TEST ===
+
+  TRANSACTION (2.0ms)  rollback transaction
+  TRANSACTION (0.5ms)  begin transaction
+
+=== BEGIN TEST Author#destroy! remove an author with multiple books ===
+  Author Load (0.2ms)  SELECT "authors".* FROM "authors" WHERE "authors"."name" = ? LIMIT ?  [["name", "Andrew Park"], ["LIMIT", 1]]
+  TRANSACTION (0.1ms)  SAVEPOINT active_record_1
+  Book Delete All (0.3ms)  DELETE FROM "books" WHERE "books"."author_id" = ?  [["author_id", 1]]
+  Author model 1 will be destroyed
+  Author Destroy (0.1ms)  DELETE FROM "authors" WHERE "authors"."id" = ?  [["id", 1]]
+  TRANSACTION (0.0ms)  RELEASE SAVEPOINT active_record_1
+  Author Count (0.1ms)  SELECT COUNT(*) FROM "authors"
+  Book Count (0.0ms)  SELECT COUNT(*) FROM "books"
+  NUMBER AUTHORS DELETED: 1; NUMBER BOOKS DELETED: 3
+=== END TEST ===
+
+  TRANSACTION (0.4ms)  rollback transaction
+  TRANSACTION (0.1ms)  begin transaction
+
+=== BEGIN TEST Author#delete remove an author with no books ===
+  Author Load (0.2ms)  SELECT "authors".* FROM "authors" WHERE "authors"."name" = ? LIMIT ?  [["name", "John Doe"], ["LIMIT", 1]]
+  Author Destroy (0.4ms)  DELETE FROM "authors" WHERE "authors"."id" = ?  [["id", 3]]
+  Author Count (0.1ms)  SELECT COUNT(*) FROM "authors"
+  Book Count (0.1ms)  SELECT COUNT(*) FROM "books"
+  NUMBER AUTHORS DELETED: 1; NUMBER BOOKS DELETED: 0
+=== END TEST ===
+
+  TRANSACTION (0.6ms)  rollback transaction
+  TRANSACTION (0.1ms)  begin transaction
+
+=== BEGIN TEST Author#delete remove an author with a single book ===
+  Author Load (0.2ms)  SELECT "authors".* FROM "authors" WHERE "authors"."name" = ? LIMIT ?  [["name", "Julian James McKinnon"], ["LIMIT", 1]]
+  Author Destroy (0.8ms)  DELETE FROM "authors" WHERE "authors"."id" = ?  [["id", 2]]
+ActiveRecord::InvalidForeignKey - SQLite3::ConstraintException: FOREIGN KEY constraint failed
+  Author Count (0.1ms)  SELECT COUNT(*) FROM "authors"
+  Book Count (0.0ms)  SELECT COUNT(*) FROM "books"
+  NUMBER AUTHORS DELETED: 0; NUMBER BOOKS DELETED: 0
+=== END TEST ===
+
+  TRANSACTION (0.4ms)  rollback transaction
+  TRANSACTION (0.1ms)  begin transaction
+
+=== BEGIN TEST Author#delete remove an author with multiple books ===
+  Author Load (0.1ms)  SELECT "authors".* FROM "authors" WHERE "authors"."name" = ? LIMIT ?  [["name", "Andrew Park"], ["LIMIT", 1]]
+  Author Destroy (0.5ms)  DELETE FROM "authors" WHERE "authors"."id" = ?  [["id", 1]]
+ActiveRecord::InvalidForeignKey - SQLite3::ConstraintException: FOREIGN KEY constraint failed
+  Author Count (0.4ms)  SELECT COUNT(*) FROM "authors"
+  Book Count (0.1ms)  SELECT COUNT(*) FROM "books"
+  NUMBER AUTHORS DELETED: 0; NUMBER BOOKS DELETED: 0
+=== END TEST ===
+
+  TRANSACTION (0.5ms)  rollback transaction
+  TRANSACTION (0.3ms)  begin transaction
+
+=== BEGIN TEST Book#destroy! remove a book from author that only has that book ===
+  Book Load (0.3ms)  SELECT "books".* FROM "books" WHERE "books"."title" = ? LIMIT ?  [["title", "Computer Programming Crash Course: 7 Books in 1"], ["LIMIT", 1]]
+  Book model 4 will be destroyed
+  TRANSACTION (0.1ms)  SAVEPOINT active_record_1
+  Book Destroy (0.3ms)  DELETE FROM "books" WHERE "books"."id" = ?  [["id", 4]]
+  TRANSACTION (0.0ms)  RELEASE SAVEPOINT active_record_1
+  Author Count (0.1ms)  SELECT COUNT(*) FROM "authors"
+  Book Count (0.0ms)  SELECT COUNT(*) FROM "books"
+  NUMBER AUTHORS DELETED: 0; NUMBER BOOKS DELETED: 1
+=== END TEST ===
+
+  TRANSACTION (0.4ms)  rollback transaction
+  TRANSACTION (0.0ms)  begin transaction
 
 === BEGIN TEST Book#destroy! remove a book from author that has multiple books ===
   Book Load (0.1ms)  SELECT "books".* FROM "books" WHERE "books"."title" = ? LIMIT ?  [["title", "Python Programming for Beginners"], ["LIMIT", 1]]
@@ -662,92 +875,50 @@ View test log
   NUMBER AUTHORS DELETED: 0; NUMBER BOOKS DELETED: 1
 === END TEST ===
 
-=== BEGIN TEST Author#delete remove an author with a single book ===
-  Author Load (0.2ms)  SELECT "authors".* FROM "authors" WHERE "authors"."name" = ? LIMIT ?  [["name", "Julian James McKinnon"], ["LIMIT", 1]]
-  Author Destroy (0.5ms)  DELETE FROM "authors" WHERE "authors"."id" = ?  [["id", 2]]
-ActiveRecord::InvalidForeignKey - SQLite3::ConstraintException: FOREIGN KEY constraint failed
-  Author Count (0.1ms)  SELECT COUNT(*) FROM "authors"
-  Book Count (0.1ms)  SELECT COUNT(*) FROM "books"
-  NUMBER AUTHORS DELETED: 0; NUMBER BOOKS DELETED: 0
-=== END TEST ===
+  TRANSACTION (0.4ms)  rollback transaction
+  TRANSACTION (0.0ms)  begin transaction
 
-=== BEGIN TEST Author#delete remove an author with multiple books ===
-  Author Load (0.2ms)  SELECT "authors".* FROM "authors" WHERE "authors"."name" = ? LIMIT ?  [["name", "Andrew Park"], ["LIMIT", 1]]
-  Author Destroy (0.5ms)  DELETE FROM "authors" WHERE "authors"."id" = ?  [["id", 1]]
-ActiveRecord::InvalidForeignKey - SQLite3::ConstraintException: FOREIGN KEY constraint failed
-  Author Count (0.1ms)  SELECT COUNT(*) FROM "authors"
-  Book Count (0.0ms)  SELECT COUNT(*) FROM "books"
-  NUMBER AUTHORS DELETED: 0; NUMBER BOOKS DELETED: 0
-=== END TEST ===
-
-=== BEGIN TEST Author#delete remove an author with no books ===
-  Author Load (0.1ms)  SELECT "authors".* FROM "authors" WHERE "authors"."name" = ? LIMIT ?  [["name", "John Doe"], ["LIMIT", 1]]
-  Author Destroy (0.3ms)  DELETE FROM "authors" WHERE "authors"."id" = ?  [["id", 3]]
-  Author Count (0.0ms)  SELECT COUNT(*) FROM "authors"
-  Book Count (0.0ms)  SELECT COUNT(*) FROM "books"
-  NUMBER AUTHORS DELETED: 1; NUMBER BOOKS DELETED: 0
-=== END TEST ===
-
-=== BEGIN TEST Author#destroy! remove an author with a single book ===
-  Author Load (0.1ms)  SELECT "authors".* FROM "authors" WHERE "authors"."name" = ? LIMIT ?  [["name", "Julian James McKinnon"], ["LIMIT", 1]]
-  TRANSACTION (0.1ms)  SAVEPOINT active_record_1
-  Book Load (0.1ms)  SELECT "books".* FROM "books" WHERE "books"."author_id" = ?  [["author_id", 2]]
-  Book model 4 will be destroyed
+=== BEGIN TEST Book#delete remove a book from author that only has that book ===
+  Book Load (0.1ms)  SELECT "books".* FROM "books" WHERE "books"."title" = ? LIMIT ?  [["title", "Computer Programming Crash Course: 7 Books in 1"], ["LIMIT", 1]]
   Book Destroy (0.3ms)  DELETE FROM "books" WHERE "books"."id" = ?  [["id", 4]]
-  Author model 2 will be destroyed
-  Author Destroy (0.1ms)  DELETE FROM "authors" WHERE "authors"."id" = ?  [["id", 2]]
-  TRANSACTION (0.1ms)  RELEASE SAVEPOINT active_record_1
-  Author Count (0.0ms)  SELECT COUNT(*) FROM "authors"
-  Book Count (0.0ms)  SELECT COUNT(*) FROM "books"
-  NUMBER AUTHORS DELETED: 1; NUMBER BOOKS DELETED: 1
+  Author Count (0.4ms)  SELECT COUNT(*) FROM "authors"
+  Book Count (0.2ms)  SELECT COUNT(*) FROM "books"
+  NUMBER AUTHORS DELETED: 0; NUMBER BOOKS DELETED: 1
 === END TEST ===
 
-=== BEGIN TEST Author#destroy! remove an author with no books ===
-  Author Load (0.1ms)  SELECT "authors".* FROM "authors" WHERE "authors"."name" = ? LIMIT ?  [["name", "John Doe"], ["LIMIT", 1]]
-  TRANSACTION (0.0ms)  SAVEPOINT active_record_1
-  Book Load (0.0ms)  SELECT "books".* FROM "books" WHERE "books"."author_id" = ?  [["author_id", 3]]
-  Author model 3 will be destroyed
-  Author Destroy (0.3ms)  DELETE FROM "authors" WHERE "authors"."id" = ?  [["id", 3]]
-  TRANSACTION (0.0ms)  RELEASE SAVEPOINT active_record_1
-  Author Count (0.0ms)  SELECT COUNT(*) FROM "authors"
-  Book Count (0.0ms)  SELECT COUNT(*) FROM "books"
-  NUMBER AUTHORS DELETED: 1; NUMBER BOOKS DELETED: 0
-=== END TEST ===
+  TRANSACTION (1.5ms)  rollback transaction
+  TRANSACTION (80.7ms)  begin transaction
 
-=== BEGIN TEST Author#destroy! remove an author with multiple books ===
-  Author Load (0.1ms)  SELECT "authors".* FROM "authors" WHERE "authors"."name" = ? LIMIT ?  [["name", "Andrew Park"], ["LIMIT", 1]]
-  TRANSACTION (0.0ms)  SAVEPOINT active_record_1
-  Book Load (0.1ms)  SELECT "books".* FROM "books" WHERE "books"."author_id" = ?  [["author_id", 1]]
-  Book model 1 will be destroyed
-  Book Destroy (0.3ms)  DELETE FROM "books" WHERE "books"."id" = ?  [["id", 1]]
-  Book model 2 will be destroyed
-  Book Destroy (0.1ms)  DELETE FROM "books" WHERE "books"."id" = ?  [["id", 2]]
-  Book model 3 will be destroyed
-  Book Destroy (0.0ms)  DELETE FROM "books" WHERE "books"."id" = ?  [["id", 3]]
-  Author model 1 will be destroyed
-  Author Destroy (0.1ms)  DELETE FROM "authors" WHERE "authors"."id" = ?  [["id", 1]]
-  TRANSACTION (0.0ms)  RELEASE SAVEPOINT active_record_1
+=== BEGIN TEST Book#delete remove a book from author that has multiple books ===
+  Book Load (0.2ms)  SELECT "books".* FROM "books" WHERE "books"."title" = ? LIMIT ?  [["title", "Python Programming for Beginners"], ["LIMIT", 1]]
+  Book Destroy (0.4ms)  DELETE FROM "books" WHERE "books"."id" = ?  [["id", 1]]
   Author Count (0.1ms)  SELECT COUNT(*) FROM "authors"
   Book Count (0.1ms)  SELECT COUNT(*) FROM "books"
-  NUMBER AUTHORS DELETED: 1; NUMBER BOOKS DELETED: 3
+  NUMBER AUTHORS DELETED: 0; NUMBER BOOKS DELETED: 1
 === END TEST ===
 </code>
 </pre>
 </details>
 
-WIP: Summarize test log (book removal is fine, Author delete still FK constraint, Author destroy - cascade)
+Test log summary:
+
+* Calling `destroy/destroy!` on Author model (`has_many` side of relationship) instance works to delete that author *and* also directly deletes each of the author's books. That is, each associated book will be deleted via SQL DELETE statement but will *not* have its `before_destroy` callback invoked.
+* Calling `delete` on Author model fails on foreign key constraint for author instances that have one or more associated books.
+* Book instances (`belongs_to` side of relationship) can be destroyed or deleted with no errors and this action only affects the book, not the related author.
 
 ## TODO
 
-* Nice to have: change margin-bottom amount on detail/summary element depending on open/closed state.
-* Information hierarchy?
 * WIP: Starting with belongs_to/has_many pair (common use case, eg: Book belongs to Author, Author has many Books) - run through all scenarios in the matrix
+* Nice to have: change margin-bottom amount on detail/summary element depending on open/closed state.
+* Nice to have: custom syntax highlight/styles for rails test log. See: https://github.com/rails/rails/blob/5-0-stable/activesupport/lib/active_support/log_subscriber.rb and https://stackoverflow.com/questions/25574906/ruby-on-rails-how-to-print-log-messages-in-color
+* Information hierarchy?
 * Add Rails Guides sentence describing each option before trying it out.
 * Cleanup Rails console output to only highlight the relevant parts
 * Try to get to "orphaned records" warning as described in guide - what causes this?
 * What about all the other association types - maybe too much for one blog post - do a multi part?
 * Add aside: passing `-h` or `--help` to any generator command, eg: `bin/rails generate model -h` provides a complete guide to that generator. For example, wondering what are the valid data types for model attributes
 * Link to companion project: https://github.com/danielabar/learn-associations
+* Summarize all the results like when you want to use each? (maybe too complicated because it depends on requirements...)
 * Conclusion para
 * Title
 * Description
