@@ -767,135 +767,109 @@ end
 <summary class="markdown-summary">
 View test log
 </summary>
-<pre class="grvsc-container gatsby-highlight-monokai" data-language>
+<pre class="grvsc-container">
 <code class="grvsc-code">
 
 === BEGIN TEST Author#destroy! remove an author with no books ===
-  Author Load (0.5ms)  SELECT "authors".* FROM "authors" WHERE "authors"."name" = ? LIMIT ?  [["name", "John Doe"], ["LIMIT", 1]]
-  TRANSACTION (0.1ms)  SAVEPOINT active_record_1
-  Book Delete All (0.4ms)  DELETE FROM "books" WHERE "books"."author_id" = ?  [["author_id", 3]]
+  <span class="rails-log-cyan">Author Load (0.4ms)</span>  <span class="rails-log-blue">SELECT "authors".* FROM "authors" WHERE "authors"."name" = ? LIMIT ?</span>  [["name", "John Doe"], ["LIMIT", 1]]
+  <span class="rails-log-cyan">TRANSACTION (0.1ms)</span>  <span class="rails-log-magenta">SAVEPOINT active_record_1</span>
+  <span class="rails-log-cyan">Book Delete All (0.5ms)</span>  <span class="rails-log-red">DELETE FROM "books" WHERE "books"."author_id" = ?</span>  [["author_id", 3]]
   Author model 3 will be destroyed
-  Author Destroy (0.9ms)  DELETE FROM "authors" WHERE "authors"."id" = ?  [["id", 3]]
-  TRANSACTION (0.2ms)  RELEASE SAVEPOINT active_record_1
-  Author Count (0.3ms)  SELECT COUNT(*) FROM "authors"
-  Book Count (0.1ms)  SELECT COUNT(*) FROM "books"
+  <span class="rails-log-cyan">Author Destroy (0.4ms)</span>  <span class="rails-log-red">DELETE FROM "authors" WHERE "authors"."id" = ?</span>  [["id", 3]]
+  <span class="rails-log-cyan">TRANSACTION (0.0ms)</span>  <span class="rails-log-magenta">RELEASE SAVEPOINT active_record_1</span>
+  <span class="rails-log-cyan">Author Count (0.1ms)</span>  <span class="rails-log-blue">SELECT COUNT(*) FROM "authors"</span>
+  <span class="rails-log-cyan">Book Count (0.0ms)</span>  <span class="rails-log-blue">SELECT COUNT(*) FROM "books"</span>
   NUMBER AUTHORS DELETED: 1; NUMBER BOOKS DELETED: 0
 === END TEST ===
 
-  TRANSACTION (0.5ms)  rollback transaction
-  TRANSACTION (0.1ms)  begin transaction
-
 === BEGIN TEST Author#destroy! remove an author with a single book ===
-  Author Load (0.2ms)  SELECT "authors".* FROM "authors" WHERE "authors"."name" = ? LIMIT ?  [["name", "Julian James McKinnon"], ["LIMIT", 1]]
-  TRANSACTION (0.1ms)  SAVEPOINT active_record_1
-  Book Delete All (1.0ms)  DELETE FROM "books" WHERE "books"."author_id" = ?  [["author_id", 2]]
+  <span class="rails-log-cyan">Author Load (0.1ms)</span>  <span class="rails-log-blue">SELECT "authors".* FROM "authors" WHERE "authors"."name" = ? LIMIT ?</span>  [["name", "Julian James McKinnon"], ["LIMIT", 1]]
+  <span class="rails-log-cyan">TRANSACTION (0.1ms)</span>  <span class="rails-log-magenta">SAVEPOINT active_record_1</span>
+  <span class="rails-log-cyan">Book Delete All (0.6ms)</span>  <span class="rails-log-red">DELETE FROM "books" WHERE "books"."author_id" = ?</span>  [["author_id", 2]]
   Author model 2 will be destroyed
-  Author Destroy (0.1ms)  DELETE FROM "authors" WHERE "authors"."id" = ?  [["id", 2]]
-  TRANSACTION (0.0ms)  RELEASE SAVEPOINT active_record_1
-  Author Count (0.1ms)  SELECT COUNT(*) FROM "authors"
-  Book Count (0.0ms)  SELECT COUNT(*) FROM "books"
+  <span class="rails-log-cyan">Author Destroy (0.1ms)</span>  <span class="rails-log-red">DELETE FROM "authors" WHERE "authors"."id" = ?</span>  [["id", 2]]
+  <span class="rails-log-cyan">TRANSACTION (0.0ms)</span>  <span class="rails-log-magenta">RELEASE SAVEPOINT active_record_1</span>
+  <span class="rails-log-cyan">Author Count (0.1ms)</span>  <span class="rails-log-blue">SELECT COUNT(*) FROM "authors"</span>
+  <span class="rails-log-cyan">Book Count (0.0ms)</span>  <span class="rails-log-blue">SELECT COUNT(*) FROM "books"</span>
   NUMBER AUTHORS DELETED: 1; NUMBER BOOKS DELETED: 1
 === END TEST ===
 
-  TRANSACTION (2.0ms)  rollback transaction
-  TRANSACTION (0.5ms)  begin transaction
-
 === BEGIN TEST Author#destroy! remove an author with multiple books ===
-  Author Load (0.2ms)  SELECT "authors".* FROM "authors" WHERE "authors"."name" = ? LIMIT ?  [["name", "Andrew Park"], ["LIMIT", 1]]
-  TRANSACTION (0.1ms)  SAVEPOINT active_record_1
-  Book Delete All (0.3ms)  DELETE FROM "books" WHERE "books"."author_id" = ?  [["author_id", 1]]
+  <span class="rails-log-cyan">Author Load (0.1ms)</span>  <span class="rails-log-blue">SELECT "authors".* FROM "authors" WHERE "authors"."name" = ? LIMIT ?</span>  [["name", "Andrew Park"], ["LIMIT", 1]]
+  <span class="rails-log-cyan">TRANSACTION (0.0ms)</span>  <span class="rails-log-magenta">SAVEPOINT active_record_1</span>
+  <span class="rails-log-cyan">Book Delete All (0.3ms)</span>  <span class="rails-log-red">DELETE FROM "books" WHERE "books"."author_id" = ?</span>  [["author_id", 1]]
   Author model 1 will be destroyed
-  Author Destroy (0.1ms)  DELETE FROM "authors" WHERE "authors"."id" = ?  [["id", 1]]
-  TRANSACTION (0.0ms)  RELEASE SAVEPOINT active_record_1
-  Author Count (0.1ms)  SELECT COUNT(*) FROM "authors"
-  Book Count (0.0ms)  SELECT COUNT(*) FROM "books"
+  <span class="rails-log-cyan">Author Destroy (0.1ms)</span>  <span class="rails-log-red">DELETE FROM "authors" WHERE "authors"."id" = ?</span>  [["id", 1]]
+  <span class="rails-log-cyan">TRANSACTION (0.1ms)</span>  <span class="rails-log-magenta">RELEASE SAVEPOINT active_record_1</span>
+  <span class="rails-log-cyan">Author Count (0.0ms)</span>  <span class="rails-log-blue">SELECT COUNT(*) FROM "authors"</span>
+  <span class="rails-log-cyan">Book Count (0.0ms)</span>  <span class="rails-log-blue">SELECT COUNT(*) FROM "books"</span>
   NUMBER AUTHORS DELETED: 1; NUMBER BOOKS DELETED: 3
 === END TEST ===
 
-  TRANSACTION (0.4ms)  rollback transaction
-  TRANSACTION (0.1ms)  begin transaction
-
 === BEGIN TEST Author#delete remove an author with no books ===
-  Author Load (0.2ms)  SELECT "authors".* FROM "authors" WHERE "authors"."name" = ? LIMIT ?  [["name", "John Doe"], ["LIMIT", 1]]
-  Author Destroy (0.4ms)  DELETE FROM "authors" WHERE "authors"."id" = ?  [["id", 3]]
-  Author Count (0.1ms)  SELECT COUNT(*) FROM "authors"
-  Book Count (0.1ms)  SELECT COUNT(*) FROM "books"
+  <span class="rails-log-cyan">Author Load (0.1ms)</span>  <span class="rails-log-blue">SELECT "authors".* FROM "authors" WHERE "authors"."name" = ? LIMIT ?</span>  [["name", "John Doe"], ["LIMIT", 1]]
+  <span class="rails-log-cyan">Author Destroy (0.3ms)</span>  <span class="rails-log-red">DELETE FROM "authors" WHERE "authors"."id" = ?</span>  [["id", 3]]
+  <span class="rails-log-cyan">Author Count (0.1ms)</span>  <span class="rails-log-blue">SELECT COUNT(*) FROM "authors"</span>
+  <span class="rails-log-cyan">Book Count (0.0ms)</span>  <span class="rails-log-blue">SELECT COUNT(*) FROM "books"</span>
   NUMBER AUTHORS DELETED: 1; NUMBER BOOKS DELETED: 0
 === END TEST ===
 
-  TRANSACTION (0.6ms)  rollback transaction
-  TRANSACTION (0.1ms)  begin transaction
-
 === BEGIN TEST Author#delete remove an author with a single book ===
-  Author Load (0.2ms)  SELECT "authors".* FROM "authors" WHERE "authors"."name" = ? LIMIT ?  [["name", "Julian James McKinnon"], ["LIMIT", 1]]
-  Author Destroy (0.8ms)  DELETE FROM "authors" WHERE "authors"."id" = ?  [["id", 2]]
+  <span class="rails-log-cyan">Author Load (0.1ms)</span>  <span class="rails-log-blue">SELECT "authors".* FROM "authors" WHERE "authors"."name" = ? LIMIT ?</span>  [["name", "Julian James McKinnon"], ["LIMIT", 1]]
+  <span class="rails-log-cyan">Author Destroy (0.4ms)</span>  <span class="rails-log-red">DELETE FROM "authors" WHERE "authors"."id" = ?</span>  [["id", 2]]
 ActiveRecord::InvalidForeignKey - SQLite3::ConstraintException: FOREIGN KEY constraint failed
-  Author Count (0.1ms)  SELECT COUNT(*) FROM "authors"
-  Book Count (0.0ms)  SELECT COUNT(*) FROM "books"
+  <span class="rails-log-cyan">Author Count (0.0ms)</span>  <span class="rails-log-blue">SELECT COUNT(*) FROM "authors"</span>
+  <span class="rails-log-cyan">Book Count (0.0ms)</span>  <span class="rails-log-blue">SELECT COUNT(*) FROM "books"</span>
   NUMBER AUTHORS DELETED: 0; NUMBER BOOKS DELETED: 0
 === END TEST ===
-
-  TRANSACTION (0.4ms)  rollback transaction
-  TRANSACTION (0.1ms)  begin transaction
 
 === BEGIN TEST Author#delete remove an author with multiple books ===
-  Author Load (0.1ms)  SELECT "authors".* FROM "authors" WHERE "authors"."name" = ? LIMIT ?  [["name", "Andrew Park"], ["LIMIT", 1]]
-  Author Destroy (0.5ms)  DELETE FROM "authors" WHERE "authors"."id" = ?  [["id", 1]]
+  <span class="rails-log-cyan">Author Load (0.1ms)</span>  <span class="rails-log-blue">SELECT "authors".* FROM "authors" WHERE "authors"."name" = ? LIMIT ?</span>  [["name", "Andrew Park"], ["LIMIT", 1]]
+  <span class="rails-log-cyan">Author Destroy (0.4ms)</span>  <span class="rails-log-red">DELETE FROM "authors" WHERE "authors"."id" = ?</span>  [["id", 1]]
 ActiveRecord::InvalidForeignKey - SQLite3::ConstraintException: FOREIGN KEY constraint failed
-  Author Count (0.4ms)  SELECT COUNT(*) FROM "authors"
-  Book Count (0.1ms)  SELECT COUNT(*) FROM "books"
+  <span class="rails-log-cyan">Author Count (0.0ms)</span>  <span class="rails-log-blue">SELECT COUNT(*) FROM "authors"</span>
+  <span class="rails-log-cyan">Book Count (0.0ms)</span>  <span class="rails-log-blue">SELECT COUNT(*) FROM "books"</span>
   NUMBER AUTHORS DELETED: 0; NUMBER BOOKS DELETED: 0
 === END TEST ===
 
-  TRANSACTION (0.5ms)  rollback transaction
-  TRANSACTION (0.3ms)  begin transaction
-
 === BEGIN TEST Book#destroy! remove a book from author that only has that book ===
-  Book Load (0.3ms)  SELECT "books".* FROM "books" WHERE "books"."title" = ? LIMIT ?  [["title", "Computer Programming Crash Course: 7 Books in 1"], ["LIMIT", 1]]
+  <span class="rails-log-cyan">Book Load (0.3ms)</span>  <span class="rails-log-blue">SELECT "books".* FROM "books" WHERE "books"."title" = ? LIMIT ?</span>  [["title", "Computer Programming Crash Course: 7 Books in 1"], ["LIMIT", 1]]
   Book model 4 will be destroyed
-  TRANSACTION (0.1ms)  SAVEPOINT active_record_1
-  Book Destroy (0.3ms)  DELETE FROM "books" WHERE "books"."id" = ?  [["id", 4]]
-  TRANSACTION (0.0ms)  RELEASE SAVEPOINT active_record_1
-  Author Count (0.1ms)  SELECT COUNT(*) FROM "authors"
-  Book Count (0.0ms)  SELECT COUNT(*) FROM "books"
+  <span class="rails-log-cyan">TRANSACTION (0.1ms)</span>  <span class="rails-log-magenta">SAVEPOINT active_record_1</span>
+  <span class="rails-log-cyan">Book Destroy (0.3ms)</span>  <span class="rails-log-red">DELETE FROM "books" WHERE "books"."id" = ?</span>  [["id", 4]]
+  <span class="rails-log-cyan">TRANSACTION (0.0ms)</span>  <span class="rails-log-magenta">RELEASE SAVEPOINT active_record_1</span>
+  <span class="rails-log-cyan">Author Count (0.0ms)</span>  <span class="rails-log-blue">SELECT COUNT(*) FROM "authors"</span>
+  <span class="rails-log-cyan">Book Count (0.0ms)</span>  <span class="rails-log-blue">SELECT COUNT(*) FROM "books"</span>
   NUMBER AUTHORS DELETED: 0; NUMBER BOOKS DELETED: 1
 === END TEST ===
-
-  TRANSACTION (0.4ms)  rollback transaction
-  TRANSACTION (0.0ms)  begin transaction
 
 === BEGIN TEST Book#destroy! remove a book from author that has multiple books ===
-  Book Load (0.1ms)  SELECT "books".* FROM "books" WHERE "books"."title" = ? LIMIT ?  [["title", "Python Programming for Beginners"], ["LIMIT", 1]]
+  <span class="rails-log-cyan">Book Load (0.2ms)</span>  <span class="rails-log-blue">SELECT "books".* FROM "books" WHERE "books"."title" = ? LIMIT ?</span>  [["title", "Python Programming for Beginners"], ["LIMIT", 1]]
   Book model 1 will be destroyed
-  TRANSACTION (0.0ms)  SAVEPOINT active_record_1
-  Book Destroy (0.3ms)  DELETE FROM "books" WHERE "books"."id" = ?  [["id", 1]]
-  TRANSACTION (0.0ms)  RELEASE SAVEPOINT active_record_1
-  Author Count (0.0ms)  SELECT COUNT(*) FROM "authors"
-  Book Count (0.0ms)  SELECT COUNT(*) FROM "books"
+  <span class="rails-log-cyan">TRANSACTION (0.1ms)</span>  <span class="rails-log-magenta">SAVEPOINT active_record_1</span>
+  <span class="rails-log-cyan">Book Destroy (0.4ms)</span>  <span class="rails-log-red">DELETE FROM "books" WHERE "books"."id" = ?</span>  [["id", 1]]
+  <span class="rails-log-cyan">TRANSACTION (0.0ms)</span>  <span class="rails-log-magenta">RELEASE SAVEPOINT active_record_1</span>
+  <span class="rails-log-cyan">Author Count (0.1ms)</span>  <span class="rails-log-blue">SELECT COUNT(*) FROM "authors"</span>
+  <span class="rails-log-cyan">Book Count (0.1ms)</span>  <span class="rails-log-blue">SELECT COUNT(*) FROM "books"</span>
   NUMBER AUTHORS DELETED: 0; NUMBER BOOKS DELETED: 1
 === END TEST ===
-
-  TRANSACTION (0.4ms)  rollback transaction
-  TRANSACTION (0.0ms)  begin transaction
 
 === BEGIN TEST Book#delete remove a book from author that only has that book ===
-  Book Load (0.1ms)  SELECT "books".* FROM "books" WHERE "books"."title" = ? LIMIT ?  [["title", "Computer Programming Crash Course: 7 Books in 1"], ["LIMIT", 1]]
-  Book Destroy (0.3ms)  DELETE FROM "books" WHERE "books"."id" = ?  [["id", 4]]
-  Author Count (0.4ms)  SELECT COUNT(*) FROM "authors"
-  Book Count (0.2ms)  SELECT COUNT(*) FROM "books"
+  <span class="rails-log-cyan">Book Load (0.3ms)</span>  <span class="rails-log-blue">SELECT "books".* FROM "books" WHERE "books"."title" = ? LIMIT ?</span>  [["title", "Computer Programming Crash Course: 7 Books in 1"], ["LIMIT", 1]]
+  <span class="rails-log-cyan">Book Destroy (0.4ms)</span>  <span class="rails-log-red">DELETE FROM "books" WHERE "books"."id" = ?</span>  [["id", 4]]
+  <span class="rails-log-cyan">Author Count (0.1ms)</span>  <span class="rails-log-blue">SELECT COUNT(*) FROM "authors"</span>
+  <span class="rails-log-cyan">Book Count (0.1ms)</span>  <span class="rails-log-blue">SELECT COUNT(*) FROM "books"</span>
   NUMBER AUTHORS DELETED: 0; NUMBER BOOKS DELETED: 1
 === END TEST ===
-
-  TRANSACTION (1.5ms)  rollback transaction
-  TRANSACTION (80.7ms)  begin transaction
 
 === BEGIN TEST Book#delete remove a book from author that has multiple books ===
-  Book Load (0.2ms)  SELECT "books".* FROM "books" WHERE "books"."title" = ? LIMIT ?  [["title", "Python Programming for Beginners"], ["LIMIT", 1]]
-  Book Destroy (0.4ms)  DELETE FROM "books" WHERE "books"."id" = ?  [["id", 1]]
-  Author Count (0.1ms)  SELECT COUNT(*) FROM "authors"
-  Book Count (0.1ms)  SELECT COUNT(*) FROM "books"
+  <span class="rails-log-cyan">Book Load (0.1ms)</span>  <span class="rails-log-blue">SELECT "books".* FROM "books" WHERE "books"."title" = ? LIMIT ?</span>  [["title", "Python Programming for Beginners"], ["LIMIT", 1]]
+  <span class="rails-log-cyan">Book Destroy (0.3ms)</span>  <span class="rails-log-red">DELETE FROM "books" WHERE "books"."id" = ?</span>  [["id", 1]]
+  <span class="rails-log-cyan">Author Count (0.1ms)</span>  <span class="rails-log-blue">SELECT COUNT(*) FROM "authors"</span>
+  <span class="rails-log-cyan">Book Count (0.0ms)</span>  <span class="rails-log-blue">SELECT COUNT(*) FROM "books"</span>
   NUMBER AUTHORS DELETED: 0; NUMBER BOOKS DELETED: 1
 === END TEST ===
+
 </code>
 </pre>
 </details>
@@ -908,9 +882,9 @@ Test log summary:
 
 ## TODO
 
+* Something weird with BOOK COUNT in log - adding markdown-emphasis
 * WIP: Starting with belongs_to/has_many pair (common use case, eg: Book belongs to Author, Author has many Books) - run through all scenarios in the matrix
 * Nice to have: change margin-bottom amount on detail/summary element depending on open/closed state.
-* Nice to have: custom syntax highlight/styles for rails test log. See: https://github.com/rails/rails/blob/5-0-stable/activesupport/lib/active_support/log_subscriber.rb and https://stackoverflow.com/questions/25574906/ruby-on-rails-how-to-print-log-messages-in-color
 * Information hierarchy?
 * Add Rails Guides sentence describing each option before trying it out.
 * Cleanup Rails console output to only highlight the relevant parts
