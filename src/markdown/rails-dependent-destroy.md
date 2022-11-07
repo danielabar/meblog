@@ -1396,13 +1396,13 @@ Use this option if you want Rails to populate the model's `errors` property with
 
 In this case, be very aware of the difference between `destroy!` and `destroy` methods. If using `destroy!`, it will raise `ActiveRecord::RecordNotDestroyed`. If you want to access the model's `errors` property you'll have to do so in a rescue block. If using the `destroy` method, it will return `false` rather than raising when the model could not be removed, and the model's `errors` property will be populated.
 
-## Scenario 7: Belongs to Destroy and Has Many Restrict Not Specified
+## Scenario 7: Belongs to Destroy and Has Many Not Specified
 
 In this case, we update the Book model to specify `destroy` and the Author model is unspecified:
 
 ```ruby
 class Book < ApplicationRecord
-  belongs_to :author, dependent: destroy
+  belongs_to :author, dependent: :destroy
   before_destroy :one_last_thing
   def one_last_thing
     Rails.logger.warn("  Book model #{id} will be destroyed")
@@ -1536,11 +1536,90 @@ ActiveRecord::InvalidForeignKey - SQLite3::ConstraintException: FOREIGN KEY cons
 
 Test log summary:
 
-TBD: Book destroy attempts to go up to Author and destroy that as well, but that only works if Author only has that one book.
+* Author tests behave the same as Scenario 1, where any author with an associated book cannot be removed due to foreign key constraint.
+* Calling destroy on a book that belongs to an author that only has that one book, destroys both the book and the author.
+* Calling destroy on a book that belongs to an author that has other books as well fails. It attempts to delete the author but then runs into a foreign key constraint because there's still other books in the system that belong to that author. In this case, nothing is deleted.
+* Calling delete on a book (whether the author has only that one book or others as well), deletes only that book and does not attempt to go up to the author for further deletion.
+
+Note that the Rails Guides warn not to use this `dependent: :destroy` option in this way:
+
+> You should not specify this option on a belongs_to association that is connected with a has_many association on the other class. Doing so can lead to orphaned records in your database.
+
+The test that attempts to destroy a book belonging to an author that has other books is where this issue could happen. If the associated author had been removed, that would leave the other books "orphaned". With a non nullable foreign key constraint on the Book model, this was not allowed.
+
+However, if the Book migration did not specify that author was a foreign key:
+
+```ruby
+class CreateBooks < ActiveRecord::Migration[7.0]
+  def change
+    create_table :books do |t|
+      t.string :title
+      t.date :published_at
+      # t.references :author, null: false, foreign_key: true
+      # for experimentation in allowing a nullable foreign key
+      t.references :author
+
+      t.timestamps
+    end
+  end
+end
+```
+
+Then calling destroy on a book whose author has other books will remove both the book and author from the system, leaving the other books from this author as "orphans" in that they still have their `author_id` property populated, but the referenced author has been removed.
+
+Let's see this in a Rails console:
+
+```ruby
+# book by author that has other books
+book = Book.find_by(title: "Python Programming for Beginners")
+
+# removing book also removes associated author, even though that author has other books!
+book.destroy!
+# Book model 1 will be destroyed
+# TRANSACTION (0.1ms)  begin transaction
+# Book Destroy (0.8ms)  DELETE FROM "books" WHERE "books"."id" = ?  [["id", 1]]
+# Author Load (0.3ms)  SELECT "authors".* FROM "authors" WHERE "authors"."id" = ? LIMIT ?  [["id", 1], ["LIMIT", 1]]
+# Author model 1 will be destroyed
+# Author Destroy (0.3ms)  DELETE FROM "authors" WHERE "authors"."id" = ?  [["id", 1]]
+# TRANSACTION (0.7ms)  commit transaction
+
+# this leaves some books still pointing to the deleted author - these are orphans
+orphaned_books = Book.where(author_id: 1)
+orphaned_books.count
+# Book Count (1.3ms)  SELECT COUNT(*) FROM "books" WHERE "books"."author_id" = ?  [["author_id", 1]]
+# => 2
+```
+
+The `dependent: :destroy` option on the `belongs_to` side of a relationship could be useful in a 1-1 situation, for example, if an Author specified `has_one` book instead of `has_many`. But otherwise, it doesn't really make sense because either it will lead to orphan records or foreign key constraint errors in some cases.
+
+## Scenario 8: Belongs to Destroy and Has Many Destroy
+
+In this case, the `destroy` option is specified on both sides of the relationship:
+
+```ruby
+class Book < ApplicationRecord
+  belongs_to :author, dependent: :destroy
+  before_destroy :one_last_thing
+  def one_last_thing
+    Rails.logger.warn("  Book model #{id} will be destroyed")
+  end
+end
+
+class Author < ApplicationRecord
+  has_many :books, dependent: :destroy
+  before_destroy :one_last_thing
+  def one_last_thing
+    Rails.logger.warn("  Author model #{id} will be destroyed")
+  end
+end
+```
+
+TBD: Invalid due to potential infinite loop? author destroy implies book destroy which in turn implies author destroy...
 
 ## TODO
 
 * WIP: Starting with belongs_to/has_many pair (common use case, eg: Book belongs to Author, Author has many Books) - run through all scenarios in the matrix
+* Observation: Many (all?) the dependent options behaviour is only exhibited when calling `destroy/destroy!` on a model instance rather than `delete`. This is another difference in addition to invoking callbacks?
 * Information hierarchy?
 * Add Rails Guides sentence describing each option before trying it out.
 * Cleanup Rails console output to only highlight the relevant parts
