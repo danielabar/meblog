@@ -286,8 +286,8 @@ Summing up the options, there are 2 dependent options on the `belongs_to` associ
 | [7](../rails-dependent-destroy/#scenario-7-belongs-to-destroy-and-has-many-restrict-not-specified)        | :destroy      | not specified            |
 | [8](../rails-dependent-destroy/#scenario-8-belongs-to-destroy-and-has-many-destroy)        | :destroy      | :destroy                 |
 | [9](../rails-dependent-destroy/#scenario-9-belongs-to-destroy-and-has-many-delete-all)        | :destroy      | :delete_all              |
-| 10       | :destroy      | :nullify                 |
-| 11       | :destroy      | :restrict_with_exception |
+| [10](../rails-dependent-destroy/#scenario-10-belongs-to-destroy-and-has-many-nullify)       | :destroy      | :nullify                 |
+| [11](../rails-dependent-destroy/#scenario-11-belongs-to-destroy-and-has-restrict-with-exception)       | :destroy      | :restrict_with_exception |
 | 12       | :destroy      | :restrict_with_error     |
 | 13       | :delete       | not specified            |
 | 14       | :delete       | :destroy                 |
@@ -1250,7 +1250,7 @@ class Author < ApplicationRecord
 end
 ```
 
-The description for `restrict_with_error` option says `causes an error to be added to the owner if there are any associated objects`. Before running the tests, lets make a small change to the Author tests, to also log the model's `errors` property. I only made this change on the tests that try to remove an Author with one or more books.
+The description for `restrict_with_error` option says `causes an error to be added to the owner if there are any associated objects`. Before running the tests, lets make a small change to the Author tests, to also log the model's `errors` property. I only made this change on the tests that try to remove an Author with one or more books using the `destroy` method:
 
 ```ruby
 it "remove an author with a single book" do
@@ -1897,9 +1897,325 @@ Test log summary:
 * Calling `delete` on a book removes just that book.
 
 I wouldn't use this combination as it can produce a surprising result when calling `book.destroy` on a book that belongs to an author that also has other books. It ends up removing not just that book but all the other books written by this author. It's a kind of cascade but starting from a child, going up to the parent, then back down to other children.
+
+## Scenario 10: Belongs to Destroy and Has Many Nullify
+
+In this case, the `destroy` option is specified on Book and `nullify` on Author:
+
+```ruby
+class Book < ApplicationRecord
+  belongs_to :author, dependent: :destroy # when the object is destroyed, destroy will be called on its associated objects
+  before_destroy :one_last_thing
+  def one_last_thing
+    Rails.logger.warn("  Book model #{id} will be destroyed")
+  end
+end
+
+class Author < ApplicationRecord
+  has_many :books, dependent: :nullify # causes the foreign key to be set to NULL
+  before_destroy :one_last_thing
+  def one_last_thing
+    Rails.logger.warn("  Author model #{id} will be destroyed")
+  end
+end
+```
+
+In Scenario 4, we learned that in order for `nullify` to work, the model on the other side of the relationship (Book) needs to allow a nullable foreign key. So we'll run the tests with the database having this migration for the `books` table:
+
+```ruby
+class CreateBooks < ActiveRecord::Migration[7.0]
+  def change
+    create_table :books do |t|
+      t.string :title
+      t.date :published_at
+      # t.references :author, null: false, foreign_key: true
+      # for experimentation in allowing a nullable foreign key
+      t.references :author
+
+      t.timestamps
+    end
+  end
+end
+```
+
+<details class="markdown-details">
+<summary class="markdown-summary">
+View test log
+</summary>
+<pre class="grvsc-container gatsby-highlight-monokai" data-language>
+<code class="grvsc-code">
+
+=== BEGIN TEST Author#destroy! remove an author with no books ===
+  <span class="rails-log-cyan">Author Load (0.4ms)</span>  <span class="rails-log-blue">SELECT "authors".* FROM "authors" WHERE "authors"."name" = ? LIMIT ?</span>  [["name", "John Doe"], ["LIMIT", 1]]
+  <span class="rails-log-cyan">TRANSACTION (0.1ms)</span>  <span class="rails-log-magenta">SAVEPOINT active_record_1</span>
+  <span class="rails-log-cyan">Book Update All (0.5ms)</span>  <span class="rails-log-yellow">UPDATE "books" SET "author_id" = ? WHERE "books"."author_id" = ?</span>  [["author_id", nil], ["author_id", 3]]
+  Author model 3 will be destroyed
+  <span class="rails-log-cyan">Author Destroy (0.4ms)</span>  <span class="rails-log-red">DELETE FROM "authors" WHERE "authors"."id" = ?</span>  [["id", 3]]
+  <span class="rails-log-cyan">TRANSACTION (0.0ms)</span>  <span class="rails-log-magenta">RELEASE SAVEPOINT active_record_1</span>
+  <span class="rails-log-cyan">Author Count (0.1ms)</span>  <span class="rails-log-blue">SELECT COUNT(*) FROM "authors"</span>
+  <span class="rails-log-cyan">Book Count (0.0ms)</span>  <span class="rails-log-blue">SELECT COUNT(*) FROM "books"</span>
+  NUMBER AUTHORS DELETED: 1; NUMBER BOOKS DELETED: 0
+=== END TEST ===
+
+=== BEGIN TEST Author#destroy! remove an author with a single book ===
+  <span class="rails-log-cyan">Author Load (0.6ms)</span>  <span class="rails-log-blue">SELECT "authors".* FROM "authors" WHERE "authors"."name" = ? LIMIT ?</span>  [["name", "Julian James McKinnon"], ["LIMIT", 1]]
+  <span class="rails-log-cyan">TRANSACTION (0.1ms)</span>  <span class="rails-log-magenta">SAVEPOINT active_record_1</span>
+  <span class="rails-log-cyan">Book Update All (0.7ms)</span>  <span class="rails-log-yellow">UPDATE "books" SET "author_id" = ? WHERE "books"."author_id" = ?</span>  [["author_id", nil], ["author_id", 2]]
+  Author model 2 will be destroyed
+  <span class="rails-log-cyan">Author Destroy (0.1ms)</span>  <span class="rails-log-red">DELETE FROM "authors" WHERE "authors"."id" = ?</span>  [["id", 2]]
+  <span class="rails-log-cyan">TRANSACTION (0.0ms)</span>  <span class="rails-log-magenta">RELEASE SAVEPOINT active_record_1</span>
+  <span class="rails-log-cyan">Author Count (0.1ms)</span>  <span class="rails-log-blue">SELECT COUNT(*) FROM "authors"</span>
+  <span class="rails-log-cyan">Book Count (0.0ms)</span>  <span class="rails-log-blue">SELECT COUNT(*) FROM "books"</span>
+  NUMBER AUTHORS DELETED: 1; NUMBER BOOKS DELETED: 0
+=== END TEST ===
+
+=== BEGIN TEST Author#destroy! remove an author with multiple books ===
+  <span class="rails-log-cyan">Author Load (0.1ms)</span>  <span class="rails-log-blue">SELECT "authors".* FROM "authors" WHERE "authors"."name" = ? LIMIT ?</span>  [["name", "Andrew Park"], ["LIMIT", 1]]
+  <span class="rails-log-cyan">TRANSACTION (0.0ms)</span>  <span class="rails-log-magenta">SAVEPOINT active_record_1</span>
+  <span class="rails-log-cyan">Book Update All (0.4ms)</span>  <span class="rails-log-yellow">UPDATE "books" SET "author_id" = ? WHERE "books"."author_id" = ?</span>  [["author_id", nil], ["author_id", 1]]
+  Author model 1 will be destroyed
+  <span class="rails-log-cyan">Author Destroy (0.1ms)</span>  <span class="rails-log-red">DELETE FROM "authors" WHERE "authors"."id" = ?</span>  [["id", 1]]
+  <span class="rails-log-cyan">TRANSACTION (0.1ms)</span>  <span class="rails-log-magenta">RELEASE SAVEPOINT active_record_1</span>
+  <span class="rails-log-cyan">Author Count (0.1ms)</span>  <span class="rails-log-blue">SELECT COUNT(*) FROM "authors"</span>
+  <span class="rails-log-cyan">Book Count (0.1ms)</span>  <span class="rails-log-blue">SELECT COUNT(*) FROM "books"</span>
+  NUMBER AUTHORS DELETED: 1; NUMBER BOOKS DELETED: 0
+=== END TEST ===
+
+=== BEGIN TEST Author#delete remove an author with no books ===
+  <span class="rails-log-cyan">Author Load (0.2ms)</span>  <span class="rails-log-blue">SELECT "authors".* FROM "authors" WHERE "authors"."name" = ? LIMIT ?</span>  [["name", "John Doe"], ["LIMIT", 1]]
+  <span class="rails-log-cyan">Author Destroy (0.3ms)</span>  <span class="rails-log-red">DELETE FROM "authors" WHERE "authors"."id" = ?</span>  [["id", 3]]
+  <span class="rails-log-cyan">Author Count (0.1ms)</span>  <span class="rails-log-blue">SELECT COUNT(*) FROM "authors"</span>
+  <span class="rails-log-cyan">Book Count (0.1ms)</span>  <span class="rails-log-blue">SELECT COUNT(*) FROM "books"</span>
+  NUMBER AUTHORS DELETED: 1; NUMBER BOOKS DELETED: 0
+=== END TEST ===
+
+=== BEGIN TEST Author#delete remove an author with a single book ===
+  <span class="rails-log-cyan">Author Load (0.1ms)</span>  <span class="rails-log-blue">SELECT "authors".* FROM "authors" WHERE "authors"."name" = ? LIMIT ?</span>  [["name", "Julian James McKinnon"], ["LIMIT", 1]]
+  <span class="rails-log-cyan">Author Destroy (0.3ms)</span>  <span class="rails-log-red">DELETE FROM "authors" WHERE "authors"."id" = ?</span>  [["id", 2]]
+  <span class="rails-log-cyan">Author Count (0.1ms)</span>  <span class="rails-log-blue">SELECT COUNT(*) FROM "authors"</span>
+  <span class="rails-log-cyan">Book Count (0.0ms)</span>  <span class="rails-log-blue">SELECT COUNT(*) FROM "books"</span>
+  NUMBER AUTHORS DELETED: 1; NUMBER BOOKS DELETED: 0
+=== END TEST ===
+
+=== BEGIN TEST Author#delete remove an author with multiple books ===
+  <span class="rails-log-cyan">Author Load (0.2ms)</span>  <span class="rails-log-blue">SELECT "authors".* FROM "authors" WHERE "authors"."name" = ? LIMIT ?</span>  [["name", "Andrew Park"], ["LIMIT", 1]]
+  <span class="rails-log-cyan">Author Destroy (16.1ms)</span>  <span class="rails-log-red">DELETE FROM "authors" WHERE "authors"."id" = ?</span>  [["id", 1]]
+  <span class="rails-log-cyan">Author Count (0.2ms)</span>  <span class="rails-log-blue">SELECT COUNT(*) FROM "authors"</span>
+  <span class="rails-log-cyan">Book Count (0.1ms)</span>  <span class="rails-log-blue">SELECT COUNT(*) FROM "books"</span>
+  NUMBER AUTHORS DELETED: 1; NUMBER BOOKS DELETED: 0
+=== END TEST ===
+
+=== BEGIN TEST Book#destroy! remove a book from author that only has that book ===
+  <span class="rails-log-cyan">Book Load (0.2ms)</span>  <span class="rails-log-blue">SELECT "books".* FROM "books" WHERE "books"."title" = ? LIMIT ?</span>  [["title", "Computer Programming Crash Course: 7 Books in 1"], ["LIMIT", 1]]
+  Book model 4 will be destroyed
+  <span class="rails-log-cyan">TRANSACTION (0.1ms)</span>  <span class="rails-log-magenta">SAVEPOINT active_record_1</span>
+  <span class="rails-log-cyan">Book Destroy (1.3ms)</span>  <span class="rails-log-red">DELETE FROM "books" WHERE "books"."id" = ?</span>  [["id", 4]]
+  <span class="rails-log-cyan">Author Load (0.1ms)</span>  <span class="rails-log-blue">SELECT "authors".* FROM "authors" WHERE "authors"."id" = ? LIMIT ?</span>  [["id", 2], ["LIMIT", 1]]
+  <span class="rails-log-cyan">Book Update All (0.1ms)</span>  <span class="rails-log-yellow">UPDATE "books" SET "author_id" = ? WHERE "books"."author_id" = ?</span>  [["author_id", nil], ["author_id", 2]]
+  Author model 2 will be destroyed
+  <span class="rails-log-cyan">Author Destroy (0.2ms)</span>  <span class="rails-log-red">DELETE FROM "authors" WHERE "authors"."id" = ?</span>  [["id", 2]]
+  <span class="rails-log-cyan">TRANSACTION (0.0ms)</span>  <span class="rails-log-magenta">RELEASE SAVEPOINT active_record_1</span>
+  <span class="rails-log-cyan">Author Count (0.0ms)</span>  <span class="rails-log-blue">SELECT COUNT(*) FROM "authors"</span>
+  <span class="rails-log-cyan">Book Count (0.0ms)</span>  <span class="rails-log-blue">SELECT COUNT(*) FROM "books"</span>
+  NUMBER AUTHORS DELETED: 1; NUMBER BOOKS DELETED: 1
+=== END TEST ===
+
+=== BEGIN TEST Book#destroy! remove a book from author that has multiple books ===
+  <span class="rails-log-cyan">Book Load (0.1ms)</span>  <span class="rails-log-blue">SELECT "books".* FROM "books" WHERE "books"."title" = ? LIMIT ?</span>  [["title", "Python Programming for Beginners"], ["LIMIT", 1]]
+  Book model 1 will be destroyed
+  <span class="rails-log-cyan">TRANSACTION (0.0ms)</span>  <span class="rails-log-magenta">SAVEPOINT active_record_1</span>
+  <span class="rails-log-cyan">Book Destroy (0.3ms)</span>  <span class="rails-log-red">DELETE FROM "books" WHERE "books"."id" = ?</span>  [["id", 1]]
+  <span class="rails-log-cyan">Author Load (0.0ms)</span>  <span class="rails-log-blue">SELECT "authors".* FROM "authors" WHERE "authors"."id" = ? LIMIT ?</span>  [["id", 1], ["LIMIT", 1]]
+  <span class="rails-log-cyan">Book Update All (0.1ms)</span>  <span class="rails-log-yellow">UPDATE "books" SET "author_id" = ? WHERE "books"."author_id" = ?</span>  [["author_id", nil], ["author_id", 1]]
+  Author model 1 will be destroyed
+  <span class="rails-log-cyan">Author Destroy (0.1ms)</span>  <span class="rails-log-red">DELETE FROM "authors" WHERE "authors"."id" = ?</span>  [["id", 1]]
+  <span class="rails-log-cyan">TRANSACTION (0.0ms)</span>  <span class="rails-log-magenta">RELEASE SAVEPOINT active_record_1</span>
+  <span class="rails-log-cyan">Author Count (0.0ms)</span>  <span class="rails-log-blue">SELECT COUNT(*) FROM "authors"</span>
+  <span class="rails-log-cyan">Book Count (0.0ms)</span>  <span class="rails-log-blue">SELECT COUNT(*) FROM "books"</span>
+  NUMBER AUTHORS DELETED: 1; NUMBER BOOKS DELETED: 1
+=== END TEST ===
+
+=== BEGIN TEST Book#delete remove a book from author that only has that book ===
+  <span class="rails-log-cyan">Book Load (0.1ms)</span>  <span class="rails-log-blue">SELECT "books".* FROM "books" WHERE "books"."title" = ? LIMIT ?</span>  [["title", "Computer Programming Crash Course: 7 Books in 1"], ["LIMIT", 1]]
+  <span class="rails-log-cyan">Book Destroy (0.4ms)</span>  <span class="rails-log-red">DELETE FROM "books" WHERE "books"."id" = ?</span>  [["id", 4]]
+  <span class="rails-log-cyan">Author Count (0.1ms)</span>  <span class="rails-log-blue">SELECT COUNT(*) FROM "authors"</span>
+  <span class="rails-log-cyan">Book Count (0.0ms)</span>  <span class="rails-log-blue">SELECT COUNT(*) FROM "books"</span>
+  NUMBER AUTHORS DELETED: 0; NUMBER BOOKS DELETED: 1
+=== END TEST ===
+
+=== BEGIN TEST Book#delete remove a book from author that has multiple books ===
+  <span class="rails-log-cyan">Book Load (0.3ms)</span>  <span class="rails-log-blue">SELECT "books".* FROM "books" WHERE "books"."title" = ? LIMIT ?</span>  [["title", "Python Programming for Beginners"], ["LIMIT", 1]]
+  <span class="rails-log-cyan">Book Destroy (0.7ms)</span>  <span class="rails-log-red">DELETE FROM "books" WHERE "books"."id" = ?</span>  [["id", 1]]
+  <span class="rails-log-cyan">Author Count (0.5ms)</span>  <span class="rails-log-blue">SELECT COUNT(*) FROM "authors"</span>
+  <span class="rails-log-cyan">Book Count (1.8ms)</span>  <span class="rails-log-blue">SELECT COUNT(*) FROM "books"</span>
+  NUMBER AUTHORS DELETED: 0; NUMBER BOOKS DELETED: 1
+=== END TEST ===
+</code>
+</pre>
+</details>
+
+Test log summary:
+
+* Calling `destroy` on an author with one or more books is successful. It first finds the author's associated books, updates their `author_id` column to `nil`, then SQL DELETEs the author record.
+* Calling `delete` on an author is also successful. However, it does not update its associated book models to have a null `author_id`. This will leave book records "orphaned" in that they're referencing an author that no longer exists.
+* Calling `destroy` on a book that belongs to an author that only has that one book successfully removes first the book, and then the author from the database.
+* Calling `destroy` on a book that belongs to an author that has other books is interesting. The book and author are removed from the database, and also, any other books the author has are updated to have a null `author_id`.
+* Calling `delete` on any book executes SQL DELETE to remove just that book and doesn't affect any author or other books.
+
+I wouldn't use this combination because like in Scenario 9, there's a surprising result when calling `destroy` on a book that belongs to an author that has other books. Not only does it remove the book and author, but also updates the author's other books, let's call them siblings to the deleted book, to have a null `author_id`.
+
+## Scenario 11: Belongs to Destroy and Has Restrict With Exception
+
+In this case, the `destroy` option is specified on Book and `restrict_with_exception` on Author:
+
+```ruby
+class Book < ApplicationRecord
+  belongs_to :author, dependent: :destroy # when the object is destroyed, destroy will be called on its associated objects
+  before_destroy :one_last_thing
+  def one_last_thing
+    Rails.logger.warn("  Book model #{id} will be destroyed")
+  end
+end
+
+class Author < ApplicationRecord
+  has_many :books, dependent: :restrict_with_exception # ActiveRecord::DeleteRestrictionError exception raised if there are any associated records
+  before_destroy :one_last_thing
+  def one_last_thing
+    Rails.logger.warn("  Author model #{id} will be destroyed")
+  end
+end
+```
+
+<details class="markdown-details">
+<summary class="markdown-summary">
+View test log
+</summary>
+<pre class="grvsc-container gatsby-highlight-monokai" data-language>
+<code class="grvsc-code">
+
+=== BEGIN TEST Author#destroy! remove an author with no books ===
+  <span class="rails-log-cyan">Author Load (0.4ms)</span>  <span class="rails-log-blue">SELECT "authors".* FROM "authors" WHERE "authors"."name" = ? LIMIT ?</span>  [["name", "John Doe"], ["LIMIT", 1]]
+  <span class="rails-log-cyan">TRANSACTION (0.1ms)</span>  <span class="rails-log-magenta">SAVEPOINT active_record_1</span>
+  <span class="rails-log-cyan">Book Exists? (0.3ms)</span>  <span class="rails-log-blue">SELECT 1 AS one FROM "books" WHERE "books"."author_id" = ? LIMIT ?</span>  [["author_id", 3], ["LIMIT", 1]]
+  Author model 3 will be destroyed
+  <span class="rails-log-cyan">Author Destroy (1.8ms)</span>  <span class="rails-log-red">DELETE FROM "authors" WHERE "authors"."id" = ?</span>  [["id", 3]]
+  <span class="rails-log-cyan">TRANSACTION (0.1ms)</span>  <span class="rails-log-magenta">RELEASE SAVEPOINT active_record_1</span>
+  <span class="rails-log-cyan">Author Count (0.1ms)</span>  <span class="rails-log-blue">SELECT COUNT(*) FROM "authors"</span>
+  <span class="rails-log-cyan">Book Count (0.1ms)</span>  <span class="rails-log-blue">SELECT COUNT(*) FROM "books"</span>
+  NUMBER AUTHORS DELETED: 1; NUMBER BOOKS DELETED: 0
+=== END TEST ===
+
+=== BEGIN TEST Author#destroy! remove an author with a single book ===
+  <span class="rails-log-cyan">Author Load (0.1ms)</span>  <span class="rails-log-blue">SELECT "authors".* FROM "authors" WHERE "authors"."name" = ? LIMIT ?</span>  [["name", "Julian James McKinnon"], ["LIMIT", 1]]
+  <span class="rails-log-cyan">TRANSACTION (0.0ms)</span>  <span class="rails-log-magenta">SAVEPOINT active_record_1</span>
+  <span class="rails-log-cyan">Book Exists? (0.1ms)</span>  <span class="rails-log-blue">SELECT 1 AS one FROM "books" WHERE "books"."author_id" = ? LIMIT ?</span>  [["author_id", 2], ["LIMIT", 1]]
+  <span class="rails-log-cyan">TRANSACTION (0.0ms)</span>  <span class="rails-log-red">ROLLBACK TO SAVEPOINT active_record_1</span>
+ActiveRecord::DeleteRestrictionError - Cannot delete record because of dependent books
+  <span class="rails-log-cyan">Author Count (0.1ms)</span>  <span class="rails-log-blue">SELECT COUNT(*) FROM "authors"</span>
+  <span class="rails-log-cyan">Book Count (0.0ms)</span>  <span class="rails-log-blue">SELECT COUNT(*) FROM "books"</span>
+  NUMBER AUTHORS DELETED: 0; NUMBER BOOKS DELETED: 0
+=== END TEST ===
+
+=== BEGIN TEST Author#destroy! remove an author with multiple books ===
+  <span class="rails-log-cyan">Author Load (0.1ms)</span>  <span class="rails-log-blue">SELECT "authors".* FROM "authors" WHERE "authors"."name" = ? LIMIT ?</span>  [["name", "Andrew Park"], ["LIMIT", 1]]
+  <span class="rails-log-cyan">TRANSACTION (0.1ms)</span>  <span class="rails-log-magenta">SAVEPOINT active_record_1</span>
+  <span class="rails-log-cyan">Book Exists? (0.1ms)</span>  <span class="rails-log-blue">SELECT 1 AS one FROM "books" WHERE "books"."author_id" = ? LIMIT ?</span>  [["author_id", 1], ["LIMIT", 1]]
+  <span class="rails-log-cyan">TRANSACTION (0.0ms)</span>  <span class="rails-log-red">ROLLBACK TO SAVEPOINT active_record_1</span>
+ActiveRecord::DeleteRestrictionError - Cannot delete record because of dependent books
+  <span class="rails-log-cyan">Author Count (0.1ms)</span>  <span class="rails-log-blue">SELECT COUNT(*) FROM "authors"</span>
+  <span class="rails-log-cyan">Book Count (0.1ms)</span>  <span class="rails-log-blue">SELECT COUNT(*) FROM "books"</span>
+  NUMBER AUTHORS DELETED: 0; NUMBER BOOKS DELETED: 0
+=== END TEST ===
+
+=== BEGIN TEST Author#delete remove an author with no books ===
+  <span class="rails-log-cyan">Author Load (0.1ms)</span>  <span class="rails-log-blue">SELECT "authors".* FROM "authors" WHERE "authors"."name" = ? LIMIT ?</span>  [["name", "John Doe"], ["LIMIT", 1]]
+  <span class="rails-log-cyan">Author Destroy (0.3ms)</span>  <span class="rails-log-red">DELETE FROM "authors" WHERE "authors"."id" = ?</span>  [["id", 3]]
+  <span class="rails-log-cyan">Author Count (0.0ms)</span>  <span class="rails-log-blue">SELECT COUNT(*) FROM "authors"</span>
+  <span class="rails-log-cyan">Book Count (0.0ms)</span>  <span class="rails-log-blue">SELECT COUNT(*) FROM "books"</span>
+  NUMBER AUTHORS DELETED: 1; NUMBER BOOKS DELETED: 0
+=== END TEST ===
+
+=== BEGIN TEST Author#delete remove an author with a single book ===
+  <span class="rails-log-cyan">Author Load (0.1ms)</span>  <span class="rails-log-blue">SELECT "authors".* FROM "authors" WHERE "authors"."name" = ? LIMIT ?</span>  [["name", "Julian James McKinnon"], ["LIMIT", 1]]
+  <span class="rails-log-cyan">Author Destroy (0.4ms)</span>  <span class="rails-log-red">DELETE FROM "authors" WHERE "authors"."id" = ?</span>  [["id", 2]]
+ActiveRecord::InvalidForeignKey - SQLite3::ConstraintException: FOREIGN KEY constraint failed
+  <span class="rails-log-cyan">Author Count (0.0ms)</span>  <span class="rails-log-blue">SELECT COUNT(*) FROM "authors"</span>
+  <span class="rails-log-cyan">Book Count (0.0ms)</span>  <span class="rails-log-blue">SELECT COUNT(*) FROM "books"</span>
+  NUMBER AUTHORS DELETED: 0; NUMBER BOOKS DELETED: 0
+=== END TEST ===
+
+=== BEGIN TEST Author#delete remove an author with multiple books ===
+  <span class="rails-log-cyan">Author Load (0.1ms)</span>  <span class="rails-log-blue">SELECT "authors".* FROM "authors" WHERE "authors"."name" = ? LIMIT ?</span>  [["name", "Andrew Park"], ["LIMIT", 1]]
+  <span class="rails-log-cyan">Author Destroy (0.4ms)</span>  <span class="rails-log-red">DELETE FROM "authors" WHERE "authors"."id" = ?</span>  [["id", 1]]
+ActiveRecord::InvalidForeignKey - SQLite3::ConstraintException: FOREIGN KEY constraint failed
+  <span class="rails-log-cyan">Author Count (0.0ms)</span>  <span class="rails-log-blue">SELECT COUNT(*) FROM "authors"</span>
+  <span class="rails-log-cyan">Book Count (0.1ms)</span>  <span class="rails-log-blue">SELECT COUNT(*) FROM "books"</span>
+  NUMBER AUTHORS DELETED: 0; NUMBER BOOKS DELETED: 0
+=== END TEST ===
+
+=== BEGIN TEST Book#destroy! remove a book from author that only has that book ===
+  <span class="rails-log-cyan">Book Load (0.9ms)</span>  <span class="rails-log-blue">SELECT "books".* FROM "books" WHERE "books"."title" = ? LIMIT ?</span>  [["title", "Computer Programming Crash Course: 7 Books in 1"], ["LIMIT", 1]]
+  Book model 4 will be destroyed
+  <span class="rails-log-cyan">TRANSACTION (0.1ms)</span>  <span class="rails-log-magenta">SAVEPOINT active_record_1</span>
+  <span class="rails-log-cyan">Book Destroy (0.3ms)</span>  <span class="rails-log-red">DELETE FROM "books" WHERE "books"."id" = ?</span>  [["id", 4]]
+  <span class="rails-log-cyan">Author Load (0.1ms)</span>  <span class="rails-log-blue">SELECT "authors".* FROM "authors" WHERE "authors"."id" = ? LIMIT ?</span>  [["id", 2], ["LIMIT", 1]]
+  <span class="rails-log-cyan">Book Exists? (0.1ms)</span>  <span class="rails-log-blue">SELECT 1 AS one FROM "books" WHERE "books"."author_id" = ? LIMIT ?</span>  [["author_id", 2], ["LIMIT", 1]]
+  Author model 2 will be destroyed
+  <span class="rails-log-cyan">Author Destroy (0.1ms)</span>  <span class="rails-log-red">DELETE FROM "authors" WHERE "authors"."id" = ?</span>  [["id", 2]]
+  <span class="rails-log-cyan">TRANSACTION (0.0ms)</span>  <span class="rails-log-magenta">RELEASE SAVEPOINT active_record_1</span>
+  <span class="rails-log-cyan">Author Count (0.0ms)</span>  <span class="rails-log-blue">SELECT COUNT(*) FROM "authors"</span>
+  <span class="rails-log-cyan">Book Count (0.0ms)</span>  <span class="rails-log-blue">SELECT COUNT(*) FROM "books"</span>
+  NUMBER AUTHORS DELETED: 1; NUMBER BOOKS DELETED: 1
+=== END TEST ===
+
+=== BEGIN TEST Book#destroy! remove a book from author that has multiple books ===
+  <span class="rails-log-cyan">Book Load (0.1ms)</span>  <span class="rails-log-blue">SELECT "books".* FROM "books" WHERE "books"."title" = ? LIMIT ?</span>  [["title", "Python Programming for Beginners"], ["LIMIT", 1]]
+  Book model 1 will be destroyed
+  <span class="rails-log-cyan">TRANSACTION (0.0ms)</span>  <span class="rails-log-magenta">SAVEPOINT active_record_1</span>
+  <span class="rails-log-cyan">Book Destroy (0.3ms)</span>  <span class="rails-log-red">DELETE FROM "books" WHERE "books"."id" = ?</span>  [["id", 1]]
+  <span class="rails-log-cyan">Author Load (0.1ms)</span>  <span class="rails-log-blue">SELECT "authors".* FROM "authors" WHERE "authors"."id" = ? LIMIT ?</span>  [["id", 1], ["LIMIT", 1]]
+  <span class="rails-log-cyan">Book Exists? (0.2ms)</span>  <span class="rails-log-blue">SELECT 1 AS one FROM "books" WHERE "books"."author_id" = ? LIMIT ?</span>  [["author_id", 1], ["LIMIT", 1]]
+  <span class="rails-log-cyan">TRANSACTION (0.2ms)</span>  <span class="rails-log-red">ROLLBACK TO SAVEPOINT active_record_1</span>
+ActiveRecord::DeleteRestrictionError - Cannot delete record because of dependent books
+  <span class="rails-log-cyan">Author Count (1.1ms)</span>  <span class="rails-log-blue">SELECT COUNT(*) FROM "authors"</span>
+  <span class="rails-log-cyan">Book Count (0.1ms)</span>  <span class="rails-log-blue">SELECT COUNT(*) FROM "books"</span>
+  NUMBER AUTHORS DELETED: 0; NUMBER BOOKS DELETED: 0
+=== END TEST ===
+
+=== BEGIN TEST Book#delete remove a book from author that only has that book ===
+  <span class="rails-log-cyan">Book Load (0.3ms)</span>  <span class="rails-log-blue">SELECT "books".* FROM "books" WHERE "books"."title" = ? LIMIT ?</span>  [["title", "Computer Programming Crash Course: 7 Books in 1"], ["LIMIT", 1]]
+  <span class="rails-log-cyan">Book Destroy (0.7ms)</span>  <span class="rails-log-red">DELETE FROM "books" WHERE "books"."id" = ?</span>  [["id", 4]]
+  <span class="rails-log-cyan">Author Count (0.5ms)</span>  <span class="rails-log-blue">SELECT COUNT(*) FROM "authors"</span>
+  <span class="rails-log-cyan">Book Count (0.7ms)</span>  <span class="rails-log-blue">SELECT COUNT(*) FROM "books"</span>
+  NUMBER AUTHORS DELETED: 0; NUMBER BOOKS DELETED: 1
+=== END TEST ===
+
+=== BEGIN TEST Book#delete remove a book from author that has multiple books ===
+  <span class="rails-log-cyan">Book Load (0.2ms)</span>  <span class="rails-log-blue">SELECT "books".* FROM "books" WHERE "books"."title" = ? LIMIT ?</span>  [["title", "Python Programming for Beginners"], ["LIMIT", 1]]
+  <span class="rails-log-cyan">Book Destroy (0.3ms)</span>  <span class="rails-log-red">DELETE FROM "books" WHERE "books"."id" = ?</span>  [["id", 1]]
+  <span class="rails-log-cyan">Author Count (0.1ms)</span>  <span class="rails-log-blue">SELECT COUNT(*) FROM "authors"</span>
+  <span class="rails-log-cyan">Book Count (0.1ms)</span>  <span class="rails-log-blue">SELECT COUNT(*) FROM "books"</span>
+  NUMBER AUTHORS DELETED: 0; NUMBER BOOKS DELETED: 1
+=== END TEST ===
+</code>
+</pre>
+</details>
+
+Test log summary:
+
+* Calling `destroy` on an author with one or more books fails due to `ActiveRecord::DeleteRestrictionError - Cannot delete record because of dependent books`. This is the same behaviour observed in Scenario 5.
+* Calling `delete` on an author with one or more books also fails, but with a `ActiveRecord::InvalidForeignKey - SQLite3::ConstraintException: FOREIGN KEY constraint failed` error raised. Again, the same as Scenario 5.
+* Calling `destroy` on a book belonging to an author that only has that one book removes both the book and author.
+* Calling `destroy` on a book belonging to an author that has other books is interesting - it starts a SQL DELETE to remove the book, then goes up to the author to remove it as well (due to `dependent: :destroy` being specified on Book model), but then the `dependent: :restrict_with_exception` option on Author model kicks in and raises `ActiveRecord::DeleteRestrictionError - Cannot delete record because of dependent books`. Since all this activity is wrapped in a transaction, it gets rolled back and nothing is removed.
+* Calling `delete` on any book executes SQL DELETE to remove just that book and doesn't affect any author or other books.
+
+I wouldn't use this combination as it results in a conflict between the child model Book saying when I'm deleted, delete my parent, and the parent model Author saying, do not delete me if I have children.
+
 ## TODO
 
 * WIP: Starting with belongs_to/has_many pair (common use case, eg: Book belongs to Author, Author has many Books) - run through all scenarios in the matrix
+* Make all "Scenario X" links
+* Redo Scenario 4 with Book migration allowing nullable foreign key to author - observe that Author can now be deleted, and Book model will be "orphaned"?
 * Update model code prior to Scenario 9 to include comments for dependent option
 * Observation: Many (all?) the dependent options behaviour is only exhibited when calling `destroy/destroy!` on a model instance rather than `delete`. This is another difference in addition to invoking callbacks?
 * Information hierarchy?
