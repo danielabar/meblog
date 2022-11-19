@@ -193,7 +193,7 @@ bin/rails db:seed
 RAILS_ENV=test bin/rails db:seed
 ```
 
-## Delete vs Destroy
+## Delete Destroy
 
 Now I wanted to understand what would happen when attempting to remove various Author or Book records from the database with respect to their associations. However, there's an additional complexity in that there's two different methods to remove a record, which sound similar, but do slightly different things. From the [Rails API Documentation](https://api.rubyonrails.org/):
 
@@ -234,7 +234,7 @@ another_post.destroy
 
 From the above, we can see that `delete` immediately invokes the SQL `DELETE` statement whereas `destroy` first invokes the `before_destroy` callback. Now with this understood, we can move on to removal of records with associations.
 
-## Dependent Options Matrix
+## Options Matrix
 
 Recall we have Books that `belong_to` an Author, and Author's `have_many` books. Let's start by looking at the dependent options for [belongs_to](https://guides.rubyonrails.org/association_basics.html#options-for-belongs-to-dependent):
 
@@ -277,24 +277,24 @@ Summing up the options, there are 2 dependent options on the `belongs_to` associ
 
 | Scenario | belongs_to    | has_many                 |
 |----------|---------------|--------------------------|
-| [1](../rails-dependent-destroy/#1-no-dependent-options)        | not specified | not specified            |
-| [2](../rails-dependent-destroy/#2-belongs-to-not-specified-and-has-many-destroy)        | not specified | :destroy                 |
-| [3](../rails-dependent-destroy/#3-belongs-to-not-specified-and-has-many-delete-all)        | not specified | :delete_all              |
-| [4](../rails-dependent-destroy/#4-belongs-to-not-specified-and-has-many-nullify)        | not specified | :nullify                 |
-| [5](../rails-dependent-destroy/#5-belongs-to-not-specified-and-has-many-restrict-with-exception)        | not specified | :restrict_with_exception |
-| [6](../rails-dependent-destroy/#6-belongs-to-not-specified-and-has-many-restrict-with-error)        | not specified | :restrict_with_error     |
-| [7](../rails-dependent-destroy/#7-belongs-to-destroy-and-has-many-restrict-not-specified)        | :destroy      | not specified            |
-| [8](../rails-dependent-destroy/#8-belongs-to-destroy-and-has-many-destroy)        | :destroy      | :destroy                 |
-| [9](../rails-dependent-destroy/#9-belongs-to-destroy-and-has-many-delete-all)        | :destroy      | :delete_all              |
-| [10](../rails-dependent-destroy/#10-belongs-to-destroy-and-has-many-nullify)       | :destroy      | :nullify                 |
-| [11](../rails-dependent-destroy/#11-belongs-to-destroy-and-has-many-restrict-with-exception)       | :destroy      | :restrict_with_exception |
-| [12](../rails-dependent-destroy/#12-belongs-to-destroy-and-has-many-restrict-with-error)       | :destroy      | :restrict_with_error     |
-| [13](../rails-dependent-destroy/#13-belongs-to-delete-and-has-many-not-specified)       | :delete       | not specified            |
-| [14](../rails-dependent-destroy/#14-belongs-to-delete-and-has-many-destroy)       | :delete       | :destroy                 |
-| [15](../rails-dependent-destroy/#15-belongs-to-delete-and-has-many-delete-all)       | :delete       | :delete_all              |
-| [16](../rails-dependent-destroy/#16-belongs-to-delete-and-has-many-nullify)       | :delete       | :nullify                 |
-| [17](../rails-dependent-destroy/#17-belongs-to-delete-and-has-many-restrict-with-exception)       | :delete       | :restrict_with_exception |
-| [18](../rails-dependent-destroy/#18-belongs-to-delete-and-has-many-restrict-with-error)       | :delete       | :restrict_with_error     |
+| [1](../rails-dependent-destroy/#1-no-options)        | not specified | not specified            |
+| [2](../rails-dependent-destroy/#2-has-many-destroy)        | not specified | :destroy                 |
+| [3](../rails-dependent-destroy/#3-has-many-delete-all)        | not specified | :delete_all              |
+| [4](../rails-dependent-destroy/#4-has-many-nullify)        | not specified | :nullify                 |
+| [5](../rails-dependent-destroy/#5-has-many-restrict-with-exception)        | not specified | :restrict_with_exception |
+| [6](../rails-dependent-destroy/#6-has-many-restrict-with-error)        | not specified | :restrict_with_error     |
+| [7](../rails-dependent-destroy/#7-belongs-to-destroy)        | :destroy      | not specified            |
+| [8](../rails-dependent-destroy/#8-belongs-to-destroy-has-many-destroy)        | :destroy      | :destroy                 |
+| [9](../rails-dependent-destroy/#9-belongs-to-destroy-has-many-delete-all)        | :destroy      | :delete_all              |
+| [10](../rails-dependent-destroy/#10-belongs-to-destroy-has-many-nullify)       | :destroy      | :nullify                 |
+| [11](../rails-dependent-destroy/#11-belongs-to-destroy-has-many-restrict-with-exception)       | :destroy      | :restrict_with_exception |
+| [12](../rails-dependent-destroy/#12-belongs-to-destroy-has-many-restrict-with-error)       | :destroy      | :restrict_with_error     |
+| [13](../rails-dependent-destroy/#13-belongs-to-delete)       | :delete       | not specified            |
+| [14](../rails-dependent-destroy/#14-belongs-to-delete-has-many-destroy)       | :delete       | :destroy                 |
+| [15](../rails-dependent-destroy/#15-belongs-to-delete-has-many-delete-all)       | :delete       | :delete_all              |
+| [16](../rails-dependent-destroy/#16-belongs-to-delete-has-many-nullify)       | :delete       | :nullify                 |
+| [17](../rails-dependent-destroy/#17-belongs-to-delete-has-many-restrict-with-exception)       | :delete       | :restrict_with_exception |
+| [18](../rails-dependent-destroy/#18-belongs-to-delete-has-many-restrict-with-error)       | :delete       | :restrict_with_error     |
 
 For each combination, I want to understand what happens given the following:
 
@@ -460,7 +460,7 @@ end
 
 In this next section, each model class will be modified with respect to its dependent option, then the tests will be run and the log files analyzed to understand the behavior of each option.
 
-### 1: No dependent options
+### 1: No Options
 
 In this scenario, we do not specify any `dependent` option on either side of the `belongs_to/has_many` relationship. So the models simply look like this:
 
@@ -601,7 +601,7 @@ Test Log Summary:
 
 If your system never needs to delete any instance of the model on the `has_many` side, then not specifying any `dependent` options is ok, otherwise, consider one of the other scenarios.
 
-### 2: Belongs to not specified and Has Many Destroy
+### 2: Has Many Destroy
 
 In this case, we leave the Book model with no dependent option, and specify `destroy` on the Author model:
 
@@ -749,7 +749,7 @@ Test log summary:
 
 Use the `dependent: :destroy` option to support a cascade style delete where a parent model and all its associations can be removed, with the associated models `before_destroy` callbacks invoked for final cleanup.
 
-### 3: Belongs to not specified and Has Many Delete All
+### 3: Has Many Delete All
 
 In this case, we leave the Book model with no dependent option, and specify `delete_all` on the Author model:
 
@@ -890,7 +890,7 @@ Test log summary:
 
 Use the `dependent: :delete_all` option to support a cascade style delete where a parent model and all its associations can be removed, and where the associated models can be immediately deleted via SQL DELETE, with no need for their `before_destroy` callbacks invoked, i.e. no need for any final cleanup.
 
-### 4: Belongs to not specified and Has Many Nullify
+### 4: Has Many Nullify
 
 In this case, we leave the Book model with no dependent option, and specify `nullify` on the Author model:
 
@@ -1093,7 +1093,7 @@ Notice the order of operations:
 
 In a real application, the code that handles or displays Books would have to be flexible enough to handle a null Author rather than assuming it will always be populated.
 
-### 5: Belongs to not specified and Has Many Restrict With Exception
+### 5: Has Many Restrict With Exception
 
 In this case, we leave the Book model with no dependent option, and specify `restrict_with_exception` on the Author model:
 
@@ -1232,7 +1232,7 @@ Test log summary:
 
 Use this option if you want to prevent models with dependent models from being removed, but with an explicit exception that can be handled rather than catching a foreign key constraint violation from the database. Note that you have to use the `destroy` method to raise `DeleteRestrictionError`. The `delete` method still raises `ActiveRecord::InvalidForeignKey`.
 
-### 6: Belongs to not specified and Has Many Restrict With Error
+### 6: Has Many Restrict With Error
 
 In this case, we leave the Book model with no dependent option, and specify `restrict_with_error` on the Author model:
 
@@ -1399,7 +1399,7 @@ Use this option if you want Rails to populate the model's `errors` property with
 
 In this case, be very aware of the difference between `destroy!` and `destroy` methods. If using `destroy!`, it will raise `ActiveRecord::RecordNotDestroyed`. If you want to access the model's `errors` property you'll have to do so in a rescue block. If using the `destroy` method, it will return `false` rather than raising when the model could not be removed, and the model's `errors` property will be populated.
 
-### 7: Belongs to Destroy and Has Many Not Specified
+### 7: Belongs to Destroy
 
 In this case, we update the Book model to specify `destroy` and the Author model is unspecified:
 
@@ -1595,7 +1595,7 @@ orphaned_books.count
 
 The `dependent: :destroy` option on the `belongs_to` side of a relationship could be useful in a 1-1 situation, for example, if an Author specified `has_one` book instead of `has_many`. But otherwise, it doesn't really make sense because either it will lead to orphan records or foreign key constraint errors in some cases.
 
-### 8: Belongs to Destroy and Has Many Destroy
+### 8: Belongs to Destroy Has Many Destroy
 
 In this case, the `destroy` option is specified on both sides of the relationship:
 
@@ -1751,7 +1751,7 @@ Test log summary:
 
 Even though Rails will not go into an infinite loop with `destroy` on both sides of the relationship, this seems like an invalid combination. In a simple application such as this one, it's easy to see the `destroy` on both sides and fix it (choose just one), but in a larger app with more models, it could be tricky to find.
 
-### 9: Belongs to Destroy and Has Many Delete All
+### 9: Belongs to Destroy Has Many Delete All
 
 In this case, the `destroy` option is specified on Book and `delete_all` on Author:
 
@@ -1901,7 +1901,7 @@ Test log summary:
 
 I wouldn't use this combination as it can produce a surprising result when calling `book.destroy` on a book that belongs to an author that also has other books. It ends up removing not just that book but all the other books written by this author. It's a kind of cascade but starting from a child, going up to the parent, then back down to other children.
 
-### 10: Belongs to Destroy and Has Many Nullify
+### 10: Belongs to Destroy Has Many Nullify
 
 In this case, the `destroy` option is specified on Book and `nullify` on Author:
 
@@ -2067,7 +2067,7 @@ Test log summary:
 
 I wouldn't use this combination because like in Scenario 9, there's a surprising result when calling `destroy` on a book that belongs to an author that has other books. Not only does it remove the book and author, but also updates the author's other books, let's call them siblings to the deleted book, to have a null `author_id`.
 
-### 11: Belongs to Destroy and Has Many Restrict With Exception
+### 11: Belongs to Destroy Has Many Restrict With Exception
 
 In this case, the `destroy` option is specified on Book and `restrict_with_exception` on Author:
 
@@ -2214,7 +2214,7 @@ Test log summary:
 
 I wouldn't use this combination as it results in a conflict between the child model Book saying when I'm deleted, delete my parent, and the parent model Author saying, do not delete me if I have children.
 
-### 12: Belongs to Destroy and Has Many Restrict With Error
+### 12: Belongs to Destroy Has Many Restrict With Error
 
 In this case, the `destroy` option is specified on Book and `restrict_with_error` on Author:
 
@@ -2386,7 +2386,7 @@ Test log summary:
 
 I wouldn't use this combination because there's a conflict between the child model Book saying "when I'm destroyed, also destroy my parent", and the parent model Author saying "do not destroy me if I have children".
 
-### 13: Belongs to Delete and Has Many Not Specified
+### 13: Belongs to Delete
 
 In this case, the `delete` option is specified on Book and the Author model does not specify any dependent option:
 
@@ -2531,7 +2531,7 @@ Test log summary:
 
 I wouldn't use this option as the results seem inconsistent with respect to removing child models (on the belongs_to side of the relationship). That is, if removing a book that belongs to an author that only has that one book, then both the child and parent models are removed (with the child model having its destroy callback invoked but the parent model does not). But if a child model belongs to a parent with other children, then nothing is removed.
 
-### 14: Belongs to Delete and Has Many Destroy
+### 14: Belongs to Delete Has Many Destroy
 
 In this case, the `delete` option is specified on Book and `destroy` option is specified on Author:
 
@@ -2685,7 +2685,7 @@ Test log summary:
 
 I wouldn't use this combination of options as the desired cascading delete effect from an Author to its Books won't happen as expected. See Scenario 2 for the expected cascade.
 
-### 15: Belongs to Delete and Has Many Delete All
+### 15: Belongs to Delete Has Many Delete All
 
 In this case, the `delete` option is specified on Book and `delete_all` option is specified on Author:
 
@@ -2835,7 +2835,7 @@ Test log summary:
 
 It looks like these options don't interfere with each other and behave the same as if only one was specified. But having `dependent: :delete` on the belongs_to side of the relationship is still problematic, as was explained in Scenario 13.
 
-### 16: Belongs to Delete and Has Many Nullify
+### 16: Belongs to Delete Has Many Nullify
 
 In this case, the `delete` option is specified on Book and `nullify` option is specified on Author:
 
@@ -3002,7 +3002,7 @@ Most surprising: The nullify option on the has_many side of the relationship beh
 
 I wouldn't use this combination as there's some surprising results. Specifically calling `destroy` on a book will result in its sibling books being made orphans because their author_id will still be populated, pointing to an author that no longer exists. With the nullify option on the author, it's expected that some books will have a nil author_id, but not that author_id could be populated but invalid.
 
-### 17: Belongs to Delete and Has Many Restrict With Exception
+### 17: Belongs to Delete Has Many Restrict With Exception
 
 In this case, the `delete` option is specified on Book and `restrict_with_exception` option is specified on Author:
 
@@ -3147,7 +3147,7 @@ Test log summary:
 
 The combination of `dependent: :delete` on `belongs_to` and `dependent: :restrict_with_exception` on `has_many` behave the same as if each option was specified independently and the other side was not specified.
 
-### 18: Belongs to Delete and Has Many Restrict With Error
+### 18: Belongs to Delete Has Many Restrict With Error
 
 In this case, the `delete` option is specified on Book and `restrict_with_error` option is specified on Author:
 
