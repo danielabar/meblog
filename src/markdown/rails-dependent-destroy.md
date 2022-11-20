@@ -2807,6 +2807,18 @@ Test log summary:
 
 The combination of `dependent: :delete` on `belongs_to` and `dependent: :restrict_with_exception` on `has_many` behave the same as if each option was specified independently and the other side was not specified.
 
+## Which Should You Use?
+
+The answer, as in nearly all things tech is... it depends. Firstly, it depends on the business and/or legal requirements of the application. Which models need to be removed? For example, should a customer be able to click a button to remove their account? If so, what should happen to all other models that may refer to this customer record? Should their orders be removed? Would that affect accounting systems? Maybe this is a good use case for allowing nullable foreign keys. All these questions need to be answered.
+
+Some other factors to consider are:
+* Choosing the least surprising option (TOOD: example of destroying a book also removed siblings is surprising, having removal behave differently when there is only one vs many is surprising)
+* Consistent referential integrity (TODO: option that sometimes leaves null FK and sometimes populated FK for entity that has been removed is confusing, especially if you run SQL reports outside of Rails/ActiveREcord)
+
+## Conclusion
+
+This post has used exploratory tests to understand how ActiveRecord dependent options function in one to many relationships to remove (or fail to remove) records from the database.
+
 ## TODO
 
 * Make all "Scenario X" links and fix numbers after scenarios 6, 12, and 18 removed.
@@ -2817,8 +2829,8 @@ The combination of `dependent: :delete` on `belongs_to` and `dependent: :restric
 * What about all the other association types - maybe too much for one blog post - do a multi part?
 * Link to companion project: https://github.com/danielabar/learn-associations
 * Add aside: passing `-h` or `--help` to any generator command, eg: `bin/rails generate model -h` provides a complete guide to that generator. For example, wondering what are the valid data types for model attributes
-* Summarize all the results like when you want to use each? (maybe too complicated because it depends on business and legal requirements...)
-* Conclusion para
+* WIP Summarize all the results like when you want to use each? (maybe too complicated because it depends on business and legal requirements...)
+* WIP Conclusion para
 * Title
 * Nice to have: change margin-bottom amount on detail/summary element depending on open/closed state.
 * Something weird with BOOK COUNT in log - adding markdown-emphasis
