@@ -2809,11 +2809,14 @@ The combination of `dependent: :delete` on `belongs_to` and `dependent: :restric
 
 ## Which Should You Use?
 
-The answer, as in nearly all things tech is... it depends. Firstly, it depends on the business and/or legal requirements of the application. Which models need to be removed? For example, should a customer be able to click a button to remove their account? If so, what should happen to all other models that may refer to this customer record? Should their orders be removed? Would that affect accounting systems? Maybe this is a good use case for allowing nullable foreign keys. All these questions need to be answered.
+The answer, as in nearly all things tech is... it depends. Firstly, it depends on the business and/or legal requirements of the application. Which models need to be removed? For example, should a customer be able to click a button to remove their account? If so, what should happen to all other models that may refer to this customer record? For an e-commerce or SaaS application, the customer's shipping addresses and payment methods should probably be removed which would be a good use case for `has_many :shipping_addresses, dependent: :destroy` option on the Customer model.
 
-Some other factors to consider are:
-* Choosing the least surprising option (TOOD: example of destroying a book also removed siblings is surprising, having removal behave differently when there is only one vs many is surprising)
+But what about the customer's orders, would that affect accounting systems? Or any product reviews the customer may have written? Maybe this is a good use case for allowing nullable foreign keys. All these questions need to be answered.
+
+Some other factors to consider include:
+* Choose the least surprising option. For example, the combination of `belongs_to: :destroy` and `has_many: :nullify` results in siblings having their foreign key references set to nil when one is destroyed. (TOOD: Scenario 9 example of destroying a book also removed siblings is surprising, having removal behave differently when there is only one vs many is surprising)
 * Consistent referential integrity (TODO: option that sometimes leaves null FK and sometimes populated FK for entity that has been removed is confusing, especially if you run SQL reports outside of Rails/ActiveREcord)
+* Try to avoid having combinations of dependent options on each side of the relationship, that make that option behave differently than if it were used alone because this is difficult to reason about. (TODO: Maybe this is the same as the least surprising point)
 
 ## Conclusion
 
