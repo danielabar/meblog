@@ -234,6 +234,10 @@ another_post.destroy
 
 From the above, we can see that `delete` immediately invokes the SQL `DELETE` statement whereas `destroy` first invokes the `before_destroy` callback. Now with this understood, we can move on to removal of records with associations.
 
+<aside class="markdown-aside">
+There is one more difference in the behaviour the delete and destroy that isn't documented. When specifying a dependent option on an ActiveRecord association, the logic for that option will only run when the destroy method is invoked, not the delete method. This will be demonstrated in the various test scenarios further in this post.
+</aside>
+
 ## Options Matrix
 
 Recall we have Books that `belong_to` an Author, and Author's `have_many` books. Let's start by looking at the dependent options for [belongs_to](https://guides.rubyonrails.org/association_basics.html#options-for-belongs-to-dependent):
@@ -2811,12 +2815,17 @@ The combination of `dependent: :delete` on `belongs_to` and `dependent: :restric
 
 The answer, as in nearly all things tech is... it depends. Firstly, it depends on the business and/or legal requirements of the application. Which models need to be removed? For example, should a customer be able to click a button to remove their account? If so, what should happen to all other models that may refer to this customer record? For an e-commerce or SaaS application, the customer's shipping addresses and payment methods should probably be removed which would be a good use case for `has_many :shipping_addresses, dependent: :destroy` option on the Customer model.
 
-But what about the customer's orders, would that affect accounting systems? Or any product reviews the customer may have written? Maybe this is a good use case for allowing nullable foreign keys. All these questions need to be answered.
+But what about the customer's orders, would removing those affect reporting and financial systems? How about any product reviews the customer may have written? This might be a good use case for allowing nullable foreign keys. All these questions need to be answered.
 
-Some other factors to consider include:
-* Choose the least surprising option. For example, the combination of `belongs_to: :destroy` and `has_many: :nullify` results in siblings having their foreign key references set to nil when one is destroyed. (TOOD: Scenario 9 example of destroying a book also removed siblings is surprising, having removal behave differently when there is only one vs many is surprising)
-* Consistent referential integrity (TODO: option that sometimes leaves null FK and sometimes populated FK for entity that has been removed is confusing, especially if you run SQL reports outside of Rails/ActiveREcord)
-* Try to avoid having combinations of dependent options on each side of the relationship, that make that option behave differently than if it were used alone because this is difficult to reason about. (TODO: Maybe this is the same as the least surprising point)
+Another factor to consider is the [principle of least surprise](https://en.wikipedia.org/wiki/Principle_of_least_astonishment). For example, the combination of `dependent: :destroy` on the belongs_to side and `dependent: :nullify` on the has_many side results in siblings having their foreign key references set to nil when one of them is destroyed. We saw this in Scenario 9 where having nullify on the has_many side causes the `belongs_to: :destroy` to go from a book, up to its author for removal, and then back to all the other books to nullify their author_id foreign keys.
+
+We also encountered surprising results in Scenario 8, with the combination of `dependent: :destroy` on belongs_to and `dependent :delete_all` on has_many. In this case, removing a book that belongs to an author that has other books resulted in all of these books being removed. I would avoid combinations of options that produce surprising results.
+
+Another thing to consider is consistency. It's one thing to allow nullable foreign keys, but in Scenario 14, the combination of `belongs_to: :delete` and `has_many: :nullify` can result in books referencing an author that no longer exists. That is, their foreign key is not null, but invalid. Although ActiveRecord can handle this by simply returning `nil` when referencing `book.author`, it could result in inconsistencies if using direct SQL statements for a reporting system.
+
+Lastly, consider the advice in the Rails Guides, specifically the warning not to use `dependent: :destroy` on the `belongs_to` side of a one-to-many relationship due to possibility of orphan records. We tried this in Scenario 6. It did not result in orphan records but trying to remove a book belonging to an author that had other books failed on a foreign key constraint. In this case ActiveRecord prevents orphan records, but will result in more complex code that needs to handle some entities can be removed and some cannot due to how many other entities their parent has.
+
+A final thing to be aware of is when using any of the dependent options to affect related entities, this behaviour only kicks in when invoking the `destroy` or `destroy!` methods on the model instance. The `delete` method only invokes direct SQL on the model on which it is called and does not attempt to affect any of its relationships.
 
 ## Conclusion
 
@@ -2824,15 +2833,13 @@ This post has used exploratory tests to understand how ActiveRecord dependent op
 
 ## TODO
 
+* Somewhere near beginning, give reader option to jump to Which Should You Use section.
 * Make all "Scenario X" links and fix numbers after scenarios 6, 12, and 18 removed.
 * Redo Scenario 4 with Book migration allowing nullable foreign key to author - observe that Author can now be deleted, and Book model will be "orphaned". This is a problem, it's one thing to code for a null reference on a child model, but in this case, the code would also have to handle that it could be an invalid reference - messy! Lesson learned - if you want to use `nullify` option, must always call `destroy` on parent model, not `delete`.
 * Update model code prior to Scenario 9 to include comments for dependent option
-* Observation: Many (all?) the dependent options behaviour is only exhibited when calling `destroy/destroy!` on a model instance rather than `delete`. This is another difference in addition to invoking callbacks?
-* Cleanup Rails console output to only highlight the relevant parts
 * What about all the other association types - maybe too much for one blog post - do a multi part?
 * Link to companion project: https://github.com/danielabar/learn-associations
 * Add aside: passing `-h` or `--help` to any generator command, eg: `bin/rails generate model -h` provides a complete guide to that generator. For example, wondering what are the valid data types for model attributes
-* WIP Summarize all the results like when you want to use each? (maybe too complicated because it depends on business and legal requirements...)
 * WIP Conclusion para
 * Title
 * Nice to have: change margin-bottom amount on detail/summary element depending on open/closed state.
