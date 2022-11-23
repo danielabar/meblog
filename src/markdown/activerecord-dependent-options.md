@@ -283,21 +283,21 @@ This means there are 3 * 5 = 15 possible combinations of dependent options:
 
 | Scenario | belongs_to    | has_many                 |
 |----------|---------------|--------------------------|
-| [1](../rails-dependent-destroy/#1-no-options)        | not specified | not specified            |
-| [2](../rails-dependent-destroy/#2-has-many-destroy)        | not specified | :destroy                 |
-| [3](../rails-dependent-destroy/#3-has-many-delete-all)        | not specified | :delete_all              |
-| [4](../rails-dependent-destroy/#4-has-many-nullify)        | not specified | :nullify                 |
-| [5](../rails-dependent-destroy/#5-has-many-restrict-with-exception)        | not specified | :restrict_with_exception |
-| [6](../rails-dependent-destroy/#6-belongs-to-destroy)        | :destroy      | not specified            |
-| [7](../rails-dependent-destroy/#7-belongs-to-destroy-has-many-destroy)        | :destroy      | :destroy                 |
-| [8](../rails-dependent-destroy/#8-belongs-to-destroy-has-many-delete-all)        | :destroy      | :delete_all              |
-| [9](../rails-dependent-destroy/#9-belongs-to-destroy-has-many-nullify)       | :destroy      | :nullify                 |
-| [10](../rails-dependent-destroy/#10-belongs-to-destroy-has-many-restrict-with-exception)       | :destroy      | :restrict_with_exception |
-| [11](../rails-dependent-destroy/#11-belongs-to-delete)       | :delete       | not specified            |
-| [12](../rails-dependent-destroy/#12-belongs-to-delete-has-many-destroy)       | :delete       | :destroy                 |
-| [13](../rails-dependent-destroy/#13-belongs-to-delete-has-many-delete-all)       | :delete       | :delete_all              |
-| [14](../rails-dependent-destroy/#14-belongs-to-delete-has-many-nullify)       | :delete       | :nullify                 |
-| [15](../rails-dependent-destroy/#15-belongs-to-delete-has-many-restrict-with-exception)       | :delete       | :restrict_with_exception |
+| [1](../activerecord-dependent-options/#1-no-options)        | not specified | not specified            |
+| [2](../activerecord-dependent-options/#2-has-many-destroy)        | not specified | :destroy                 |
+| [3](../activerecord-dependent-options/#3-has-many-delete-all)        | not specified | :delete_all              |
+| [4](../activerecord-dependent-options/#4-has-many-nullify)        | not specified | :nullify                 |
+| [5](../activerecord-dependent-options/#5-has-many-restrict-with-exception)        | not specified | :restrict_with_exception |
+| [6](../activerecord-dependent-options/#6-belongs-to-destroy)        | :destroy      | not specified            |
+| [7](../activerecord-dependent-options/#7-belongs-to-destroy-has-many-destroy)        | :destroy      | :destroy                 |
+| [8](../activerecord-dependent-options/#8-belongs-to-destroy-has-many-delete-all)        | :destroy      | :delete_all              |
+| [9](../activerecord-dependent-options/#9-belongs-to-destroy-has-many-nullify)       | :destroy      | :nullify                 |
+| [10](../activerecord-dependent-options/#10-belongs-to-destroy-has-many-restrict-with-exception)       | :destroy      | :restrict_with_exception |
+| [11](../activerecord-dependent-options/#11-belongs-to-delete)       | :delete       | not specified            |
+| [12](../activerecord-dependent-options/#12-belongs-to-delete-has-many-destroy)       | :delete       | :destroy                 |
+| [13](../activerecord-dependent-options/#13-belongs-to-delete-has-many-delete-all)       | :delete       | :delete_all              |
+| [14](../activerecord-dependent-options/#14-belongs-to-delete-has-many-nullify)       | :delete       | :nullify                 |
+| [15](../activerecord-dependent-options/#15-belongs-to-delete-has-many-restrict-with-exception)       | :delete       | :restrict_with_exception |
 
 For each combination, I want to understand what happens given the following:
 
@@ -618,7 +618,7 @@ class Book < ApplicationRecord
 end
 
 class Author < ApplicationRecord
-  has_many :books, dependent: :destroy
+  has_many :books, dependent: :destroy # causes all the associated objects to also be destroyed
   before_destroy :one_last_thing
   def one_last_thing
     Rails.logger.warn("  Author model #{id} will be destroyed")
@@ -766,7 +766,7 @@ class Book < ApplicationRecord
 end
 
 class Author < ApplicationRecord
-  has_many :books, dependent: :delete_all
+  has_many :books, dependent: :delete_all # causes all the associated objects to be deleted directly from the database
   before_destroy :one_last_thing
   def one_last_thing
     Rails.logger.warn("  Author model #{id} will be destroyed")
@@ -907,7 +907,7 @@ class Book < ApplicationRecord
 end
 
 class Author < ApplicationRecord
-  has_many :books, dependent: :nullify
+  has_many :books, dependent: :nullify # causes the foreign key to be set to NULL
   before_destroy :one_last_thing
   def one_last_thing
     Rails.logger.warn("  Author model #{id} will be destroyed")
@@ -1110,7 +1110,7 @@ class Book < ApplicationRecord
 end
 
 class Author < ApplicationRecord
-  has_many :books, dependent: :restrict_with_exception
+  has_many :books, dependent: :restrict_with_exception # ActiveRecord::DeleteRestrictionError exception raised if there are any associated records
   before_destroy :one_last_thing
   def one_last_thing
     Rails.logger.warn("  Author model #{id} will be destroyed")
@@ -1241,7 +1241,7 @@ In this case, we update the Book model to specify `destroy` and the Author model
 
 ```ruby
 class Book < ApplicationRecord
-  belongs_to :author, dependent: :destroy
+  belongs_to :author, dependent: :destroy # when the object is destroyed, destroy will be called on its associated objects
   before_destroy :one_last_thing
   def one_last_thing
     Rails.logger.warn("  Book model #{id} will be destroyed")
@@ -1375,7 +1375,7 @@ ActiveRecord::InvalidForeignKey - SQLite3::ConstraintException: FOREIGN KEY cons
 
 Test log summary:
 
-* Author tests behave the same as Scenario 1, where any author with an associated book cannot be removed due to foreign key constraint.
+* Author tests behave the same as [Scenario 1](../activerecord-dependent-options/#1-no-options), where any author with an associated book cannot be removed due to foreign key constraint.
 * Calling `destroy` on a book that belongs to an author that only has that one book, destroys both the book and the author.
 * Calling `destroy` on a book that belongs to an author that has other books as well fails. It attempts to delete the author but then runs into a foreign key constraint because there's still other books in the system that belong to that author. In this case, nothing is deleted.
 * Calling delete on a book (whether the author has only that one book or others as well), deletes only that book and does not attempt to go up to the author for further deletion.
@@ -1437,7 +1437,7 @@ In this case, the `destroy` option is specified on both sides of the relationshi
 
 ```ruby
 class Book < ApplicationRecord
-  belongs_to :author, dependent: :destroy
+  belongs_to :author, dependent: :destroy # when the object is destroyed, destroy will be called on its associated objects
   before_destroy :one_last_thing
   def one_last_thing
     Rails.logger.warn("  Book model #{id} will be destroyed")
@@ -1445,7 +1445,7 @@ class Book < ApplicationRecord
 end
 
 class Author < ApplicationRecord
-  has_many :books, dependent: :destroy
+  has_many :books, dependent: :destroy # causes all the associated objects to also be destroyed
   before_destroy :one_last_thing
   def one_last_thing
     Rails.logger.warn("  Author model #{id} will be destroyed")
@@ -1582,7 +1582,7 @@ Test log summary:
 * Calling `destroy!` on an Author with one or more books fails, but not on a foreign key constraint, rather, an `ActiveRecord::RecordNotDestroyed - Failed to destroy Book with id={author id}`. In this case it's attempting to destroy the Author's associated book(s) but failing to do so. Interesting that the error message doesn't say why it failed.
 * Calling `delete` on an Author with one or more books fails, raising `ActiveRecord::InvalidForeignKey`.
 * Calling `destroy!` on a book belonging to an Author that only has that one book works - both the book and its author are removed from the database, although it does run a query first to see if that author has any other books.
-* Calling `destroy!` on a book belonging to an Author that has other books fails with `ActiveRecord::RecordNotDestroyed - Failed to destroy Book with id={book_id}`. In Scenario 7 (where destroy was only specified on Book but not Author), this case also failed but with a more useful error indicating why the book could not be removed: `ActiveRecord::InvalidForeignKey - SQLite3::ConstraintException: FOREIGN KEY constraint failed`.
+* Calling `destroy!` on a book belonging to an Author that has other books fails with `ActiveRecord::RecordNotDestroyed - Failed to destroy Book with id={book_id}`. In [Scenario 6](../activerecord-dependent-options/#6-belongs-to-destroy), where destroy was only specified on Book but not Author, this case also failed but with a more useful error indicating why the book could not be removed: `ActiveRecord::InvalidForeignKey - SQLite3::ConstraintException: FOREIGN KEY constraint failed`.
 * Calling `delete` on a book, regardless of its author having just that book or others, successfully removes that book and does not attempt to remove any authors.
 
 Even though Rails will not go into an infinite loop with `destroy` on both sides of the relationship, this seems like an invalid combination. In a simple application such as this one, it's easy to see the `destroy` on both sides and fix it (choose just one), but in a larger app with more models, it could be tricky to find.
@@ -1729,7 +1729,7 @@ ActiveRecord::InvalidForeignKey - SQLite3::ConstraintException: FOREIGN KEY cons
 
 Test log summary:
 
-* Calling `destroy!` an author has the same effect as it did in Scenario 3, in that it first directly removes all of the author's books via SQL DELETE, then calls the author's `before_destroy` callback, then removes the author from the database.
+* Calling `destroy!` an author has the same effect as it did in [Scenario 3](../activerecord-dependent-options/#3-has-many-delete-all), in that it first directly removes all of the author's books via SQL DELETE, then calls the author's `before_destroy` callback, then removes the author from the database.
 * Calling `delete` on an author with books fails on a foreign key constraint.
 * Calling `destroy` on a book belonging to an author that only has that one book removes both the book and its associated author from the database.
 * Calling `destroy` on a book belonging to an author that has other books is the most interesting case - it removes the book from the database, then finds the author, then finds all the other books belonging to this author and removes those as well.
@@ -1759,7 +1759,7 @@ class Author < ApplicationRecord
 end
 ```
 
-In Scenario 4, we learned that in order for `nullify` to work, the model on the other side of the relationship (Book) needs to allow a nullable foreign key. So we'll run the tests with the database having this migration for the `books` table:
+In [Scenario 4](../activerecord-dependent-options/#4-has-many-nullify), we learned that in order for `nullify` to work, the model on the other side of the relationship (Book) needs to allow a nullable foreign key. So we'll run the tests with the database having this migration for the `books` table:
 
 ```ruby
 class CreateBooks < ActiveRecord::Migration[7.0]
@@ -1901,7 +1901,7 @@ Test log summary:
 * Calling `destroy` on a book that belongs to an author that has other books is interesting. The book and author are removed from the database, and also, any other books the author has are updated to have a null `author_id`.
 * Calling `delete` on any book executes SQL DELETE to remove just that book and doesn't affect any author or other books.
 
-I wouldn't use this combination because like in Scenario 9, there's a surprising result when calling `destroy` on a book that belongs to an author that has other books. Not only does it remove the book and author, but also updates the author's other books, let's call them siblings to the deleted book, to have a null `author_id`.
+I wouldn't use this combination because there's a surprising result when calling `destroy` on a book that belongs to an author that has other books. Not only does it remove that book and author, but also updates the author's other books, let's call them siblings to the deleted book, to have a null `author_id`.
 
 ### 10: Belongs to Destroy Has Many Restrict With Exception
 
@@ -2042,8 +2042,8 @@ ActiveRecord::DeleteRestrictionError - Cannot delete record because of dependent
 
 Test log summary:
 
-* Calling `destroy` on an author with one or more books fails due to `ActiveRecord::DeleteRestrictionError - Cannot delete record because of dependent books`. This is the same behaviour observed in Scenario 5.
-* Calling `delete` on an author with one or more books also fails, but with a `ActiveRecord::InvalidForeignKey - SQLite3::ConstraintException: FOREIGN KEY constraint failed` error raised. Again, the same as Scenario 5.
+* Calling `destroy` on an author with one or more books fails due to `ActiveRecord::DeleteRestrictionError - Cannot delete record because of dependent books`. This is the same behaviour observed in [Scenario 5](../activerecord-dependent-options/#5-has-many-restrict-with-exception).
+* Calling `delete` on an author with one or more books also fails, but with a `ActiveRecord::InvalidForeignKey - SQLite3::ConstraintException: FOREIGN KEY constraint failed` error raised. Again, the same as [Scenario 5](../activerecord-dependent-options/#5-has-many-restrict-with-exception).
 * Calling `destroy` on a book belonging to an author that only has that one book removes both the book and author.
 * Calling `destroy` on a book belonging to an author that has other books is interesting - it starts a SQL DELETE to remove the book, then goes up to the author to remove it as well (due to `dependent: :destroy` being specified on Book model), but then the `dependent: :restrict_with_exception` option on Author model kicks in and raises `ActiveRecord::DeleteRestrictionError - Cannot delete record because of dependent books`. Since all this activity is wrapped in a transaction, it gets rolled back and nothing is removed.
 * Calling `delete` on any book executes SQL DELETE to remove just that book and doesn't affect any author or other books.
@@ -2188,7 +2188,7 @@ ActiveRecord::InvalidForeignKey - SQLite3::ConstraintException: FOREIGN KEY cons
 
 Test log summary:
 
-* Similar to Scenario 7, when no dependent options are specified on the Author/has_many side of the relationship, trying to either `destroy` or `delete` an author with one or more books fails with `ActiveRecord::InvalidForeignKey - SQLite3::ConstraintException: FOREIGN KEY constraint failed`.
+* Similar to [Scenario 6](../activerecord-dependent-options/#6-belongs-to-destroy), when no dependent options are specified on the Author/has_many side of the relationship, trying to either `destroy` or `delete` an author with one or more books fails with `ActiveRecord::InvalidForeignKey - SQLite3::ConstraintException: FOREIGN KEY constraint failed`.
 * Calling `destroy` on a Book that belongs to an Author that only has that one book destroys the book (i.e. callbacks and SQL DELETE), and also deletes the Author (i.e. SQL DELETE, no callbacks). This is the effect of the `delete` option specified on Book.
 * Calling `destroy` on a Book that belongs to an Author that has other books as well first destroys the book, then attempts to SQL DELETE the author. This fails on a foreign key constraint, since the other books belonging to this Author are still in the database referencing it, and so the entire transaction is rolled back and nothing is removed.
 * Calling `delete` on a book invokes SQL DELETE on just that book, no other models are affected.
@@ -2217,7 +2217,7 @@ class Author < ApplicationRecord
 end
 ```
 
-Similar to Scenario 8, this seems like a situation that could lead to an infinite delete/destroy loop with each side of the relationship trying to remove the other. Let's see what happens:
+Similar to [Scenario 7](../activerecord-dependent-options/#7-belongs-to-destroy-has-many-destroy), this seems like a situation that could lead to an infinite delete/destroy loop with each side of the relationship trying to remove the other. Let's see what happens:
 
 <details class="markdown-details">
 <summary class="markdown-summary">
@@ -2347,7 +2347,7 @@ Test log summary:
 * Calling `destroy` on a Book belonging to an Author that has other books fails on a foreign key constraint when attempting to SQL DELETE the author, because that would leave the other books referencing an author that no longer exists.
 * Calling `delete` on a book works to remove just that book.
 
-I wouldn't use this combination of options as the desired cascading delete effect from an Author to its Books won't happen as expected. See Scenario 2 for the expected cascade.
+I wouldn't use this combination of options as the desired cascading delete effect from an Author to its Books won't happen as expected. See [Scenario 2](../activerecord-dependent-options/#2-has-many-destroy) for the expected cascade.
 
 ### 13: Belongs to Delete Has Many Delete All
 
@@ -2497,7 +2497,7 @@ Test log summary:
 * Calling `destroy` on a book belonging to an author that has other books fails on a foreign key constraint, at the point when attempting to delete the associated author, because there are still other books referencing this author.
 * Calling `delete` on a book works to delete just that book.
 
-It looks like these options don't interfere with each other and behave the same as if only one was specified. But having `dependent: :delete` on the belongs_to side of the relationship is still problematic, as was explained in Scenario 13.
+It looks like these options don't interfere with each other and behave the same as if only one was specified. But having `dependent: :delete` on the belongs_to side of the relationship is still problematic, as was explained in [Scenario 11](../activerecord-dependent-options/#11-belongs-to-delete).
 
 ### 14: Belongs to Delete Has Many Nullify
 
@@ -2521,7 +2521,7 @@ class Author < ApplicationRecord
 end
 ```
 
-Just like in Scenario 4, in order to observe the effects of `nullify`, the `books` migration needs to allow a nullable reference to `author_id`:
+Just like in [Scenario 4](../activerecord-dependent-options/#4-has-many-nullify), in order to observe the effects of `nullify`, the `books` migration needs to allow a nullable reference to `author_id`:
 
 ```ruby
 class CreateBooks < ActiveRecord::Migration[7.0]
@@ -2659,7 +2659,7 @@ Test log summary:
 * Calling `destroy` on an author with one or more books first updates its associated book's `author_id` to nil, then invokes the author's callback and deletes the author. So no books are removed from the database, but the book records are updated to have a nil author_id.
 * Calling `delete` on an author, whether it has 0, 1, or more books deletes the author from the database, and does *not* attempt to remove or update the associated book records. This creates an orphan situation where book records are left in the database referencing an author that no longer exists.
 * Calling `destroy` on a book that belongs to an author that only has that one book invokes the book's callback and deletes it. Then it finds the associated author and deletes that as well.
-* Calling `destroy` on a book that belongs to an author that has other books behaves the same as when the author only has that one book. That is, it deletes both the book and author, leaving the author's other books as orphans, i.e. referencing an author that no longer exists. This is different behaviour than when nullify was used in Scenario 10, in which case the other books were updated to have a nil author_id. SURPRISE
+* Calling `destroy` on a book that belongs to an author that has other books deletes both the book and author, leaving the author's other books as orphans, i.e. referencing an author that no longer exists. This is different behaviour than when nullify was used in [Scenario 9](../activerecord-dependent-options/#9-belongs-to-destroy-has-many-nullify), in which case the other books were updated to have a nil author_id.
 * Calling `delete` on a book removes just that book.
 
 Most surprising: The nullify option on the has_many side of the relationship behaves differently depending on whether the belongs_to specifies dependent option destroy or delete.
@@ -2817,30 +2817,29 @@ The answer, as in nearly all things tech is... it depends. Firstly, it depends o
 
 But what about the customer's orders, would removing those affect reporting and financial systems? How about any product reviews the customer may have written? This might be a good use case for allowing nullable foreign keys. All these questions need to be answered.
 
-Another factor to consider is the [principle of least surprise](https://en.wikipedia.org/wiki/Principle_of_least_astonishment). For example, the combination of `dependent: :destroy` on the belongs_to side and `dependent: :nullify` on the has_many side results in siblings having their foreign key references set to nil when one of them is destroyed. We saw this in Scenario 9 where having nullify on the has_many side causes the `belongs_to: :destroy` to go from a book, up to its author for removal, and then back to all the other books to nullify their author_id foreign keys.
+Another factor to consider is the [principle of least surprise](https://en.wikipedia.org/wiki/Principle_of_least_astonishment). For example, the combination of `dependent: :destroy` on the belongs_to side and `dependent: :nullify` on the has_many side results in siblings having their foreign key references set to nil when one of them is destroyed. We saw this in [Scenario 9](activerecord-dependent-options/#9-belongs-to-destroy-has-many-nullify) where having nullify on the has_many side causes the `belongs_to: :destroy` to go from a book, up to its author for removal, and then back to all the other books to nullify their author_id foreign keys.
 
-We also encountered surprising results in Scenario 8, with the combination of `dependent: :destroy` on belongs_to and `dependent :delete_all` on has_many. In this case, removing a book that belongs to an author that has other books resulted in all of these books being removed. I would avoid combinations of options that produce surprising results.
+We also encountered surprising results in [Scenario 8](../activerecord-dependent-options/#8-belongs-to-destroy-has-many-delete-all), with the combination of `dependent: :destroy` on belongs_to and `dependent :delete_all` on has_many. In this case, removing a book that belongs to an author that has other books resulted in all of these books being removed. I would avoid combinations of options that produce surprising results.
 
-Another thing to consider is consistency. It's one thing to allow nullable foreign keys, but in Scenario 14, the combination of `belongs_to: :delete` and `has_many: :nullify` can result in books referencing an author that no longer exists. That is, their foreign key is not null, but invalid. Although ActiveRecord can handle this by simply returning `nil` when referencing `book.author`, it could result in inconsistencies if using direct SQL statements for a reporting system.
+Another thing to consider is consistency. It's one thing to allow nullable foreign keys, but in [Scenario 14](../activerecord-dependent-options/#14-belongs-to-delete-has-many-nullify), the combination of `belongs_to: :delete` and `has_many: :nullify` can result in books referencing an author that no longer exists. That is, their foreign key is not null, but specifies an author_id that no longer exists. Although ActiveRecord can handle this by simply returning `nil` when referencing `book.author`, it could result in inconsistencies if using direct SQL statements for a reporting system.
 
-Lastly, consider the advice in the Rails Guides, specifically the warning not to use `dependent: :destroy` on the `belongs_to` side of a one-to-many relationship due to possibility of orphan records. We tried this in Scenario 6. It did not result in orphan records but trying to remove a book belonging to an author that had other books failed on a foreign key constraint. In this case ActiveRecord prevents orphan records, but will result in more complex code that needs to handle some entities can be removed and some cannot due to how many other entities their parent has.
+Lastly, consider the advice in the Rails Guides, specifically the warning not to use `dependent: :destroy` on the `belongs_to` side of a one-to-many relationship due to possibility of orphan records. We tried this in [Scenario 6](../activerecord-dependent-options/#6-belongs-to-destroy). It did not result in orphan records but trying to remove a book belonging to an author that had other books failed on a foreign key constraint. In this case ActiveRecord prevents orphan records, but will result in more complex code that needs to handle some entities can be removed and some cannot due to how many other entities their parent has.
 
-A final thing to be aware of is when using any of the dependent options to affect related entities, this behaviour only kicks in when invoking the `destroy` or `destroy!` methods on the model instance. The `delete` method only invokes direct SQL on the model on which it is called and does not attempt to affect any of its relationships.
+A final thing to be aware of is when using any of the dependent options to affect related entities: This behaviour only kicks in when invoking the `destroy` or `destroy!` methods on the model instance. The `delete` method only invokes direct SQL on the model on which it is called and does not attempt to affect any of its relationships.
 
 ## Conclusion
 
-This post has used exploratory tests to understand how ActiveRecord dependent options function in one to many relationships to remove (or fail to remove) records from the database.
+This post has used exploratory tests to understand how ActiveRecord dependent options function in a one to many relationship to remove (or fail to remove) records from the database when used only on one, or both sides of the relationship. It has also explored differences in the `delete` vs `destroy` methods. It then covered some factors to consider in choosing which dependent option(s) to use.
 
 ## TODO
 
 * Somewhere near beginning, give reader option to jump to Which Should You Use section.
-* Make all "Scenario X" links and fix numbers after scenarios 6, 12, and 18 removed.
+* Review all test log summaries
 * Redo Scenario 4 with Book migration allowing nullable foreign key to author - observe that Author can now be deleted, and Book model will be "orphaned". This is a problem, it's one thing to code for a null reference on a child model, but in this case, the code would also have to handle that it could be an invalid reference - messy! Lesson learned - if you want to use `nullify` option, must always call `destroy` on parent model, not `delete`.
-* Update model code prior to Scenario 9 to include comments for dependent option
 * What about all the other association types - maybe too much for one blog post - do a multi part?
 * Link to companion project: https://github.com/danielabar/learn-associations
 * Add aside: passing `-h` or `--help` to any generator command, eg: `bin/rails generate model -h` provides a complete guide to that generator. For example, wondering what are the valid data types for model attributes
-* WIP Conclusion para
-* Title
 * Nice to have: change margin-bottom amount on detail/summary element depending on open/closed state.
 * Something weird with BOOK COUNT in log - adding markdown-emphasis
+* Remove cursor pointer style from log output
+* Remove all SELECT COUNT... from log output
