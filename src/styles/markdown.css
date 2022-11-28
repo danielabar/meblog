@@ -137,6 +137,6 @@
 }
 
 .markdown-details {
-  cursor: pointer;
+  cursor: default;
   margin-bottom: 15px;
 }

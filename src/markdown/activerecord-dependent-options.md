@@ -16,7 +16,7 @@ Many years ago, before the likes of GDPR and privacy concerns, the "solution" wa
 
 The Rails Guide on [Active Record Associations](https://guides.rubyonrails.org/association_basics.html) does cover deletion options. However, since there are so many options besides just for deletion, I found myself scrolling up and down through the docs and losing track of which side of the association was being referred to. Also, since different options can be specified on each side of an association, it can be tricky to reason about what would happen with various *combinations* of options.
 
-A further complexity is that there are two different ways to remove an ActiveRecord model in rails: Delete and Destroy. They sound similar but do slightly different things (more on this later). If you add that into the mix of removal options, the number of scenarios grows even further.
+A further complexity is that there are two different ways to remove an ActiveRecord model in rails: Delete and Destroy. They sound similar but do different things (more on this later). If you add that into the mix of removal options, the number of scenarios grows even further.
 
 In the vein of "a picture is worth a thousand words", I decided to build a sample Rails application and do a deep dive on all the removal options for some commonly used associations and how they behave when deleting or destroying a record. This post will walk through the results of this.
 
@@ -208,13 +208,13 @@ If you want to follow along with the project, here is the [source](https://githu
 
 ## Delete Destroy
 
-Now I wanted to understand what would happen when attempting to remove various Author or Book records from the database with respect to their associations. However, there's an additional complexity in that there's two different methods to remove a record, which sound similar, but do slightly different things. From the [Rails API Documentation](https://api.rubyonrails.org/):
+I wanted to understand what would happen when attempting to remove various Author or Book records from the database with respect to their associations. However, there's an additional complexity in that there's two different methods to remove a record, which sound similar, but do slightly different things. From the [Rails API Documentation](https://api.rubyonrails.org/):
 
 * [delete](https://api.rubyonrails.org/classes/ActiveRecord/Persistence.html#method-i-delete): Deletes the record in the database and freezes this instance to reflect that no changes should be made (since they can't be persisted). Returns the frozen instance. The row is simply removed with an SQL `DELETE` statement on the record's primary key, and no callbacks are executed.
 * [destroy](https://api.rubyonrails.org/classes/ActiveRecord/Persistence.html#method-i-destroy): Deletes the record in the database and freezes this instance to reflect that no changes should be made (since they can't be persisted). There's a series of callbacks associated with destroy. If the `before_destroy` callback throws `:abort` the action is cancelled and destroy returns `false`.
 * [destroy!](https://api.rubyonrails.org/classes/ActiveRecord/Persistence.html#method-i-destroy-21): Similar to `destroy`, except raises `ActiveRecord::RecordNotDestroyed` rather than returning false if the record is not destroyed.
 
-To summarize the difference, `delete` immediately invokes SQL to remove the record from the database, whereas `destroy/destroy!` first invokes the model's `before_destroy` callback which can potentially stop the deletion. I'm assuming this could be a place for any extra cleanup code could be added.
+To summarize the difference, `delete` immediately invokes SQL to remove the record from the database, whereas `destroy/destroy!` first invokes the model's `before_destroy` callback which can potentially stop the deletion. I'm assuming this could be a place for cleanup code.
 
 To understand this with a simple case, let's modify the `Post` model, which has no associations, to add a `before_destroy` callback. This callback will simply output a message:
 
@@ -255,8 +255,8 @@ There is one more difference in the behaviour the delete and destroy that isn't 
 
 Recall we have Books that `belong_to` an Author, and Author's `have_many` books. Let's start by looking at the dependent options for [belongs_to](https://guides.rubyonrails.org/association_basics.html#options-for-belongs-to-dependent):
 
-* `:destroy` when the object is destroyed, destroy will be called on its associated objects.
-* `:delete` when the object is destroyed, all its associated objects will be deleted directly from the database without calling their destroy method.
+1. `:destroy` when the object is destroyed, destroy will be called on its associated objects.
+2. `:delete` when the object is destroyed, all its associated objects will be deleted directly from the database without calling their destroy method.
 
 For example, to use the `destroy` option, the Book model would look like this to indicate that whenever a Book is destroyed, its associated Author should also be destroyed:
 
@@ -270,13 +270,14 @@ class Book < ApplicationRecord
 end
 ```
 
-And the dependent options for [has_many](https://guides.rubyonrails.org/association_basics.html#dependent):
+Here are the dependent options for [has_many](https://guides.rubyonrails.org/association_basics.html#dependent):
 
-* `:destroy` causes all the associated objects to also be destroyed
-* `:delete_all` causes all the associated objects to be deleted directly from the database (so callbacks will not execute)
-* `:nullify` causes the foreign key to be set to NULL. Polymorphic type column is also nullified on polymorphic associations. Callbacks are not executed.
-* `:restrict_with_exception` causes an ActiveRecord::DeleteRestrictionError exception to be raised if there are any associated records
-* `:restrict_with_error` causes an error to be added to the owner if there are any associated objects
+1. `:destroy` causes all the associated objects to also be destroyed
+2. `:delete_all` causes all the associated objects to be deleted directly from the database (so callbacks will not execute)
+3. `:destroy_async` when the object is destroyed, an `ActiveRecord::DestroyAssociationAsyncJob` job is enqueued which will call destroy on its associated objects. Active Job must be set up for this to work.
+4. `:nullify` causes the foreign key to be set to NULL. Polymorphic type column is also nullified on polymorphic associations. Callbacks are not executed.
+5. `:restrict_with_exception` causes an ActiveRecord::DeleteRestrictionError exception to be raised if there are any associated records
+6. `:restrict_with_error` causes an error to be added to the owner if there are any associated objects
 
 For example, to use the `destroy` option, the Author model would look like this to indicate that whenever an Author is destroyed, its Books should also be destroyed:
 
@@ -290,7 +291,9 @@ class Author < ApplicationRecord
 end
 ```
 
-Summing up the options, there are 2 dependent options on the `belongs_to` association, plus the "option" to not specify anything which makes 3. There are 5 dependent options on the `has_many` association, plus the do nothing "option" which makes 6. On the `has_many` side, the `restrict_with_error` option behaves similarly to the `restrict_with_exception` except that it populates the `errors` property of the model instead of raising an exception. To reduce the number of combinations in this analysis, will only consider `restrict_with_exception`.
+Summing up the options, there are 2 dependent options on the `belongs_to` association, plus the "option" to not specify anything which makes 3. There are 6 dependent options on the `has_many` association, plus the do nothing "option" which makes 7.
+
+On the `has_many` side, the `restrict_with_error` option behaves similarly to the `restrict_with_exception` except that it populates the `errors` property of the model instead of raising an exception. Similarly, the `destroy_async` option behaves similarly to the `destroy` except it does so via a job. To reduce the number of combinations and avoid the complexity of setting up ActiveJob in this analysis, will only consider `restrict_with_exception` and leave off `destroy_async`.
 
 This means there are 3 * 5 = 15 possible combinations of dependent options:
 
@@ -485,7 +488,7 @@ class Book < ApplicationRecord
   belongs_to :author
   before_destroy :one_last_thing
   def one_last_thing
-    Rails.logger.warn("  Book model #{id} will be destroyed")
+    Rails.logger.warn("Book model #{id} will be destroyed")
   end
 end
 
@@ -493,7 +496,7 @@ class Author < ApplicationRecord
   has_many :books
   before_destroy :one_last_thing
   def one_last_thing
-    Rails.logger.warn("  Author model #{id} will be destroyed")
+    Rails.logger.warn("Author model #{id} will be destroyed")
   end
 end
 ```
@@ -606,7 +609,7 @@ class Book < ApplicationRecord
   belongs_to :author
   before_destroy :one_last_thing
   def one_last_thing
-    Rails.logger.warn("  Book model #{id} will be destroyed")
+    Rails.logger.warn("Book model #{id} will be destroyed")
   end
 end
 
@@ -614,7 +617,7 @@ class Author < ApplicationRecord
   has_many :books, dependent: :destroy # causes all the associated objects to also be destroyed
   before_destroy :one_last_thing
   def one_last_thing
-    Rails.logger.warn("  Author model #{id} will be destroyed")
+    Rails.logger.warn("Author model #{id} will be destroyed")
   end
 end
 ```
@@ -719,7 +722,7 @@ ActiveRecord::InvalidForeignKey - SQLite3::ConstraintException: FOREIGN KEY cons
 
 Test log summary:
 
-* Calling `destroy/destroy!` on Author model (`has_many` side of relationship) instance works to delete that author *and* also destroys each of the author's books. That is, each associated book has its `before_destroy` callback invoked, and then is deleted from the database with a SQL DELETE statement.
+* Calling `destroy/destroy!` on Author model (`has_many` side of relationship) instance works to delete that author *and* also destroys each of the author's books. That is, each associated book has its `before_destroy` callback invoked, and then is deleted from the database with a SQL DELETE statement. Note that in the case of an Author with multiple Books, the books are deleted one at a time with multiple SQL DELETE statements. This is because each book also must have its callbacks invoked.
 * Calling `delete` on Author model fails on foreign key constraint for author instances that have one or more associated books. (`delete` on Author model with no books succeeds).
 * Book instances (`belongs_to` side of relationship) can be destroyed or deleted with no errors and this action only affects the book, not the related author.
 
@@ -734,7 +737,7 @@ class Book < ApplicationRecord
   belongs_to :author
   before_destroy :one_last_thing
   def one_last_thing
-    Rails.logger.warn("  Book model #{id} will be destroyed")
+    Rails.logger.warn("Book model #{id} will be destroyed")
   end
 end
 
@@ -742,7 +745,7 @@ class Author < ApplicationRecord
   has_many :books, dependent: :delete_all # causes all the associated objects to be deleted directly from the database
   before_destroy :one_last_thing
   def one_last_thing
-    Rails.logger.warn("  Author model #{id} will be destroyed")
+    Rails.logger.warn("Author model #{id} will be destroyed")
   end
 end
 ```
@@ -840,7 +843,7 @@ ActiveRecord::InvalidForeignKey - SQLite3::ConstraintException: FOREIGN KEY cons
 
 Test log summary:
 
-* Calling `destroy/destroy!` on Author model (`has_many` side of relationship) instance works to delete that author *and* also directly deletes each of the author's books. That is, each associated book will be deleted via SQL DELETE statement but will *not* have its `before_destroy` callback invoked.
+* Calling `destroy/destroy!` on Author model (`has_many` side of relationship) instance works to delete that author *and* also directly deletes each of the author's books. That is, each associated book will be deleted via SQL DELETE statement but will *not* have its `before_destroy` callback invoked. Unlike in [Scenario 2](../activerecord-dependent-options/#2-has-many-destroy) where the books were deleted one at a time, in this case, all of an author's books are deleted in a single SQL DELETE statement.
 * Calling `delete` on Author model fails on foreign key constraint for author instances that have one or more associated books.
 * Book instances (`belongs_to` side of relationship) can be destroyed or deleted with no errors and this action only affects the book, not the related author.
 
@@ -855,7 +858,7 @@ class Book < ApplicationRecord
   belongs_to :author
   before_destroy :one_last_thing
   def one_last_thing
-    Rails.logger.warn("  Book model #{id} will be destroyed")
+    Rails.logger.warn("Book model #{id} will be destroyed")
   end
 end
 
@@ -863,7 +866,7 @@ class Author < ApplicationRecord
   has_many :books, dependent: :nullify # causes the foreign key to be set to NULL
   before_destroy :one_last_thing
   def one_last_thing
-    Rails.logger.warn("  Author model #{id} will be destroyed")
+    Rails.logger.warn("Author model #{id} will be destroyed")
   end
 end
 ```
@@ -1034,7 +1037,7 @@ class Book < ApplicationRecord
   belongs_to :author
   before_destroy :one_last_thing
   def one_last_thing
-    Rails.logger.warn("  Book model #{id} will be destroyed")
+    Rails.logger.warn("Book model #{id} will be destroyed")
   end
 end
 
@@ -1042,7 +1045,7 @@ class Author < ApplicationRecord
   has_many :books, dependent: :restrict_with_exception # ActiveRecord::DeleteRestrictionError exception raised if there are any associated records
   before_destroy :one_last_thing
   def one_last_thing
-    Rails.logger.warn("  Author model #{id} will be destroyed")
+    Rails.logger.warn("Author model #{id} will be destroyed")
   end
 end
 ```
@@ -1153,7 +1156,7 @@ class Book < ApplicationRecord
   belongs_to :author, dependent: :destroy # when the object is destroyed, destroy will be called on its associated objects
   before_destroy :one_last_thing
   def one_last_thing
-    Rails.logger.warn("  Book model #{id} will be destroyed")
+    Rails.logger.warn("Book model #{id} will be destroyed")
   end
 end
 
@@ -1161,7 +1164,7 @@ class Author < ApplicationRecord
   has_many :books
   before_destroy :one_last_thing
   def one_last_thing
-    Rails.logger.warn("  Author model #{id} will be destroyed")
+    Rails.logger.warn("Author model #{id} will be destroyed")
   end
 end
 ```
@@ -1328,7 +1331,7 @@ class Book < ApplicationRecord
   belongs_to :author, dependent: :destroy # when the object is destroyed, destroy will be called on its associated objects
   before_destroy :one_last_thing
   def one_last_thing
-    Rails.logger.warn("  Book model #{id} will be destroyed")
+    Rails.logger.warn("Book model #{id} will be destroyed")
   end
 end
 
@@ -1336,7 +1339,7 @@ class Author < ApplicationRecord
   has_many :books, dependent: :destroy # causes all the associated objects to also be destroyed
   before_destroy :one_last_thing
   def one_last_thing
-    Rails.logger.warn("  Author model #{id} will be destroyed")
+    Rails.logger.warn("Author model #{id} will be destroyed")
   end
 end
 ```
@@ -1464,7 +1467,7 @@ class Book < ApplicationRecord
   belongs_to :author, dependent: :destroy # when the object is destroyed, destroy will be called on its associated objects
   before_destroy :one_last_thing
   def one_last_thing
-    Rails.logger.warn("  Book model #{id} will be destroyed")
+    Rails.logger.warn("Book model #{id} will be destroyed")
   end
 end
 
@@ -1472,7 +1475,7 @@ class Author < ApplicationRecord
   has_many :books, dependent: :delete_all # causes all associated objects to be deleted directly from the database
   before_destroy :one_last_thing
   def one_last_thing
-    Rails.logger.warn("  Author model #{id} will be destroyed")
+    Rails.logger.warn("Author model #{id} will be destroyed")
   end
 end
 ```
@@ -1594,7 +1597,7 @@ class Book < ApplicationRecord
   belongs_to :author, dependent: :destroy # when the object is destroyed, destroy will be called on its associated objects
   before_destroy :one_last_thing
   def one_last_thing
-    Rails.logger.warn("  Book model #{id} will be destroyed")
+    Rails.logger.warn("Book model #{id} will be destroyed")
   end
 end
 
@@ -1602,7 +1605,7 @@ class Author < ApplicationRecord
   has_many :books, dependent: :nullify # causes the foreign key to be set to NULL
   before_destroy :one_last_thing
   def one_last_thing
-    Rails.logger.warn("  Author model #{id} will be destroyed")
+    Rails.logger.warn("Author model #{id} will be destroyed")
   end
 end
 ```
@@ -1740,7 +1743,7 @@ class Book < ApplicationRecord
   belongs_to :author, dependent: :destroy # when the object is destroyed, destroy will be called on its associated objects
   before_destroy :one_last_thing
   def one_last_thing
-    Rails.logger.warn("  Book model #{id} will be destroyed")
+    Rails.logger.warn("Book model #{id} will be destroyed")
   end
 end
 
@@ -1748,7 +1751,7 @@ class Author < ApplicationRecord
   has_many :books, dependent: :restrict_with_exception # ActiveRecord::DeleteRestrictionError exception raised if there are any associated records
   before_destroy :one_last_thing
   def one_last_thing
-    Rails.logger.warn("  Author model #{id} will be destroyed")
+    Rails.logger.warn("Author model #{id} will be destroyed")
   end
 end
 ```
@@ -1867,7 +1870,7 @@ class Book < ApplicationRecord
   belongs_to :author, dependent: :delete # when the object is destroyed, all its associated objects will be deleted directly from the database
   before_destroy :one_last_thing
   def one_last_thing
-    Rails.logger.warn("  Book model #{id} will be destroyed")
+    Rails.logger.warn("Book model #{id} will be destroyed")
   end
 end
 
@@ -1875,7 +1878,7 @@ class Author < ApplicationRecord
   has_many :books
   before_destroy :one_last_thing
   def one_last_thing
-    Rails.logger.warn("  Author model #{id} will be destroyed")
+    Rails.logger.warn("Author model #{id} will be destroyed")
   end
 end
 ```
@@ -1992,7 +1995,7 @@ class Book < ApplicationRecord
   belongs_to :author, dependent: :delete # when the object is destroyed, all its associated objects will be deleted directly from the database
   before_destroy :one_last_thing
   def one_last_thing
-    Rails.logger.warn("  Book model #{id} will be destroyed")
+    Rails.logger.warn("Book model #{id} will be destroyed")
   end
 end
 
@@ -2000,7 +2003,7 @@ class Author < ApplicationRecord
   has_many :books, dependent: :destroy # causes all the associated objects to also be destroyed
   before_destroy :one_last_thing
   def one_last_thing
-    Rails.logger.warn("  Author model #{id} will be destroyed")
+    Rails.logger.warn("Author model #{id} will be destroyed")
   end
 end
 ```
@@ -2126,7 +2129,7 @@ class Book < ApplicationRecord
   belongs_to :author, dependent: :delete # when the object is destroyed, all its associated objects will be deleted directly from the database
   before_destroy :one_last_thing
   def one_last_thing
-    Rails.logger.warn("  Book model #{id} will be destroyed")
+    Rails.logger.warn("Book model #{id} will be destroyed")
   end
 end
 
@@ -2134,7 +2137,7 @@ class Author < ApplicationRecord
   has_many :books, dependent: :delete_all # causes all the associated objects to be deleted directly from the database
   before_destroy :one_last_thing
   def one_last_thing
-    Rails.logger.warn("  Author model #{id} will be destroyed")
+    Rails.logger.warn("Author model #{id} will be destroyed")
   end
 end
 ```
@@ -2256,7 +2259,7 @@ class Book < ApplicationRecord
   belongs_to :author, dependent: :delete # when the object is destroyed, all its associated objects will be deleted directly from the database
   before_destroy :one_last_thing
   def one_last_thing
-    Rails.logger.warn("  Book model #{id} will be destroyed")
+    Rails.logger.warn("Book model #{id} will be destroyed")
   end
 end
 
@@ -2264,7 +2267,7 @@ class Author < ApplicationRecord
   has_many :books, dependent: :nullify # causes the foreign key to be set to NULL
   before_destroy :one_last_thing
   def one_last_thing
-    Rails.logger.warn("  Author model #{id} will be destroyed")
+    Rails.logger.warn("Author model #{id} will be destroyed")
   end
 end
 ```
@@ -2403,7 +2406,7 @@ class Book < ApplicationRecord
   belongs_to :author, dependent: :delete # when the object is destroyed, all its associated objects will be deleted directly from the database
   before_destroy :one_last_thing
   def one_last_thing
-    Rails.logger.warn("  Book model #{id} will be destroyed")
+    Rails.logger.warn("Book model #{id} will be destroyed")
   end
 end
 
@@ -2411,7 +2414,7 @@ class Author < ApplicationRecord
   has_many :books, dependent: :restrict_with_exception # ActiveRecord::DeleteRestrictionError exception raised if there are any associated records
   before_destroy :one_last_thing
   def one_last_thing
-    Rails.logger.warn("  Author model #{id} will be destroyed")
+    Rails.logger.warn("Author model #{id} will be destroyed")
   end
 end
 ```
@@ -2527,6 +2530,10 @@ The answer, as in nearly all things tech is... it depends. Firstly, it depends o
 
 But what about the customer's orders, would removing those affect reporting and financial systems? How about any product reviews the customer may have written? This might be a good use case for allowing nullable foreign keys and using `has_many: product_reviews, dependent: :nullify` if the review content is considered the company's content, not the customers. All these questions need to be answered.
 
+### Performance
+
+Both `dependent: :destroy` and `dependent: :delete_all` on the has_many side will perform a cascade style delete. But the `:destroy` option will execute multiple SQL DELETE statements, one for each associated model to be removed because its callbacks are also being invoked. Whereas the `:delete_all` option will remove all associated models in a single SQL DELETE statement. If the parent model is expected to have a lot of children, using `:destroy` could be noticeably slower than `:delete_all`. If the callbacks absolutely have to be executed, consider the `:destroy_async` option.
+
 ### Surprises
 
 Another factor to consider is the [principle of least surprise](https://en.wikipedia.org/wiki/Principle_of_least_astonishment). For example, the combination of `dependent: :destroy` on the belongs_to side and `dependent: :nullify` on the has_many side results in siblings having their foreign key references set to nil when one of them is destroyed. We saw this in [Scenario 9](activerecord-dependent-options/#9-belongs-to-destroy-has-many-nullify) where having nullify on the has_many side causes the `belongs_to: :destroy` to go from a book, up to its author for removal, and then back to all the other books to nullify their author_id foreign keys.
@@ -2547,14 +2554,8 @@ Consider the advice in the Rails Guides, specifically the warning not to use `de
 
 ### Removal Method
 
-A final thing to be aware of is when using any of the dependent options to affect related entities: This behaviour only kicks in when invoking the `destroy` or `destroy!` methods on the model instance. The `delete` method only invokes direct SQL on the model on which it is called and does not attempt to affect any of its relationships.
+A final thing to be aware of is when using any of the dependent options to affect related entities: This behaviour only kicks in when invoking the `destroy` or `destroy!` methods on the model instance. The `delete` method only invokes direct SQL on the model on which it is called and does not attempt to affect any of its associations.
 
 ## Conclusion
 
 This post has used [exploratory tests](https://github.com/danielabar/learn-associations) to understand how ActiveRecord dependent options function in a one to many relationship to remove (or fail to remove) records from the database when used only on one, or both sides of the relationship. It has also explored differences in the `delete` vs `destroy` methods. It then covered some factors to consider in choosing which dependent option(s) to use.
-
-## TODO
-
-* Mention not considering async/job options since activejob not enabled on this simple project
-* Nice to have: change margin-bottom amount on detail/summary element depending on open/closed state.
-* Remove cursor pointer style from log output
