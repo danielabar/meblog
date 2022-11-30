@@ -52,7 +52,7 @@ Before moving on with troubleshooting, there's a command you can run to reset th
 
 ```bash
 # Rails 5+
-bundle exec rails db:reset RAILS_ENV=test
+bin/rails db:reset RAILS_ENV=test
 
 # Older versions
 bundle exec rake db:reset RAILS_ENV=test
