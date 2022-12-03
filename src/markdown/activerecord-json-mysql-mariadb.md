@@ -54,7 +54,7 @@ orange
 But when the same code runs in a deployed environment that is using MariaDB, an error results:
 
 ```
-NoMethodError (undefined method `each' for "[\"apple\", \"orange\"]":String)
+undefined method `each' for "[\"apple\", \"orange\"]":String (NoMethodError)
 ```
 
 ## Contents of JSON Column
@@ -118,10 +118,37 @@ According to the MariaDB [docs](https://mariadb.com/kb/en/json-data-type/), this
 
 > JSON is an alias for LONGTEXT introduced for compatibility reasons with MySQL's JSON data type. MariaDB implements this as a LONGTEXT rather, as the JSON data type contradicts the SQL standard... In order to ensure that a a valid json document is inserted, the JSON_VALID function can be used as a CHECK constraint. This constraint is automatically included for types using the JSON alias from MariaDB 10.4.3.
 
+## Short Term Solution
+
+In the short term, we have a situation where developer's laptops are using MySQL which will return an Array from the JSON column (given that we're only inserting array values and an appropriate JSON validator is in place). But when the same code runs in production, a String is returned.
+
+Without changing any setup, a solution to this is to override the ActiveRecord attribute method for the JSON field `fav_fruits`, and  use the [read_attribute](https://api.rubyonrails.org/classes/ActiveRecord/AttributeMethods/Read.html#method-i-read_attribute) method from the `ActiveRecord::AttributeMethods::Read` module to retrieve the value, and convert as needed.
+
+```ruby
+def fav_fruits
+  # Retrieve the typecast value of fav_fruits from the database, which could be:
+  #   1. nil
+  #   2. String
+  #   3. Array
+  days = read_attribute(:fav_fruits)
+
+  # 1. Not allowed to have default not null value on json column, return empty array in this case.
+  return [] if days.blank?
+
+  # 2. MariaDB: If a String is found, convert to JSON.
+  return JSON.parse(days) if days.is_a?(String)
+
+  # 3. MySQL: Otherwise, return the original value.
+  days
+end
+```
+
+Now, anywhere in the code that `user.fav_fruits` is used, it's guaranteed to always return an Array.
+
 ## TODO
 
-* Solution: short term (read_attributes), long term (update local to use exact same db as prod)
+* Solution: long term (update local to use exact same db as prod)
 * Optionally but not really in scope: show JSON array validator?
 * Feature image
 * Related posts (enum)
-* Try to scaffold a Rails project with MariaDB Docker container
+* Link to reference repo demonstrating Rails project with MariaDB and a JSON column: https://github.com/danielabar/maria
