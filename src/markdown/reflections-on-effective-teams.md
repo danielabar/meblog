@@ -10,11 +10,17 @@ related:
   - "About Those Docs"
 ---
 
-I was inspired to write this post after listening to a Software Engineering Radio podcast with guest Jon Smart on the subject of [Patterns and Anti-Patterns for Successful Software Delivery](https://www.se-radio.net/2022/12/episode-543-jon-smart-on-patterns-and-anti-patterns-for-successful-software-delivery-in-enterprises/). He discusses why "Agile Transformation" is an anti-pattern, the importance of focusing on outcomes rather than outputs and avoiding one-size-fits-all solutions. He says the goal shouldn't be to "do agile", but rather introduces a new language of better (quality), sooner (time to value), safer (agile not fragile), and happier (customers, colleagues, citizens, clients).
+I was inspired to write this post after listening to a Software Engineering Radio podcast with guest Jon Smart on the subject of [Patterns and Anti-Patterns for Successful Software Delivery](https://www.se-radio.net/2022/12/episode-543-jon-smart-on-patterns-and-anti-patterns-for-successful-software-delivery-in-enterprises/). He discusses why "Agile Transformation" is an anti-pattern, the importance of focusing on outcomes rather than outputs, and avoiding one-size-fits-all solutions. He says the goal shouldn't be to "do agile", but rather introduces a new language of better (quality), sooner (time to value), safer (agile not fragile), and happier (customers, colleagues, citizens, clients).
 
 Listening to this podcast made me reflect on my 20 years experience of software development on various project and product teams across different sized companies and industries in terms of what practices have made some teams more effective than others. In this post, I'll share practices I've experienced that have made teams effective.
 
-But first, what do I mean by an effective team? My definition of this term is a team that can continuously delivery working software that solves their customers problems, keeping the customers happy to keep on paying for the service, and even telling their friends and colleagues about the service. Furthermore, the delivery of subsequent releases introduces little to no [regressions](https://en.wikipedia.org/wiki/Software_regression). Equally important, an effective team consists of team members who feel satisfied and fulfilled in their work and reasonably look forward to starting work each day.
+## Definition
+
+But first, what do I mean by an effective team? My definition of this term is a team that can continuously deliver working software that solves their customers problems, keeping the customers happy to keep on paying for the service, and spreading the good word.
+
+The delivery of each release introduces little to no [regressions](https://en.wikipedia.org/wiki/Software_regression).
+
+Equally important, an effective team consists of team members who can communicate well with each other, feel satisfied and fulfilled in their work, and reasonably look forward to starting work each day.
 
 Now that the definition is out of the way, the rest of this post will cover qualities that make effective teams.
 
@@ -26,16 +32,17 @@ An effective team will have a PM that has a strong sense of product direction an
 
 Sometimes the product direction is not entirely clear. The company could be dealing with unknowns and engaging in research and experiments to determine market fit. A team can still be effective in this case if its communicated clearly to all team members that they're dealing with unknowns. In this environment, people are encouraged to think creatively of potential solutions and to try things out, with the understanding that many features may not stick and have to be rolled back. i.e. no one is blamed if something doesn't work out because it all contributes to increased understanding.
 
-The only style of product I've seen be ineffective is when there are a lot of unknowns, but the PM (or key business decision makers) doesn't seem to be aware of this. In this case, when developers ask clarifying questions, the answers are still vague. Then developers will make their best guess. When the feature is delivered, its not what anyone expected, but no one can exactly explain why. This can lead to finger pointing where product blames developers for not meeting requirements and developers in turn saying the requirements weren't clear. This leads to constant frustration, stress and high turnover.
+The only style of product I've seen be ineffective is when there are a lot of unknowns, but the PM (or key business decision makers) doesn't seem to be aware that they don't know. In this case, when developers ask clarifying questions, the answers are still vague. Then developers will make their best guess. When the feature is delivered, its not what anyone expected, but no one can exactly explain why. This can lead to finger pointing where product blames developers for not meeting requirements and developers in turn saying the requirements weren't clear. This leads to constant frustration, stress and high turnover.
 
 ## Spirit of Agile
 
-An effective team keeps the spirit of agile alive, while not burying themselves under needless ceremonies and process. In my experience, this means keeping a focus on getting things done using a flow approach rather than a rigid methodology like Scrum. There does need to be some process, i.e. every day should not feel like a hack-a-thon, but it should not be a burden and should not be disrupting developer flow with constant meetings. This process could include:
+An effective team keeps the spirit of agile alive, while not burying themselves under needless ceremonies and process. In my experience, this means keeping a focus on getting things done using a flow approach rather than a rigid methodology like Scrum.
 
-* Breaking up large requirements into smaller features and entering these into a ticketing system to keep track of the work to be done.
+There does need to be some process to avoid chaos, i.e. every day should not feel like a hack-a-thon, but it should not be a burden and should not be disrupting developer flow with constant meetings. This process could include:
+
+* Breaking up large requirements into smaller features and entering these into a ticketing system to keep track of the work to be done. Ticket descriptions can point to Wiki documents with detailed requirements such as business rules and why the feature is being developed.
 * Identifying dependencies between tickets and those that can be done in parallel (to support multiple team members being able to work on a feature at the same time).
-* Each ticket can have a high level description with a pointer to a document in the company's Wiki with further details. These details would include the business rules and why this feature is being done.
-* TODO list is kept in priority order in the ticketing system.
+* The ticket list is kept is maintained in priority order so that everyone knows what's important without having to constantly ask the PM "What should I work on?".
 * Developers pick up tickets by assigning the most important item in the list to themselves and starting a feature branch in version control with the ticket number and brief description in the branch name.
 * Developers include the ticket number in each commit message.
 * All code has automated tests at the appropriate level (from unit to end-to-end).
@@ -45,7 +52,7 @@ An effective team keeps the spirit of agile alive, while not burying themselves 
 * Developers submit PRs when their feature is ready for review, with instructions to reviewer how to exercise the code.
 * Developers address feedback on their PRs, and when approved merge.
 * If CI passes on the merge commit, CD (Continuous Deployment) kicks in and automatically deploys the code to production.
-* Developers can pick up next most important item, rinse and repeat.
+* Developers pick up next most important item, rinse and repeat.
 
 
 ## Culture of Writing
