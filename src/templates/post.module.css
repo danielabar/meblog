@@ -143,6 +143,10 @@
   content: "markdown";
 }
 
+.content pre[data-language="makefile"]::before {
+  content: "makefile";
+}
+
 .content pre[data-language="sql"]::before {
   content: "sql";
 }
