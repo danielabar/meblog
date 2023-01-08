@@ -12,7 +12,7 @@ related:
 
 I was inspired to write this post after listening to a Software Engineering Radio podcast with guest Jon Smart on the subject of [Patterns and Anti-Patterns for Successful Software Delivery](https://www.se-radio.net/2022/12/episode-543-jon-smart-on-patterns-and-anti-patterns-for-successful-software-delivery-in-enterprises/). He discusses why "Agile Transformation" is an anti-pattern, the importance of focusing on outcomes rather than outputs, and avoiding one-size-fits-all solutions. He says the goal shouldn't be to "do agile", but rather introduces a new language of better (quality), sooner (time to value), safer (agile not fragile), and happier (customers, colleagues, citizens, clients).
 
-Listening to this podcast made me reflect on my 20 years experience of software development on various project and product teams across different sized companies and industries in terms of what practices have made some teams more effective than others. In this post, I'll share practices I've experienced that have made teams effective.
+Listening to this podcast made me reflect on my many years experience of software development on various project and product teams across different sized companies and industries in terms of what practices have made some teams more effective than others. In this post, I'll share practices I've experienced that have made teams effective.
 
 ## Definition
 
@@ -36,7 +36,7 @@ The only style of product I've seen be ineffective is when there are a lot of un
 
 ## Minimal Process
 
-An effective team keeps the spirit of [agile](https://agilemanifesto.org/principles.html) alive, while not burying themselves under needless ceremonies and process. In my experience, this means keeping a focus on getting things done using a flow approach rather than a rigid methodology like Scrum.
+An effective team keeps the spirit of [agile](https://agilemanifesto.org/principles.html) alive, while not burying themselves under needless ceremonies and process. In my experience, this means keeping a focus on getting things done using a flow approach rather than a rigid methodology like Scrum. A small(ish) team of intrinsically motivated people with solid written communication skills and autonomy over the entire stack can get a lot done with a minimum of process and meetings.
 
 There does need to be some process to avoid chaos, i.e. every day should not feel like a hack-a-thon, but it should not be a burden and should not be disrupting developer flow with regular meetings. This process could include:
 
@@ -52,7 +52,7 @@ There does need to be some process to avoid chaos, i.e. every day should not fee
 * Developers pick up next most important item, rinse and repeat.
 
 <aside class="markdown-aside">
-There's been a lot said about ticketing systems being four letter words and all that. It doesn't need to be this way. The ticketing system is simply a communication tool to help teams know what needs to be done and what's most important. It's not intended as a management tool to measure developers performance or to make developers spend any more time in it than necessary. Ideally the ticketing system is fully integrated with version control so that ticket status changes such as In Progress, In Review, and Done are applied automatically.
+There's been a lot said about ticketing systems being four letter words and all that. It doesn't need to be this way. The ticketing system is simply a communication tool to help teams know what needs to be done and what's most important. It's not intended as a management tool to measure developers performance or to make developers spend any more time in it than necessary. Ideally the ticketing system is fully integrated with version control so that ticket status changes such as In Progress, In Review, and Done are applied automatically as developers start pushing to branches, submit PRs, and merge.
 </aside>
 
 ## Culture of Writing
@@ -61,35 +61,58 @@ An effective team develops a culture of writing, both on the business and techni
 
 On the business side, writing is used to capture the requirements and business rules, and also the *why* behind these. This could be tied to improved revenue generation or user experience. I've found its helpful for developers that are implementing the requirements to understand why a feature is being built a certain way.
 
-On the technical side, [writing](../about-those-docs#what-to-document) is used to capture architectural proposals and decisions, project setup, common workflows through the application, troubleshooting tips, third party integrations, configuration, how to do deployments, how to exercise new code being added in a pull request, and anything else that helps developers onboard to a project.
+On the technical side, [writing](../about-those-docs#what-to-document) is used to share knowledge and expertise to level up all team members, current and future. This includes architectural proposals and decisions, project setup, common workflows through the application, troubleshooting tips, third party integrations, configuration, how to do deployments, how to exercise new code being added in a pull request, and anything else that helps developers understand how the project works.
 
-These written documents are not intended as contracts where people can finger point later if something is not working. Rather, they are living documents to support collaboration, and are updated as questions and new information arises. Which leads me to...
-
-This is one place where I differ from one of the Agile Manifesto principles which states:
+These written documents are not intended as contracts where people can finger point later if something is not working. Rather, they are living documents owned by the entire team. They support collaboration and team continuity, and are updated as questions and new information arises. Here is where I differ from one of the Agile Manifesto principles which states:
 
 > The most efficient and effective method of conveying information to and within a development team is face-to-face conversation.
 
 Relying primarily on face-to-face conversations:
 
-* Results in a lot of scheduled or impromptu meetings that interrupting flow state.
+* Results in a lot of scheduled or impromptu meetings that interrupt flow state.
 * Requires co-incidence that everyone required to make a decision happens to be online at the same time. What if someone's out sick, vacation, appointment, works in a different timezone etc.
 * Relies on people having perfect memories of what was discussed and decided in the conversation.
 * Assumes that the best way to get people's input into decisions is via realtime conversation - this can result in "off the cuff" remarks that upon deeper technical analysis, may not turn out to be optimal.
 * Can be prone to [loudest voice in the room](https://www.linkedin.com/pulse/loudest-voice-room-hisako-esaki/) effect where the more dominant personalities assert their opinions, and the quieter types that may have differing opinions don't feel comfortable challenging it or can't get a word in.
+* Results in a lot of knowledge that only lives in people's heads, and gets lost as people leave.
 
-WIP:
+Using written communication can improve team effectiveness by:
 
-Using written communication can improve team effectiveness:
+* Minimizing interruptions - developers can review proposals or questions others may have when its an optimal time for them.
+* Asynchronous nature of responding to written communication means the team can be distributed and can still function even when people have different schedules or personal matters to attend to. i.e. work can revolve around life rather than life needing to revolve around work.
+* Leaves a written artifact of discussions and decisions. No more "What was that we decided in the meeting last week?" or "Why was tool X over Y chosen to solve this problem?".
+* Captures everyone's feedback because everyone has an opportunity to contribute to a shared document or via comments.
+* Contributes to a shared understanding, not just the current team members, but future team members. i.e. as the usual churn of tech workers coming and going happens, the project can still continue smoothly because important decisions have been captured in writing.
 
-...
+## Meetings
 
-This is not to suggest that face-to-face conversations are never needed...
+The previous section on writing is not to suggest that face-to-face conversations are never needed. There could be a tricky issue that's gone back and forth in comments in a document or PR and isn't getting resolved. Or some people think better "out loud" and sometimes need to bounce ideas off a few other people. An effective team will support all types of thinkers. So if a meeting is needed, here's how to get the most out of the precious time:
+
+* Make it brief. Set the default meeting time to 30 minutes in whatever calendar/scheduling tool the company is using. If you think you'll need longer, bump it up to 45 minutes, but try not to go over an hour. In my experience, people lose their focus beyond this, and if the issue hasn't been resolved in an hour, dragging it on any longer doesn't help.
+* Limit the required attendees. For example, if two people are having a strong difference of opinion over a technical proposal, only those two, plus maybe the team lead or manager should be required. Other team members can be marked as optional. It's not always the case that every team member has a strong opinion, for these folks, not interrupting them and letting them get on with their work may be best.
+* Include a goal in the meeting description. This is different from an agenda, which is simply a list of items to be discussed. You could have a list of points that even after discussion, doesn't move the team forward. A goal on the other hand is very specific. For example: "At the end of this meeting, we will have a decision on whether we will be using either RabbitMQ or Kafka for messaging". Or "The purpose of this meeting is to finalize the design for the search results page". The meeting description should include pointers to documents/discussion that has happened prior, so all attendees can be fully up to speed before the meeting starts. In the case of a technical decision, this could be a link to an [ADR](../about-those-docs/#architecture-decision-records) and/or related PR comments. In the case of a UI/UX decision, it could be pointers to the Figma document (or whatever design tool is being used).
+* Update the referenced documents during the meeting as decision(s) are being made. This way there's no issue of forgetting what was decided or having to be a secretary later transcribing what people said.
+* At the conclusion of the meeting, share/publish the decision to make it visible to the entire team.
 
 ## Small-ish Team Size
 
+Over the years, I have found the optimal team size to be anywhere from 2 - 4, maybe upwards of 5 developers, plus a PM and designer.
+
+This varies with the size of the code base. The idea is to allow a developer to complete a feature without getting into constant merge conflicts or co-ordination with another developer because they're both working in the same area.
+
+It can be tempting to add more developers to a project thinking that productivity will improve nearly linearly. For example if one developer can complete one feature per week, then adding 9 more developers will result in 8 or 9 features completed per week. This is more likely to result in people stepping on each other's toes or spending the majority of their time in meetings trying to co-ordinate.
+
+The idea here is to minimize the lines of communication. As the team size grows, the number of lines of communication increase, which means each individual will have to spend more time in communication activities, rather than hands-on building software.
+
 ## Do the Simplest Thing That Works
 
+An effective team chooses relatively simple solutions that get the job done, while not painting themselves into a corner. This often means starting with a monolith rather than microservices.
+
+avoid over engineering, not to paint oneself in a corner, but don't build in flexibility when not sure that it will be needed. When the new requirements come in, they may need flexibility in a different direction, resulting in unused complexity in the code...
+
 ## Vertical Development
+
+aka fullstack, minimize friction...
 
 ## Automation
 
@@ -106,7 +129,10 @@ I would add: Not just feeling safe to ask questions and challenge authority, but
 Not assigning blame when something goes wrong, but looking to the process and how it can be improved to avoid this kind of error in the future.
 
 ## TODO
+* Make the meetings points level 3 sub-sections
+* Lines of communication reference re: team size
 * Caveat - based on my experience, of course there are many more teams and companies I haven’t worked at that may have different lessons learned, your mileage may vary
 * Where does effective communication (between engineers and between engineers and product) fit in?
-* Does this fit somewhere? Focus on writing differs from original Agile Manifesto that emphasizes face-to-face conversations. The purpose of writing isn't to define a formal contract, rather, its to support product continuity in a world where tech workers come and go frequently. Relying primarily on face-to-face conversations generates a lot of institutional knowledge that only lives in peoples heads and is lost when people leave. Also it can be forgotten unless someone is willing to take on the role of secretary to diligently document the results of every single conversation.
 * Traceability: Eg: Jira ticket can either have the requirements, or just high level and point to a Wiki/Confluence doc with more details. Every Git commit and PR should reference ticket number. Then future developers that are maintaining code can git blame, find the jira ticket, then find the detailed requirements to fully understand why the current code behaves as it does. They can also find the PR which should contain instructions about how to exercise that feature.
+* Rotate developers across different areas to spread knowledge, reduce lottery count
+* Dedicate some % of time to KTLO
