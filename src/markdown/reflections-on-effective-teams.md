@@ -28,7 +28,7 @@ Now that the definition is out of the way, the rest of this post will cover qual
 
 An effective team starts with good product direction. The role of the person(s) that define this has changed names over the years, from Business Analyst, to Product Manager or Product Owner. I'll just refer to it as PM.
 
-An effective team will have a PM that has a strong sense of product direction and can express clearly how different areas of the product should work and why. These features should be driven by what will solve the customers problems, ultimately generating revenue. The PM should also expect clarifying questions from engineers and consistently update written requirements to reflect those clarifications. This way all team members current *and* future can gain an understanding of why the product works the way it does.
+An effective team will have a PM that has a strong sense of product direction and can express clearly how different areas of the product should work and why. These features should be driven by what will solve the customers problems, ultimately generating revenue. The PM should also expect clarifying questions from engineers and consistently update written requirements to reflect those clarifications (more on writing later in this post). This way all team members current *and* future can gain an understanding of why the product works the way it does.
 
 Sometimes the product direction is not entirely clear. The company could be dealing with unknowns and engaging in research and experiments to determine market fit. A team can still be effective in this case if it's communicated clearly to all team members that they're dealing with unknowns. In this environment, people are encouraged to think creatively of potential solutions and to try things out, with the understanding that many features may not stick and have to be rolled back. i.e. no one is blamed if something doesn't work out because it all contributes to increased understanding.
 
@@ -96,19 +96,27 @@ The previous section on writing is not to suggest that face-to-face conversation
 
 ## Small-ish Team Size
 
-Over the years, I have found the optimal team size to be anywhere from 2 - 4, maybe upwards of 5 developers, plus a PM and designer.
+Over the years, I have found the optimal team size to be on the small end, ranging from 2 - 4 developers, plus a PM and designer. The reason for this is it limits the number of [lines of communication](https://www.leadingagile.com/2018/02/lines-of-communication-team-size-applying-brooks-law/) within the team. Here is a useful diagram from that blog post to illustrate the issue:
 
-This varies with the size of the code base. The idea is to allow a developer to complete a feature without getting into constant merge conflicts or co-ordination with another developer because they're both working in the same area.
+![lines of communication and team size](../images/lines-of-communication-teams-size.webp "lines of communication and team size")
 
-It can be tempting to add more developers to a project thinking that productivity will improve nearly linearly. For example if one developer can complete one feature per week, then adding 9 more developers will result in 8 or 9 features completed per week. This is more likely to result in people stepping on each other's toes or spending the majority of their time in meetings trying to co-ordinate.
+If the team has 2 developers, a PM, and a designer, that's a total size of 4, resulting in 6 lines of communication, which is manageable. Bumping this up to 4 developers results in a total team size of 6, which leads to 15 lines of communication. I feel like that's pushing at the maximum of what a team can manage and still be effective.
 
-The idea here is to minimize the lines of communication. As the team size grows, the number of lines of communication increase, which means each individual will have to spend more time in communication activities, rather than hands-on building software.
+It can be tempting to add more developers to a project thinking that productivity will improve linearly. For example if one developer can complete one feature per week, then adding 9 more developers will result in 9 features completed per week. But it never works out this way. What's more likely is people end up stepping on each other's toes attempting to modify the same area of the code for different reasons, or spending the majority of their time in meetings trying to co-ordinate rather than hands-on building software. This is explained by [Brook's Law](https://en.wikipedia.org/wiki/Brooks%27s_law) which observes that adding people to a software project that is behind schedule delays it even longer.
+
+There's a little more nuance here in that it varies with the surface area of the project. A large project could in theory support a few more developers, if the areas that need to be developed in parallel are all independent of each other. On the other hand, even if the project is large, if the majority of development tends to occur in one area, then keep the team size small.
 
 ## Do the Simplest Thing That Works
 
-An effective team chooses relatively simple solutions that get the job done, while not painting themselves into a corner. This often means starting with a monolith rather than microservices.
+I learned this motto from a company I worked at earlier in my career and the advice has served me well.
 
-avoid over engineering, not to paint oneself in a corner, but don't build in flexibility when not sure that it will be needed. When the new requirements come in, they may need flexibility in a different direction, resulting in unused complexity in the code...
+An effective team chooses relatively simple solutions that get the job done, while not painting themselves into a corner. The idea here is to value maintainability and ease of deployment over cleverness or attempting a "big tech" scale architecture from day one of the project. While its nice to think that in the future the project will be so popular it needs to support millions, or even billions of simultaneous users, the reality is, most projects don't get to Meta/Alphabet/Amazon scale.
+
+This often means starting with a monolith rather than microservices. It can always be split up later *if* transaction volumes and revenue generated from these justifies that. And even then, you would want to measure and identify where the performance bottlenecks are, and come up with optimal solutions to address those directly. For example, if incoming requests are receiving errors due to running out of database connections, splitting up into microservices may not resolve the underlying issue. Instead investigate - is connection pooling being used? Is there a memory leak where some code is always opening, then forgetting to close a connection? Is there some work that could be moved to a background task manager to reduce the length of time needed to service a request? If many requests are read-only could increasing the number of database replicas help? For reads and writes, could consider [horizontal scaling](https://dzone.com/articles/how-to-horizontally-scale-your-postgres-database-using-citus) of database. Notice these investigations are going from simplest to most complex.
+
+Avoid over-engineering, i.e. building in abstractions and flexibility unless its known to be needed. Otherwise what can happen is this flexibility is never needed, but when future requirements come in, they need to "flex" in a different direction, resulting in overly complex code.
+
+Avoid premature optimization. For example, writing harder to understand code that shaves microseconds of performance over more straightforward code. Developers spend more of their time reading code others wrote rather than writing net new code so legibility and avoiding second takes is often more valuable than a few microseconds that some obscurely written code saves. An exception to this is a real-time system in which those microseconds are a competitive advantage, such as a trading system. In this case, this is a good place to add code comments explaining what this code does, and more importantly *why* this code is needed. In my experience, performance issues have been caused more frequently by missing database indices, N+1 queries, and loading too much JavaScript, especially intrusive trackers and advertising.
 
 ## Vertical Development
 
@@ -136,3 +144,5 @@ Not assigning blame when something goes wrong, but looking to the process and ho
 * Traceability: Eg: Jira ticket can either have the requirements, or just high level and point to a Wiki/Confluence doc with more details. Every Git commit and PR should reference ticket number. Then future developers that are maintaining code can git blame, find the jira ticket, then find the detailed requirements to fully understand why the current code behaves as it does. They can also find the PR which should contain instructions about how to exercise that feature.
 * Rotate developers across different areas to spread knowledge, reduce lottery count
 * Dedicate some % of time to KTLO
+* Edit feature image
+* Reduce lines of communication img size

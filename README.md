@@ -82,6 +82,12 @@ To a specific section (within same or other post):
 [post template](../gatsby-related-posts#post-template)
 ```
 
+Image in src/images:
+
+```markdown
+![image alt text](../images/image-file-name.png "image description")
+```
+
 ### References
 
 - [Gatsby Unit Testing](https://www.gatsbyjs.com/docs/how-to/testing/unit-testing/)
