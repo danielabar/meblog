@@ -100,7 +100,7 @@ Over the years, I have found the optimal team size to be on the small end, rangi
 
 ![lines of communication and team size](../images/lines-of-communication-teams-size.webp "lines of communication and team size")
 
-If the team has 2 developers, a PM, and a designer, that's a total size of 4, resulting in 6 lines of communication, which is manageable. Bumping this up to 4 developers results in a total team size of 6, which leads to 15 lines of communication. I feel like that's pushing at the maximum of what a team can manage and still be effective.
+If the team has 2 developers, a PM, and a designer, that's a total size of 4, resulting in 6 lines of communication, which is manageable. Bumping this up to 4 developers results in a total team size of 6, which leads to 15 lines of communication. That's pushing at the maximum of what a team can manage and still be effective.
 
 It can be tempting to add more developers to a project thinking that productivity will improve linearly. For example if one developer can complete one feature per week, then adding 9 more developers will result in 9 features completed per week. But it never works out this way. What's more likely is people end up stepping on each other's toes attempting to modify the same area of the code for different reasons, or spending the majority of their time in meetings trying to co-ordinate rather than hands-on building software. This is explained by [Brook's Law](https://en.wikipedia.org/wiki/Brooks%27s_law) which observes that adding people to a software project that is behind schedule delays it even longer.
 
@@ -118,7 +118,7 @@ Avoid over-engineering, i.e. building in abstractions and flexibility unless its
 
 Avoid premature optimization. For example, writing harder to understand code that shaves microseconds of performance over more straightforward code. Developers spend more of their time reading code others wrote rather than writing net new code so legibility and avoiding second takes is often more valuable than a few microseconds that some obscurely written code saves. An exception to this is a real-time system in which those microseconds are a competitive advantage, such as a trading system. In this case, this is a good place to add code comments explaining what this code does, and more importantly *why* this code is needed. In my experience, performance issues have been caused more frequently by loading too much data (lack of pagination), missing database indices, N+1 queries, and loading too much JavaScript, such as intrusive trackers and advertising.
 
-## Vertical Development
+## Fullstack
 
 When I started my career, there were no separate titles for front and back end developers. The titles were just like "software developer" or "programmer analyst". These were fullstack roles before that term had been developed. Developers were responsible for building out features end to end, including database schema design, back end services and apis, and making the front end look and function as specified in the [design comps](https://thedilldesign.com/web-design-comps-made/).
 
@@ -126,7 +126,7 @@ Then some years later, a trend emerged to separate out the roles into "back end 
 
 It's true that there's a different kind of thinking involved in building the front end such as the declarative nature of HTML and CSS, weaving in JavaScript in an organized way (which could mean learning a number of [SPA](https://developer.mozilla.org/en-US/docs/Glossary/SPA) frameworks), a focus on the visual for different media, animations, and accessibility, just to name a few items. Whereas on the back end a developer is focused on ensuring the database is normalized, efficient queries, building models that accurately represent the business domain, and services and apis that implement the business rules.
 
-However, neither of these are how the business people (who are paying the developers to have this software built), nor the customers (who will use the product) actually think about it. They view the software as a single unit that either solves their problem or doesn't. For example, when the PM specifies a new feature to be added to the product such as Advanced Search, the story/requirements will have the design comps showing the layout of all the search fields that should be supported, and specify the behaviour for what kind of results should be returned for various combinations of fields. They are not thinking about (nor should they) which parts of the logic will execute on the server and which on the browser client.
+However, neither of these are how the business people (who are paying the developers to have this software built), nor the customers (who will use the product) actually think about it. They view the application as a single unit that either solves their problem or doesn't. For example, when the PM specifies a new feature to be added to the product such as Advanced Search, the story/requirements will have the design comps showing the layout of all the search fields that should be supported, and specify the behaviour for what kind of results should be returned for various combinations of fields. They are not thinking about (nor should they) which parts of the logic will execute on the server and which on the browser client.
 
 In a world where there are separate teams of developers doing front vs back end work, this feature would get split up into two tickets - one to implement the front end and another for the back end. Now there's a very tight dependency between the two people working on these tickets. They might collaborate to determine what the search api endpoint will look like and what parameters it will support. Then the back end person will implement it and submit a PR for that work, which will get merged. In the meantime, the front end person can start building their part, perhaps with a mock API (which someone will have to implement) that mirrors the real API that was agreed to.
 
@@ -136,16 +136,27 @@ Now the front end developer has to reach out to the back end developer, who may 
 
 The other thing that often happens is there's a deadline to get the feature complete. In this case the front end developer may implement some workarounds on the front end to make things seemingly work, when it would have been more efficient to have the back end do this work.
 
-It's not the fault of the PM that is asking for changes, remember Agile tells us we're supposed to embrace change!
+It's not the fault of the PM that is asking for changes, remember Agile tells us we're supposed to embrace change! But when the teams are structured as horizontal slices of the stack (database, back end, front end), it creates needless friction to get features complete that are vertical slices through the entire stack. I have found it more effective to give every developer autonomy over the entire stack so they can use the appropriate tools to get their job done.
 
-TODO - work this in:
-I believe fullstack development leads to less friction in the development process and more agility (in the true spirit of the word agile, not the process-heavy methodologies that call themselves agile but are really mini waterfalls repeated over and over, burying the team under mountains of needless ceremony). When there are separate teams doing front end vs back end, this leads to a separation of technologies rather than separation of concerns. I view a "concern" as a vertical slice through the stack representing the end to end delivery of a feature (including deployment), which is more aligned with how the business and even customers view features.
+## Linting & Tests
 
-## Automation
+An effective team puts linting, automated testing, and CI (Continuous Integration) in place from the very early days of the project. Unless it's a hack-a-thon or throw-away code, this is a must.
 
-- linting
-- testing
-- CI/CD
+A good set of linting rules suggests best practices, prevents common coding errors, and enforces code style/formatting to avoid [bike shedding](https://en.wikipedia.org/wiki/Law_of_triviality) in PRs. Especially when it comes to code style, (eg: braces on same line or next, semi colons or not, etc.), it's less important to be "right" and more important for the team to be consistent.
+
+Getting in the habit of writing tests leads to better quality code. It also supports adding new features and refactoring without fear of causing regressions.
+
+Finally, linting and tests should be easy to run on each developers laptop, via CLI and/or editor plugins. These should also run as part of CI, which should be running on each commit pushed to feature branches and the main branch. A failure in CI should notify the developer that pushed the breaking commit. The main branch should be protected such that CI must be passing before any PR can be merged.
+
+## KTLO
+
+As exciting as it is to work on new features, an effective team dedicates a certain percentage of time to KTLO (keep the lights on) activities. This could include dealing with dependabot PRs, alerts from monitoring systems, deprecation warnings, library upgrades, and bug fixes. Otherwise things can get stale and make it more difficult to keep moving the project forward.
+
+Some teams will set aside a certain part of the year for these activities. Another way is to regularly add these items to the ticketing system with a certain tag such as `Maintenance`, and then let developers know for every 3 or so features they work on, pick up a maintenance task.
+
+## Rotate Assignments
+
+Intentionally rotate developers, assigning them to areas of the project they’re not familiar with to spread knowledge and avoid silos, reduce lottery count
 
 ## Psychological Safety
 
@@ -155,13 +166,18 @@ I would add: Not just feeling safe to ask questions and challenge authority, but
 
 Not assigning blame when something goes wrong, but looking to the process and how it can be improved to avoid this kind of error in the future.
 
+Feeling safe to ask questions without ever hearing “I can't believe you didn’t know that”, propose alternative solutions or architectures. Flatten hierarchy, i.e. its ok for a junior to question a senior, avoid assigning blame when something goes wrong. An effective team uses the opportunity to learn what happened and how to prevent something similar from happening again
+
+
 ## TODO
 * Make the meetings points level 3 sub-sections
-* Lines of communication reference re: team size
 * Caveat - based on my experience, of course there are many more teams and companies I haven’t worked at that may have different lessons learned, your mileage may vary
-* Where does effective communication (between engineers and between engineers and product) fit in?
+* Where does effective communication (between engineers and between engineers and product) fit in - maybe in Culture of Writing section?
+  * You could have a team of genius developers that can solve every leet code interview question ever written but still not have an effective team if the engineers struggle to understand the user stories, or recognize when there’s additional clarifications to go to PM with. This is sometimes called “soft skills”, but I consider it just as critical as the ability to code.
+* Fill in rotate assignments section
+* Fill in psychological safety section
 * Traceability: Eg: Jira ticket can either have the requirements, or just high level and point to a Wiki/Confluence doc with more details. Every Git commit and PR should reference ticket number. Then future developers that are maintaining code can git blame, find the jira ticket, then find the detailed requirements to fully understand why the current code behaves as it does. They can also find the PR which should contain instructions about how to exercise that feature.
-* Rotate developers across different areas to spread knowledge, reduce lottery count
-* Dedicate some % of time to KTLO
 * Edit feature image
-* Reduce lines of communication img size
+* Reduce lines of communication img size (webp? maybe need different img format for gatsby-image?)
+* Add Objection to fullstack re: some people prefer to specialize
+* Also reference Martin Fowler post on developer effectiveness: https://martinfowler.com/articles/developer-effectiveness.html
