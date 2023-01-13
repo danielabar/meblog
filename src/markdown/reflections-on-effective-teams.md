@@ -24,6 +24,10 @@ Equally important, an effective team consists of team members who communicate we
 
 Now that the definition is out of the way, the rest of this post will cover qualities that make effective teams.
 
+<aside class="markdown-aside">
+There are of course, many more projects and teams in this world that I haven't worked on than those I have, so all the practices suggested in this post are based only on my experience. There could be other practices that I've missed that are also effective, and some of my suggestions may not work for all teams. Your mileage may vary.
+</aside>
+
 ## Product
 
 An effective team starts with good product direction. The role of the person(s) that define this has changed names over the years, from Business Analyst, to Product Manager or Product Owner. I'll just refer to it as PM.
@@ -88,23 +92,35 @@ Using written communication can improve team effectiveness by:
 
 The previous section on writing is not to suggest that face-to-face conversations are never needed. There could be a tricky issue that's gone back and forth in comments in a document or PR and isn't getting resolved. Or some people think better "out loud" and sometimes need to bounce ideas off a few other people. An effective team will support all types of thinkers. So if a meeting is needed, here's how to get the most out of the precious time:
 
-* Make it brief. Set the default meeting time to 30 minutes in whatever calendar/scheduling tool the company is using. If you think you'll need longer, bump it up to 45 minutes, but try not to go over an hour. In my experience, people lose their focus beyond this, and if the issue hasn't been resolved in an hour, dragging it on any longer doesn't help.
-* Limit the required attendees. For example, if two people are having a strong difference of opinion over a technical proposal, only those two, plus maybe the team lead or manager should be required. Other team members can be marked as optional. It's not always the case that every team member has a strong opinion, for these folks, not interrupting them and letting them get on with their work may be best.
-* Include a goal in the meeting description. This is different from an agenda, which is simply a list of items to be discussed. You could have a list of points that even after discussion, doesn't move the team forward. A goal on the other hand is very specific. For example: "At the end of this meeting, we will have a decision on whether we will be using either RabbitMQ or Kafka for messaging". Or "The purpose of this meeting is to finalize the design for the search results page". The meeting description should include pointers to documents/discussion that has happened prior, so all attendees can be fully up to speed before the meeting starts. In the case of a technical decision, this could be a link to an [ADR](../about-those-docs/#architecture-decision-records) and/or related PR comments. In the case of a UI/UX decision, it could be pointers to the Figma document (or whatever design tool is being used).
-* Update the referenced documents during the meeting as decision(s) are being made. This way there's no issue of forgetting what was decided or having to be a secretary later transcribing what people said.
-* At the conclusion of the meeting, share/publish the decision to make it visible to the entire team.
+### Keep it Brief
+
+Set the default meeting time to 30 minutes in whatever calendar/scheduling tool the company is using. If you think you'll need longer, bump it up to 45 minutes, but try not to go over an hour. In my experience, people lose their focus beyond this, and if the issue hasn't been resolved in an hour, dragging it on any longer doesn't help.
+
+### Limit Attendees
+
+The entire team is not needed at every meeting. For example, if two people are having a strong difference of opinion over a technical proposal, only those two, plus maybe the team lead or manager should be required. Other team members can be marked as optional. It's not always the case that every team member has a strong opinion, for these folks, not interrupting them and letting them get on with their work may be best.
+
+### Have a Goal
+
+Include a goal in the meeting description. This is different from an agenda, which is simply a list of items to be discussed. You could have a list of points that even after discussion, doesn't move the team forward. A goal on the other hand is very specific. For example: "At the end of this meeting, we will have a decision on whether we will be using either RabbitMQ or Kafka for messaging". Or "The purpose of this meeting is to finalize the design for the search results page".
+
+The meeting description should include pointers to documents/discussion that has happened prior, so all attendees can be fully up to speed before the meeting starts. In the case of a technical decision, this could be a link to an [ADR](../about-those-docs/#architecture-decision-records) and/or related PR comments. In the case of a UI/UX decision, it could be pointers to the Figma document (or whatever design tool is being used).
+
+### Update Docs
+
+Update the referenced documents during the meeting as decision(s) are being made. This way there's no issue of forgetting what was decided or having to be a secretary later transcribing what people said. Finally, at the conclusion of the meeting, share/publish the decision to make it visible to the entire team.
 
 ## Small-ish Team Size
 
 Over the years, I have found the optimal team size to be on the small end, ranging from 2 - 4 developers, plus a PM and designer. The reason for this is it limits the number of [lines of communication](https://www.leadingagile.com/2018/02/lines-of-communication-team-size-applying-brooks-law/) within the team. Here is a useful diagram from that blog post to illustrate the issue:
 
-![lines of communication and team size](../images/lines-of-communication-teams-size.webp "lines of communication and team size")
+![lines of communication and team size](../images/lines-of-communication-teams-size.png "lines of communication and team size")
 
 If the team has 2 developers, a PM, and a designer, that's a total size of 4, resulting in 6 lines of communication, which is manageable. Bumping this up to 4 developers results in a total team size of 6, which leads to 15 lines of communication. That's pushing at the maximum of what a team can manage and still be effective.
 
 It can be tempting to add more developers to a project thinking that productivity will improve linearly. For example if one developer can complete one feature per week, then adding 9 more developers will result in 9 features completed per week. But it never works out this way. What's more likely is people end up stepping on each other's toes attempting to modify the same area of the code for different reasons, or spending the majority of their time in meetings trying to co-ordinate rather than hands-on building software. This is explained by [Brook's Law](https://en.wikipedia.org/wiki/Brooks%27s_law) which observes that adding people to a software project that is behind schedule delays it even longer.
 
-There's a little more nuance here in that it varies with the surface area of the project. A large project could in theory support a few more developers, if the areas that need to be developed in parallel are all independent of each other. On the other hand, even if the project is large, if the majority of development tends to occur in one area, then keep the team size small.
+There's a little more nuance here in that it varies with the surface area of the project. A large project could potentially support a few more developers, if the areas that need to be developed in parallel are independent of each other, and there's thorough, up-to-date [engineering documentation](../about-those-docs) that allows new developers to onboard independently.
 
 ## Do the Simplest Thing That Works
 
@@ -150,7 +166,7 @@ Finally, linting and tests should be easy to run on each developers laptop, via 
 
 ## KTLO
 
-As exciting as it is to work on new features, an effective team dedicates a certain percentage of time to KTLO (keep the lights on) activities. This could include dealing with dependabot PRs, alerts from monitoring systems, deprecation warnings, library upgrades, and bug fixes. Otherwise things can get stale and make it more difficult to keep moving the project forward.
+As exciting as it is to work on new features, an effective team dedicates a certain percentage of time to KTLO (keep the lights on) activities. This could include dealing with dependabot PRs, alerts from monitoring systems, deprecation warnings, library upgrades, and bug fixes. Otherwise things can get stale or stop working altogether, and make it difficult to keep moving the project forward.
 
 Some teams will set aside a certain part of the year for these activities. Another way is to regularly add these items to the ticketing system with a certain tag such as `Maintenance`, and then let developers know for every 3 or so features they work on, pick up a maintenance task.
 
@@ -160,7 +176,9 @@ Intentionally rotate developers, assigning them to areas of the project they’r
 
 ## Psychological Safety
 
-Definition from podcast: Ability to feel safe to ask questions, to challenge authority, to have your voice heard, to express your thoughts without fear of repercussion, without fear of being shot down or belittled. Ability to have open, vulnerable conversations with respect. Not having a blame culture. If something goes wrong, its not because someone did something wrong, it's because there was something in the system of work that enabled this thing to happen.
+Psychological safety is an absolute must in order for any team to work effectively. Here is the definition that was given on the podcast that inspired this post:
+
+> Ability to feel safe to ask questions, to challenge authority, to have your voice heard, to express your thoughts without fear of repercussion, without fear of being shot down or belittled. Ability to have open, vulnerable conversations with respect. Not having a blame culture. If something goes wrong, its not because someone did something wrong, it's because there was something in the system of work that enabled this thing to happen.
 
 I would add: Not just feeling safe to ask questions and challenge authority, but for it to be encouraged.
 
@@ -170,14 +188,16 @@ Feeling safe to ask questions without ever hearing “I can't believe you didn�
 
 
 ## TODO
-* Make the meetings points level 3 sub-sections
-* Caveat - based on my experience, of course there are many more teams and companies I haven’t worked at that may have different lessons learned, your mileage may vary
-* Where does effective communication (between engineers and between engineers and product) fit in - maybe in Culture of Writing section?
-  * You could have a team of genius developers that can solve every leet code interview question ever written but still not have an effective team if the engineers struggle to understand the user stories, or recognize when there’s additional clarifications to go to PM with. This is sometimes called “soft skills”, but I consider it just as critical as the ability to code.
 * Fill in rotate assignments section
 * Fill in psychological safety section
+* Conclusion
+* Where does effective communication (between engineers and between engineers and product) fit in - maybe in Culture of Writing section?
+  * You could have a team of genius developers that can solve every leet code interview question ever written but still not have an effective team if the engineers struggle to understand the user stories, or recognize when there’s additional clarifications to go to PM with. This is sometimes called “soft skills”, but I consider it just as critical as the ability to code.
 * Traceability: Eg: Jira ticket can either have the requirements, or just high level and point to a Wiki/Confluence doc with more details. Every Git commit and PR should reference ticket number. Then future developers that are maintaining code can git blame, find the jira ticket, then find the detailed requirements to fully understand why the current code behaves as it does. They can also find the PR which should contain instructions about how to exercise that feature.
 * Edit feature image
-* Reduce lines of communication img size (webp? maybe need different img format for gatsby-image?)
 * Add Objection to fullstack re: some people prefer to specialize
+* Maybe mention original Agile Manifesto from early 2000's? (when exactly), a lot has changed since then including WFH/remote, DEI, recognition of [neurodiversity](https://www.health.harvard.edu/blog/what-is-neurodiversity-202111232645) in the workplace, psychology research on flow state
 * Also reference Martin Fowler post on developer effectiveness: https://martinfowler.com/articles/developer-effectiveness.html
+* Fullstack:
+  * Make the Node.js same language back/front an aside?
+  * Mention that I've worked in all 3 (fullstack, back end only, front end only)
