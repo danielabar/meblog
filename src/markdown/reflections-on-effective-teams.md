@@ -110,15 +110,19 @@ The meeting description should include pointers to documents/discussion that has
 
 Update the referenced documents during the meeting as decision(s) are being made. This way there's no issue of forgetting what was decided or having to be a secretary later transcribing what people said. Finally, at the conclusion of the meeting, share/publish the decision to make it visible to the entire team.
 
+<aside class="markdown-aside">
+Shopify has gone as far as <a class="markdown-link" href="https://www.forbes.com/sites/jenamcgregor/2023/01/03/shopify-is-canceling-all-meetings-with-more-than-two-people-from-workers-calendars-and-urging-few-to-be-added-back/?sh=61950fd6fe8a">cancelling all recurring meetings involving two or more people</a>. Perhaps once a company gets to a large enough size, a top-down edict like this is needed. My suggestion is to consider what problem you're trying to solve by booking a meeting, and then see if there's an asynchronous/written approach that could solve it first. If that's been tried and didn't work, then book the meeting, keeping the above guidelines in mind to maximize the time investment.
+</aside>
+
 ## Small-ish Team Size
 
-Over the years, I have found the optimal team size to be on the small end, ranging from 2 - 4 developers, plus a PM and designer. The reason for this is it limits the number of [lines of communication](https://www.leadingagile.com/2018/02/lines-of-communication-team-size-applying-brooks-law/) within the team. Here is a useful diagram from that blog post to illustrate the issue:
+Over the years, I have found the optimal team size to be on the small end, ranging from 2 - 4 developers, plus a PM and designer. Keeping the team size small limits the number of [lines of communication](https://www.leadingagile.com/2018/02/lines-of-communication-team-size-applying-brooks-law/). Here is a useful diagram from that blog post to illustrate the issue:
 
 ![lines of communication and team size](../images/lines-of-communication-teams-size.png "lines of communication and team size")
 
 If the team has 2 developers, a PM, and a designer, that's a total size of 4, resulting in 6 lines of communication, which is manageable. Bumping this up to 4 developers results in a total team size of 6, which leads to 15 lines of communication. That's pushing at the maximum of what a team can manage and still be effective.
 
-It can be tempting to add more developers to a project thinking that productivity will improve linearly. For example if one developer can complete one feature per week, then adding 9 more developers will result in 9 features completed per week. But it never works out this way. What's more likely is people end up stepping on each other's toes attempting to modify the same area of the code for different reasons, or spending the majority of their time in meetings trying to co-ordinate rather than hands-on building software. This is explained by [Brook's Law](https://en.wikipedia.org/wiki/Brooks%27s_law) which observes that adding people to a software project that is behind schedule delays it even longer.
+It can be tempting to add more developers to a project thinking that productivity will improve linearly. For example if one developer can complete one feature per week, then adding 9 more developers will result in 9 features completed per week. However, 9 developers plus a PM and designer makes 11 team members, which translates to an astonishing 55 lines of communication! What's more likely is people end up stepping on each other's toes attempting to modify the same area of the code for different reasons, or spending the majority of their time in meetings trying to co-ordinate rather than hands-on building software. This is explained by [Brook's Law](https://en.wikipedia.org/wiki/Brooks%27s_law) which observes that adding people to a software project that is behind schedule delays it even longer.
 
 There's a little more nuance here in that it varies with the surface area of the project. A large project could potentially support a few more developers, if the areas that need to be developed in parallel are independent of each other, and there's thorough, up-to-date [engineering documentation](../about-those-docs) that allows new developers to onboard independently.
 
@@ -132,7 +136,9 @@ This often means starting with a monolith rather than microservices. It can alwa
 
 Avoid over-engineering, i.e. building in abstractions and flexibility unless its known to be needed. Otherwise what can happen is this flexibility is never needed, but when future requirements come in, they need to "flex" in a different direction, resulting in overly complex code.
 
-Avoid premature optimization. For example, writing harder to understand code that shaves microseconds of performance over more straightforward code. Developers spend more of their time reading code others wrote rather than writing net new code so legibility and avoiding second takes is often more valuable than a few microseconds that some obscurely written code saves. An exception to this is a real-time system in which those microseconds are a competitive advantage, such as a trading system. In this case, this is a good place to add code comments explaining what this code does, and more importantly *why* this code is needed. In my experience, performance issues have been caused more frequently by loading too much data (lack of pagination), missing database indices, N+1 queries, and loading too much JavaScript, such as intrusive trackers and advertising.
+Avoid premature optimization. For example, writing harder to understand code that shaves microseconds of performance over more straightforward code. Developers spend more of their time reading code others wrote rather than writing net new code so legibility and avoiding second takes is often more valuable than a few microseconds that some obscurely written code saves. In my experience, performance issues have been caused more frequently by loading too much data (lack of pagination), missing database indices, N+1 queries, and loading too much JavaScript, such as intrusive trackers or non-minified code.
+
+There are exceptions of course, in some domains such as real-time systems or graphics processing, these microseconds matter. This is a good place to add code comments explaining what this code does, and more importantly *why* this code is needed.
 
 ## Fullstack
 
@@ -176,28 +182,26 @@ Intentionally rotate developers, assigning them to areas of the project they’r
 
 ## Psychological Safety
 
-Psychological safety is an absolute must in order for any team to work effectively. Here is the definition that was given on the podcast that inspired this post:
+Psychological safety is an absolute must in order for any team to work effectively. Here is the definition that was given on the [podcast](https://www.se-radio.net/2022/12/episode-543-jon-smart-on-patterns-and-anti-patterns-for-successful-software-delivery-in-enterprises/) that inspired this post:
 
-> Ability to feel safe to ask questions, to challenge authority, to have your voice heard, to express your thoughts without fear of repercussion, without fear of being shot down or belittled. Ability to have open, vulnerable conversations with respect. Not having a blame culture. If something goes wrong, its not because someone did something wrong, it's because there was something in the system of work that enabled this thing to happen.
+> Psychological safety is the ability to feel safe to ask questions, to challenge authority, to have your voice heard, to express your thoughts without fear of repercussion, without fear of being shot down or belittled. It's the ability to have open, vulnerable conversations with respect. Not having a blame culture. If something goes wrong, its not because someone did something wrong, it's because there was something in the system of work that enabled this thing to happen.
 
-I would add: Not just feeling safe to ask questions and challenge authority, but for it to be encouraged.
+To this I would add, not just feeling safe to ask questions and challenge authority, but for it to be encouraged across the hierarchy. For example, it's should be ok for a junior dev to question the architecture proposed by the CTO. This is necessary for new idea generation. Otherwise the team descends into a culture of "we've always done things this way", and stops innovating. Not every new idea that people suggest will work out, but they should never be censured for it because other people will look to that example and think "I better keep my mouth shut", and that other idea that never gets surfaced could have been amazing.
 
-Not assigning blame when something goes wrong, but looking to the process and how it can be improved to avoid this kind of error in the future.
+Developers also need to feel safe suggesting accurate estimates (which are typically larger than business people like to hear) or indicating that something is going to take longer than the initial estimate. When this safety isn't present, people end up working long hours trying to reach unrealistic deadlines, quality suffers, and burn out ensues.
 
-Feeling safe to ask questions without ever hearing “I can't believe you didn’t know that”, propose alternative solutions or architectures. Flatten hierarchy, i.e. its ok for a junior to question a senior, avoid assigning blame when something goes wrong. An effective team uses the opportunity to learn what happened and how to prevent something similar from happening again
-
+The other aspect of this is what happens when someone makes a mistake that has a serious impact such as data loss. It's important to not assign blame to the individual but look to how the system can be improved so no one else can ever make this mistake again. For example, is there some connection between the dev and production environments that shouldn't exist? Was some operational documentation out of date? Should every developers shell profile include logic to automatically turn the title bar or prompt red when connecting to production? Every mistake is an opportunity to improve systems and documentation. On the other hand if an individual "gets in trouble" for admitting to a mistake, you can be sure that no one will ever admit to a mistake again, which makes the entire matter worse.
 
 ## TODO
 * Fill in rotate assignments section
-* Fill in psychological safety section
 * Conclusion
 * Where does effective communication (between engineers and between engineers and product) fit in - maybe in Culture of Writing section?
   * You could have a team of genius developers that can solve every leet code interview question ever written but still not have an effective team if the engineers struggle to understand the user stories, or recognize when there’s additional clarifications to go to PM with. This is sometimes called “soft skills”, but I consider it just as critical as the ability to code.
-* Traceability: Eg: Jira ticket can either have the requirements, or just high level and point to a Wiki/Confluence doc with more details. Every Git commit and PR should reference ticket number. Then future developers that are maintaining code can git blame, find the jira ticket, then find the detailed requirements to fully understand why the current code behaves as it does. They can also find the PR which should contain instructions about how to exercise that feature.
+* Should this be a separate section? Traceability: Eg: Jira ticket can either have the requirements, or just high level and point to a Wiki/Confluence doc with more details. Every Git commit and PR should reference ticket number. Then future developers that are maintaining code can git blame, find the jira ticket, then find the detailed requirements to fully understand why the current code behaves as it does. They can also find the PR which should contain instructions about how to exercise that feature.
 * Edit feature image
 * Add Objection to fullstack re: some people prefer to specialize
 * Maybe mention original Agile Manifesto from early 2000's? (when exactly), a lot has changed since then including WFH/remote, DEI, recognition of [neurodiversity](https://www.health.harvard.edu/blog/what-is-neurodiversity-202111232645) in the workplace, psychology research on flow state
-* Also reference Martin Fowler post on developer effectiveness: https://martinfowler.com/articles/developer-effectiveness.html
+* Reference: Martin Fowler post on developer effectiveness: https://martinfowler.com/articles/developer-effectiveness.html
 * Fullstack:
   * Make the Node.js same language back/front an aside?
   * Mention that I've worked in all 3 (fullstack, back end only, front end only)
