@@ -59,6 +59,16 @@ There does need to be some process to avoid chaos, i.e. every day should not fee
 There's been a lot said about ticketing systems being four letter words and all that. It doesn't need to be this way. The ticketing system is simply a communication tool to help teams know what needs to be done and what's most important. It's not intended as a management tool to measure developers performance or to make developers spend any more time in it than necessary. Ideally the ticketing system is fully integrated with version control so that ticket status changes such as In Progress, In Review, and Done are applied automatically as developers start pushing to branches, submit PRs, and merge.
 </aside>
 
+## Traceability
+
+How often has it happened that you're looking at a particular section of code and wondering "What does this even do?" or "How did this ever work?". Since developers spend more of their time reading code others wrote rather than writing brand new code, traceability is needed for effectiveness. Traceability refers to being able to answer questions like "what does this do?" by following a path from every line of code, to the business requirements that necessitated it, *and* to the PR (pull request) where this code got merged into the main branch for more technical context.
+
+In order to achieve this, all changes to the code (except for very simple adhoc work such as fixing a typo in the docs) should be associated with a ticket number in the ticketing system. This ticket should contain the business requirements in the case of a new feature, or for a bug, it should contain the steps to reproduce with actual vs expected results.
+
+When developers commit their code, the commit message should include the ticket number. Furthermore, the ticketing system should be integrated with the system where the code is hosted (eg: Github, Gitlab, etc.). This means that when a PR is created for this ticket, the ticketing system automatically updates the ticket with a link to the PR.
+
+Now when the developer is looking at any line of code, they can run `git blame` to see the commit message and associated ticket number. Then they can [open the ticket](../find-jira-tickets-faster) to understand the business context around this code. From the ticket, they can follow through to the PR, and read the technical context in the PR description, and also the step by step instructions how to exercise the code (which should be part of the PR description).
+
 ## Culture of Writing
 
 An effective team develops a culture of writing, both on the business and technical side.
@@ -134,15 +144,15 @@ There are exceptions of course, in some domains such as real-time systems or gra
 
 ## Fullstack
 
-When I started my career, there were no separate titles for front and back end developers. The titles were just like "software developer" or "programmer analyst". These were fullstack roles before that term had been developed. Developers were responsible for building out features end to end, including database schema design, back end services and apis, and making the front end look and function as specified in the [design comps](https://thedilldesign.com/web-design-comps-made/).
+When I started my career, there were no separate titles for front and back end developers. The titles were just like "software developer" or "programmer analyst". These were fullstack roles before that term had been developed. Developers were responsible for building out features end to end, including database schema design, back end services and APIs, and making the front end look and function as specified in the [design comps](https://thedilldesign.com/web-design-comps-made/).
 
 Then some years later, a trend emerged to separate out the roles into "back end developer" and "front end developer". The idea being that these are separate skills with often, separate languages (until [Node.js](https://nodejs.org/en/) came along and made it possible to build the back end in the same language as the front end), and that people should specialize in one area or another.
 
-It's true that there's a different kind of thinking involved in building the front end such as the declarative nature of HTML and CSS, weaving in JavaScript in an organized way (which could mean learning a number of [SPA](https://developer.mozilla.org/en-US/docs/Glossary/SPA) frameworks), a focus on the visual for different media, animations, and accessibility, just to name a few items. Whereas on the back end a developer is focused on ensuring the database is normalized, efficient queries, building models that accurately represent the business domain, and services and apis that implement the business rules.
+It's true that there's a different kind of thinking involved in building the front end such as the declarative nature of HTML and CSS, weaving in JavaScript in an organized way (which could mean learning a number of [SPA](https://developer.mozilla.org/en-US/docs/Glossary/SPA) frameworks), a focus on the visual for different media, animations, and accessibility, just to name a few items. Whereas on the back end a developer is focused on ensuring the database is normalized, efficient queries, building models that accurately represent the business domain, and services and APIs that implement the business rules.
 
 However, neither of these are how the business people (who are paying the developers to have this software built), nor the customers (who will use the product) actually think about it. They view the application as a single unit that either solves their problem or doesn't. For example, when the PM specifies a new feature to be added to the product such as Advanced Search, the story/requirements will have the design comps showing the layout of all the search fields that should be supported, and specify the behaviour for what kind of results should be returned for various combinations of fields. The PM is not thinking about (nor should they) which parts of the logic will execute on the server and which on the browser client.
 
-In a world where there are separate teams of developers doing front vs back end work, this feature would get split up into two tickets - one to implement the front end and another for the back end. Now there's a very tight dependency between the two people working on these tickets. They might collaborate to determine what the search api endpoint will look like and what parameters it will support. Then the back end person will implement it and submit a PR for that work, which will get merged. In the meantime, the front end person can start building their part, perhaps with a mock API (which someone will have to implement) that mirrors the real API that was agreed to.
+In a world where there are separate teams of developers doing front vs back end work, this feature would get split up into two tickets - one to implement the front end and another for the back end. Now there's a very tight dependency between the two people working on these tickets. They might collaborate to determine what the search API endpoint will look like and what parameters it will support. Then the back end person will implement it and submit a PR for that work, which will get merged. In the meantime, the front end person can start building their part, perhaps with a mock API (which someone will have to implement) that mirrors the real API that was agreed to.
 
 But the front end person won't be able to finish their work until the back end developer's real API is merged. Then the front end developer can update their branch with the real API and start using it. Then they might realize there's an issue, perhaps some edge cases that the search endpoint isn't handling or a bug, resulting in the front end being broken. Another thing that frequently happens is when the PM views the front end with the real back end, they may want some changes. Who here hasn't had the experience of a conversation with a PM along the lines of "I thought it should work this way, but now that I see it in action, I think it would be better if it behaved this other way..."
 
@@ -196,15 +206,29 @@ The topic of estimates is way too large to fully cover in this post, and somewha
 
 The other aspect of psychological safety is what happens when someone makes a mistake that has a serious impact such as data loss. It's important to not assign blame to the individual but look to how the system can be improved so no one else can ever make this mistake again. For example, is there some connection between the dev and production environments that shouldn't exist? Was some operational documentation out of date? Should every developers shell profile include logic to automatically turn the title bar or prompt red when connecting to production? Every mistake is an opportunity to improve systems and documentation. On the other hand if an individual "gets in trouble" for admitting to a mistake, you can be sure that no one will ever admit to a mistake again, which makes the entire matter worse.
 
+## Conclusion
+
+This post has covered the definition of an effective software development team, and practices that lead to effectiveness. These practices include:
+
+* Lightweight process that lets developers get into flow state and supports traceability.
+* Favoring written communication to solve problems over frequent meetings.
+* Maintaining a small team.
+* Sticking to simple implementations where possible.
+* Favoring fullstack over multiple teams split up by horizontal layers or technologies of the stack.
+* Automation from the start including linting rules and tests.
+* Dedicated time to maintenance.
+* Giving all team members opportunities to work on all areas of the product, especially those in which they're less familiar.
+* Ensuring a psychologically safe environment for everyone.
+
+For further reading on this topic, see this post on [Developer Effectiveness](https://martinfowler.com/articles/developer-effectiveness.html) on Martin Fowler's blog.
+
 ## TODO
-* Conclusion
+* Maybe add CD to Automation section?
 * Where does effective communication (between engineers and between engineers and product) fit in - maybe in Culture of Writing section?
   * You could have a team of genius developers that can solve every leet code interview question ever written but still not have an effective team if the engineers struggle to understand the user stories, or recognize when there’s additional clarifications to go to PM with. This is sometimes called “soft skills”, but I consider it just as critical as the ability to code.
-* Should this be a separate section? Traceability: Eg: Jira ticket can either have the requirements, or just high level and point to a Wiki/Confluence doc with more details. Every Git commit and PR should reference ticket number. Then future developers that are maintaining code can git blame, find the jira ticket, then find the detailed requirements to fully understand why the current code behaves as it does. They can also find the PR which should contain instructions about how to exercise that feature.
 * Edit feature image
 * Add Objection to fullstack re: some people prefer to specialize
 * Maybe mention original Agile Manifesto from early 2000's? (when exactly), a lot has changed since then including WFH/remote, DEI, recognition of [neurodiversity](https://www.health.harvard.edu/blog/what-is-neurodiversity-202111232645) in the workplace, psychology research on flow state
-* Reference: Martin Fowler post on developer effectiveness: https://martinfowler.com/articles/developer-effectiveness.html
 * Fullstack:
   * Make the Node.js same language back/front an aside?
   * Mention that I've worked in all 3 (fullstack, back end only, front end only)
