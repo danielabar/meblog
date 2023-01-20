@@ -10,13 +10,13 @@ related:
   - "About Those Docs"
 ---
 
-I was inspired to write this post after listening to a Software Engineering Radio podcast with guest Jon Smart on the subject of [Patterns and Anti-Patterns for Successful Software Delivery](https://www.se-radio.net/2022/12/episode-543-jon-smart-on-patterns-and-anti-patterns-for-successful-software-delivery-in-enterprises/). He discusses why "Agile Transformation" is an anti-pattern, the importance of focusing on outcomes rather than outputs, and avoiding one-size-fits-all solutions. He says the goal shouldn't be to "do agile", but rather introduces a new language of better (quality), sooner (time to value), safer (agile not fragile), and happier (customers, colleagues, citizens, clients).
+I was inspired to write this post after listening to a Software Engineering Radio podcast with guest Jon Smart on the subject of [Patterns and Anti-Patterns for Successful Software Delivery](https://www.se-radio.net/2022/12/episode-543-jon-smart-on-patterns-and-anti-patterns-for-successful-software-delivery-in-enterprises/). He discusses why "Agile Transformation" is an anti-pattern, and avoiding one-size-fits-all solutions. He says the goal shouldn't be to "do agile", but rather introduces a new language of better (quality), sooner (time to value), safer (agile not fragile), and happier (customers, colleagues, citizens, clients).
 
 Listening to this podcast made me reflect on my many years experience of software development on various project and product teams across different sized companies and industries in terms of what practices have made some teams more effective than others. In this post, I'll share practices I've experienced that have made teams effective.
 
 ## Definition
 
-But first, what do I mean by an effective team? My definition of this term is a team that can continuously deliver working software that solves their customers problems, keeping the customers happy to keep on paying for the service, and spreading the good word.
+But first, what do I mean by an effective team? My definition of this term is a team that can continuously deliver working software that solves their customers problems, and the customers are happy to keep on paying for the service.
 
 The delivery of each release introduces little to no [regressions](https://en.wikipedia.org/wiki/Software_regression).
 
@@ -42,7 +42,7 @@ The only style of product I've seen be ineffective is when there are a lot of un
 
 An effective team keeps the spirit of [agile](https://agilemanifesto.org/principles.html) alive, while not burying themselves under needless ceremonies and process. In my experience, this means keeping a focus on getting things done using a flow approach rather than a rigid methodology like Scrum. A small(ish) team of intrinsically motivated people with solid written communication skills and autonomy over the entire stack can get a lot done with a minimum of process and meetings.
 
-There does need to be some process to avoid chaos, i.e. every day should not feel like a hack-a-thon, but it should not be a burden and should not be disrupting developer flow with regular meetings. This process could include:
+There does need to be some process to avoid chaos, i.e. every day should not feel like a hack-a-thon. A lightweight process could include:
 
 * Breaking up large requirements into smaller items and entering these into a ticketing system to keep track of the work to be done, in priority order.
 * Developers pick up tickets by assigning the next most important item in the list to themselves and starting a feature branch in version control with the ticket number and brief description in the branch name. Commit messages also include the ticket number.
@@ -67,15 +67,19 @@ In order to achieve this, all changes to the code (except for very simple adhoc 
 
 When developers commit their code, the commit message should include the ticket number. Furthermore, the ticketing system should be integrated with the system where the code is hosted (eg: Github, Gitlab, etc.). This means that when a PR is created for this ticket, the ticketing system automatically updates the ticket with a link to the PR.
 
-Now when the developer is looking at any line of code, they can run `git blame` to see the commit message and associated ticket number. Then they can [open the ticket](../find-jira-tickets-faster) to understand the business context around this code. From the ticket, they can follow through to the PR, and read the technical context in the PR description, and also the step by step instructions how to exercise the code (which should be part of the PR description).
+Now when the developer is looking at any line of code, they can run `git blame` to see the commit message and associated ticket number. Then they can [open the ticket](../find-jira-tickets-faster) to understand the business context around this code. From the ticket, they can follow through to the PR, and read the technical context in the PR description, and also the step by step instructions how to exercise the code (which is part of the PR description).
 
 ## Culture of Writing
 
 An effective team develops a culture of writing, both on the business and technical side.
 
-On the business side, writing is used to capture the requirements and business rules, and also the *why* behind these. This could be tied to improved revenue generation or user experience. I've found its helpful for developers that are implementing the requirements to understand why a feature is being built a certain way.
+On the business side, writing is used to capture the requirements and business rules, and also the *why* behind these. This could be tied to improved revenue generation or user experience. I've found its helpful for developers that are implementing the requirements to understand why a feature is being built a certain way. You could have a team of genius developers that can solve every leet code interview question ever written but still not have an effective team if the engineers struggle to understand the user stories, or recognize when there’s additional clarifications to go to PM with. This is sometimes called "soft skills", but I consider it just as critical as the ability to code.
 
 On the technical side, [writing](../about-those-docs#what-to-document) is used to share knowledge and expertise to level up all team members, current and future. This includes architectural proposals and decisions, project setup, common workflows through the application, troubleshooting tips, third party integrations, configuration, how to do deployments, how to exercise new code being added in a pull request, and anything else that helps developers understand how the project works.
+
+<aside class="markdown-aside">
+The kind of documents I'm referring to are internal, that is, written by engineers for engineers working together on the same project. Not to be confused with external customer-facing documentation, that may be best written by someone who specializes in this kind of writing, especially if the customers are non-technical.
+</aside>
 
 These written documents are not intended as contracts where people can finger point later if something is not working. Rather, they are living documents owned by the entire team. They support collaboration and team continuity, and are updated as questions and new information arises. Here is where I differ from one of the Agile Manifesto principles which states:
 
@@ -144,9 +148,9 @@ There are exceptions of course, in some domains such as real-time systems or gra
 
 ## Fullstack
 
-When I started my career, there were no separate titles for front and back end developers. The titles were just like "software developer" or "programmer analyst". These were fullstack roles before that term had been developed. Developers were responsible for building out features end to end, including database schema design, back end services and APIs, and making the front end look and function as specified in the [design comps](https://thedilldesign.com/web-design-comps-made/).
+When I started my career, there were no separate titles for front and back end developers. The titles were just like "software developer" or "programmer analyst". These were fullstack roles before that term had been coined. Developers were responsible for building out features end to end, including database schema design, back end services and APIs, and making the front end look and function as specified in the [design comps](https://thedilldesign.com/web-design-comps-made/).
 
-Then some years later, a trend emerged to separate out the roles into "back end developer" and "front end developer". The idea being that these are separate skills with often, separate languages (until [Node.js](https://nodejs.org/en/) came along and made it possible to build the back end in the same language as the front end), and that people should specialize in one area or another.
+Then some years later, a trend emerged to separate out the roles into "back end developer" and "front end developer". The idea being that these are separate skills with often, separate languages (until [Node.js](https://nodejs.org/en/) came along and made it possible to build the back end in the same language as the front end), and that people should specialize in one area or another. I've had the opportunity to work as fullstack, front-end only, and back-end only.
 
 It's true that there's a different kind of thinking involved in building the front end such as the declarative nature of HTML and CSS, weaving in JavaScript in an organized way (which could mean learning a number of [SPA](https://developer.mozilla.org/en-US/docs/Glossary/SPA) frameworks), a focus on the visual for different media, animations, and accessibility, just to name a few items. Whereas on the back end a developer is focused on ensuring the database is normalized, efficient queries, building models that accurately represent the business domain, and services and APIs that implement the business rules.
 
@@ -162,17 +166,19 @@ The other thing that often happens is there's a deadline to get the feature comp
 
 It's not the fault of the PM that is asking for changes, remember Agile tells us we're supposed to embrace change! But when the teams are structured as horizontal slices of the stack (database, back end, front end), it creates needless friction to get features complete that are vertical slices through the entire stack. I have found it more effective to give every developer autonomy over the entire stack so they can use the appropriate tools to get their job done.
 
-## Linting & Tests
+Of course there will always be some team members that prefer to specialize in one area or another. I believe the best way to work in this case is to have those experts be on the PR reviews, and to gradually document their specialized knowledge and best practices. To the extent that the best practices can be encoded as linting rules, bring those rules into the project linter (more on this in the next section). In this way, it's like everyone on the team has the expert sitting beside them as they code, levelling up everyone's knowledge. It's also beneficial to the company in case the expert(s) leave.
 
-An effective team puts linting, automated testing, and CI (Continuous Integration) in place from the very early days of the project. Unless it's a hack-a-thon or throw-away code, this is a must.
+## Automation
+
+An effective team establishes automated processes to minimize manual effort. This includes linting, automated testing, CI (Continuous Integration), and CD (Continuous Deployment) in place from the very early days of the project. Unless it's a hack-a-thon or throw-away code, this is a must.
 
 A good set of linting rules suggests best practices, prevents common coding errors, and enforces code style/formatting to avoid [bike shedding](https://en.wikipedia.org/wiki/Law_of_triviality) in PRs. Especially when it comes to code style, (eg: braces on same line or next, semi colons or not, etc.), it's less important to be "right" and more important for the team to be consistent.
 
-Getting in the habit of writing tests leads to better quality code. It also supports adding new features and refactoring without fear of causing regressions.
+Getting in the habit of writing automated tests (unit, integration, and system) leads to better quality code. It also supports adding new features and refactoring without fear of causing regressions, and minimizes or eliminates entirely the need for manual QA.
 
 Finally, linting and tests should be easy to run on each developers laptop, via CLI and/or editor plugins. These should also run as part of CI, which should be running on each commit pushed to feature branches and the main branch. A failure in CI should notify the developer that pushed the breaking commit. The main branch should be protected such that CI must be passing before any PR can be merged.
 
-## KTLO
+## Maintenance
 
 As exciting as it is to work on new features, an effective team dedicates a certain percentage of time to KTLO (keep the lights on) activities. This could include dealing with dependabot PRs, alerts from monitoring systems, deprecation warnings, library upgrades, and bug fixes. Otherwise things can get stale or stop working altogether, and make it difficult to keep moving the project forward.
 
@@ -215,7 +221,7 @@ This post has covered the definition of an effective software development team, 
 * Maintaining a small team.
 * Sticking to simple implementations where possible.
 * Favoring fullstack over multiple teams split up by horizontal layers or technologies of the stack.
-* Automation from the start including linting rules and tests.
+* Automate all the things.
 * Dedicated time to maintenance.
 * Giving all team members opportunities to work on all areas of the product, especially those in which they're less familiar.
 * Ensuring a psychologically safe environment for everyone.
@@ -223,12 +229,7 @@ This post has covered the definition of an effective software development team, 
 For further reading on this topic, see this post on [Developer Effectiveness](https://martinfowler.com/articles/developer-effectiveness.html) on Martin Fowler's blog.
 
 ## TODO
-* Maybe add CD to Automation section?
-* Where does effective communication (between engineers and between engineers and product) fit in - maybe in Culture of Writing section?
-  * You could have a team of genius developers that can solve every leet code interview question ever written but still not have an effective team if the engineers struggle to understand the user stories, or recognize when there’s additional clarifications to go to PM with. This is sometimes called “soft skills”, but I consider it just as critical as the ability to code.
 * Edit feature image
-* Add Objection to fullstack re: some people prefer to specialize
 * Maybe mention original Agile Manifesto from early 2000's? (when exactly), a lot has changed since then including WFH/remote, DEI, recognition of [neurodiversity](https://www.health.harvard.edu/blog/what-is-neurodiversity-202111232645) in the workplace, psychology research on flow state
 * Fullstack:
   * Make the Node.js same language back/front an aside?
-  * Mention that I've worked in all 3 (fullstack, back end only, front end only)
