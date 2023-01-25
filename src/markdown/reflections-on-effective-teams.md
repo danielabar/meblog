@@ -2,7 +2,7 @@
 title: "Reflections on Effective Teams"
 featuredImage: "../images/effective-teams-josue-isai-ramos-figueroa-qvBYnMuNJ9A-unsplash.jpg"
 description: "Several practices that make software delivery teams effective."
-date: "2023-05-01"
+date: "2023-02-01"
 category: "career"
 related:
   - "Working Towards an Asynchronous Future"
@@ -32,7 +32,7 @@ There are of course, many more projects and teams in this world that I haven't w
 
 An effective team starts with good product direction. The role of the person(s) that define this has changed names over the years, from Business Analyst, to Product Manager or Product Owner. I'll just refer to it as PM.
 
-An effective team will have a PM that has a strong sense of product direction and can express clearly how different areas of the product should work and why. These features should be driven by what will solve the customers problems, ultimately generating revenue. The PM should also expect clarifying questions from engineers and consistently update written requirements to reflect those clarifications (more on writing later in this post). This way all team members current *and* future can gain an understanding of why the product works the way it does.
+An effective team will have a PM that has a strong sense of product direction and can express clearly how different areas of the product should work and why. These features should be driven by what will solve the customers problems, ultimately generating revenue. The PM should also expect clarifying questions from engineers and consistently update written requirements to reflect those clarifications (more on [writing](../reflections-on-effective-teams#culture-of-writing) later in this post). This way all team members current *and* future can gain an understanding of why the product works the way it does.
 
 Sometimes the product direction is not entirely clear. The company could be dealing with unknowns and engaging in research and experiments to determine market fit. A team can still be effective in this case if it's communicated clearly to all team members that they're dealing with unknowns. In this environment, people are encouraged to think creatively of potential solutions and to try things out, with the understanding that many features may not stick and have to be rolled back. i.e. no one is blamed if something doesn't work out because it all contributes to increased understanding.
 
@@ -40,9 +40,9 @@ The only style of product I've seen be ineffective is when there are a lot of un
 
 ## Minimal Process
 
-An effective team keeps the spirit of [agile](https://agilemanifesto.org/principles.html) alive, while not burying themselves under needless ceremonies and process. In my experience, this means keeping a focus on getting things done using a flow approach rather than a rigid methodology like Scrum. A small(ish) team of intrinsically motivated people with solid written communication skills and autonomy over the entire stack can get a lot done with a minimum of process and meetings.
+An effective team keeps the spirit of [agile](https://agilemanifesto.org/principles.html) alive, while not burying themselves under needless ceremonies and process. In my experience, this means keeping a focus on getting things done using a flow approach rather than a <s class="markdown-strikethrough">religious</s> rigid methodology like [Scrum](https://en.wikipedia.org/wiki/Scrum_(software_development)).
 
-There does need to be some process to avoid chaos, i.e. every day should not feel like a hack-a-thon. A lightweight process could include:
+A small(ish) team of intrinsically motivated people with solid written communication skills and autonomy over the entire stack can get a lot done with a minimum of process and meetings. There does need to be some process to avoid chaos, i.e. every day should not feel like a hack-a-thon. A lightweight process could include:
 
 * Breaking up large requirements into smaller items and entering these into a ticketing system to keep track of the work to be done, in priority order.
 * Developers pick up tickets by assigning the next most important item in the list to themselves and starting a feature branch. Major change are discussed with [ADRs](../about-those-docs#architecture-decision-records).
@@ -73,7 +73,7 @@ Now when the developer is looking at any line of code, they can run [git blame](
 
 An effective team develops a culture of writing, both on the business and technical side.
 
-On the business side, writing is used to capture the requirements and business rules, and also the *why* behind these. This could be tied to improved revenue generation or user experience. I've found its helpful for developers that are implementing the requirements to understand why a feature is being built a certain way. You could have a team of genius developers that can solve every leet code interview question ever written but still not have an effective team if they struggle to understand the user stories, or recognize when there’s additional clarifications to go to PM with. This is sometimes called "soft skills", but I consider it just as critical as the ability to code.
+On the business side, writing is used to capture the requirements and business rules, and also the *why* behind these. This could be tied to improved revenue generation or user experience. I've found its helpful for developers that are implementing the requirements to understand why a feature is being built a certain way. A team of genius developers that can solve every leet code interview question ever written could still be ineffective if they struggle to understand the user stories, or recognize when there’s additional clarifications to go to PM with. This is sometimes called "soft skills", but I consider it just as critical as the ability to code.
 
 On the technical side, [writing](../about-those-docs#what-to-document) is used to share knowledge and expertise to level up all team members, current and future. This includes architectural proposals and decisions, project setup, common workflows through the application, troubleshooting tips, third party integrations, configuration, how to do deployments, how to exercise new code being added in a pull request, and anything else that helps developers understand how the project works.
 
@@ -85,7 +85,7 @@ These written documents are not intended as *contracts* where people can finger 
 
 > The most efficient and effective method of conveying information to and within a development team is face-to-face conversation.
 
-The original manifesto was developed in [2001](https://agilemanifesto.org/history.html). A lot has changed in team work since then including the prevalence of remote work, recognition of the importance of mental health and preventing burnout, DEI, neurodiversity, and psychology research on flow state. Relying primarily on face-to-face conversations:
+The original manifesto was developed in [2001](https://agilemanifesto.org/history.html). A lot has changed in team work since then including the prevalence of remote work, recognition of the importance of mental health and preventing burnout, DEI, neurodiversity, and psychology research on [flow state](https://en.wikipedia.org/wiki/Flow_(psychology)). Relying primarily on face-to-face conversations:
 
 * Results in a lot of scheduled or impromptu meetings that interrupt flow state.
 * Requires co-incidence that everyone required to make a decision happens to be online at the same time. What if someone's out sick, vacation, appointment, has another commitment, works in a different timezone etc.
@@ -104,7 +104,9 @@ Using written communication can improve team effectiveness by:
 
 ## Meetings
 
-The previous section on writing is not to suggest that face-to-face conversations are never needed. There could be a tricky issue that's gone back and forth in comments in a document or PR and isn't getting resolved. Or some people think better "out loud" and sometimes need to bounce ideas off a few other people. An effective team will support all types of thinkers. So if a meeting is needed, here's how to get the most out of the precious time:
+The previous section on writing is not to suggest that face-to-face conversations are never needed. There could be a tricky issue that's gone back and forth in comments in a document or PR and isn't getting resolved. Or some people think better "out loud" and sometimes need to bounce ideas off a few other people. An effective team will support all types of thinkers.
+
+If a meeting is needed, here's how to get the most out of the precious time:
 
 **Keep it brief:** Set the default meeting time to 30 minutes in whatever calendar/scheduling tool the company is using. If you think you'll need longer, bump it up to 45 minutes, but try not to go over an hour. In my experience, people lose their focus beyond this, and if the issue hasn't been resolved in an hour, dragging it on any longer doesn't help.
 
@@ -138,7 +140,7 @@ I learned this motto from a company I worked at earlier in my career and the adv
 
 An effective team chooses relatively simple solutions that get the job done, while not painting themselves into a corner. The idea here is to value maintainability and ease of deployment over cleverness or attempting a "big tech" scale architecture from day one of the project. While its nice to think that in the future the project will be so popular it needs to support millions, or even billions of simultaneous users, the reality is, most projects don't get to Meta/Alphabet/Amazon scale.
 
-This often means starting with a monolith rather than microservices. It can always be split up later *if* transaction volumes and revenue generated from these justifies that. Even then, you would want to measure and identify where the performance bottlenecks are, and come up with optimal solutions to address those directly. For example, if incoming requests are receiving errors due to running out of database connections, splitting up into microservices may not resolve the underlying issue. Instead investigate - is connection pooling being used? Is there a memory leak where some code is always opening, then forgetting to close a connection? Is there some work that could be moved to a background task manager to reduce the length of time needed to service a request? If many requests are read-only could increasing the number of database replicas help? For reads and writes, could consider [horizontal scaling](https://dzone.com/articles/how-to-horizontally-scale-your-postgres-database-using-citus) of database. Notice these investigations are going from simplest to most complex.
+This often means starting with a monolith rather than microservices. It can always be split up later *if* transaction volumes and revenue generated from these justifies that. Even then, you would want to measure and identify where the performance bottlenecks are, and come up with optimal solutions to address those directly. For example, if incoming requests are receiving errors due to running out of database connections, splitting up into microservices may not resolve the underlying issue. Instead investigate - Can the database max connections config be increased? Is connection pooling being used? Is there a memory leak where some code is always opening, then forgetting to close a connection? Is there some work that could be moved to a background task manager to reduce the length of time needed to service a request? If many requests are read-only could increasing the number of database replicas help? For reads and writes, could consider [horizontal scaling](https://dzone.com/articles/how-to-horizontally-scale-your-postgres-database-using-citus) of database. Notice these investigations are going from simplest to most complex.
 
 Avoid over-engineering, i.e. building in abstractions and flexibility unless its known to be needed. Otherwise what can happen is this flexibility is never needed, but when future requirements come in, they need to "flex" in a different direction, resulting in overly complex code.
 
