@@ -46,9 +46,8 @@ A small(ish) team of intrinsically motivated people with solid written communica
 
 * Breaking up large requirements into smaller items and entering these into a ticketing system to keep track of the work to be done, in priority order.
 * Developers pick up tickets by assigning the next most important item in the list to themselves and starting a feature branch. Major change are discussed with [ADRs](../about-those-docs#architecture-decision-records).
-* All code has automated tests at the appropriate level (from unit to end-to-end). Definitely investing in end-to-end testing to limit the need for manual QA (or only need it for things that can't be automated).
-* Non-obvious things are included in [engineering documentation](../about-those-docs) as part of feature development.
-* Linting is in place for consistent formatting and to prevent coding errors. Ideally linting has been added on day one of the project. [It can be added later](../markdown/add-rubocop-to-legacy-project), although that will be more effort.
+* All code has automated tests at the appropriate level (from unit to end-to-end).
+* [Engineering documentation](../about-those-docs) is maintained as part of development.
 * CI (Continuous Integration) runs on each commit to verify the build, lint rules and passing tests
 * Developers submit PRs when their feature is ready for review, with [instructions to reviewer](../markdown/working-towards-asynchronous-future#pull-requests) how to exercise the code.
 * Developers address feedback on their PRs, and when approved merge.
@@ -132,7 +131,7 @@ If the team has 2 developers, a PM, and a designer, that's a total size of 4, re
 
 It can be tempting to add more developers to a project thinking that productivity will improve linearly. For example if one developer can complete one feature per week, then adding 9 more developers will result in 9 features completed per week. However, 9 developers plus a PM and designer makes 11 team members, which translates to an astonishing 55 lines of communication! What's more likely is people end up stepping on each other's toes attempting to modify the same area of the code for different reasons, or spending the majority of their time in meetings trying to co-ordinate rather than hands-on building software. This is explained by [Brook's Law](https://en.wikipedia.org/wiki/Brooks%27s_law) which observes that adding people to a software project that is behind schedule delays it even longer.
 
-There's a little more nuance here in that it varies with the surface area of the project. A large project could potentially support a few more developers, if the areas that need to be developed in parallel are independent of each other, and there's thorough, up-to-date engineering documentation that allows new developers to [onboard](../about-those-docs#readmemd-project-setup) independently.
+There's a little more nuance here in that it varies with the surface area of the project. A large project could potentially support a few more developers, if the areas that need to be developed in parallel are independent of each other, and there's thorough, up-to-date engineering documentation that allows developers to [onboard](../about-those-docs#readmemd-project-setup) independently.
 
 ## Do the Simplest Thing That Works
 
@@ -166,21 +165,23 @@ But the front end person won't be able to finish their work until the back end d
 
 Now the front end developer has to reach out to the back end developer, who may or may not be available, maybe they've moved on to another ticket and either have to context switch or tell the front end developer to wait until they have time to fix it. So the front end developer will mark the ticket as blocked and move on to something else, hopefully remembering to return to the original ticket whenever the backend developer gets around to merging the fixes.
 
-The other thing that often happens is there's a deadline to get the feature complete. In this case the front end developer may implement some workarounds on the front end to make things seemingly work, when it would have been more efficient to have the back end do this work.
+The other thing that often happens is there's a deadline to get the feature complete. In this case the front end developer may implement some workarounds on the front end to make things seemingly work, when it would have been more efficient to have the back end do this.
 
-It's not the fault of the PM that is asking for changes, remember Agile tells us we're supposed to embrace change! But when the teams are structured as horizontal slices of the stack (database, back end, front end), it creates needless friction to get features complete that are vertical slices through the entire stack. I have found it more effective to give every developer autonomy over the entire stack so they can use the appropriate tools to get their job done.
+It's not the fault of the PM that is asking for changes, remember Agile tells us we're supposed to embrace change! But when the teams are structured as horizontal slices of the stack (database, back end, front end), it creates needless friction to get features complete that are vertical slices through the entire stack. I have found it most effective to give every developer autonomy over the entire stack so they can use the appropriate tools to get their job done.
 
-Of course there will always be some team members that prefer to specialize in one area or another. I believe the best way to work in this case is to have those experts be on the PR reviews, and to gradually document their specialized knowledge and best practices. To the extent that the best practices can be encoded as linting rules, bring those rules into the project linter (more on this in the next section). In this way, it's like everyone on the team has the expert sitting beside them as they code, levelling up everyone's knowledge. It's also beneficial to the company in case the expert(s) leave.
+Of course there will always be some team members that prefer to specialize in one area or another. In this case, have those experts be on the PR reviews, and gradually document their specialized knowledge. To the extent that the best practices can be encoded as linting rules, bring those rules into the project linter (more on this in the next section). In this way, it's like everyone on the team has the expert sitting beside them as they code, levelling up everyone's knowledge. It's also beneficial to the company in case the expert(s) leave.
 
 ## Automation
 
-An effective team establishes automated processes to minimize manual effort. This includes linting, automated testing, CI (Continuous Integration), and CD (Continuous Deployment) in place from the very early days of the project. Unless it's a hack-a-thon or throw-away code, this is a must.
+An effective team establishes automated processes to minimize manual effort. This includes linting, automated testing, CI (Continuous Integration), and CD (Continuous Deployment) in place from the very early days of the project. [Linting can be added later](../markdown/add-rubocop-to-legacy-project), although that will be more effort. Unless it's a hack-a-thon or throw-away code, this is a must.
 
 A good set of linting rules suggests best practices, prevents common coding errors, and enforces code style/formatting to avoid [bike shedding](https://en.wikipedia.org/wiki/Law_of_triviality) in PRs. Especially when it comes to code style, (eg: spacing, semi colons, etc.), it's less important to be "right" and more important for the team to be consistent.
 
-Getting in the habit of writing automated tests (unit, integration, and system) leads to better quality code. It also supports adding new features and refactoring without fear of causing regressions, and minimizes or eliminates entirely the need for manual QA.
+Getting in the habit of writing automated tests (unit, integration, and system/end-to-end) leads to better quality code. It also supports adding new features and refactoring without fear of causing regressions, and minimizes or eliminates entirely the need for manual QA.
 
-Finally, linting and tests should be easy to run on each developers laptop, via CLI and/or editor plugins. These should also run as part of CI, which should be running on each commit pushed to feature branches and the main branch. A failure in CI should notify the developer that pushed the breaking commit. The main branch should be protected such that CI must be passing before any PR can be merged.
+Linting and tests should be easy to run on each developers laptop, via CLI and/or editor plugins. These should also run as part of CI, which should be running on each commit pushed to feature branches and the main branch. A failure in CI should notify the developer that pushed the breaking commit. The main branch should be protected such that CI must be passing before any PR can be merged.
+
+Finally, where possible, continuous deployment should be setup to automatically deploy after code is merged to the main branch (given that CI is passing). This avoids manual effort of having a developer putting together a build, cutting a release branch, asking the team not to merge any PRs while the release is in progress, etc.
 
 ## Maintenance
 
@@ -214,7 +215,7 @@ Developers also need to feel safe suggesting accurate estimates (which are typic
 The topic of estimates is way too large to fully cover in this post, and somewhat out of scope so I've only touched on it. Give a listen to this podcast from Freakonomics on <a class="markdown-link" href="https://freakonomics.com/podcast/heres-why-all-your-projects-are-always-late-and-what-to-do-about-it/">why all your projects are always late</a> for an insightful and entertaining take.
 </aside>
 
-The other aspect of psychological safety is what happens when someone makes a mistake that has a serious impact such as data loss. It's important to not assign blame to the individual but look to how the system can be improved so no one else can ever make this mistake again. For example, is there some connection between the dev and production environments that shouldn't exist? Was some operational documentation out of date? Should every developers shell profile include logic to automatically turn the title bar or prompt red when connecting to production? Every mistake is an opportunity to improve systems and documentation. On the other hand if an individual "gets in trouble" for admitting to a mistake, you can be sure that no one will ever admit to a mistake again, which makes the entire matter worse.
+The other aspect of psychological safety is what happens when someone makes a mistake that has a serious impact such as data loss. It's important to not assign blame to the individual but rather, look to how the system can be improved so no one else can ever make this mistake again. For example, is there some connection between the dev and production environments that shouldn't exist? Was some operational documentation out of date? Should every developers shell profile include logic to automatically turn the title bar or prompt red when connecting to production? Every mistake is an opportunity to improve systems and documentation. On the other hand if an individual "gets in trouble" for admitting to a mistake, you can be sure that no one will ever admit to a mistake again, which makes the entire matter worse.
 
 ## Conclusion
 
