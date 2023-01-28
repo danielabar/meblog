@@ -40,7 +40,7 @@ The only style of product I've seen be ineffective is when there are a lot of un
 
 ## Minimal Process
 
-An effective team keeps the spirit of [agile](https://agilemanifesto.org/principles.html) alive, while not burying themselves under needless ceremonies and process. In my experience, this means keeping a focus on getting things done using a flow approach rather than a <s class="markdown-strikethrough">religious</s> rigid methodology like [Scrum](https://en.wikipedia.org/wiki/Scrum_(software_development)).
+An effective team keeps the spirit of [agile](https://agilemanifesto.org/principles.html) alive, while not burying themselves under needless ceremonies and process. This means keeping a focus on getting things done using a flow approach rather than a <s class="markdown-strikethrough">religious</s> rigid methodology like [Scrum](https://en.wikipedia.org/wiki/Scrum_(software_development)).
 
 A small(ish) team of intrinsically motivated people with solid written communication skills and autonomy over the entire stack can get a lot done with a minimum of process and meetings. There does need to be some process to avoid chaos, i.e. every day should not feel like a hack-a-thon. A lightweight process could include:
 
@@ -55,7 +55,7 @@ A small(ish) team of intrinsically motivated people with solid written communica
 * Developers pick up next most important item, rinse and repeat.
 
 <aside class="markdown-aside">
-There's been a lot said about ticketing systems being four letter words and all that. It doesn't need to be this way. The ticketing system is simply a communication tool to help teams know what needs to be done and what's most important. It's not intended as a management tool to measure developers performance or to make developers spend any more time in it than necessary. Ideally the ticketing system is fully integrated with version control so that ticket status changes such as In Progress, In Review, and Done are applied automatically as developers start pushing to branches, submit PRs, and merge.
+There's been a lot said about ticketing systems being four letter words and all that. It doesn't need to be this way. The ticketing system is simply a communication tool to keep track of what needs to be done and what's most important. Ideally it will be integrated with version control so that ticket status changes such as In Progress, In Review, and Done are applied automatically as developers start pushing to branches, submit PRs, and merge.
 </aside>
 
 ## Traceability
@@ -72,12 +72,12 @@ Now when the developer is looking at any line of code, they can run [git blame](
 
 An effective team develops a culture of writing, both on the business and technical side.
 
-On the business side, writing is used to capture the requirements and business rules, and also the *why* behind these. This could be tied to improved revenue generation or user experience. I've found its helpful for developers that are implementing the requirements to understand why a feature is being built a certain way. A team of genius developers that can solve every leet code interview question ever written could still be ineffective if they struggle to understand the requirements, or recognize when there’s additional clarifications to go to PM with. This is sometimes called "soft skills", but I consider it just as critical as the ability to code.
+On the business side, writing is used to capture the requirements and business rules, and also the *why* behind these. This could be tied to improved revenue generation or user experience. I've found its helpful for developers that are implementing the requirements to understand why a feature is being built a certain way. A team of genius developers that can solve every leet code interview question ever written could still be ineffective if they don't understand the requirements, or recognize when there’s additional clarifications to go to PM with.
 
 On the technical side, [writing](../about-those-docs#what-to-document) is used to share knowledge and expertise. This includes architectural proposals and decisions, project setup, common workflows through the application, troubleshooting tips, third party integrations, configuration, how to do deployments, how to exercise new code being added in a pull request, and anything else that helps developers understand how the project works.
 
 <aside class="markdown-aside">
-The kind of documents I'm referring to are internal, that is, written by engineers for engineers working together on the same project. Not to be confused with external customer-facing documentation. That is best written by someone who specializes in this kind of writing, especially if the customers are non-technical.
+The kind of documents I'm referring to are internal, that is, written by engineers for engineers working together on the same project. Not to be confused with external customer-facing documentation. That is best written by a specialist, especially if the customers are non-technical.
 </aside>
 
 These written documents are not intended as *contracts* where people can finger point later if something is not working. Rather, they are *living* documents owned by the entire team. They support collaboration and team continuity, and are updated as questions and new information arises. Here is where I differ from one of the Agile Manifesto principles which states:
@@ -107,15 +107,15 @@ The previous section on writing is not to suggest that face-to-face conversation
 
 If a meeting is needed, here's how to get the most out of the precious time:
 
-**Keep it brief:** Set the default meeting time to 30 minutes in whatever calendar/scheduling tool the company is using. If you think you'll need longer, bump it up to 45 minutes, but try not to go over an hour. In my experience, people lose their focus beyond this, and if the issue hasn't been resolved in an hour, dragging it on any longer doesn't help.
+**Keep it brief:** Set the default meeting time to 30 minutes. If you think you'll need longer, bump it up to 45 minutes, but try not to go over an hour. In my experience, people lose their focus beyond this, and if the issue hasn't been resolved in an hour, dragging it on any longer doesn't help.
 
 **Limit attendees:** The entire team is not needed at every meeting. For example, if two people are having a strong difference of opinion over a technical proposal, only those two, plus maybe the team lead or manager should be required. Other team members can be marked as optional. It's not always the case that every team member has a strong opinion, for these folks, not interrupting them and letting them get on with their work may be best.
 
-**Have a goal:** Include a goal in the meeting description. This is different from an agenda, which is simply a list of items to be discussed. A goal on the other hand is very specific. For example: "At the end of this meeting, we will have a decision on whether we will be using RabbitMQ or Kafka for messaging". Or "The purpose of this meeting is to finalize the design for the search results page".
+**Have a goal:** Include a goal in the meeting description. This is different from an agenda, which is just a list of items to be discussed. A goal on the other hand is very specific. For example: "At the end of this meeting, we will have a decision on whether to use RabbitMQ or Kafka for messaging". Or "The purpose of this meeting is to finalize the design for the search results page".
 
-**Come prepared:** The meeting description should include pointers to documents/discussion that has happened prior, so all attendees can be fully up to speed before the meeting starts. In the case of a technical decision, this could be a link to an [ADR](../about-those-docs/#architecture-decision-records) and/or related PR comments. In the case of a UI/UX decision, it could be pointers to the Figma document (or whatever design tool is being used).
+**Come prepared:** The meeting description should include pointers to documents/discussion that has happened prior, so all attendees can be fully up to speed before the meeting starts. In the case of a technical decision, this could be a link to an [ADR](../about-those-docs/#architecture-decision-records) and related PR comments. In the case of a UI/UX decision, it could be pointers to the Figma document (or whatever design tool is being used).
 
-**Update docs:** Update the referenced documents during the meeting as decision(s) are being made. This way there's no issue of forgetting what was decided or having to be a secretary later transcribing what people said. Finally, at the conclusion of the meeting, share/publish the decision to make it visible to the entire team.
+**Update docs:** Update the referenced documents during the meeting as decision(s) are being made. This way there's no issue of forgetting what was decided or someone having to be a secretary later transcribing what people said. Finally, at the conclusion of the meeting, share/publish the decision to make it visible to the entire team.
 
 <aside class="markdown-aside">
 Shopify has gone as far as <a class="markdown-link" href="https://www.forbes.com/sites/jenamcgregor/2023/01/03/shopify-is-canceling-all-meetings-with-more-than-two-people-from-workers-calendars-and-urging-few-to-be-added-back/?sh=61950fd6fe8a">cancelling all recurring meetings involving two or more people</a>. Perhaps once a company gets to a large enough size, a top-down edict like this is needed. My suggestion is to consider what problem you're trying to solve by booking a meeting, and then see if there's an asynchronous/written approach that could solve it first. If that's been tried and didn't work, then book the meeting, keeping the above guidelines in mind to maximize the time investment.
@@ -137,9 +137,9 @@ There's a little more nuance here in that it varies with the surface area of the
 
 I learned this motto from a company I worked at earlier in my career and the advice has served me well.
 
-An effective team chooses relatively simple solutions that get the job done, while not painting themselves into a corner. The idea here is to value maintainability and ease of deployment over cleverness or attempting a "big tech" architecture from day one of the project. While its nice to think that in the future the project will be so popular it needs to support millions, or even billions of simultaneous users, the reality is, most projects don't get to Meta/Alphabet/Amazon scale.
+An effective team chooses relatively simple solutions that get the job done, while not painting themselves into a corner. The idea here is to value maintainability and ease of deployment over cleverness or attempting a "big tech" architecture from day one of the project. While its nice to think that in the future, the project will be so popular it needs to support millions, or even billions of simultaneous users, the reality is, most projects don't get to Meta/Alphabet/Amazon scale.
 
-This often means starting with a monolith rather than microservices. It can always be split up later *if* transaction volumes and revenue generated from these justifies that. Even then, it will be be beneficial to measure and identify where the performance bottlenecks are, and come up with solutions to address those directly. For example, if incoming requests are receiving errors due to running out of database connections, splitting up into microservices may not resolve the underlying issue. Instead investigate - Can the database max connections config be increased? Is connection pooling being used? Is there a memory leak where some code is always opening, then forgetting to close a connection? Is there some work that could be moved to a background task manager to reduce the length of time needed to service a request? If many requests are read-only could increasing the number of database replicas help? For reads and writes, consider [horizontal scaling](https://dzone.com/articles/how-to-horizontally-scale-your-postgres-database-using-citus) of database. Notice these investigations are going from simplest to more complex.
+This often means starting with a monolith rather than microservices. It can be split up later if transaction volumes and revenue generated from these justifies that. Even then, it will be be beneficial to measure and identify where the performance bottlenecks are, and come up with solutions to address those directly. For example, if incoming requests are receiving errors due to running out of database connections, splitting up into microservices may not resolve the underlying issue. Instead investigate - Can the database max connections config be increased? Is connection pooling being used? Is there a memory leak where some code is always opening, then forgetting to close a connection? Is there some work that could be moved to a background task manager to reduce the length of time needed to service a request? If many requests are read-only could increasing the number of database replicas help? For reads and writes, consider [horizontal scaling](https://dzone.com/articles/how-to-horizontally-scale-your-postgres-database-using-citus) of database. Notice these investigations are going from simplest to more complex.
 
 Avoid over-engineering, i.e. building in abstractions and flexibility unless its known to be needed. Otherwise what can happen is this flexibility is never needed, but when future requirements come in, they need to "flex" in a different direction, resulting in overly complex code.
 
@@ -185,13 +185,13 @@ Finally, where possible, continuous deployment should be setup to automatically 
 
 ## Maintenance
 
-As exciting as it is to work on new features, an effective team dedicates a certain percentage of time to maintenance activities. This could include dealing with dependabot PRs, alerts from monitoring systems, deprecation warnings, library upgrades, and bug fixes. Otherwise things can get stale or stop working altogether, and make it difficult to keep moving the project forward.
+As exciting as it is to work on new features, an effective team dedicates a certain percentage of time to maintenance. This could include dealing with dependabot PRs, alerts from monitoring systems, deprecation warnings, library upgrades, and bug fixes. Otherwise things can get stale or stop working altogether, and make it difficult to keep moving the project forward.
 
-Some teams will set aside a certain part of the year for these activities. Another way is to regularly add these items to the ticketing system with a tag such as `Maintenance`, and then let developers know for every 3 or so features they work on, pick up a maintenance task.
+Some teams will set aside a certain part of the year for these activities. Another way is to regularly add these items to the ticketing system with a tag such as `Maintenance`, and then let developers know for every 3 or so features they work on, pick up a maintenance task. This would work out to roughly 25% of time spent on maintenance. Adjust as per your teams needs, as long as its not 0!
 
 ## Rotate Assignments
 
-On many teams, developers tend to become experts on the area of the application that they've worked on most. It could be based on interest, or just by co-incidence of the initial task assignments. What tends to happen is whenever new feature requests or bugs come up, they get assigned to the developer that's already most familiar with that area because it will be "faster" to get it done.
+On many teams, developers tend to become experts on the area of the application that they've worked on most. It could be based on interest, or just by co-incidence of the initial task assignments. Then when new feature requests or bugs come up, they get assigned to the developer that's already most familiar with that area because it will be "faster" to get it done.
 
 However, this speed is an illusion, or a trade-off between the short term and long term viability of the project. When the expert goes on an extended vacation or leaves to pursue another opportunity, progress slows down when development is needed in the area that only the expert was familiar with.
 
@@ -222,7 +222,7 @@ The other aspect of psychological safety is what happens when someone makes a mi
 This post has covered the definition of an effective software development team, and practices that lead to effectiveness. These practices include:
 
 * Lightweight process that lets developers get into flow state and supports traceability.
-* Favoring written communication to solve problems over frequent meetings.
+* Favoring written communication over frequent meetings.
 * Maintaining a small team.
 * Sticking to simple implementations where possible.
 * Favoring fullstack where possible.
