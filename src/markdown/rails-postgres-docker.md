@@ -2,7 +2,7 @@
 title: "Setup a Rails Project with Postgres and Docker"
 featuredImage: "../images/rails-postgres-docker-guillaume-bolduc-uBe2mknURG4-unsplash.jpg"
 description: "Learn how to scaffold a new Rails project with Postgres running in a Docker container for development."
-date: "2023-02-01"
+date: "2023-05-01"
 category: "rails"
 related:
   - "Dockerize a Rails Application for Development"
