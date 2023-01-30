@@ -10,17 +10,13 @@ related:
   - "About Those Docs"
 ---
 
-I was inspired to write this post after listening to a Software Engineering Radio podcast with guest Jon Smart on the subject of [Patterns and Anti-Patterns for Successful Software Delivery](https://www.se-radio.net/2022/12/episode-543-jon-smart-on-patterns-and-anti-patterns-for-successful-software-delivery-in-enterprises/). He discusses why "Agile Transformation" is an anti-pattern, and avoiding one-size-fits-all solutions. He says the goal shouldn't be to "do agile", but rather introduces a new language of better (quality), sooner (time to value), safer (agile not fragile), and happier (customers, colleagues, citizens, clients).
+I was inspired to write this post after listening to a Software Engineering Radio podcast with guest Jon Smart on the subject of [Patterns and Anti-Patterns for Successful Software Delivery](https://www.se-radio.net/2022/12/episode-543-jon-smart-on-patterns-and-anti-patterns-for-successful-software-delivery-in-enterprises/). Topics covered included why "Agile Transformation" is an anti-pattern, and avoiding one-size-fits-all solutions.
 
 Listening to this podcast made me reflect on my many years experience of software development on various project and product teams across different sized companies and industries in terms of what practices have made some teams more effective than others. In this post, I'll share practices I've experienced that have made teams effective.
 
 ## Definition
 
-But first, what do I mean by an effective team? My definition of this term is a team that can continuously deliver working software that solves their customers problems, and the customers are happy to keep on paying for the service.
-
-The delivery of each release introduces little to no [regressions](https://en.wikipedia.org/wiki/Software_regression).
-
-Equally important, an effective team consists of team members who communicate well with each other, feel satisfied and fulfilled in their work, and reasonably look forward to starting work each day.
+But first, what do I mean by an effective team? My definition of this term is a team that can continuously deliver working software that solves their customers problems, and the customers are happy to keep on paying for the service. The delivery of each release introduces little to no [regressions](https://en.wikipedia.org/wiki/Software_regression). Equally important, an effective team consists of team members who communicate well with each other, feel satisfied and fulfilled in their work, and reasonably look forward to starting work each day.
 
 Now that the definition is out of the way, the rest of this post will cover practices that make teams effective.
 
@@ -42,7 +38,7 @@ The only style of product I've seen be ineffective is when there are a lot of un
 
 An effective team keeps the spirit of [agile](https://agilemanifesto.org/principles.html) alive, while not burying themselves under needless ceremonies and process. This means keeping a focus on getting things done using a flow approach rather than a <s class="markdown-strikethrough">religious</s> rigid methodology like [Scrum](https://en.wikipedia.org/wiki/Scrum_(software_development)).
 
-A small(ish) team of intrinsically motivated people with solid written communication skills and autonomy over the entire stack can get a lot done with a minimum of process and meetings. There does need to be some process to avoid chaos, i.e. every day should not feel like a hack-a-thon. A lightweight process could include:
+A small team (more on [team size](../reflections-on-effective-teams#small-ish-team-size) later in this post) of intrinsically motivated people with solid written communication skills and autonomy over the entire stack can get a lot done with a minimum of process and meetings. There does need to be some process to avoid chaos, every day should not feel like a hack-a-thon. A lightweight process could include:
 
 * Breaking up large requirements into smaller items and entering these into a ticketing system to keep track of the work to be done, in priority order.
 * Developers pick up tickets by assigning the next most important item in the list to themselves and starting a feature branch. Major change are discussed with [ADRs](../about-those-docs#architecture-decision-records).
@@ -72,7 +68,7 @@ Now when the developer is looking at any line of code, they can run [git blame](
 
 An effective team develops a culture of writing, both on the business and technical side.
 
-On the business side, writing is used to capture the requirements and business rules, and also the *why* behind these. This could be tied to improved revenue generation or user experience. I've found its helpful for developers that are implementing the requirements to understand why a feature is being built a certain way. A team of genius developers that can solve every leet code interview question ever written could still be ineffective if they don't understand the requirements, or recognize when there’s additional clarifications to go to PM with.
+On the business side, writing is used to capture the requirements and business rules, and also the *why* behind these. This could be tied to improved revenue generation or user experience. Its helpful for developers that are implementing the requirements to understand why a feature is being built a certain way. A team of genius developers that can solve every leet code interview question ever written could still be ineffective if they don't understand the requirements, or recognize when there’s additional clarifications to go to PM with.
 
 On the technical side, [writing](../about-those-docs#what-to-document) is used to share knowledge and expertise. This includes architectural proposals and decisions, project setup, common workflows through the application, troubleshooting tips, third party integrations, configuration, how to do deployments, how to exercise new code being added in a pull request, and anything else that helps developers understand how the project works.
 
@@ -84,11 +80,11 @@ These written documents are not intended as *contracts* where people can finger 
 
 > The most efficient and effective method of conveying information to and within a development team is face-to-face conversation.
 
-The original manifesto was developed in [2001](https://agilemanifesto.org/history.html). A lot has changed in team work since then including the prevalence of remote work, recognition of the importance of mental health and preventing burnout, DEI, neurodiversity, and psychology research on [flow state](https://en.wikipedia.org/wiki/Flow_(psychology)). Relying primarily on face-to-face conversations:
+The original manifesto was developed in [2001](https://agilemanifesto.org/history.html). Changes in team work since then include the prevalence of remote work, recognition of the importance of mental health and preventing burnout, DEI, neurodiversity, and psychology research on [flow state](https://en.wikipedia.org/wiki/Flow_(psychology)). Relying primarily on face-to-face conversations:
 
 * Results in a lot of scheduled or impromptu meetings that interrupt flow state.
 * Requires co-incidence that everyone required to make a decision happens to be online at the same time. What if someone's out sick, vacation, appointment, has another commitment, works in a different timezone etc.
-* Relies on people having perfect memories of what was discussed and decided in the conversation.
+* Relies on people having perfect memories of what was discussed.
 * Assumes that the best way to get people's input into decisions is via realtime conversation - this can result in "off the cuff" remarks that upon deeper technical analysis, may not turn out to be optimal.
 * Can be prone to [loudest voice in the room](https://www.linkedin.com/pulse/loudest-voice-room-hisako-esaki/) effect where the more dominant personalities assert their opinions, and the quieter types that may have differing opinions don't feel comfortable challenging it or can't get a word in.
 * Results in a lot of knowledge that only lives in people's heads, and gets lost as people leave.
@@ -97,7 +93,7 @@ Using written communication can improve team effectiveness by:
 
 * Minimizing interruptions - developers can review proposals or questions others may have when its an optimal time for them.
 * Asynchronous nature of responding to written communication means the team can be distributed and can still function even when people have different schedules or personal matters to attend to. i.e. work can revolve around life rather than life needing to revolve around work.
-* Leaves a written artifact of discussions and decisions. No more "What was that we decided in the meeting last week?" or "Why was tool X over Y chosen to solve this problem?".
+* Leaves a written artifact of discussions and decisions. No more "What was that we decided in the meeting last week?" or "Why was tool X over Y chosen?".
 * Captures everyone's feedback because everyone has an opportunity to contribute to shared documents with the results of deep, thoughtful analysis.
 * Contributes to a shared understanding of business and technical decisions. Not only for the current team members, but future team members. i.e. as the usual churn of tech workers coming and going happens, the project can still continue smoothly because important decisions have been captured in writing.
 
@@ -113,7 +109,7 @@ If a meeting is needed, here's how to get the most out of the precious time:
 
 **Have a goal:** Include a goal in the meeting description. This is different from an agenda, which is just a list of items to be discussed. A goal on the other hand is very specific. For example: "At the end of this meeting, we will have a decision on whether to use RabbitMQ or Kafka for messaging". Or "The purpose of this meeting is to finalize the design for the search results page".
 
-**Come prepared:** The meeting description should include pointers to documents/discussion that has happened prior, so all attendees can be fully up to speed before the meeting starts. In the case of a technical decision, this could be a link to an [ADR](../about-those-docs/#architecture-decision-records) and related PR comments. In the case of a UI/UX decision, it could be pointers to the Figma document (or whatever design tool is being used).
+**Come prepared:** The meeting description should include pointers to documents/discussion that has happened prior, so all attendees can be fully up to speed before the meeting starts. In the case of a technical decision, this could be a link to an [ADR](../about-those-docs/#architecture-decision-records) and related PR comments. In the case of a UI/UX decision, it could be pointers to the current designs.
 
 **Update docs:** Update the referenced documents during the meeting as decision(s) are being made. This way there's no issue of forgetting what was decided or someone having to be a secretary later transcribing what people said. Finally, at the conclusion of the meeting, share/publish the decision to make it visible to the entire team.
 
@@ -129,9 +125,9 @@ Over the years, I have found the optimal team size to be on the small end, rangi
 
 If the team has 2 developers, a PM, and a designer, that's a total size of 4, resulting in 6 lines of communication, which is manageable. Bumping this up to 4 developers results in a total team size of 6, which leads to 15 lines of communication. That's pushing at the maximum of what a team can manage and still be effective.
 
-It can be tempting to add more developers to a project thinking that productivity will improve linearly. For example if one developer can complete one feature per week, then adding 9 more developers will result in 9 features completed per week. However, 9 developers plus a PM and designer makes 11 team members, which translates to an astonishing 55 lines of communication! What's more likely is people end up stepping on each other's toes attempting to modify the same area of the code for different reasons, or spending the majority of their time in meetings trying to co-ordinate rather than hands-on building software. This is explained by [Brook's Law](https://en.wikipedia.org/wiki/Brooks%27s_law) which observes that adding people to a software project that is behind schedule delays it even longer.
+It can be tempting to add more developers to a project thinking that productivity will improve linearly. For example if one developer can complete one feature per week, then adding 9 more developers will result in 9 features completed per week. However, 9 developers plus a PM and designer makes 11 team members, which results in 55 lines of communication! What's more likely is people end up stepping on each other's toes attempting to modify the same area of the code for different reasons, or spending the majority of their time in meetings trying to co-ordinate rather than hands-on building software. This is explained by [Brook's Law](https://en.wikipedia.org/wiki/Brooks%27s_law) which observes that adding people to a software project that is behind schedule delays it even longer.
 
-There's a little more nuance here in that it varies with the surface area of the project. A large project could potentially support a few more developers, if the areas that need to be developed are independent of each other, and there's thorough, up-to-date engineering documentation that allows developers to [onboard](../about-those-docs#readmemd-project-setup) independently.
+There's a little more nuance here in that it varies with the surface area of the project. A large project could potentially support a few more developers, if the areas that need to be developed are independent of each other, and there's up-to-date engineering documentation that allows developers to [onboard](../about-those-docs#readmemd-project-setup) independently.
 
 ## Do the Simplest Thing That Works
 
@@ -139,11 +135,11 @@ I learned this motto from a company I worked at earlier in my career and the adv
 
 An effective team chooses relatively simple solutions that get the job done, while not painting themselves into a corner. The idea here is to value maintainability and ease of deployment over cleverness or attempting a "big tech" architecture from day one of the project. While its nice to think that in the future, the project will be so popular it needs to support millions, or even billions of simultaneous users, the reality is, most projects don't get to Meta/Alphabet/Amazon scale.
 
-This often means starting with a monolith rather than microservices. It can be split up later if transaction volumes and revenue generated from these justifies that. Even then, it will be be beneficial to measure and identify where the performance bottlenecks are, and come up with solutions to address those directly. For example, if incoming requests are receiving errors due to running out of database connections, splitting up into microservices may not resolve the underlying issue. Instead investigate - Can the database max connections config be increased? Is connection pooling being used? Is there a memory leak where some code is always opening, then forgetting to close a connection? Is there some work that could be moved to a background task manager to reduce the length of time needed to service a request? If many requests are read-only could increasing the number of database replicas help? For reads and writes, consider [horizontal scaling](https://dzone.com/articles/how-to-horizontally-scale-your-postgres-database-using-citus) of database. Notice these investigations are going from simplest to more complex.
+This often means starting with a monolith rather than microservices. It can be split up later if transaction volumes and revenue generated from these justifies that. Even then, it will be be beneficial to measure and identify where the performance bottlenecks are, and come up with solutions to address those directly. For example, if incoming requests are receiving errors due to running out of database connections, splitting up into microservices may not resolve the underlying issue. Instead investigate - Can the database max connections config be increased? Is connection pooling being used and properly configured? Is there a memory leak where some code is always opening, then forgetting to close a connection? Is there some work that could be moved to a background task runner to reduce the length of time needed to handle common requests? If many requests are read-only could increasing the number of database replicas help? For reads and writes, consider [horizontal scaling](https://dzone.com/articles/how-to-horizontally-scale-your-postgres-database-using-citus) of database. Notice these investigations are going from simplest to more complex.
 
 Avoid over-engineering, i.e. building in abstractions and flexibility unless its known to be needed. Otherwise what can happen is this flexibility is never needed, but when future requirements come in, they need to "flex" in a different direction, resulting in overly complex code.
 
-Avoid premature optimization. For example, writing harder to understand code that shaves microseconds of performance over more straightforward code. Developers spend more of their time reading code others wrote rather than writing new code so legibility and avoiding second takes is often more valuable than a few microseconds that some obscurely written code saves. In my experience, performance issues have been caused more frequently by loading too much data from the server (lack of pagination), missing database indices, N+1 queries, and loading too much JavaScript, such as trackers or non-minified code.
+Avoid premature optimization. For example, writing harder to understand code that shaves microseconds of performance over more straightforward code. Developers spend more of their time reading code others wrote rather than writing new code so legibility and avoiding second takes is often more valuable than a few microseconds that some obscurely written code saves. In my experience, performance issues have been caused more frequently by loading too much data from the server (eg: lack of pagination), missing database indices, N+1 queries, and loading too much JavaScript, such as trackers or non-minified code.
 
 There are exceptions - in some domains such as real-time systems or graphics processing, these microseconds matter. This is a good place to add [code comments](../about-those-docs#code-comments) explaining what this code does, and more importantly *why* this code is needed.
 
@@ -157,7 +153,7 @@ It's true that there's a different kind of thinking involved in building the fro
 
 However, neither of these are how the business people (who are paying the developers to have this software built), nor the customers (who will use the product) actually think about it. They view the application as a single unit that either solves their problem or doesn't.
 
-Consider a simple example: When the PM specifies a new feature to be added to the product such as advanced search, the requirements will have the design comps showing the layout of the new fields, and specify the behaviour for what kind of results should be returned for various combinations of fields. The PM is not thinking about (nor should they) which parts of the logic will execute on the server and which on the client.
+Consider an example: When the PM specifies a new feature to be added to the product such as advanced search, the requirements will have the design comps showing the layout of the new fields, and specify the behaviour for what kind of results should be returned for various combinations of fields. The PM is not thinking about (nor should they) which parts of the logic will execute on the server and which on the client.
 
 When there are separate teams of developers doing front vs back end work, this feature gets split up into two tickets - one to implement the front end and another for the back end. Now there's a very tight dependency between the two people working on these tickets. They might collaborate to determine the path of the search API endpoint and what parameters it will support. Then the back end person will implement it and submit a PR for that work, which will get merged. In the meantime, the front end person can start building their part, perhaps with a mock API (which someone will have to implement) that mirrors the real API that was agreed to.
 
@@ -165,9 +161,9 @@ But the front end person won't be able to finish their work until the back end d
 
 Now the front end developer has to reach out to the back end developer, who may have moved on to another ticket and either have to context switch or tell the front end developer to wait until they have time to fix it. So the front end developer will mark the ticket as blocked and move on to something else, hopefully remembering to return to the original ticket whenever the backend developer gets around to merging the fixes.
 
-The other thing that often happens is there's a deadline to get the feature complete. In this case the front end developer may implement some workarounds on the front end to make things seemingly work, when it would have been more efficient to have the back end do this.
+The other thing that often happens is there's a deadline to get the feature complete. In this case the front end developer may have no choice but to implement some workarounds on the front end to make things seemingly work, when it would have been more efficient to have the back end do this.
 
-It's not the fault of the PM that is asking for changes, remember Agile tells us we're supposed to embrace change! But when the teams are structured as horizontal slices of the stack (database, back end, front end), it creates needless friction to get features complete that are vertical slices through the entire stack. I have found it most effective to give every developer autonomy over the entire stack so they can use the appropriate tools to get their job done.
+It's not the fault of the PM that is asking for changes, remember Agile tells us we're supposed to embrace change! But when the teams are structured as horizontal slices of the stack (database, back end, front end), it creates needless friction to get features complete that are vertical slices through the entire stack. It's more effective to give every developer autonomy over the entire stack so they can use the appropriate tools to get their job done.
 
 If some team members prefer to specialize in one area or another, this can still work. In this case, have those experts be on the PR reviews, and gradually document their specialized knowledge. To the extent that the best practices can be encoded as linting rules, bring those rules into the project linter (more on this in the next section). In this way, it's like everyone on the team has the expert sitting beside them as they code, levelling up everyone's knowledge. It's also beneficial to the company in case the expert(s) leave.
 
@@ -187,7 +183,7 @@ Finally, where possible, continuous deployment should be setup to automatically 
 
 As exciting as it is to work on new features, an effective team dedicates a certain percentage of time to maintenance. This could include dealing with dependabot PRs, alerts from monitoring systems, deprecation warnings, library upgrades, and bug fixes. Otherwise things can get stale or stop working altogether, and make it difficult to keep moving the project forward.
 
-Some teams will set aside a certain part of the year for these activities. Another way is to regularly add these items to the ticketing system with a tag such as `Maintenance`, and then let developers know for every 3 or so features they work on, pick up a maintenance task. This would work out to roughly 25% of time spent on maintenance. Adjust as per your teams needs, as long as its not 0!
+Some teams will set aside a certain part of the year for these activities. Another way is to regularly add these items to the ticketing system with a tag such as `Maintenance`, and then let developers know for every 3 or so features they work on, pick up a maintenance task. This would work out to roughly 25% of time spent on maintenance. Adjust as per your teams needs, as long as its not 0.
 
 ## Rotate Assignments
 
@@ -215,7 +211,7 @@ Developers also need to feel safe suggesting accurate estimates (which are typic
 The topic of estimates is way too large to fully cover in this post, and somewhat out of scope so I've only touched on it. Give a listen to this podcast from Freakonomics on <a class="markdown-link" href="https://freakonomics.com/podcast/heres-why-all-your-projects-are-always-late-and-what-to-do-about-it/">why all your projects are always late</a> for an insightful and entertaining take.
 </aside>
 
-The other aspect of psychological safety is what happens when someone makes a mistake that has a serious impact such as data loss. It's important to not assign blame to the individual but rather, look to how the system can be improved so no one else can ever make this mistake again. For example, is there some connection between the dev and production environments that shouldn't exist? Was some operational documentation out of date? Should every developers shell profile include logic to automatically turn the title bar or prompt red when connecting to production? Every mistake is an opportunity to improve systems and documentation. On the other hand if an individual "gets in trouble" for admitting to a mistake, you can be sure that no one will ever admit to a mistake again, which makes the entire matter worse.
+Another aspect of psychological safety is what happens when someone makes a mistake that has a serious impact such as data loss? It's important to not assign blame to the individual but rather, look to how the system can be improved so no one else can ever make this mistake again. For example, is there some connection between the dev and production environments that shouldn't exist? Was some operational documentation out of date? Should every developers shell profile include logic to turn the prompt red when connecting to production? Every mistake is an opportunity to improve systems and documentation. On the other hand if an individual "gets in trouble" for admitting to a mistake, you can be sure that no one will ever admit to a mistake again, which makes the entire matter worse.
 
 ## Conclusion
 
