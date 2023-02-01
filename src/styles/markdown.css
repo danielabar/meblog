@@ -100,3 +100,9 @@
 .markdown-header-link svg {
   fill: var(--brand-darken-40);
 }
+
+.markdown-strikethrough {
+  color: var(--post-strikethrough-font-color);
+  font-family: sans-serif;
+  text-decoration: line-through wavy var(--post-strikethrough-color);
+}
