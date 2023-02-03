@@ -12,7 +12,7 @@ related:
 
 I was inspired to write this post after listening to a Software Engineering Radio podcast with guest Jon Smart on the subject of [Patterns and Anti-Patterns for Successful Software Delivery](https://www.se-radio.net/2022/12/episode-543-jon-smart-on-patterns-and-anti-patterns-for-successful-software-delivery-in-enterprises/). Topics covered included why "Agile Transformation" is an anti-pattern, and avoiding one-size-fits-all solutions.
 
-Listening to this podcast made me reflect on my many years experience of software development on various project and product teams across different sized companies and industries in terms of what practices have made some teams more effective than others. In this post, I'll share practices I've experienced that have made teams effective.
+Listening to this podcast made me reflect on my many years experience of software development on various project and product teams across different sized companies and industries in terms of what practices have made some teams more effective than others. In this post, I'll share practices I've experienced that have made teams effective, keeping in mind the majority of my experience has been in web development.
 
 ## Definition
 
@@ -68,7 +68,7 @@ When a developer is looking at any line of code, they can run [git blame](https:
 
 An effective team develops a culture of writing, both on the business and technical side.
 
-On the business side, writing is used to capture the requirements and business rules, and also the *why* behind these. This could be tied to improved revenue generation or user experience. Its helpful for developers that are implementing the requirements to understand why a feature is being built a certain way. A team of genius developers that can solve every leet code interview question ever written could still be ineffective if they don't understand the requirements, or recognize when there’s additional clarifications to go to PM with.
+On the business side, writing is used to capture the requirements and business rules, and also the *why* behind these. This could be tied to improved revenue generation or user experience. Its helpful for developers that are implementing the requirements to understand why a feature is being built a certain way. A team of genius developers that can solve every [leetcode](https://en.wikipedia.org/wiki/Competitive_programming) interview question ever written could still be ineffective if they don't understand the requirements, or recognize when there’s additional clarifications to go to PM with.
 
 On the technical side, writing is used to share knowledge and expertise. This includes architectural proposals and decisions, project setup, common workflows through the application, troubleshooting tips, third party integrations, configuration, how to do deployments, how to exercise new code being added in a pull request, and anything else that helps developers understand how the project works.
 
