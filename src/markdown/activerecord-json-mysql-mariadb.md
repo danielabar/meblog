@@ -108,11 +108,11 @@ But when the same code runs in a deployed environment that is using MariaDB, an 
 undefined method `each' for "[\"apple\", \"orange\"]":String (NoMethodError)
 ```
 
-If you would like to see the problem in action, clone this [demo repo](https://github.com/danielabar/maria), which runs a Rails 7 project against a MariaDB instance running in a Docker container, and try out the steps to reproduce.
+If you would like to see the problem in action, clone this [demo repo](https://github.com/danielabar/maria), which runs a Rails 7 project using a MariaDB instance running in a Docker container, and try out the steps to reproduce.
 
 ## Table Contents
 
-It looks like the problem is that in MariaDB, despite having defined the column as JSON, and having inserted an array, the value that got stored in the database is a String. Confirming this with a little more code.
+It looks like the problem is that in MariaDB, despite having defined the column as JSON, and having inserted an array, the value that got stored in the database is a String. We can see this by invoking the `class` method of the `fav_fruits` attribute in a project using MySQL, and then in a project using MariaDB:
 
 First, MySQL:
 
@@ -140,6 +140,10 @@ CREATE TABLE `users` (
   `fav_fruits` json DEFAULT NULL
 )
 ```
+
+<aside class="markdown-aside">
+This project is using the SQL format of the schema dump rather than the default Ruby format. This is useful if you ever need to use raw SQL in a migration to execute something that isn't supported by the migration DSL. See the Rails guide on <a class="markdown-link" href="https://guides.rubyonrails.org/active_record_migrations.html#types-of-schema-dumps">migrations</a> for more details.
+</aside>
 
 But how does the schema look within each database? To check this, I'm using [DataGrip](https://www.jetbrains.com/datagrip/), which is a licensed tool but you could do the same with a command line tool or any database GUI that has a feature to show a table's schema.
 
@@ -169,37 +173,84 @@ With MariaDB, the `fav_fruits` column is not defined as json, rather it's define
 
 According to the MariaDB docs for the [JSON Data Type](https://mariadb.com/kb/en/json-data-type/), this is a feature, not a bug:
 
-> JSON is an alias for LONGTEXT introduced for compatibility reasons with MySQL's JSON data type. MariaDB implements this as a LONGTEXT rather, as the JSON data type contradicts the SQL standard... In order to ensure that a a valid json document is inserted, the JSON_VALID function can be used as a CHECK constraint. This constraint is automatically included for types using the JSON alias from MariaDB 10.4.3.
+> JSON is an alias for LONGTEXT introduced for compatibility reasons with MySQL's JSON data type. MariaDB implements this as a LONGTEXT rather, as the JSON data type contradicts the SQL standard... In order to ensure that a valid json document is inserted, the JSON_VALID function can be used as a CHECK constraint. This constraint is automatically included for types using the JSON alias from MariaDB 10.4.3.
 
 ## Solution
 
-In the short term, we have a situation where developer's laptops are using MySQL which will return an Array from the JSON column (given that we're only inserting array values and an appropriate JSON validator is in place). But when the same code runs in production, a String is returned.
+In the short term, we have a situation where developer's laptops are using MySQL which will return an Array from the JSON column (given that we're only inserting array values and an appropriate JSON validator is in place). But when the same code runs in production against a MariaDB database, a String is returned.
 
 Without changing any setup, a solution to this is to override the ActiveRecord attribute method for the JSON field `fav_fruits`, and  use the [read_attribute](https://api.rubyonrails.org/classes/ActiveRecord/AttributeMethods/Read.html#method-i-read_attribute) method from the `ActiveRecord::AttributeMethods::Read` module to retrieve the value, and convert as needed.
 
 ```ruby
-def fav_fruits
-  # Retrieve the typecast value of fav_fruits from the database, which could be:
-  #   1. nil
-  #   2. String
-  #   3. Array
-  days = read_attribute(:fav_fruits)
+class User < ApplicationRecord
+  def fav_fruits
+    # Retrieve the typecast value of fav_fruits from the database, which could be:
+    #   1. nil
+    #   2. String
+    #   3. Array
+    days = read_attribute(:fav_fruits)
 
-  # 1. Not allowed to have default not null value on json column, return empty array in this case.
-  return [] if days.blank?
+    # 1. Not allowed to have default not null value on json column, return empty array in this case.
+    return [] if days.blank?
 
-  # 2. MariaDB: If a String is found, convert to JSON.
-  return JSON.parse(days) if days.is_a?(String)
+    # 2. MariaDB: If a String is found, convert to JSON.
+    return JSON.parse(days) if days.is_a?(String)
 
-  # 3. MySQL: Otherwise, return the original value.
-  days
+    # 3. MySQL: Otherwise, return the original value.
+    days
+  end
 end
 ```
 
-Now, anywhere in the code that `user.fav_fruits` is used, it's guaranteed to always return an Array.
+Now, anywhere in the code that `user.fav_fruits` is used, it's guaranteed to always return an Array, whether the underlying database is MySQL or MariaDB.
 
-In the long term, the solution will be to update the local setup to use MariaDB instead of MySQL to avoid any future surprises of differences in implementation.
+In the long term, a better approach is to update the local setup to use MariaDB instead of MySQL. This will avoid any future surprises of differences in implementation. With this in place, the solution is to modify the model to use ActiveRecord's [serialize](https://api.rubyonrails.org/classes/ActiveRecord/AttributeMethods/Serialization/ClassMethods.html#method-i-serialize) class method. This tells Rails that you want this column retrieved from the database as JSON:
+
+```ruby
+class User < ApplicationRecord
+  serialize :fav_fruits, JSON
+  # ...
+end
+```
+
+With this change in place, we can again run a Rails console in the project that's using MariaDB and check the value of fav_fruits, this time its retrieved from the database as an Array rather than a String:
+
+```ruby
+u = User.find_by(username: "alice")
+u.fav_fruits
+# => ["apple", "orange"]
+
+u.fav_fruits.class
+# => Array
+```
+
+Overriding the `fav_fruits` method is no longer needed, unless you want to maintain the behaviour of having an empty array returned instead of nil, in which case, the User model would look like this:
+
+```ruby
+class User < ApplicationRecord
+  # solution to guarantee JSON when retrieving fav_fruits from MariaDB
+  serialize :fav_fruits, JSON
+
+  # if want [] returned instead of nil
+  def fav_fruits
+    days = read_attribute(:fav_fruits)
+    return [] if days.blank?
+    super
+  end
+end
+```
+
+**WARNING:** Do not use the `serialize` class method when running against a database that natively supports JSON such as MySQL or Postgres. Otherwise the following error will result when inserting data:
+
+```ruby
+User.create(username: "alice", fav_fruits: ["apple", "orange"])
+# activerecord-7.0.4/lib/active_record/attribute_methods/serialization.rb:117:in `block in serialize':
+# Column `fav_fruits` of type ActiveRecord::Type::Json does not support `serialize` feature.
+# (ActiveRecord::AttributeMethods::Serialization::ColumnNotSerializableError)
+# Usually it means that you are trying to use `serialize`
+# on a column that already implements serialization natively.
+```
 
 ## Conclusion
 
-This post has covered an important difference in JSON handling between MySQL and MariaDB and demonstrated a simple solution using ActiveRecord, in the case where the local development environment is using MySQL and production is using MariaDB.
+This post has covered an important difference in JSON handling between MySQL and MariaDB. It showed a solution if both databases must be supported and another solution if all environments can be modified to use MariaDB. In general, it's better to have the local development environment mirror production as closely as possible to avoid surprising differences in behaviour.
