@@ -24,6 +24,13 @@ npm install
 
 ## Development
 
+Generate a new post:
+
+```bash
+./scripts/generate-post.sh my-article-title my-category
+# generates markdown file at: src/markdown/my-article-title.md
+```
+
 In a terminal at root of project, run:
 
 ```bash
