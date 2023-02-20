@@ -12,7 +12,7 @@ related:
 
 If you were affected by the [LastPass breach](https://blog.lastpass.com/2022/12/notice-of-recent-security-incident/) at the end of 2022, you've probably found yourself on various websites changing passwords. You may have also noticed that some websites block pasting in a password field. For some reason, the companies behind these seem to think that being able to paste in a password field is insecure. But it's actually the opposite, forcing users to manually type in a password one character at a time encourages the use of weak passwords - shorter and easier to type in. It can also interfere with password managers, although some of them may be able to work around it.
 
-My first reaction when encountering this behaviour was irritation at being blocked from performing a basic function. My second reaction was curiosity - how does this work and is there anything that can be done about it? The good news is yes, this post will show how to work around this frustrating user experience.
+My first reaction when encountering this behaviour was irritation at being blocked from performing a basic function. My second reaction was curiosity - how does this work and is there anything that can be done about it? The good news is yes! This post will show how to work around this frustrating user experience.
 
 ## Solution
 
@@ -29,13 +29,23 @@ document.addEventListener('paste', allowPaste, true);
 
 Now, without refreshing the page, try to paste again in the field that wouldn't allow it before - you should now be able to paste, hurray!
 
-To avoid having to remember those lines and paste them in the console each time, they can be saved in a Snippet as follows:
+### Snippet
+
+To avoid having to remember those lines and paste them in the console each time, they can be saved in a [Snippet](https://developer.chrome.com/docs/devtools/javascript/snippets/) as follows:
 
 1. With Developer Tools open, click on the Sources tab.
 2. There should be another panel open on the left hand side with tabs like Page, Filesystem, Snippets. Click on Snippets.
 3. Click on "+ New Snippet" at the top of the Snippets tab.
-4. This will open up an editor in the middle tab - paste in the lines of JavaScript from above, and press <kbd class="markdown-kbd">Cmd</kbd> + <kbd class="markdown-kbd">S</kbd> to save it.
+4. This will open up an editor in the middle panel - paste in the lines of JavaScript from above, and press <kbd class="markdown-kbd">Cmd</kbd> + <kbd class="markdown-kbd">S</kbd> to save it.
 5. Chrome will automatically assign the snippet a name, shown in the snippet listing in the left panel such as "Script snippet #1". Right-click on it, select Rename, and name it whatever you like. I name mine "free_the_paste".
+
+When you're finished, it should look something like this:
+
+![chrome snippet free paste](../images/chrome-snippet-free-paste.png "chrome snippet free paste")
+
+To use the snippet, next time you land on a page that is preventing pasting into a field, open dev tools, click on the snippet, then hit <kbd class="markdown-kbd">Cmd</kbd> + <kbd class="markdown-kbd">Enter</kbd> to run it. Then go ahead and paste to your hearts content.
+
+If you'd like to test this out, I've created an [example page](https://danielabar.github.io/messing_with_paste/) with some input fields that block paste.
 
 ## How Does it Work?
 
@@ -128,22 +138,59 @@ What's needed is a way to reverse the order of event handling so that the event 
 
 ### Bubbling vs Capture
 
-The second concept to understand is the third argument `true` that's passed to `addEventListener`:
+Let's take a closer look at the last line of the solution snippet that adds an event listener for the `paste` event. Specifically, notice the third argument `true`:
 
 ```javascript
 document.addEventListener('paste', allowPaste, true);
 ```
 
-This corresponds to the `useCapture` parameter of the `addEventListener` method. It's not commonly used and defaults to `false` when not specified.
+If you've done any web development, you've probably used the two argument version of the `addEventListener` method:
 
-## TODO
-* better feature image?
-* link to Snippet definition from chrome devtools docs
-* WIP: deeper explanation for the curious
-  * Link to MDN for official ref on `addEventListener`
-  * explain use of `useCapture` option
-  * "For event listeners attached to the event target, the event is in the target phase, rather than the capturing and bubbling phases. Event listeners in the capturing phase are called before event listeners in any non-capturing phases."
-* Add screenshots for adding snippet
-* link to my example site to test out the snippet: https://danielabar.github.io/messing_with_paste/
-* Reference MDN paste event: https://developer.mozilla.org/en-US/docs/Web/API/Document/paste_event or better https://developer.mozilla.org/en-US/docs/Web/API/Element/paste_event
-* Add WARN: Not intended as how-to instructions for blocking paste, please don't do this - its awful UX!!!
+```javascript
+document.addEventListener('someEvent', someFunction)
+```
+
+However, there's also a three argument version of this method:
+
+```javascript
+document.addEventListener('someEvent', someFunction, useCapture)
+```
+
+The third argument is a boolean indicating whether the event should be handled in the capture or bubbling phase. It defaults to false which means if not specified, it will be handled during the bubbling phase. The bubbling phase is probably the most familiar to web developers. This is where the event bubbles up the DOM tree, starting from the element that received the event (for example, an input field with a listener for the paste event), then the form or whatever dom element the field is contained in, and so on up to the body, html, document, and window. This is also known as event propagation.
+
+But it turns out, *before* the bubbling phase runs, there is a capturing phase for event handling that goes in the opposite direction. This is also event propagation, but it goes down the DOM tree. For our simple example, the order of event handling would be:
+
+1. The `window` object which contains the entire DOM tree and all other browser-related objects.
+2. The `document` object which represents the DOM for the current page.
+3. The `html` element that wraps the `body` and is the root of the DOM tree.
+4. The `body` element, which the container div is directly contained in.
+5. The `container` div that the input field is contained in.
+6. The `input` field.
+
+Now we can see the usefulness of setting `useCapture` to `true` in an event handler. It gives you a chance to run some code *before* other event handlers that are part of the website you're visiting.
+
+The last bit of this solution is to know that there's a method [stopImmediatePropagation](https://developer.mozilla.org/en-US/docs/Web/API/Event/stopImmediatePropagation) available on the event that prevents other listeners of the same event from being called. So for example, if you've plugged into the capture phase (event going down from window to element) and were to call `stopImmediatePropagation`, any elements lower in the DOM tree would never receive the event.
+
+This is exactly what's needed to undo the paste blocking. Here's the solution snippet again with comments explaining what we've just learned:
+
+```javascript
+// Prevent any further event listeners from receiving event `e`.
+var allowPaste = function(e) {
+  e.stopImmediatePropagation();
+  console.log("Free the paste!")
+  return true;
+};
+
+// Listen for the `paste` event during the capture phase,
+// i.e. as the event propagates down the DOM tree rather
+// than up.
+document.addEventListener('paste', allowPaste, true);
+```
+
+<aside class="markdown-aside">
+Note that <a class="markdown-link" href="https://developer.mozilla.org/en-US/docs/Web/API/Event/stopImmediatePropagation">stopImmediatePropagation</a> is different from <a class="markdown-link" href="https://developer.mozilla.org/en-US/docs/Web/API/Event/preventDefault">preventDefault</a>, which stops the default action from occurring on the element that received the event, but does allow the event to bubble up or capture the DOM tree as it normally would. Read this excellent post from Wes Bos for a <a class="markdown-link" href="https://wesbos.com/javascript/05-events/targets-bubbling-propagation-and-capture">deeper explanation</a> of event phases.
+</aside>
+
+## Conclusion
+
+This post has demonstrated how to work around web sites that prevent pasting into input fields with a few lines of JavaScript. It also covered an explanation of bubbling vs capturing phases in event handling and how this can be used to run custom code from the dev tools before the existing web site code runs.
