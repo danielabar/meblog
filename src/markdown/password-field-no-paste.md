@@ -1,6 +1,6 @@
 ---
 title: "When the Password Field Says No to Paste"
-featuredImage: "../images/password-paste-regularguy-eth-q7h8LVeUgFU-unsplash.jpg"
+featuredImage: "../images/password-paste-fly-d-C5pXRFEjq3w-unsplash.jpg"
 description: "Take back control from websites that block pasting in password fields."
 date: "2023-03-01"
 category: "javascript"
@@ -18,7 +18,7 @@ My first reaction when encountering this behaviour was irritation at being block
 
 Next time you encounter a website that won't let you paste into a password (or any other) field, open Developer Tools (<kbd class="markdown-kbd">Cmd</kbd> + <kbd class="markdown-kbd">Option</kbd> + <kbd class="markdown-kbd">I</kbd> on a Mac if using Chrome), make sure you're in the Console tab, and paste in the following lines:
 
-```javascript
+```js
 var allowPaste = function(e) {
   e.stopImmediatePropagation();
   console.log("Free the paste!")
@@ -61,7 +61,7 @@ This makes use of the `paste` event. According to [MDN](https://developer.mozill
 
 That bit in the markup `onpaste="return false;"` overrides the default action, which is to insert the contents of the clipboard into the field at the cursor position. It's equivalent to the following, which adds an event handler to the field using the `onpaste` property of the field:
 
-```javascript
+```js
 const some_field = document.querySelector("#some_field");
 some_field.onpaste = (event) => {
   return false;
@@ -70,7 +70,7 @@ some_field.onpaste = (event) => {
 
 Alternatively, it could be implemented using the [addEventListener](https://developer.mozilla.org/en-US/docs/Web/API/EventTarget/addEventListener) method of the text field:
 
-```javascript
+```js
 const some_field = document.querySelector("#some_field");
 some_field.addEventListener("paste", (event) => {
   event.preventDefault();
@@ -79,9 +79,9 @@ some_field.addEventListener("paste", (event) => {
 
 The end result of returning false from an override of the `paste` event (or invoking `preventDefault()` on the event with `addEventListener`) is that nothing happens when the user attempts to pastes in content.
 
-Now let's take a closer look at the solution, which was to add another event listener on the document:
+Now let's take a closer look at the solution, which adds another event listener for the `paste` event on the document:
 
-```javascript
+```js
 var allowPaste = function(e) {
   e.stopImmediatePropagation();
   console.log("Free the paste!")
@@ -94,7 +94,7 @@ There's two concepts to understand for why the above code has the effect of undo
 
 ### Element Nesting
 
-The first concept is that when an event is fired on a DOM element (eg: by user clicking, pasting, etc), that element could be nested within other elements, which in turn are contained in the body tag, which is contained in the html tag, which is contained in the document. And all of these elements receive the event in turn, for example, given the following markup:
+The first concept is that when an event is fired on a DOM element (eg: by user clicking, pasting, etc), that element could be nested within other elements, which in turn are contained in the body tag, which is contained in the html tag, which is contained in the document. And all of these elements receive the event in turn. For example, given the following markup:
 
 
 ```html
@@ -121,11 +121,9 @@ When a user pastes into `some_field`, the paste event is first fired on the inpu
 4. The `document` object which represents the DOM for the current page.
 5. The `window` object which contains the entire DOM tree and all other browser-related objects.
 
-This is referred to as event bubbling, the event is first handled by the element that received the event, and then bubbles all the way up the DOM tree.
+This is referred to as event bubbling, the event is first handled by the element that received the event, and then bubbles all the way up the DOM tree. This means the order matters. If you were to attempt to add an event listener via dev tools to a page with the above markup like this:
 
-This means the order matters. If you were to attempt to add an event listener via dev tools to a page with the above markup like this:
-
-```javascript
+```js
 document.addEventListener('paste', function () {
   console.log('Document pasted!');
   // Try to do something to unblock paste?
@@ -140,25 +138,25 @@ What's needed is a way to reverse the order of event handling so that the event 
 
 Let's take a closer look at the last line of the solution snippet that adds an event listener for the `paste` event. Specifically, notice the third argument `true`:
 
-```javascript
+```js
 document.addEventListener('paste', allowPaste, true);
 ```
 
 If you've done any web development, you've probably used the two argument version of the `addEventListener` method:
 
-```javascript
+```js
 document.addEventListener('someEvent', someFunction)
 ```
 
 However, there's also a three argument version of this method:
 
-```javascript
+```js
 document.addEventListener('someEvent', someFunction, useCapture)
 ```
 
 The third argument is a boolean indicating whether the event should be handled in the capture or bubbling phase. It defaults to false which means if not specified, it will be handled during the bubbling phase. The bubbling phase is probably the most familiar to web developers. This is where the event bubbles up the DOM tree, starting from the element that received the event (for example, an input field with a listener for the paste event), then the form or whatever dom element the field is contained in, and so on up to the body, html, document, and window. This is also known as event propagation.
 
-But it turns out, *before* the bubbling phase runs, there is a capturing phase for event handling that goes in the opposite direction. This is also event propagation, but it goes down the DOM tree. For our simple example, the order of event handling would be:
+But it turns out, *before* the bubbling phase runs, there is a capturing phase for event handling that goes in the opposite direction. This is also event propagation, but it goes down the DOM tree. For our simple example, the order of event handling in the capture phase is:
 
 1. The `window` object which contains the entire DOM tree and all other browser-related objects.
 2. The `document` object which represents the DOM for the current page.
@@ -173,17 +171,16 @@ The last bit of this solution is to know that there's a method [stopImmediatePro
 
 This is exactly what's needed to undo the paste blocking. Here's the solution snippet again with comments explaining what we've just learned:
 
-```javascript
-// Prevent any further event listeners from receiving event `e`.
+```js
 var allowPaste = function(e) {
+  // Prevent any further event listeners from receiving event `e`.
   e.stopImmediatePropagation();
   console.log("Free the paste!")
   return true;
 };
 
 // Listen for the `paste` event during the capture phase,
-// i.e. as the event propagates down the DOM tree rather
-// than up.
+// i.e. as the event propagates down the DOM tree rather than up.
 document.addEventListener('paste', allowPaste, true);
 ```
 
