@@ -47,6 +47,10 @@ To use the snippet, next time you land on a page that is preventing pasting into
 
 If you'd like to test this out, I've created an [example page](https://danielabar.github.io/messing_with_paste/) with some input fields that block paste.
 
+<aside class="markdown-aside">
+There are a number of browser extensions that solve this, saving the effort of maintaining and running a custom snippet of JavaScript. However, each extension you add increases the <a class="markdown-link" href="https://krebsonsecurity.com/2018/09/browser-extensions-are-they-worth-the-risk/">attack surface</a>, so I wouldn't recommend adding an extensions for something small like this.
+</aside>
+
 ## How Does it Work?
 
 In order to understand why the snippet works, we first need to understand how paste is blocked in the first place. If you inspect any input field that has paste blocked, it will most likely look like this:
@@ -77,7 +81,7 @@ some_field.addEventListener("paste", (event) => {
 });
 ```
 
-The end result of returning false from an override of the `paste` event (or invoking `preventDefault()` on the event with `addEventListener`) is that nothing happens when the user attempts to pastes in content.
+The end result of returning false from a `paste` event handler (or invoking `preventDefault()` on the event with `addEventListener`) is that nothing happens when the user attempts to pastes in content.
 
 Now let's take a closer look at the solution, which adds another event listener for the `paste` event on the document:
 
@@ -115,16 +119,16 @@ The first concept is that when an event is fired on a DOM element (eg: by user c
 
 When a user pastes into `some_field`, the paste event is first fired on the input element (which has a handler that prevents the actual paste from happening). But the execution doesn't end there, the `paste` event is then also fired in turn on:
 
-1. The `container` div that the input field is contained in.
-2. The `body` element, which the container div is directly contained in.
-3. The `html` element that wraps the `body` and is the root of the DOM tree.
+1. The `<div class="container">` element that the input field is contained in.
+2. The `<body>` element, which the container div is directly contained in.
+3. The `<html>` element that wraps the `body` and is the root of the DOM tree.
 4. The `document` object which represents the DOM for the current page.
 5. The `window` object which contains the entire DOM tree and all other browser-related objects.
 
 This is referred to as event bubbling, the event is first handled by the element that received the event, and then bubbles all the way up the DOM tree. This means the order matters. If you were to attempt to add an event listener via dev tools to a page with the above markup like this:
 
 ```js
-document.addEventListener('paste', function () {
+document.addEventListener('paste', function (e) {
   console.log('Document pasted!');
   // Try to do something to unblock paste?
 });
@@ -142,19 +146,21 @@ Let's take a closer look at the last line of the solution snippet that adds an e
 document.addEventListener('paste', allowPaste, true);
 ```
 
-If you've done any web development, you've probably used the two argument version of the `addEventListener` method:
+If you've done any web development, you've probably used the version of the `addEventListener` method that accepts two parameters as follows:
 
 ```js
+// Listen for `someEvent` on document and perform
+// `someFunction` when the event is fired.
 document.addEventListener('someEvent', someFunction)
 ```
 
-However, there's also a three argument version of this method:
+However, there's another version of this method that accepts three parameters:
 
 ```js
 document.addEventListener('someEvent', someFunction, useCapture)
 ```
 
-The third argument is a boolean indicating whether the event should be handled in the capture or bubbling phase. It defaults to false which means if not specified, it will be handled during the bubbling phase. The bubbling phase is probably the most familiar to web developers. This is where the event bubbles up the DOM tree, starting from the element that received the event (for example, an input field with a listener for the paste event), then the form or whatever dom element the field is contained in, and so on up to the body, html, document, and window. This is also known as event propagation.
+The third parameter is a boolean indicating whether the event should be handled in the capture or bubbling phase. It defaults to false which means if not specified, it will be handled during the bubbling phase. The bubbling phase is probably the most familiar to web developers. This is where the event bubbles up the DOM tree, starting from the element that received the event (for example, an input field with a listener for the paste event), then the form or whatever dom element the field is contained in, and so on up to the body, html, document, and window. This is also known as event propagation.
 
 But it turns out, *before* the bubbling phase runs, there is a capturing phase for event handling that goes in the opposite direction. This is also event propagation, but it goes down the DOM tree. For our simple example, the order of event handling in the capture phase is:
 
@@ -185,9 +191,9 @@ document.addEventListener('paste', allowPaste, true);
 ```
 
 <aside class="markdown-aside">
-Note that <a class="markdown-link" href="https://developer.mozilla.org/en-US/docs/Web/API/Event/stopImmediatePropagation">stopImmediatePropagation</a> is different from <a class="markdown-link" href="https://developer.mozilla.org/en-US/docs/Web/API/Event/preventDefault">preventDefault</a>, which stops the default action from occurring on the element that received the event, but does allow the event to bubble up or capture the DOM tree as it normally would. Read this excellent post from Wes Bos for a <a class="markdown-link" href="https://wesbos.com/javascript/05-events/targets-bubbling-propagation-and-capture">deeper explanation</a> of event phases.
+Note that <a class="markdown-link" href="https://developer.mozilla.org/en-US/docs/Web/API/Event/stopImmediatePropagation">stopImmediatePropagation</a> is different from <a class="markdown-link" href="https://developer.mozilla.org/en-US/docs/Web/API/Event/preventDefault">preventDefault</a>, which stops the default action from occurring on the element that received the event, but does allow the event to bubble up or capture down the DOM tree as it normally would. Read this excellent post from Wes Bos for a <a class="markdown-link" href="https://wesbos.com/javascript/05-events/targets-bubbling-propagation-and-capture">deeper explanation</a> of event phases.
 </aside>
 
 ## Conclusion
 
-This post has demonstrated how to work around web sites that prevent pasting into input fields with a few lines of JavaScript. It also covered an explanation of bubbling vs capturing phases in event handling and how this can be used to run custom code from the dev tools before the existing web site code runs.
+This post has demonstrated how to work around web sites that prevent pasting into input fields with a few lines of JavaScript. It also covered an explanation of bubbling vs capturing phases in event handling and how this can be used to run custom code from the dev tools before the existing web site code runs. Finally, if you're building web sites and have any say in how they're built, please try to avoid interfering with standard behaviour like this as it can frustrate users.
