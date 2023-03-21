@@ -104,6 +104,7 @@ The following all needs to work:
 - [] `rm package-lock.json && rm -rf node_modules && make install`
 - [] `make devclean`
 - [] `make dev`
+  - [] verify `search.sql` is generated in project root
   - [] `/hello` (while running local hello-visitor)
   - [] `/search` (while running local hello-visitor)
   - [] syntax highlighting (eg: fix `graphql`)
