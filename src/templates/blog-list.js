@@ -37,27 +37,21 @@ export default class BlogList extends React.Component {
   }
 }
 
-export const blogListQuery = graphql`
-  query blogListQuery($skip: Int!, $limit: Int!) {
-    allMarkdownRemark(
-      sort: { fields: [frontmatter___date], order: DESC }
-      limit: $limit
-      skip: $skip
-    ) {
-      edges {
-        node {
-          id
-          fields {
-            slug
-          }
-          frontmatter {
-            title
-            date(formatString: "MMMM YYYY")
-            category
-          }
-          excerpt
+export const blogListQuery = graphql`query blogListQuery($skip: Int!, $limit: Int!) {
+  allMarkdownRemark(sort: {frontmatter: {date: DESC}}, limit: $limit, skip: $skip) {
+    edges {
+      node {
+        id
+        fields {
+          slug
         }
+        frontmatter {
+          title
+          date(formatString: "MMMM YYYY")
+          category
+        }
+        excerpt
       }
     }
   }
-`
+}`

@@ -95,7 +95,23 @@ Image in src/images:
 ![image alt text](../images/image-file-name.png "image description")
 ```
 
-### References
+## Gatsby Upgrade Checklist
+
+[4 - 5](https://v5.gatsbyjs.com/docs/reference/release-notes/migrating-from-v4-to-v5/)
+
+The following all needs to work:
+
+- [] `rm package-lock.json && rm -rf node_modules && make install`
+- [] `make devclean`
+- [] `make dev`
+  - [] `/hello` (while running local hello-visitor)
+  - [] `/search` (while running local hello-visitor)
+  - [] syntax highlighting (eg: fix `graphql`)
+- [] `make test`
+- [] `make serve` (serve prod build)
+  - [] Sitemap should be generated (wherever it is, update Google Search Console -> Sitemaps, after deploy, eg: `/sitemap-0.xml`)
+
+## References
 
 - [Gatsby Unit Testing](https://www.gatsbyjs.com/docs/how-to/testing/unit-testing/)
 - [Jest](https://jestjs.io/docs/getting-started)
