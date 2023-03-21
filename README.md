@@ -111,6 +111,7 @@ The following all needs to work:
 - [] `make test`
 - [] `make serve` (serve prod build)
   - [] Sitemap should be generated (wherever it is, update Google Search Console -> Sitemaps, after deploy, eg: `/sitemap-0.xml`)
+- [] CI workflow passing on Github
 
 ## References
 
