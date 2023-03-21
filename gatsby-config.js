@@ -80,7 +80,7 @@ module.exports = {
             resolve: `gatsby-remark-vscode`,
             options: {
               theme: "Monokai", // Or install your favorite theme from GitHub
-              extensions: ["rest-client", "HCL", "applescript"],
+              extensions: ["rest-client", "HCL", "applescript", "vscode-graphql-syntax"],
               wrapperClassName: "gatsby-highlight",
               inlineCode: {
                 className: "my-inline",

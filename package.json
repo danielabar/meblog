@@ -43,7 +43,8 @@
     "react-dom": "18.2.0",
     "react-helmet": "5.2.1",
     "react-icons": "3.10.0",
-    "rest-client": "github:Huachao/vscode-restclient"
+    "rest-client": "github:Huachao/vscode-restclient",
+    "vscode-graphql-syntax": "github:danielabar/vscode-graphql-syntax"
   },
   "devDependencies": {
     "@testing-library/jest-dom": "5.16.5",
