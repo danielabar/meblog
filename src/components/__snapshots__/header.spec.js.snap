@@ -1,7 +1,7 @@
 // Jest Snapshot v1, https://goo.gl/fbAQLP
 
 exports[`Header renders nav menu for wide widths 1`] = `
-Object {
+{
   "asFragment": [Function],
   "baseElement": <body>
     <div>
@@ -158,7 +158,7 @@ Object {
 `;
 
 exports[`Header renders nav menu responsive for narrow widths 1`] = `
-Object {
+{
   "asFragment": [Function],
   "baseElement": <body>
     <div>

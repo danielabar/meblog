@@ -1,7 +1,7 @@
 // Jest Snapshot v1, https://goo.gl/fbAQLP
 
 exports[`Home Page renders with layout, article list, and all-link 1`] = `
-Object {
+{
   "asFragment": [Function],
   "baseElement": <body>
     <div>

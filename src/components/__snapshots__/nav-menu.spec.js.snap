@@ -1,7 +1,7 @@
 // Jest Snapshot v1, https://goo.gl/fbAQLP
 
 exports[`NavMenu renders search input when SEARCH_ENABLED env var is true 1`] = `
-Object {
+{
   "asFragment": [Function],
   "baseElement": <body>
     <div>

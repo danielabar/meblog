@@ -1,7 +1,7 @@
 // Jest Snapshot v1, https://goo.gl/fbAQLP
 
 exports[`Pagination renders a single page 1`] = `
-Object {
+{
   "asFragment": [Function],
   "baseElement": <body>
     <div>
@@ -92,7 +92,7 @@ Object {
 `;
 
 exports[`Pagination renders first page 1`] = `
-Object {
+{
   "asFragment": [Function],
   "baseElement": <body>
     <div>
@@ -193,7 +193,7 @@ Object {
 `;
 
 exports[`Pagination renders last page 1`] = `
-Object {
+{
   "asFragment": [Function],
   "baseElement": <body>
     <div>
@@ -294,7 +294,7 @@ Object {
 `;
 
 exports[`Pagination renders middle page 1`] = `
-Object {
+{
   "asFragment": [Function],
   "baseElement": <body>
     <div>
