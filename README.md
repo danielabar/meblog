@@ -95,7 +95,25 @@ Image in src/images:
 ![image alt text](../images/image-file-name.png "image description")
 ```
 
-### References
+## Gatsby Upgrade Checklist
+
+[4 - 5](https://v5.gatsbyjs.com/docs/reference/release-notes/migrating-from-v4-to-v5/)
+
+The following all needs to work:
+
+- [x] `rm package-lock.json && rm -rf node_modules && make install`
+- [x] `make devclean`
+- [x] `make dev`
+  - [x] verify `search.sql` is generated in project root
+  - [x] `/visits` (while running local [hello-visitor](https://github.com/danielabar/hello-visitor))
+  - [x] `/search` (while running local [hello-visitor](https://github.com/danielabar/hello-visitor))
+  - [x] syntax highlighting (eg: fix `graphql`)
+- [x] `make test`
+- [x] `make serve` (serve prod build)
+  - [x] Sitemap should be generated (wherever it is, update Google Search Console -> Sitemaps, after deploy, eg: `/sitemap-0.xml`)
+- [x] CI workflow passing on Github
+
+## References
 
 - [Gatsby Unit Testing](https://www.gatsbyjs.com/docs/how-to/testing/unit-testing/)
 - [Jest](https://jestjs.io/docs/getting-started)

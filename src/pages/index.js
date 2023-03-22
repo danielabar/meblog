@@ -29,28 +29,23 @@ const Index = ({ data }) => (
 
 export default Index
 
-export const query = graphql`
-  {
-    allMarkdownRemark(
-      limit: 5
-      sort: { fields: [frontmatter___date], order: DESC }
-    ) {
-      totalCount
-      edges {
-        node {
-          id
-          frontmatter {
-            title
-            date(formatString: "MMMM YYYY")
-            category
-          }
-          excerpt
-          html
-          fields {
-            slug
-          }
+export const query = graphql`{
+  allMarkdownRemark(limit: 5, sort: {frontmatter: {date: DESC}}) {
+    totalCount
+    edges {
+      node {
+        id
+        frontmatter {
+          title
+          date(formatString: "MMMM YYYY")
+          category
+        }
+        excerpt
+        html
+        fields {
+          slug
         }
       }
     }
   }
-`
+}`

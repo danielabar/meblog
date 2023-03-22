@@ -14,8 +14,11 @@ jobs:
       - name: Setup node
         uses: actions/setup-node@v3
         with:
-          node-version: "14"
+          node-version: "18"
           cache: "npm"
+
+      - name: Downgrade npm
+        run: npm install -g npm@6.14.14
 
       - name: install
         run: make install
