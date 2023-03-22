@@ -21,6 +21,9 @@ jobs:
           node-version: "18"
           cache: "npm"
 
+      - name: Downgrade npm
+        run: npm install -g npm@6.14.14
+
       - name: Install
         run: make install
 
