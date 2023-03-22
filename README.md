@@ -101,17 +101,17 @@ Image in src/images:
 
 The following all needs to work:
 
-- [] `rm package-lock.json && rm -rf node_modules && make install`
-- [] `make devclean`
-- [] `make dev`
-  - [] verify `search.sql` is generated in project root
-  - [] `/hello` (while running local hello-visitor)
-  - [] `/search` (while running local hello-visitor)
-  - [] syntax highlighting (eg: fix `graphql`)
-- [] `make test`
-- [] `make serve` (serve prod build)
-  - [] Sitemap should be generated (wherever it is, update Google Search Console -> Sitemaps, after deploy, eg: `/sitemap-0.xml`)
-- [] CI workflow passing on Github
+- [x] `rm package-lock.json && rm -rf node_modules && make install`
+- [x] `make devclean`
+- [x] `make dev`
+  - [x] verify `search.sql` is generated in project root
+  - [x] `/visits` (while running local [hello-visitor](https://github.com/danielabar/hello-visitor))
+  - [x] `/search` (while running local [hello-visitor](https://github.com/danielabar/hello-visitor))
+  - [x] syntax highlighting (eg: fix `graphql`)
+- [x] `make test`
+- [x] `make serve` (serve prod build)
+  - [x] Sitemap should be generated (wherever it is, update Google Search Console -> Sitemaps, after deploy, eg: `/sitemap-0.xml`)
+- [x] CI workflow passing on Github
 
 ## References
 
