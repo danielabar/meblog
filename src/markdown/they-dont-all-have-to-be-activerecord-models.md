@@ -410,9 +410,7 @@ end
 * create similar visual for Customer model showing `age` field in UI does not exist in database but need to perform validations on it.
 * WIP Explain CustomerForm model, controller changes, erb changes for new scenario
 * Link to companion project: https://github.com/danielabar/not_all_activerecord
-* Rails console examples demonstrating CustomerForm validations
 * show that the PORO model can be tested, even with shoulda matchers
-* mention Rails version and link to companion project on Github when ready
 * Conclusion para
 * Add assumption that reader knows Rails basics, if not, point them to the getting started guide
 * Maybe only need [ActiveModel::Validations](https://guides.rubyonrails.org/active_model_basics.html#validations)
