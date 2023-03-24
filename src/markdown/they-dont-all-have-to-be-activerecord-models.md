@@ -5,12 +5,12 @@ description: "tbd"
 date: "2023-07-01"
 category: "rails"
 related:
-  - "tbd"
-  - "tbd"
-  - "tbd"
+  - "Fix Rails Blocked Host Error with Docker"
+  - "Rails Strong Params for GET Request"
+  - "Rails CORS Middleware For Multiple Resources"
 ---
 
-Rails makes it easy (relative to other web frameworks) to go from an idea to a working web application. If you follow along with the [Getting Started with Rails](https://guides.rubyonrails.org/getting_started.html) guide, you can see how straightforward it is to go from an idea of a blog application with articles that have that have a title and body text, to creating a database table that stores articles, a model to represent the articles and validation rules, views that render HTML to initiate CRUD operations on articles, and a controller to handle http request/responses, and delegate to the model to perform the CRUD operations.
+Rails makes it relatively easy to go from an idea to a working web application. If you follow along with the [Getting Started with Rails](https://guides.rubyonrails.org/getting_started.html) guide, you can see how straightforward it is to go from an idea of a blog application with articles that have that have a title and body text, to creating a database table that stores articles, a model to represent the articles and validation rules, views that render HTML to display articles, and a controller to handle http request/responses, and delegate to the model to perform the CRUD operations.
 
 There's also plenty of online tutorials and courses that will cover creating a Rails application from start to finish for other domains besides a blogging application. Going through any of these will give you a sense of how Rails can be used to represent just about any domain where you want to build a web app to expose CRUD operations on a relational data model.
 
@@ -18,11 +18,17 @@ However, all of the learning materials that I have seen make an assumption that 
 
 TODO: Maybe visual from one of my Pluralsight courses? eg: Company/Stock Prices https://github.com/danielabar/user-resource-rails-pluralsight#identifying-entities
 
-This symmetry between the UI form and the underlying table is very nice for learning. But what I've found in the "real world", is that the interface presented in the web view does not exactly match the database table, due to complex business requirements. Then it's not obvious how to make use of all the Rails niceties around form binding to the model, validations and saving. This post will show a technique that can be used anytime you encounter a mismatch between a form presented to a user, and what needs to be persisted in the database.
+This symmetry between the UI form and the underlying table is very nice for learning. But what I've found in the "real world", is that the interface presented in the web view does not exactly match the database table, due to complex business requirements. Then it's not obvious how to make use of all the Rails niceties around form binding to the model, validations and saving. This post will show a technique that can be used when there's a mismatch between a form presented to a user, and what needs to be persisted in the database.
 
 ## Example
 
 Consider an example of a back office for some application where administrators will fill out a form to create new customers. The `customers` table will persist email, first and last names. However, the form also has a field for the customers age. It's used for validation where customer must be greater than a certain age, but it will not be persisted to table, therefore its not part of customer model. A more complex case might be that the form asks for SIN/SSN to validate against an external service, but this value is not required to be persisted.
+
+To get started, the [scaffold](https://www.rubyguides.com/2020/03/rails-scaffolding/) generator can be used to create a migration, model, controller, and all the CRUD views for the Customer model, specifying the fields that should be persisted for each customer:
+
+```
+bin/rails generate scaffold customer email:string first_name:string last_name:string
+```
 
 Here is the migration that creates the `customers` table. Notice there is no `:age` column because the requirements are that it should not be persisted:
 
@@ -40,7 +46,7 @@ class CreateCustomers < ActiveRecord::Migration[7.0]
 end
 ```
 
-Here is the corresponding `Customer` model (I'm using the [annotate](https://github.com/ctran/annotate_models) gem to get schema information outputted as comments at the top of the model class):
+Here is the corresponding `Customer` model. I've added some validations. I'm also using the [annotate](https://github.com/ctran/annotate_models) gem to get schema information outputted as comments at the top of the model class:
 
 ```ruby
 # == Schema Information
@@ -71,7 +77,7 @@ Here is the required form to create a new customer that the back office admin ap
 
 ## First Attempt
 
-Suppose in this hypothetical app, that the customer's age must be greater than 18. If you were to attempt to implement this in the standard Rails way as per the getting started guide and common tutorials, you might add the validation rule to the `Customer` model such as:
+Suppose in this hypothetical app, that the customer's age must be greater than 18. If you were to attempt to implement the age requirement in the standard Rails way as per the getting started guide and common tutorials, you might add the validation rule to the `Customer` model such as:
 
 ```ruby
 class Customer < ApplicationRecord
@@ -146,6 +152,8 @@ ActiveModel::UnknownAttributeError (unknown attribute 'age' for Customer.
 
 This type of problem can be solved with [ActiveModel](https://guides.rubyonrails.org/active_model_basics.html). This is a module in Rails that provides a way to create model-like objects that have many of the same features as traditional Rails models, but are not necessarily backed by a database table. This is useful when modeling data that is not directly related to the application's database, which is exactly what we need to solve this example.
 
+The steps in this section will explain what needs to be changed from the scaffolded code to implement the requirement of having a field in the create form that is used for validation, but not persisted. You can also check out this [project](https://github.com/danielabar/not_all_activerecord) that demonstrates the complete solution.
+
 ### CustomerForm
 
 Start by introducing a `CustomerForm` model. This will be used instead of the `Customer` model to bind to the form that admin users fill out to create a customer. This class lives in the same `models` directory as all the other Rails models, but rather than inheriting from `ApplicationRecord` as the other models that are backed by a database table, it includes the `ActiveModel::Model` module:
@@ -157,7 +165,7 @@ class CustomerForm
 end
 ```
 
-To make this class useful, define attributes for all the fields that are needed for the customer form. Unlike with an ActiveRecord model, Rails doesn't create these automatically because there is no backing database table. Notice the attributes don't necessarily have to match columns in the `customers` table because this model is not attached to any table:
+Next, define attributes for all the fields that are needed for the customer form. Unlike with an ActiveRecord model, Rails doesn't create these automatically because there is no backing database table. Notice the attributes don't necessarily have to match columns in the `customers` table because this model is not attached to any table:
 
 ```ruby
 # app/models/customer_form.rb
@@ -213,6 +221,13 @@ customer_form = CustomerForm.new(
 
 customer_form.valid?
 # => true
+
+customer_form.age = 6
+customer_form.valid?
+# => false
+
+customer_form.errors.full_messages
+# => ["Age must be greater than 18"]
 ```
 
 Nice, so we can have (nearly) all the validations that are on the `Customer` model, plus some additional ones that aren't backed by a table column. The `uniqueness: true` validation isn't available on ActiveModel because that requires access to a database table to verify a unique value among all the existing records. Since email should be unique across all customers, this can be implemented  with a custom `validate` method. The API is the same as adding custom validation methods to an ActiveRecord object:
@@ -256,7 +271,7 @@ customer_form.errors.full_messages
 => ["Email already taken"]
 ```
 
-The last thing we'll need on the `CustomerForm` model is the ability to save a customer to the database. Save should return false if the model is invalid, otherwise create and save an instance of the `Customer` model. Let's also make the saved `Customer` model an instance variable so that it can be accessed by the controller to populate the `show` view.
+The last thing we'll need on the `CustomerForm` model is the ability to save a customer to the database. The `save` method should return false if the model is invalid, otherwise create and save an instance of the `Customer` model. Let's also make the saved `Customer` model an instance variable so that it can be accessed by the controller to populate the `show` view.
 
 The final `CustomerForm` class:
 
@@ -310,7 +325,7 @@ end
 
 ### New View and Form
 
-The next step is the modify the `new` view to use the `CustomerForm` object instead of a `Customer` object, and pass it to a new form partial that will render the customer creation form.
+The next step is to modify the `new` view to use the `CustomerForm` object instead of a `Customer` object, and pass it to a new form partial that will render the customer creation form. Note that the scaffold command used earlier generated a `_form.html.erb` partial to be used for both creating and editing customer instances. We're changing this to introduce a `_form_new.html.erb` partial since the customer creation requirements are different from editing:
 
 ```html
 <!-- app/views/customers/new.html.erb -->
@@ -325,7 +340,7 @@ The next step is the modify the `new` view to use the `CustomerForm` object inst
 </div>
 ```
 
-Here is the form that binds the form fields to the `@customer_form` instance variable passed to it by the `new` view:
+Here is the form that binds the form fields to the `@customer_form` instance variable passed to it by the `new` view. Notice the `url: customers_path` is specified for the `form_with` helper, otherwise the view will attempt to render a url `customer_forms_path` by convention of the model name, but this does not exist. Note also we pass the label "Create Customer" to the `form.submit` helper, otherwise by convention of the model name, it would render a label "Create Customer form".
 
 ```html
 <!-- app/views/customers/_form_new.html.erb -->
@@ -370,11 +385,14 @@ Here is the form that binds the form fields to the `@customer_form` instance var
 
 ### CustomersController Create
 
-When the "Create Customer" button is clicked from the new form, it will submit a POST request to the `CustomersController#create` method. This method must be modified to use the `CustomerForm` model instead of `Customer`. We also need to define a `customer_form_params` method to specify the allowed fields for customer creation. If the customer is saved successfully, redirect to the show view, providing the `customer` instance variable of the `customer_form` object. Otherwise, render the `new` view with a 422 Unprocessable Entity HTTP response. Since the `@customer_form` instance variable has been set, the `new` view will be able to iterate over its `errors` property and display them:
+When the "Create Customer" button is clicked from the new form, it will submit a POST request to the `CustomersController#create` method. This method must be modified to use the `CustomerForm` model instead of `Customer`. We also need to define a `customer_form_params` method to specify the allowed fields for customer creation.
+
+If the customer is saved successfully, the `create` method should redirect to the show view, providing the `customer` instance variable of the `customer_form` object. Otherwise, render the `new` view with a 422 Unprocessable Entity HTTP response code. Since the `@customer_form` instance variable has been set, the `new` view will be able to iterate over its `errors` property and display them:
 
 ```ruby
 # app/controllers/customers_controller.rb
 class CustomersController < ApplicationController
+
   # POST /customers or /customers.json
   def create
     # Initialize the ActiveModel with form parameters from the view
@@ -384,7 +402,7 @@ class CustomersController < ApplicationController
       # `save` is a custom method defined in `CustomerForm` that first calls `valid?`
       if @customer_form.save
         # If `save` returns true, redirect to `show` view passing in the saved customer
-        format.html { redirect_to customer_url(@customer_form.customer), notice: "Customer was successfully created." }
+        format.html { redirect_to customer_url(@customer_form.customer), notice: "Customer successfully created." }
         format.json { render :show, status: :created, location: @customer }
       else
         # If `save` returns false, render the `new` view to display the errors in `customer_form`:
@@ -403,15 +421,118 @@ class CustomersController < ApplicationController
 end
 ```
 
+### Try It
+
+Putting all of these code changes together, we can now navigate to the new customer create form at `http://localhost:3000/customers/new`, and fill it in with an age that is invalid:
+
+![not all ar invalid form](../images/not-all-ar-invalid-form.png "not all ar invalid form")
+
+Here is the rendered HTML form, notice the `name` attributes of the input fields are like `customer_form[field]` rather than `customer[field]`. This is because we're binding to the `CustomerForm` ActiveModel rather than the  `Customer` Active Record model:
+
+```html
+<form action="/customers" method="post">
+  <input type="hidden" name="authenticity_token" value="Lda1K...">
+
+  <div>
+    <label for="customer_form_email">Email</label>
+    <input type="text" name="customer_form[email]" id="customer_form_email">
+  </div>
+
+  <div>
+    <label for="customer_form_first_name">First name</label>
+    <input type="text" name="customer_form[first_name]" id="customer_form_first_name">
+  </div>
+
+  <div>
+    <label for="customer_form_last_name">Last name</label>
+    <input type="text" name="customer_form[last_name]" id="customer_form_last_name">
+  </div>
+
+  <div>
+    <label for="customer_form_age">Age</label>
+    <input type="number" name="customer_form[age]" id="customer_form_age">
+  </div>
+
+  <div>
+    <input type="submit" name="commit" value="Create Customer">
+  </div>
+</form>
+```
+
+After clicking the "Create Customer" button, the request and response is logged to the Rails server output. Notice the `customer_form` parameter rather than `customer` due to the use of the `CustomerForm` ActiveModel.
+
+```
+Started POST "/customers"
+Processing by CustomersController#create as TURBO_STREAM
+  Parameters: {
+    "authenticity_token"=>"[FILTERED]",
+    "customer_form"=>{
+      "email"=>"jane@example.com",
+      "first_name"=>"Jane",
+      "last_name"=>"Doe",
+      "age"=>"3"
+    },
+    "commit"=>"Create Customer"
+  }
+  Customer Load (0.5ms)
+    SELECT "customers".* FROM "customers" WHERE "customers"."email" = ? LIMIT ?
+    [["email", "jane@example.com"], ["LIMIT", 1]]
+  ↳ app/models/customer_form.rb:15:in `email_available?'
+  Rendering customers/new.html.erb within layouts/application
+  Rendered customers/_form_new.html.erb
+Completed 422 Unprocessable Entity
+```
+
+Since there is an error with the `age` attribute in the `customer_form` instance variable set by the `CustomersController`, it will be displayed in the new form:
+
+![not all ar form error](../images/not-all-ar-form-error.png "not all ar form error")
+
+Let's correct the error by setting an age greater than 18 and submitting the form again:
+
+![not all ar valid form](../images/not-all-ar-valid-form.png "not all ar valid form")
+
+This time, the Rails server output shows a new `customers` record being inserted into the database, then redirecting to the customers show view at `http://localhost/customers/{id}`:
+
+```Started POST "/customers"
+Processing by CustomersController#create as TURBO_STREAM
+  Parameters: {
+    "authenticity_token"=>"[FILTERED]",
+    "customer_form"=>{
+      "email"=>"jane@example.com",
+      "first_name"=>"Jane",
+      "last_name"=>"Doe",
+      "age"=>"19"
+    },
+    "commit"=>"Create Customer"
+  }
+  Customer Load (9.8ms)
+    SELECT "customers".* FROM "customers" WHERE "customers"."email" = ? LIMIT ?
+    [["email", "jane@example.com"], ["LIMIT", 1]]
+  ↳ app/models/customer_form.rb:15:in `email_available?'
+  TRANSACTION (0.1ms)  begin transaction
+  Customer Create (3.3ms)  INSERT INTO "customers"
+    ("email", "first_name", "last_name", "created_at", "updated_at")
+    VALUES (?, ?, ?, ?, ?)
+    [["email", "jane@example.com"], ["first_name", "Jane"], ["last_name", "Doe"],
+    ["created_at", "2023-03-24 11:22:45"], ["updated_at", "2023-03-24 11:22:45"]]
+  ↳ app/models/customer_form.rb:25:in `save'
+  TRANSACTION (1.7ms)  commit transaction
+  ↳ app/models/customer_form.rb:25:in `save'
+Redirected to http://localhost:3000/customers/12
+Completed 302 Found
+```
+
+And here is the customer show view with the flash message that it was successfully created (this portion is directly from the scaffolded code):
+
+![not all ar success](../images/not-all-ar-success.png "not all ar success")
+
+
 ## TODO
 * link CRUD to good definition, wikipedia if exists
 * link to few other courses I've taken with example other domains
 * create some visual showing UI of Article with title and body, Model with the same fields, and database table with same fields
 * create similar visual for Customer model showing `age` field in UI does not exist in database but need to perform validations on it.
-* WIP Explain CustomerForm model, controller changes, erb changes for new scenario
-* Link to companion project: https://github.com/danielabar/not_all_activerecord
 * show that the PORO model can be tested, even with shoulda matchers
 * Conclusion para
 * Add assumption that reader knows Rails basics, if not, point them to the getting started guide
 * Maybe only need [ActiveModel::Validations](https://guides.rubyonrails.org/active_model_basics.html#validations)
-* Does this fit in somewhere? Typically the `new` and `edit` views will share the same `_form` partial. For this case, we will leave the edit view unchanged because we're only focusing on the business requirements to create a new customer.
