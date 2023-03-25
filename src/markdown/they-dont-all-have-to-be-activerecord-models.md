@@ -18,7 +18,11 @@ However, all of the learning materials that I have seen make an assumption that 
 
 TODO: Maybe visual from one of my Pluralsight courses? eg: Company/Stock Prices https://github.com/danielabar/user-resource-rails-pluralsight#identifying-entities
 
-This symmetry between the UI form and the underlying table is very nice for learning. But what I've found in the "real world", is that the interface presented in the web view does not exactly match the database table, due to complex business requirements. Then it's not obvious how to make use of all the Rails niceties around form binding to the model, validations and saving. This post will show a technique that can be used when there's a mismatch between a form presented to a user, and what needs to be persisted in the database.
+This symmetry between the UI form and the underlying table is very nice for learning. But what I've found in the "real world is that often, the interface presented in the web view does not exactly match the database table, due to complex business requirements. Then it's not obvious how to make use of all the Rails niceties around form binding to the model, validations and saving. This post will show a technique that can be used when there's a mismatch between a form presented to a user, and what needs to be persisted in the database.
+
+<aside class="markdown-aside">
+A quick note before moving on - this post assumes the reader already has a basic understanding of Rails fundamentals including how to build a simple web application with models, views, and controllers. If you don't, checkout the <a class="markdown-link" href="https://guides.rubyonrails.org/getting_started.html">Getting Started with Rails Guides</a>.
+</aside>
 
 ## Example
 
@@ -91,6 +95,24 @@ class Customer < ApplicationRecord
 end
 ```
 
+Add the `age` field to the customer creation form in the view:
+
+```html
+<%= form_with(model: customer) do |form| %>
+  <!-- other customer fields -->
+
+  <!-- try to bind the `age` field even though it does not exist on customer model -->
+  <div>
+    <%= form.label :age, style: "display: block" %>
+    <%= form.number_field :age %>
+  </div>
+
+  <div>
+    <%= form.submit %>
+  </div>
+<% end %>
+```
+
 Update the `CustomersController` to permit `:age` as a parameter for creation:
 
 ```ruby
@@ -120,24 +142,6 @@ class CustomersController < ApplicationController
     params.require(:customer).permit(:email, :first_name, :last_name, :age)
   end
 end
-```
-
-Add the `age` field to the customer creation form in the view:
-
-```html
-<%= form_with(model: customer) do |form| %>
-  <!-- other customer fields -->
-
-  <!-- try to bind the `age` field even though it does not exist on customer model -->
-  <div>
-    <%= form.label :age, style: "display: block" %>
-    <%= form.number_field :age %>
-  </div>
-
-  <div>
-    <%= form.submit %>
-  </div>
-<% end %>
 ```
 
 When attempting to save a new customer, the following error will result, indicating that the record could not be saved due to unknown attribute `age`:
@@ -526,13 +530,93 @@ And here is the customer show view with the flash message that it was successful
 
 ![not all ar success](../images/not-all-ar-success.png "not all ar success")
 
+### Tests
+
+Before we can conclude that we're done, the `CustomerForm` model should have automated tests. I'm using [RSpec](https://rspec.info/) on this project. A really nice feature of including the ActiveModel module is the validation rules can be tested with [shoulda matchers](http://matchers.shoulda.io/), just like an Active Record model. Here are the tests for the validation rules, and the `save` method:
+
+```ruby
+require "rails_helper"
+
+RSpec.describe CustomerForm, type: :model do
+  subject(:customer_form) { described_class.new }
+
+  describe "validations" do
+    it { should validate_presence_of(:email) }
+    it { should allow_value("email@example.com").for(:email) }
+    it { should_not allow_value("email").for(:email) }
+    it { should validate_presence_of(:first_name) }
+    it { should validate_presence_of(:last_name) }
+    it { should validate_presence_of(:age) }
+    it { should validate_numericality_of(:age).only_integer.is_greater_than(18) }
+
+    context "when email is already taken" do
+      let!(:customer) { create(:customer, email: "email@example.com") }
+
+      before { customer_form.email = "email@example.com" }
+
+      it { should_not be_valid }
+      it "has an error on email" do
+        customer_form.valid?
+        expect(customer_form.errors[:email]).to include("already taken")
+      end
+    end
+  end
+
+  describe "#save" do
+    context "when form is valid" do
+      before do
+        customer_form.email = "this_is_good@test.com"
+        customer_form.first_name = "Fred"
+        customer_form.last_name = "Flinstone"
+        customer_form.age = 44
+      end
+
+      it "creates a new customer" do
+        expect { subject.save }.to change(Customer, :count).by(1)
+      end
+
+      it "returns true" do
+        expect(subject.save).to be_truthy
+      end
+
+      it "sets the customer attribute" do
+        subject.save
+        expect(subject.customer).to be_a(Customer)
+      end
+    end
+
+    context "when form is invalid" do
+      before do
+        allow(subject).to receive(:valid?).and_return(false)
+      end
+
+      it "does not create a new customer" do
+        expect { subject.save }.not_to change(Customer, :count)
+      end
+
+      it "returns false" do
+        expect(subject.save).to be_falsey
+      end
+
+      it "does not set the customer attribute" do
+        subject.save
+        expect(subject.customer).to be_nil
+      end
+    end
+  end
+end
+```
+
+<aside class="markdown-aside">
+If you're setting up a new Rails project, it defaults to minitest rather than RSpec for automated testing. See this post I wrote on <a class="markdown-link" href="https://danielabaron.me/blog/start-rails-6-project-with-rspec/">Starting a Rails Project with RSpec</a> for how to switch from minitest to RSpec.
+</aside>
+
+## Conclusion
+
+This post has demonstrated how to use Active Model in a Rails application when the form presented to the user does not exactly match what should be persisted in the database. We just scratched the surface of what's available from the ActiveModel module with regards to validation. Be sure to check out the [Active Model Basics Rails Guides](https://guides.rubyonrails.org/active_model_basics.html) to learn about all the available features.
 
 ## TODO
 * link CRUD to good definition, wikipedia if exists
 * link to few other courses I've taken with example other domains
 * create some visual showing UI of Article with title and body, Model with the same fields, and database table with same fields
 * create similar visual for Customer model showing `age` field in UI does not exist in database but need to perform validations on it.
-* show that the PORO model can be tested, even with shoulda matchers
-* Conclusion para
-* Add assumption that reader knows Rails basics, if not, point them to the getting started guide
-* Maybe only need [ActiveModel::Validations](https://guides.rubyonrails.org/active_model_basics.html#validations)
