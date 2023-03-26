@@ -10,31 +10,35 @@ related:
   - "Rails CORS Middleware For Multiple Resources"
 ---
 
-Rails makes it relatively easy to go from an idea to a working web application. If you follow along with the [Getting Started with Rails](https://guides.rubyonrails.org/getting_started.html) guide, you can see how straightforward it is to go from an idea of a blog application with articles that have that have a title and body text, to creating a database table that stores articles, a model to represent the articles and validation rules, views that render HTML to display articles, and a controller to handle http request/responses, and delegate to the model to perform the CRUD operations.
+Rails makes it relatively easy to go from an idea to a working web application. If you follow along with the [Getting Started with Rails](https://guides.rubyonrails.org/getting_started.html) guide, you can see how straightforward it is to go from an idea of a blog application with articles that have that have a title and body text, to creating a database table that stores articles, a model to represent the articles and validation rules, views that render HTML to display articles, and a controller to handle http request/responses, and delegate to the model to perform the [CRUD](https://en.wikipedia.org/wiki/Create,_read,_update_and_delete) operations.
 
-There's also plenty of online tutorials and courses that will cover creating a Rails application from start to finish for other domains besides a blogging application. Going through any of these will give you a sense of how Rails can be used to represent just about any domain where you want to build a web app to expose CRUD operations on a relational data model.
+There's also plenty of online tutorials and courses that cover creating a Rails application from start to finish for other domains besides a blogging application. Going through any of these will give you a sense of how Rails can be used to represent just about any domain where you want to build a web app to expose CRUD operations on a relational data model.
 
-However, all of the learning materials that I have seen make an assumption that there is always a one to one relationship between each form field that will be displayed in the web view, and the underlying database table that will be persisted. For example...
+However, all of the learning materials that I have seen make an assumption that there is always a one to one relationship between each form field that will be displayed in the web view, and the underlying database table that will be persisted. For example a Pluralsight course I took on [Adding Resources to a Rails Application](https://www.pluralsight.com/courses/adding-user-resource-rails-application) covered building a cryptocurrency tracking application. Here's the new cryptocurrency creation form from the course, notice that the fields shown in the form map neatly to the underlying table:
 
-TODO: Maybe visual from one of my Pluralsight courses? eg: Company/Stock Prices https://github.com/danielabar/user-resource-rails-pluralsight#identifying-entities
+![not all ar cryptocurrency table vs form](../images/not-all-ar-cryptocurrency-table-vs-form.png "not all ar cryptocurrency table vs form")
 
-This symmetry between the UI form and the underlying table is very nice for learning. But what I've found in the "real world is that often, the interface presented in the web view does not exactly match the database table, due to complex business requirements. Then it's not obvious how to make use of all the Rails niceties around form binding to the model, validations and saving. This post will show a technique that can be used when there's a mismatch between a form presented to a user, and what needs to be persisted in the database.
+This symmetry between the UI form and the underlying table is very nice for learning. But what I've found in the "real world" is that often, the interface presented in the web view does not exactly match the database table, due to complex business requirements. Then it's not obvious how to make use of all the Rails niceties around form binding to the model, validations and saving. This post will show a technique that can be used when there's a mismatch between a form presented to a user, and what needs to be persisted in the database.
 
 <aside class="markdown-aside">
-A quick note before moving on - this post assumes the reader already has a basic understanding of Rails fundamentals including how to build a simple web application with models, views, and controllers. If you don't, checkout the <a class="markdown-link" href="https://guides.rubyonrails.org/getting_started.html">Getting Started with Rails Guides</a>.
+A quick note before moving on - this post assumes you already have a basic understanding of Rails fundamentals including how to build a simple web application with models, views, and controllers. If you don't, checkout the <a class="markdown-link" href="https://guides.rubyonrails.org/getting_started.html">Getting Started with Rails Guides</a>.
 </aside>
 
 ## Example
 
 Consider an example of a back office for some application where administrators will fill out a form to create new customers. The `customers` table will persist email, first and last names. However, the form also has a field for the customers age. It's used for validation where customer must be greater than a certain age, but it will not be persisted to table, therefore its not part of customer model. A more complex case might be that the form asks for SIN/SSN to validate against an external service, but this value is not required to be persisted.
 
-To get started, the [scaffold](https://www.rubyguides.com/2020/03/rails-scaffolding/) generator can be used to create a migration, model, controller, and all the CRUD views for the Customer model, specifying the fields that should be persisted for each customer:
+Here's a visual, notice that most of the fields in the new customer creation form map to the `customers` table, but the "age" field does not, because the requirements are that it should not be persisted in the database:
+
+![not all ar customer table vs form](../images/not-all-ar-customer-table-vs-form.png "not all ar customer table vs form")
+
+If we ignore the complexity of the "age" field for the moment, the majority of this requirement could be implemented with the [scaffold](https://www.rubyguides.com/2020/03/rails-scaffolding/) generator. This will create a migration, model, controller, and all the CRUD views for the Customer model, specifying the fields that should be persisted for each customer:
 
 ```
 bin/rails generate scaffold customer email:string first_name:string last_name:string
 ```
 
-Here is the migration that creates the `customers` table. Notice there is no `:age` column because the requirements are that it should not be persisted:
+Here is the migration that creates the `customers` table. Notice there is no `:age` column because the requirements are that it should not be persisted. I've added not null constraints on all the fields, and a unique constraint on the `:email` field:
 
 ```ruby
 class CreateCustomers < ActiveRecord::Migration[7.0]
@@ -50,7 +54,7 @@ class CreateCustomers < ActiveRecord::Migration[7.0]
 end
 ```
 
-Here is the corresponding `Customer` model. I've added some validations. I'm also using the [annotate](https://github.com/ctran/annotate_models) gem to get schema information outputted as comments at the top of the model class:
+Here is the corresponding `Customer` model. I've added some validations for the email, first, and last name fields. I'm also using the [annotate](https://github.com/ctran/annotate_models) gem to get schema information outputted as comments at the top of the model class:
 
 ```ruby
 # == Schema Information
@@ -74,10 +78,6 @@ class Customer < ApplicationRecord
   validates :last_name, presence: true
 end
 ```
-
-Here is the required form to create a new customer that the back office admin application will use. Notice the `age` field that isn't present in the `customers` table or `Customer` model:
-
-![new customer form](../images/not-all-ar-new-customer.png "new customer form")
 
 ## First Attempt
 
@@ -272,7 +272,7 @@ customer_form.valid?
 
 # Error message indicates email is already taken
 customer_form.errors.full_messages
-=> ["Email already taken"]
+# => ["Email already taken"]
 ```
 
 The last thing we'll need on the `CustomerForm` model is the ability to save a customer to the database. The `save` method should return false if the model is invalid, otherwise create and save an instance of the `Customer` model. Let's also make the saved `Customer` model an instance variable so that it can be accessed by the controller to populate the `show` view.
@@ -614,9 +614,3 @@ If you're setting up a new Rails project, it defaults to minitest rather than RS
 ## Conclusion
 
 This post has demonstrated how to use Active Model in a Rails application when the form presented to the user does not exactly match what should be persisted in the database. We just scratched the surface of what's available from the ActiveModel module with regards to validation. Be sure to check out the [Active Model Basics Rails Guides](https://guides.rubyonrails.org/active_model_basics.html) to learn about all the available features.
-
-## TODO
-* link CRUD to good definition, wikipedia if exists
-* link to few other courses I've taken with example other domains
-* create some visual showing UI of Article with title and body, Model with the same fields, and database table with same fields
-* create similar visual for Customer model showing `age` field in UI does not exist in database but need to perform validations on it.
