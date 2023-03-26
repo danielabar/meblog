@@ -52,6 +52,16 @@ const NavMenuResponsive = () => {
             </li>
             <li className={`${styles.headerItem} ${styles.navItem}`}>
               <Link
+                to="/learning"
+                onClick={closeIfActive}
+                className={styles.navLink}
+                activeClassName={styles.active}
+              >
+                Learning
+              </Link>
+            </li>
+            <li className={`${styles.headerItem} ${styles.navItem}`}>
+              <Link
                 to="/about"
                 onClick={closeIfActive}
                 className={styles.navLink}

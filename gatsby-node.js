@@ -23,7 +23,10 @@ exports.createPages = ({ graphql, actions }) => {
 
   return new Promise(resolve => {
     graphql(`{
-  allMarkdownRemark(sort: {frontmatter: {date: DESC}}) {
+  allMarkdownRemark(
+    filter: { fileAbsolutePath: { regex: "/src/markdown/" } }
+    sort: {frontmatter: {date: DESC}}
+  ) {
     edges {
       node {
         frontmatter {

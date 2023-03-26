@@ -30,7 +30,11 @@ const Index = ({ data }) => (
 export default Index
 
 export const query = graphql`{
-  allMarkdownRemark(limit: 5, sort: {frontmatter: {date: DESC}}) {
+  allMarkdownRemark(
+    limit: 5,
+    filter: { fileAbsolutePath: { regex: "/src/markdown/" } }
+    sort: {frontmatter: {date: DESC}}
+  ) {
     totalCount
     edges {
       node {
