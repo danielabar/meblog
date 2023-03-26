@@ -44,6 +44,15 @@ exports[`Layout renders correctly 1`] = `
                   class="undefined undefined"
                 >
                   <a
+                    href="/learning"
+                  >
+                    Learning
+                  </a>
+                </li>
+                <li
+                  class="undefined undefined"
+                >
+                  <a
                     href="/about"
                   >
                     About
@@ -175,6 +184,15 @@ exports[`Layout renders correctly 1`] = `
                   href="/blog"
                 >
                   Blog
+                </a>
+              </li>
+              <li
+                class="undefined undefined"
+              >
+                <a
+                  href="/learning"
+                >
+                  Learning
                 </a>
               </li>
               <li

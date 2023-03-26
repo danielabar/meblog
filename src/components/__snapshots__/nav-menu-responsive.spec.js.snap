@@ -50,6 +50,15 @@ exports[`NavMenuResponsive opens 1`] = `
             class="undefined undefined"
           >
             <a
+              href="/learning"
+            >
+              Learning
+            </a>
+          </li>
+          <li
+            class="undefined undefined"
+          >
+            <a
               href="/about"
             >
               About
@@ -99,6 +108,15 @@ exports[`NavMenuResponsive opens 1`] = `
             href="/blog"
           >
             Blog
+          </a>
+        </li>
+        <li
+          class="undefined undefined"
+        >
+          <a
+            href="/learning"
+          >
+            Learning
           </a>
         </li>
         <li

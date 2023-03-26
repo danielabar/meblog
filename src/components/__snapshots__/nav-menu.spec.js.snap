@@ -22,6 +22,15 @@ exports[`NavMenu renders search input when SEARCH_ENABLED env var is true 1`] = 
             class="undefined undefined"
           >
             <a
+              href="/learning"
+            >
+              Learning
+            </a>
+          </li>
+          <li
+            class="undefined undefined"
+          >
+            <a
               href="/about"
             >
               About
@@ -68,6 +77,15 @@ exports[`NavMenu renders search input when SEARCH_ENABLED env var is true 1`] = 
             href="/blog"
           >
             Blog
+          </a>
+        </li>
+        <li
+          class="undefined undefined"
+        >
+          <a
+            href="/learning"
+          >
+            Learning
           </a>
         </li>
         <li

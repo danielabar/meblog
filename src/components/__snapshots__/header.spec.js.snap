@@ -43,6 +43,15 @@ exports[`Header renders nav menu for wide widths 1`] = `
                 class="undefined undefined"
               >
                 <a
+                  href="/learning"
+                >
+                  Learning
+                </a>
+              </li>
+              <li
+                class="undefined undefined"
+              >
+                <a
                   href="/about"
                 >
                   About
@@ -87,6 +96,15 @@ exports[`Header renders nav menu for wide widths 1`] = `
                 href="/blog"
               >
                 Blog
+              </a>
+            </li>
+            <li
+              class="undefined undefined"
+            >
+              <a
+                href="/learning"
+              >
+                Learning
               </a>
             </li>
             <li
