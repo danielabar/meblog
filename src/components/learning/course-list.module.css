@@ -1,9 +1,6 @@
-/* If want all columns evenly distributed across free space, don't use pixels at all, use fr units: */
-/* auto will adjust column to max size of the content (i.e. ALL items in the column will get wider),
-then 1fr will use all of the remaining free space: */
-/* Use repeat function to specify how many times you want to repeat and what should be repeated, */
-/* With auto-fill, do not specify how many columns, just tell grid to "figure it out" based on however much content is in each item. */
-/* Combination of auto-fill/auto-fit/minmax replaces many media queries because it makes grid responsive by design. */
+/* auto-fit: Create as many columns as possible without overflowing the container, while still maintaining the minimum width of 250px */
+/* minmax(250px, 1fr):  Sets minimum width of each column to 250px and maximum width of 1fr */
+/* 1fr unit: Distribute the available space equally among the columns */
 .container {
   display: grid;
   grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));

@@ -95,11 +95,19 @@ Image in src/images:
 ![image alt text](../images/image-file-name.png "image description")
 ```
 
-
 ## Markdown Styling
 
 * Add entry mapping markdown element to a css class in in `gatsby-config.js` under the `plugins` -> `gatsby-transformer-remark` section.
 * Add css styles for the class in `src/styles/markdown.css`.
+
+## Fonts
+
+This project uses [Fontsource](https://www.gatsbyjs.com/docs/how-to/styling/using-web-fonts/#self-host-google-fonts-with-fontsource) to self host Google fonts. Fonts used include:
+
+[figtree](https://www.npmjs.com/package/@fontsource/figtree)
+
+Weights: [300,400,500,600,700,800,900]
+Styles: [italic,normal]
 
 ## Gatsby Upgrade Checklist
 
