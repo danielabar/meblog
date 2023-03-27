@@ -1,6 +1,7 @@
 /* eslint-disable react/jsx-pascal-case */
 import React from "react"
 import { graphql } from "gatsby"
+import { GatsbyImage } from "gatsby-plugin-image"
 import "@fontsource/bai-jamjuree/200.css"
 import "@fontsource/bai-jamjuree/300.css"
 import "@fontsource/bai-jamjuree/400.css"
@@ -32,6 +33,10 @@ const Learning = props => {
         {courses.map(({ node }) => (
           <li key={node.id}>
             {node.frontmatter.title}
+            <GatsbyImage
+              image={node.frontmatter.featuredImage.childImageSharp.gatsbyImageData}
+              alt="TBD"
+            />
           </li>
         ))}
         </ul>
@@ -62,7 +67,7 @@ export const query = graphql`{
           notes
           featuredImage {
             childImageSharp {
-              gatsbyImageData(width: 300, height: 170, layout: FIXED)
+              gatsbyImageData(width: 200, height: 150, layout: FIXED)
             }
           }
         }
