@@ -1,0 +1,27 @@
+.container {
+  background-color: #fff;
+  border: 1px solid transparent;
+  border-radius: 5px;
+  box-shadow: 2px 2px 4px 0px rgba(0, 0, 0, 0.3);
+  padding: 20px;
+}
+
+.imgwrapper {
+  margin-bottom: 15px;
+}
+
+.image {
+  border-radius: 5px;
+}
+
+.platformInfo {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.categoryWrapper {
+  border-radius: 5px;
+  display: inline-block;
+  padding: 1px 10px;
+}

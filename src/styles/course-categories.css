@@ -1,0 +1,15 @@
+/* custom styles for the categories */
+.javascript {
+  background-color: red;
+  color: white;
+}
+
+.ruby {
+  background-color: blue;
+  color: white;
+}
+
+.rails {
+  background-color: green;
+  color: white;
+}
