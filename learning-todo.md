@@ -10,7 +10,7 @@
   * [ ] Square images from DAll-e don't look good, need to get a wider aspect ratio, look into [imagemagick](https://www.digitalocean.com/community/tutorials/workflow-resizing-images-with-imagemagick)
 * [ ] Import course data into `src/learning`.
 * [ ] Import corresponding course images into `src/images/learning`.
-* [ ] `LearningIntro` component (similar to `Intro`) but with text to explain the learning section.
+* [ ] `LearningIntro` component (similar to `Intro`) but with text to explain the learning section (see brainstorming below)/
 * [ ] New unit tests for new learning page and related components.
 * [ ] Implement [sitemap config](https://www.gatsbyjs.com/plugins/gatsby-plugin-sitemap) to exclude the new `/learning` page.
 * [ ] Verify SEO and tracking for new `/learning` page.
@@ -31,3 +31,7 @@ The `layout` option in `gatsbyImageData` specifies how the image should be displ
 You can use the layout option to control how the images are displayed on your Gatsby site. For example, you may use `FIXED` layout for images that are meant to be displayed at a specific size, such as thumbnails or icons. You may use `FULL_WIDTH` layout for images that you want to stretch to fill the width of their container, such as hero images. Finally, you may use `CONSTRAINED` layout for images that you want to fit within a specific space, such as inline images within a blog post.
 
 Figure out relationship between for example `gatsbyImageData(width: 250, aspectRatio: 1.67)` in `src/pages/learning.js` and grid definition `grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));` in `src/components/learning/course-list.module.css`
+
+## Learning Intro Brainstorming
+
+Welcome to the Learning section. In a world where change is the only constant, it's crucial to keep learning and expanding our knowledge. This is especially true in the constantly evolving world of technology, where new languages, tools, libraries, and frameworks are always emerging. Here, I've gathered a collection of online courses that I've completed and compiled detailed notes on, so you can learn from my experiences and take your skills to the next level. Also check out the link to my article on how to get the most out of online courses, and start your learning journey today!
