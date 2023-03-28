@@ -1,12 +1,12 @@
 # Learning Feature TODOs
 
 * [x] Maintain existing nav and other unit tests.
-* [x] `LearningList` component (similar to `ArticleList`) but not paginated, will contain all the courses and iterate over each to render a `CourseCard`. The course list should be in a responsive grid. Something like 3 or 4 across for desktop, maybe 2 for tablet, and a "tube" of single cards for mobile/phone.
-* [ ] `CourseCard` component to display: image, category, title, instructor, platform, completed date, link to my course notes (layout TBD).
+* [x] `LearningList` component (similar to `ArticleList`) but to display a grid of course cards.
+* [x] `CourseCard` component to display: image, category, title, completed date, link to my course notes.
   * [x] Consider a different font for course cards (Inter, Roboto, DM Sans, Figtree)
-  * [ ] Upgrade react-icons to get latest and greatest FA, eg: [person-chalkboard](https://fontawesome.com/icons/person-chalkboard?f=classic&s=solid)
-  * [ ] Figure out gatsbyImageData options for course card image wrt grid options (see below)
+  * [x] Upgrade react-icons.
   * [ ] Design color scheme for course categories (background lighter tag color and corresponding darker text color)
+  * [ ] Figure out gatsbyImageData options for course card image wrt grid options (see below)
   * [ ] Square images from DAll-e don't look good, need to get a wider aspect ratio, look into [imagemagick](https://www.digitalocean.com/community/tutorials/workflow-resizing-images-with-imagemagick)
 * [ ] Import course data into `src/learning`.
 * [ ] Import corresponding course images into `src/images/learning`.
