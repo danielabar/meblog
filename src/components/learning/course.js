@@ -1,12 +1,9 @@
 import React from "react"
 import { GatsbyImage } from "gatsby-plugin-image"
-// import { FaPersonChalkboard } from "react-icons/fa"
+import { FaRegCalendar, FaExternalLinkAlt } from "react-icons/fa"
 import * as styles from "./course.module.css"
 
 const Course = props => {
-  console.dir(props.title)
-  console.dir(props)
-
   return (
     <div className={styles.container}>
 
@@ -22,9 +19,15 @@ const Course = props => {
 
       <div className={styles.title}>{props.title}</div>
 
-      <div className={styles.platformInfo}>
-        <div className={styles.instructor}>{props.instructor}</div>
-        <div className={styles.platform}>{props.platform}</div>
+      <div className={styles.myInfo}>
+        <div className={styles.iconWithText}>
+          <FaRegCalendar className={styles.icon} />
+          <span className={styles.iconText}>{props.completed_date}</span>
+        </div>
+        <div className={styles.iconWithText}>
+          <FaExternalLinkAlt className={styles.icon} />
+          <a className={styles.iconLink} href={props.notes} target="_blank" rel="noopener noreferrer">View Notes</a>
+        </div>
       </div>
     </div>
   )

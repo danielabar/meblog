@@ -16,10 +16,11 @@
   border-radius: 5px;
 }
 
-.platformInfo {
-  display: flex;
-  justify-content: space-between;
+.myInfo {
   align-items: center;
+  display: flex;
+  font-size: 14px;
+  justify-content: space-between;
 }
 
 .categoryWrapper {
@@ -51,7 +52,29 @@
   opacity: 0.8;
 }
 
-.platformInfo {
-  font-size: 14px;
+.iconWithText {
+  align-items: center;
+  display: flex;
+  justify-content: space-between;
+}
+
+.iconText {
+  margin-left: 5px;
+  margin-top: 1px;
+  opacity: 0.6;
+}
+
+.iconLink {
+  margin-left: 5px;
+  margin-top: 1px;
+  transition: opacity 0.3s ease;
+  opacity: 0.6;
+}
+
+.iconLink:hover {
+  opacity: 0.8;
+}
+
+.icon {
   opacity: 0.6;
 }
