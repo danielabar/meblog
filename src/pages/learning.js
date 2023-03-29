@@ -19,8 +19,7 @@ import "@fontsource/figtree/900-italic.css"
 
 import SEO from "../components/SEO"
 import Layout from "../components/layout"
-// TODO: Make a learning intro
-import Intro from "../components/intro"
+import Intro from "../components/learning/intro"
 import CourseList from "../components/learning/course-list"
 import AllLink from "../components/all-link"
 import * as styles from "./learning.module.css"
