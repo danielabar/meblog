@@ -6,8 +6,8 @@
 * [x] `CourseCard` component to display: image, category, title, completed date, link to my course notes.
   * [x] Consider a different font for course cards (Inter, Roboto, DM Sans, Figtree)
   * [x] Upgrade react-icons.
+  * [ ] Design color scheme for course categories, see `src/styles/course-categories.css` and below.
   * [ ] Shadows are too heavy, make lighter, then slightly heavier on card hover.
-  * [ ] Design color scheme for course categories (background lighter tag color and corresponding darker text color)
   * [ ] Figure out gatsbyImageData options for course card image wrt grid options (see below)
   * [ ] Square images from DAll-e don't look good, need to get a wider aspect ratio, look into [imagemagick](https://www.digitalocean.com/community/tutorials/workflow-resizing-images-with-imagemagick)
 * [ ] Import course data into `src/learning`.
@@ -15,8 +15,8 @@
 * [ ] New unit tests for new learning page and related components.
 * [ ] Implement [sitemap config](https://www.gatsbyjs.com/plugins/gatsby-plugin-sitemap) to exclude the new `/learning` page.
 * [ ] Verify SEO and tracking for new `/learning` page.
-* [ ] Verify prod build `make serve`
-* [ ] Sorting/Filtering (could be follow-on)
+* [ ] Verify prod build `make serve`.
+* [ ] Sorting/Filtering (could be follow-on, could [this](https://github.com/pacocoursey/cmdk) be useful?). Also see Isotope and MixItUp.
 
 
 ## Gatsby Image Data
@@ -36,3 +36,19 @@ Figure out relationship between for example `gatsbyImageData(width: 250, aspectR
 ## Learning Intro Brainstorming
 
 Welcome to the Learning section. In a world where change is the only constant, it's crucial to keep learning and expanding our knowledge. This is especially true in tech, where new languages, tools, libraries, and frameworks are always emerging. Here, I've gathered a collection of online courses that I've completed and compiled detailed notes on, so you can learn from my experiences and take your skills to the next level. Also check out the link to my article on how to get the most out of online courses, and start your learning journey today!
+
+## Category Tag Colors
+
+```css
+background-color: #E6F2FE; /* light blue */
+color: #0D1A2F; /* dark blue */
+
+background-color: #D8D4F9; /* light purple */
+color: #1E1733; /* dark purple */
+
+background-color: #EAF8FC; /* light blue */
+color: #0B4457; /* dark blue */
+
+background-color: #E7D9E7; /* light purple */
+color: #1B0F1F; /* dark purple */
+```

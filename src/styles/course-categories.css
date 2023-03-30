@@ -1,15 +1,15 @@
 /* custom styles for the categories */
 .javascript {
-  background-color: red;
-  color: white;
+  background-color: #f7e691; /* light yellow */
+  color: #5E4C3C; /* dark brown */
 }
 
 .ruby {
-  background-color: blue;
-  color: white;
+  background-color: #FEE5E9; /* light pink */
+  color: #3C1F2A; /* dark brown */
 }
 
 .rails {
-  background-color: green;
-  color: white;
+  background-color: #D5F8E9; /* light green */
+  color: #1E3D33; /* dark green */
 }
