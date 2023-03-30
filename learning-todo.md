@@ -33,6 +33,29 @@ You can use the layout option to control how the images are displayed on your Ga
 
 Figure out relationship between for example `gatsbyImageData(width: 250, aspectRatio: 1.67)` in `src/pages/learning.js` and grid definition `grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));` in `src/components/learning/course-list.module.css`
 
+### Imagemagick
+
+Since will be displaying many images on one page, might be good to crop them to size before adding to gatsby image processing. If using Dall-E, they are 1024x1024. Try variations on imagemagick convert command:
+
+```
+convert input.png -resize "250x140^" -gravity center -crop 250x140+0+0 +repage output.png
+convert atom.png -resize 250x140^ -gravity center -extent 250x140 atom_output.png
+
+Shrink content to fit smaller frame and apply background to fill the rest
+convert gatsby.png -resize 250x140 -background "rgba(0, 0, 255, 0.5)" -gravity center -extent 250x140 gatsby_output.png
+
+Sample background color from image:
+convert gatsby.png -gravity NorthWest -crop 1x1+0+0 -format "%[pixel:u]\n" info:
+srgb(253,254,255
+
+Command substitution:
+convert atom.png -background "$(convert atom.png -gravity NorthWest -crop 1x1+50+50 -format "%[pixel:u]" info:)" \
+-resize 250x140 -gravity center -extent 250x140 atom-smart-back.png
+
+```
+
+Want images that are 250px wide, with 16:9 aspect ratio (i.e. 1.87).
+
 ## Learning Intro Brainstorming
 
 Welcome to the Learning section. In a world where change is the only constant, it's crucial to keep learning and expanding our knowledge. This is especially true in tech, where new languages, tools, libraries, and frameworks are always emerging. Here, I've gathered a collection of online courses that I've completed and compiled detailed notes on, so you can learn from my experiences and take your skills to the next level. Also check out the link to my article on how to get the most out of online courses, and start your learning journey today!
