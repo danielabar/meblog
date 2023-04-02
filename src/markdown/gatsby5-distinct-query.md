@@ -48,8 +48,8 @@ description: "Learn some advanced techniques to take your lifting to the next le
 date: "2023-01-15"
 category: "strength"
 ---
-If you've been lifting weights for a while and want to take your workout to the next level, you'll need to start incorporating some advanced techniques.
-...
+If you've been lifting weights for a while and want to take your workout to the next level,
+you'll need to start incorporating some advanced techniques...
 ```
 
 ```markdown
@@ -59,8 +59,8 @@ description: "Get back to the basics with a beginner's guide to cardio workouts.
 date: "2023-03-22"
 category: "cardio"
 ---
-If you're new to working out or just looking to get back into shape, cardio is a great place to start.
-...
+If you're new to working out or just looking to get back into shape,
+cardio is a great place to start...
 ```
 
 ```markdown
@@ -70,8 +70,8 @@ description: "Get started with strength training and build a foundation for a he
 date: "2023-07-16"
 category: "strength"
 ---
-Strength training is an effective way to build muscle, increase bone density, and improve overall health.
-...
+Strength training is an effective way to build muscle,
+increase bone density, and improve overall health...
 ```
 
 ```markdown
@@ -81,12 +81,73 @@ description: "Improve your flexibility and reduce stress with this beginner's gu
 date: "2023-09-02"
 category: "yoga"
 ---
-Yoga is a good way to improve flexibility, reduce stress, and promote overall wellness.
-...
+Yoga is a good way to improve flexibility, reduce stress,
+and promote overall wellness...
 ```
+
+Now you'd like to get a list of all the categories, perhaps to generate a list of category tags that readers could click on to view articles for that category.
+
+## Solution
+
+Here is the GraphQL query to get a list of distinct categories. The key here is to use the `distinct` *aggregation resolver*, and within that, specify the field to extract unique values for. The nesting of `category` within `frontmatter` matches how the nodes are structured when using the [gatsby-transformer-remark](https://www.npmjs.com/package/gatsby-transformer-remark) plugin. The `SELECT` after specifying the `category` field seems a little odd, more on this later:
+
+```graphql
+{
+  allMarkdownRemark {
+    distinct(field: { frontmatter: { category: SELECT} })
+  }
+}
+```
+
+<aside class="markdown-aside">
+An aggregation resolver is a type of resolver function that aggregates data from multiple sources into a single field on a GraphQL node. In addition to the distinct aggregation, Gatsby also supports group, min, max, and sum. I couldn't find documentation about these built-in resolvers but here's a <a class="markdown-link" href="https://github.com/gatsbyjs/gatsby/pull/30789">PR</a> where some of them got introduced. It's also possible to create your own <a class="markdown-link" href="https://www.gatsbyjs.com/docs/reference/graphql-data-layer/schema-customization/#createresolvers-api">custom resolvers</a>.
+</aside>
+
+Using the `distinct` resolver will produce output like this:
+
+```json
+{
+  "data": {
+    "allMarkdownRemark": {
+      "distinct": [
+        "strength",
+        "cardio",
+        "yoga"
+      ]
+    }
+  },
+  "extensions": {}
+}
+```
+
+To have the categories sorted alphabetically in ascending order, pass in the `sort` option to the query field `allMarkdownRemark`. Use `DESC` instead of `ASC` for reverse alphabetic order:
+
+```graphql
+{
+  allMarkdownRemark(
+    sort: {frontmatter: {category: ASC}}
+  ) {
+    distinct(field: { frontmatter: { category: SELECT} })
+  }
+}
+```
+
+If the markdown files are located in different directories such as `/src/markdown/fitness` and `/src/markdown/health` and you only want the distinct categories for the `fitness` articles, pass the `filter` option to the query field. Within that, specify the field that should be filtered on, in this case, `fileAbsolutePath`. Then use the `regex` filter operator to limit the results to only markdown files that are located in a certain directory:
+
+```graphql
+{
+  allMarkdownRemark(
+    filter: { fileAbsolutePath: { regex: "/src/markdown/fitness/" } }
+    sort: {frontmatter: {category: ASC}}
+  ) {
+    distinct(field: { frontmatter: { category: SELECT} })
+  }
+}
+```
+
+For more filter options and how they can be combined, see the [Gatsby GraphQL](https://www.gatsbyjs.com/docs/graphql-reference/#filter) docs.
 
 ## TODO
 * Improve structure of example para
-* Show solution
-* Explain technique to find it as it wasn't in official docs (had to search source, tests, git commit, github issue)
+* Explain technique to find it as it wasn't in official docs https://www.gatsbyjs.com/docs/graphql-reference/ (had to search source, tests, git commit, github issue)
 * Conclusion para
