@@ -6,8 +6,8 @@
 * [x] `CourseCard` component to display: image, category, title, completed date, link to my course notes.
   * [x] Consider a different font for course cards (Inter, Roboto, DM Sans, Figtree)
   * [x] Upgrade react-icons.
-  * [ ] Design color scheme for course categories, see `src/styles/course-categories.css` and below.
-  * [ ] Shadows are too heavy, make lighter, then slightly heavier on card hover.
+  * [x] Design color scheme for course categories, see `src/styles/course-categories.css` and below.
+  * [x] Shadows are too heavy, make lighter, then slightly heavier on card hover.
   * [ ] Figure out gatsbyImageData options for course card image wrt grid options (see below)
   * [ ] Square images from DAll-e don't look good, need to get a wider aspect ratio, look into [imagemagick](https://www.digitalocean.com/community/tutorials/workflow-resizing-images-with-imagemagick)
 * [ ] Import course data into `src/learning`.
