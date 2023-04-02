@@ -1,15 +1,76 @@
-/* custom styles for the categories */
-.javascript {
-  background-color: #f7e691; /* light yellow */
-  color: #5E4C3C; /* dark brown */
+.css {
+  background-color: #f4e1d2;
+  /* light peach */
+  color: #3c2f2f;
+  /* dark maroon */
 }
 
-.ruby {
-  background-color: #FEE5E9; /* light pink */
-  color: #3C1F2A; /* dark brown */
+.database {
+  background-color: #e2d6f4;
+  /* light purple */
+  color: #382c4f;
+  /* dark indigo */
+}
+
+.devops {
+  background-color: #d2f4e1;
+  /* light green */
+  color: #2f3c2f;
+  /* dark forest */
+}
+
+.golang {
+  background-color: #e1d2f4;
+  /* light lavender */
+  color: #3c2f3a;
+  /* dark plum */
+}
+
+.java {
+  background-color: #f4d2e1;
+  /* light pink */
+  color: #3c2f33;
+  /* dark magenta */
+}
+
+.javascript {
+  background-color: #f7e691;
+  /* light yellow */
+  color: #5E4C3C;
+  /* dark brown */
+}
+
+.linux {
+  background-color: #d2f4e1;
+  /* light green */
+  color: #2f3c2f;
+  /* dark forest */
+}
+
+.python {
+  background-color: #d2f4e1;
+  /* light green */
+  color: #3c2f2f;
+  /* dark maroon */
 }
 
 .rails {
-  background-color: #D5F8E9; /* light green */
-  color: #1E3D33; /* dark green */
+  background-color: #e1d2f4;
+  /* light lavender */
+  color: #3c2f4d;
+  /* dark orchid */
+}
+
+.ruby {
+  background-color: #f4e1d2;
+  /* light peach */
+  color: #3c2f2f;
+  /* dark maroon */
+}
+
+.web-development {
+  background-color: #f4d2e1;
+  /* light pink */
+  color: #3c2f2f;
+  /* dark magenta */
 }

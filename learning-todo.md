@@ -6,12 +6,13 @@
 * [x] `CourseCard` component to display: image, category, title, completed date, link to my course notes.
   * [x] Consider a different font for course cards (Inter, Roboto, DM Sans, Figtree)
   * [x] Upgrade react-icons.
-  * [x] Design color scheme for course categories, see `src/styles/course-categories.css` and below.
   * [x] Shadows are too heavy, make lighter, then slightly heavier on card hover.
+  * [ ] Design color scheme for course categories, see `src/styles/course-categories.css` and below.
   * [ ] Figure out gatsbyImageData options for course card image wrt grid options (see below)
   * [ ] Square images from DAll-e don't look good, need to get a wider aspect ratio, look into [imagemagick](https://www.digitalocean.com/community/tutorials/workflow-resizing-images-with-imagemagick)
-* [ ] Import course data into `src/learning`.
-* [ ] Import corresponding course images into `src/images/learning`.
+* [x] Import pluralsight and wesbos course data into `src/learning`.
+* [ ] Import tutsplus course data into `src/learning`.
+* [ ] Generate course images into `src/images/learning` (replace all placeholder.png)
 * [ ] New unit tests for new learning page and related components.
 * [ ] Implement [sitemap config](https://www.gatsbyjs.com/plugins/gatsby-plugin-sitemap) to exclude the new `/learning` page.
 * [ ] Verify SEO and tracking for new `/learning` page.
@@ -60,7 +61,21 @@ Want images that are 250px wide, with 16:9 aspect ratio (i.e. 1.87).
 
 Welcome to the Learning section. In a world where change is the only constant, it's crucial to keep learning and expanding our knowledge. This is especially true in tech, where new languages, tools, libraries, and frameworks are always emerging. Here, I've gathered a collection of online courses that I've completed and compiled detailed notes on, so you can learn from my experiences and take your skills to the next level. Also check out the link to my article on how to get the most out of online courses, and start your learning journey today!
 
-## Category Tag Colors
+## Category Tags
+
+**Distinct Categories**
+
+css
+database
+devops
+golang
+java
+javascript
+linux
+python
+rails
+ruby
+web development
 
 ```css
 background-color: #E6F2FE; /* light blue */

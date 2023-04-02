@@ -1,0 +1,70 @@
+/* Define base colors for each category */
+:root {
+  --javascript-color: #F7B32D;
+  --python-color: #306998;
+  --java-color: #ED8B00;
+  --ruby-color: #CC342D;
+  --database-color: #008CBA;
+  --html-css-color: #E44D26;
+  --ui-ux-color: #EB9B0C;
+  --react-color: #61DBFB;
+  --angular-color: #B52E31;
+  --node-color: #68A063;
+  --design-color: #A17E46;
+}
+
+/* Generate background and font colors for each category */
+.javascript {
+  background-color: var(--javascript-color);
+  color: hsl(var(--javascript-color-h), 70%, 25%);
+}
+
+.python {
+  background-color: var(--python-color);
+  color: hsl(var(--python-color-h), 70%, 25%);
+}
+
+.java {
+  background-color: var(--java-color);
+  color: hsl(var(--java-color-h), 70%, 25%);
+}
+
+.ruby {
+  background-color: var(--ruby-color);
+  color: hsl(var(--ruby-color-h), 70%, 25%);
+}
+
+.database {
+  background-color: var(--database-color);
+  color: hsl(var(--database-color-h), 70%, 25%);
+}
+
+.html-css {
+  background-color: var(--html-css-color);
+  color: hsl(var(--html-css-color-h), 70%, 25%);
+}
+
+.ui-ux {
+  background-color: var(--ui-ux-color);
+  color: hsl(var(--ui-ux-color-h), 70%, 25%);
+}
+
+.react {
+  background-color: var(--react-color);
+  color: hsl(var(--react-color-h), 70%, 25%);
+}
+
+.angular {
+  background-color: var(--angular-color);
+  color: hsl(var(--angular-color-h), 70%, 25%);
+}
+
+.node {
+  background-color: var(--node-color);
+  color: hsl(var(--node-color-h), 70%, 25%);
+}
+
+.design {
+  background-color: var(--design-color);
+  color: hsl(var(--design-color-h), 70%, 25%);
+}
