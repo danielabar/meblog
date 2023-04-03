@@ -147,7 +147,159 @@ If the markdown files are located in different directories such as `/src/markdow
 
 For more filter options and how they can be combined, see the [Gatsby GraphQL](https://www.gatsbyjs.com/docs/graphql-reference/#filter) docs.
 
+If you just needed to find the solution quickly, you can copy paste the above and move on. But if you're curious as to how I found it when regular searching failed, read on.
+
+## Finding The Solution
+
+Although the query seems straightforward enough, finding the correct syntax was surprisingly difficult. The reason is the aggregation syntax has changed from Gatsby v4 to Gatsby v5. At the time when I was searching for it, here is the syntax that was turning up for a distinct query:
+
+```graphql
+# OLD GATSBY V4 SYNTAX - DO NOT USE ON GATSBY V5
+{
+  allMarkdownRemark {
+    distinct(field: frontmatter___category)
+  }
+}
+```
+
+Running the above will result in an error:
+
+```json
+{
+  "errors": [
+    {
+      "message": "Expected value of type \"MarkdownRemarkFieldSelector!\", found frontmatter___category.",
+      "locations": [
+        {
+          "line": 3,
+          "column": 21
+        }
+      ]
+    }
+  ]
+}
+```
+
+I tried Duck Duck Go (my default search engine) and Google (fallback when can't find what I need on DDG) but both were returning the same results, either invalid syntax, or links to official Gatsby docs with no mention of the word "distinct".
+
+### How About AI?
+
+I also asked ChatGPT but it returned the same invalid syntax. When told about the error, ChatGPT suggested this variation which also does not work:
+
+```graphql
+# ALSO INCORRECT - DO NOT USE!
+{
+  allMarkdownRemark {
+    distinct(field: frontmatter { category })
+  }
+}
+```
+
+Running the above results in a syntax error:
+
+```json
+{
+  "errors": [
+    {
+      "message": "Syntax Error: Expected Name, found \"{\".",
+      "locations": [
+        {
+          "line": 3,
+          "column": 33
+        }
+      ]
+    }
+  ]
+}
+```
+
+When I told ChatGPT this solution was also not working, it responded with "I apologize, the correct syntax is...", and then proceeded to provide the first "solution" that I had already told it was incorrect `distinct(field: frontmatter___category)`. When I pointed this out it apologized again and then gave me the second incorrect "solution" `distinct(field: frontmatter { category })`. It was literally stuck in a loop apologizing and alternating between incorrect solutions. So our engineering jobs are safe for now.
+
+### Dig Into The Source
+
+A useful technique when web search fails is to search in the source code. Since Gatsby is open source and hosted on Github, the source is easily accessible. I started on the [Gatsby repo on Github](https://github.com/gatsbyjs/gatsby) and entered `distinct` in the search box, then selected to search "In this repository" as follows:
+
+![gatsby repo search distinct](../images/gatsby-repo-search-distinct.png "gatsby repo search distinct")
+
+A number of results were returned. One of the results was for a test with the description being `returns list of distinct values in a field` as shown below:
+
+![gatsby repo search distinct result](../images/gatsby-repo-search-distinct-result.png "gatsby repo search distinct result")
+
+This seemed promising as that was exactly the problem I was trying to solve. Looking more closely at this [test](https://github.com/gatsbyjs/gatsby/blob/master/packages/gatsby/src/schema/__tests__/connection-input-fields.js#L177-L215), it defines a query that extracts distinct values from a number of fields. One of them is a frontmatter field which is what I was looking for - notice the field `blue` in this test:
+
+```js
+// Copied from: packages/gatsby/src/schema/__tests__/connection-input-fields.js
+it(`returns list of distinct values in a field`, async () => {
+  const result = await queryResult(
+    makeNodes(),
+    `
+      {
+        allTest {
+          totalCount
+          names: distinct(field: { name: SELECT })
+          array: distinct(field: { anArray: SELECT })
+          blue: distinct(field: { frontmatter: { blue: SELECT }})
+          dates: distinct(field: { dateArray: SELECT })
+          # Only one node has this field
+          circle: distinct(field: { frontmatter: { circle: SELECT }})
+          nestedField: distinct(field: { anotherKey:{ withANested:{ nestedKey: SELECT }}})
+        }
+      }
+    `
+  )
+
+  expect(result.errors).not.toBeDefined()
+  expect(result.data.allTest.names.length).toEqual(2)
+  expect(result.data.allTest.names[0]).toEqual(`The Mad Max`)
+
+  expect(result.data.allTest.array.length).toEqual(5)
+  expect(result.data.allTest.array[0]).toEqual(`1`)
+
+  expect(result.data.allTest.blue.length).toEqual(2)
+  expect(result.data.allTest.blue[0]).toEqual(`100`)
+
+  expect(result.data.allTest.circle.length).toEqual(1)
+  expect(result.data.allTest.circle[0]).toEqual(`happy`)
+
+  expect(result.data.allTest.dates[2]).toEqual(`2006-07-04T22:39:53.000Z`)
+  expect(result.data.allTest.dates.length).toEqual(4)
+
+  expect(result.data.allTest.nestedField.length).toEqual(2)
+  expect(result.data.allTest.nestedField[0]).toEqual(`bar`)
+  expect(result.data.allTest.nestedField[1]).toEqual(`foo`)
+})
+```
+
+So to make the `distinct` query work requires specifying an object for the field rather than triple underscores, and the addition of `: SELECT` after specifying which field you want to extract distinct values for.
+
+### But Why?
+
+I could have left it at that but got curious as to what this special word `SELECT` was doing and whether there were any other special values that could be specified in the query. In GraphiQL, the in-browser GraphQL IDE that's running on `http://localhost:8000/___graphql` when you run Gatsby in development mode, you can <kbd class="markdown-kbd">Cmd</kbd> + click on any text in the query to open the documentation. Doing this on the `SELECT` keyword revealed that its a `FieldSelectorEnum`:
+
+![graphiql select doc](../images/graphiql-select-doc.png "graphiql select doc")
+
+Unfortunately there was no additional description of what this is or what other values are possible. So I searched for `FieldSelectorEnum` in the Gatsby source (same technique as before, searching with Github UI) and found it defined [here](https://github.com/gatsbyjs/gatsby/blob/master/packages/gatsby/src/schema/types/pagination.ts#L114-L125):
+
+```js
+// Copied from: packages/gatsby/src/schema/types/pagination.ts
+leafInputComposer: schemaComposer.getOrCreateETC(
+    `FieldSelectorEnum`,
+    etc => {
+      etc.setFields({
+        // GraphQL spec doesn't allow using "true" (or "false" or "null") as enum values
+        // so we "SELECT"
+        SELECT: { value: `SELECT` },
+      })
+    }
+  ),
+  postfix: `FieldSelector`,
+}).getTypeNonNull()
+```
+
+TODO: Maybe not this para...
+At the top of every source file on Github, there's a "Blame" button. Clicking it will run [git blame](https://www.git-scm.com/docs/git-blame) which will show the commit message associated with each line. Running that for this test showed that all the lines for the `distinct` query were associated with commit message `chore: apply patches for v5 (#36796)`. The number portion of that message is clickable when running Blame on the Github UI, and it leads to a PR.
+
 ## TODO
 * Improve structure of example para
-* Explain technique to find it as it wasn't in official docs https://www.gatsbyjs.com/docs/graphql-reference/ (had to search source, tests, git commit, github issue)
+* WIP: Explain technique to find it as it wasn't in official docs https://www.gatsbyjs.com/docs/graphql-reference/ (had to search source, tests, git commit, github issue)
 * Conclusion para
