@@ -18,7 +18,7 @@ This post assumes that the reader has some basic knowledge of building websites 
 
 ## Example
 
-A common use case for Gatsby is to generate a static site where the content for the pages comes from markdown files. The [gatsby-transformer-remark](https://www.npmjs.com/package/gatsby-transformer-remark) plugin transforms markdown files into HTML and creates nodes for them in Gatsby's GraphQL data layer. For example, given a `src` directory in a Gatsby project that looks like this (suppose this is for a fitness site):
+A common use case for Gatsby is to generate a static site where the content for the pages comes from markdown files. The [gatsby-transformer-remark](https://www.npmjs.com/package/gatsby-transformer-remark) plugin transforms markdown files into HTML and creates nodes for them in Gatsby's GraphQL data layer. For instance, suppose we have a fitness site and the  `src` directory contains markdown files for each workout routine as follows:
 
 ```
 src
@@ -85,7 +85,7 @@ Yoga is a good way to improve flexibility, reduce stress,
 and promote overall wellness...
 ```
 
-Now you'd like to get a list of all the categories, perhaps to generate a list of category tags that readers could click on to view articles for that category.
+Now we would like to get a list of all the categories, perhaps to generate a list of category tags that readers could click on to view articles for that category.
 
 ## Solution
 
@@ -103,7 +103,7 @@ Here is the GraphQL query to get a list of distinct categories. The key here is 
 An aggregation resolver is a type of resolver function that aggregates data from multiple sources into a single field on a GraphQL node. In addition to the distinct aggregation, Gatsby also supports group, min, max, and sum. I couldn't find documentation about these built-in resolvers but here's a <a class="markdown-link" href="https://github.com/gatsbyjs/gatsby/pull/30789">PR</a> where some of them got introduced. It's also possible to create your own <a class="markdown-link" href="https://www.gatsbyjs.com/docs/reference/graphql-data-layer/schema-customization/#createresolvers-api">custom resolvers</a>.
 </aside>
 
-Using the `distinct` resolver will produce output like this:
+Running the above query will produce output like this:
 
 ```json
 {
@@ -132,7 +132,7 @@ To have the categories sorted alphabetically in ascending order, pass in the `so
 }
 ```
 
-If the markdown files are located in different directories such as `/src/markdown/fitness` and `/src/markdown/health` and you only want the distinct categories for the `fitness` articles, pass the `filter` option to the query field. Within that, specify the field that should be filtered on, in this case, `fileAbsolutePath`. Then use the `regex` filter operator to limit the results to only markdown files that are located in a certain directory:
+If the markdown files are located in different directories such as `/src/markdown/fitness` and `/src/markdown/recipes` and you only want the distinct categories for the `fitness` articles, pass the `filter` option to the query field. Within that, specify the field that should be filtered on, in this case, `fileAbsolutePath`. Then use the `regex` filter operator to limit the results to only markdown files that are located in a certain directory:
 
 ```graphql
 {
@@ -151,7 +151,7 @@ If you just needed to find the solution quickly, you can copy paste the above an
 
 ## Finding The Solution
 
-Although the query seems straightforward enough, finding the correct syntax was surprisingly difficult. The reason is the aggregation syntax has changed from Gatsby v4 to Gatsby v5. At the time when I was searching for it, here is the syntax that was turning up for a distinct query:
+Although the query seems straightforward enough, finding the correct syntax was surprisingly difficult. The reason is the aggregation syntax has changed from Gatsby v4 to Gatsby v5. In my search for the correct syntax, I tried both Duck Duck Go (my default search engine) and Google (my fallback option), but both returned either invalid syntax or links to official Gatsby docs with no mention of the "distinct" keyword. Here is the query that was turning up from web search:
 
 ```graphql
 # OLD GATSBY V4 SYNTAX - DO NOT USE ON GATSBY V5
@@ -179,8 +179,6 @@ Running the above will result in an error:
   ]
 }
 ```
-
-I tried Duck Duck Go (my default search engine) and Google (fallback when can't find what I need on DDG) but both were returning the same results, either invalid syntax, or links to official Gatsby docs with no mention of the word "distinct".
 
 ### How About AI?
 
@@ -270,7 +268,7 @@ it(`returns list of distinct values in a field`, async () => {
 })
 ```
 
-So to make the `distinct` query work requires specifying an object for the field rather than triple underscores, and the addition of `: SELECT` after specifying which field you want to extract distinct values for.
+So to make the `distinct` query work requires specifying an object for the field rather than triple underscores, and the addition of `: SELECT` after specifying which field you want to extract distinct values for. Updating my query to the syntax shown in the rest resolved the issue.
 
 ### But Why?
 
@@ -296,10 +294,48 @@ leafInputComposer: schemaComposer.getOrCreateETC(
 }).getTypeNonNull()
 ```
 
-TODO: Maybe not this para...
-At the top of every source file on Github, there's a "Blame" button. Clicking it will run [git blame](https://www.git-scm.com/docs/git-blame) which will show the commit message associated with each line. Running that for this test showed that all the lines for the `distinct` query were associated with commit message `chore: apply patches for v5 (#36796)`. The number portion of that message is clickable when running Blame on the Github UI, and it leads to a PR.
+From the comment, it looks like it would have made more sense to have nothing specified, for example `distinct(field: frontmatter { category })` but the GraphQL spec doesn't allow this and that's why `SELECT` had to be added as in `distinct(field: frontmatter { category: SELECT })`. To see if I could get any more explanation about this, I clicked on the "Blame" button (in the Github UI, it shows up at the top of every source file) as follows:
 
-## TODO
-* Improve structure of example para
-* WIP: Explain technique to find it as it wasn't in official docs https://www.gatsbyjs.com/docs/graphql-reference/ (had to search source, tests, git commit, github issue)
-* Conclusion para
+![github blame button](../images/github-blame-button.png "github blame button")
+
+This shows the commit messages for every line in the source file. For the section of code that defined `FieldSelectorEnum`, the commit message was: `feat: [v5 breaking change] change sort and aggregation fields API #36708`. In Github the `#` before a number makes it link to either an issue or a PR, so I clicked on #36708 and it led to this [PR](https://github.com/gatsbyjs/gatsby/pull/36708). The description for this PR indicates that it implements changes from a discussion titled [RFC: Change to sort and aggregation fields API #36242](https://github.com/gatsbyjs/gatsby/discussions/36242). This discussion explains the syntax change from the triple underscore format to the object format for sorting and aggregation and provides some examples of old vs new syntax. This change was done to improve performance. The examples provided are:
+
+```graphql
+# OLD SYNTAX
+{
+  allMarkdownRemark(sort: { fields: [frontmatter___date], order: DESC }) {
+    nodes {
+      ...fields
+    }
+  }
+}
+
+# NEW SYNTAX
+{
+  allMarkdownRemark(sort: { frontmatter: { date: DESC } }) {
+    nodes {
+      ...fields
+    }
+  }
+}
+
+# OLD
+{
+  allMarkdownRemark {
+    distinct(field: frontmatter___category)
+  }
+}
+
+# NEW
+{
+  allMarkdownRemark {
+    distinct(field: { frontmatter: { category: SELECT } })
+  }
+}
+```
+
+For sorting, it makes sense that you would have to specify ASC or DESC, for example, but for distinct, there's nothing that really fits but the GraphQL forces "something" to go there so that's why `SELECT` is used.
+
+## Conclusion
+
+This post has covered how to write a GraphQL query for Gatsby v5 to extract distinct values for a given field. It has also covered options for sorting and limiting results to a particular directory where markdown files are located. Finally, it also covered a useful technique for getting answers to questions about open source projects when a web search doesn't turn up the answer.
