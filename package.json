@@ -45,7 +45,7 @@
     "react-helmet": "5.2.1",
     "react-icons": "4.8.0",
     "rest-client": "github:Huachao/vscode-restclient",
-    "vscode-graphql-syntax": "github:danielabar/vscode-graphql-syntax"
+    "vscode-graphql-syntax": "github:danielabar/vscode-graphql-syntax",
     "vscode-ruby-syntax": "github:smridge/vscode-ruby-syntax"
   },
   "devDependencies": {
