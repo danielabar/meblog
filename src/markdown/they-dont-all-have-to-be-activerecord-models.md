@@ -2,7 +2,7 @@
 title: "They Don't All Have To Be ActiveRecord Models"
 featuredImage: "../images/not-ar-model-vandan-patel-C63NHsUUR1A-unsplash.jpg"
 description: "tbd"
-date: "2023-07-01"
+date: "2023-08-01"
 category: "rails"
 related:
   - "Fix Rails Blocked Host Error with Docker"
@@ -497,7 +497,8 @@ Let's correct the error by setting an age greater than 18 and submitting the for
 
 This time, the Rails server output shows a new `customers` record being inserted into the database, then redirecting to the customers show view at `http://localhost/customers/{id}`:
 
-```Started POST "/customers"
+```
+Started POST "/customers"
 Processing by CustomersController#create as TURBO_STREAM
   Parameters: {
     "authenticity_token"=>"[FILTERED]",
