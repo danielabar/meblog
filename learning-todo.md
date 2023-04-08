@@ -3,15 +3,16 @@
 * [x] Maintain existing nav and other unit tests.
 * [x] `LearningList` component (similar to `ArticleList`) but to display a grid of course cards.
 * [x] `LearningIntro` component (similar to `Intro`) but with text to explain the learning section (see brainstorming below)/
+* [x] Import pluralsight and wesbos course data into `src/learning`.
+* [x] Import tutsplus course data into `src/learning`.
 * [x] `CourseCard` component to display: image, category, title, completed date, link to my course notes.
   * [x] Consider a different font for course cards (Inter, Roboto, DM Sans, Figtree)
   * [x] Upgrade react-icons.
   * [x] Shadows are too heavy, make lighter, then slightly heavier on card hover.
+  * [ ] Consider category tags in uppercase, smaller/lighter font with slightly increased letter spacing.
   * [ ] Design color scheme for course categories, see `src/styles/course-categories.css` and below.
   * [ ] Figure out gatsbyImageData options for course card image wrt grid options (see below)
   * [ ] Square images from DAll-e don't look good, need to get a wider aspect ratio, look into [imagemagick](https://www.digitalocean.com/community/tutorials/workflow-resizing-images-with-imagemagick)
-* [x] Import pluralsight and wesbos course data into `src/learning`.
-* [ ] Import tutsplus course data into `src/learning`.
 * [ ] Generate course images into `src/images/learning` (replace all placeholder.png)
 * [ ] New unit tests for new learning page and related components.
 * [ ] Implement [sitemap config](https://www.gatsbyjs.com/plugins/gatsby-plugin-sitemap) to exclude the new `/learning` page.
@@ -52,7 +53,13 @@ srgb(253,254,255
 Command substitution:
 convert atom.png -background "$(convert atom.png -gravity NorthWest -crop 1x1+50+50 -format "%[pixel:u]" info:)" \
 -resize 250x140 -gravity center -extent 250x140 atom-smart-back.png
+```
 
+Other various experiments:
+```
+convert cropped.png -fill white -opaque "$(convert cropped.png -crop 1x1+0+0 txt: | tail -n 1 | awk '{print $3}')" output_image.png
+convert cropped.png -fuzz 5% -transparent "$(convert cropped.png -crop 1x1+50+50 txt: | tail -n 1 | awk '{print $3}')" -alpha extract -negate output_image.png
+convert cropped.png -fuzz 1% -transparent "$(convert cropped.png -crop 1x1+0+0 txt: | tail -n 1 | awk '{print $3}')" output.png
 ```
 
 Want images that are 250px wide, with 16:9 aspect ratio (i.e. 1.87).
@@ -65,17 +72,39 @@ Welcome to the Learning section. In a world where change is the only constant, i
 
 **Distinct Categories**
 
-css
-database
-devops
-golang
-java
-javascript
-linux
-python
-rails
-ruby
-web development
+```graphql
+{
+  allMarkdownRemark(
+    filter: { fileAbsolutePath: { regex: "/src/learning/" } }
+    sort: {frontmatter: {category: ASC}}
+  ) {
+    distinct(field: { frontmatter: { category: SELECT} })
+  }
+}
+```
+
+```json
+{
+  "data": {
+    "allMarkdownRemark": {
+      "distinct": [
+        "css",
+        "database",
+        "devops",
+        "golang",
+        "java",
+        "javascript",
+        "linux",
+        "python",
+        "rails",
+        "ruby",
+        "web-development"
+      ]
+    }
+  },
+  "extensions": {}
+}
+```
 
 ```css
 background-color: #E6F2FE; /* light blue */
