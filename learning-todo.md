@@ -9,8 +9,7 @@
   * [x] Consider a different font for course cards (Inter, Roboto, DM Sans, Figtree)
   * [x] Upgrade react-icons.
   * [x] Shadows are too heavy, make lighter, then slightly heavier on card hover.
-  * [ ] Consider category tags in uppercase, smaller/lighter font with slightly increased letter spacing.
-  * [ ] Design color scheme for course categories, see `src/styles/course-categories.css` and below.
+  * [x] Design color scheme for course categories, see `src/styles/course-categories.css` and below.
   * [ ] Figure out gatsbyImageData options for course card image wrt grid options (see below)
   * [ ] Square images from DAll-e don't look good, need to get a wider aspect ratio, look into [imagemagick](https://www.digitalocean.com/community/tutorials/workflow-resizing-images-with-imagemagick)
 * [ ] Generate course images into `src/images/learning` (replace all placeholder.png)
@@ -106,16 +105,73 @@ Welcome to the Learning section. In a world where change is the only constant, i
 }
 ```
 
-```css
-background-color: #E6F2FE; /* light blue */
-color: #0D1A2F; /* dark blue */
+Categories by count:
 
-background-color: #D8D4F9; /* light purple */
-color: #1E1733; /* dark purple */
+```graphql
+{
+  allMarkdownRemark(
+    filter: { fileAbsolutePath: { regex: "/src/learning/" } }
+  ) {
+    group(field: { frontmatter: { category: SELECT} }) {
+      fieldValue
+      totalCount
+    }
+  }
+}
+```
 
-background-color: #EAF8FC; /* light blue */
-color: #0B4457; /* dark blue */
-
-background-color: #E7D9E7; /* light purple */
-color: #1B0F1F; /* dark purple */
+```json
+{
+  "data": {
+    "allMarkdownRemark": {
+      "group": [
+        {
+          "fieldValue": "css",
+          "totalCount": 8
+        },
+        {
+          "fieldValue": "database",
+          "totalCount": 3
+        },
+        {
+          "fieldValue": "devops",
+          "totalCount": 3
+        },
+        {
+          "fieldValue": "golang",
+          "totalCount": 1
+        },
+        {
+          "fieldValue": "java",
+          "totalCount": 2
+        },
+        {
+          "fieldValue": "javascript",
+          "totalCount": 24
+        },
+        {
+          "fieldValue": "linux",
+          "totalCount": 2
+        },
+        {
+          "fieldValue": "python",
+          "totalCount": 2
+        },
+        {
+          "fieldValue": "rails",
+          "totalCount": 6
+        },
+        {
+          "fieldValue": "ruby",
+          "totalCount": 3
+        },
+        {
+          "fieldValue": "web-development",
+          "totalCount": 1
+        }
+      ]
+    }
+  },
+  "extensions": {}
+}
 ```

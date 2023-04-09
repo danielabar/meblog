@@ -1,76 +1,54 @@
 .css {
-  background-color: #f4e1d2;
-  /* light peach */
-  color: #3c2f2f;
-  /* dark maroon */
+  background-color: #FF99FF;
+  color: #662D66;
 }
 
 .database {
-  background-color: #e2d6f4;
-  /* light purple */
-  color: #382c4f;
-  /* dark indigo */
+  background-color: #FB9CBE;
+  color: #662D41;
 }
 
 .devops {
-  background-color: #d2f4e1;
-  /* light green */
-  color: #2f3c2f;
-  /* dark forest */
+  background-color: #CAACEC;
+  color: #472D66;
 }
 
 .golang {
-  background-color: #e1d2f4;
-  /* light lavender */
-  color: #3c2f3a;
-  /* dark plum */
+  background-color: #99FFE4;
+  color: #2D6657;
 }
 
 .java {
-  background-color: #f4d2e1;
-  /* light pink */
-  color: #3c2f33;
-  /* dark magenta */
+  background-color: #FFCEAD;
+  color: #663B1F;
 }
 
 .javascript {
-  background-color: #f7e691;
-  /* light yellow */
-  color: #5E4C3C;
-  /* dark brown */
+  background-color: #9696FF;
+  color: #292966;
 }
 
 .linux {
-  background-color: #d2f4e1;
-  /* light green */
-  color: #2f3c2f;
-  /* dark forest */
+  background-color: #9CE6AB;
+  color: #2D6638;
 }
 
 .python {
-  background-color: #d2f4e1;
-  /* light green */
-  color: #3c2f2f;
-  /* dark maroon */
+  background-color: #A6DEE0;
+  color: #1F6466;
 }
 
 .rails {
-  background-color: #e1d2f4;
-  /* light lavender */
-  color: #3c2f4d;
-  /* dark orchid */
+  background-color: #D59EC6;
+  color: #662D57;
 }
 
 .ruby {
-  background-color: #f4e1d2;
-  /* light peach */
-  color: #3c2f2f;
-  /* dark maroon */
+  background-color: #FF9999;
+  color: #662D2D;
 }
 
 .web-development {
-  background-color: #f4d2e1;
-  /* light pink */
-  color: #3c2f2f;
-  /* dark magenta */
+  background-color: #FFFF99;
+  color: #66422D;
 }
