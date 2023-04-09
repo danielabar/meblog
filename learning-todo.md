@@ -10,9 +10,10 @@
   * [x] Upgrade react-icons.
   * [x] Shadows are too heavy, make lighter, then slightly heavier on card hover.
   * [x] Design color scheme for course categories, see `src/styles/course-categories.css` and below.
+  * [ ] Maybe slight black overlay so images aren't so prominent, something like this? https://stackoverflow.com/questions/43479968/how-can-i-add-an-image-overlaying-an-img-tag
   * [ ] Figure out gatsbyImageData options for course card image wrt grid options (see below)
   * [ ] Square images from DAll-e don't look good, need to get a wider aspect ratio, look into [imagemagick](https://www.digitalocean.com/community/tutorials/workflow-resizing-images-with-imagemagick)
-* [ ] Generate course images into `src/images/learning` (replace all placeholder.png)
+* [ ] WIP Generate course images into `src/images/learning` (replace all placeholder.png)
 * [ ] New unit tests for new learning page and related components.
 * [ ] Implement [sitemap config](https://www.gatsbyjs.com/plugins/gatsby-plugin-sitemap) to exclude the new `/learning` page.
 * [ ] Verify SEO and tracking for new `/learning` page.
@@ -39,6 +40,11 @@ Figure out relationship between for example `gatsbyImageData(width: 250, aspectR
 Since will be displaying many images on one page, might be good to crop them to size before adding to gatsby image processing. If using Dall-E, they are 1024x1024. Try variations on imagemagick convert command:
 
 ```
+convert idiomatic-ruby.jpg -resize 250x -gravity center -crop 250x140+0+0 idiomatic-ruby.png
+
+convert gatsby-green-light.jpg -resize x140 -gravity south -region 50x50+75+45 -liquid-rescale 1.1x1.1 -gravity center -crop 250x140+0+0 gatsby-green-light-magnified.png
+
+
 convert input.png -resize "250x140^" -gravity center -crop 250x140+0+0 +repage output.png
 convert atom.png -resize 250x140^ -gravity center -extent 250x140 atom_output.png
 
