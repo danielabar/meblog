@@ -13,12 +13,18 @@
   box-shadow: 4px 4px 10px 0px rgba(0, 0, 0, 0.4);
 }
 
+.container:hover .image {
+  filter: brightness(85%);
+}
+
 .imgwrapper {
   margin-bottom: 20px;
 }
 
 .image {
   border-radius: 5px;
+  filter: brightness(75%);
+  transition: filter 0.3s ease;
 }
 
 .myInfo {

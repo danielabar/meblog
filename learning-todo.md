@@ -10,9 +10,9 @@
   * [x] Upgrade react-icons.
   * [x] Shadows are too heavy, make lighter, then slightly heavier on card hover.
   * [x] Design color scheme for course categories, see `src/styles/course-categories.css` and below.
-  * [ ] Maybe slight black overlay so images aren't so prominent, something like this? https://stackoverflow.com/questions/43479968/how-can-i-add-an-image-overlaying-an-img-tag
-  * [ ] Figure out gatsbyImageData options for course card image wrt grid options (see below)
-  * [ ] Square images from DAll-e don't look good, need to get a wider aspect ratio, look into [imagemagick](https://www.digitalocean.com/community/tutorials/workflow-resizing-images-with-imagemagick)
+  * [x] Slight black overlay so images aren't so prominent, something like this? https://stackoverflow.com/questions/43479968/how-can-i-add-an-image-overlaying-an-img-tag
+  * [x] Figure out gatsbyImageData options for course card image wrt grid options (see below)
+  * [x] Square images from DAll-e don't look good, need to get a wider aspect ratio, look into [imagemagick](https://www.digitalocean.com/community/tutorials/workflow-resizing-images-with-imagemagick), adjust gravity based on where important details of the image are: `convert react-hooks-orig.png -resize 250x -gravity north -crop 250x140+0+0 react-hooks.png`
 * [ ] WIP Generate course images into `src/images/learning` (replace all placeholder.png)
 * [ ] New unit tests for new learning page and related components.
 * [ ] Implement [sitemap config](https://www.gatsbyjs.com/plugins/gatsby-plugin-sitemap) to exclude the new `/learning` page.
