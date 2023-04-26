@@ -147,6 +147,47 @@ If the markdown files are located in different directories such as `/src/markdow
 
 For more filter options and how they can be combined, see the [Gatsby GraphQL](https://www.gatsbyjs.com/docs/graphql-reference/#filter) docs.
 
+Use the [group](https://www.gatsbyjs.com/docs/graphql-reference/#group) function to get a list of categories and how frequently they appear:
+
+```graphql
+{
+  allMarkdownRemark(
+    filter: { fileAbsolutePath: { regex: "/src/learning/" } }
+  ) {
+    group(field: { frontmatter: { category: SELECT} }) {
+      fieldValue
+      totalCount
+    }
+  }
+}
+```
+
+This will output:
+
+```json
+{
+  "data": {
+    "allMarkdownRemark": {
+      "group": [
+        {
+          "fieldValue": "strength",
+          "totalCount": 2
+        },
+        {
+          "fieldValue": "cardio",
+          "totalCount": 1
+        },
+        {
+          "fieldValue": "yoga",
+          "totalCount": 1
+        }
+      ]
+    }
+  },
+  "extensions": {}
+}
+```
+
 If you just needed to find the solution quickly, you can copy paste the above and move on. But if you're curious as to how I found it when regular searching failed, read on.
 
 ## Finding The Solution
