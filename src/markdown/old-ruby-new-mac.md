@@ -49,36 +49,144 @@ I tried a variety of these and was still getting errors. Keep in mind its not ju
 
 The idea is to build a Docker image that comes with the older Ruby version needed for this project, mount the project code into this image, and install the project dependencies as part of the image. Then a container can be run from this image, and all the usual Rails commands such as starting a server, console, etc. can be run inside the container.
 
-## Image
+## Docker Image
 
-The first thing that's needed is to build the Docker image. When doing so, we need to select a base image from which to get started. I'm using a [CircleCI Ruby image](https://hub.docker.com/r/circleci/ruby) as it comes with common dev tooling and a non-root user by default. Here is the Dockerfile that uses the Ruby 2.3.3:
+The first thing that's needed is to build the Docker image. When doing so, we need to select a base image from which to get started. I'm using a [CircleCI Ruby image](https://hub.docker.com/r/circleci/ruby) as it comes with common dev tooling and a non-root user named `circleci`. Here is the Dockerfile that uses the Ruby 2.3.3.
+
+To use it, place the following in the root of your project, replace `2.3.3` with your Ruby version, and `myapp` with your app name:
 
 ```Dockerfile
 # https://hub.docker.com/layers/circleci/ruby/2.3.3/images/sha256-d4ee971ae3f1c1eac1301c79e7d1a9b994b2d8b0f0ed899ffa4f7f11dd21d1ff?context=explore
 FROM circleci/ruby:2.3.3
 
-# Is PORT needed given that port is mapped in docker-compose.yml?
-# ARG PORT
-# ENV PORT=${PORT:-3000}
+# Set path to the app as an environment variable
+# so it can be referenced again in this file as `$app`
 ENV app /usr/share/myapp
 
+# Create a directory for our app.
 RUN sudo mkdir -p $app
+
+# Make the `circleci` user owner of our app dir.
 RUN sudo chown circleci $app
-# TODO: investigate why needed?
+
+# Give `circleci` owner read/write/execute on app dir
+# and all dirs/files within it, and read/execute for other users.
 RUN sudo chmod -R 0755 $app
 
-# Is USER needed? Already declared in base image
-# USER circleci
+# Set the working directory to our app dir.
 WORKDIR $app
 
-# TODO: Investigate why needed
+# Copy files/dirs from build context to the current working directory in container,
+# and sets the user/group ownership of copied files/dirs to circleci:circleci.
 COPY --chown=circleci:circleci . .
 
+# Replace with bundler version used by your old app.
 RUN gem install bundler:1.17.3
 
+# Install app dependencies
 RUN bundle install
-# EXPOSE ${PORT}
 ```
+
+## Docker Compose
+
+Next up, add the following `docker-compose.yml` file to the root of the project. This will make it easy to run a container from the Dockerfile created in the previous step:
+
+```yml
+version: "3.9"
+services:
+  myapp:
+    # Use Dockerfile from current directory
+    build:
+      context: .
+
+    # Optional if using dotenv, provide your .env file here
+    # env_file:
+    #   - .env
+
+    # Mount the current directory `.` into container at `/user/share/myapp`
+    volumes:
+      - .:/usr/share/myapp
+
+    # Map port 3000 on the container to 3000 on the host
+    ports:
+      - "3000:3000"
+
+    # Allows container to respond to Ctrl+C and to view container's output in real-time
+    tty: true
+```
+
+To build the image, run:
+
+```
+docker-compose build
+```
+
+## Docker Container
+
+To run a container from the image, run:
+
+```
+docker-compose up
+```
+
+This will run the container in the foreground, which attaches the terminal to the logs of the containers so that you can see their output. But then you can't use that terminal session for anything else, and have to open a new terminal tab to do other things.
+
+Alternatively, you can run the container in the background (aka detached mode), and the output will not be displayed in the terminal:
+
+```
+docker-compose up -d
+```
+
+If you run it in the background, you can always view the logs with the command below which will "follow" the logs in real time:
+
+```
+docker-compose logs -f
+```
+
+## Rails Server
+
+Now that you have a running container, it's time to start a Rails server. To do this, first run a shell in the container, using `exec` which is used to execute a command inside a running container:
+
+```
+docker-compose exec myapp bash
+```
+
+Then from the shell prompt in the container, start the Rails server:
+
+```bash
+pwd
+# Should be /usr/share/myapp because of WORKDIR setting in Dockerfile
+
+ls
+# Should see contents of myapp such as models, views, controllers, lib, etc.
+
+# Start Rails server
+bin/rails server
+# Server should be listening on port 3000
+```
+
+At this point, you should be able to navigate to `http://localhost:3000` in a browser and view your app's home page.
+
+Note that if you shutdown your computer which will stop the container, or use `docker-compose stop` to stop the container, the Rails server process that's running in the container may not shut down cleanly because it's not running as PID 1 in the container. That means if you shell in again to run a Rails server, you may get the [server is already running](https://testsuite.io/a-server-is-already-running-pids) error. We'll deal with this shortly.
+
+## Other Commands
+
+To run any other commands in the container such as database migrations or a Rails console, open a new terminal tab, shell into the container (you can have multiple shells) and run your command. For example, to run database migrations:
+
+```
+docker-compose exec myapp bash
+bundle exec rake db:migrate
+```
+
+To run a Rails console:
+
+```
+docker-compose exec myapp bash
+bin/rails console
+```
+
+## Less Typing
+
 
 ## TODO
 
