@@ -241,9 +241,9 @@ docker-compose exec myapp bash -c "./scripts/run_dev.sh"
 
 ## Even Less Typing
 
-Even with the previous technique of combining commands with `exec` and `-c` flag, there's still a lot of typing. You could [alias](https://phoenixnap.com/kb/linux-alias-command) them but then you'd have to remember what you aliased them to, and then each team member working on this project would have to setup their own aliases.
+With the previous technique of combining commands with `exec` and `-c` flag, there's still a lot of typing. You could [alias](https://phoenixnap.com/kb/linux-alias-command) them but then you'd have to remember what you aliased them to, and then each team member working on this project would have to setup their own aliases.
 
-An easier way is to introduce a Makefile into the project. A Makefile is a simple text file containing a set of instructions (rules) that specify how to build the project. The rules specify the dependencies and the commands needed to build or update them. Traditionally used for C/C++ projects, a Makefile can also make life more convenient by reducing the amount of typing needed to run commonly used commands on any project.
+An easier way is to introduce a [Makefile](https://opensource.com/article/18/8/what-how-makefile) into the project. A Makefile is a simple text file containing a set of instructions (rules) that specify how to build the project. The rules specify the dependencies and the commands needed to build or update them. Traditionally used for C/C++ projects, a Makefile can also make life more convenient by reducing the amount of typing needed to run commonly used commands on any project.
 
 For example, in the previous section, we saw that to run a Rails server within the Docker container required:
 
@@ -281,7 +281,7 @@ server: start
   docker-compose exec myapp bash -c "./run_dev.sh"
 ```
 
-Where the `start_dev_container.sh` script attempts to run an echo statement in the container, and then inspects the return code. If the container is not started, this would error and the return code will be non-zero. If we get a non-zero return code, then we start the container in the background:
+Where the `start_dev_container.sh` script attempts to run an echo statement in the container, and then inspects the return code. If the container is not started, this would error and the return code will be non-zero. If we get a non-zero return code, then we start the container in the background. Place the following in the `scripts` directory of your project and remember to run `chmod +x scripts/start_dev_container.sh`:
 
 ```bash
 #!/bin/bash
@@ -292,57 +292,61 @@ ret=$?
 exit 0
 ```
 
+<aside class="markdown-aside">
+Makefiles are primarily designed to work on *nix operating systems like Linux and macOS, which have a Unix-like shell environment that supports the make command. However, if you're using Windows, you can still use Makefiles by installing the <a class="markdown-link" href="https://learn.microsoft.com/en-us/windows/wsl/install">Windows Subsystem for Linux</a>, which allows you to run a Linux environment directly on top of Windows.
+</aside>
+
 You can add the most common Rails commands to the Makefile, making each dependent on the `start` task. Here's what I use, feel free to add more as per your projects needs:
 
 ```Makefile
 # Start the dev container if it's not already running.
 start:
-	./scripts/start_dev_container.sh
+  ./scripts/start_dev_container.sh
 
 # Stop the dev container.
 stop:
-	docker-compose stop
+  docker-compose stop
 
 # Display dev container status.
 status:
-	docker-compose ps
+  docker-compose ps
 
 # Start a Rails server.
 server: start
-	docker-compose exec myapp bash -c "./run_dev.sh"
+  docker-compose exec myapp bash -c "./run_dev.sh"
 
 # Launch a shell in container.
 shell: start
-	docker-compose exec myapp bash
+  docker-compose exec myapp bash
 
 # Launch a Rails console.
 console: start
-	docker-compose exec myapp rails c
+  docker-compose exec myapp rails c
 
 # Migrate database.
 migrate_db: start
-	docker-compose exec myapp rake db:migrate
+  docker-compose exec myapp rake db:migrate
 
 # Rollback database.
 rollback_db: start
-	docker-compose exec myapp rake db:rollback
+  docker-compose exec myapp rake db:rollback
 
 # Drop db, create db, load schema, custom seeds.
 reset_db: start
-	docker-compose exec myapp rake db:reset
+  docker-compose exec myapp rake db:reset
 
 # Run all the RSpec tests: make test
 # To run a specific test: SPECS="path/to/the_spec.rb" make test
 test: start
-	docker-compose exec myapp rspec $$SPECS
+  docker-compose exec myapp rspec $$SPECS
 
 # Run the linter.
 rubocop: start
-	docker-compose exec myapp rubocop
+  docker-compose exec myapp rubocop
 
 # Display all available routes.
 routes: start
-	docker-compose exec myapp rake routes
+  docker-compose exec myapp rake routes
 ```
 
 ## Drawbacks
@@ -356,8 +360,4 @@ This post has covered how to use Docker and docker-compose to run an old Ruby on
 ## TODO
 
 * explain that base image has `CMD ["/bin/bash"]`, i.e. it doesn't do anything on its own, all containers created from this image will be waiting at the shell prompt for us to enter commands.
-* `convert ruby-in-box-original.png -resize 900x -gravity center -crop 900x506+0+0 ruby-in-box.png`
-* link to Makefile intro
-* Research: Is Makefile *nix only? What to do about Windows? Can LSW handle it?
-* Make `Dockerfile` show up as yellow tag css
-* Fix spacing in makefile
+* Why `Dockerfile` doesn't render as code tag?
