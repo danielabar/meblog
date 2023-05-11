@@ -18,15 +18,15 @@ Then you receive your next assignment, which is to perform some maintenance on a
 
 ```
 $ rbenv install 2.3.3
-To follow progress, use 'tail -f /var/folders/t7/6n5394xn43sd2x3y8m06gdx40000gn/T/ruby-build.20230501063921.13746.log' or pass --verbose
+To follow progress, use 'tail -f /var/folders/t7/6n5394/T/ruby-build.20230501063921.137.log' or pass --verbose
 Downloading openssl-1.0.2u.tar.gz...
--> https://dqw8nmjcqpjn7.cloudfront.net/ecd0c6ffb493dd06707d38b14bb4d8c2288bb7033735606569d8f90f89669d16
+-> https://dqw8nmjcqpjn7.cloudfront.net/ecd0c6ffb493dd06707d38b...
 Installing openssl-1.0.2u...
 
 BUILD FAILED (macOS 13.3.1 using ruby-build 20230330)
 
-Inspect or clean up the working tree at /var/folders/t7/6n5394xn43sd2x3y8m06gdx40000gn/T/ruby-build.20230501063921.13746.TS6Kze
-Results logged to /var/folders/t7/6n5394xn43sd2x3y8m06gdx40000gn/T/ruby-build.20230501063921.13746.log
+Inspect or clean up the working tree at /var/folders/t7/6n5394/T/ruby-build.20230501063921.137.TS6
+Results logged to /var/folders/t7/6n5394/T/ruby-build.20230501063921.137.log
 
 Last 10 log lines:
       _dgram_write in libcrypto.a(bss_dgram.o)
@@ -47,12 +47,12 @@ That feeling...
 
 The issue here is with OpenSSL linking against the i386 architecture, which is not compatible with the new Mac's ARM-based architecture, and so the build fails. There are some [suggestions](https://stackoverflow.com/questions/69012676/install-older-ruby-versions-on-a-m1-macbook) related to uninstalling OpenSSL and re-installing with alternate compile flags. You can also attempt to uninstall all the dev tooling, setup for [rosetta all the things](https://apple.stackexchange.com/questions/409746/run-everything-in-rosetta-2-on-silicon-mac), then re-install.
 
-I tried a variety of these and was still getting errors. Keep in mind its not just Ruby that needs to be installed, its also all the older gems and some of them require native extensions which will also cause issues. I was also concerned that it would cause problems when I have to switch to other projects that use newer Ruby versions (3.x and above are compiled for the newer Macs), as I frequently toggle between different projects. In this post I'll share an alternative solution using Docker that I found easier to get working.
+I tried a variety of these and was still getting errors. Keep in mind its not just Ruby that needs to be installed, its also all the older gems, some of which require native extensions and will run into compilation issues. I was also concerned that it would cause problems when switching to other projects that use newer Ruby versions (3.x and above are compiled for the newer Macs), as I frequently toggle between different projects. In this post I'll share an alternative solution using [Docker](https://www.docker.com/) that I found easier to get working.
 
 The idea is to build a Docker image that comes with the older Ruby version needed for this project, mount the project code into this image, and install the project dependencies as part of the image. Then a container can be run from this image, and all the usual Rails commands such as starting a server, console, etc. can be run inside the container.
 
 <aside class="markdown-aside">
-This post assumes some familiarity with some Docker concepts including images, containers, and use of Docker Compose to manage multi-container applications. If you need a refresher on Docker fundamentals, check out the <a class="markdown-link" href="https://docs.docker.com/get-started/">Getting Started</a> guide and <a class="markdown-link" href="https://docs.docker.com/get-started/resources/">Educational Resources</a>.
+This post assumes familiarity with Docker concepts including images, containers, and use of Docker Compose to manage multi-container applications. If you need a refresher on Docker fundamentals, check out the <a class="markdown-link" href="https://docs.docker.com/get-started/">Getting Started</a> guide and <a class="markdown-link" href="https://docs.docker.com/get-started/resources/">Educational Resources</a>.
 </aside>
 
 ## Docker Image
@@ -62,7 +62,6 @@ The first thing that's needed is to build the Docker image. When doing so, we ne
 To use it, place the following in the root of your project, replace `2.3.3` with your Ruby version, and `myapp` with your app name:
 
 ```Dockerfile
-# https://hub.docker.com/layers/circleci/ruby/2.3.3/images/sha256-d4ee971ae3f1c1eac1301c79e7d1a9b994b2d8b0f0ed899ffa4f7f11dd21d1ff?context=explore
 FROM circleci/ruby:2.3.3
 
 # Set path to the app as an environment variable
@@ -93,6 +92,10 @@ RUN gem install bundler:1.17.3
 RUN bundle install
 ```
 
+<aside class="markdown-aside">
+Note that the CMD instruction in the base Circle CI image is: CMD ["bin/bash"]. This means that when you run a container from this image, the container will start with a Bash shell prompt. We'll be making use of this to run all our Rails commands soon. You can see the full definition <a class="markdown-link" href="https://hub.docker.com/layers/circleci/ruby/2.3.3/images/sha256-d4ee971ae3f1c1eac1301c79e7d1a9b994b2d8b0f0ed899ffa4f7f11dd21d1ff?context=explore">here</a>.
+</aside>
+
 ## Docker Compose
 
 Next up, add the following `docker-compose.yml` file to the root of the project. This will make it easy to run a container from the Dockerfile created in the previous step:
@@ -104,10 +107,6 @@ services:
     # Use Dockerfile from current directory
     build:
       context: .
-
-    # Optional if using dotenv, provide your .env file here
-    # env_file:
-    #   - .env
 
     # Mount the current directory `.` into container at `/user/share/myapp`
     volumes:
@@ -143,7 +142,7 @@ Alternatively, you can run the container in the background (aka detached mode), 
 docker-compose up -d
 ```
 
-If you run it in the background, you can always view the logs with the command below which will "follow" the logs in real time:
+If you run it in the background, you can always view the logs with the command below which will follow the logs in real time:
 
 ```
 docker-compose logs -f
@@ -212,15 +211,13 @@ The last two can be combined as follows:
 docker-compose exec myapp rails console
 ```
 
-This works because there's only one version of rails and one rails app installed in the container.
-
-Starting a Rails server requires a little more work to get it into one step, the following may not work:
+Starting a Rails server requires a little more effort to get it into one step, the following may not work:
 
 ```
 docker-compose exec myapp rails server
 ```
 
-This is because if the `./tmp/server.pid` file is still lying around from last time, you'll get a `server is already running` error. To solve this, let's introduce a script that first removes this file, then runs the Rails server, then use docker-compose to execute this script.
+This is because if the `./tmp/server.pid` file still exists from last time you ran a Rails server in the container, you'll get a `server is already running` error. To solve this, let's introduce a script that first removes this file, then runs the Rails server, then use docker-compose to execute this script.
 
 Place the following in `scripts/run_dev.sh` (I'm assuming you have a directory `scripts` in the root of your project, if not, create it):
 
@@ -241,9 +238,7 @@ docker-compose exec myapp bash -c "./scripts/run_dev.sh"
 
 ## Even Less Typing
 
-With the previous technique of combining commands with `exec` and `-c` flag, there's still a lot of typing. You could [alias](https://phoenixnap.com/kb/linux-alias-command) them but then you'd have to remember what you aliased them to, and then each team member working on this project would have to setup their own aliases.
-
-An easier way is to introduce a [Makefile](https://opensource.com/article/18/8/what-how-makefile) into the project. A Makefile is a simple text file containing a set of instructions (rules) that specify how to build the project. The rules specify the dependencies and the commands needed to build or update them. Traditionally used for C/C++ projects, a Makefile can also make life more convenient by reducing the amount of typing needed to run commonly used commands on any project.
+Combining commands with `exec` and `-c` flag saves some typing, but we can do even better. Let's introduce a [Makefile](https://opensource.com/article/18/8/what-how-makefile) into the project. A Makefile is a text file containing a set of instructions (rules) that specify how to build the project. The rules specify the dependencies and the commands needed to build or update them. Traditionally used for C/C++ projects, a Makefile can also make life more convenient by reducing the amount of typing needed to run commonly used commands on any project.
 
 For example, in the previous section, we saw that to run a Rails server within the Docker container required:
 
@@ -258,7 +253,7 @@ server:
   docker-compose exec myapp bash -c "./run_dev.sh"
 ```
 
-Then you could simply run this at the terminal to start the Rails server:
+Then you could run this at the terminal to start the Rails server:
 
 ```
 make server
@@ -273,10 +268,11 @@ service "myapp" is not running container #1
 This can be solved with task dependencies. We can add a `start` task that will check if the container isn't already running, then start it, and then have the `server` task depend on the `start` task:
 
 ```Makefile
+# Start the container if it isn't already running
 start:
   ./scripts/start_dev_container.sh
 
-# run the `start` task before the `server` task
+# Run the `start` task before the `server` task
 server: start
   docker-compose exec myapp bash -c "./run_dev.sh"
 ```
@@ -351,13 +347,8 @@ routes: start
 
 ## Drawbacks
 
-There are some drawbacks with this approach. There's some increased complexity in having to learn new tooling for those not already familiar with Docker and docker-compose. Also all the commands are slower to run within the container as compared to when directly installed on the laptop.
+There are some drawbacks with this approach. There's some increased complexity in having to learn new tooling for those not already familiar with Docker and docker-compose. Also the commands are slower to run within the container as compared to running directly on the laptop.
 
 ## Conclusion
 
-This post has covered how to use Docker and docker-compose to run an old Ruby on Rails project that doesn't easily install on the newer ARM-based Macs. We've learned how to build an image, run a container from this image, use of `exec` to run commands in the container, and use of a Makefile with dependencies to save some typing of lengthy commands.
-
-## TODO
-
-* explain that base image has `CMD ["/bin/bash"]`, i.e. it doesn't do anything on its own, all containers created from this image will be waiting at the shell prompt for us to enter commands.
-* Why `Dockerfile` doesn't render as code tag?
+This post has covered how to use Docker and docker-compose to run an old Ruby on Rails project that doesn't easily install on the newer ARM-based Macs. We've learned how to build an image, run a container from this image, and use `exec` to run commands in the container. Finally we covered how to use a Makefile with dependencies to save some typing of lengthy commands.
