@@ -2,7 +2,7 @@
 title: "Understanding ActiveRecord Dependent Options"
 featuredImage: "../images/activerecord-dep-gary-chan-YzSZN3qvHeo-unsplash.jpg"
 description: "A closer look at all the ways to remove ActiveRecord models from the database."
-date: "2023-06-01"
+date: "2023-07-01"
 category: "rails"
 related:
   - "Use UUID for primary key with Rails and Postgres"
