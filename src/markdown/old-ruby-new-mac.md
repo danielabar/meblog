@@ -59,7 +59,7 @@ This post assumes familiarity with Docker concepts including images, containers,
 
 The first thing that's needed is to build the Docker image. When doing so, we need to select a base image from which to get started. I'm using a [CircleCI Ruby image](https://hub.docker.com/r/circleci/ruby) as it comes with common dev tooling and a non-root user named `circleci`. Here is the Dockerfile that uses the Ruby 2.3.3.
 
-To use it, place the following in the root of your project, replace `2.3.3` with your Ruby version, and `myapp` with your app name:
+To use it, place the following file named `Dockerfile` in the root of your project. Replace `2.3.3` with your Ruby version, and `myapp` with your app name:
 
 ```Dockerfile
 FROM circleci/ruby:2.3.3
@@ -93,12 +93,12 @@ RUN bundle install
 ```
 
 <aside class="markdown-aside">
-Note that the CMD instruction in the base Circle CI image is: CMD ["bin/bash"]. This means that when you run a container from this image, the container will start with a Bash shell prompt. We'll be making use of this to run all our Rails commands soon. You can see the full definition <a class="markdown-link" href="https://hub.docker.com/layers/circleci/ruby/2.3.3/images/sha256-d4ee971ae3f1c1eac1301c79e7d1a9b994b2d8b0f0ed899ffa4f7f11dd21d1ff?context=explore">here</a>.
+The CMD instruction in the base Circle CI image is: CMD ["bin/bash"]. This means that when you run a container from this image, the container will start with a Bash shell prompt. We'll be making use of this to run all our Rails commands soon. You can see the full definition <a class="markdown-link" href="https://hub.docker.com/layers/circleci/ruby/2.3.3/images/sha256-d4ee971ae3f1c1eac1301c79e7d1a9b994b2d8b0f0ed899ffa4f7f11dd21d1ff?context=explore">here</a>.
 </aside>
 
 ## Docker Compose
 
-Next up, add the following `docker-compose.yml` file to the root of the project. This will make it easy to run a container from the Dockerfile created in the previous step:
+Add the following `docker-compose.yml` file to the root of the project. This will make it easy to run a container from the `Dockerfile` created in the previous step:
 
 ```yml
 version: "3.9"
@@ -116,7 +116,7 @@ services:
     ports:
       - "3000:3000"
 
-    # Allows container to respond to Ctrl+C and to view container's output in real-time
+    # Allow container to respond to Ctrl+C and to view container's output in real-time
     tty: true
 ```
 
@@ -134,7 +134,7 @@ To run a container from the image, run:
 docker-compose up
 ```
 
-This will run the container in the foreground, which attaches the terminal to the logs of the containers so that you can see their output. But then you can't use that terminal session for anything else, and have to open a new terminal tab to do other things.
+This will run the container in the foreground, which attaches the terminal to the logs of the containers so that you can see its output. But then you can't use that terminal session for anything else, and have to open a new terminal tab to do other things.
 
 Alternatively, you can run the container in the background (aka detached mode), and the output will not be displayed in the terminal:
 
@@ -195,13 +195,13 @@ rails console
 One thing you may have noticed about running Rails dockerized is there's more typing to get things running. For example, to run a Rails console, requires three commands:
 
 ```bash
-# Start container
+# 1. Start container
 docker-compose up
 
-# Shell into container
+# 2. Shell into container
 docker-compose exec myapp bash
 
-# Run Rails console from container shell
+# 3. Run Rails console from container shell
 rails console
 ```
 
@@ -277,7 +277,7 @@ server: start
   docker-compose exec myapp bash -c "./run_dev.sh"
 ```
 
-Where the `start_dev_container.sh` script attempts to run an echo statement in the container, and then inspects the return code. If the container is not started, this would error and the return code will be non-zero. If we get a non-zero return code, then we start the container in the background. Place the following in the `scripts` directory of your project and remember to run `chmod +x scripts/start_dev_container.sh`:
+Where the `start_dev_container.sh` script attempts to run an echo statement in the container, and then inspects the return code. If the container is not started, this would error and the return code will be non-zero. If we get a non-zero return code, then we start the container in the background. Place the following in the `scripts` directory of your project and run `chmod +x scripts/start_dev_container.sh` to make it executable:
 
 ```bash
 #!/bin/bash
@@ -351,4 +351,4 @@ There are some drawbacks with this approach. There's some increased complexity i
 
 ## Conclusion
 
-This post has covered how to use Docker and docker-compose to run an old Ruby on Rails project that doesn't easily install on the newer ARM-based Macs. We've learned how to build an image, run a container from this image, and use `exec` to run commands in the container. Finally we covered how to use a Makefile with dependencies to save some typing of lengthy commands.
+This post has covered how to use Docker and docker-compose to run an old Ruby on Rails project that doesn't easily install on the newer ARM-based Macs. We've learned how to build an image, run a container from this image, and use `exec` to run commands in the container. Finally we covered how to use a Makefile with dependencies to save on some typing of lengthy commands.
