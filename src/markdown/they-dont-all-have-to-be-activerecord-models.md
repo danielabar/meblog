@@ -2,7 +2,7 @@
 title: "They Don't All Have To Be ActiveRecord Models"
 featuredImage: "../images/not-ar-model-vandan-patel-C63NHsUUR1A-unsplash.jpg"
 description: "tbd"
-date: "2023-08-01"
+date: "2023-09-01"
 category: "rails"
 related:
   - "Fix Rails Blocked Host Error with Docker"
