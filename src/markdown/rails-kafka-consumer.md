@@ -29,11 +29,9 @@ We'll be focusing on the Rails side of things. Assume that another team is maint
 }
 ```
 
-These messages will be produced to a Kafka topic named `product_inventory`. When integrating Kafka, it's important for the various development teams involved to agree on the topic name(s) and message formats, essentially agreeing on a "contract". This will ensure that the disparate systems can actually communicate with each other as expected.
+These messages will be produced to a Kafka topic named `inventory_management_product_updates`. When integrating Kafka, it's important for the various development teams involved to agree on the topic name(s) and message formats, essentially agreeing on a "contract". This will ensure that the disparate systems can actually communicate with each other as expected.
 
-<aside class="markdown-aside">
-When it comes to Kafka topic naming conventions, there are many different <a class="markdown-link" href="https://cnr.sh/essays/how-paint-bike-shed-kafka-topic-naming-conventions">opinions</a> such as whether to include <a class="markdown-link" href="https://www.kadeck.com/blog/kafka-topic-naming-conventions-5-recommendations-with-examples">version numbers</a> or not. It's beyond the scope of this post to cover this so we'll keep it simple for this demonstration.
-</aside>
+When it comes to Kafka topic naming conventions, there are many different [opinions](https://cnr.sh/essays/how-paint-bike-shed-kafka-topic-naming-conventions) such as whether to include [version numbers](https://www.kadeck.com/blog/kafka-topic-naming-conventions-5-recommendations-with-examples) or not. It's beyond the scope of this post to cover all of these. If your organization has already established a naming convention, use that.
 
 ## Rails Product
 
@@ -55,7 +53,7 @@ class CreateProducts < ActiveRecord::Migration[7.0]
 end
 ```
 
-Here is the the corresponding `Product` model:
+Here is the the corresponding `Product` model. I'm using the [annotate](https://github.com/ctran/annotate_models) gem to automatically generate schema information as comments in the model class when migrations are run:
 
 ```ruby
 # app/models/product.rb
@@ -88,7 +86,7 @@ end
 ```
 
 <aside class="markdown-aside">
-Since the prices are stored as a decimal column in the database, a format method is added to the model, and the inspect method is overridden to use it. This is so when products are displayed in the console for debugging purposes, it will show a price like 47.53 rather than 0.4753e2.
+Since the prices are stored as a decimal column in the database, a format method is added to the model, and the inspect method is overridden to use it. This is so when products are displayed in the console for debugging purposes, it will show a price like 47.53 rather than 0.4753e2. Also note that for a real application, the precision and scale would be defined such as decimal(10, 2) but this simple demo is using the default SQLite database which doesn't support specifying these.
 </aside>
 
 In development, the `products` table is populated with seed data, using the faker gem:
@@ -197,34 +195,102 @@ karafka_rails_consumer_demo_zookeeper_1   /etc/confluent/docker/run   Up      0.
 
 ## Introduce Karafka
 
-Now we need to enhance the Rails application so that it can consume messages from the `product_inventory` Kafka topic. We're going to use the [Karafka](https://karafka.io/docs/) gem to make the integration relatively easy. Some of the benefits of this gem include:
+Now we need to enhance the Rails application so that it can consume messages from the `inventory_management_product_updates` Kafka topic. We're going to use the [Karafka](https://karafka.io/docs/) gem to make the integration relatively easy. Some of the benefits of this gem include:
 * Abstracts complexities of working directly with the Kafka protocol. For example, you don't need to write your own `poll()` loop and manually manage offsets (although you can do the latter if your app needs more control).
 * Leverages [multithreading](https://karafka.io/docs/Concurrency-and-multithreading/) to achieve concurrency and high performance.
-* Integrates easily with Rails following [routing](https://karafka.io/docs/Routing/) style conventions, allowing you to make use of existing business logic in your Rails app such as models and services.
+* Integrates easily with Rails, following [routing](https://karafka.io/docs/Routing/) style conventions, and allowing you to make use of existing business logic in your Rails app such as models and services.
 * Built in [error handling](https://karafka.io/docs/Dead-Letter-Queue/) and retry logic.
 * Testing utilities that make it easy to write [automated tests](https://karafka.io/docs/Testing/) for consumers and producers.
-* Provides both an open source and pro version if you need even more [advanced features](https://karafka.io/docs/Pro-Features-List/) (similar to Sidekiq model).
+* Provides both an open source and pro version if you need even more [advanced features](https://karafka.io/docs/Pro-Features-List/) (similar to the Sidekiq model).
 
-To get started with Karafka, add the following to the `Gemfile`:
+To get started with Karafka, add the following to the project's `Gemfile` and then run `bundle install`:
 
 ```
 gem "karafka", ">= 2.0.34"
 ```
 
-And then run `bundle install`. Next run the karafka installation command which will setup some initial scaffolding:
+Next run the karafka installation command which will setup some initial scaffolding:
 
 ```
 bundle exec karafka install
 ```
 
-This will generate the main Karafka entrypoint file `karafka.rb` with an example of a topic and consumer.
+This command will generate the main Karafka entrypoint file `karafka.rb` with some basic configuration, and an example topic and consumer:
+
+```ruby
+# karafka.rb
+class KarafkaApp < Karafka::App
+  setup do |config|
+    config.kafka = { "bootstrap.servers": "127.0.0.1:9092" }
+    config.client_id = "example_app"
+    config.consumer_persistence = !Rails.env.development?
+  end
+
+  routes.draw do
+    topic :example do
+      consumer ExampleConsumer
+    end
+  end
+end
+```
+
+Modify this file by replacing the `example` topic with the `inventory_management_product_updates` topic in the `routes.draw` block, and the example consumer with `ProductInventoryConsumer` (to be implemented shortly):
+
+```ruby
+class KarafkaApp < Karafka::App
+  # config block...
+
+  routes.draw do
+    topic :inventory_management_product_updates do
+      consumer ProductInventoryConsumer
+    end
+  end
+end
+```
+
+<aside class="markdown-aside">
+For this demo, there's no need to modify the default config block generated by Karafka. Recall the Kafka broker running in a docker container has exposed port 9092 so we'll be able to connect to it. In a real application, you would use an environment variable to specify the location of the bootstrap servers. There are also many more <a href="https://karafka.io/docs/Configuration/" class="markdown-link">configuration options</a> you can explore.
+</aside>
+
+Now let's implement the `ProductInventoryConsumer` class. This is a class that inherits from `ApplicationConsumer`, which was also generated from the karafka installation command and inherits from `Karafka::BaseConsumer`.
+
+```ruby
+# app/consumers/application_consumer.rb
+
+# This file was automatically generated from the karafka installation command
+# Application consumer from which all Karafka consumers should inherit
+class ApplicationConsumer < Karafka::BaseConsumer
+end
+```
+
+The only method that's required to be implemented in your consumer classes is the `consume` method, which will be invoked by Karafka with a batch of messages. For now, we will only log the message payload and offset to confirm messages are being received. The `consume` method also has access to the `topic` so let's log the topic name as well:
+
+```ruby
+# app/consumers/product_inventory_consumer.rb
+class ProductInventoryConsumer < ApplicationConsumer
+  def consume
+    messages.each do |message|
+      Rails.logger.info("ProductInventoryConsumer consuming: Topic: #{topic.name}, " \
+      "Message: #{message.payload}, Offset: #{message.offset}")
+    end
+  end
+end
+```
+
+TODO: Aside about Karafka lazy deserialization, message only deserialized when invoke `payload` method on it. Also somewhere mention about default JSON deserialization, maybe after we've seen a simple demo.
+
+To exercise this code, open a new terminal tab and run:
+
+```
+bundle exec karafka server
+```
+
+This command initializes the Karafka application defined at `karafka.rb`, connects to the Kafka cluster specified by the `bootstrap.servers` config, starts consuming messages from the topics specified in the `routes.draw` block, and invokes the configured consumer classes to process those messages. The server will continuously listen for new messages until the process is terminated.
 
 WIP...
 
 ## TODO
-* NEXT UP Show basic config and routing for a single consumer/topic
-* Write simple consumer that just logs its payload (explain default serialize/deserialize message format in Karafka is JSON)
-* Launch Karafka server, explain that behind the scenes, Karafka kicks off all the consumers to run `poll()` loop
+* explain default serialize/deserialize message format in Karafka is JSON
 * Launch a Rails console and produce a sample message, verify in Karafka server console that the message is displayed.
 * Start with business logic in consumer: Simply take inventory_count and product_code from message, and update the product model
 * Try it out with a good/happy path case
@@ -243,3 +309,4 @@ WIP...
 * Simple diagram showing legacy inventory system, produces inventory messages to Kafka topic, consumed by the Rails e-commerce app.
 * Link to demo app on Github
 * Maybe mention schema validation as an aside?
+* Mention just barely scratched the surface of what can be done with kafka and karafka, link to docs for more advanced use cases.
