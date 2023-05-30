@@ -86,7 +86,7 @@ end
 ```
 
 <aside class="markdown-aside">
-Since the prices are stored as a decimal column in the database, a format method is added to the model, and the inspect method is overridden to use it. This is so when products are displayed in the console for debugging purposes, it will show a price like 47.53 rather than 0.4753e2. Also note that for a real application, the precision and scale would be defined such as decimal(10, 2) but this simple demo is using the default SQLite database which doesn't support specifying these.
+Not critical to this demo, but since the prices are stored as a decimal column in the database, a format method is added to the model, and the inspect method is overridden to use it. This is so when products are displayed in the console for debugging purposes, it will show a price like 47.53 rather than 0.4753e2. Also note that for a real application, the precision and scale would be defined such as decimal(10, 2) but this simple demo is using the default SQLite database which doesn't support specifying these.
 </aside>
 
 In development, the `products` table is populated with seed data, using the faker gem:
@@ -285,13 +285,55 @@ To exercise this code, open a new terminal tab and run:
 bundle exec karafka server
 ```
 
-This command initializes the Karafka application defined at `karafka.rb`, connects to the Kafka cluster specified by the `bootstrap.servers` config, starts consuming messages from the topics specified in the `routes.draw` block, and invokes the configured consumer classes to process those messages. The server will continuously listen for new messages until the process is terminated.
+This command initializes the Karafka application defined at `karafka.rb`, connects to the Kafka cluster specified by the `bootstrap.servers` config, starts consuming messages from the topics specified in the `routes.draw` block, and invokes the configured consumer classes to process those messages. The server will continuously listen for new messages until the process is terminated. The output of this command should look something like this:
+
+```
+Running Karafka 2.1.0 server
+See LICENSE and the LGPL-3.0 for licensing details
+[00f6800d4770] Polling messages...
+[00f6800d4770] Polled 0 messages in 47.48299999954179ms
+[00f6800d4770] Polling messages...
+[00f6800d4770] Polled 0 messages in 1000.3159999996424ms
+...
+```
+
+In order to exercise the `ProductInventoryConsumer` code, messages need to be produced to the `inventory_management_product_updates` topic. In production, this will be done by the inventory management system. But for local development, we don't have that system running on our laptops. Fortunately, Karafka can also be used to [produce](https://karafka.io/docs/Components/#producer) messages. Let's try this out by launching a Rails console `bin/rails c` in another terminal tab and then:
+
+```ruby
+# Generate a message with the expected attributes in JSON format:
+message = {
+  product_code: Product.first.code,
+  inventory_count: 10
+}.to_json
+# => "{\"product_code\":\"JANW7810\",\"inventory_count\":10}"
+
+# Produce and send a message to the `inventory_management_product_updates` topic:
+Karafka.producer.produce_async(topic: 'inventory_management_product_updates', payload: message)
+# [ce1340a60c42] Async producing of a message to 'inventory_management_product_updates' topic took 21.07400000002235 ms
+# [ce1340a60c42] {:topic=>"inventory_management_product_updates", :payload=>"{\"product_code\":\"JANW7810\",\"inventory_count\":10}"}
+# => #<Rdkafka::Producer::DeliveryHandle:0x0000000114198588>
+```
+
+After you submit the producer command, keep an eye on the terminal tab running the Karafka server, you should see some output indicating the message has been consumed from topic `inventory_management_product_updates` and offset `0`:
+
+```
+[50b2762f16b2] Consume job for ProductInventoryConsumer on inventory_management_product_updates/0 started
+ProductInventoryConsumer consuming: Topic: inventory_management_product_updates, Message: {"product_code"=>"JANW7810", "inventory_count"=>10}, Offset: 0
+[50b2762f16b2] Consume job for ProductInventoryConsumer on inventory_management_product_updates/0 finished in 345.4149999995716ms
+```
+
+<aside class="markdown-aside">
+For those keeping count, that's three terminal tabs required to work with this application during development mode: First one to run the Kafka cluster in docker containers, second one to run the Karafka server for consuming messages, and a third one to run a Rails console to produce messages. Later we'll need a fourth one for running tests. If you want to be able to view the output of these all at the same time, a simple way is to use the <a class="markdown-link" href="https://iterm2.com/documentation-one-page.html">Split Panes</a> feature of iTerm or <a class="markdown-link" href="https://github.com/tmux/tmux/wiki">tmux</a> for more advanced features.
+</aside>
+
+## Update Product
+
+Now that we know we can produce and consume messages with Kafka, it's time to do the actual work of updating the product inventory.
 
 WIP...
 
 ## TODO
 * explain default serialize/deserialize message format in Karafka is JSON
-* Launch a Rails console and produce a sample message, verify in Karafka server console that the message is displayed.
 * Start with business logic in consumer: Simply take inventory_count and product_code from message, and update the product model
 * Try it out with a good/happy path case
 * What could go wrong? Try sending an invalid product code, Try sending negative inventory count
@@ -310,3 +352,4 @@ WIP...
 * Link to demo app on Github
 * Maybe mention schema validation as an aside?
 * Mention just barely scratched the surface of what can be done with kafka and karafka, link to docs for more advanced use cases.
+* Aside you can also run a multi-broker cluster to experiment with partitions and replicas distributed across brokers, point to multiple setup from my course repo (but for this demo, a simple setup will suffice).
