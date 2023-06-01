@@ -143,10 +143,6 @@
   content: "markdown";
 }
 
-.content pre[data-language="makefile"]::before {
-  content: "makefile";
-}
-
 .content pre[data-language="sql"]::before {
   content: "sql";
 }
@@ -157,6 +153,14 @@
 
 .content pre[data-language="nomad"]::before {
   content: "nomad";
+}
+
+.content pre[data-language="Makefile"]::before {
+  content: "Makefile";
+}
+
+.content pre[data-language="Dockerfile"]::before {
+  content: "Dockerfile";
 }
 
 .content pre[data-language="graphql"]::before {
