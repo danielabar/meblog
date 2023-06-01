@@ -277,8 +277,6 @@ class ProductInventoryConsumer < ApplicationConsumer
 end
 ```
 
-TODO: Aside about Karafka lazy deserialization, message only deserialized when invoke `payload` method on it. Also somewhere mention about default JSON deserialization, maybe after we've seen a simple demo.
-
 To exercise this code, open a new terminal tab and run:
 
 ```
@@ -322,19 +320,46 @@ ProductInventoryConsumer consuming: Topic: inventory_management_product_updates,
 [50b2762f16b2] Consume job for ProductInventoryConsumer on inventory_management_product_updates/0 finished in 345.4149999995716ms
 ```
 
+When there's a batch of messages ready to be processed, the `consume` method gets invoked with the `messages`, which can be iterated (in our simple case, there's only one message currently). Each of these is an instance of [Karafka::Messages::Message](https://karafka.io/docs/code/karafka/Karafka/Messages/Message.html). When the `payload` method is invoked on the `message` object, Karafka will deserialize it, which converts the raw Kafka message to a format you can work with in your Ruby code. By default, it uses JSON deserialization, which means it assumes the messages are in JSON format, and they will be deserialized into a Ruby hash. This is what's shown in the console output when we log `message.payload`. The Karafka docs have more details about [deserialization](https://karafka.io/docs/Deserialization/).
+
 <aside class="markdown-aside">
 For those keeping count, that's three terminal tabs required to work with this application during development mode: First one to run the Kafka cluster in docker containers, second one to run the Karafka server for consuming messages, and a third one to run a Rails console to produce messages. Later we'll need a fourth one for running tests. If you want to be able to view the output of these all at the same time, a simple way is to use the <a class="markdown-link" href="https://iterm2.com/documentation-one-page.html">Split Panes</a> feature of iTerm or <a class="markdown-link" href="https://github.com/tmux/tmux/wiki">tmux</a> for more advanced features.
 </aside>
 
 ## Update Product
 
-Now that we know we can produce and consume messages with Kafka, it's time to do the actual work of updating the product inventory.
+Now that we know we can produce and consume messages with Kafka, it's time to do the actual work of updating the product inventory. We saw from the previous exercise that a message like `"{\"product_code\":\"JANW7810\",\"inventory_count\":10}"` will get deserialized to a Ruby hash when the `payload` method is invoked on it. The resulting hash looks like this:
+
+```ruby
+{
+  "product_code" => "JANW7810",
+  "inventory_count" => 10
+}
+```
+
+This means that we can access the product code and inventory count within the consumer as follows:
+
+```ruby
+# app/consumers/product_inventory_consumer.rb
+class ProductInventoryConsumer < ApplicationConsumer
+  def consume
+    messages.each do |message|
+      payload = message.payload
+
+      puts "Product code = #{payload['product_code']}"
+      # Product code = JANW7810
+      puts "Inventory count = #{payload['inventory_count']}"
+      # Inventory count = 10
+    end
+  end
+```
+
+So updating the product inventory count could be done directly in the consumer like this:
 
 WIP...
 
 ## TODO
-* explain default serialize/deserialize message format in Karafka is JSON
-* Start with business logic in consumer: Simply take inventory_count and product_code from message, and update the product model
+* WIP: Start with business logic in consumer: Simply take inventory_count and product_code from message, and update the product model
 * Try it out with a good/happy path case
 * What could go wrong? Try sending an invalid product code, Try sending negative inventory count
 * Start handling all this in consumer - gets messy
@@ -353,3 +378,4 @@ WIP...
 * Maybe mention schema validation as an aside?
 * Mention just barely scratched the surface of what can be done with kafka and karafka, link to docs for more advanced use cases.
 * Aside you can also run a multi-broker cluster to experiment with partitions and replicas distributed across brokers, point to multiple setup from my course repo (but for this demo, a simple setup will suffice).
+* Better feature image
