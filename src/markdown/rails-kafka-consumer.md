@@ -356,12 +356,103 @@ class ProductInventoryConsumer < ApplicationConsumer
 
 So updating the product inventory count could be done directly in the consumer like this:
 
-WIP...
+```ruby
+class ProductInventoryConsumer < ApplicationConsumer
+  def consume
+    messages.each do |message|
+      payload = message.payload
+      product = Product.find_by(code: payload["product_code"])
+      product.update!(inventory: payload["inventory_count"])
+    end
+  end
+end
+```
+
+There are some problems with this approach as we'll see shortly, but first, let's exercise this version of the consumer just to see if it works. Back in the Rails console, run this code to check the inventory value of the first product, then produce a message to update it to a different value:
+
+```ruby
+# Check what the current inventory value is
+Product.first.inventory
+# 20
+
+# Produce a message to update it to a different value
+message = {
+  product_code: Product.first.code,
+  inventory_count: 123
+}.to_json
+Karafka.producer.produce_async(topic: 'inventory_management_product_updates', payload: message)
+```
+
+Now keep an eye on the tab that's running the karafka server (that's our consumer polling for messages), it should receive this message and show that the product inventory has been updated:
+
+```
+[d886a13043fd] Consume job for ProductInventoryConsumer on inventory_management_product_updates/0 started
+  Product Load (0.9ms)  SELECT "products".* FROM "products" WHERE "products"."code" = ? LIMIT ?  [["code", "JANW7810"], ["LIMIT", 1]]
+  ↳ app/consumers/product_inventory_consumer.rb:5:in `block in consume'
+  TRANSACTION (0.2ms)  begin transaction
+  ↳ app/consumers/product_inventory_consumer.rb:6:in `block in consume'
+  Product Update (0.4ms)  UPDATE "products" SET "inventory" = ?, "updated_at" = ? WHERE "products"."id" = ?  [["inventory", 123], ["updated_at", "2023-06-02 11:10:00.738034"], ["id", 41]]
+  ↳ app/consumers/product_inventory_consumer.rb:6:in `block in consume'
+  TRANSACTION (2.1ms)  commit transaction
+  ↳ app/consumers/product_inventory_consumer.rb:6:in `block in consume'
+[d886a13043fd] Consume job for ProductInventoryConsumer on inventory_management_product_updates/0 finished in 23.927999999839813ms
+```
+
+Back in the Rails console, let's fetch the product again and check its inventory count, it should be `123` from the Kafka message we produced earlier:
+
+```ruby
+Product.first.inventory
+# 123
+```
+
+Great it's working! But we're not quite ready to ship...
+
+## What Could Go Wrong?
+
+In the previous section, we saw the happy path working. Now its time to think of things that could go wrong. What happens if the inventory system sends a product code that the Rails e-commerce system doesn't have in its records? Let's try this out. Back in the Rails console, produce a message for a product code that's not in the `products` table:
+
+```ruby
+message = {
+  product_code: "NO-SUCH-CODE",
+  inventory_count: 123
+}.to_json
+Karafka.producer.produce_async(topic: 'inventory_management_product_updates', payload: message)
+```
+
+Keep an eye on the terminal tab running the Karafka server, it will show a stack trace from attempting to consume this message:
+
+```
+[d886a13043fd] Consume job for ProductInventoryConsumer on inventory_management_product_updates/0 started
+  Product Load (0.5ms)  SELECT "products".* FROM "products" WHERE "products"."code" = ? LIMIT ?  [["code", "NO-SUCH-CODE"], ["LIMIT", 1]]
+  ↳ app/consumers/product_inventory_consumer.rb:5:in `block in consume'
+Consumer consuming error: undefined method `update!' for nil:NilClass
+
+      product.update!(inventory: payload["inventory_count"])
+             ^^^^^^^^
+/Users/dbaron/projects/meblog-projects/rails7/karafka_rails_consumer_demo/app/consumers/product_inventory_consumer.rb:6:in `block in consume'
+/Users/dbaron/.rbenv/versions/3.1.2/lib/ruby/gems/3.1.0/gems/karafka-2.1.0/lib/karafka/messages/messages.rb:22:in `each'
+/Users/dbaron/.rbenv/versions/3.1.2/lib/ruby/gems/3.1.0/gems/karafka-2.1.0/lib/karafka/messages/messages.rb:22:in `each'
+/Users/dbaron/projects/meblog-projects/rails7/karafka_rails_consumer_demo/app/consumers/product_inventory_consumer.rb:3:in `consume'
+```
+
+What's happening is that `nil` is returned from the `find_by` method, then it errors out attempting to call the `update!` method on the `nil` return:
+
+```ruby
+# This line returns `nil` when called with `code: "NO-SUCH-CODE"`
+product = Product.find_by(code: payload["product_code"])
+
+# Which results in undefined method `update!` for nil:NilClass here
+product.update!(inventory: payload["inventory_count"])
+```
+
+If you let the Karafka server keep running, you'll see the stack trace repeat several times, at increasing intervals of time. This is because Karafka's default behaviour is to keep retrying the failed message if an error is raised, according to a back-off strategy.
+
+TODO: Explanation from https://karafka.io/docs/Error-handling-and-back-off-policy/
+
+WIP: While we could use the DLQ and just let Karafka deal with this, it will be cleaner to tidy up the business logic and ensure the system produces useful error messages. Otherwise some poor soul in production support is going to be dealing with a bunch of failed messages and have no idea what's gone wrong.
 
 ## TODO
-* WIP: Start with business logic in consumer: Simply take inventory_count and product_code from message, and update the product model
-* Try it out with a good/happy path case
-* What could go wrong? Try sending an invalid product code, Try sending negative inventory count
+* WIP: What could go wrong? Try sending an invalid product code, Try sending negative inventory count
 * Start handling all this in consumer - gets messy
 * Explain analogy: Kafka consumers can be thought of like Rails controllers - their primary responsibility is to consume messages from Kafka, and optionally produce messages (eg: may want to produce a message to another topic to indicate message processing was successful). Rails controller is primarily responsible for dealing with HTTP request/response.
 * Just like it's not desirable to place business logic in a Rails controller (mixing concerns), it's also not desirable to place business logic in a Kafka consumer.
@@ -373,7 +464,7 @@ WIP...
 * Aside/assumption basic knowledge of Rails and Kafka
 * Inventory info is updated based on business events -> makes it a good fit to integrate with Kafka, which is designed for event-driven systems.
 * Sometimes get large bursts of inventory events, useful to have these persisted in a Kafka topic, and the Rails app, via a Kafka consumer will process these when it can -> i.e. don't have to worry about lost messages like you would the a service oriented REST solution.
-* Simple diagram showing legacy inventory system, produces inventory messages to Kafka topic, consumed by the Rails e-commerce app.
+* Simple diagram showing legacy inventory system, produces inventory messages to Kafka topic, consumed by the Rails e-commerce app. Maybe https://mermaid.js.org/syntax/c4c.html and https://plantuml.com/component-diagram ?
 * Link to demo app on Github
 * Maybe mention schema validation as an aside?
 * Mention just barely scratched the surface of what can be done with kafka and karafka, link to docs for more advanced use cases.
