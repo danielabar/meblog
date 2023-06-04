@@ -18,7 +18,7 @@ In order to display this inventory information in the Rails e-commerce app, it n
 
 Conceptually, here is what we'll be building:
 
-TODO: diagram
+![legacy kafka rails](../images/legacy-kafka-rails-zoom.png "legacy kafka rails")
 
 We'll be focusing on the Rails side of things. Assume that another team is maintaining the inventory management system and they've already modified it to produce JSON formatted messages every time there's an inventory change. Here's an example message showing that the product identified by product code `ABCD1234` now has 23 units left in stock:
 
@@ -328,7 +328,13 @@ For those keeping count, that's three terminal tabs required to work with this a
 
 ## Update Product
 
-Now that we know we can produce and consume messages with Kafka, it's time to do the actual work of updating the product inventory. We saw from the previous exercise that a message like `"{\"product_code\":\"JANW7810\",\"inventory_count\":10}"` will get deserialized to a Ruby hash when the `payload` method is invoked on it. The resulting hash looks like this:
+Now that we know we can produce and consume messages with Kafka, it's time to do the actual work of updating the product inventory. We saw from the previous exercise that a message like this:
+
+```
+"{\"product_code\":\"JANW7810\",\"inventory_count\":10}"
+```
+
+Gets deserialized to a Ruby hash when the `payload` method is invoked on it:
 
 ```ruby
 {
@@ -344,12 +350,12 @@ This means that we can access the product code and inventory count within the co
 class ProductInventoryConsumer < ApplicationConsumer
   def consume
     messages.each do |message|
+      # Deserialize JSON message into a hash assigned to `payload`
       payload = message.payload
 
-      puts "Product code = #{payload['product_code']}"
-      # Product code = JANW7810
-      puts "Inventory count = #{payload['inventory_count']}"
-      # Inventory count = 10
+      # Access payload attributes
+      puts "Product code = #{payload['product_code']}" # JANW7810
+      puts "Inventory count = #{payload['inventory_count']}" # 10
     end
   end
 ```
@@ -387,11 +393,13 @@ Now keep an eye on the tab that's running the karafka server (that's our consume
 
 ```
 [d886a13043fd] Consume job for ProductInventoryConsumer on inventory_management_product_updates/0 started
-  Product Load (0.9ms)  SELECT "products".* FROM "products" WHERE "products"."code" = ? LIMIT ?  [["code", "JANW7810"], ["LIMIT", 1]]
+  Product Load (0.9ms)  SELECT "products".* FROM "products"
+  WHERE "products"."code" = ? LIMIT ?  [["code", "JANW7810"], ["LIMIT", 1]]
   ↳ app/consumers/product_inventory_consumer.rb:5:in `block in consume'
   TRANSACTION (0.2ms)  begin transaction
   ↳ app/consumers/product_inventory_consumer.rb:6:in `block in consume'
-  Product Update (0.4ms)  UPDATE "products" SET "inventory" = ?, "updated_at" = ? WHERE "products"."id" = ?  [["inventory", 123], ["updated_at", "2023-06-02 11:10:00.738034"], ["id", 41]]
+  Product Update (0.4ms)  UPDATE "products" SET "inventory" = ?, "updated_at" = ?
+  WHERE "products"."id" = ?  [["inventory", 123], ["updated_at", "2023-06-02 11:10:00.738034"], ["id", 41]]
   ↳ app/consumers/product_inventory_consumer.rb:6:in `block in consume'
   TRANSACTION (2.1ms)  commit transaction
   ↳ app/consumers/product_inventory_consumer.rb:6:in `block in consume'
@@ -409,7 +417,13 @@ Great it's working! But we're not quite ready to ship...
 
 ## What Could Go Wrong?
 
-In the previous section, we saw the happy path working. Now its time to think of things that could go wrong. What happens if the inventory system sends a product code that the Rails e-commerce system doesn't have in its records? Let's try this out. Back in the Rails console, produce a message for a product code that's not in the `products` table:
+In the previous section, we saw the happy path working. Now its time to think of things that could go wrong.
+
+![what could possibly go wrong](../images/what-could-possibly-go-wrong.jpeg "what could possibly go wrong")
+
+For example, what if the inventory system sends a product code that the Rails e-commerce system doesn't have in its records? This could happen if the legacy system also manages in-store products that are not sold online, or maybe its just buggy and no one quite understands how it works.
+
+Let's simulate this situation by producing a message in the Rails console for a non existing product code:
 
 ```ruby
 message = {
@@ -423,16 +437,17 @@ Keep an eye on the terminal tab running the Karafka server, it will show a stack
 
 ```
 [d886a13043fd] Consume job for ProductInventoryConsumer on inventory_management_product_updates/0 started
-  Product Load (0.5ms)  SELECT "products".* FROM "products" WHERE "products"."code" = ? LIMIT ?  [["code", "NO-SUCH-CODE"], ["LIMIT", 1]]
+  Product Load (0.5ms)  SELECT "products".* FROM "products"
+  WHERE "products"."code" = ? LIMIT ?  [["code", "NO-SUCH-CODE"], ["LIMIT", 1]]
   ↳ app/consumers/product_inventory_consumer.rb:5:in `block in consume'
 Consumer consuming error: undefined method `update!' for nil:NilClass
 
       product.update!(inventory: payload["inventory_count"])
              ^^^^^^^^
-/Users/dbaron/projects/meblog-projects/rails7/karafka_rails_consumer_demo/app/consumers/product_inventory_consumer.rb:6:in `block in consume'
-/Users/dbaron/.rbenv/versions/3.1.2/lib/ruby/gems/3.1.0/gems/karafka-2.1.0/lib/karafka/messages/messages.rb:22:in `each'
-/Users/dbaron/.rbenv/versions/3.1.2/lib/ruby/gems/3.1.0/gems/karafka-2.1.0/lib/karafka/messages/messages.rb:22:in `each'
-/Users/dbaron/projects/meblog-projects/rails7/karafka_rails_consumer_demo/app/consumers/product_inventory_consumer.rb:3:in `consume'
+/path/to/app/consumers/product_inventory_consumer.rb:6:in `block in consume'
+/path/to/gems/karafka-2.1.0/lib/karafka/messages/messages.rb:22:in `each'
+/path/to/gems/karafka-2.1.0/lib/karafka/messages/messages.rb:22:in `each'
+/path/to/app/consumers/product_inventory_consumer.rb:3:in `consume'
 ```
 
 What's happening is that `nil` is returned from the `find_by` method, then it errors out attempting to call the `update!` method on the `nil` return:
@@ -445,16 +460,214 @@ product = Product.find_by(code: payload["product_code"])
 product.update!(inventory: payload["inventory_count"])
 ```
 
-If you let the Karafka server keep running, you'll see the stack trace repeat several times, at increasing intervals of time. This is because Karafka's default behaviour is to keep retrying the failed message if an error is raised, according to a back-off strategy.
+If you let the Karafka server keep running, you'll see the stack trace repeat several times, at increasing intervals of time. This is because Karafka's default behaviour is to keep retrying the failed message if an error is raised, according to a back-off strategy, up until a maximum value of 30,000 ms is reached (30 seconds), at which point, it will keep trying every 30 seconds:
 
-TODO: Explanation from https://karafka.io/docs/Error-handling-and-back-off-policy/
+```
+[1bcb7660af45] Pausing on topic inventory_management_product_updates/0 on offset 1
+[d854346b76bf] Retrying of ProductInventoryConsumer after 2000 ms on topic inventory_management_product_updates/0 from offset 1
+...
+[1bcb7660af45] Pausing on topic inventory_management_product_updates/0 on offset 1
+[8d4c56ce8e62] Retrying of ProductInventoryConsumer after 8000 ms on topic inventory_management_product_updates/0 from offset 1
+...
+[1bcb7660af45] Pausing on topic inventory_management_product_updates/0 on offset 1
+[15a4dead41b2] Retrying of ProductInventoryConsumer after 16000 ms on topic inventory_management_product_updates/0 from offset 1
+...
+[1bcb7660af45] Pausing on topic inventory_management_product_updates/0 on offset 1
+[8f894960f0ac] Retrying of ProductInventoryConsumer after 30000 ms on topic inventory_management_product_updates/0 from offset 1
+...
+# keeps retrying every 30000 ms
+```
 
-WIP: While we could use the DLQ and just let Karafka deal with this, it will be cleaner to tidy up the business logic and ensure the system produces useful error messages. Otherwise some poor soul in production support is going to be dealing with a bunch of failed messages and have no idea what's gone wrong.
+This behaviour is controlled by the following config settings, which get assigned default values. Here's a snippet from the Karafka source [Karafka::Setup::Config](https://github.com/karafka/karafka/blob/master/lib/karafka/setup/config.rb):
+
+```ruby
+# option [Boolean] should we use exponential backoff
+setting :pause_with_exponential_backoff, default: true
+
+# option [Integer] what is the max timeout in case of an exponential backoff (milliseconds)
+setting :pause_max_timeout, default: 30_000
+```
+
+Without error handling, it will keep trying to process this message, and not move on to other messages (because the offset of the bad message will not be committed). So clearly, some error handling is needed.
+
+## Dead Letter Queue
+
+In terms of writing the least amount of application code, the easiest way to get error handling with Karafka is to configure a [Dead Letter Queue](https://karafka.io/docs/Dead-Letter-Queue/) (DLQ) per each topic. For example:
+
+```ruby
+# karafka.rb
+class KarafkaApp < Karafka::App
+  # config block...
+
+  routes.draw do
+    topic :inventory_management_product_updates do
+      consumer ProductInventoryConsumer
+      dead_letter_queue(
+        # name this as per your organization's naming conventions
+        topic: "dlq_inventory_management_product_updates",
+        max_retries: 2
+      )
+    end
+  end
+end
+```
+
+With this approach, if any error is raised during message processing, Karafka will automatically retry up to a configured number of `max_retries` (which can also be set to zero if you don't ever want it to retry). If message processing still fails after the retries are exhausted, the message will be moved to the topic specified in the `dead_letter_queue` method, in this case, `dlq_inventory_management_product_updates`.
+
+With the modified `karafka.rb` in place, producing an inventory update message with a product code that does not exist will generate the following log messages in the karafka server. I've annotated them with `=== EXPLANATION ===`, which shows that after consuming the bad message, Karafka will make two more attempts to process it. If those still fail, it writes the message the the topic `dlq_inventory_management_product_updates`, then moves on, waiting to consume new messages:
+
+```
+=== START CONSUMING BAD MESSAGE ===
+[d13504295353] Consume job for ProductInventoryConsumer on inventory_management_product_updates/0 started
+  Product Load (0.2ms)  SELECT "products".* FROM "products"
+  WHERE "products"."code" = ? LIMIT ?  [["code", "NO_SUCH_CODE"], ["LIMIT", 1]]
+  ↳ app/consumers/product_inventory_consumer.rb:5:in `block in consume'
+Consumer consuming error: undefined method `update!' for nil:NilClass
+
+      product.update!(inventory: payload["inventory_count"])
+             ^^^^^^^^
+/path/to/app/consumers/product_inventory_consumer.rb:6:in `block in consume'
+...stack trace...
+
+=== FIRST RETRY ===
+[fa875ec2db84] Retrying of ProductInventoryConsumer after 2000 ms on topic inventory_management_product_updates/0 from offset 1
+[d13504295353] Consume job for ProductInventoryConsumer on inventory_management_product_updates/0 started
+  Product Load (0.1ms)  SELECT "products".* FROM "products"
+  WHERE "products"."code" = ? LIMIT ?  [["code", "NO_SUCH_CODE"], ["LIMIT", 1]]
+  ↳ app/consumers/product_inventory_consumer.rb:5:in `block in consume'
+Consumer consuming error: undefined method `update!' for nil:NilClass
+
+      product.update!(inventory: payload["inventory_count"])
+             ^^^^^^^^
+/path/to/app/consumers/product_inventory_consumer.rb:6:in `block in consume'
+...stack trace...
+
+=== SECOND RETRY ===
+[76694e052832] Retrying of ProductInventoryConsumer after 4000 ms on topic inventory_management_product_updates/0 from offset 1
+[d13504295353] Consume job for ProductInventoryConsumer on inventory_management_product_updates/0 started
+  Product Load (0.2ms)  SELECT "products".* FROM "products"
+  WHERE "products"."code" = ? LIMIT ?  [["code", "NO_SUCH_CODE"], ["LIMIT", 1]]
+  ↳ app/consumers/product_inventory_consumer.rb:5:in `block in consume'
+Consumer consuming error: undefined method `update!' for nil:NilClass
+
+      product.update!(inventory: payload["inventory_count"])
+             ^^^^^^^^
+/path/to/app/consumers/product_inventory_consumer.rb:6:in `block in consume'
+...stack trace...
+
+=== WRITE BAD MESSAGE TO DLQ ===
+[23c9519eb294] Async producing of a message to 'dlq_inventory_management_product_updates' topic took 1.7790000000968575 ms
+[23c9519eb294] {:topic=>"dlq_inventory_management_product_updates", :payload=>"{\"product_code\":\"NO_SUCH_CODE\",\"inventory_count\":5}"}
+[d1e59c1bd1df] Dispatched message 1 from inventory_management_product_updates/0 to DLQ topic: dlq_inventory_management_product_updates
+
+=== OFFSET COMMITTED, READY TO PROCESS MORE MESSAGES ===
+[316f38a98a31] Pausing on topic inventory_management_product_updates/0 on offset 2
+[bc51bb551a3f] Polling messages...
+```
+
+While we could use the DLQ and simply let Karafka deal with all errors, it will be cleaner to have the business logic be more resilient, and ensure the system produces useful error messages. Otherwise some poor soul in production support is going to be dealing with a bunch of failed messages in the dead letter queue and have no idea what's gone wrong. That could be you if developers are also responsible for production support at your company!
+
+The other issue with this approach is there's some wasted processing with the retries. For example, if the product code does not exist in the e-commerce system, there's no point retrying the message because it still won't exist.
+
+## Validation in Consumer
+
+As a first attempt at making the code more resilient, we could modify the consumer to first check if the product exists, before attempting an update, otherwise log an error and manually dispatch to the dead letter queue:
+
+```ruby
+class ProductInventoryConsumer < ApplicationConsumer
+  def consume
+    messages.each do |message|
+      payload = message.payload
+      product = Product.find_by(code: payload["product_code"])
+      if product.present?
+        product.update!(inventory: payload["inventory_count"])
+      else
+        Rails.logger.error("Product #{payload['product_code']} does not exist")
+        dispatch_to_dlq(message)
+      end
+    end
+  end
+end
+```
+
+With this in place, producing a message with an non-existing product code will result in logging an error, and the invalid message dispatched to the dead letter queue without any retries. Here's what this looks like in the Karafka server logs, again I've added `=== EXPLANATIONS ===`:
+
+```
+=== START CONSUMING MESSAGE ===
+[ce8640c13bf0] Polled 1 messages in 1004.0149999996647ms
+[ac5cf1c6d557] Consume job for ProductInventoryConsumer on inventory_management_product_updates/0 started
+
+=== CHECK IF PRODUCT EXISTS ===
+  Product Load (0.4ms)  SELECT "products".* FROM "products"
+  WHERE "products"."code" = ? LIMIT ?  [["code", "NO_SUCH_CODE"], ["LIMIT", 1]]
+  ↳ app/consumers/product_inventory_consumer.rb:5:in `block in consume'
+
+=== RAILS LOGGER ERROR ===
+Product NO_SUCH_CODE does not exist
+
+=== DISPATCH TO DQL ===
+[12cb723b4056] Async producing of a message to 'dlq_inventory_management_product_updates' topic took 0.9180000005289912 ms
+[12cb723b4056] {:topic=>"dlq_inventory_management_product_updates", :payload=>"{\"product_code\":\"NO_SUCH_CODE\",\"inventory_count\":5}"}
+[89c41457fc4c] Dispatched message 2 from inventory_management_product_updates/0 to DLQ topic: dlq_inventory_management_product_updates
+[ac5cf1c6d557] Consume job for ProductInventoryConsumer on inventory_management_product_updates/0 finished in 275.4199999999255ms
+
+=== READY FOR MORE MESSAGES ===
+[ce8640c13bf0] Polling messages...
+```
+
+While this works, the consumer is starting to get a little messy. And it will continue to get messier more validation rules are enforced. For example, in the e-commerce system, there's a constraint that the inventory count must be greater than zero, recall the product model has:
+
+```ruby
+# app/models/product.rb
+class Product < ApplicationRecord
+  # other validations...
+  validates :inventory, presence: true, numericality: { greater_than_or_equal_to: 0 }
+end
+```
+
+Suppose the inventory management system could send negative inventory counts, or blank values. It might do this if the business rules in the legacy system are different than those in the e-commerce system, or again, it could be buggy and not enough time/people to deal with the legacy system quirks. The consumer could be modified to handle this case as well, something like this:
+
+```ruby
+class ProductInventoryConsumer < ApplicationConsumer
+  def consume
+    messages.each do |message|
+      payload = message.payload
+      product = Product.find_by(code: payload["product_code"])
+      if product.present?
+        if payload["inventory_count"] >= 0
+          product.update!(inventory: payload["inventory_count"])
+        else
+          Rails.logger.error("Inventory count cannot be negative")
+          dispatch_to_dlq(message)
+        end
+      else
+        Rails.logger.error("Product #{payload['product_code']} does not exist")
+        dispatch_to_dlq(message)
+      end
+    end
+  end
+end
+```
+
+At this point, if the project is using Rubocop with a default configuration, this code will light up with the following offenses warning that the complexity of the `consume` method is too high and that there's too many lines:
+
+```
+app/consumers/product_inventory_consumer.rb:2:3:C: Metrics/AbcSize:Assignment
+Branch Condition size for consume is too high. [<3, 16, 6> 17.35/17]
+  def consume ...
+  ^^^^^^^^^^^
+app/consumers/product_inventory_consumer.rb:2:3: C: Metrics/MethodLength:
+Method has too many lines. [15/10]
+  def consume ...
+  ^^^^^^^^^^^
+```
+
+While one could debate the max method length rule (default value is 10, perhaps 15 is reasonable), the complexity warning should not be ignored. The `Abc` size rule calculates the complexity of a method by considering the number of assignments (A), branches (B), and conditions (C) and comparing it to a maximum threshold. In this case, it's calculated a score of 17.35 which exceeds the default threshold of 17.
+
+WIP: Smell, simple example, a real app may have even more rules (eg: active/inactive products). Introduce single responsibility principle, thinking of consumer === controller...
 
 ## TODO
-* WIP: What could go wrong? Try sending an invalid product code, Try sending negative inventory count
-* Start handling all this in consumer - gets messy
-* Explain analogy: Kafka consumers can be thought of like Rails controllers - their primary responsibility is to consume messages from Kafka, and optionally produce messages (eg: may want to produce a message to another topic to indicate message processing was successful). Rails controller is primarily responsible for dealing with HTTP request/response.
+* Explain analogy: Kafka consumers can be thought of like Rails controllers - their primary responsibility is to consume messages from Kafka, and optionally produce messages (eg: may want to produce a message to another topic to indicate message processing was successful). Rails controller is primarily responsible for dealing with HTTP request/response. Single Responsibility Principle
 * Just like it's not desirable to place business logic in a Rails controller (mixing concerns), it's also not desirable to place business logic in a Kafka consumer.
 * Introduce idea of service object and ActiveModel for validations...
 * This is a relatively simple example, imagine there could be more business rules, eg: product could have an active flag, and only should update inventory if product is still active.
@@ -464,9 +677,43 @@ WIP: While we could use the DLQ and just let Karafka deal with this, it will be 
 * Aside/assumption basic knowledge of Rails and Kafka
 * Inventory info is updated based on business events -> makes it a good fit to integrate with Kafka, which is designed for event-driven systems.
 * Sometimes get large bursts of inventory events, useful to have these persisted in a Kafka topic, and the Rails app, via a Kafka consumer will process these when it can -> i.e. don't have to worry about lost messages like you would the a service oriented REST solution.
-* Simple diagram showing legacy inventory system, produces inventory messages to Kafka topic, consumed by the Rails e-commerce app. Maybe https://mermaid.js.org/syntax/c4c.html and https://plantuml.com/component-diagram ?
+* WIP: Simple diagram showing legacy inventory system, produces inventory messages to Kafka topic, consumed by the Rails e-commerce app. Maybe https://mermaid.js.org/syntax/c4c.html and https://plantuml.com/component-diagram ?
 * Link to demo app on Github
-* Maybe mention schema validation as an aside?
+* Maybe mention schema validation as an aside? Can prevent some issues but still good to have resiliency on the consumer application.
 * Mention just barely scratched the surface of what can be done with kafka and karafka, link to docs for more advanced use cases.
 * Aside you can also run a multi-broker cluster to experiment with partitions and replicas distributed across brokers, point to multiple setup from my course repo (but for this demo, a simple setup will suffice).
 * Better feature image
+
+### Diagram Mermaid Attempt
+
+[Known unresolved issue](https://github.com/mermaid-js/mermaid/issues/3221) arrow text overlaps arrows and boxes
+
+[Try offsets in styles](https://github.com/mermaid-js/mermaid/blob/develop/demos/c4context.html)
+
+[Draw C4 Shape Source](https://github.com/mermaid-js/mermaid/blob/1b40f552b20df4ab99a986dd58c9d254b3bfd7bc/packages/mermaid/src/diagrams/c4/svgDraw.js#L195)
+
+[![](https://mermaid.ink/img/pako:eNqNU19vmzAQ_yqW1YdMohkQkgDa9pAsD1EbZSKa1FZIkwsHsQI2sk1XFuW7zyYlAa2T6qfz6ffnfHc-4oSngEO89JacKXhVMUPtUVQVgHSSQaIoy9GukQpKiV4oQXckO5AOudI8UQkq4deC1ywlohk92xaK8T3kJGli_AkdOzB60xmtNzsDWbMXYIqLBm0IIzmU-hZjC93wLJOgHr7G2LHbo2U6kVMXXPwOmRE7l_Wu3SLa3q0iA1oIfgDRU7tgnrZbA3jiGgDVAPOvoyC0kAYemeB909VyuzGQ1e2SlyWIBIaSXRhBce7Htcofgqd1AvLLs0Cfv21ASt0c2aP_rFKiQDN3qilgSO8179a1e-18NBknMNX2vc91Xs311GVdftx8yP-I-8V-QU0BHfVtAruGJf93G4D7ZpNJT3pIvicNr5V-V0bz0U3i7fakgjWL-G-zYG2NidfNtssbOWxhPbiS0FR_knbCMVZ7vaYxDnVY0Hyv9zVmJw0kteKmdBwqUYOF69b6OyW5ICUOM1JInYWU6n3fnL9d-_ssXBGmt-6K0XccHvErDl03GHtB4E2mru86juO6Fm502p-MPX_u-kFgz2ZTfz47WfhPK2GPfS-YOfZ06s6DqaeZp78mdiax?type=png)](https://mermaid.live/edit#pako:eNqNU19vmzAQ_yqW1YdMohkQkgDa9pAsD1EbZSKa1FZIkwsHsQI2sk1XFuW7zyYlAa2T6qfz6ffnfHc-4oSngEO89JacKXhVMUPtUVQVgHSSQaIoy9GukQpKiV4oQXckO5AOudI8UQkq4deC1ywlohk92xaK8T3kJGli_AkdOzB60xmtNzsDWbMXYIqLBm0IIzmU-hZjC93wLJOgHr7G2LHbo2U6kVMXXPwOmRE7l_Wu3SLa3q0iA1oIfgDRU7tgnrZbA3jiGgDVAPOvoyC0kAYemeB909VyuzGQ1e2SlyWIBIaSXRhBce7Htcofgqd1AvLLs0Cfv21ASt0c2aP_rFKiQDN3qilgSO8179a1e-18NBknMNX2vc91Xs311GVdftx8yP-I-8V-QU0BHfVtAruGJf93G4D7ZpNJT3pIvicNr5V-V0bz0U3i7fakgjWL-G-zYG2NidfNtssbOWxhPbiS0FR_knbCMVZ7vaYxDnVY0Hyv9zVmJw0kteKmdBwqUYOF69b6OyW5ICUOM1JInYWU6n3fnL9d-_ssXBGmt-6K0XccHvErDl03GHtB4E2mru86juO6Fm502p-MPX_u-kFgz2ZTfz47WfhPK2GPfS-YOfZ06s6DqaeZp78mdiax)
+
+```
+C4Context
+title Connecting Systems via Kafka
+Enterprise_Boundary(b0, "Legacy") {
+  System(IMS, "Inventory Management", $offsetX="1000000")
+}
+Boundary(kf, "Kafka") {
+  System(BROKER, "Broker")
+  System(ZOO, "Zookeeper")
+}
+Boundary(rails, "Rails") {
+  System(ECOM, "E-Commerce")
+}
+
+Rel(IMS, BROKER, "Produces<br />Messages")
+UpdateRelStyle(IMS, BROKER, $offsetX="-20", $offsetY="-19")
+Rel(ECOM, BROKER, "Consumes<br />Messages")
+UpdateRelStyle(ECOM, BROKER, $offsetX="-20", $offsetY="-19")
+BiRel(BROKER, ZOO, "Sync")
+UpdateRelStyle(BROKER, ZOO, $offsetX="-33")
+
+UpdateLayoutConfig($c4ShapeInRow="1", $c4BoundaryInRow="3")
+```
