@@ -421,9 +421,7 @@ In the previous section, we saw the happy path working. Now its time to think of
 
 ![what could possibly go wrong](../images/what-could-possibly-go-wrong.jpeg "what could possibly go wrong")
 
-For example, what if the inventory system sends a product code that the Rails e-commerce system doesn't have in its records? This could happen if the legacy system also manages in-store products that are not sold online, or maybe its just buggy and no one quite understands how it works.
-
-Let's simulate this situation by producing a message in the Rails console for a non existing product code:
+For example, what if the inventory system sends a product code that the Rails e-commerce system doesn't have in its records? This could happen if the legacy system also manages in-store products that are not sold online, or maybe its just buggy and no one quite understands how it works. Let's simulate this situation by producing a message in the Rails console for a non existing product code:
 
 ```ruby
 message = {
@@ -512,7 +510,7 @@ class KarafkaApp < Karafka::App
 end
 ```
 
-With this approach, if any error is raised during message processing, Karafka will automatically retry up to a configured number of `max_retries` (which can also be set to zero if you don't ever want it to retry). If message processing still fails after the retries are exhausted, the message will be moved to the topic specified in the `dead_letter_queue` method, in this case, `dlq_inventory_management_product_updates`.
+With this approach, if any error is raised during message processing, Karafka will automatically retry up to a configured number of `max_retries` (which can also be set to zero if you don't ever want it to retry). If message processing still fails after the retries are exhausted, a new message containing the same header and payload as the troublesome message will be produced to the topic specified in the `dead_letter_queue` method, in this case, `dlq_inventory_management_product_updates`.
 
 With the modified `karafka.rb` in place, producing an inventory update message with a product code that does not exist will generate the following log messages in the karafka server. I've annotated them with `=== EXPLANATION ===`, which shows that after consuming the bad message, Karafka will make two more attempts to process it. If those still fail, it writes the message the the topic `dlq_inventory_management_product_updates`, then moves on, waiting to consume new messages:
 
@@ -567,7 +565,7 @@ Consumer consuming error: undefined method `update!' for nil:NilClass
 
 While we could use the DLQ and simply let Karafka deal with all errors, it will be cleaner to have the business logic be more resilient, and ensure the system produces useful error messages. Otherwise some poor soul in production support is going to be dealing with a bunch of failed messages in the dead letter queue and have no idea what's gone wrong. That could be you if developers are also responsible for production support at your company!
 
-The other issue with this approach is there's some wasted processing with the retries. For example, if the product code does not exist in the e-commerce system, there's no point retrying the message because it still won't exist.
+The other issue with this approach is there's some wasted processing with the retries. For example, if the product code does not exist in the e-commerce system, there's no point retrying the message because it still won't exist. While this can be mitigated by setting `max_retries: 0`, there could be other errors which should be retried such as if a network blip occurs and the database is temporarily unreachable.
 
 ## Validation in Consumer
 
@@ -649,7 +647,7 @@ class ProductInventoryConsumer < ApplicationConsumer
 end
 ```
 
-At this point, if the project is using Rubocop with a default configuration, this code will light up with the following offenses warning that the complexity of the `consume` method is too high and that there's too many lines:
+At this point, if the project is using [Rubocop](https://rubocop.org/) with a default configuration, this code will light up with the following offenses warning that the complexity of the `consume` method is too high and that there's too many lines:
 
 ```
 app/consumers/product_inventory_consumer.rb:2:3:C: Metrics/AbcSize:Assignment
@@ -662,14 +660,46 @@ Method has too many lines. [15/10]
   ^^^^^^^^^^^
 ```
 
-While one could debate the max method length rule (default value is 10, perhaps 15 is reasonable), the complexity warning should not be ignored. The `Abc` size rule calculates the complexity of a method by considering the number of assignments (A), branches (B), and conditions (C) and comparing it to a maximum threshold. In this case, it's calculated a score of 17.35 which exceeds the default threshold of 17.
+While one could debate the max method length rule (default value is 10, perhaps 15 is reasonable), the complexity warning should not be ignored. The Rubocop [Abc rule](https://docs.rubocop.org/rubocop/cops_metrics.html#metricsabcsize) calculates the complexity of a method by considering the number of assignments (A), branches (B), aka method calls, and conditions (C) and comparing it to a maximum threshold. In this case, it's calculated a score of `17.35` which exceeds the default threshold of `17`.
 
-WIP: Smell, simple example, a real app may have even more rules (eg: active/inactive products). Introduce single responsibility principle, thinking of consumer === controller...
+One way to resolve this is to break up the `consume` method into smaller methods, for example, the validation and error handling could be extracted as separate methods. But this is just a simple example, for a real production application, there could be many more rules, and more logic involved in performing the update, which would continue to increase the complexity.
+
+## Too Much Responsibility
+
+The real issue here is that the Kafka consumer as currently written, is taking on too many responsibilities. These include:
+1. Deserializing the message payloads received from the broker.
+2. Implementing business rules with validation on the message payload.
+3. Implementing business logic in updating the product inventory count (a simple one model update in this example, but could be more involved in a real app).
+4. Producing new messages to the dead letter queue topic in case of validation errors.
+
+A useful way of thinking about this is to compare the consumer to a Rails controller. With a controller, its responsibilities should be limited to handling http requests and responses, while business logic should be delegated to services and/or models. This makes testing of business logic easier because its isolated from the complexity of http request and response handling.
+
+Applying this way of thinking to a consumer, we can say that it should only be concerned with Kafka-specific things such as communicating with the broker to consume and produce messages, and deserializing and serializing message payloads. Everything else should be handled by services and/or models.
+
+To simplify the consumer, we will apply two concepts: A model to perform all business rule validations, and a service to check if the model is valid, and only perform the business logic update if the model is valid.
+
+## Model
+
+Typically in a Rails application, a model is a class that inherits from [ActiveRecord](https://api.rubyonrails.org/classes/ActiveRecord/Base.html) and has an underlying database table. Then it has access to the `validates` and `validate` macros to perform validations such as:
+
+```ruby
+class SomeModel < ApplicationRecord
+  validates :some_attribute, presence: true
+  validate :my_custom_method?
+
+  def my_custom_method?
+    # do some custom validation...
+  end
+end
+```
+
+These validation macros are very useful, and could help us clean up the consumer code by providing a model class whose sole responsibility is to indicate whether the message payload is valid, and if its not, list the error messages indicating what's wrong with it. But we don't have a database table specifically for the messages coming from Kafka and it would be overkill to create one. Fortunately, there is a way to make use of model validations without having an underlying database table. The [ActiveModel::Model](https://api.rubyonrails.org/classes/ActiveModel/Model.html) module can be included in any class, and it will have similar functionality to an ActiveRecord model.
+
+WIP: explanation of ActiveModel
 
 ## TODO
-* Explain analogy: Kafka consumers can be thought of like Rails controllers - their primary responsibility is to consume messages from Kafka, and optionally produce messages (eg: may want to produce a message to another topic to indicate message processing was successful). Rails controller is primarily responsible for dealing with HTTP request/response. Single Responsibility Principle
-* Just like it's not desirable to place business logic in a Rails controller (mixing concerns), it's also not desirable to place business logic in a Kafka consumer.
-* Introduce idea of service object and ActiveModel for validations...
+* WIP: Introduce idea of service object and ActiveModel for validations...
+* Tests for model, service, consumer (if post getting too long, just link to demo repo)
 * This is a relatively simple example, imagine there could be more business rules, eg: product could have an active flag, and only should update inventory if product is still active.
 * Link to Karafka gem
 * Link to faker gem
@@ -683,6 +713,7 @@ WIP: Smell, simple example, a real app may have even more rules (eg: active/inac
 * Mention just barely scratched the surface of what can be done with kafka and karafka, link to docs for more advanced use cases.
 * Aside you can also run a multi-broker cluster to experiment with partitions and replicas distributed across brokers, point to multiple setup from my course repo (but for this demo, a simple setup will suffice).
 * Better feature image
+* Maybe ref re: service: https://dev.to/isalevine/using-rails-service-objects-to-make-skinny-controllers-and-models-3k9c
 
 ### Diagram Mermaid Attempt
 
