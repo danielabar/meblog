@@ -676,7 +676,12 @@ A useful way of thinking about this is to compare the consumer to a Rails contro
 
 Applying this way of thinking to a consumer, we can say that it should only be concerned with Kafka-specific things such as communicating with the broker to consume and produce messages, and deserializing and serializing message payloads. Everything else should be handled by services and/or models.
 
-To simplify the consumer, we will apply two concepts: A model to perform all business rule validations, and a service to check if the model is valid, and only perform the business logic update if the model is valid.
+To simplify the consumer, we will apply two concepts:
+
+1. A model, initialized with the message payload hash, to perform all business rule validations.
+2. A service to check if the model is valid, and only perform the business logic update if the model is valid.
+
+The next sections will walk through the refactor.
 
 ## Model
 
@@ -693,12 +698,116 @@ class SomeModel < ApplicationRecord
 end
 ```
 
-These validation macros are very useful, and could help us clean up the consumer code by providing a model class whose sole responsibility is to indicate whether the message payload is valid, and if its not, list the error messages indicating what's wrong with it. But we don't have a database table specifically for the messages coming from Kafka and it would be overkill to create one. Fortunately, there is a way to make use of model validations without having an underlying database table. The [ActiveModel::Model](https://api.rubyonrails.org/classes/ActiveModel/Model.html) module can be included in any class, and it will have similar functionality to an ActiveRecord model.
+These validation macros are very useful, and could help us clean up the consumer code by providing a model class whose sole responsibility is to indicate whether the message payload is valid, and if its not, list the error messages indicating what's wrong with it. But we don't have a database table specifically for the messages coming from Kafka and it would be overkill to create one. Fortunately, Rails has a solution for this. The [ActiveModel::Model](https://guides.rubyonrails.org/active_model_basics.html) module can be included in any class. It provides a way to create model-like objects that have many of the same features as traditional Rails models, but are not necessarily backed by a database table.
 
-WIP: explanation of ActiveModel
+This new model will be named `ProductInventoryForm`. There's no strict naming convention on these, but the `Form` part of the name indicates that instances of this class are used to temporarily collect input data. To start, include `ActiveModel::Model`, define the attributes from the Kafka message `product_code` and `inventory_count`, and specify some validation using the `validates` macro:
+
+```ruby
+# app/models/product_inventory_form.rb
+class ProductInventoryForm
+  include ActiveModel::Model
+
+  attr_accessor :product_code, :inventory_count
+
+  validates :product_code, presence: true
+  validates :inventory_count, presence: true, numericality: { only_integer: true, greater_than_or_equal_to: 0 }
+end
+```
+
+Let's launch a Rails console (`bin/rails c`) to experiment with this model:
+
+```ruby
+# Instantiate an empty model
+product_form = ProductInventoryForm.new
+
+# Including ActiveModel::Model exposes the `valid?` method
+product_form.valid?
+# => false
+
+# We can also access the error messages
+product_form.errors.full_messages
+# => [
+#      "Product code can't be blank",
+#      "Inventory count can't be blank",
+#      "Inventory count is not a number"
+#    ]
+
+# Instantiate a model with a hash to populate the attributes
+product_form = ProductInventoryForm.new({product_code: "FOO", inventory_count: 10})
+# > #<ProductInventoryForm:0x0000000115a44ac8 @inventory_count=10, @product_code="FOO">
+
+# This time the model is valid because we've provided a product code and inventory count
+product_form.valid?
+# => true
+product_form.errors.full_messages
+# => []
+```
+
+The above examples show that we can use the `ProductInventoryForm` model to perform as many validations as we need on the attributes, using the familiar pattern of Rails ActiveRecord models. But you may have noticed that the model is currently considered valid for any non-nil `product_code`. Let's fix that to require that the `product_code` must actually exist in the database. We can do this by using the `validate` macro to define a method `product_exists?` that will perform some custom validation:
+
+```ruby
+# app/models/product_inventory_form.rb
+class ProductInventoryForm
+  include ActiveModel::Model
+
+  attr_accessor :product_code, :inventory_count
+
+  validates :product_code, presence: true
+  validates :inventory_count, presence: true, numericality: { only_integer: true, greater_than_or_equal_to: 0 }
+
+  # Only invoke the `product_exists?` validation if there are no validation errors with product_code.
+  # For example, if product_code is blank, it doesn't make sense to try and check if it exists.
+  # This is accomplished by specifying a "stabby lamda" (i.e. anonymous function) to the "if" hash key,
+  # i.e. the `validate` method accepts a hash of options, one of them being `if` to specify the conditions
+  # under which the given validation should run.
+  validate :product_exists?, if: -> { errors[:product_code].blank? }
+
+  def product_exists?
+    errors.add(:product_code, "#{product_code} does not exist") unless Product.exists?(code: product_code)
+  end
+end
+```
+
+With this in place, run `reload!` in the Rails console, and try to instantiate both an invalid and valid product form:
+
+```ruby
+# This should be considered invalid because
+# product code does not exist and inventory is negative:
+product_form = ProductInventoryForm.new({product_code: "FOO", inventory_count: -5})
+=> #<ProductInventoryForm:0x000000010e7f93d8 @inventory_count=-5, @product_code="FOO">
+
+# Run the validation rules. This time it also runs a query against the
+# products table due to the custom `product_exists?` validation.
+product_form.valid?
+# Product Exists? (0.4ms)  SELECT 1 AS one FROM "products" WHERE "products"."code" = ? LIMIT ?  [["code", "FOO"], ["LIMIT", 1]]
+# => false
+
+# Check the error messages
+product_form.errors.full_messages
+# => ["Inventory count must be greater than or equal to 0", "Product code FOO does not exist"]
+
+# Build a valid model: code exists and inventory count positive
+product_form = ProductInventoryForm.new({product_code: Product.first.code, inventory_count: 15})
+# => #<ProductInventoryForm:0x0000000110761540 @inventory_count=15, @product_code="JANW7810">
+
+# This time, the product code exists so the model is valid
+product_form.valid?
+# Product Exists? (0.3ms)  SELECT 1 AS one FROM "products" WHERE "products"."code" = ? LIMIT ?  [["code", "JANW7810"], ["LIMIT", 1]]
+# => true
+```
+
+<aside class="markdown-aside">
+I'm placing this in the "app/models" directory but if you prefer, these kind of models could go in a different directory such as "app/form_objects" if you want to keep them separate from the models backed by a database table. Just remember to update "config.autoload_paths` in "config/application.rb" to include the new directory.
+</aside>
+
+## Service
+
+With the `ProductInventoryForm` model in place, we have all the validation rules needed to replace the nested conditionals that are in the consumer. But in order to tie this all together, we'll also need a service.
+
+WIP...
 
 ## TODO
-* WIP: Introduce idea of service object and ActiveModel for validations...
+* WIP: Introduce idea of service object
 * Tests for model, service, consumer (if post getting too long, just link to demo repo)
 * This is a relatively simple example, imagine there could be more business rules, eg: product could have an active flag, and only should update inventory if product is still active.
 * Link to Karafka gem
@@ -714,6 +823,7 @@ WIP: explanation of ActiveModel
 * Aside you can also run a multi-broker cluster to experiment with partitions and replicas distributed across brokers, point to multiple setup from my course repo (but for this demo, a simple setup will suffice).
 * Better feature image
 * Maybe ref re: service: https://dev.to/isalevine/using-rails-service-objects-to-make-skinny-controllers-and-models-3k9c
+* Maybe mention in this simple example, the attributes in the message correspond neatly with attributes in the `products` table, but a real app would be more complicated, requiring checks and updates across different db tables.b
 
 ### Diagram Mermaid Attempt
 
