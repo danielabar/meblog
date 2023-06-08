@@ -802,9 +802,43 @@ I'm placing this in the "app/models" directory but if you prefer, these kind of 
 
 ## Service
 
-With the `ProductInventoryForm` model in place, we have all the validation rules needed to replace the nested conditionals that are in the consumer. But in order to tie this all together, we'll also need a service.
+With the `ProductInventoryForm` model in place, we have all the validation rules needed to replace the nested conditionals that are in the consumer. The next step is to introduce a service to make use of the model for validity checks, and to do the product updating. Unlike models, views, and controllers, a service is not a built-in Rails concept, but its very useful as a place for organizing business logic.
 
-WIP...
+Create a new directory `app/services` in your project, and add the `UpdateProductInventoryService` class:
+
+```ruby
+# app/services/update_product_inventory_service.rb
+class UpdateProductInventoryService
+  attr_reader :errors, :payload
+
+  # This will be initialized with the message payload from Kafka.
+  def initialize(payload)
+    @payload = payload
+    @errors = []
+  end
+
+  # The `process` method returns true if update succeeded, false otherwise.
+  def process
+    product_inventory_form = ProductInventoryForm.new(payload)
+    if product_inventory_form.valid?
+      update_product(product_inventory_form)
+      true
+    else
+      errors.push(*product_inventory_form.errors.full_messages)
+      false
+    end
+  end
+
+  private
+
+  def update_product(product_inventory_form)
+    product = Product.find_by(code: product_inventory_form.product_code)
+    product.update!(inventory: product_inventory_form.inventory_count)
+  end
+end
+```
+
+WIP explanation...
 
 ## TODO
 * WIP: Introduce idea of service object
