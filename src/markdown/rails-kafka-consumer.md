@@ -270,8 +270,11 @@ The only method that's required to be implemented in your consumer classes is th
 class ProductInventoryConsumer < ApplicationConsumer
   def consume
     messages.each do |message|
-      Rails.logger.info("ProductInventoryConsumer consuming: Topic: #{topic.name}, " \
-      "Message: #{message.payload}, Offset: #{message.offset}")
+      Rails.logger.info(
+        "ProductInventoryConsumer consuming Topic: #{topic.name}, \
+        Message: #{message.payload},\
+        Offset: #{message.offset}"
+      )
     end
   end
 end
@@ -323,7 +326,7 @@ ProductInventoryConsumer consuming: Topic: inventory_management_product_updates,
 When there's a batch of messages ready to be processed, the `consume` method gets invoked with the `messages`, which can be iterated (in our simple case, there's only one message currently). Each of these is an instance of [Karafka::Messages::Message](https://karafka.io/docs/code/karafka/Karafka/Messages/Message.html). When the `payload` method is invoked on the `message` object, Karafka will deserialize it, which converts the raw Kafka message to a format you can work with in your Ruby code. By default, it uses JSON deserialization, which means it assumes the messages are in JSON format, and they will be deserialized into a Ruby hash. This is what's shown in the console output when we log `message.payload`. The Karafka docs have more details about [deserialization](https://karafka.io/docs/Deserialization/).
 
 <aside class="markdown-aside">
-For those keeping count, that's three terminal tabs required to work with this application during development mode: First one to run the Kafka cluster in docker containers, second one to run the Karafka server for consuming messages, and a third one to run a Rails console to produce messages. Later we'll need a fourth one for running tests. If you want to be able to view the output of these all at the same time, a simple way is to use the <a class="markdown-link" href="https://iterm2.com/documentation-one-page.html">Split Panes</a> feature of iTerm or <a class="markdown-link" href="https://github.com/tmux/tmux/wiki">tmux</a> for more advanced features.
+For those keeping count, that's three terminal tabs required to work with this application during development mode: First one to run the Kafka cluster in docker containers, second one to run the Karafka server for consuming messages, and a third one to run a Rails console to produce messages. If you want to be able to view the output of these all at the same time, a simple way is to use the <a class="markdown-link" href="https://iterm2.com/documentation-one-page.html">Split Panes</a> feature of iTerm or <a class="markdown-link" href="https://github.com/tmux/tmux/wiki">tmux</a> for more advanced features.
 </aside>
 
 ## Update Product
@@ -613,7 +616,7 @@ Product NO_SUCH_CODE does not exist
 [ce8640c13bf0] Polling messages...
 ```
 
-While this works, the consumer is starting to get a little messy. And it will continue to get messier more validation rules are enforced. For example, in the e-commerce system, there's a constraint that the inventory count must be greater than zero, recall the product model has:
+While this works, the consumer is starting to get a little messy. And it will continue to get messier as more validation rules are enforced. For example, in the e-commerce system, there's a constraint that the inventory count must be greater than zero, recall the product model has:
 
 ```ruby
 # app/models/product.rb
@@ -804,7 +807,7 @@ I'm placing this in the "app/models" directory but if you prefer, these kind of 
 
 With the `ProductInventoryForm` model in place, we have all the validation rules needed to replace the nested conditionals that are in the consumer. The next step is to introduce a service to make use of the model for validity checks, and to do the product updating. Unlike models, views, and controllers, a service is not a built-in Rails concept, but its very useful as a place for organizing business logic.
 
-Create a new directory `app/services` in your project, and add the `UpdateProductInventoryService` class:
+Create a new directory `app/services` in your project, and add the `UpdateProductInventoryService` class as shown below:
 
 ```ruby
 # app/services/update_product_inventory_service.rb
@@ -817,13 +820,20 @@ class UpdateProductInventoryService
     @errors = []
   end
 
-  # The `process` method returns true if update succeeded, false otherwise.
+  # The `process` method returns true if update succeeded, false otherwise,
+  # with an array of error messages.
   def process
+    # Instantiate the form object with the message payload
     product_inventory_form = ProductInventoryForm.new(payload)
+
+    # If the "form" is valid, update product inventory, and return true.
+    # Otherwise, populate `errors` from form validation messages, and return false.
     if product_inventory_form.valid?
       update_product(product_inventory_form)
       true
     else
+      # Use the splat operator `*` to push each element of the form objects'
+      # validation messages to the service `errors` array.
       errors.push(*product_inventory_form.errors.full_messages)
       false
     end
@@ -831,6 +841,8 @@ class UpdateProductInventoryService
 
   private
 
+  # Update product using `product_code` and `inventory_count` attributes
+  # from the form object.
   def update_product(product_inventory_form)
     product = Product.find_by(code: product_inventory_form.product_code)
     product.update!(inventory: product_inventory_form.inventory_count)
@@ -838,12 +850,43 @@ class UpdateProductInventoryService
 end
 ```
 
-WIP explanation...
+This service is initialized with the message payload from Kafka, which recall, is just a hash, making it easy to test this class outside of having Kafka running. It also initializes an empty `errors` array. The `process` method instantiates a `ProductInventoryForm` with the payload, then checks if the inputs are valid by invoking the `valid?` method on the form object. Recall we saw in the previous section that the `valid?` method will run all the validation rules we defined on the form object.
+
+If the input is valid, it updates the product inventory by looking up the `product_code` from the form object, and updating it with the given `inventory_count` from the form object. If the input is invalid, the service `errors` array is populated with the error messages from the form object, which are available by calling `product_inventory_form.errors.full_messages`.
+
+## Lean Consumer
+
+Now that we have a model for validations, and a service that does the business logic, we can update our consumer to make it "leaner", that is, take on less responsibilities. This will eliminate the complexity warning from Rubocop and make the code easier to read.
+
+In the version shown below, the consumer instantiates the `UpdateProductInventoryService` by passing it the message payload, and then invokes the `process` method on the service. If the `process` method does not return a truthy value, an error message is logged containing all the service error messages:
+
+```ruby
+class ProductInventoryConsumer < ApplicationConsumer
+  def consume
+    messages.each do |message|
+      Rails.logger.info(
+        "ProductInventoryConsumer consuming Topic: #{topic.name}, \
+        Message: #{message.payload},\
+        Offset: #{message.offset}"
+      )
+
+      # Instantiate service by passing in the payload.
+      service = UpdateProductInventoryService.new(message.payload)
+
+      # Call the service `process` method and log error(s) if unsuccessful.
+      Rails.logger.error("ProductInventoryConsumer message invalid: #{service.errors.join(', ')}") unless service.process
+    end
+  end
+end
+```
 
 ## TODO
-* WIP: Introduce idea of service object
 * Tests for model, service, consumer (if post getting too long, just link to demo repo)
+* Summarize responsibilities: Consumer - deal with Kafka things and delegate to service for business logic, Model - deal with validation things, Service - business logic in co-ordination with the model. (or maybe this just goes in the Conclusion para)
+* Decide if messages that fail validation should also go in DLQ or if that's only for unexpected errors such as invalid message format, unable to reach database, etc.
 * This is a relatively simple example, imagine there could be more business rules, eg: product could have an active flag, and only should update inventory if product is still active.
+* Conclusion para
+* Add `=== EXPLANATIONS ===` to log output in "Introduce Karafka" section.
 * Link to Karafka gem
 * Link to faker gem
 * Link to confluent, briefly explain "Kafka as a service"
@@ -858,6 +901,7 @@ WIP explanation...
 * Better feature image
 * Maybe ref re: service: https://dev.to/isalevine/using-rails-service-objects-to-make-skinny-controllers-and-models-3k9c
 * Maybe mention in this simple example, the attributes in the message correspond neatly with attributes in the `products` table, but a real app would be more complicated, requiring checks and updates across different db tables.b
+* Aside: Lots of differing opinions on how to organize business logic in a Rails app, not in scope of this post to discuss pros/cons of each, link some useful refs like https://blog.appsignal.com/2023/05/10/organize-business-logic-in-your-ruby-on-rails-application.html, https://www.aha.io/engineering/articles/organizing-code-in-a-rails-monolith, and/or find youtube RailsConf talk "Your service layer needn't be fancy, it just needs to exist"
 
 ### Diagram Mermaid Attempt
 
