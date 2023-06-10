@@ -29,13 +29,11 @@ We'll be focusing on the Rails side of things. Assume that another team is maint
 }
 ```
 
-These messages will be produced to a Kafka topic named `inventory_management_product_updates`. When integrating Kafka, it's important for the various development teams involved to agree on the topic name(s) and message formats, essentially agreeing on a "contract". This will ensure that the disparate systems can actually communicate with each other as expected.
-
-When it comes to Kafka topic naming conventions, there are many different [opinions](https://cnr.sh/essays/how-paint-bike-shed-kafka-topic-naming-conventions) such as whether to include [version numbers](https://www.kadeck.com/blog/kafka-topic-naming-conventions-5-recommendations-with-examples) or not. It's beyond the scope of this post to cover all of these. If your organization has already established a naming convention, use that.
+These messages will be produced to a Kafka topic named `inventory_management_product_updates`. When integrating Kafka, it's important for the various development teams involved to agree on the topic name(s) and message formats, essentially agreeing on a "contract". This will ensure that the disparate systems can actually communicate with each other as expected. When it comes to Kafka topic naming conventions, there are many different [opinions](https://cnr.sh/essays/how-paint-bike-shed-kafka-topic-naming-conventions) such as whether to include [version numbers](https://www.kadeck.com/blog/kafka-topic-naming-conventions-5-recommendations-with-examples) or not. It's beyond the scope of this post to cover all of these. If your organization has already established a naming convention, use that.
 
 ## Rails Product
 
-The Rails application has a `products` table to store the product name, product code, price, and inventory count:
+The Rails application has a `products` table to store the product name, product code, price, and inventory count. Here is the migration:
 
 ```ruby
 # db/migrate/20230524104551_create_products.rb
@@ -89,7 +87,7 @@ end
 Not critical to this demo, but since the prices are stored as a decimal column in the database, a format method is added to the model, and the inspect method is overridden to use it. This is so when products are displayed in the console for debugging purposes, it will show a price like 47.53 rather than 0.4753e2. Also note that for a real application, the precision and scale would be defined such as decimal(10, 2) but this simple demo is using the default SQLite database which doesn't support specifying these.
 </aside>
 
-In development, the `products` table is populated with seed data, using the faker gem:
+In development, the `products` table is populated with seed data, using the [faker](https://github.com/faker-ruby/faker) gem:
 
 ```ruby
 # db/seeds.rb
@@ -99,17 +97,14 @@ if Rails.env.development?
   Product.destroy_all
 
   20.times do
-    name = Faker::Commerce.product_name
-    code = "#{Faker::Alphanumeric.alpha(number: 4).upcase}#{Faker::Number.number(digits: 4)}"
-    price = Faker::Commerce.price(range: 0..100.0)
-    inventory = rand(0..50)
     Product.create!(
-      name:,
-      code:,
-      price:,
-      inventory:
+      name: Faker::Commerce.product_name,
+      code: "#{Faker::Alphanumeric.alpha(number: 4).upcase}#{Faker::Number.number(digits: 4)}",
+      price: Faker::Commerce.price(range: 0..100.0),
+      inventory: rand(0..50)
     )
   end
+
   puts "Seeding completed!"
 else
   puts "Seeding skipped. Not in development environment."
@@ -196,12 +191,12 @@ karafka_rails_consumer_demo_zookeeper_1   /etc/confluent/docker/run   Up      0.
 ## Introduce Karafka
 
 Now we need to enhance the Rails application so that it can consume messages from the `inventory_management_product_updates` Kafka topic. We're going to use the [Karafka](https://karafka.io/docs/) gem to make the integration relatively easy. Some of the benefits of this gem include:
-* Abstracts complexities of working directly with the Kafka protocol. For example, you don't need to write your own `poll()` loop and manually manage offsets (although you can do the latter if your app needs more control).
+* Abstracts complexities of working directly with the Kafka protocol.
 * Leverages [multithreading](https://karafka.io/docs/Concurrency-and-multithreading/) to achieve concurrency and high performance.
-* Integrates easily with Rails, following [routing](https://karafka.io/docs/Routing/) style conventions, and allowing you to make use of existing business logic in your Rails app such as models and services.
+* Integrates easily with Rails, following [routing](https://karafka.io/docs/Routing/) style conventions.
 * Built in [error handling](https://karafka.io/docs/Dead-Letter-Queue/) and retry logic.
 * Testing utilities that make it easy to write [automated tests](https://karafka.io/docs/Testing/) for consumers and producers.
-* Provides both an open source and pro version if you need even more [advanced features](https://karafka.io/docs/Pro-Features-List/) (similar to the Sidekiq model).
+* Provides both an open source and pro version if you need even more [advanced features](https://karafka.io/docs/Pro-Features-List/).
 
 To get started with Karafka, add the following to the project's `Gemfile` and then run `bundle install`:
 
@@ -252,18 +247,7 @@ end
 For this demo, there's no need to modify the default config block generated by Karafka. Recall the Kafka broker running in a docker container has exposed port 9092 so we'll be able to connect to it. In a real application, you would use an environment variable to specify the location of the bootstrap servers. There are also many more <a href="https://karafka.io/docs/Configuration/" class="markdown-link">configuration options</a> you can explore.
 </aside>
 
-Now let's implement the `ProductInventoryConsumer` class. This is a class that inherits from `ApplicationConsumer`, which was also generated from the karafka installation command and inherits from `Karafka::BaseConsumer`.
-
-```ruby
-# app/consumers/application_consumer.rb
-
-# This file was automatically generated from the karafka installation command
-# Application consumer from which all Karafka consumers should inherit
-class ApplicationConsumer < Karafka::BaseConsumer
-end
-```
-
-The only method that's required to be implemented in your consumer classes is the `consume` method, which will be invoked by Karafka with a batch of messages. For now, we will only log the message payload and offset to confirm messages are being received. The `consume` method also has access to the `topic` so let's log the topic name as well:
+Now let's implement the `ProductInventoryConsumer` class. This is a class that inherits from `ApplicationConsumer`, which was also generated from the karafka installation command and inherits from `Karafka::BaseConsumer`. The only method that's required to be implemented in your consumer classes is the `consume` method, which will be invoked by Karafka with a batch of messages. For now, we will only log the message payload and offset to confirm messages are being received. The `consume` method also has access to the `topic` so let's log the topic name as well:
 
 ```ruby
 # app/consumers/product_inventory_consumer.rb
@@ -298,7 +282,7 @@ See LICENSE and the LGPL-3.0 for licensing details
 ...
 ```
 
-In order to exercise the `ProductInventoryConsumer` code, messages need to be produced to the `inventory_management_product_updates` topic. In production, this will be done by the inventory management system. But for local development, we don't have that system running on our laptops. Fortunately, Karafka can also be used to [produce](https://karafka.io/docs/Components/#producer) messages. Let's try this out by launching a Rails console `bin/rails c` in another terminal tab and then:
+In order to exercise the `ProductInventoryConsumer` code, messages need to be produced to the `inventory_management_product_updates` topic. In production, this will be done by the inventory management system. But for local development, we don't have that system running on our laptops. Fortunately, Karafka can also be used to [produce](https://karafka.io/docs/Components/#producer) messages. Let's try this out by launching a Rails console `bin/rails c` in another terminal tab and then enter the following code:
 
 ```ruby
 # Generate a message with the expected attributes in JSON format:
@@ -319,7 +303,8 @@ After you submit the producer command, keep an eye on the terminal tab running t
 
 ```
 [50b2762f16b2] Consume job for ProductInventoryConsumer on inventory_management_product_updates/0 started
-ProductInventoryConsumer consuming: Topic: inventory_management_product_updates, Message: {"product_code"=>"JANW7810", "inventory_count"=>10}, Offset: 0
+ProductInventoryConsumer consuming: Topic: inventory_management_product_updates,
+  Message: {"product_code"=>"JANW7810", "inventory_count"=>10}, Offset: 0
 [50b2762f16b2] Consume job for ProductInventoryConsumer on inventory_management_product_updates/0 finished in 345.4149999995716ms
 ```
 
@@ -454,6 +439,8 @@ Consumer consuming error: undefined method `update!' for nil:NilClass
 What's happening is that `nil` is returned from the `find_by` method, then it errors out attempting to call the `update!` method on the `nil` return:
 
 ```ruby
+# app/consumers/product_inventory_consumer.rb
+
 # This line returns `nil` when called with `code: "NO-SUCH-CODE"`
 product = Product.find_by(code: payload["product_code"])
 
@@ -572,7 +559,7 @@ The other issue with this approach is there's some wasted processing with the re
 
 ## Validation in Consumer
 
-As a first attempt at making the code more resilient, we could modify the consumer to first check if the product exists, before attempting an update, otherwise log an error and manually dispatch to the dead letter queue:
+As a first attempt at making the code more resilient, we could modify the consumer to first check if the product exists, before attempting an update, otherwise log an error and manually dispatch to the dead letter queue (Karafka will only automatically produce a message to the DLQ when an exception is raised):
 
 ```ruby
 class ProductInventoryConsumer < ApplicationConsumer
@@ -672,19 +659,15 @@ One way to resolve this is to break up the `consume` method into smaller methods
 The real issue here is that the Kafka consumer as currently written, is taking on too many responsibilities. These include:
 1. Deserializing the message payloads received from the broker.
 2. Implementing business rules with validation on the message payload.
-3. Implementing business logic in updating the product inventory count (a simple one model update in this example, but could be more involved in a real app).
+3. Implementing business logic in updating the product inventory count.
 4. Producing new messages to the dead letter queue topic in case of validation errors.
 
 A useful way of thinking about this is to compare the consumer to a Rails controller. With a controller, its responsibilities should be limited to handling http requests and responses, while business logic should be delegated to services and/or models. This makes testing of business logic easier because its isolated from the complexity of http request and response handling.
 
-Applying this way of thinking to a consumer, we can say that it should only be concerned with Kafka-specific things such as communicating with the broker to consume and produce messages, and deserializing and serializing message payloads. Everything else should be handled by services and/or models.
-
-To simplify the consumer, we will apply two concepts:
+Applying this way of thinking to a consumer, we can say that it should only be concerned with Kafka-specific things such as communicating with the broker to consume and produce messages, and deserializing and serializing message payloads. To simplify the consumer, we will apply two concepts:
 
 1. A model, initialized with the message payload hash, to perform all business rule validations.
 2. A service to check if the model is valid, and only perform the business logic update if the model is valid.
-
-The next sections will walk through the refactor.
 
 ## Model
 
@@ -854,11 +837,18 @@ This service is initialized with the message payload from Kafka, which recall, i
 
 If the input is valid, it updates the product inventory by looking up the `product_code` from the form object, and updating it with the given `inventory_count` from the form object. If the input is invalid, the service `errors` array is populated with the error messages from the form object, which are available by calling `product_inventory_form.errors.full_messages`.
 
+Remember to tell Rails that this new directory should be auto loaded by adding the following to your configuration:
+
+```ruby
+# config/application.rb
+config.autoload_paths << Rails.root.join("services")
+```
+
 ## Lean Consumer
 
-Now that we have a model for validations, and a service that does the business logic, we can update our consumer to make it "leaner", that is, take on less responsibilities. This will eliminate the complexity warning from Rubocop and make the code easier to read.
+Now that we have a model for validations, and a service that does the business logic, we can update our consumer to make it "leaner", that is, take on less responsibilities. This will eliminate the complexity warning from Rubocop and make the code more maintainable.
 
-In the version shown below, the consumer instantiates the `UpdateProductInventoryService` by passing it the message payload, and then invokes the `process` method on the service. If the `process` method does not return a truthy value, an error message is logged containing all the service error messages:
+In the version shown below, the consumer instantiates the `UpdateProductInventoryService` by passing it the message payload, and then invokes the `process` method on the service. If the `process` method does not return a truthy value, an error message is logged containing all the service error messages and the message is moved to the dead letter queue:
 
 ```ruby
 class ProductInventoryConsumer < ApplicationConsumer
@@ -874,65 +864,33 @@ class ProductInventoryConsumer < ApplicationConsumer
       service = UpdateProductInventoryService.new(message.payload)
 
       # Call the service `process` method and log error(s) if unsuccessful.
-      Rails.logger.error("ProductInventoryConsumer message invalid: #{service.errors.join(', ')}") unless service.process
+      unless service.process
+        Rails.logger.error("ProductInventoryConsumer message invalid: #{service.errors.join(', ')}")
+        dispatch_to_dlq(message)
+      end
     end
   end
 end
 ```
 
+## Conclusion
+
+This post has covered a technique for integrating Kafka into a Rails application using the Karafka gem. We learned how to avoid complexity in the consumer by limiting its responsibilities to communicating with Kafka, while introducing a model for validations, and a service for business logic. This makes each component easier to read and test. This post got quite lengthy so I'm not including the tests here, but you can view the fully working demo project including tests on [Github](https://github.com/danielabar/karafka_rails_consumer_demo).
+
+
 ## TODO
-* Tests for model, service, consumer (if post getting too long, just link to demo repo)
-* Summarize responsibilities: Consumer - deal with Kafka things and delegate to service for business logic, Model - deal with validation things, Service - business logic in co-ordination with the model. (or maybe this just goes in the Conclusion para)
-* Decide if messages that fail validation should also go in DLQ or if that's only for unexpected errors such as invalid message format, unable to reach database, etc.
+* Add consumer test in demo project
+* Shorten model section - present the final code with all validations at once
 * This is a relatively simple example, imagine there could be more business rules, eg: product could have an active flag, and only should update inventory if product is still active.
-* Conclusion para
 * Add `=== EXPLANATIONS ===` to log output in "Introduce Karafka" section.
-* Link to Karafka gem
-* Link to faker gem
 * Link to confluent, briefly explain "Kafka as a service"
 * Aside/assumption basic knowledge of Rails and Kafka
 * Inventory info is updated based on business events -> makes it a good fit to integrate with Kafka, which is designed for event-driven systems.
 * Sometimes get large bursts of inventory events, useful to have these persisted in a Kafka topic, and the Rails app, via a Kafka consumer will process these when it can -> i.e. don't have to worry about lost messages like you would the a service oriented REST solution.
-* WIP: Simple diagram showing legacy inventory system, produces inventory messages to Kafka topic, consumed by the Rails e-commerce app. Maybe https://mermaid.js.org/syntax/c4c.html and https://plantuml.com/component-diagram ?
-* Link to demo app on Github
 * Maybe mention schema validation as an aside? Can prevent some issues but still good to have resiliency on the consumer application.
 * Mention just barely scratched the surface of what can be done with kafka and karafka, link to docs for more advanced use cases.
 * Aside you can also run a multi-broker cluster to experiment with partitions and replicas distributed across brokers, point to multiple setup from my course repo (but for this demo, a simple setup will suffice).
 * Better feature image
 * Maybe ref re: service: https://dev.to/isalevine/using-rails-service-objects-to-make-skinny-controllers-and-models-3k9c
 * Maybe mention in this simple example, the attributes in the message correspond neatly with attributes in the `products` table, but a real app would be more complicated, requiring checks and updates across different db tables.b
-* Aside: Lots of differing opinions on how to organize business logic in a Rails app, not in scope of this post to discuss pros/cons of each, link some useful refs like https://blog.appsignal.com/2023/05/10/organize-business-logic-in-your-ruby-on-rails-application.html, https://www.aha.io/engineering/articles/organizing-code-in-a-rails-monolith, and/or find youtube RailsConf talk "Your service layer needn't be fancy, it just needs to exist"
-
-### Diagram Mermaid Attempt
-
-[Known unresolved issue](https://github.com/mermaid-js/mermaid/issues/3221) arrow text overlaps arrows and boxes
-
-[Try offsets in styles](https://github.com/mermaid-js/mermaid/blob/develop/demos/c4context.html)
-
-[Draw C4 Shape Source](https://github.com/mermaid-js/mermaid/blob/1b40f552b20df4ab99a986dd58c9d254b3bfd7bc/packages/mermaid/src/diagrams/c4/svgDraw.js#L195)
-
-[![](https://mermaid.ink/img/pako:eNqNU19vmzAQ_yqW1YdMohkQkgDa9pAsD1EbZSKa1FZIkwsHsQI2sk1XFuW7zyYlAa2T6qfz6ffnfHc-4oSngEO89JacKXhVMUPtUVQVgHSSQaIoy9GukQpKiV4oQXckO5AOudI8UQkq4deC1ywlohk92xaK8T3kJGli_AkdOzB60xmtNzsDWbMXYIqLBm0IIzmU-hZjC93wLJOgHr7G2LHbo2U6kVMXXPwOmRE7l_Wu3SLa3q0iA1oIfgDRU7tgnrZbA3jiGgDVAPOvoyC0kAYemeB909VyuzGQ1e2SlyWIBIaSXRhBce7Htcofgqd1AvLLs0Cfv21ASt0c2aP_rFKiQDN3qilgSO8179a1e-18NBknMNX2vc91Xs311GVdftx8yP-I-8V-QU0BHfVtAruGJf93G4D7ZpNJT3pIvicNr5V-V0bz0U3i7fakgjWL-G-zYG2NidfNtssbOWxhPbiS0FR_knbCMVZ7vaYxDnVY0Hyv9zVmJw0kteKmdBwqUYOF69b6OyW5ICUOM1JInYWU6n3fnL9d-_ssXBGmt-6K0XccHvErDl03GHtB4E2mru86juO6Fm502p-MPX_u-kFgz2ZTfz47WfhPK2GPfS-YOfZ06s6DqaeZp78mdiax?type=png)](https://mermaid.live/edit#pako:eNqNU19vmzAQ_yqW1YdMohkQkgDa9pAsD1EbZSKa1FZIkwsHsQI2sk1XFuW7zyYlAa2T6qfz6ffnfHc-4oSngEO89JacKXhVMUPtUVQVgHSSQaIoy9GukQpKiV4oQXckO5AOudI8UQkq4deC1ywlohk92xaK8T3kJGli_AkdOzB60xmtNzsDWbMXYIqLBm0IIzmU-hZjC93wLJOgHr7G2LHbo2U6kVMXXPwOmRE7l_Wu3SLa3q0iA1oIfgDRU7tgnrZbA3jiGgDVAPOvoyC0kAYemeB909VyuzGQ1e2SlyWIBIaSXRhBce7Htcofgqd1AvLLs0Cfv21ASt0c2aP_rFKiQDN3qilgSO8179a1e-18NBknMNX2vc91Xs311GVdftx8yP-I-8V-QU0BHfVtAruGJf93G4D7ZpNJT3pIvicNr5V-V0bz0U3i7fakgjWL-G-zYG2NidfNtssbOWxhPbiS0FR_knbCMVZ7vaYxDnVY0Hyv9zVmJw0kteKmdBwqUYOF69b6OyW5ICUOM1JInYWU6n3fnL9d-_ssXBGmt-6K0XccHvErDl03GHtB4E2mru86juO6Fm502p-MPX_u-kFgz2ZTfz47WfhPK2GPfS-YOfZ06s6DqaeZp78mdiax)
-
-```
-C4Context
-title Connecting Systems via Kafka
-Enterprise_Boundary(b0, "Legacy") {
-  System(IMS, "Inventory Management", $offsetX="1000000")
-}
-Boundary(kf, "Kafka") {
-  System(BROKER, "Broker")
-  System(ZOO, "Zookeeper")
-}
-Boundary(rails, "Rails") {
-  System(ECOM, "E-Commerce")
-}
-
-Rel(IMS, BROKER, "Produces<br />Messages")
-UpdateRelStyle(IMS, BROKER, $offsetX="-20", $offsetY="-19")
-Rel(ECOM, BROKER, "Consumes<br />Messages")
-UpdateRelStyle(ECOM, BROKER, $offsetX="-20", $offsetY="-19")
-BiRel(BROKER, ZOO, "Sync")
-UpdateRelStyle(BROKER, ZOO, $offsetX="-33")
-
-UpdateLayoutConfig($c4ShapeInRow="1", $c4BoundaryInRow="3")
-```
+* Aside: Lots of differing opinions on how to organize business logic in a Rails app, not in scope of this post to discuss pros/cons of each, link some useful refs like https://blog.appsignal.com/2023/05/10/organize-business-logic-in-your-ruby-on-rails-application.html, https://www.aha.io/engineering/articles/organizing-code-in-a-rails-monolith, and/or find youtube RailsConf talk "Your service layer needn't be fancy, it just needs to exist": https://youtu.be/CRboMkFdZfg
