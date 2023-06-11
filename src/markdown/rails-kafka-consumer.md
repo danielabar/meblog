@@ -12,7 +12,13 @@ related:
 
 This post will walk through how to integrate a Kafka consumer into a Rails application in a maintainable and testable way. Why would you need to do this? Consider the following scenario: You're working on an e-commerce system that has been developed with Rails. You'd like to enhance the product details page to show whether the current product is in stock, out of stock, or only has small number of items left (eg: "Only 3 left in stock!"). The inventory information comes from a legacy inventory management system that has been written in a different programming language. This legacy system is responsible for updating the inventory count based on events, such as product purchases, returns, or stock replenishments.
 
-In order to display this inventory information in the Rails e-commerce app, it needs the ability to communicate with the legacy inventory system. There are many [solutions](https://en.wikipedia.org/wiki/Enterprise_Integration_Patterns) for enabling different systems to communicate, each with tradeoffs to consider. For this post, I will show you how Kafka can be used to solve this problem. Apache Kafka is a distributed streaming platform that enables high-throughput, fault-tolerant, and real-time event data streaming for building scalable and event-driven applications.
+In order to display this inventory information in the Rails e-commerce app, it needs the ability to communicate with the legacy inventory system. There are many [solutions](https://en.wikipedia.org/wiki/Enterprise_Integration_Patterns) for enabling different systems to communicate, each with tradeoffs to consider. For this post, I will show you how [Apache Kafka](https://kafka.apache.org/) can be used to solve this problem. Kafka is a distributed streaming platform that enables high-throughput, fault-tolerant, and real-time event data streaming for building scalable and event-driven applications.
+
+Given that the inventory information is updated based on business events, this makes it a good fit to integrate with Kafka, which is designed for event-driven systems. Using Kafka will make the integration between the legacy and e-commerce system more tolerant to large bursts of inventory events, whereas a REST/HTTP based integration might be prone to information loss in the case of temporary network or database outages.
+
+<aside class="markdown-aside">
+This post assumes some basic knowledge of Rails (models and controllers), Kafka (producers, consumers, topics), and Docker (just enough to run a docker compose file). Looking to level up on any of these topics? Check out this guide on <a class="markdown-link" href="https://www.akshaykhot.com/books-to-learn-ruby-and-rails/">books for learning Rails</a>, an introductory Kafka <a class="markdown-link" href="https://developer.confluent.io/what-is-apache-kafka/">tutorial</a>, and Docker <a class="markdown-link" href="https://docs.docker.com/get-started/">getting started</a>.
+</aside>
 
 ## Big Picture
 
@@ -29,7 +35,11 @@ We'll be focusing on the Rails side of things. Assume that another team is maint
 }
 ```
 
-These messages will be produced to a Kafka topic named `inventory_management_product_updates`. When integrating Kafka, it's important for the various development teams involved to agree on the topic name(s) and message formats, essentially agreeing on a "contract". This will ensure that the disparate systems can actually communicate with each other as expected. When it comes to Kafka topic naming conventions, there are many different [opinions](https://cnr.sh/essays/how-paint-bike-shed-kafka-topic-naming-conventions) such as whether to include [version numbers](https://www.kadeck.com/blog/kafka-topic-naming-conventions-5-recommendations-with-examples) or not. It's beyond the scope of this post to cover all of these. If your organization has already established a naming convention, use that.
+These messages will be produced to a Kafka topic named `inventory_management_product_updates`. When integrating Kafka, it's important for the various development teams involved to agree on the topic name(s) and message formats, essentially agreeing on a "contract". This will ensure that the disparate systems can actually communicate with each other as expected.
+
+<aside class="markdown-aside">
+When it comes to Kafka topic naming conventions, there are many different <a class="markdown-link" href="https://cnr.sh/essays/how-paint-bike-shed-kafka-topic-naming-conventions">opinions</a> such as whether to include <a class="markdown-link" href="https://www.kadeck.com/blog/kafka-topic-naming-conventions-5-recommendations-with-examples">version numbers</a> or not. It's beyond the scope of this post to cover all of these. If your organization has already established a naming convention, use that.
+</aside>
 
 ## Rails Product
 
@@ -95,7 +105,6 @@ require "faker"
 
 if Rails.env.development?
   Product.destroy_all
-
   20.times do
     Product.create!(
       name: Faker::Commerce.product_name,
@@ -104,8 +113,6 @@ if Rails.env.development?
       inventory: rand(0..50)
     )
   end
-
-  puts "Seeding completed!"
 else
   puts "Seeding skipped. Not in development environment."
 end
@@ -122,7 +129,7 @@ Here are some example products:
 
 ## Install Kafka
 
-Even though we'll be focused on consuming messages in the Rails application, we're going to also need to produce messages to try it out. This means we'll need access to a Kafka cluster, which includes one or more brokers, and Zookeeper to manage the cluster. While you could point to a shared cluster if your organization manages their own or uses Confluent, I prefer to think of this similar to a database. In the same way that every developer working on a Rails application has their own local database installed, Kafka is also a kind of database (specifically, a raw, distributed database). It could get messy if all developers are pointing to a shared cluster, producing test messages that end up getting consumed by other developers running their own tests. It's also useful to have it installed locally for learning and experimentation, otherwise you would have to pay for hosting it somewhere or using a service like Confluent.
+Even though we'll be focused on consuming messages in the Rails application, we're going to also need to produce messages to try it out. This means we'll need access to a Kafka cluster, which includes one or more brokers, and Zookeeper to manage the cluster. While you could point to a shared cluster if your organization manages their own or uses [Confluent](https://www.confluent.io/) (Kafka as a service), I prefer to think of this similar to a database. In the same way that every developer working on a Rails application has their own local database installed, Kafka is also a kind of database (specifically, a raw, distributed database). It could get messy if all developers are pointing to a shared cluster, producing test messages that end up getting consumed by other developers running their own tests. It's also useful to have it installed locally for learning and experimentation, otherwise you would have to pay for hosting it somewhere or using a service like Confluent.
 
 The easiest way to set up a Kafka cluster locally is with Docker and docker-compose. Confluent provides these images for free in their [cp-all-in-one](https://github.com/confluentinc/cp-all-in-one) repository. We actually only need to run two containers locally for a minimal cluster - one broker, and one zookeeper instance. Add the following `docker-compose.yml` file to the root of the project:
 
@@ -188,7 +195,11 @@ karafka_rails_consumer_demo_broker_1      /etc/confluent/docker/run   Up      0.
 karafka_rails_consumer_demo_zookeeper_1   /etc/confluent/docker/run   Up      0.0.0.0:2181->2181/tcp, 2888/tcp, 3888/tcp
 ```
 
-## Introduce Karafka
+<aside class="markdown-aside">
+This tutorial is intentionally using just a single broker to keep the Kafka side simple. A real application would have multiple brokers with topics distributed and replicated across them for scalability and fault-tolerance. See this example <a class="markdown-link" href="https://github.com/danielabar/kafka-getting-started-pluralsight/blob/main/docker-compose-multiple.yml">docker-compose file</a> for a more advanced setup and a <a class="markdown-link" href="https://github.com/danielabar/kafka-getting-started-pluralsight#demo-fault-tolerance-and-resiliency">demo</a> of how to use it.
+</aside>
+
+## Install Karafka
 
 Now we need to enhance the Rails application so that it can consume messages from the `inventory_management_product_updates` Kafka topic. We're going to use the [Karafka](https://karafka.io/docs/) gem to make the integration relatively easy. Some of the benefits of this gem include:
 * Abstracts complexities of working directly with the Kafka protocol.
@@ -299,12 +310,17 @@ Karafka.producer.produce_async(topic: 'inventory_management_product_updates', pa
 # => #<Rdkafka::Producer::DeliveryHandle:0x0000000114198588>
 ```
 
-After you submit the producer command, keep an eye on the terminal tab running the Karafka server, you should see some output indicating the message has been consumed from topic `inventory_management_product_updates` and offset `0`:
+After you submit the producer command, keep an eye on the terminal tab running the Karafka server, you should see some output indicating the message has been consumed from topic `inventory_management_product_updates` and offset `0`. I've added some `=== EXPLANATIONS ===`:
 
 ```
+=== KARAFKA LOGGING WHEN CONSUMER STARTS PROCESSING ===
 [50b2762f16b2] Consume job for ProductInventoryConsumer on inventory_management_product_updates/0 started
+
+=== CONSUMER INFO LEVEL LOGGING ===
 ProductInventoryConsumer consuming: Topic: inventory_management_product_updates,
   Message: {"product_code"=>"JANW7810", "inventory_count"=>10}, Offset: 0
+
+=== KARAFKA LOGGING WHEN CONSUMER FINISHES PROCESSING ===
 [50b2762f16b2] Consume job for ProductInventoryConsumer on inventory_management_product_updates/0 finished in 345.4149999995716ms
 ```
 
@@ -380,7 +396,10 @@ Karafka.producer.produce_async(topic: 'inventory_management_product_updates', pa
 Now keep an eye on the tab that's running the karafka server (that's our consumer polling for messages), it should receive this message and show that the product inventory has been updated:
 
 ```
+=== KARAFKA LOGGING WHEN CONSUMER STARTS PROCESSING ===
 [d886a13043fd] Consume job for ProductInventoryConsumer on inventory_management_product_updates/0 started
+
+=== RAILS DEV LOGGING FROM FINDING AND UPDATING PRODUCT ===
   Product Load (0.9ms)  SELECT "products".* FROM "products"
   WHERE "products"."code" = ? LIMIT ?  [["code", "JANW7810"], ["LIMIT", 1]]
   ↳ app/consumers/product_inventory_consumer.rb:5:in `block in consume'
@@ -391,6 +410,8 @@ Now keep an eye on the tab that's running the karafka server (that's our consume
   ↳ app/consumers/product_inventory_consumer.rb:6:in `block in consume'
   TRANSACTION (2.1ms)  commit transaction
   ↳ app/consumers/product_inventory_consumer.rb:6:in `block in consume'
+
+=== KARAFKA LOGGING WHEN CONSUMER FINISHES PROCESSING ===
 [d886a13043fd] Consume job for ProductInventoryConsumer on inventory_management_product_updates/0 finished in 23.927999999839813ms
 ```
 
@@ -401,7 +422,7 @@ Product.first.inventory
 # 123
 ```
 
-Great it's working! But we're not quite ready to ship...
+Great it's working, let's ship it! Not so fast...
 
 ## What Could Go Wrong?
 
@@ -409,7 +430,7 @@ In the previous section, we saw the happy path working. Now its time to think of
 
 ![what could possibly go wrong](../images/what-could-possibly-go-wrong.jpeg "what could possibly go wrong")
 
-For example, what if the inventory system sends a product code that the Rails e-commerce system doesn't have in its records? This could happen if the legacy system also manages in-store products that are not sold online, or maybe its just buggy and no one quite understands how it works. Let's simulate this situation by producing a message in the Rails console for a non existing product code:
+For example, what if the inventory system sends a product code that the Rails e-commerce system doesn't have in its records? This could happen if the legacy system also manages in-store products that are not sold online, or maybe its buggy and no one quite understands how it works. Let's simulate this situation by producing a message in the Rails console for a non existing product code:
 
 ```ruby
 message = {
@@ -652,7 +673,11 @@ Method has too many lines. [15/10]
 
 While one could debate the max method length rule (default value is 10, perhaps 15 is reasonable), the complexity warning should not be ignored. The Rubocop [Abc rule](https://docs.rubocop.org/rubocop/cops_metrics.html#metricsabcsize) calculates the complexity of a method by considering the number of assignments (A), branches (B), aka method calls, and conditions (C) and comparing it to a maximum threshold. In this case, it's calculated a score of `17.35` which exceeds the default threshold of `17`.
 
-One way to resolve this is to break up the `consume` method into smaller methods, for example, the validation and error handling could be extracted as separate methods. But this is just a simple example, for a real production application, there could be many more rules, and more logic involved in performing the update, which would continue to increase the complexity.
+One way to resolve this is to break up the `consume` method into smaller methods, for example, the validation and error handling could be extracted as separate methods. But this is just a simple example. A real application could be many more rules. For example, the e-commerce system could have a concept of active vs inactive products where only the active ones should have their inventory updated.
+
+<aside class="markdown-aside">
+Another technique that can help with some validation issues when using Kafka is a <a class="markdown-link" href="https://docs.confluent.io/platform/current/schema-registry/index.html">schema registry</a>, although you will probably still want some business level validation in the application. This is an advanced topic that won't be covered in this post.
+</aside>
 
 ## Too Much Responsibility
 
@@ -875,21 +900,13 @@ end
 
 ## Conclusion
 
-This post has covered a technique for integrating Kafka into a Rails application using the Karafka gem. We learned how to avoid complexity in the consumer by limiting its responsibilities to communicating with Kafka, while introducing a model for validations, and a service for business logic. This makes each component easier to read and test. This post got quite lengthy so I'm not including the tests here, but you can view the fully working demo project including tests on [Github](https://github.com/danielabar/karafka_rails_consumer_demo).
+This post has covered a technique for integrating Kafka into a Rails application using the Karafka gem. We learned how to avoid complexity in the consumer by limiting its responsibilities to communicating with Kafka, while introducing a model for validations, and a service for business logic. This makes each component easier to maintain. This post got quite lengthy so I'm not including the tests here, but you can view the fully working demo project including tests on [Github](https://github.com/danielabar/karafka_rails_consumer_demo).
 
 
 ## TODO
 * Add consumer test in demo project
 * Shorten model section - present the final code with all validations at once
-* This is a relatively simple example, imagine there could be more business rules, eg: product could have an active flag, and only should update inventory if product is still active.
-* Add `=== EXPLANATIONS ===` to log output in "Introduce Karafka" section.
-* Link to confluent, briefly explain "Kafka as a service"
-* Aside/assumption basic knowledge of Rails and Kafka
-* Inventory info is updated based on business events -> makes it a good fit to integrate with Kafka, which is designed for event-driven systems.
-* Sometimes get large bursts of inventory events, useful to have these persisted in a Kafka topic, and the Rails app, via a Kafka consumer will process these when it can -> i.e. don't have to worry about lost messages like you would the a service oriented REST solution.
-* Maybe mention schema validation as an aside? Can prevent some issues but still good to have resiliency on the consumer application.
 * Mention just barely scratched the surface of what can be done with kafka and karafka, link to docs for more advanced use cases.
-* Aside you can also run a multi-broker cluster to experiment with partitions and replicas distributed across brokers, point to multiple setup from my course repo (but for this demo, a simple setup will suffice).
 * Better feature image
 * Maybe ref re: service: https://dev.to/isalevine/using-rails-service-objects-to-make-skinny-controllers-and-models-3k9c
 * Maybe mention in this simple example, the attributes in the message correspond neatly with attributes in the `products` table, but a real app would be more complicated, requiring checks and updates across different db tables.b
