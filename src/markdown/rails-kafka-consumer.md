@@ -1,6 +1,6 @@
 ---
 title: "Add a Kafka Consumer to Rails"
-featuredImage: "../images/rails-kafka-consumer-tom-grunbauer-8_9Rix4OvrM-unsplash.jpg"
+featuredImage: "../images/rails-kafka-consumer-multiple-trains-tracks.jpeg"
 description: "Learn how to integrate a Kafka consumer into a Rails application"
 date: "2023-10-01"
 category: "rails"
@@ -709,52 +709,9 @@ class SomeModel < ApplicationRecord
 end
 ```
 
-These validation macros are very useful, and could help us clean up the consumer code by providing a model class whose sole responsibility is to indicate whether the message payload is valid, and if its not, list the error messages indicating what's wrong with it. But we don't have a database table specifically for the messages coming from Kafka and it would be overkill to create one. Fortunately, Rails has a solution for this. The [ActiveModel::Model](https://guides.rubyonrails.org/active_model_basics.html) module can be included in any class. It provides a way to create model-like objects that have many of the same features as traditional Rails models, but are not necessarily backed by a database table.
+These validation macros are very useful, and could help us clean up the consumer code by providing a model class whose sole responsibility is to indicate whether the message payload is valid, and if its not, list the error messages indicating what's wrong with it. But we don't have a database table specifically for the messages coming from Kafka and it would be overkill to create one. Fortunately, Rails has a solution for this. The [ActiveModel::Model](https://guides.rubyonrails.org/active_model_basics.html) module can be included in any class. It provides a way to create model-like objects that have many of the same features as traditional Rails models, but are not backed by a database table.
 
-This new model will be named `ProductInventoryForm`. There's no strict naming convention on these, but the `Form` part of the name indicates that instances of this class are used to temporarily collect input data. To start, include `ActiveModel::Model`, define the attributes from the Kafka message `product_code` and `inventory_count`, and specify some validation using the `validates` macro:
-
-```ruby
-# app/models/product_inventory_form.rb
-class ProductInventoryForm
-  include ActiveModel::Model
-
-  attr_accessor :product_code, :inventory_count
-
-  validates :product_code, presence: true
-  validates :inventory_count, presence: true, numericality: { only_integer: true, greater_than_or_equal_to: 0 }
-end
-```
-
-Let's launch a Rails console (`bin/rails c`) to experiment with this model:
-
-```ruby
-# Instantiate an empty model
-product_form = ProductInventoryForm.new
-
-# Including ActiveModel::Model exposes the `valid?` method
-product_form.valid?
-# => false
-
-# We can also access the error messages
-product_form.errors.full_messages
-# => [
-#      "Product code can't be blank",
-#      "Inventory count can't be blank",
-#      "Inventory count is not a number"
-#    ]
-
-# Instantiate a model with a hash to populate the attributes
-product_form = ProductInventoryForm.new({product_code: "FOO", inventory_count: 10})
-# > #<ProductInventoryForm:0x0000000115a44ac8 @inventory_count=10, @product_code="FOO">
-
-# This time the model is valid because we've provided a product code and inventory count
-product_form.valid?
-# => true
-product_form.errors.full_messages
-# => []
-```
-
-The above examples show that we can use the `ProductInventoryForm` model to perform as many validations as we need on the attributes, using the familiar pattern of Rails ActiveRecord models. But you may have noticed that the model is currently considered valid for any non-nil `product_code`. Let's fix that to require that the `product_code` must actually exist in the database. We can do this by using the `validate` macro to define a method `product_exists?` that will perform some custom validation:
+This new model will be named `ProductInventoryForm`. There's no naming convention on these, but the `Form` part of the name indicates that instances of this class are used to temporarily collect input data. Here is the model class, which includes `ActiveModel::Model`, defines attributes from the Kafka message `product_code` and `inventory_count`, and specifies validation using the `validates` and `validate` macros:
 
 ```ruby
 # app/models/product_inventory_form.rb
@@ -779,32 +736,56 @@ class ProductInventoryForm
 end
 ```
 
-With this in place, run `reload!` in the Rails console, and try to instantiate both an invalid and valid product form:
+Let's launch a Rails console (`bin/rails c`) to experiment with this model:
 
 ```ruby
+# Instantiate an empty model
+product_form = ProductInventoryForm.new
+
+# Including ActiveModel::Model exposes the `valid?` method
+product_form.valid?
+# => false
+
+# We can also access the error messages
+product_form.errors.full_messages
+# => [
+#      "Product code can't be blank",
+#      "Inventory count can't be blank",
+#      "Inventory count is not a number"
+#    ]
+
+# Instantiate a model with a hash to populate the attributes
 # This should be considered invalid because
 # product code does not exist and inventory is negative:
 product_form = ProductInventoryForm.new({product_code: "FOO", inventory_count: -5})
 => #<ProductInventoryForm:0x000000010e7f93d8 @inventory_count=-5, @product_code="FOO">
 
-# Run the validation rules. This time it also runs a query against the
+# Run the validation rules. It runs a query against the
 # products table due to the custom `product_exists?` validation.
 product_form.valid?
-# Product Exists? (0.4ms)  SELECT 1 AS one FROM "products" WHERE "products"."code" = ? LIMIT ?  [["code", "FOO"], ["LIMIT", 1]]
+# Product Exists? (0.4ms)  SELECT 1 AS one FROM "products"
+#   WHERE "products"."code" = ? LIMIT ?  [["code", "FOO"], ["LIMIT", 1]]
 # => false
 
 # Check the error messages
 product_form.errors.full_messages
-# => ["Inventory count must be greater than or equal to 0", "Product code FOO does not exist"]
+# => [
+#     "Inventory count must be greater than or equal to 0",
+#     "Product code FOO does not exist"
+#   ]
 
 # Build a valid model: code exists and inventory count positive
 product_form = ProductInventoryForm.new({product_code: Product.first.code, inventory_count: 15})
 # => #<ProductInventoryForm:0x0000000110761540 @inventory_count=15, @product_code="JANW7810">
 
-# This time, the product code exists so the model is valid
+# This time, the product code exists so the model is valid,
+# and no error messages are populated.
 product_form.valid?
-# Product Exists? (0.3ms)  SELECT 1 AS one FROM "products" WHERE "products"."code" = ? LIMIT ?  [["code", "JANW7810"], ["LIMIT", 1]]
+# Product Exists? (0.3ms)  SELECT 1 AS one FROM "products"
+#   WHERE "products"."code" = ? LIMIT ?  [["code", "JANW7810"], ["LIMIT", 1]]
 # => true
+product_form.errors.full_messages
+# []
 ```
 
 <aside class="markdown-aside">
@@ -904,10 +885,16 @@ This post has covered a technique for integrating Kafka into a Rails application
 
 
 ## TODO
-* Add consumer test in demo project
-* Shorten model section - present the final code with all validations at once
 * Mention just barely scratched the surface of what can be done with kafka and karafka, link to docs for more advanced use cases.
-* Better feature image
 * Maybe ref re: service: https://dev.to/isalevine/using-rails-service-objects-to-make-skinny-controllers-and-models-3k9c
 * Maybe mention in this simple example, the attributes in the message correspond neatly with attributes in the `products` table, but a real app would be more complicated, requiring checks and updates across different db tables.b
 * Aside: Lots of differing opinions on how to organize business logic in a Rails app, not in scope of this post to discuss pros/cons of each, link some useful refs like https://blog.appsignal.com/2023/05/10/organize-business-logic-in-your-ruby-on-rails-application.html, https://www.aha.io/engineering/articles/organizing-code-in-a-rails-monolith, and/or find youtube RailsConf talk "Your service layer needn't be fancy, it just needs to exist": https://youtu.be/CRboMkFdZfg
+* Somewhere around error handling, mention this block in `karafka.rb` to log error and stacktrace for unexpected errors (i.e. non-validation errors):
+  ```ruby
+  Karafka.monitor.subscribe "error.occurred" do |event|
+    e = event[:error]
+    Rails.logger.error("ProductInventoryConsumer failed: #{e.message}\n#{e.backtrace.join("\n")}")
+    # Or whatever error monitoring service Airbrake, Rollbar, etc.
+    # Sentry.capture_exception(event[:error])
+  end
+  ```
