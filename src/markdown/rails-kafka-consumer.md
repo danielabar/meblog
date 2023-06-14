@@ -426,9 +426,9 @@ Great it's working, let's ship it! Not so fast...
 
 ## What Could Go Wrong?
 
-In the previous section, we saw the happy path working. Now its time to think of things that could go wrong.
+In the previous section, we saw the happy path working. Now its time to think: What could possibly go wrong?
 
-![what could possibly go wrong](../images/what-could-possibly-go-wrong.jpeg "what could possibly go wrong")
+![what could possibly go wrong](../images/what-could-go-wrong-fork-in-toaster.jpeg "what could possibly go wrong")
 
 For example, what if the inventory system sends a product code that the Rails e-commerce system doesn't have in its records? This could happen if the legacy system also manages in-store products that are not sold online, or maybe its buggy and no one quite understands how it works. Let's simulate this situation by producing a message in the Rails console for a non existing product code:
 
@@ -574,7 +574,34 @@ Consumer consuming error: undefined method `update!' for nil:NilClass
 [bc51bb551a3f] Polling messages...
 ```
 
-While we could use the DLQ and simply let Karafka deal with all errors, it will be cleaner to have the business logic be more resilient, and ensure the system produces useful error messages. Otherwise some poor soul in production support is going to be dealing with a bunch of failed messages in the dead letter queue and have no idea what's gone wrong. That could be you if developers are also responsible for production support at your company!
+## Error Monitoring
+
+It's also useful to capture the error messages and stack traces in your error tracking/monitoring tool of choice (Sentry, Rollback, etc.). Karafka provides a [monitoring API](https://karafka.io/docs/Monitoring-and-logging/) that allows you to subscribe to instrumentation events such as errors occurring, and deal with them as you wish. Add this block to the `karafka.rb` file in the project root, between the configuration block and the routes:
+
+```ruby
+# frozen_string_literal: true
+
+class KarafkaApp < Karafka::App
+  setup do |config|
+    # config...
+  end
+
+  Karafka.monitor.subscribe "error.occurred" do |event|
+    e = event[:error]
+    Rails.logger.error("ProductInventoryConsumer failed: #{e.message}\n#{e.backtrace.join("\n")}")
+    # Or whatever error monitoring service Airbrake, Rollbar, etc.
+    Sentry.capture_exception(event[:error])
+  end
+
+  routes.draw do
+    # topics and consumers...
+  end
+end
+```
+
+Now whenever an error occurs in the consumer, the message and stack trace will get logged, and additionally you can notify whatever error monitoring service you use such as Sentry, Rollbar, etc. The message that caused the error will still get produced to the DLQ as per the topic configuration.
+
+While we could use the DLQ, together with Karafka's built-in error monitoring and simply let Karafka deal with all errors, it will be cleaner to also have the business logic be more resilient, and ensure the system produces useful error messages. Otherwise some poor soul in production support is going to be dealing with a bunch of failed messages in the dead letter queue and have no idea what's gone wrong. That could be you if developers are also responsible for production support at your company!
 
 The other issue with this approach is there's some wasted processing with the retries. For example, if the product code does not exist in the e-commerce system, there's no point retrying the message because it still won't exist. While this can be mitigated by setting `max_retries: 0`, there could be other errors which should be retried such as if a network blip occurs and the database is temporarily unreachable.
 
@@ -794,7 +821,11 @@ I'm placing this in the "app/models" directory but if you prefer, these kind of 
 
 ## Service
 
-With the `ProductInventoryForm` model in place, we have all the validation rules needed to replace the nested conditionals that are in the consumer. The next step is to introduce a service to make use of the model for validity checks, and to do the product updating. Unlike models, views, and controllers, a service is not a built-in Rails concept, but its very useful as a place for organizing business logic.
+With the `ProductInventoryForm` model in place, we have all the validation rules needed to replace the nested conditionals that are in the consumer. The next step is to introduce a service to make use of the model for validity checks, and to do the product updating.
+
+<aside class="markdown-aside">
+Unlike models, views, and controllers, a service is not a built-in Rails component, but it's very useful as a place for organizing business logic. Services are often used to encapsulate complex operations or interactions with external systems. See this RailsConf 2022 talk titled <a class="markdown-link" href="https://youtu.be/CRboMkFdZfg">Your Service Layer Needn't be Fancy, It Just Needs to Exist</a> to learn about the benefits of having a service layer and some practical examples how to implement it.
+</aside>
 
 Create a new directory `app/services` in your project, and add the `UpdateProductInventoryService` class as shown below:
 
@@ -881,20 +912,4 @@ end
 
 ## Conclusion
 
-This post has covered a technique for integrating Kafka into a Rails application using the Karafka gem. We learned how to avoid complexity in the consumer by limiting its responsibilities to communicating with Kafka, while introducing a model for validations, and a service for business logic. This makes each component easier to maintain. This post got quite lengthy so I'm not including the tests here, but you can view the fully working demo project including tests on [Github](https://github.com/danielabar/karafka_rails_consumer_demo).
-
-
-## TODO
-* Mention just barely scratched the surface of what can be done with kafka and karafka, link to docs for more advanced use cases.
-* Maybe ref re: service: https://dev.to/isalevine/using-rails-service-objects-to-make-skinny-controllers-and-models-3k9c
-* Maybe mention in this simple example, the attributes in the message correspond neatly with attributes in the `products` table, but a real app would be more complicated, requiring checks and updates across different db tables.b
-* Aside: Lots of differing opinions on how to organize business logic in a Rails app, not in scope of this post to discuss pros/cons of each, link some useful refs like https://blog.appsignal.com/2023/05/10/organize-business-logic-in-your-ruby-on-rails-application.html, https://www.aha.io/engineering/articles/organizing-code-in-a-rails-monolith, and/or find youtube RailsConf talk "Your service layer needn't be fancy, it just needs to exist": https://youtu.be/CRboMkFdZfg
-* Somewhere around error handling, mention this block in `karafka.rb` to log error and stacktrace for unexpected errors (i.e. non-validation errors):
-  ```ruby
-  Karafka.monitor.subscribe "error.occurred" do |event|
-    e = event[:error]
-    Rails.logger.error("ProductInventoryConsumer failed: #{e.message}\n#{e.backtrace.join("\n")}")
-    # Or whatever error monitoring service Airbrake, Rollbar, etc.
-    # Sentry.capture_exception(event[:error])
-  end
-  ```
+This post has covered a technique for integrating Kafka into a Rails application using the Karafka gem. We learned how to avoid complexity in the consumer by limiting its responsibilities to communicating with Kafka, while introducing a model for validations, and a service for business logic. This makes each component easier to maintain. This post got quite lengthy so I'm not including the tests here, but you can view the demo project including tests on [Github](https://github.com/danielabar/karafka_rails_consumer_demo).
