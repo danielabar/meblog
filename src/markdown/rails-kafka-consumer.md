@@ -12,7 +12,7 @@ related:
 
 This post will walk through how to integrate a Kafka consumer into a Rails application in a maintainable and testable way. Why would you need to do this? Consider the following scenario: You're working on an e-commerce system that has been developed with Rails. You'd like to enhance the product details page to show whether the current product is in stock, out of stock, or only has small number of items left (eg: "Only 3 left in stock!"). The inventory information comes from a legacy inventory management system that has been written in a different programming language. This legacy system is responsible for updating the inventory count based on events, such as product purchases, returns, or stock replenishments.
 
-In order to display this inventory information in the Rails e-commerce app, it needs the ability to communicate with the legacy inventory system. There are many [solutions](https://en.wikipedia.org/wiki/Enterprise_Integration_Patterns) for enabling different systems to communicate, each with tradeoffs to consider. For this post, I will show you how [Apache Kafka](https://kafka.apache.org/) can be used to solve this problem. Kafka is a distributed streaming platform that enables high-throughput, fault-tolerant, and real-time event data streaming for building scalable and event-driven applications.
+In order to display this inventory information in the Rails e-commerce app, it needs the ability to communicate with the legacy inventory system. There are many [solutions](https://en.wikipedia.org/wiki/Enterprise_Integration_Patterns) for enabling different systems to communicate, each with tradeoffs to consider. This post will demonstrate how [Apache Kafka](https://kafka.apache.org/) can be used to solve this problem. Kafka is a distributed streaming platform that enables high-throughput, fault-tolerant, and real-time event data streaming for building scalable and event-driven applications.
 
 Given that the inventory information is updated based on business events, this makes it a good fit to integrate with Kafka, which is designed for event-driven systems. Using Kafka will make the integration between the legacy and e-commerce system more tolerant to large bursts of inventory events, whereas a REST/HTTP based integration might be prone to information loss in the case of temporary network or database outages.
 
@@ -26,7 +26,7 @@ Conceptually, here is what we'll be building:
 
 ![legacy kafka rails](../images/legacy-kafka-rails-zoom.png "legacy kafka rails")
 
-We'll be focusing on the Rails side of things. Assume that another team is maintaining the inventory management system and they've already modified it to produce JSON formatted messages every time there's an inventory change. Here's an example message showing that the product identified by product code `ABCD1234` now has 23 units left in stock:
+We'll be focusing on the Rails side of things. Assume that another team is maintaining the inventory management system and they've already modified it to produce JSON formatted messages every time there's an inventory change. Here's an example message showing that the product identified by product code `ABCD1234` has 23 units left in stock:
 
 ```json
 {
@@ -35,7 +35,7 @@ We'll be focusing on the Rails side of things. Assume that another team is maint
 }
 ```
 
-These messages will be produced to a Kafka topic named `inventory_management_product_updates`. When integrating Kafka, it's important for the various development teams involved to agree on the topic name(s) and message formats, essentially agreeing on a "contract". This will ensure that the disparate systems can actually communicate with each other as expected.
+These messages will be produced to a Kafka topic named `inventory_management_product_updates`. When integrating Kafka, it's important for all the teams involved to agree on the topic name(s) and message formats, essentially agreeing on a "contract". This will ensure that the disparate systems can actually communicate with each other as expected.
 
 <aside class="markdown-aside">
 When it comes to Kafka topic naming conventions, there are many different <a class="markdown-link" href="https://cnr.sh/essays/how-paint-bike-shed-kafka-topic-naming-conventions">opinions</a> such as whether to include <a class="markdown-link" href="https://www.kadeck.com/blog/kafka-topic-naming-conventions-5-recommendations-with-examples">version numbers</a> or not. It's beyond the scope of this post to cover all of these. If your organization has already established a naming convention, use that.
@@ -129,9 +129,9 @@ Here are some example products:
 
 ## Install Kafka
 
-Even though we'll be focused on consuming messages in the Rails application, we're going to also need to produce messages to try it out. This means we'll need access to a Kafka cluster, which includes one or more brokers, and Zookeeper to manage the cluster. While you could point to a shared cluster if your organization manages their own or uses [Confluent](https://www.confluent.io/) (Kafka as a service), I prefer to think of this similar to a database. In the same way that every developer working on a Rails application has their own local database installed, Kafka is also a kind of database (specifically, a raw, distributed database). It could get messy if all developers are pointing to a shared cluster, producing test messages that end up getting consumed by other developers running their own tests. It's also useful to have it installed locally for learning and experimentation, otherwise you would have to pay for hosting it somewhere or using a service like Confluent.
+Even though we'll be focused on consuming messages in the Rails application, we're going to also need to produce messages to try it out. This means we'll need access to a Kafka cluster, which includes one or more brokers, and [Zookeeper](https://zookeeper.apache.org/) to manage the cluster. While you could point to a shared cluster if your organization manages their own or uses [Confluent](https://www.confluent.io/) (Kafka as a service), I prefer to think of this similar to a database. In the same way that every developer working on a Rails application has their own local database installed, Kafka is also a kind of database (specifically, a raw, distributed database). It could get messy if all developers are pointing to a shared cluster, producing test messages that end up getting consumed by other developers running their own tests. It's also useful to have it installed locally for learning and experimentation, otherwise you would have to pay for hosting it somewhere or using a service like Confluent.
 
-The easiest way to set up a Kafka cluster locally is with Docker and docker-compose. Confluent provides these images for free in their [cp-all-in-one](https://github.com/confluentinc/cp-all-in-one) repository. We actually only need to run two containers locally for a minimal cluster - one broker, and one zookeeper instance. Add the following `docker-compose.yml` file to the root of the project:
+The easiest way to set up a Kafka cluster locally is with Docker and docker-compose. Confluent provides these images in their [cp-all-in-one](https://github.com/confluentinc/cp-all-in-one) repository. We actually only need to run two containers locally for a minimal cluster - one broker, and one zookeeper instance. Add the following `docker-compose.yml` file to the root of the project:
 
 ```yml
 ---
@@ -207,7 +207,7 @@ Now we need to enhance the Rails application so that it can consume messages fro
 * Integrates easily with Rails, following [routing](https://karafka.io/docs/Routing/) style conventions.
 * Built in [error handling](https://karafka.io/docs/Dead-Letter-Queue/) and retry logic.
 * Testing utilities that make it easy to write [automated tests](https://karafka.io/docs/Testing/) for consumers and producers.
-* Provides both an open source and pro version if you need even more [advanced features](https://karafka.io/docs/Pro-Features-List/).
+* Provides both an open source and pro version with additional [advanced features](https://karafka.io/docs/Pro-Features-List/).
 
 To get started with Karafka, add the following to the project's `Gemfile` and then run `bundle install`:
 
@@ -255,10 +255,10 @@ end
 ```
 
 <aside class="markdown-aside">
-For this demo, there's no need to modify the default config block generated by Karafka. Recall the Kafka broker running in a docker container has exposed port 9092 so we'll be able to connect to it. In a real application, you would use an environment variable to specify the location of the bootstrap servers. There are also many more <a href="https://karafka.io/docs/Configuration/" class="markdown-link">configuration options</a> you can explore.
+For this demo, there's no need to modify the default config block generated by Karafka. Recall the Kafka broker running in a docker container has exposed port 9092 so we'll be able to connect to it. In a real application, you would use an environment variable to specify the location of the bootstrap servers. There are also many more <a href="https://karafka.io/docs/Configuration/" class="markdown-link">configuration options</a>.
 </aside>
 
-Now let's implement the `ProductInventoryConsumer` class. This is a class that inherits from `ApplicationConsumer`, which was also generated from the karafka installation command and inherits from `Karafka::BaseConsumer`. The only method that's required to be implemented in your consumer classes is the `consume` method, which will be invoked by Karafka with a batch of messages. For now, we will only log the message payload and offset to confirm messages are being received. The `consume` method also has access to the `topic` so let's log the topic name as well:
+Now let's implement the `ProductInventoryConsumer` class. This is a class that inherits from `ApplicationConsumer`, which was also generated from the karafka installation command and inherits from `Karafka::BaseConsumer`. The only method that's required to be implemented in a consumer class is the `consume` method, which will be invoked by Karafka with a batch of messages. For now, we will only log the message payload and [offset](https://github.com/danielabar/kafka-getting-started-pluralsight#consumer-offset-and-message-retention-policy) to confirm messages are being received. The `consume` method also has access to the `topic` so let's log the topic name as well:
 
 ```ruby
 # app/consumers/product_inventory_consumer.rb
@@ -281,7 +281,7 @@ To exercise this code, open a new terminal tab and run:
 bundle exec karafka server
 ```
 
-This command initializes the Karafka application defined at `karafka.rb`, connects to the Kafka cluster specified by the `bootstrap.servers` config, starts consuming messages from the topics specified in the `routes.draw` block, and invokes the configured consumer classes to process those messages. The server will continuously listen for new messages until the process is terminated. The output of this command should look something like this:
+This command initializes the Karafka application defined at `karafka.rb`, connects to the Kafka cluster specified by the `bootstrap.servers` config, starts consuming messages from the topics specified in the `routes.draw` block, and invokes the configured consumer classes to process those messages. The server will continuously listen for new messages until the process is terminated. The output of this command is as follows:
 
 ```
 Running Karafka 2.1.0 server
@@ -293,7 +293,7 @@ See LICENSE and the LGPL-3.0 for licensing details
 ...
 ```
 
-In order to exercise the `ProductInventoryConsumer` code, messages need to be produced to the `inventory_management_product_updates` topic. In production, this will be done by the inventory management system. But for local development, we don't have that system running on our laptops. Fortunately, Karafka can also be used to [produce](https://karafka.io/docs/Components/#producer) messages. Let's try this out by launching a Rails console `bin/rails c` in another terminal tab and then enter the following code:
+In order to exercise the `ProductInventoryConsumer` code, messages need to be produced to the `inventory_management_product_updates` topic. In production, this will be done by the inventory management system. For local development, we don't have that system running on our laptops. Fortunately, Karafka can also be used to [produce](https://karafka.io/docs/Components/#producer) messages. Let's try this out by launching a Rails console `bin/rails c` in another terminal tab and then enter the following code:
 
 ```ruby
 # Generate a message with the expected attributes in JSON format:
@@ -305,29 +305,32 @@ message = {
 
 # Produce and send a message to the `inventory_management_product_updates` topic:
 Karafka.producer.produce_async(topic: 'inventory_management_product_updates', payload: message)
-# [ce1340a60c42] Async producing of a message to 'inventory_management_product_updates' topic took 21.07400000002235 ms
-# [ce1340a60c42] {:topic=>"inventory_management_product_updates", :payload=>"{\"product_code\":\"JANW7810\",\"inventory_count\":10}"}
-# => #<Rdkafka::Producer::DeliveryHandle:0x0000000114198588>
+# [ce1340a60c42] Async producing of a message to '
+#   inventory_management_product_updates' topic took 21.07400000002235 ms
+# [ce1340a60c42] {:topic=>"inventory_management_product_updates",
+#   :payload=>"{\"product_code\":\"JANW7810\",\"inventory_count\":10}"}
 ```
 
-After you submit the producer command, keep an eye on the terminal tab running the Karafka server, you should see some output indicating the message has been consumed from topic `inventory_management_product_updates` and offset `0`. I've added some `=== EXPLANATIONS ===`:
+After submitting the producer command, watch on the terminal tab running the Karafka server. There will be some output indicating the message has been consumed from topic `inventory_management_product_updates` and offset `0`. I've added some `=== EXPLANATIONS ===`:
 
 ```
 === KARAFKA LOGGING WHEN CONSUMER STARTS PROCESSING ===
-[50b2762f16b2] Consume job for ProductInventoryConsumer on inventory_management_product_updates/0 started
+[50b2762f16b2] Consume job for ProductInventoryConsumer on
+  inventory_management_product_updates/0 started
 
 === CONSUMER INFO LEVEL LOGGING ===
 ProductInventoryConsumer consuming: Topic: inventory_management_product_updates,
   Message: {"product_code"=>"JANW7810", "inventory_count"=>10}, Offset: 0
 
 === KARAFKA LOGGING WHEN CONSUMER FINISHES PROCESSING ===
-[50b2762f16b2] Consume job for ProductInventoryConsumer on inventory_management_product_updates/0 finished in 345.4149999995716ms
+[50b2762f16b2] Consume job for ProductInventoryConsumer on
+  inventory_management_product_updates/0 finished in 345.4149999995716ms
 ```
 
 When there's a batch of messages ready to be processed, the `consume` method gets invoked with the `messages`, which can be iterated (in our simple case, there's only one message currently). Each of these is an instance of [Karafka::Messages::Message](https://karafka.io/docs/code/karafka/Karafka/Messages/Message.html). When the `payload` method is invoked on the `message` object, Karafka will deserialize it, which converts the raw Kafka message to a format you can work with in your Ruby code. By default, it uses JSON deserialization, which means it assumes the messages are in JSON format, and they will be deserialized into a Ruby hash. This is what's shown in the console output when we log `message.payload`. The Karafka docs have more details about [deserialization](https://karafka.io/docs/Deserialization/).
 
 <aside class="markdown-aside">
-For those keeping count, that's three terminal tabs required to work with this application during development mode: First one to run the Kafka cluster in docker containers, second one to run the Karafka server for consuming messages, and a third one to run a Rails console to produce messages. If you want to be able to view the output of these all at the same time, a simple way is to use the <a class="markdown-link" href="https://iterm2.com/documentation-one-page.html">Split Panes</a> feature of iTerm or <a class="markdown-link" href="https://github.com/tmux/tmux/wiki">tmux</a> for more advanced features.
+For those keeping count, that's three terminal tabs required to work with this application during development mode: First one to run the Kafka cluster in Docker containers, second one to run the Karafka server for consuming messages, and a third one to run a Rails console to produce messages. If you want to be able to view the output of these all at the same time, a simple way is to use the <a class="markdown-link" href="https://iterm2.com/documentation-one-page.html">Split Panes</a> feature of iTerm or <a class="markdown-link" href="https://github.com/tmux/tmux/wiki">tmux</a> for more advanced features.
 </aside>
 
 ## Update Product
@@ -347,7 +350,7 @@ Gets deserialized to a Ruby hash when the `payload` method is invoked on it:
 }
 ```
 
-This means that we can access the product code and inventory count within the consumer as follows:
+This means the product code and inventory count can be accessed within the consumer as follows:
 
 ```ruby
 # app/consumers/product_inventory_consumer.rb
@@ -378,7 +381,7 @@ class ProductInventoryConsumer < ApplicationConsumer
 end
 ```
 
-There are some problems with this approach as we'll see shortly, but first, let's exercise this version of the consumer just to see if it works. Back in the Rails console, run this code to check the inventory value of the first product, then produce a message to update it to a different value:
+There are some problems with this approach as we'll see shortly, but first, let's exercise this version of the consumer just to see if it works. Back in the Rails console, run the code shown below to check the inventory value of the first product, then produce a message to update it to a different value:
 
 ```ruby
 # Check what the current inventory value is
@@ -393,11 +396,12 @@ message = {
 Karafka.producer.produce_async(topic: 'inventory_management_product_updates', payload: message)
 ```
 
-Now keep an eye on the tab that's running the karafka server (that's our consumer polling for messages), it should receive this message and show that the product inventory has been updated:
+Now the tab running the Karafka server (consumer polling for messages), will show that the message has been received and the product inventory has been updated:
 
 ```
 === KARAFKA LOGGING WHEN CONSUMER STARTS PROCESSING ===
-[d886a13043fd] Consume job for ProductInventoryConsumer on inventory_management_product_updates/0 started
+[d886a13043fd] Consume job for ProductInventoryConsumer on
+  inventory_management_product_updates/0 started
 
 === RAILS DEV LOGGING FROM FINDING AND UPDATING PRODUCT ===
   Product Load (0.9ms)  SELECT "products".* FROM "products"
@@ -412,21 +416,22 @@ Now keep an eye on the tab that's running the karafka server (that's our consume
   ↳ app/consumers/product_inventory_consumer.rb:6:in `block in consume'
 
 === KARAFKA LOGGING WHEN CONSUMER FINISHES PROCESSING ===
-[d886a13043fd] Consume job for ProductInventoryConsumer on inventory_management_product_updates/0 finished in 23.927999999839813ms
+[d886a13043fd] Consume job for ProductInventoryConsumer on
+  inventory_management_product_updates/0 finished in 23.927999999839813ms
 ```
 
-Back in the Rails console, let's fetch the product again and check its inventory count, it should be `123` from the Kafka message we produced earlier:
+Back in the Rails console, fetch the product again and check its inventory count, it should be `123` from the Kafka message produced earlier:
 
 ```ruby
 Product.first.inventory
 # 123
 ```
 
-Great it's working, let's ship it! Not so fast...
+Great it's working, ship it! Not so fast...
 
-## What Could Go Wrong?
+## What Could Possibly Go Wrong?
 
-In the previous section, we saw the happy path working. Now its time to think: What could possibly go wrong?
+In the previous section, we saw the happy path working. Now its time to think about things that could go wrong.
 
 ![what could possibly go wrong](../images/what-could-go-wrong-fork-in-toaster.jpeg "what could possibly go wrong")
 
@@ -443,7 +448,9 @@ Karafka.producer.produce_async(topic: 'inventory_management_product_updates', pa
 Keep an eye on the terminal tab running the Karafka server, it will show a stack trace from attempting to consume this message:
 
 ```
-[d886a13043fd] Consume job for ProductInventoryConsumer on inventory_management_product_updates/0 started
+[d886a13043fd] Consume job for ProductInventoryConsumer on
+  inventory_management_product_updates/0 started
+
   Product Load (0.5ms)  SELECT "products".* FROM "products"
   WHERE "products"."code" = ? LIMIT ?  [["code", "NO-SUCH-CODE"], ["LIMIT", 1]]
   ↳ app/consumers/product_inventory_consumer.rb:5:in `block in consume'
@@ -523,11 +530,13 @@ end
 
 With this approach, if any error is raised during message processing, Karafka will automatically retry up to a configured number of `max_retries` (which can also be set to zero if you don't ever want it to retry). If message processing still fails after the retries are exhausted, a new message containing the same header and payload as the troublesome message will be produced to the topic specified in the `dead_letter_queue` method, in this case, `dlq_inventory_management_product_updates`.
 
-With the modified `karafka.rb` in place, producing an inventory update message with a product code that does not exist will generate the following log messages in the karafka server. I've annotated them with `=== EXPLANATION ===`, which shows that after consuming the bad message, Karafka will make two more attempts to process it. If those still fail, it writes the message the the topic `dlq_inventory_management_product_updates`, then moves on, waiting to consume new messages:
+With the modified `karafka.rb` in place, producing an inventory update message with a product code that does not exist will generate the following log messages in the Karafka server. I've annotated them with `=== EXPLANATION ===`, which shows that after consuming the bad message, Karafka will make two more attempts to process it. If those still fail, it writes the message the the topic `dlq_inventory_management_product_updates`, then moves on, waiting to consume new messages:
 
 ```
 === START CONSUMING BAD MESSAGE ===
-[d13504295353] Consume job for ProductInventoryConsumer on inventory_management_product_updates/0 started
+[d13504295353] Consume job for ProductInventoryConsumer on
+  inventory_management_product_updates/0 started
+
   Product Load (0.2ms)  SELECT "products".* FROM "products"
   WHERE "products"."code" = ? LIMIT ?  [["code", "NO_SUCH_CODE"], ["LIMIT", 1]]
   ↳ app/consumers/product_inventory_consumer.rb:5:in `block in consume'
@@ -539,8 +548,11 @@ Consumer consuming error: undefined method `update!' for nil:NilClass
 ...stack trace...
 
 === FIRST RETRY ===
-[fa875ec2db84] Retrying of ProductInventoryConsumer after 2000 ms on topic inventory_management_product_updates/0 from offset 1
-[d13504295353] Consume job for ProductInventoryConsumer on inventory_management_product_updates/0 started
+[fa875ec2db84] Retrying of ProductInventoryConsumer after 2000 ms on
+  topic inventory_management_product_updates/0 from offset 1
+[d13504295353] Consume job for ProductInventoryConsumer on
+  inventory_management_product_updates/0 started
+
   Product Load (0.1ms)  SELECT "products".* FROM "products"
   WHERE "products"."code" = ? LIMIT ?  [["code", "NO_SUCH_CODE"], ["LIMIT", 1]]
   ↳ app/consumers/product_inventory_consumer.rb:5:in `block in consume'
@@ -552,8 +564,11 @@ Consumer consuming error: undefined method `update!' for nil:NilClass
 ...stack trace...
 
 === SECOND RETRY ===
-[76694e052832] Retrying of ProductInventoryConsumer after 4000 ms on topic inventory_management_product_updates/0 from offset 1
-[d13504295353] Consume job for ProductInventoryConsumer on inventory_management_product_updates/0 started
+[76694e052832] Retrying of ProductInventoryConsumer after 4000 ms on
+  topic inventory_management_product_updates/0 from offset 1
+[d13504295353] Consume job for ProductInventoryConsumer on
+  inventory_management_product_updates/0 started
+
   Product Load (0.2ms)  SELECT "products".* FROM "products"
   WHERE "products"."code" = ? LIMIT ?  [["code", "NO_SUCH_CODE"], ["LIMIT", 1]]
   ↳ app/consumers/product_inventory_consumer.rb:5:in `block in consume'
@@ -565,9 +580,12 @@ Consumer consuming error: undefined method `update!' for nil:NilClass
 ...stack trace...
 
 === WRITE BAD MESSAGE TO DLQ ===
-[23c9519eb294] Async producing of a message to 'dlq_inventory_management_product_updates' topic took 1.7790000000968575 ms
-[23c9519eb294] {:topic=>"dlq_inventory_management_product_updates", :payload=>"{\"product_code\":\"NO_SUCH_CODE\",\"inventory_count\":5}"}
-[d1e59c1bd1df] Dispatched message 1 from inventory_management_product_updates/0 to DLQ topic: dlq_inventory_management_product_updates
+[23c9519eb294] Async producing of a message to
+  'dlq_inventory_management_product_updates' topic took 1.7790000000968575 ms
+[23c9519eb294] {:topic=>"dlq_inventory_management_product_updates",
+  :payload=>"{\"product_code\":\"NO_SUCH_CODE\",\"inventory_count\":5}"}
+[d1e59c1bd1df] Dispatched message 1 from inventory_management_product_updates/0
+  to DLQ topic: dlq_inventory_management_product_updates
 
 === OFFSET COMMITTED, READY TO PROCESS MORE MESSAGES ===
 [316f38a98a31] Pausing on topic inventory_management_product_updates/0 on offset 2
@@ -913,3 +931,19 @@ end
 ## Conclusion
 
 This post has covered a technique for integrating Kafka into a Rails application using the Karafka gem. We learned how to avoid complexity in the consumer by limiting its responsibilities to communicating with Kafka, while introducing a model for validations, and a service for business logic. This makes each component easier to maintain. This post got quite lengthy so I'm not including the tests here, but you can view the demo project including tests on [Github](https://github.com/danielabar/karafka_rails_consumer_demo).
+
+## TODO
+
+Use better error handling block from Karafka docs:
+```ruby
+Karafka.monitor.subscribe 'error.occurred' do |event|
+  type = event[:type]
+  error = event[:error]
+  details = (error.backtrace || []).join("\n")
+
+  puts "Oh no! An error: #{error} of type: #{type} occurred!"
+  puts details
+end
+```
+
+Continue editing starting from Error Monitoring.
