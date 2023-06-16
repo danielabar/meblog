@@ -10,6 +10,8 @@ related:
   - "Access Chrome Bookmarks with Keyboard"
 ---
 
+**Update (June 2023):** I had the opportunity to dive deeper into the importance of engineering documentation and explore various aspects of maintainable software in an interview with host Robby Russell on the [Maintainable](https://www.maintainable.fm/) podcast. We discussed practical advice on what to document and how, as well as tackling technical debt and other software challenges. If you're interested in hearing more about these topics and gaining valuable insights, I highly recommend [listening to the episode](https://www.maintainable.fm/episodes/daniela-baron-about-those-docs).
+
 Today I want to write about engineering documentation. That is, docs that are written by engineers, for engineers that are working on the same project. It's known that despite the many benefits of having good project documentation, engineers generally dislike writing it. This means useful docs tend to be lacking on projects. Before we get into how to rectify this, let's first discuss what *not* to do.
 
 ## What Not To Do
@@ -189,7 +191,7 @@ Now that you know the benefits of documentation and what to document, how can we
 
 My recommendation is that all documentation written by engineers for engineers should be written in markdown and located with the project source. Specifically, a `README.md` in the project root, and all other docs in a `/docs` directory, with links from the `Further Reading` section of the readme, to each doc.
 
-The reason for having all engineering docs with the code, rather than an external tool such as Confluence, is that the docs participate in the same lifecyle as the code. That is, they get included in PR reviews, which raises their visibility among the team. This also makes it more natural to maintain them, as the developer doesn't need to remember to login to some external tool after the PR is merged to add docs. Also, the docs become easily searchable along with the code, making them easier to maintain. In my experience, docs located outside the source get forgotten and stale.
+The reason for having all engineering docs with the code, rather than an external tool such as Confluence, is that the docs participate in the same lifecycle as the code. That is, they get included in PR reviews, which raises their visibility among the team. This also makes it more natural to maintain them, as the developer doesn't need to remember to login to some external tool after the PR is merged to add docs. Also, the docs become easily searchable along with the code, making them easier to maintain. In my experience, docs located outside the source get forgotten and stale.
 
 The reason for using markdown is it's a lightweight, developer-friendly text format. Just about every IDE and editor as a plugin for it. The [Markdown All in One](https://marketplace.visualstudio.com/items?itemName=yzhang.markdown-all-in-one&ssr=false#review-details) for VS Code comes with syntax highlighting and snippets, which makes editing easy and efficient.
 
