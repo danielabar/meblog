@@ -604,11 +604,14 @@ class KarafkaApp < Karafka::App
     # config...
   end
 
+  # Common error handling example
   Karafka.monitor.subscribe "error.occurred" do |event|
-    e = event[:error]
-    Rails.logger.error("ProductInventoryConsumer failed: #{e.message}\n#{e.backtrace.join("\n")}")
+    type = event[:type]
+    error = event[:error]
+    details = (error.backtrace || []).join("\n")
+    Rails.logger.error("An error: #{error} of type: #{type} occurred, details: #{details}")
     # Or whatever error monitoring service Airbrake, Rollbar, etc.
-    Sentry.capture_exception(event[:error])
+    Sentry.capture_exception(error)
   end
 
   routes.draw do
@@ -934,16 +937,6 @@ This post has covered a technique for integrating Kafka into a Rails application
 
 ## TODO
 
-Use better error handling block from Karafka docs:
-```ruby
-Karafka.monitor.subscribe 'error.occurred' do |event|
-  type = event[:type]
-  error = event[:error]
-  details = (error.backtrace || []).join("\n")
-
-  puts "Oh no! An error: #{error} of type: #{type} occurred!"
-  puts details
-end
-```
+Mention about initial project scaffolding?
 
 Continue editing starting from Error Monitoring.
