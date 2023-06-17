@@ -35,13 +35,23 @@ We'll be focusing on the Rails side of things. Assume that another team is maint
 }
 ```
 
-These messages will be produced to a Kafka topic named `inventory_management_product_updates`. When integrating Kafka, it's important for all the teams involved to agree on the topic name(s) and message formats, essentially agreeing on a "contract". This will ensure that the disparate systems can actually communicate with each other as expected.
+These messages will be produced to a Kafka topic named `inventory_management_product_updates`. When integrating Kafka, it's important for all the teams involved to agree on the topic name(s) and message formats, essentially agreeing on a "contract". This will ensure that the disparate systems can communicate with each other as expected.
 
 <aside class="markdown-aside">
 When it comes to Kafka topic naming conventions, there are many different <a class="markdown-link" href="https://cnr.sh/essays/how-paint-bike-shed-kafka-topic-naming-conventions">opinions</a> such as whether to include <a class="markdown-link" href="https://www.kadeck.com/blog/kafka-topic-naming-conventions-5-recommendations-with-examples">version numbers</a> or not. It's beyond the scope of this post to cover all of these. If your organization has already established a naming convention, use that.
 </aside>
 
 ## Rails Product
+
+For this demo, I used Rails 7.x and the default options for a new project:
+
+```bash
+rails --version
+# Rails 7.0.4.3
+rails new karafka_rails_consumer_demo
+cd karafka_rails_consumer_demo
+bin/rails generate model product name:string code:string price:decimal inventory:integer
+```
 
 The Rails application has a `products` table to store the product name, product code, price, and inventory count. Here is the migration:
 
@@ -61,7 +71,7 @@ class CreateProducts < ActiveRecord::Migration[7.0]
 end
 ```
 
-Here is the the corresponding `Product` model. I'm using the [annotate](https://github.com/ctran/annotate_models) gem to automatically generate schema information as comments in the model class when migrations are run:
+Here is the the corresponding `Product` model. I'm using the [annotate](https://github.com/ctran/annotate_models) gem to automatically generate schema information as comments in the model class when migrations are run via `bin/rails db:migrate`:
 
 ```ruby
 # app/models/product.rb
@@ -196,10 +206,10 @@ karafka_rails_consumer_demo_zookeeper_1   /etc/confluent/docker/run   Up      0.
 ```
 
 <aside class="markdown-aside">
-This tutorial is intentionally using just a single broker to keep the Kafka side simple. A real application would have multiple brokers with topics distributed and replicated across them for scalability and fault-tolerance. See this example <a class="markdown-link" href="https://github.com/danielabar/kafka-getting-started-pluralsight/blob/main/docker-compose-multiple.yml">docker-compose file</a> for a more advanced setup and a <a class="markdown-link" href="https://github.com/danielabar/kafka-getting-started-pluralsight#demo-fault-tolerance-and-resiliency">demo</a> of how to use it.
+This tutorial is intentionally using just a single broker to keep the Kafka side simple. A real application would have multiple brokers with topics distributed and replicated across them for scalability and fault-tolerance. See this example <a class="markdown-link" href="https://github.com/danielabar/kafka-getting-started-pluralsight/blob/main/docker-compose-multiple.yml">docker-compose file</a> for a more advanced setup with multiple brokers and a <a class="markdown-link" href="https://github.com/danielabar/kafka-getting-started-pluralsight#demo-fault-tolerance-and-resiliency">demo</a> of how to use it.
 </aside>
 
-## Install Karafka
+## Add Karafka Gem
 
 Now we need to enhance the Rails application so that it can consume messages from the `inventory_management_product_updates` Kafka topic. We're going to use the [Karafka](https://karafka.io/docs/) gem to make the integration relatively easy. Some of the benefits of this gem include:
 * Abstracts complexities of working directly with the Kafka protocol.
@@ -311,7 +321,7 @@ Karafka.producer.produce_async(topic: 'inventory_management_product_updates', pa
 #   :payload=>"{\"product_code\":\"JANW7810\",\"inventory_count\":10}"}
 ```
 
-After submitting the producer command, watch on the terminal tab running the Karafka server. There will be some output indicating the message has been consumed from topic `inventory_management_product_updates` and offset `0`. I've added some `=== EXPLANATIONS ===`:
+After submitting the producer command, the terminal tab running the Karafka server will log output indicating the message has been consumed from topic `inventory_management_product_updates` and offset `0`. I've added some `=== EXPLANATIONS ===`:
 
 ```
 === KARAFKA LOGGING WHEN CONSUMER STARTS PROCESSING ===
@@ -381,7 +391,7 @@ class ProductInventoryConsumer < ApplicationConsumer
 end
 ```
 
-There are some problems with this approach as we'll see shortly, but first, let's exercise this version of the consumer just to see if it works. Back in the Rails console, run the code shown below to check the inventory value of the first product, then produce a message to update it to a different value:
+There are some problems with this approach as will be covered shortly, but first, let's exercise this version of the consumer just to see if it works. Back in the Rails console, run the code shown below to check the inventory value of the first product, then produce a message to update it to a different value:
 
 ```ruby
 # Check what the current inventory value is
@@ -530,7 +540,7 @@ end
 
 With this approach, if any error is raised during message processing, Karafka will automatically retry up to a configured number of `max_retries` (which can also be set to zero if you don't ever want it to retry). If message processing still fails after the retries are exhausted, a new message containing the same header and payload as the troublesome message will be produced to the topic specified in the `dead_letter_queue` method, in this case, `dlq_inventory_management_product_updates`.
 
-With the modified `karafka.rb` in place, producing an inventory update message with a product code that does not exist will generate the following log messages in the Karafka server. I've annotated them with `=== EXPLANATION ===`, which shows that after consuming the bad message, Karafka will make two more attempts to process it. If those still fail, it writes the message the the topic `dlq_inventory_management_product_updates`, then moves on, waiting to consume new messages:
+With the modified `karafka.rb` in place (remember to restart the karafka server `bundle exec karafka server` after making changes to `karafka.rb`), producing an inventory update message with a product code that does not exist will generate the following log messages in the Karafka server. I've annotated them with `=== EXPLANATION ===`, which shows that after consuming the bad message, Karafka will make two more attempts to process it. If those still fail, it writes the message the the topic `dlq_inventory_management_product_updates`, then moves on, waiting to consume new messages:
 
 ```
 === START CONSUMING BAD MESSAGE ===
@@ -594,7 +604,9 @@ Consumer consuming error: undefined method `update!' for nil:NilClass
 
 ## Error Monitoring
 
-It's also useful to capture the error messages and stack traces in your error tracking/monitoring tool of choice (Sentry, Rollback, etc.). Karafka provides a [monitoring API](https://karafka.io/docs/Monitoring-and-logging/) that allows you to subscribe to instrumentation events such as errors occurring, and deal with them as you wish. Add this block to the `karafka.rb` file in the project root, between the configuration block and the routes:
+It's also useful to capture the error messages and stack traces in your error tracking/monitoring tool of choice (Sentry, Rollback, etc.). Karafka provides a [monitoring API](https://karafka.io/docs/Monitoring-and-logging/) that allows you to subscribe to instrumentation events, and deal with them as you wish.
+
+Add this block to the `karafka.rb` file in the project root, between the configuration block and the routes to extract the error object and stack trace from the `event` and log them. Additionally here is where you would log to whatever error monitoring service you use:
 
 ```ruby
 # frozen_string_literal: true
@@ -628,7 +640,7 @@ The other issue with this approach is there's some wasted processing with the re
 
 ## Validation in Consumer
 
-As a first attempt at making the code more resilient, we could modify the consumer to first check if the product exists, before attempting an update, otherwise log an error and manually dispatch to the dead letter queue (Karafka will only automatically produce a message to the DLQ when an exception is raised):
+As a first attempt at making the code more resilient, we could modify the consumer to check if the product exists, before attempting an update, otherwise log an error and manually dispatch to the dead letter queue (Karafka will only automatically produce a message to the DLQ when an exception is raised):
 
 ```ruby
 class ProductInventoryConsumer < ApplicationConsumer
@@ -652,7 +664,8 @@ With this in place, producing a message with an non-existing product code will r
 ```
 === START CONSUMING MESSAGE ===
 [ce8640c13bf0] Polled 1 messages in 1004.0149999996647ms
-[ac5cf1c6d557] Consume job for ProductInventoryConsumer on inventory_management_product_updates/0 started
+[ac5cf1c6d557] Consume job for ProductInventoryConsumer
+  on inventory_management_product_updates/0 started
 
 === CHECK IF PRODUCT EXISTS ===
   Product Load (0.4ms)  SELECT "products".* FROM "products"
@@ -663,10 +676,14 @@ With this in place, producing a message with an non-existing product code will r
 Product NO_SUCH_CODE does not exist
 
 === DISPATCH TO DQL ===
-[12cb723b4056] Async producing of a message to 'dlq_inventory_management_product_updates' topic took 0.9180000005289912 ms
-[12cb723b4056] {:topic=>"dlq_inventory_management_product_updates", :payload=>"{\"product_code\":\"NO_SUCH_CODE\",\"inventory_count\":5}"}
-[89c41457fc4c] Dispatched message 2 from inventory_management_product_updates/0 to DLQ topic: dlq_inventory_management_product_updates
-[ac5cf1c6d557] Consume job for ProductInventoryConsumer on inventory_management_product_updates/0 finished in 275.4199999999255ms
+[12cb723b4056] Async producing of a message to
+  'dlq_inventory_management_product_updates' topic took 0.9180000005289912 ms
+[12cb723b4056] {:topic=>"dlq_inventory_management_product_updates",
+  :payload=>"{\"product_code\":\"NO_SUCH_CODE\",\"inventory_count\":5}"}
+[89c41457fc4c] Dispatched message 2 from
+  inventory_management_product_updates/0 to DLQ topic: dlq_inventory_management_product_updates
+[ac5cf1c6d557] Consume job for ProductInventoryConsumer on
+  inventory_management_product_updates/0 finished in 275.4199999999255ms
 
 === READY FOR MORE MESSAGES ===
 [ce8640c13bf0] Polling messages...
@@ -682,7 +699,7 @@ class Product < ApplicationRecord
 end
 ```
 
-Suppose the inventory management system could send negative inventory counts, or blank values. It might do this if the business rules in the legacy system are different than those in the e-commerce system, or again, it could be buggy and not enough time/people to deal with the legacy system quirks. The consumer could be modified to handle this case as well, something like this:
+Suppose the inventory management system could send negative inventory counts, or blank values. It might do this if the business rules in the legacy system are different than those in the e-commerce system, or again, it could be buggy and not enough time/people to deal with the legacy system quirks. The consumer could be modified to handle this case as well:
 
 ```ruby
 class ProductInventoryConsumer < ApplicationConsumer
@@ -706,7 +723,7 @@ class ProductInventoryConsumer < ApplicationConsumer
 end
 ```
 
-At this point, if the project is using [Rubocop](https://rubocop.org/) with a default configuration, this code will light up with the following offenses warning that the complexity of the `consume` method is too high and that there's too many lines:
+At this point, if the project is using [Rubocop](https://rubocop.org/) with a default configuration, this code will light up with the following offenses warning that the complexity of the `consume` method is too high and that the method is too long:
 
 ```
 app/consumers/product_inventory_consumer.rb:2:3:C: Metrics/AbcSize:Assignment
@@ -724,7 +741,7 @@ While one could debate the max method length rule (default value is 10, perhaps 
 One way to resolve this is to break up the `consume` method into smaller methods, for example, the validation and error handling could be extracted as separate methods. But this is just a simple example. A real application could be many more rules. For example, the e-commerce system could have a concept of active vs inactive products where only the active ones should have their inventory updated.
 
 <aside class="markdown-aside">
-Another technique that can help with some validation issues when using Kafka is a <a class="markdown-link" href="https://docs.confluent.io/platform/current/schema-registry/index.html">schema registry</a>, although you will probably still want some business level validation in the application. This is an advanced topic that won't be covered in this post.
+Another technique that can help with some validation issues when using Kafka is a <a class="markdown-link" href="https://docs.confluent.io/platform/current/schema-registry/index.html">schema registry</a>, although you will probably still want some business level validation in the application. This is an advanced topic that won't be covered in this post. You can also check out this <a class="markdown-link" href="https://github.com/danielabar/karafka_avro_demo">demo project</a> showing how to use the Avro schema format with a Confluent Schema Registry from a Ruby application with the Karafka gem.
 </aside>
 
 ## Too Much Responsibility
@@ -737,7 +754,7 @@ The real issue here is that the Kafka consumer as currently written, is taking o
 
 A useful way of thinking about this is to compare the consumer to a Rails controller. With a controller, its responsibilities should be limited to handling http requests and responses, while business logic should be delegated to services and/or models. This makes testing of business logic easier because its isolated from the complexity of http request and response handling.
 
-Applying this way of thinking to a consumer, we can say that it should only be concerned with Kafka-specific things such as communicating with the broker to consume and produce messages, and deserializing and serializing message payloads. To simplify the consumer, we will apply two concepts:
+Applying this way of thinking to a Kafka consumer, we can say that it should only be concerned with Kafka-specific things such as communicating with the broker to consume and produce messages, and deserializing and serializing message payloads. To simplify the consumer, we will apply two concepts:
 
 1. A model, initialized with the message payload hash, to perform all business rule validations.
 2. A service to check if the model is valid, and only perform the business logic update if the model is valid.
@@ -902,9 +919,9 @@ Remember to tell Rails that this new directory should be auto loaded by adding t
 config.autoload_paths << Rails.root.join("services")
 ```
 
-## Lean Consumer
+## Refactor Consumer
 
-Now that we have a model for validations, and a service that does the business logic, we can update our consumer to make it "leaner", that is, take on less responsibilities. This will eliminate the complexity warning from Rubocop and make the code more maintainable.
+Now that we have a model for validations, and a service for business logic, the consumer can be refactored to take on less responsibilities. This will eliminate the complexity warning from Rubocop and make the code more maintainable.
 
 In the version shown below, the consumer instantiates the `UpdateProductInventoryService` by passing it the message payload, and then invokes the `process` method on the service. If the `process` method does not return a truthy value, an error message is logged containing all the service error messages and the message is moved to the dead letter queue:
 
@@ -933,10 +950,4 @@ end
 
 ## Conclusion
 
-This post has covered a technique for integrating Kafka into a Rails application using the Karafka gem. We learned how to avoid complexity in the consumer by limiting its responsibilities to communicating with Kafka, while introducing a model for validations, and a service for business logic. This makes each component easier to maintain. This post got quite lengthy so I'm not including the tests here, but you can view the demo project including tests on [Github](https://github.com/danielabar/karafka_rails_consumer_demo).
-
-## TODO
-
-Mention about initial project scaffolding?
-
-Continue editing starting from Error Monitoring.
+This post has covered a technique for integrating Kafka into a Rails application using the [Karafka](https://karafka.io/docs/) gem, including how to do error handling and use the dead letter queue. We also learned how to avoid complexity in the consumer by limiting its responsibilities to communicating with Kafka, while introducing a model for validations, and a service for business logic. This makes each component easier to maintain. This post got quite lengthy so I'm not including the tests here, but you can try out the [demo project](https://github.com/danielabar/karafka_rails_consumer_demo) including tests in the [spec](https://github.com/danielabar/karafka_rails_consumer_demo/tree/main/spec) directory on Github.
