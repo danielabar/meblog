@@ -1,22 +1,52 @@
 ---
 title: "Configurable Retry with Ruby"
-featuredImage: "../images/tbd.jpg"
-description: "tbd"
+featuredImage: "../images/ruby-retrybrett-jordan--dChkgNLmp4-unsplash.jpg"
+description: "Learn how to implement retry logic in Ruby and enhance it with a custom module for improved error handling and resilience"
 date: "2023-11-01"
 category: "ruby"
 related:
-  - "tbd"
-  - "tbd"
-  - "tbd"
+  - "Old Ruby and New Mac"
+  - "Solving a Python Interview Question in Ruby"
+  - "Testing Faraday with RSpec"
 ---
 
-Rough brainstorming notes...
+Often when writing Ruby code, you'll encounter a section of code that might not work the first time, but might work on a repeated attempt. For example, when fetching data from a remote API, the request may occasionally fail due to network issues but be successful when trying the same request a second time. This post will explore how to  handle such situations using Ruby's [retry](https://docs.ruby-lang.org/en/3.2/syntax/exceptions_rdoc.html) keyword. Additionally, we'll delve into creating a custom module that extends the functionality of the built-in mechanism, providing additional enhancements and reducing some boilerplate.
 
-# Configurable Retry
+## Built-in Retry
 
-Why not just use Ruby's [retry](https://docs.ruby-lang.org/en/3.2/syntax/exceptions_rdoc.html)?
+In Ruby, the `retry` keyword is used to repeat the execution of a block of code within a `rescue` clause. It allows you to handle and recover from exceptions by retrying the failed operation. In a web application, you would typically want to retry an external network request, but to keep the examples simple for this post, we'll be looking at some code that reads a file. Reading a file could fail if the file is not available on the file system or the user running the program doesn't have permission to view it.
 
-In Ruby, the `retry` method is used to repeat the execution of a block of code within a `rescue` clause. It allows you to handle and recover from exceptions by retrying the failed operation.
+For example, the `FileReader` class below is initialized with a path to a file, then attempts to read from the file using `File.read`, which could raise an error:
+
+```ruby
+class FileReader
+  def initialize(file_path)
+    @file_path = file_path
+  end
+
+  def read_file
+    File.read(@file_path)
+    puts "File read successful"
+  rescue Errno::ENOENT => e
+    puts "File read failed, exception: #{e}"
+  end
+end
+```
+
+Loading and running this class in an irb console results in the following:
+
+```ruby
+# Assume example.txt exists in the current directory
+FileReader.new("example.txt").read_file
+# File read successful
+
+FileReader.new("does_not_exist.txt").read_file
+# File read failed, exception: No such file or directory @ rb_sysopen - does_not_exist.txt
+```
+
+# Rough brainstorming notes
+
+In Ruby, the `retry` keyword is used to repeat the execution of a block of code within a `rescue` clause. It allows you to handle and recover from exceptions by retrying the failed operation.
 
 Here's an example usage of the `retry` method:
 
@@ -359,12 +389,13 @@ We then have different contexts within the `describe ".with_retries"` block to c
 
 ## TODO
 
-* Intro para
+* Explain simple Ruby project setup (no Rails!), show tree dir with boot.rb loading the files
+* WIP: Introduce built-in `retry`
+* WIP: Write a simpler `with_retries` that hard-codes the options and does not support `Timeout` to introduce the concept, then introduce ActiveSupport `extract_options!` to support the `limit` option and list of exceptions, and lastly add the `timeout_in` option.
 * Subsection organization
-* Write a simpler `with_retries` that hard-codes the options and does not support `Timeout` to introduce the concept, then introduce ActiveSupport `extract_options!` to support the `limit` option and list of exceptions, and lastly add the `timeout_in` option.
 * Figure out testing.
 * Link to demo repo on Github.
 * Conclusion para.
+* Add "re" in a monospaced font to feature image, maybe throw in a ruby gem if it looks good
 * Somehow work in: "If at first you don't succeed... Ruby's retry to the rescue"
-* Feature image.
 * Use [Ruby Logger](https://blog.appsignal.com/2023/05/17/manage-your-ruby-logs-like-a-pro.html?utm_source=shortruby&utm_campaign=shortruby_0042&utm_medium=email) to display what's happening
