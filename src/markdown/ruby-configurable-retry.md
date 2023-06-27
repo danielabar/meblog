@@ -42,10 +42,11 @@ FileReader.new("example.txt").read_file
 # File read successful
 
 FileReader.new("does_not_exist.txt").read_file
-# File read failed, exception: No such file or directory @ rb_sysopen - does_not_exist.txt
+# File read failed, exception:
+#   No such file or directory @ rb_sysopen - does_not_exist.txt
 ```
 
-Suppose this code is part of a bigger application with known timing issues, where its possible that the first time the file is accessed, it might not have been created yet, but attempting it a second or even third time, by then its usually there. Here is one way the `FileReader` class can be enhanced to automatically retry the read operation if it fails up to a limited number of times:
+Suppose this code is part of a bigger application with known timing issues, where a separate process is responsible for creating the file, but its possible that the first time the file is accessed, it might not have been created yet, then attempting it a second or even third time, by then its usually there. Here is one way the `FileReader` class can be enhanced to automatically retry the `read` operation if it fails up to a limited number of times:
 
 ```ruby
 class FileReader
@@ -74,13 +75,50 @@ end
 
 In the above version, if an error occurs reading the file, it incorporates a retry mechanism. If the number of attempts `@attempt` is less than the maximum allowed attempts `MAX_ATTEMPTS`, the method increments the attempt counter and uses the `retry` keyword to reattempt the file read operation. If the maximum number of attempts has been reached, it outputs a failure message indicating that the file was not found after the specified number of attempts.
 
-The `retry` keyword causes the program flow to go back to the beginning of the `begin` block, and the file reading operation is attempted again. If it fails again, the `rescue` clause is triggered, and the process repeats until either the operation succeeds or the maximum number of retry attempts is reached.
+The `retry` keyword causes the program flow to go back to the beginning of the `begin` block (or beginning of method as in this case), and the file reading operation is attempted again. If it fails again, the `rescue` clause is triggered, and the process repeats until either the operation succeeds or the maximum number of retry attempts is reached.
 
-Note that the `retry` method can only be used within a `rescue` clause, as it relies on the context of handling exceptions.
+Loading this version in an irb console and trying it out we can see that when the file exists, it behaves the same as before. When the file does not exist, it makes two more attempts, then gives up if those still fail:
 
-## Retryable Module
+```ruby
+FileReader.new("example.txt").read_file
+# File read successful!
 
-The code in the previous section works, but there's a lot of boilerplate. Having the retry and attempt counting logic commingled with the actual business logic makes it difficult to quickly scan the method and determine what its true purpose is. Also, what if you need this logic in many methods throughout the code? What if some types of calls should only be re-attempted once and others multiple times? As currently written, the retry logic isn't easily re-usable and would have to be repeated in every method where retry was needed.
+FileReader.new("does_not_exist.txt").read_file
+# File not found. Retrying (attempt 1 of 2)...
+# File not found. Retrying (attempt 2 of 2)...
+# File not found after 2 attempts.
+```
+
+<aside class="markdown-aside">
+The "retry" method can only be used within a "rescue" clause, as it relies on the context of handling exceptions.
+</aside>
+
+If you want to see the method succeed after a failed attempt, add a breakpoint just before the `retry`. I'm using Ruby's built-in debugger, which is available [without a separate gem install as of 3.1](https://www.ruby-lang.org/en/news/2021/12/25/ruby-3-1-0-released/):
+
+```ruby
+def read_file
+  File.read(@file_path)
+  puts "File read successful!"
+rescue Errno::ENOENT
+  if @attempt < MAX_ATTEMPTS
+    @attempt += 1
+    puts "File not found. Retrying (attempt #{@attempt} of #{MAX_ATTEMPTS})..."
+
+    # === ADD BREAKPOINT HERE ===
+    debugger
+
+    retry
+  else
+    puts "File not found after #{MAX_ATTEMPTS} attempts."
+  end
+end
+```
+
+When the breakpoint is reached, create the file `does_not_exist.txt` in the file system (using a separate terminal, i.e. `touch does_not_exist.txt`), then enter `continue` in the irb console to let the code continue execution. It will go back to the beginning of the method to attempt the file read again, and this time you should see the message `File read successful!` printed to the console.
+
+## Retryable
+
+The code in the previous section works, but there's a lot of boilerplate. Having the retry and attempt counting logic commingled with the actual business logic makes it difficult to quickly scan the method and determine what its true purpose is. Also, what if you need this logic in many methods throughout the code? What if some types of calls should only be re-attempted once and others multiple times? As currently written, the retry logic has to be repeated in every method where it's needed.
 
 Let's attempt to refactor by extracting the retry and attempt counting logic to a `Retryable` module. We'll make use of the `yield` keyword to transfer control to a block of code that will get passed as an argument to the `with_retries` method of this module. This block of code will represent the actual operation that might raise an error. Since we don't know what kind of error might be raised, we'll rescue `StandardError` (not ideal but we'll get back to this point later):
 
@@ -98,7 +136,7 @@ module Retryable
       # If attempts have been exceeded, log message
       # and raise error for caller to handle.
       if retried >= 2
-        puts "Retryable failed after 3 retries, exception: #{e}"
+        puts "Retryable failed after #{retried} attempts, exception: #{e}"
         raise e
       end
 
@@ -111,9 +149,11 @@ module Retryable
 end
 ```
 
-TODO: Explanation...
+In the `rescue` block, the `retried` counter is checked and if it has reached the max attempt limit (hard-coded to 2 at the moment), then an message is logged and the error is raised. Otherwise, the `retried` counter is incremented and `retry` is used to execute the code in the `begin` block again, which uses `yield` to execute whatever block of the code the caller passed in.
 
-Now the `FileReader` class can be modified to make use of the `Retryable` module as follows:
+To use this `Retryable` module, it can be included in a class, which can then call the `with_retries` method, passing a block of code that might raise an exception. The code will be retried up to 2 times before failing.
+
+Here's the `FileReader` modified to make use of the `Retryable` module:
 
 ```ruby
 require "./app/retryable"
@@ -134,6 +174,28 @@ class FileReader
   end
 end
 ```
+
+Loading and running this version of the class in an irb console results in the following:
+
+```ruby
+# Assume example.txt exists in the current directory
+FileReader.new("example.txt").read_file
+# File read successful
+
+FileReader.new("does_not_exist.txt").read_file
+# Retryable retrying attempt 1
+# Retryable retrying attempt 2
+# Retryable failed after 2 attempts, exception:
+#   No such file or directory @ rb_sysopen - does_not_exist.txt
+# file_reader.rb:28:in `read':
+#   No such file or directory @ rb_sysopen - does_not_exist.txt (Errno::ENOENT)
+```
+
+The benefit of extracting the retry logic to a module is that it cleans up the calling code, in that now it can be solely focused on its single purpose of reading a file. Also, the `Retryable` module can be easily reused by including it in any class, and wrapping any block of code that needs to be retried in the `with_retries` block.
+
+## More Flexibility
+
+There are some problems with the `Retryable` module as currently written. The max number of attempts is currently hard-coded to `2`, and it always rescues `StandardError`. Let's add some flexibility so the caller can specify a list of exceptions that should be retried, and the number of retry attempts.
 
 # Rough brainstorming notes
 ## More Flexibility and Reuse
@@ -439,46 +501,13 @@ The yield keyword is commonly used to implement iterators or to execute custom c
 ## TODO
 
 * Explain simple Ruby project setup (no Rails!), show tree dir with boot.rb loading the files
-* WIP: Write a simpler `with_retries` that hard-codes the options and does not support `Timeout` to introduce the concept
-* Then introduce ActiveSupport `extract_options!` to support the `limit` option and list of exceptions, and lastly add the `timeout_in` option.
+* Mention what Ruby version and that it has built-in debugger
+* WIP: Then introduce ActiveSupport `extract_options!` to support the `limit` option and list of exceptions, and lastly add the `timeout_in` option.
 * Subsection organization
+* Maybe aside about error hierarchy in Ruby? https://github.com/danielabar/ruby-pluralsight#handling-exceptions
 * Figure out testing.
 * Link to demo repo on Github.
 * Conclusion para.
 * Add "re" in a monospaced font to feature image, maybe throw in a ruby gem if it looks good
 * Somehow work in: "If at first you don't succeed... Ruby's retry to the rescue"
 * Use [Ruby Logger](https://blog.appsignal.com/2023/05/17/manage-your-ruby-logs-like-a-pro.html?utm_source=shortruby&utm_campaign=shortruby_0042&utm_medium=email) to display what's happening
-* Consider more complicated example with actual network request. Get [API key](https://openweathermap.org/faq), [info](https://openweathermap.org/current)
-```ruby
-require 'net/http'
-require 'json'
-
-class OpenWeatherMapAPI
-  API_KEY = 'YOUR_API_KEY'.freeze
-  API_URL = "https://api.openweathermap.org/data/2.5/weather".freeze
-
-  def initialize(city)
-    @city = city
-  end
-
-  def make_request
-    uri = URI("#{API_URL}?q=#{@city}&appid=#{API_KEY}")
-    response = Net::HTTP.get_response(uri)
-
-    if response.is_a?(Net::HTTPSuccess)
-      data = JSON.parse(response.body)
-      temperature = data['main']['temp']
-      weather_description = data['weather'][0]['description']
-      puts "Current weather in #{@city}: #{temperature} K, #{weather_description}"
-    else
-      puts "Request failed with HTTP status code: #{response.code}"
-    end
-  rescue StandardError => e
-    puts "An error occurred: #{e.message}"
-  end
-end
-
-# Usage:
-api_service = OpenWeatherMapAPI.new('London')
-api_service.make_request
-```
