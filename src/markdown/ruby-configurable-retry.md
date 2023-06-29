@@ -10,7 +10,7 @@ related:
   - "Testing Faraday with RSpec"
 ---
 
-Often when writing Ruby code, you'll encounter a section of code that might not work the first time, but might work on a repeated attempt. For example, when fetching data from a remote API, the request may occasionally fail due to network issues but be successful when trying the same request a second or even third time. This post will explore how to  handle such situations using Ruby's [retry](https://docs.ruby-lang.org/en/3.2/syntax/exceptions_rdoc.html) keyword. Additionally, we'll delve into creating a custom module that extends the functionality of the built-in mechanism, providing additional enhancements and reducing some boilerplate.
+Often when writing Ruby code, you'll encounter a section of code that might not work the first time, but might work on a repeated attempt. For example, when fetching data from a remote API, the request may occasionally fail due to network issues but be successful when trying the same request a second or even third time. This post will explore how to  handle such situations using Ruby's [retry](https://docs.ruby-lang.org/en/3.2/syntax/exceptions_rdoc.html) keyword. Additionally, we'll delve into creating a custom module written by my colleague Patrick TBD link that extends the functionality of the built-in mechanism, providing additional enhancements and reducing some boilerplate.
 
 ## Built-in Retry
 
@@ -116,7 +116,7 @@ end
 
 When the breakpoint is reached, create the file `does_not_exist.txt` in the file system (using a separate terminal, i.e. `touch does_not_exist.txt`), then enter `continue` in the irb console to let the code continue execution. It will go back to the beginning of the method to attempt the file read again, and this time you should see the message `File read successful` printed to the console.
 
-## Retryable
+## Reusable Module
 
 The code in the previous section works, but there's a lot of boilerplate. Having the retry and attempt counting logic commingled with the actual business logic makes it difficult to quickly scan the method and determine what its true purpose is. Also, what if you need this logic in many methods throughout the code? What if some types of calls should only be re-attempted once and others multiple times? As currently written, the retry logic has to be repeated in every method where it's needed.
 
@@ -193,7 +193,7 @@ FileReader.new("does_not_exist.txt").read_file
 
 The benefit of extracting the retry logic to a module is that it cleans up the calling code, in that now it can be solely focused on its single purpose of reading a file. Also, the `Retryable` module can be easily reused by including it in any class, and wrapping any block of code that needs to be retried in the `with_retries` block.
 
-## More Flexibility
+## Flexibility
 
 There are some problems with the `Retryable` module as currently written:
 
@@ -212,9 +212,9 @@ def read_file
 end
 ```
 
-In order to support this flexibility, the `with_retries` method in the `Retryable` will be modified to accept some arguments. We'll use the splat operator for the parameter `*args`, which will allow the `with_retries` method to accept a variable number of arguments as an array. The [extract_options!](https://api.rubyonrails.org/classes/Array.html#method-i-extract_options-21) method from ActiveSupport will be used to assist in parsing out the options.
+In order to support this flexibility, the `with_retries` method in the `Retryable` will be modified to accept some arguments. We'll use the splat operator for the parameter `*args`, which will allow the `with_retries` method to accept a variable number of arguments as an array. The [extract_options!](https://api.rubyonrails.org/classes/Array.html#method-i-extract_options-21) method from ActiveSupport will be used to assist in parsing out the array/options.
 
-The splat operator will also be used in the rescue clause, to expand the `*exceptions` array into multiple arguments, each one being an individual exception that should be retried. We also populate default options and an exception list, so that the `with_retries` method will still work if the caller does not specify any arguments:
+The splat operator will also be used in the rescue clause, to expand the `*exceptions` array into multiple arguments, each one being an individual exception that should be retried.
 
 ```ruby
 require "active_support/all"
@@ -234,7 +234,7 @@ module Retryable
     options[:limit] ||= 3
 
     # Default exceptions to handle if caller has not provided any
-    exceptions = [StandardError, Timeout::Error] if exceptions.empty?
+    exceptions = [StandardError] if exceptions.empty?
 
     retried = 0
     begin
@@ -256,62 +256,33 @@ end
 <a class="markdown-link" href="https://guides.rubyonrails.org/active_support_core_extensions.html">ActiveSupport</a> provides many Ruby language extensions and utilities. It's installed automatically for Rails projects, but it can be used outside of Rails by specifying it in the Gemfile as "gem 'activesupport'", and then requiring it at the top of the module.
 </aside>
 
-# Rough brainstorming notes
-## More Flexibility and Reuse
+Another feature that would be useful when retrying is the ability to specify a timeout. That is, the caller might want to specify a time limit on each attempt such as "if there are no results within 2 seconds, try again. This can be done with Ruby's [Timeout](https://docs.ruby-lang.org/en/3.2/Timeout.html) module, which provides a way to halt a long running operation if it hasn’t finished in a fixed amount of time.
+
+Below is a modified version of the `Retryable` module that supports a `timeout_in` option, and if specified, wraps the `yield` execution in a `Timeout.timeout` block, with the `timeout_in` value provided by the caller. We also add `Timeout::Error` to the list of default exceptions to handle:
 
 ```ruby
-# app/services/retryable.rb
-
-# For a Rails project, ActiveSupport would be auto loaded
 require "active_support/all"
 require "timeout"
 
 module Retryable
-  # Retries the execution of a block of code with retry logic.
-  #
-  # @param [Array<Exception>] args The list of exceptions that should trigger a retry.
-  # @param [Hash] options The options for retrying the code block.
-  # @option options [Integer] :limit (3) The maximum number of retry attempts.
-  # @option options [Integer] :timeout_in The maximum time in seconds to wait for each retry attempt.
-  # @yield The block of code to be executed.
-  #
-  # @example Retry the code block with a specific exception and a custom limit:
-  #   Retryable.with_retries(Errno::ENOENT, limit: 5) do
-  #     # Code to be retried if Errno::ENOENT is raised
-  #   end
-  #
-  # @example Retry the code block with default exceptions and a timeout:
-  #   Retryable.with_retries(limit: 3, timeout_in: 10) do
-  #     # Code to be retried if StandardError or Timeout::Error is raised,
-  #     # with a maximum of 3 retries and a timeout of 10 seconds.
-  #   end
-  #
-  # @example Retry the code block with default options:
-  #   Retryable.with_retries do
-  #     # Code to be retried if StandardError or Timeout::Error is raised,
-  #     # with a maximum of 3 retries and no timeout.
-  #   end
-  #
-  # @example Retry the code block with multiple exceptions:
-  #   Retryable.with_retries(Errno::ECONNRESET, Errno::ETIMEDOUT, limit: 5) do
-  #     # Code to be retried if Errno::ECONNRESET or Errno::ETIMEDOUT is raised,
-  #     # with a maximum of 5 retries and no timeout.
-  #   end
-  #
-  def self.with_retries(*args)
+  def with_retries(*args)
     options = args.extract_options!
     exceptions = args
 
     options[:limit] ||= 3
+
+    # Default exceptions to handle if caller has not provided any
     exceptions = [StandardError, Timeout::Error] if exceptions.empty?
 
     retried = 0
     begin
+      # If caller has provided a `timeout_in` option,
+      # wrap the execution in a timeout block:
       if options[:timeout_in]
         Timeout.timeout(options[:timeout_in]) do
-          puts "=== DEBUG: attempt..."
           return yield
         end
+      # Otherwise, execute the code as before:
       else
         yield
       end
@@ -327,134 +298,11 @@ module Retryable
   end
 end
 ```
-## Benefits
 
-The provided code defines a module called `Retryable` in a Ruby project. This module contains a method `with_retries` that allows for retrying a block of code in case of specified exceptions. This custom implementation offers some additional features compared to Ruby's built-in `retry` method. Here are a few points to consider:
-
-1. **Customizable retry limit**: The `with_retries` method allows you to specify the maximum number of retry attempts through the `limit` option. This provides flexibility in controlling the number of retries, whereas Ruby's `retry` method is limited to a fixed number of retries.
-
-2. **Handling specific exceptions**: The `with_retries` method allows you to specify a list of exceptions to rescue and retry on. If no specific exceptions are provided, it defaults to rescuing `StandardError` and `Timeout::Error`. In contrast, Ruby's `retry` method retries the block only when encountering an exception caught by the `rescue` clause.
-
-3. **Timeout option**: The `with_retries` method supports a `timeout_in` option, which can be used to specify a time limit for each retry attempt using the `Timeout` module. This is useful when you want to ensure that the retried operation doesn't take too long. Ruby's `retry` method doesn't provide built-in timeout functionality.
-
-4. **Logging and error reporting**: The custom implementation includes logging and error reporting using methods like `Rails.logger.error` and `Rollbar.log`. This allows you to capture information about the retries, the retry limit, the timeout, and the exceptions encountered. Ruby's `retry` method doesn't provide built-in logging or reporting features.
-
-Overall, the custom `Retryable` module provides more flexibility and additional features compared to Ruby's `retry` method. It allows you to control the retry limit, specify exceptions to handle, add timeouts, and log/report retry attempts. However, the choice between using the custom module or the built-in `retry` method depends on the specific requirements and complexity of your code.
-
-## Explanation
-
-Here's an explanation of how the code works:
-
-- The `with_retries` method accepts variable arguments (`*args`), which can include exceptions to be rescued and options for retry behavior.
-- The method extracts the options from the arguments using `args.extract_options!` and assigns them to the `options` variable. The remaining arguments are assumed to be exceptions to be rescued and are assigned to the `exceptions` variable.
-- If the `:limit` option is not provided in the `options` hash, it defaults to 3.
-- If no exceptions are specified in the arguments, the `exceptions` variable is set to `[StandardError, Timeout::Error]`.
-- The `retried` variable is initialized to 0 to keep track of the number of retries.
-- The method then begins a `begin-rescue` block. If the `:timeout_in` option is provided in the `options` hash, the code is executed within a timeout using `Timeout.timeout` for the specified duration. If there is no timeout, the code is executed normally.
-- If an exception occurs during execution, it is captured and assigned to the variable `e`.
-- If the number of retries (`retried`) exceeds the specified limit (`options[:limit]`), an error message or log is generated (assuming there is a Rails logger or a Rollbar logger available), including information such as the number of retries, limit, timeout duration, and the exception that caused the failure.
-- Finally, if the number of retries is below the limit, the `retried` counter is incremented, and the code execution is retried from the beginning using the `retry` keyword.
-
-### More in depth on *args:
-
-In the `Retryable` module's `with_retries` method, the asterisk (`*`) before the `args` parameter is known as the "splat" operator. It allows the method to accept a variable number of arguments as an array.
-
-With the `*args` parameter, the caller can pass zero or more arguments to the `with_retries` method. These arguments are captured in the `args` array, which can then be further processed within the method.
-
-The different arguments that a caller can pass to the `with_retries` method include:
-
-1. `limit: <integer>`: Specifies the maximum number of retry attempts. For example: `with_retries(limit: 3)` will allow up to 3 retry attempts.
-
-2. `exceptions: <array of exceptions>`: Specifies the list of exceptions to be rescued and retried. For example: `with_retries(exceptions: [Errno::ENOENT, Timeout::Error])` will rescue and retry when encountering `Errno::ENOENT` or `Timeout::Error` exceptions.
-
-3. `timeout_in: <numeric>`: Specifies the timeout duration for each retry attempt. The value should be in seconds. For example: `with_retries(timeout_in: 5)` sets a timeout of 5 seconds for each retry attempt.
-
-Additionally, the caller can pass any other arguments that might be needed within the block of code to be retried. These arguments will be received as part of the `args` array and can be accessed within the `yield` statement.
-
-It's important to note that the `with_retries` method expects the options (such as `limit`, `exceptions`, `timeout_in`) to be passed as keyword arguments. This means they should be provided in the form of `key: value` pairs when calling the method.
-
-### More in depth on *exception:
-
-In the line `rescue *exceptions => e`, the asterisk (*) is again being used as the splat operator, but in a slightly different context.
-
-In this case, `exceptions` is an array of exception classes, and the splat operator is used to "splat" or expand the array into multiple arguments. The purpose is to specify a list of exceptions that should be rescued and handled by the `rescue` block.
-
-When an exception is raised within the `begin` block, the `rescue` block attempts to match the raised exception against the list of exceptions specified with the splat operator. If a match is found, the code within the `rescue` block will be executed.
-
-Here's a breakdown of the line:
-
-- `*exceptions` - The splat operator is used to expand the `exceptions` array into individual arguments. For example, if `exceptions` contains `[Errno::ENOENT, Errno::ECONNRESET]`, it will be expanded to `Errno::ENOENT, Errno::ECONNRESET`.
-- `=> e` - This syntax assigns the rescued exception to the variable `e`. The `rescue` block will catch any exceptions specified by the splatted `exceptions` list and assign the caught exception to the variable `e`, allowing further handling or processing within the block.
-
-Here's an example to illustrate the usage:
+To try this out, modify the `FileReader#read_file` method to call [sleep](https://docs.ruby-lang.org/en/3.2/Kernel.html#method-i-sleep) to simulate a slow operation. For this example, we'll have `with_retries` use defaults for the other options so it will retry 3 times, and handle `StandardError` and `Timeout::Error`:
 
 ```ruby
-exceptions = [Errno::ENOENT, Errno::ECONNRESET]
-
-begin
-  # Code that may raise exceptions
-rescue *exceptions => e
-  # Handle the rescued exception
-  puts "Rescued exception: #{e}"
-end
-```
-
-In this example, if an `Errno::ENOENT` or `Errno::ECONNRESET` exception is raised within the `begin` block, it will be caught by the `rescue` block, and the code within the `rescue` block will execute, printing the rescued exception to the console.
-
-### More in depth on extract_options
-
-The `extract_options!` method is not part of the Ruby standard library, but rather a method commonly used in Rails projects. It is an extension provided by ActiveSupport, which is a Ruby library that extends the core Ruby classes with additional utility methods.
-
-The `extract_options!` method is typically used to extract a hash of options from the last element of an array, removing the options from the array in the process. This is a convenient way to handle method arguments that accept both positional arguments and an options hash.
-
-In a Rails project, ActiveSupport is automatically included, so you can use `extract_options!` without explicitly requiring any additional gems. However, in plain Ruby without Rails or ActiveSupport, the `extract_options!` method is not available.
-
-If you want to use `extract_options!`-like functionality in plain Ruby, add to Gemfile:
-
-```
-gem 'activesupport'
-```
-
-Then require it in code:
-
-```
-require 'active_support/all'
-```
-
-## Example usage
-
-```ruby
-class MyService
-  include Retryable
-
-  def perform_operation
-    Retryable.with_retries(limit: 5, timeout_in: 10) do
-      # Code block to be retried
-      perform_network_request
-    end
-  end
-
-  private
-
-  def perform_network_request
-    # Simulating a network request that may raise an exception
-    # or timeout
-    raise StandardError, "Network error" if rand > 0.5
-    puts "Network request successful"
-  end
-end
-
-service = MyService.new
-service.perform_operation
-```
-
-In this example, the `perform_operation` method of the `MyService` class includes the `Retryable` module and uses the `with_retries` method. It specifies a limit of 5 retries and a timeout of 10 seconds. The code block within the `with_retries` block represents a network request that may raise an exception or timeout. If an exception occurs or the request times out, the code will be retried up to the specified limit.
-
-Rewrite file reader using Retryable module:
-
-```ruby
-# require "timeout"
-require "retryable"
+require "./app/retryable"
 
 class FileReader
   include Retryable
@@ -463,26 +311,37 @@ class FileReader
     @file_path = file_path
   end
 
-  def read_file_with_retry
-    with_retries(limit: 3, exceptions: [Errno::ENOENT]) do
-      file_contents = File.read(@file_path)
-      puts "File read successful"
-      # Further processing of file contents
+  def read_file
+    # Specify we should only wait 2 seconds before retrying.
+    with_retries(timeout_in: 2) do
+      # Simulate a slow operation by pausing
+      # current thread for 3 seconds.
+      sleep(3)
+      File.read(@file_path)
+      puts "File read successful!"
     end
   end
-
-  private
-
-  def with_retries(*args, &block)
-    Retryable.with_retries(*args, &block)
-  end
 end
-
-# Usage:
-file_reader = FileReader.new("example.txt")
-file_reader.read_file_with_retry
 ```
 
+Now running this version in an irb console will show that it attempts 3 times (waiting 2 seconds each time), then raises a timeout error:
+
+```ruby
+FileReader.new("example.txt").read_slow
+# Retryable failed after 3 retry(ies), exception: execution expired
+# app/file_reader.rb:29:in `sleep': execution expired (Timeout::Error)
+#   from app/file_reader.rb:29:in `block in read_slow'
+#   from app/retryable.rb:50:in `block in with_retries'
+#   ...
+#   from app/retryable.rb:49:in `with_retries'
+#   from app/file_reader.rb:28:in `read_slow'
+```
+
+## Conclusion
+
+This post has covered an introduction to Ruby's built-in `retry` mechanism and the development of a flexible `Retryable` module. This module provides code re-use for the retry logic with flexibility to specify which exception classes should be handled, how many times the code should be retried, and whether it should timeout after some period of time. The development of this module was inspired this post on [Ruby retry](https://scoutapm.com/blog/ruby-retry) and this [Github gist](https://gist.github.com/cainlevy/1323593/2321056de18e63436e66562e218a631d32077a20), check them out for further reading on this topic.
+
+# Rough brainstorming notes
 ## Tests
 
 ```ruby
@@ -561,12 +420,11 @@ The yield keyword is commonly used to implement iterators or to execute custom c
 
 * Explain simple Ruby project setup (no Rails!), show tree dir with boot.rb loading the files
 * Mention what Ruby version and that it has built-in debugger
-* WIP: add the `timeout_in` option.
-* WIP: Subsection organization
+* Add puts in Retryable as its attempting again
 * Figure out testing.
 * Link to demo repo on Github.
-* Add refs Patrick:  https://scoutapm.com/blog/ruby-retry and https://gist.github.com/cainlevy/1323593/2321056de18e63436e66562e218a631d32077a20
-* Conclusion para.
+* Add link to Patrick's Linkedin/website
+* Need yield explanation or assume reader knows? Maybe an aside?
 * Add "re" in a monospaced font to feature image, maybe throw in a ruby gem if it looks good
 * Somehow work in: "If at first you don't succeed... Ruby's retry to the rescue"
 * Use [Ruby Logger](https://blog.appsignal.com/2023/05/17/manage-your-ruby-logs-like-a-pro.html?utm_source=shortruby&utm_campaign=shortruby_0042&utm_medium=email) to display what's happening
