@@ -10,7 +10,46 @@ related:
   - "Testing Faraday with RSpec"
 ---
 
-Often when writing Ruby code, you'll encounter a section of code that might not work the first time, but might work on a repeated attempt. For example, when fetching data from a remote API, the request may occasionally fail due to network issues but be successful when trying the same request a second or even third time. This post will explore how to  handle such situations using Ruby's [retry](https://docs.ruby-lang.org/en/3.2/syntax/exceptions_rdoc.html) keyword. Additionally, we'll delve into creating a custom module written by my colleague Patrick TBD link that extends the functionality of the built-in mechanism, providing additional enhancements and reducing some boilerplate.
+Often when writing Ruby code, you'll encounter a section of code that might not work the first time, but might work on a repeated attempt. For example, when fetching data from a remote API, the request may occasionally fail due to network issues but be successful when trying the same request a second or even third time. This post will explore how to  handle such situations using Ruby's [retry](https://docs.ruby-lang.org/en/3.2/syntax/exceptions_rdoc.html) keyword. Additionally, we'll delve into creating a custom module (written by my colleague Patrick TBD link) that extends the functionality of the built-in mechanism, providing additional enhancements and reducing boilerplate.
+
+## Ruby Project
+
+All the code in this post is using Ruby v3.1.2. If you want to follow along with the code exercises, here is the project directory structure. This is a simple Ruby project with no Rails:
+
+```
+.
+├── Gemfile
+├── Gemfile.lock
+├── README.md
+├── app
+│   ├── file_reader.rb
+│   └── retryable.rb
+├── boot.rb
+└── example.txt
+```
+
+Where `boot.rb` is used to load the code:
+
+```ruby
+require "debug"
+require "./app/retryable"
+require "./app/file_reader"
+
+def reload
+  load "./app/retryable.rb"
+  load "./app/file_reader.rb"
+end
+
+puts "FileReader loaded, try it out for example: FileReader.new(\"example.txt\").read_file"
+```
+
+The boot file is run when starting an irb console as follows:
+
+```
+irb -r ./boot.rb
+```
+
+This saves from having to manually require/load code in the console while working through the examples. You can also view the demo project on [Github](https://github.com/danielabar/ruby-retry).
 
 ## Built-in Retry
 
@@ -120,7 +159,7 @@ When the breakpoint is reached, create the file `does_not_exist.txt` in the file
 
 The code in the previous section works, but there's a lot of boilerplate. Having the retry and attempt counting logic commingled with the actual business logic makes it difficult to quickly scan the method and determine what its true purpose is. Also, what if you need this logic in many methods throughout the code? What if some types of calls should only be re-attempted once and others multiple times? As currently written, the retry logic has to be repeated in every method where it's needed.
 
-Let's attempt to refactor by extracting the retry and attempt counting logic to a `Retryable` module. We'll make use of the `yield` keyword to transfer control to a block of code that will get passed as an argument to the `with_retries` method of this module. This block of code will represent the actual operation that might raise an error. Since we don't know what kind of error might be raised, we'll rescue `StandardError` (not ideal but we'll get back to this point later):
+Let's attempt to refactor by extracting the retry and attempt counting logic to a `Retryable` module. We'll make use of the [yield](https://www.rubyguides.com/2019/12/yield-keyword/) keyword to transfer control to a block of code that will get passed as an argument to the `with_retries` method of this module. This block of code will represent the actual operation that might raise an error. Since we don't know what kind of error might be raised, we'll rescue `StandardError` (not ideal but we'll get back to this point later):
 
 ```ruby
 module Retryable
@@ -143,6 +182,7 @@ module Retryable
       # Increment attempt counter and try again.
       # Control flows back to `begin` block.
       retried += 1
+      puts "Retryable retrying (attempt #{retried} of #{options[:limit]})"
       retry
     end
   end
@@ -183,8 +223,8 @@ FileReader.new("example.txt").read_file
 # File read successful
 
 FileReader.new("does_not_exist.txt").read_file
-# Retryable retrying attempt 1
-# Retryable retrying attempt 2
+# Retryable retrying (attempt 1 of 2)
+# Retryable retrying (attempt 2 of 2)
 # Retryable failed after 2 attempts, exception:
 #   No such file or directory @ rb_sysopen - does_not_exist.txt
 # file_reader.rb:28:in `read':
@@ -246,6 +286,7 @@ module Retryable
       end
 
       retried += 1
+      puts "Retryable retrying (attempt #{retried} of #{options[:limit]})"
       retry
     end
   end
@@ -293,6 +334,7 @@ module Retryable
       end
 
       retried += 1
+      puts "Retryable retrying (attempt #{retried} of #{options[:limit]})"
       retry
     end
   end
@@ -328,6 +370,9 @@ Now running this version in an irb console will show that it attempts 3 times (w
 
 ```ruby
 FileReader.new("example.txt").read_slow
+# Retryable retrying (attempt 1 of 3)
+# Retryable retrying (attempt 2 of 3)
+# Retryable retrying (attempt 3 of 3)
 # Retryable failed after 3 retry(ies), exception: execution expired
 # app/file_reader.rb:29:in `sleep': execution expired (Timeout::Error)
 #   from app/file_reader.rb:29:in `block in read_slow'
@@ -341,8 +386,8 @@ FileReader.new("example.txt").read_slow
 
 This post has covered an introduction to Ruby's built-in `retry` mechanism and the development of a flexible `Retryable` module. This module provides code re-use for the retry logic with flexibility to specify which exception classes should be handled, how many times the code should be retried, and whether it should timeout after some period of time. The development of this module was inspired this post on [Ruby retry](https://scoutapm.com/blog/ruby-retry) and this [Github gist](https://gist.github.com/cainlevy/1323593/2321056de18e63436e66562e218a631d32077a20), check them out for further reading on this topic.
 
-# Rough brainstorming notes
-## Tests
+## Rough brainstorming notes
+### Tests
 
 ```ruby
 require "timeout"
@@ -406,25 +451,10 @@ We then have different contexts within the `describe ".with_retries"` block to c
 3. The operation times out.
 4. The retry limit is reached without success.
 
-## Yield Explanation
-
-Is this needed or to be assumed that reader knows this?
-
-In Ruby, the yield keyword is used within a method to transfer control to a block of code that was passed as an argument to that method. It allows the method to execute the block at a specific point, injecting the necessary data or context into the block for processing.
-
-When a method encounters a yield statement, it pauses its execution and executes the block of code that was passed in, passing any specified arguments. The block can perform operations using the provided data and may return a value back to the method if needed. After the block completes its execution, the method continues executing from where it left off.
-
-The yield keyword is commonly used to implement iterators or to execute custom code within a predefined method. It allows for greater flexibility and customization by enabling users of the method to define their own behavior through blocks of code that can be executed within the method's context.
-
 ## TODO
 
-* Explain simple Ruby project setup (no Rails!), show tree dir with boot.rb loading the files
-* Mention what Ruby version and that it has built-in debugger
-* Add puts in Retryable as its attempting again
 * Figure out testing.
-* Link to demo repo on Github.
 * Add link to Patrick's Linkedin/website
-* Need yield explanation or assume reader knows? Maybe an aside?
 * Add "re" in a monospaced font to feature image, maybe throw in a ruby gem if it looks good
 * Somehow work in: "If at first you don't succeed... Ruby's retry to the rescue"
 * Use [Ruby Logger](https://blog.appsignal.com/2023/05/17/manage-your-ruby-logs-like-a-pro.html?utm_source=shortruby&utm_campaign=shortruby_0042&utm_medium=email) to display what's happening
