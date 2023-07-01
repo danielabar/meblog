@@ -10,7 +10,7 @@ related:
   - "Testing Faraday with RSpec"
 ---
 
-Often when writing Ruby code, you'll encounter a section of code that might not work the first time, but might work on a repeated attempt. For example, when fetching data from a remote API, the request may occasionally fail due to network issues but be successful when trying the same request a second or even third time. This post will explore how to  handle such situations using Ruby's [retry](https://docs.ruby-lang.org/en/3.2/syntax/exceptions_rdoc.html) keyword. Additionally, we'll delve into creating a custom module (written by my colleague Patrick TBD link) that extends the functionality of the built-in mechanism, providing additional enhancements and reducing boilerplate.
+When writing Ruby code, you may encounter a section of code that is known to fail the first time, but usually works on a repeated attempt. For example, when fetching data from a remote API, the request may occasionally fail due to network issues but be successful when trying the same request a second or even third time. This post will explore how to  handle such situations using Ruby's [retry](https://docs.ruby-lang.org/en/3.2/syntax/exceptions_rdoc.html) keyword. Additionally, we'll delve into creating a custom module (written by my colleague [Patrick Ptasiński](https://www.linkedin.com/in/patryk-ptasi%C5%84ski-07941713b/)) that extends the functionality of the built-in mechanism, providing additional enhancements and reducing boilerplate.
 
 ## Ruby Project
 
@@ -18,14 +18,19 @@ All the code in this post is using Ruby v3.1.2. If you want to follow along with
 
 ```
 .
+├── .rspec
+├── .rubocop.yml
+├── .ruby-version
 ├── Gemfile
 ├── Gemfile.lock
-├── README.md
 ├── app
-│   ├── file_reader.rb
-│   └── retryable.rb
+│   ├── file_reader.rb
+│   └── retryable.rb
 ├── boot.rb
-└── example.txt
+├── example.txt
+└── spec
+    ├── retryable_spec.rb
+    └── spec_helper.rb
 ```
 
 Where `boot.rb` is used to load the code:
@@ -49,13 +54,13 @@ The boot file is run when starting an irb console as follows:
 irb -r ./boot.rb
 ```
 
-This saves from having to manually require/load code in the console while working through the examples. You can also view the demo project on [Github](https://github.com/danielabar/ruby-retry).
+This saves from having to manually require/load code in the console while working through the examples. You can also view the [demo project](https://github.com/danielabar/ruby-retry) on Github.
 
 ## Built-in Retry
 
-In Ruby, the `retry` keyword is used to repeat the execution of a block of code within a `rescue` clause. It allows you to handle and recover from exceptions by retrying the failed operation. In a web application, you would typically want to retry an external network request, but to keep the examples simple for this post, we'll be looking at some code that reads a file. Reading a file could fail if the file is not available on the file system.
+In Ruby, the `retry` keyword is used to repeat the execution of a block of code within a `rescue` clause. It allows you to handle and recover from exceptions by retrying the failed operation. In a web application, you would typically want to retry an external network request, but to keep the examples simple for this post, we'll be looking at some code that reads a file. There are many reasons why reading a file could fail, among them, if the file is not available on the file system.
 
-For example, the `FileReader` class below is initialized with a path to a file, then attempts to read from the file using `File.read`, which could raise an error if the file is not available on disk:
+For example, the `FileReader` class below is initialized with a path to a file, then attempts to read from the file using the `File.read` method, which could raise an error if the file is not available on disk:
 
 ```ruby
 class FileReader
@@ -80,6 +85,7 @@ Loading and running this class in an irb console results in the following:
 FileReader.new("example.txt").read_file
 # File read successful
 
+# Try it with a file that is not in the current directory
 FileReader.new("does_not_exist.txt").read_file
 # File read failed, exception:
 #   No such file or directory @ rb_sysopen - does_not_exist.txt
@@ -132,7 +138,7 @@ FileReader.new("does_not_exist.txt").read_file
 The "retry" method can only be used within a "rescue" clause, as it relies on the context of handling exceptions.
 </aside>
 
-If you want to see the method succeed after a failed attempt, add a breakpoint just before the `retry`. I'm using Ruby's built-in debugger, which is available [without a separate gem install as of 3.1](https://www.ruby-lang.org/en/news/2021/12/25/ruby-3-1-0-released/):
+If you want to see the method succeed after a failed attempt, add a breakpoint just before the `retry`. I'm using Ruby's built-in debugger, which is available [without a separate gem install as of v3.1](https://www.ruby-lang.org/en/news/2021/12/25/ruby-3-1-0-released/):
 
 ```ruby
 def read_file
@@ -159,7 +165,7 @@ When the breakpoint is reached, create the file `does_not_exist.txt` in the file
 
 The code in the previous section works, but there's a lot of boilerplate. Having the retry and attempt counting logic commingled with the actual business logic makes it difficult to quickly scan the method and determine what its true purpose is. Also, what if you need this logic in many methods throughout the code? What if some types of calls should only be re-attempted once and others multiple times? As currently written, the retry logic has to be repeated in every method where it's needed.
 
-Let's attempt to refactor by extracting the retry and attempt counting logic to a `Retryable` module. We'll make use of the [yield](https://www.rubyguides.com/2019/12/yield-keyword/) keyword to transfer control to a block of code that will get passed as an argument to the `with_retries` method of this module. This block of code will represent the actual operation that might raise an error. Since we don't know what kind of error might be raised, we'll rescue `StandardError` (not ideal but we'll get back to this point later):
+Let's refactor by extracting the retry and attempt counting logic to a `Retryable` module. We'll make use of the [yield](https://www.rubyguides.com/2019/12/yield-keyword/) keyword to transfer control to a block of code that will get passed as an argument to the `with_retries` method of this module. This block of code will represent the actual operation that might raise an error. Since we don't know what kind of error might be raised, we'll rescue `StandardError` (not ideal but we'll get back to this point later):
 
 ```ruby
 module Retryable
@@ -382,81 +388,157 @@ FileReader.new("example.txt").read_slow
 #   from app/file_reader.rb:28:in `read_slow'
 ```
 
-## Conclusion
+## Tests
 
-This post has covered an introduction to Ruby's built-in `retry` mechanism and the development of a flexible `Retryable` module. This module provides code re-use for the retry logic with flexibility to specify which exception classes should be handled, how many times the code should be retried, and whether it should timeout after some period of time. The development of this module was inspired this post on [Ruby retry](https://scoutapm.com/blog/ruby-retry) and this [Github gist](https://gist.github.com/cainlevy/1323593/2321056de18e63436e66562e218a631d32077a20), check them out for further reading on this topic.
+We're not quite finished, the Retryable module also needs tests. At first it looks tricky to test because it needs to be included in a class in order to invoke the `with_retries` method. So it might seem like the only way to test it would be to test the `FileReader` class that uses it. However, we can use Ruby's [module_function](https://docs.ruby-lang.org/en/3.2/Module.html#method-i-module_function) to make any method in a module callable on the module, in addition to being an instance method on any class the module is included in.
 
-## Rough brainstorming notes
-### Tests
+Here is the modified `Retryable` module that adds the `with_retries` method as a method that can be invoked directly on the module like `Retryable.with_retries(...)`:
 
 ```ruby
+require "active_support/all"
 require "timeout"
-require_relative "retryable"
 
-RSpec.describe Retryable do
-  class TestClass
-    include Retryable
-
-    def perform_retryable_operation(limit, timeout_in, raise_exception = false)
-      Retryable.with_retries(limit: limit, timeout_in: timeout_in) do
-        raise StandardError, "Custom exception" if raise_exception
-        return "Success"
-      end
-    end
+module Retryable
+  def with_retries(*args)
+    # snip...
   end
 
+  # === EXPOSE THIS METHOD DIRECTLY ON THE MODULE ===
+  module_function :with_retries
+end
+```
+
+Now the module can be set as the `described_class` with RSpec, and invoked as `described_class.with_retries(...)`:
+
+```ruby
+# spec/retryable_spec.rb
+
+require "./app/retryable"
+
+RSpec.describe Retryable do
   describe ".with_retries" do
-    let(:test_class) { TestClass.new }
-
-    context "when the operation succeeds without exceptions" do
-      it "returns the expected result" do
-        result = test_class.perform_retryable_operation(3, 10)
-        expect(result).to eq("Success")
-      end
+    it "executes the code block without retrying if no exception is raised" do
+      expect { described_class.with_retries { puts "Executing code" } }.to output("Executing code\n").to_stdout
     end
 
-    context "when the operation raises a custom exception" do
-      it "retries and raises the exception" do
-        expect {
-          test_class.perform_retryable_operation(3, 10, true)
-        }.to raise_error(StandardError, "Custom exception")
+    it "retries the code block if a specified exception is raised" do
+      counter = 0
+      described_class.with_retries(ZeroDivisionError, limit: 4) do
+        counter += 1
+        raise ZeroDivisionError if counter < 4
       end
+
+      expect(counter).to eq(4)
     end
 
-    context "when the operation times out" do
-      it "retries and raises a Timeout::Error" do
-        expect {
-          test_class.perform_retryable_operation(3, 1)
-        }.to raise_error(Timeout::Error)
-      end
+    it "raises an exception if the retry limit is exceeded" do
+      expect do
+        described_class.with_retries(ZeroDivisionError, limit: 3) do
+          raise ZeroDivisionError
+        end
+      end.to raise_error(ZeroDivisionError)
     end
 
-    context "when the retry limit is reached" do
-      it "raises the exception without retrying" do
-        expect {
-          test_class.perform_retryable_operation(2, 10, true)
-        }.to raise_error(StandardError, "Custom exception")
+    it "retries the code block with default options if no arguments are provided" do
+      counter = 0
+      described_class.with_retries do
+        counter += 1
+        raise StandardError if counter < 3
       end
+
+      expect(counter).to eq(3)
+    end
+
+    it "retries the code block with a timeout if timeout_in option is provided" do
+      counter = 0
+      described_class.with_retries(timeout_in: 1) do
+        counter += 1
+        sleep(2) if counter < 3
+      end
+
+      expect(counter).to eq(3)
     end
   end
 end
 ```
 
-In this example, we have an RSpec test suite for the `Retryable` module. We define a `TestClass` that includes the `Retryable` module and has a method `perform_retryable_operation` which utilizes `Retryable.with_retries` for the purpose of testing.
+## Documentation
 
-We then have different contexts within the `describe ".with_retries"` block to cover different scenarios:
+The last thing to do before calling this feature done is to add some documentation. Fortunately ChatGPT can help out with this. I asked it to generate [RDoc](https://ruby.github.io/rdoc/) comments for the `Retryable` module and here is what it came up with:
 
-1. The operation succeeds without exceptions.
-2. The operation raises a custom exception.
-3. The operation times out.
-4. The retry limit is reached without success.
+```ruby
+require "active_support/all"
+require "timeout"
+
+module Retryable
+  # Retries the execution of a block of code with retry logic.
+  #
+  # @param [Array<Exception>] args The list of exceptions that should trigger a retry.
+  # @param [Hash] options The options for retrying the code block.
+  # @option options [Integer] :limit (3) The maximum number of retry attempts after initial run.
+  # @option options [Integer] :timeout_in The maximum time in seconds to wait for each retry attempt.
+  # @yield The block of code to be executed.
+  #
+  # @example Retry the code block with a specific exception and a custom limit:
+  #   Retryable.with_retries(Errno::ENOENT, limit: 5) do
+  #     # Code to be retried if Errno::ENOENT is raised
+  #   end
+  #
+  # @example Retry the code block with default exceptions and a timeout:
+  #   Retryable.with_retries(limit: 3, timeout_in: 10) do
+  #     # Code to be retried if StandardError or Timeout::Error is raised,
+  #     # with a maximum of 3 retries and a timeout of 10 seconds.
+  #   end
+  #
+  # @example Retry the code block with default options:
+  #   Retryable.with_retries do
+  #     # Code to be retried if StandardError or Timeout::Error is raised,
+  #     # with a maximum of 3 retries and no timeout.
+  #   end
+  #
+  # @example Retry the code block with multiple exceptions:
+  #   Retryable.with_retries(Errno::ECONNRESET, Errno::ETIMEDOUT, limit: 5) do
+  #     # Code to be retried if Errno::ECONNRESET or Errno::ETIMEDOUT is raised,
+  #     # with a maximum of 5 retries and no timeout.
+  #   end
+  #
+  def with_retries(*args)
+    options = args.extract_options!
+    exceptions = args
+    options[:limit] ||= 3
+    exceptions = [StandardError, Timeout::Error] if exceptions.empty?
+
+    retried = 0
+    begin
+      if options[:timeout_in]
+        Timeout.timeout(options[:timeout_in]) do
+          return yield
+        end
+      else
+        yield
+      end
+    rescue *exceptions => e
+      if retried >= options[:limit]
+        puts "Retryable failed after #{options[:limit]} retry(ies), exception: #{e}"
+        raise e
+      end
+
+      retried += 1
+      puts "Retryable retrying (attempt #{retried} of #{options[:limit]})"
+      retry
+    end
+  end
+  module_function :with_retries
+end
+```
+
+## Conclusion
+
+This post has covered an introduction to Ruby's built-in `retry` mechanism and the development of a flexible `Retryable` module. This module provides code re-use for the retry logic with flexibility to specify which exception classes should be handled, how many times the code should be retried, and whether it should timeout after some period of time. Finally we covered testing and documentation. The development of this module was inspired by this post on [Ruby retry](https://scoutapm.com/blog/ruby-retry) and this [Github gist](https://gist.github.com/cainlevy/1323593/2321056de18e63436e66562e218a631d32077a20), check them out for further reading on this topic.
 
 ## TODO
 
-* Figure out testing.
-* Add link to Patrick's Linkedin/website
 * Add "re" in a monospaced font to feature image, maybe throw in a ruby gem if it looks good
 * Somehow work in: "If at first you don't succeed... Ruby's retry to the rescue"
-* Use [Ruby Logger](https://blog.appsignal.com/2023/05/17/manage-your-ruby-logs-like-a-pro.html?utm_source=shortruby&utm_campaign=shortruby_0042&utm_medium=email) to display what's happening
 * Maybe aside about error hierarchy in Ruby? https://github.com/danielabar/ruby-pluralsight#handling-exceptions
 * Maybe ref Errno exceptions: https://www.honeybadger.io/blog/understanding-rubys-strange-errno-exceptions/
