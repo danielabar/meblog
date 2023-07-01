@@ -1,6 +1,6 @@
 ---
 title: "Configurable Retry with Ruby"
-featuredImage: "../images/ruby-retrybrett-jordan--dChkgNLmp4-unsplash.jpg"
+featuredImage: "../images/ruby-retry-mod-brett-jordan--dChkgNLmp4-unsplash.jpg"
 description: "Learn how to implement retry logic in Ruby and enhance it with a custom module for improved error handling and resilience"
 date: "2023-11-01"
 category: "ruby"
@@ -57,6 +57,8 @@ irb -r ./boot.rb
 This saves from having to manually require/load code in the console while working through the examples. You can also view the [demo project](https://github.com/danielabar/ruby-retry) on Github.
 
 ## Built-in Retry
+
+> If at first you don't succeed, try, try again.
 
 In Ruby, the `retry` keyword is used to repeat the execution of a block of code within a `rescue` clause. It allows you to handle and recover from exceptions by retrying the failed operation. In a web application, you would typically want to retry an external network request, but to keep the examples simple for this post, we'll be looking at some code that reads a file. There are many reasons why reading a file could fail, among them, if the file is not available on the file system.
 
@@ -538,7 +540,5 @@ This post has covered an introduction to Ruby's built-in `retry` mechanism and t
 
 ## TODO
 
-* Add "re" in a monospaced font to feature image, maybe throw in a ruby gem if it looks good
-* Somehow work in: "If at first you don't succeed... Ruby's retry to the rescue"
 * Maybe aside about error hierarchy in Ruby? https://github.com/danielabar/ruby-pluralsight#handling-exceptions
 * Maybe ref Errno exceptions: https://www.honeybadger.io/blog/understanding-rubys-strange-errno-exceptions/
