@@ -62,7 +62,7 @@ This saves from having to manually require/load code in the console while workin
 
 In Ruby, the `retry` keyword is used to repeat the execution of a block of code within a `rescue` clause. It allows you to handle and recover from exceptions by retrying the failed operation. In a web application, you would typically want to retry an external network request, but to keep the examples simple for this post, we'll be looking at some code that reads a file. There are many reasons why reading a file could fail, among them, if the file is not available on the file system.
 
-For example, the `FileReader` class below is initialized with a path to a file, then attempts to read from the file using the `File.read` method, which could raise an error if the file is not available on disk:
+The `FileReader` class below is initialized with a path to a file, then attempts to read from the file using the `File.read` method, which could raise an error if the file is not available on disk:
 
 ```ruby
 class FileReader
@@ -110,10 +110,13 @@ class FileReader
     # do something with file contents...
   rescue Errno::ENOENT
     if @attempt < MAX_ATTEMPTS
+      # Increment attempt counter and try again,
+      # execution flows back to beginning of method.
       @attempt += 1
       puts "File not found. Retrying (attempt #{@attempt} of #{MAX_ATTEMPTS})..."
       retry
     else
+      # Used up all the attempts, give up.
       puts "File not found after #{MAX_ATTEMPTS} attempts."
     end
   end
@@ -121,8 +124,6 @@ end
 ```
 
 In the above version, if an error occurs reading the file, it incorporates a retry mechanism. If the number of attempts `@attempt` is less than the maximum allowed attempts `MAX_ATTEMPTS`, the method increments the attempt counter and uses the `retry` keyword to reattempt the file read operation. If the maximum number of attempts has been reached, it outputs a failure message indicating that the file was not found after the specified number of attempts.
-
-The `retry` keyword causes the program flow to go back to the beginning of the `begin` block (or beginning of method as in this case), and the file reading operation is attempted again. If it fails again, the `rescue` clause is triggered, and the process repeats until either the operation succeeds or the maximum number of retry attempts is reached.
 
 Loading this version in an irb console and trying it out we can see that when the file exists, it behaves the same as before. When the file does not exist, it makes two more attempts, then gives up if those still fail:
 
@@ -167,7 +168,7 @@ When the breakpoint is reached, create the file `does_not_exist.txt` in the file
 
 The code in the previous section works, but there's a lot of boilerplate. Having the retry and attempt counting logic commingled with the actual business logic makes it difficult to quickly scan the method and determine what its true purpose is. Also, what if you need this logic in many methods throughout the code? What if some types of calls should only be re-attempted once and others multiple times? As currently written, the retry logic has to be repeated in every method where it's needed.
 
-Let's refactor by extracting the retry and attempt counting logic to a `Retryable` module. We'll make use of the [yield](https://www.rubyguides.com/2019/12/yield-keyword/) keyword to transfer control to a block of code that will get passed as an argument to the `with_retries` method of this module. This block of code will represent the actual operation that might raise an error. Since we don't know what kind of error might be raised, we'll rescue `StandardError` (not ideal but we'll get back to this point later):
+Let's refactor by extracting the retry and attempt counting logic to a `Retryable` module that defines an instance method `with_retries`. This method uses the [yield](https://www.rubyguides.com/2019/12/yield-keyword/) keyword to transfer control to a block of code that will get passed as an argument. This block of code will represent the actual operation that might raise an error. Since we don't know what kind of error might be raised, we'll rescue `StandardError` for now (we'll return to this shortly):
 
 ```ruby
 module Retryable
@@ -197,9 +198,9 @@ module Retryable
 end
 ```
 
-In the `rescue` block, the `retried` counter is checked and if it has reached the max attempt limit (hard-coded to 2 at the moment), then a message is logged and the error is raised. Otherwise, the `retried` counter is incremented and `retry` is used to execute the code in the `begin` block again, which uses `yield` to execute whatever block of the code the caller passed in.
+In the `rescue` block, the `retried` counter is checked and if it has reached the max attempt limit (hard-coded to 2 at the moment), then a message is logged and the error is raised. Otherwise, the `retried` counter is incremented and `retry` is used to execute the code in the `begin` block again.
 
-To use this `Retryable` module, it can be included in a class, which can then call the `with_retries` method, passing a block of code that might raise an exception. The code will be retried up to 2 times before failing.
+To use this `Retryable` module, it can be included in a class. As a result of including this module, the class now has the `with_retries` instance method, which it can call by passing a block of code that might raise an exception. The code will be retried up to 2 times before failing.
 
 Here's the `FileReader` modified to make use of the `Retryable` module:
 
@@ -247,9 +248,13 @@ There are some problems with the `Retryable` module as currently written:
 
 It always rescues `StandardError`, but the caller may want to be more specific about which exceptions should be retried. For example, in the case of `File.read`, it could raise `Errno::ENOENT` (no such file or directory) or `Errno::EMFILE` (too many open files), which should be retried as those could get resolved in this particular application. But other errors such as `Errno::EISDIR` (is a directory) or `Errno::EACCES` (permission denied) would not get resolved on repeated attempts therefore should not be retried.
 
-Also the max number of attempts is currently hard-coded to `2`. The caller might want to specify how many retries. For example, some use cases may require a higher number of retries such as `5`, whereas others should only be retried once.
+<aside class="markdown-aside">
+The "Errno::" exceptions in Ruby differ from the usual exceptions like "NoMethodError" or "ArgumentError" because they represent operating system errors. To delve deeper into the topic and understand why they may seem cryptic, refer to this blog post <a class="markdown-link" href="https://www.honeybadger.io/blog/understanding-rubys-strange-errno-exceptions/">Understanding Ruby's Strange Errno Exceptions</a> for more insights.
+</aside>
 
-It would be nice if the `with_retries` method could accept some arguments where the caller could specify a list of exceptions that should be handled, and an options hash to specify the number of retries, like this:
+Another issue with the `Retryable` module is the maximum number of attempts is currently hard-coded to `2`. The caller might want to specify how many retries. For example, some use cases may require a higher number of retries such as `5`, whereas others should only be retried once.
+
+It would be nice if the `with_retries` method could accept some arguments where the caller could specify a list of exceptions that should be retried, and an options hash to specify the number of retries, like this:
 
 ```ruby
 def read_file
@@ -274,7 +279,7 @@ module Retryable
     # { :limit => 2 }
     options = args.extract_options!
 
-    # What's left of the args array will be the list of exceptions,
+    # What's left of the args array will be an array of exceptions,
     # for example: [Errno::ENOENT, Errno::EMFILE]
     exceptions = args
 
@@ -392,7 +397,7 @@ FileReader.new("example.txt").read_slow
 
 ## Tests
 
-We're not quite finished, the Retryable module also needs tests. At first it looks tricky to test because it needs to be included in a class in order to invoke the `with_retries` method. So it might seem like the only way to test it would be to test the `FileReader` class that uses it. However, we can use Ruby's [module_function](https://docs.ruby-lang.org/en/3.2/Module.html#method-i-module_function) to make any method in a module callable on the module, in addition to being an instance method on any class the module is included in.
+We're not quite finished, the Retryable module also needs tests. I'll be using [RSpec](http://rspec.info/). At first it looks tricky to test because it needs to be included in a class in order to invoke the `with_retries` method. So it might seem like the only way to test it would be to test the `FileReader` class that uses it. However, we can use Ruby's [module_function](https://docs.ruby-lang.org/en/3.2/Module.html#method-i-module_function) to make any method in a module callable on the module, in addition to being an instance method on any class the module is included in.
 
 Here is the modified `Retryable` module that adds the `with_retries` method as a method that can be invoked directly on the module like `Retryable.with_retries(...)`:
 
@@ -537,8 +542,3 @@ end
 ## Conclusion
 
 This post has covered an introduction to Ruby's built-in `retry` mechanism and the development of a flexible `Retryable` module. This module provides code re-use for the retry logic with flexibility to specify which exception classes should be handled, how many times the code should be retried, and whether it should timeout after some period of time. Finally we covered testing and documentation. The development of this module was inspired by this post on [Ruby retry](https://scoutapm.com/blog/ruby-retry) and this [Github gist](https://gist.github.com/cainlevy/1323593/2321056de18e63436e66562e218a631d32077a20), check them out for further reading on this topic.
-
-## TODO
-
-* Maybe aside about error hierarchy in Ruby? https://github.com/danielabar/ruby-pluralsight#handling-exceptions
-* Maybe ref Errno exceptions: https://www.honeybadger.io/blog/understanding-rubys-strange-errno-exceptions/
