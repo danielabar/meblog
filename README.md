@@ -95,6 +95,12 @@ Image in src/images:
 ![image alt text](../images/image-file-name.png "image description")
 ```
 
+
+## Markdown Styling
+
+* Add entry mapping markdown element to a css class in in `gatsby-config.js` under the `plugins` -> `gatsby-transformer-remark` section.
+* Add css styles for the class in `src/styles/markdown.css`.
+
 ## Gatsby Upgrade Checklist
 
 [4 - 5](https://v5.gatsbyjs.com/docs/reference/release-notes/migrating-from-v4-to-v5/)
@@ -113,7 +119,7 @@ The following all needs to work:
   - [x] Sitemap should be generated (wherever it is, update Google Search Console -> Sitemaps, after deploy, eg: `/sitemap-0.xml`)
 - [x] CI workflow passing on Github
 
-## References
+### References
 
 - [Gatsby Unit Testing](https://www.gatsbyjs.com/docs/how-to/testing/unit-testing/)
 - [Jest](https://jestjs.io/docs/getting-started)

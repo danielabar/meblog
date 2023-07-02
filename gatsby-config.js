@@ -49,6 +49,7 @@ module.exports = {
                 image: "markdown-image",
                 linkReference: "markdown-link-ref",
                 imageReference: "markdown-image-ref",
+                table: "markdown-table"
               },
             },
           },
