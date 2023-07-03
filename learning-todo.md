@@ -16,7 +16,7 @@
 * [x] WIP Generate course images into `src/images/learning` (replace all placeholder.png)
 * [x] Verify SEO and tracking for new `/learning` page.
 * [ ] Consider env var like `LEARNING_ENABLED` (similar to `SEARCH_ENABLED`) to control whether learning page is displayed
-* [ ] New unit tests for new learning page and related components.
+* [ ] New unit tests for new learning page and related components. (for page, see `src/pages/index.spec.js`)
 * [ ] Implement [sitemap config](https://www.gatsbyjs.com/plugins/gatsby-plugin-sitemap) to exclude the new `/learning` page.
 * [ ] Verify prod build `make serve`.
 * [ ] Sorting/Filtering (could be follow-on, could [this](https://github.com/pacocoursey/cmdk) be useful?). Also see Isotope and MixItUp.
