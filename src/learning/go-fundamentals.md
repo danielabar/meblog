@@ -2,7 +2,7 @@
 title: "Go Fundamentals"
 instructor: "Nigel Poulton"
 platform: "Pluralsight"
-featuredImage: "../images/learning/placeholder.png"
+featuredImage: "../images/learning/golang.png"
 description: "Conditionals, function basics, variables, slices, maps, custom data types with structs, concurrent programming with goroutines."
 completed_date: "2017-07-19"
 category: "golang"

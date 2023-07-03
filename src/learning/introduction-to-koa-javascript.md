@@ -2,7 +2,7 @@
 title: "Introduction to Koa Javascript"
 instructor: "Marcus Hammarberg"
 platform: "Pluralsight"
-featuredImage: "../images/learning/placeholder.png"
+featuredImage: "../images/learning/koa.jpg"
 description: "Koa, a web framework for Node.js based on generators. Course includes an introduction to generators and Koa's components."
 completed_date: "2018-07-07"
 category: "javascript"

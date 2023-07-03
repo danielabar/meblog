@@ -2,7 +2,7 @@
 title: "CentOS Essentials"
 instructor: "Andrew Mallett"
 platform: "Pluralsight"
-featuredImage: "../images/learning/placeholder.png"
+featuredImage: "../images/learning/centos7.jpg"
 description: "Linux essentials including working at command line, reading files, vim, piping, redirection, and file permissions."
 completed_date: "2019-12-30"
 category: "linux"

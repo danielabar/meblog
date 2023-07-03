@@ -14,6 +14,7 @@
   * [x] Figure out gatsbyImageData options for course card image wrt grid options (see below)
   * [x] Square images from DAll-e don't look good, need to get a wider aspect ratio, look into [imagemagick](https://www.digitalocean.com/community/tutorials/workflow-resizing-images-with-imagemagick), adjust gravity based on where important details of the image are: `convert react-hooks-orig.png -resize 250x -gravity north -crop 250x140+0+0 react-hooks.png`
 * [ ] WIP Generate course images into `src/images/learning` (replace all placeholder.png)
+* [ ] Consider env var like `LEARNING_ENABLED` (similar to `SEARCH_ENABLED`) to control whether learning page is displayed
 * [ ] New unit tests for new learning page and related components.
 * [ ] Implement [sitemap config](https://www.gatsbyjs.com/plugins/gatsby-plugin-sitemap) to exclude the new `/learning` page.
 * [ ] Verify SEO and tracking for new `/learning` page.
