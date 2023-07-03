@@ -2,7 +2,7 @@
 title: "Webapps with Angular UI"
 instructor: "Andrew Burgess"
 platform: "Envato Tuts+"
-featuredImage: "../images/learning/placeholder.png"
+featuredImage: "../images/learning/anguilarui.jpg"
 description: "TBD"
 completed_date: "2015-01-10"
 category: "javascript"
