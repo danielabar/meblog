@@ -4,7 +4,6 @@ import { FaRegCalendar, FaExternalLinkAlt } from "react-icons/fa"
 import * as styles from "./course.module.css"
 
 const Course = props => {
-  console.log(props.title)
   return (
     <div className={styles.container}>
 
