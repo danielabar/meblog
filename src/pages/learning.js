@@ -27,7 +27,7 @@ import * as styles from "./learning.module.css"
 const Learning = props => {
   return (
     <Layout>
-      <div className={styles.container}>
+      <div className={styles.container} data-testid="learning">
         <SEO
           title="Learning"
           description="Unlock the power of online courses in software development, with curated insights and expert advice to elevate your skills in a rapidly evolving field."

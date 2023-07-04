@@ -13,10 +13,12 @@
   * [x] Slight black overlay so images aren't so prominent, something like this? https://stackoverflow.com/questions/43479968/how-can-i-add-an-image-overlaying-an-img-tag
   * [x] Figure out gatsbyImageData options for course card image wrt grid options (see below)
   * [x] Square images from DAll-e don't look good, need to get a wider aspect ratio, look into [imagemagick](https://www.digitalocean.com/community/tutorials/workflow-resizing-images-with-imagemagick), adjust gravity based on where important details of the image are: `convert react-hooks-orig.png -resize 250x -gravity north -crop 250x140+0+0 react-hooks.png`
-* [x] WIP Generate course images into `src/images/learning` (replace all placeholder.png)
+* [x] Generate course images into `src/images/learning` (replace all placeholder.png)
 * [x] Verify SEO and tracking for new `/learning` page.
+* [ ] WIP New unit tests for new learning page and related components. (for page, see `src/pages/index.spec.js`)
+* [ ] Add latest Kafka course
+* [ ] Maybe new image for learning page SEO?
 * [ ] Consider env var like `LEARNING_ENABLED` (similar to `SEARCH_ENABLED`) to control whether learning page is displayed
-* [ ] New unit tests for new learning page and related components. (for page, see `src/pages/index.spec.js`)
 * [ ] Implement [sitemap config](https://www.gatsbyjs.com/plugins/gatsby-plugin-sitemap) to exclude the new `/learning` page.
 * [ ] Verify prod build `make serve`.
 * [ ] Sorting/Filtering (could be follow-on, could [this](https://github.com/pacocoursey/cmdk) be useful?). Also see Isotope and MixItUp.
