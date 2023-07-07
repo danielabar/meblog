@@ -32,6 +32,7 @@ const Learning = props => {
           title="Learning"
           description="Unlock the power of online courses in software development, with curated insights and expert advice to elevate your skills in a rapidly evolving field."
           pathname="/learning"
+          image="/images/learning.png"
         />
         <Intro />
         <CourseList courses={props.data.allMarkdownRemark.edges} />

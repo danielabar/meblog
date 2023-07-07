@@ -18,7 +18,7 @@
 * [x] Verify prod build `make serve`.
 * [x] WIP New unit tests for new learning page and related components. (for page, see `src/pages/index.spec.js`)
 * [x] Add latest Kafka course
-* [ ] Maybe new image for learning page SEO?
+* [x] New image for learning page SEO?
 * [ ] Consider env var like `LEARNING_ENABLED` (similar to `SEARCH_ENABLED`) to control whether learning page is displayed
 * [ ] Implement [sitemap config](https://www.gatsbyjs.com/plugins/gatsby-plugin-sitemap) to exclude the new `/learning` page.
 * [ ] Sorting/Filtering (could be follow-on, could [this](https://github.com/pacocoursey/cmdk) be useful?). Also see Isotope and MixItUp.

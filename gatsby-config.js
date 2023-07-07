@@ -10,7 +10,7 @@ module.exports = {
     siteUrl: "https://danielabaron.me",
     url: "https://danielabaron.me",
     description: "The personal website of Daniela Baron, software developer.",
-    image: "/images/profile.png",
+    image: "/images/dbaron_profile.png",
     twitterUsername: "@DanielaMBaron",
     googleSiteVerification: "zmLm6qu34TLdeqUUPDF_K6faoqGqQincxyNZk7VsHgY",
   },
