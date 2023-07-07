@@ -17,7 +17,7 @@
 * [x] Verify SEO and tracking for new `/learning` page.
 * [x] Verify prod build `make serve`.
 * [x] WIP New unit tests for new learning page and related components. (for page, see `src/pages/index.spec.js`)
-* [ ] Add latest Kafka course
+* [x] Add latest Kafka course
 * [ ] Maybe new image for learning page SEO?
 * [ ] Consider env var like `LEARNING_ENABLED` (similar to `SEARCH_ENABLED`) to control whether learning page is displayed
 * [ ] Implement [sitemap config](https://www.gatsbyjs.com/plugins/gatsby-plugin-sitemap) to exclude the new `/learning` page.
