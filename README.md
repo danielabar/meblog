@@ -75,6 +75,27 @@ Run tests in watch mode:
 make testw
 ```
 
+Run just one test by `describe` and it `strings`:
+
+For example, given a test like:
+
+```javascript
+describe("Course", () => {
+  it("renders correctly", () => {
+    // test body...
+  })
+  it("other test", () => {
+    // some other stuff...
+  })
+})
+```
+
+To run just the `renders correctly` test:
+
+```bash
+node_modules/.bin/jest -t "Course renders correctly"
+```
+
 ## Markdown Links
 
 To another post:

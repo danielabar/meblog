@@ -26,7 +26,7 @@ const Course = props => {
         </div>
         <div className={styles.iconWithText}>
           <FaExternalLinkAlt className={styles.icon} />
-          <a className={styles.iconLink} href={props.notes} target="_blank" rel="noopener noreferrer">View Notes</a>
+          <a className={styles.iconLink} href={props.notes} data-testid="course-notes-link" target="_blank" rel="noopener noreferrer">View Notes</a>
         </div>
       </div>
     </div>

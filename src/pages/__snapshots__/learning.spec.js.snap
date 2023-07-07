@@ -67,7 +67,9 @@ exports[`Learning Page renders 1`] = `
             data-testid="learning"
           >
             <div />
-            <section>
+            <section
+              data-testid="learning-intro"
+            >
               Welcome to the Learning section. In a world where change is the only constant, it's crucial to keep learning and expanding our knowledge. This is especially true in software development, where new languages, tools, libraries, and frameworks are always emerging. Here, I've gathered a collection of online courses that I've taken and compiled detailed notes on, so you can learn from my experiences and take your skills to the next level. Also check out my article on how to 
               <a
                 class="markdown-link"
@@ -177,6 +179,7 @@ exports[`Learning Page renders 1`] = `
                       />
                     </svg>
                     <a
+                      data-testid="course-notes-link"
                       href="https://github.com/danielabar/bash-zsh-syntax-pluralsight"
                       rel="noopener noreferrer"
                       target="_blank"
@@ -343,7 +346,9 @@ exports[`Learning Page renders 1`] = `
           data-testid="learning"
         >
           <div />
-          <section>
+          <section
+            data-testid="learning-intro"
+          >
             Welcome to the Learning section. In a world where change is the only constant, it's crucial to keep learning and expanding our knowledge. This is especially true in software development, where new languages, tools, libraries, and frameworks are always emerging. Here, I've gathered a collection of online courses that I've taken and compiled detailed notes on, so you can learn from my experiences and take your skills to the next level. Also check out my article on how to 
             <a
               class="markdown-link"
@@ -453,6 +458,7 @@ exports[`Learning Page renders 1`] = `
                     />
                   </svg>
                   <a
+                    data-testid="course-notes-link"
                     href="https://github.com/danielabar/bash-zsh-syntax-pluralsight"
                     rel="noopener noreferrer"
                     target="_blank"
