@@ -30,7 +30,7 @@ const Learning = props => {
       <div className={styles.container} data-testid="learning">
         <SEO
           title="Learning"
-          description="Unlock the power of online courses in software development, with curated insights and expert advice to elevate your skills in a rapidly evolving field."
+          description="Unlock the power of online courses in software development, with curated insights to elevate your skills in a rapidly evolving field."
           pathname="/learning"
           image="/images/learning.png"
         />
