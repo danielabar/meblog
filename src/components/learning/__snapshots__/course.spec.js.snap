@@ -1,0 +1,278 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`Course renders correctly 1`] = `
+{
+  "asFragment": [Function],
+  "baseElement": <body>
+    <div>
+      <div>
+        <div>
+          <div
+            class="gatsby-image-wrapper gatsby-image-wrapper-constrained"
+            data-gatsby-image-wrapper=""
+            style="position: relative; overflow: hidden; display: inline-block; vertical-align: top;"
+          >
+            <div
+              style="max-width: 250px; display: block;"
+            >
+              <img
+                alt=""
+                aria-hidden="true"
+                role="presentation"
+                src="data:image/svg+xml;charset=utf-8,%3Csvg%20height='140'%20width='250'%20xmlns='http://www.w3.org/2000/svg'%20version='1.1'%3E%3C/svg%3E"
+                style="max-width: 100%; display: block; position: static;"
+              />
+            </div>
+            <div
+              aria-hidden="true"
+              data-placeholder-image=""
+              style="height: 100%; left: 0px; position: absolute; top: 0px; width: 100%;"
+            />
+            <picture>
+              <source
+                data-srcset="/static/abc123/a6e40/js.webp 63w,/static/abc123/46142/js.webp 125w,/static/abc123/2cd09/js.webp 250w,/static/abc123/cd07d/js.webp 500w"
+                sizes="(min-width: 250px) 250px, 100vw"
+                type="image/webp"
+              />
+              <img
+                alt="The JavaScript Course"
+                data-gatsby-image-ssr=""
+                data-main-image=""
+                data-src="/static/abc123/5a159/js.jpg"
+                data-srcset="/static/abc123/ba115/js.jpg 63w,/static/abc123/1a003/js.jpg 125w,/static/abc123/5a159/js.jpg 250w,/static/abc123/d3119/js.jpg 500w"
+                decoding="async"
+                loading="lazy"
+                sizes="(min-width: 250px) 250px, 100vw"
+                style="height: 100%; left: 0px; position: absolute; top: 0px; transform: translateZ(0); transition: opacity 250ms linear; width: 100%; will-change: opacity; opacity: 0;"
+              />
+            </picture>
+            <noscript />
+            <script
+              type="module"
+            >
+              const t="undefined"!=typeof HTMLImageElement&&"loading"in HTMLImageElement.prototype;if(t){const t=document.querySelectorAll("img[data-main-image]");for(let e of t){e.dataset.src&&(e.setAttribute("src",e.dataset.src),e.removeAttribute("data-src")),e.dataset.srcset&&(e.setAttribute("srcset",e.dataset.srcset),e.removeAttribute("data-srcset"));const t=e.parentNode.querySelectorAll("source[data-srcset]");for(let e of t)e.setAttribute("srcset",e.dataset.srcset),e.removeAttribute("data-srcset");e.complete&&(e.style.opacity=1,e.parentNode.parentNode.querySelector("[data-placeholder-image]").style.opacity=0)}}
+            </script>
+          </div>
+        </div>
+        <div
+          class="undefined javascript"
+        >
+          <div>
+            <span>
+              •
+            </span>
+             
+            javascript
+          </div>
+        </div>
+        <div>
+          The JavaScript Course
+        </div>
+        <div>
+          <div>
+            <svg
+              fill="currentColor"
+              height="1em"
+              stroke="currentColor"
+              stroke-width="0"
+              viewBox="0 0 448 512"
+              width="1em"
+              xmlns="http://www.w3.org/2000/svg"
+            >
+              <path
+                d="M400 64h-48V12c0-6.6-5.4-12-12-12h-40c-6.6 0-12 5.4-12 12v52H160V12c0-6.6-5.4-12-12-12h-40c-6.6 0-12 5.4-12 12v52H48C21.5 64 0 85.5 0 112v352c0 26.5 21.5 48 48 48h352c26.5 0 48-21.5 48-48V112c0-26.5-21.5-48-48-48zm-6 400H54c-3.3 0-6-2.7-6-6V160h352v298c0 3.3-2.7 6-6 6z"
+              />
+            </svg>
+            <span>
+              2022-01-30
+            </span>
+          </div>
+          <div>
+            <svg
+              fill="currentColor"
+              height="1em"
+              stroke="currentColor"
+              stroke-width="0"
+              viewBox="0 0 512 512"
+              width="1em"
+              xmlns="http://www.w3.org/2000/svg"
+            >
+              <path
+                d="M432,320H400a16,16,0,0,0-16,16V448H64V128H208a16,16,0,0,0,16-16V80a16,16,0,0,0-16-16H48A48,48,0,0,0,0,112V464a48,48,0,0,0,48,48H400a48,48,0,0,0,48-48V336A16,16,0,0,0,432,320ZM488,0h-128c-21.37,0-32.05,25.91-17,41l35.73,35.73L135,320.37a24,24,0,0,0,0,34L157.67,377a24,24,0,0,0,34,0L435.28,133.32,471,169c15,15,41,4.5,41-17V24A24,24,0,0,0,488,0Z"
+              />
+            </svg>
+            <a
+              data-testid="course-notes-link"
+              href="https://github.com/danielabar/some_course_notes"
+              rel="noopener noreferrer"
+              target="_blank"
+            >
+              View Notes
+            </a>
+          </div>
+        </div>
+      </div>
+    </div>
+  </body>,
+  "container": <div>
+    <div>
+      <div>
+        <div
+          class="gatsby-image-wrapper gatsby-image-wrapper-constrained"
+          data-gatsby-image-wrapper=""
+          style="position: relative; overflow: hidden; display: inline-block; vertical-align: top;"
+        >
+          <div
+            style="max-width: 250px; display: block;"
+          >
+            <img
+              alt=""
+              aria-hidden="true"
+              role="presentation"
+              src="data:image/svg+xml;charset=utf-8,%3Csvg%20height='140'%20width='250'%20xmlns='http://www.w3.org/2000/svg'%20version='1.1'%3E%3C/svg%3E"
+              style="max-width: 100%; display: block; position: static;"
+            />
+          </div>
+          <div
+            aria-hidden="true"
+            data-placeholder-image=""
+            style="height: 100%; left: 0px; position: absolute; top: 0px; width: 100%;"
+          />
+          <picture>
+            <source
+              data-srcset="/static/abc123/a6e40/js.webp 63w,/static/abc123/46142/js.webp 125w,/static/abc123/2cd09/js.webp 250w,/static/abc123/cd07d/js.webp 500w"
+              sizes="(min-width: 250px) 250px, 100vw"
+              type="image/webp"
+            />
+            <img
+              alt="The JavaScript Course"
+              data-gatsby-image-ssr=""
+              data-main-image=""
+              data-src="/static/abc123/5a159/js.jpg"
+              data-srcset="/static/abc123/ba115/js.jpg 63w,/static/abc123/1a003/js.jpg 125w,/static/abc123/5a159/js.jpg 250w,/static/abc123/d3119/js.jpg 500w"
+              decoding="async"
+              loading="lazy"
+              sizes="(min-width: 250px) 250px, 100vw"
+              style="height: 100%; left: 0px; position: absolute; top: 0px; transform: translateZ(0); transition: opacity 250ms linear; width: 100%; will-change: opacity; opacity: 0;"
+            />
+          </picture>
+          <noscript />
+          <script
+            type="module"
+          >
+            const t="undefined"!=typeof HTMLImageElement&&"loading"in HTMLImageElement.prototype;if(t){const t=document.querySelectorAll("img[data-main-image]");for(let e of t){e.dataset.src&&(e.setAttribute("src",e.dataset.src),e.removeAttribute("data-src")),e.dataset.srcset&&(e.setAttribute("srcset",e.dataset.srcset),e.removeAttribute("data-srcset"));const t=e.parentNode.querySelectorAll("source[data-srcset]");for(let e of t)e.setAttribute("srcset",e.dataset.srcset),e.removeAttribute("data-srcset");e.complete&&(e.style.opacity=1,e.parentNode.parentNode.querySelector("[data-placeholder-image]").style.opacity=0)}}
+          </script>
+        </div>
+      </div>
+      <div
+        class="undefined javascript"
+      >
+        <div>
+          <span>
+            •
+          </span>
+           
+          javascript
+        </div>
+      </div>
+      <div>
+        The JavaScript Course
+      </div>
+      <div>
+        <div>
+          <svg
+            fill="currentColor"
+            height="1em"
+            stroke="currentColor"
+            stroke-width="0"
+            viewBox="0 0 448 512"
+            width="1em"
+            xmlns="http://www.w3.org/2000/svg"
+          >
+            <path
+              d="M400 64h-48V12c0-6.6-5.4-12-12-12h-40c-6.6 0-12 5.4-12 12v52H160V12c0-6.6-5.4-12-12-12h-40c-6.6 0-12 5.4-12 12v52H48C21.5 64 0 85.5 0 112v352c0 26.5 21.5 48 48 48h352c26.5 0 48-21.5 48-48V112c0-26.5-21.5-48-48-48zm-6 400H54c-3.3 0-6-2.7-6-6V160h352v298c0 3.3-2.7 6-6 6z"
+            />
+          </svg>
+          <span>
+            2022-01-30
+          </span>
+        </div>
+        <div>
+          <svg
+            fill="currentColor"
+            height="1em"
+            stroke="currentColor"
+            stroke-width="0"
+            viewBox="0 0 512 512"
+            width="1em"
+            xmlns="http://www.w3.org/2000/svg"
+          >
+            <path
+              d="M432,320H400a16,16,0,0,0-16,16V448H64V128H208a16,16,0,0,0,16-16V80a16,16,0,0,0-16-16H48A48,48,0,0,0,0,112V464a48,48,0,0,0,48,48H400a48,48,0,0,0,48-48V336A16,16,0,0,0,432,320ZM488,0h-128c-21.37,0-32.05,25.91-17,41l35.73,35.73L135,320.37a24,24,0,0,0,0,34L157.67,377a24,24,0,0,0,34,0L435.28,133.32,471,169c15,15,41,4.5,41-17V24A24,24,0,0,0,488,0Z"
+            />
+          </svg>
+          <a
+            data-testid="course-notes-link"
+            href="https://github.com/danielabar/some_course_notes"
+            rel="noopener noreferrer"
+            target="_blank"
+          >
+            View Notes
+          </a>
+        </div>
+      </div>
+    </div>
+  </div>,
+  "debug": [Function],
+  "findAllByAltText": [Function],
+  "findAllByDisplayValue": [Function],
+  "findAllByLabelText": [Function],
+  "findAllByPlaceholderText": [Function],
+  "findAllByRole": [Function],
+  "findAllByTestId": [Function],
+  "findAllByText": [Function],
+  "findAllByTitle": [Function],
+  "findByAltText": [Function],
+  "findByDisplayValue": [Function],
+  "findByLabelText": [Function],
+  "findByPlaceholderText": [Function],
+  "findByRole": [Function],
+  "findByTestId": [Function],
+  "findByText": [Function],
+  "findByTitle": [Function],
+  "getAllByAltText": [Function],
+  "getAllByDisplayValue": [Function],
+  "getAllByLabelText": [Function],
+  "getAllByPlaceholderText": [Function],
+  "getAllByRole": [Function],
+  "getAllByTestId": [Function],
+  "getAllByText": [Function],
+  "getAllByTitle": [Function],
+  "getByAltText": [Function],
+  "getByDisplayValue": [Function],
+  "getByLabelText": [Function],
+  "getByPlaceholderText": [Function],
+  "getByRole": [Function],
+  "getByTestId": [Function],
+  "getByText": [Function],
+  "getByTitle": [Function],
+  "queryAllByAltText": [Function],
+  "queryAllByDisplayValue": [Function],
+  "queryAllByLabelText": [Function],
+  "queryAllByPlaceholderText": [Function],
+  "queryAllByRole": [Function],
+  "queryAllByTestId": [Function],
+  "queryAllByText": [Function],
+  "queryAllByTitle": [Function],
+  "queryByAltText": [Function],
+  "queryByDisplayValue": [Function],
+  "queryByLabelText": [Function],
+  "queryByPlaceholderText": [Function],
+  "queryByRole": [Function],
+  "queryByTestId": [Function],
+  "queryByText": [Function],
+  "queryByTitle": [Function],
+  "rerender": [Function],
+  "unmount": [Function],
+}
+`;

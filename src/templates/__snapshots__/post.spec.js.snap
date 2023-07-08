@@ -44,6 +44,15 @@ exports[`Post Renders in layout 1`] = `
                   class="undefined undefined"
                 >
                   <a
+                    href="/learning"
+                  >
+                    Learning
+                  </a>
+                </li>
+                <li
+                  class="undefined undefined"
+                >
+                  <a
                     href="/about"
                   >
                     About
@@ -344,6 +353,15 @@ exports[`Post Renders in layout 1`] = `
                   href="/blog"
                 >
                   Blog
+                </a>
+              </li>
+              <li
+                class="undefined undefined"
+              >
+                <a
+                  href="/learning"
+                >
+                  Learning
                 </a>
               </li>
               <li

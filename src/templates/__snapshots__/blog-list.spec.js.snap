@@ -44,6 +44,15 @@ exports[`Blog List Renders in layout with pagination set to second page 1`] = `
                   class="undefined undefined"
                 >
                   <a
+                    href="/learning"
+                  >
+                    Learning
+                  </a>
+                </li>
+                <li
+                  class="undefined undefined"
+                >
+                  <a
                     href="/about"
                   >
                     About
@@ -247,6 +256,15 @@ exports[`Blog List Renders in layout with pagination set to second page 1`] = `
                   href="/blog"
                 >
                   Blog
+                </a>
+              </li>
+              <li
+                class="undefined undefined"
+              >
+                <a
+                  href="/learning"
+                >
+                  Learning
                 </a>
               </li>
               <li
@@ -519,6 +537,15 @@ exports[`Blog List Renders in layout with pagination set to third page 1`] = `
                   class="undefined undefined"
                 >
                   <a
+                    href="/learning"
+                  >
+                    Learning
+                  </a>
+                </li>
+                <li
+                  class="undefined undefined"
+                >
+                  <a
                     href="/about"
                   >
                     About
@@ -722,6 +749,15 @@ exports[`Blog List Renders in layout with pagination set to third page 1`] = `
                   href="/blog"
                 >
                   Blog
+                </a>
+              </li>
+              <li
+                class="undefined undefined"
+              >
+                <a
+                  href="/learning"
+                >
+                  Learning
                 </a>
               </li>
               <li

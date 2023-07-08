@@ -22,6 +22,11 @@ const NavMenu = () => {
           </Link>
         </li>
         <li className={`${styles.headerItem} ${styles.navItem}`}>
+          <Link to="/learning" activeClassName={styles.active}>
+            Learning
+          </Link>
+        </li>
+        <li className={`${styles.headerItem} ${styles.navItem}`}>
           <Link to="/about" activeClassName={styles.active}>
             About
           </Link>

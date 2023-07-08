@@ -1,0 +1,91 @@
+.container {
+  background-color: #fff;
+  border: 1px solid transparent;
+  border-radius: 5px;
+  box-shadow: 2px 2px 8px 0px rgba(0, 0, 0, 0.2);
+  font-family: "Figtree", -apple-system, system-ui, "Segoe UI", Roboto, Oxygen-Sans, Ubuntu, Cantarell, "Helvetica Neue", sans-serif;
+  padding: 20px;
+  max-width: 300px;
+  transition: box-shadow 0.3s ease-in-out;
+}
+
+.container:hover {
+  box-shadow: 4px 4px 10px 0px rgba(0, 0, 0, 0.4);
+}
+
+.container:hover .image {
+  filter: brightness(85%);
+}
+
+.imgwrapper {
+  margin-bottom: 20px;
+}
+
+.image {
+  border-radius: 5px;
+  filter: brightness(75%);
+  transition: filter 0.3s ease;
+}
+
+.myInfo {
+  align-items: center;
+  display: flex;
+  font-size: 14px;
+  justify-content: space-between;
+}
+
+.categoryWrapper {
+  border-radius: 5px;
+  display: inline-block;
+  font-size: 13px;
+  font-weight: 600;
+  margin-bottom: 15px;
+  padding: 0 15px;
+  padding-left: 8px;
+  text-transform: capitalize;
+}
+
+.categoryContent {
+  display: flex;
+  align-items: center;
+}
+
+.point {
+  display: inline-block;
+  font-size: 20px;
+  margin-right: 3px;
+}
+
+.title {
+  font-size: 18px;
+  font-weight: 600;
+  margin-bottom: 15px;
+  opacity: 0.8;
+}
+
+.iconWithText {
+  align-items: center;
+  display: flex;
+  justify-content: space-between;
+}
+
+.iconText {
+  margin-left: 5px;
+  margin-top: 1px;
+  opacity: 0.6;
+}
+
+.iconLink {
+  margin-left: 5px;
+  margin-top: 1px;
+  transition: opacity 0.3s ease;
+  opacity: 0.6;
+}
+
+.iconLink:hover {
+  opacity: 0.8;
+}
+
+.icon {
+  opacity: 0.6;
+}

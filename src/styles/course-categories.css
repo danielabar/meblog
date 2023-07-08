@@ -1,0 +1,54 @@
+.css {
+  background-color: #FF99FF;
+  color: #662D66;
+}
+
+.database {
+  background-color: #FB9CBE;
+  color: #662D41;
+}
+
+.devops {
+  background-color: #CAACEC;
+  color: #472D66;
+}
+
+.golang {
+  background-color: #99FFE4;
+  color: #2D6657;
+}
+
+.java {
+  background-color: #FFCEAD;
+  color: #663B1F;
+}
+
+.javascript {
+  background-color: #9696FF;
+  color: #292966;
+}
+
+.linux {
+  background-color: #9CE6AB;
+  color: #2D6638;
+}
+
+.python {
+  background-color: #A6DEE0;
+  color: #1F6466;
+}
+
+.rails {
+  background-color: #D59EC6;
+  color: #662D57;
+}
+
+.ruby {
+  background-color: #FF9999;
+  color: #662D2D;
+}
+
+.web-development {
+  background-color: #FFFF99;
+  color: #66422D;
+}
