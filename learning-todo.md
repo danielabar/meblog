@@ -70,6 +70,18 @@ convert cropped.png -fuzz 1% -transparent "$(convert cropped.png -crop 1x1+0+0 t
 
 Want images that are 250px wide, with 16:9 aspect ratio (i.e. 1.87).
 
+Adjust where it crops from wrt left edge (in this case, 15px from left after resizing):
+
+```bash
+convert ruby3-orig.png -resize 250x -crop 250x140+15+0 ruby3.png
+```
+
+Negative left crop is also allowed if want more space on left edge:
+
+```bash
+convert react-redux-orig.jpg -resize 250x -crop 240x140-20+0 react-redux.jpg
+```
+
 ## Learning Intro Brainstorming
 
 Welcome to the Learning section. In a world where change is the only constant, it's crucial to keep learning and expanding our knowledge. This is especially true in tech, where new languages, tools, libraries, and frameworks are always emerging. Here, I've gathered a collection of online courses that I've completed and compiled detailed notes on, so you can learn from my experiences and take your skills to the next level. Also check out the link to my article on how to get the most out of online courses, and start your learning journey today!
