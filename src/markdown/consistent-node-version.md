@@ -42,9 +42,13 @@ Install a specific version:
 
 ```bash
 nvm install 18.17.0
+
+# The `nvm install` command also switches you to that Node.js version
+node --version
+# v18.17.0
 ```
 
-Switch to a specific version (assuming it was previously installed:
+Switch to a specific version, this will work assuming the specified version was previously installed:
 
 ```bash
 nvm use 16.20.1
@@ -52,26 +56,70 @@ nvm use 16.20.1
 
 ## Use .nvmrc file
 
-## Add shell integration
-
-## TODO
-* aside: after intro para: post assumes familiarity with Node.js, link to learning resources.
-* maybe explain problem more in depth? i.e. if install whichever is latest LTS or Current from https://nodejs.org/en, but when project was originally setup, might have been an older version, so if a new developer joins and installs latest, they may encounter errors when running `npm install`, or experience different behavior in the app if the project assumes an older node version. Also when switching to a different project, if it needs a different node version, would have to uninstall, then re-install from the previous releases: https://nodejs.org/en/download/releases. This is tedious if you switch projects frequently.
-* aside: after installation section: If you're extra safety conscious, you can also download the nvm source from the latest release on github: https://github.com/nvm-sh/nvm/releases, extract the source zip, review the `install.sh` script and run it directly in your terminal rather than piping through bash from `raw.githubusercontent`.
-* aside: somewhere add a note about Windows, either use WSL or nvm-windows (ref nvm readme...)
-
-### Annotated shell integration
-
-Maybe work this in somehow for deeper explanation of shell integration?
+In the previous section, we saw how `nvm install x.y.z` and `nvm use x.y.z` can be used to install and switch to specific node versions. Another feature that nvm provides is the ability to install and use a node version without having to type it in the command line. To make use of this, create a file named `.nvmrc` in the root of your project:
 
 ```bash
-# This line loads the add-zsh-hook function, which allows you to add functions to be executed when a certain hook is triggered.
+# in project root
+touch .nvmrc
+```
+
+Edit the file so that it has a single line with the Node.js version that should be used for this project, for example:
+
+```bash
+echo "18.17.0" > .nvmrc
+```
+
+Now in this directory, you can type in:
+
+```bash
+# Will install Node v18.17.0 from .nvmrc
+nvm install
+```
+
+If the node version specified in `.nvmrc` is already installed, then this will work:
+
+```bash
+# Will switch to Node v18.17.0 from .nvmrc
+nvm use
+```
+
+The `.nvmrc` file can be committed to your project git repo. Then you can update the setup instructions in the project `README.md` to include the instructions to install nvm, then run `nvm install` and/or `nvm use`. This ensures that any developer working on this project will be using the same Node.js version. Furthermore, since nvm supports having multiple node versions installed at the same time, developers can easily switch between projects that have `.nvmrc` files in their roots, and use the nvm commands to quickly get the right Node.js version setup.
+
+## Add shell integration
+
+One slight bit of friction with the setup so far is that if you run `nvm use` in a directory with a `.nvmrc` file that specifies a Node.js version that isn't already installed, it will result in an error. For example, suppose the `.nvmrc` file specifies Node.js v20.5.0, which isn't currently installed:
+
+```bash
+# Check what Node.js version this project requires
+cd /path/to/some_project
+cat .nvmrc
+# 20.5.0
+
+# Try to use it
+nvm use
+# Found '/path/to/some_project/.nvmrc' with version <20.5.0>
+# N/A: version "v20.5.0" is not yet installed.
+# You need to run `nvm install` to install and use the node version specified in `.nvmrc`.
+```
+
+It would be nice if there was some automation that could handle this - i.e. check if the Node.js version specified in `.nvmrc` is already installed, if yes, use it, otherwise, install and then use it. Fortunately, nvm provides this as well via [shell integration](https://github.com/nvm-sh/nvm#deeper-shell-integration). The idea is you can add a script to your profile that will check for a `.nvmrc` file in any directory you `cd` to, then either install or use that Node.js version automatically.
+
+At the time of this writing, automatic shell integration is supported for the bash, zsh, and fish shells. I use zsh with my profile in `~/.zshrc`. Here are the lines I added to my profile to support automatic Node version installation and switching. It makes use of `autoload`, which is a built-in zsh function that supports loading functions only when they are needed, rather than loading them all at once when the shell starts.
+
+I asked ChatGPT to add explanatory comments:
+
+```bash
+# This line loads the add-zsh-hook function,
+# which allows you to add functions to be executed
+# when a certain hook is triggered.
 autoload -U add-zsh-hook
 
-# The load-nvmrc function is defined to handle automatic Node.js version switching based on .nvmrc files.
+# The load-nvmrc function is defined to handle automatic
+# Node.js version switching based on .nvmrc files.
 load-nvmrc() {
 
-  # Get the path of the .nvmrc file in the current directory using the nvm_find_nvmrc function provided by nvm.
+  # Get the path of the .nvmrc file in the current directory
+  # using the nvm_find_nvmrc function provided by nvm.
   local nvmrc_path="$(nvm_find_nvmrc)"
 
   # Check if an .nvmrc file was found in the current directory.
@@ -80,7 +128,8 @@ load-nvmrc() {
     # Get the Node.js version specified in the .nvmrc file.
     local nvmrc_node_version=$(nvm version "$(cat "${nvmrc_path}")")
 
-    # Check if the specified Node.js version is "N/A", meaning it is not installed.
+    # Check if the specified Node.js version is "N/A",
+    # meaning it is not installed.
     if [ "$nvmrc_node_version" = "N/A" ]; then
 
       # If the specified version is not installed, use nvm to install it.
@@ -108,8 +157,41 @@ add-zsh-hook chpwd load-nvmrc
 load-nvmrc
 ```
 
-re: `autoload`:
+With nvm shell integration in place, being on the right Node.js version is even easier, as you don't need to remember to do anything, your shell will handle all the work for you. For example, suppose you frequently toggle between two projects, one of which uses Node.js LTS and another which uses Current (18.17.0 and 10.5.0 respectively  at the time of this writing), with a directory structure similar to the following:
 
-In the context of the zsh shell (Z Shell), autoload is a built-in zsh function that allows you to load functions only when they are needed, rather than loading them all at once when the shell starts. This feature helps to improve shell startup time and memory usage, especially when dealing with large shell configurations or frameworks with many functions.
+```
+.
+├── current_project
+│   ├── .nvmrc
+│   └── app
+│       └── index.js
+└── lts_project
+    ├── .nvmrc
+    └── app
+        └── index.js
+```
 
-When you use autoload, the actual function code is not loaded into memory until the function is called for the first time. This lazy loading mechanism allows zsh to defer loading the function until it is explicitly invoked, making the shell more efficient.
+WIP...
+
+```
+Found '/path/to/lts_project/.nvmrc' with version <18.17.0>
+Downloading and installing node v18.17.0...
+Downloading https://nodejs.org/dist/v18.17.0/node-v18.17.0-darwin-arm64.tar.xz...
+######################################################################################################################################################################################################### 100.0%
+Computing checksum with shasum -a 256
+Checksums matched!
+Now using node v18.17.0 (npm v9.6.7)
+```
+
+```
+Reverting to nvm default version
+Now using node v18.16.1 (npm v9.5.1)
+```
+
+## TODO
+* aside: after intro para: post assumes familiarity with Node.js, link to learning resources.
+* maybe explain problem more in depth? i.e. if install whichever is latest LTS or Current from https://nodejs.org/en, but when project was originally setup, might have been an older version, so if a new developer joins and installs latest, they may encounter errors when running `npm install`, or experience different behavior in the app if the project assumes an older node version. Also when switching to a different project, if it needs a different node version, would have to uninstall, then re-install from the previous releases: https://nodejs.org/en/download/releases. This is tedious if you switch projects frequently.
+* aside: after installation section: If you're extra safety conscious, you can also download the nvm source from the latest release on github: https://github.com/nvm-sh/nvm/releases, extract the source zip, review the `install.sh` script and run it directly in your terminal rather than piping through bash from `raw.githubusercontent`.
+* aside: somewhere add a note about Windows, either use WSL or nvm-windows (ref nvm readme...)
+* link to nvm readme sub-sections for: bash, zsh, and fish shells
+* default explanation?
