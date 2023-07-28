@@ -10,7 +10,7 @@ related:
   - "TDD by Example"
 ---
 
-In modern web development, Node.js is not limited to Node projects; it's widely used in frontend build tooling across various tech stacks like Rails and Java Spring. This creates a challenge for developers: which Node.js version to use? Different npm packages work may only with specific Node.js versions. Furthermore, developers often work on multiple projects, and each may require a different Node.js version. This post will explain how [nvm](https://github.com/nvm-sh/nvm) (Node Version Manager) can be used to ensure a consistent Node.js environment across the project team, and make it easy to switch between different node versions when working on multiple projects.
+In modern web development, Node.js is not limited to Node projects; it's widely used in frontend build tooling across various tech stacks like Rails and Java Spring. This creates a challenge for developers: which Node.js version to use? Some npm packages may only work with specific Node.js versions. Furthermore, developers often work on multiple projects, and each may require a different Node.js version. This post will explain how [nvm](https://github.com/nvm-sh/nvm) (Node Version Manager) can be used to ensure a consistent Node.js environment across the project team, and make it easy to switch between different node versions when working on multiple projects.
 
 <aside class="markdown-aside">
 This post assumes a basic understanding of what Node.js is and how it works. If you're new to it or need a refresher, check out the official <a class="markdown-link" href="https://nodejs.org/en">Node.js website</a> and <a class="markdown-link" href="https://nodejs.org/en/docs">documentation<a>.
@@ -18,7 +18,7 @@ This post assumes a basic understanding of what Node.js is and how it works. If 
 
 ## The Problem
 
-Before getting into the details of how to use the node version manager, let's review what the problem is. If a project was originally set up with a specific Node.js version, as time goes on, newer LTS or Current versions are released. The default approach for many developers might be to install the latest available version from the official [Node.js website](https://nodejs.org/en). However, this approach can lead to issues when new team members join the project. If a new developer installs the latest Node.js version without considering the project's original setup, it may result in errors while running `npm install` or, even worse, cause unexpected behavior in the application if it relies on assumptions made for an older Node.js version.
+Before getting into the details of how to use nvm, let's review what the problem is. If a project was originally set up with a specific Node.js version, as time goes on, newer LTS or Current versions are released. The default approach for many developers might be to install the latest available version from the official [Node.js website](https://nodejs.org/en). However, this approach can lead to issues when new team members join the project. If a new developer installs the latest Node.js version without considering the project's original setup, it may result in errors while running `npm install` or, even worse, cause unexpected behavior in the application if it relies on assumptions made for an older Node.js version.
 
 Moreover, when switching to work on a different project, which might require a specific Node.js version, the developer would have to uninstall the current version and manually install the required version from the list of previous [Node.js releases](https://nodejs.org/en/download/releases). This process becomes tedious, especially for developers who frequently switch between different projects. As such, a version management solution like nvm (Node Version Manager) becomes crucial to ensure consistency and avoid compatibility issues across various projects.
 
@@ -28,11 +28,7 @@ Start by going to [nvm on Github](https://github.com/nvm-sh/nvm) and following t
 
 ```bash
 curl -o- https://raw.githubusercontent.com/nvm-sh/nvm/v0.39.3/install.sh | bash
-```
-
-Alternatively, `wget` can be used instead of `curl`:
-
-```bash
+# OR
 wget -qO- https://raw.githubusercontent.com/nvm-sh/nvm/v0.39.3/install.sh | bash
 ```
 
@@ -127,17 +123,25 @@ It would be nice if there was some automation that could handle this - i.e. chec
 At the time of this writing, automatic shell integration is supported for the [bash](https://github.com/nvm-sh/nvm#bash), [zsh](https://github.com/nvm-sh/nvm#zsh), and [fish](https://github.com/nvm-sh/nvm#fish) shells. I use zsh with my profile in `~/.zshrc`. Here are the lines I added to my profile to support automatic Node version installation and switching. I asked ChatGPT to add explanatory comments:
 
 ```bash
-# This line loads the add-zsh-hook function,
-# which allows you to add functions to be executed
-# when a certain hook is triggered.
+# ~/.zshrc
+
+# My profile things...
+
+# This section was added by the nvm install script
+# and initializes nvm:
+export NVM_DIR="$HOME/.nvm"
+[ -s "$NVM_DIR/nvm.sh" ] && \. "$NVM_DIR/nvm.sh"
+[ -s "$NVM_DIR/bash_completion" ] && \. "$NVM_DIR/bash_completion"
+
+# Add this section for shell integration AFTER nvm initialization:
+
+# Add functions to be executed when a hook is triggered.
 autoload -U add-zsh-hook
 
-# The load-nvmrc function is defined to handle automatic
-# Node.js version switching based on .nvmrc files.
+# Handle automatic Node.js version switching based on .nvmrc files.
 load-nvmrc() {
 
   # Get the path of the .nvmrc file in the current directory
-  # using the nvm_find_nvmrc function provided by nvm.
   local nvmrc_path="$(nvm_find_nvmrc)"
 
   # Check if an .nvmrc file was found in the current directory.
@@ -146,8 +150,7 @@ load-nvmrc() {
     # Get the Node.js version specified in the .nvmrc file.
     local nvmrc_node_version=$(nvm version "$(cat "${nvmrc_path}")")
 
-    # Check if the specified Node.js version is "N/A",
-    # meaning it is not installed.
+    # Check if the specified Node.js version is "N/A" (not installed)
     if [ "$nvmrc_node_version" = "N/A" ]; then
 
       # If the specified version is not installed, use nvm to install it.
@@ -225,4 +228,4 @@ cd ~/Documents
 
 ## Conclusion
 
-This post has covered the benefits of using [nvm](https://github.com/nvm-sh/nvm) in modern web development. With the ability to easily manage different Node.js versions, nvm ensures a consistent environment across projects and simplifies the process of switching between versions. The use of the `.nvmrc` file supports specifying required Node.js versions per project, streamlining the setup for developers. Additionally, nvm's shell integration automates the installation and usage of specific Node.js versions, further enhancing productivity.
+This post has covered the benefits of using [nvm](https://github.com/nvm-sh/nvm) for web development. With the ability to easily manage different Node.js versions, nvm ensures a consistent environment across projects and simplifies the process of switching between versions. The use of the `.nvmrc` file supports specifying required Node.js versions per project, streamlining the setup for developers. Additionally, nvm's shell integration automates the installation and usage of specific Node.js versions, further enhancing productivity.
