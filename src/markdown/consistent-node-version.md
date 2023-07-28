@@ -12,6 +12,10 @@ related:
 
 In modern web development, Node.js is not limited to Node projects; it's widely used in frontend build tooling across various tech stacks like Rails and Java Spring. This creates a challenge for developers: which Node.js version to use? Different npm packages work may only with specific Node.js versions. Furthermore, developers often work on multiple projects, and each may require a different Node.js version. This post will explain how [nvm](https://github.com/nvm-sh/nvm) (Node Version Manager) can be used to ensure a consistent Node.js environment across the project team, and make it easy to switch between different node versions when working on multiple projects.
 
+<aside class="markdown-aside">
+This post assumes a basic understanding of what Node.js is and how it works. If you're new to it or need a refresher, check out the official <a class="markdown-link" href="https://nodejs.org/en">Node.js website</a> and <a class="markdown-link" href="https://nodejs.org/en/docs">documentation<a>.
+</aside>
+
 ## The Problem
 
 Before getting into the details of how to use the node version manager, let's review what the problem is. If a project was originally set up with a specific Node.js version, as time goes on, newer LTS or Current versions are released. The default approach for many developers might be to install the latest available version from the official [Node.js website](https://nodejs.org/en). However, this approach can lead to issues when new team members join the project. If a new developer installs the latest Node.js version without considering the project's original setup, it may result in errors while running `npm install` or, even worse, cause unexpected behavior in the application if it relies on assumptions made for an older Node.js version.
@@ -41,6 +45,8 @@ source ~/.zshrc
 <aside class="markdown-aside">
 If you're particularly safety conscious, an alternative approach to installing nvm is to download the nvm source directly from the latest <a class="markdown-link" href="https://github.com/nvm-sh/nvm/releases">release on GitHub</a> and review the "install.sh" script to ensure its integrity. Then, instead of piping the script through bash from raw.githubusercontent, you can run the script directly in your terminal.
 </aside>
+
+If you're a Windows user, see these [important notes](https://github.com/nvm-sh/nvm#important-notes) about nvm support for Windows.
 
 At this point, you should be able to use nvm to list currently installed Node.js versions:
 
@@ -220,7 +226,3 @@ cd ~/Documents
 ## Conclusion
 
 This post has covered the benefits of using [nvm](https://github.com/nvm-sh/nvm) in modern web development. With the ability to easily manage different Node.js versions, nvm ensures a consistent environment across projects and simplifies the process of switching between versions. The use of the `.nvmrc` file supports specifying required Node.js versions per project, streamlining the setup for developers. Additionally, nvm's shell integration automates the installation and usage of specific Node.js versions, further enhancing productivity.
-
-## TODO
-* aside: after intro para: post assumes familiarity with Node.js, link to learning resources.
-* aside: somewhere add a note about Windows, either use WSL or nvm-windows (ref nvm readme...)
