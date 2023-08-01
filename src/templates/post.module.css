@@ -127,6 +127,10 @@
   content: "yml";
 }
 
+.content pre[data-language="erb"]::before {
+  content: "erb";
+}
+
 .content pre[data-language="json"]::before {
   content: "json";
 }
