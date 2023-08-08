@@ -39,6 +39,7 @@
     "Sidekiq",
     "useviewport",
     "webpacker",
+    "whodunnit",
     "WORKDIR"
   ],
   "workbench.colorCustomizations": {
