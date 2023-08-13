@@ -1,6 +1,6 @@
 ---
 title: "Efficient Model Auditing with PaperTrail"
-featuredImage: "../images/paper-trail-maksim-shutov-H8vhhepiiaU-unsplash.jpg"
+featuredImage: "../images/papertrail-efficient-model-auditing.jpg"
 description: "Learn how to optimize model auditing in your Rails application using the PaperTrail gem by setting up separate audit tables for each model, enhancing performance and organization in the auditing process"
 date: "2024-01-01"
 category: "rails"
@@ -14,7 +14,9 @@ Model auditing plays a important role in tracking changes within a Rails applica
 
 ## Project Setup
 
-We'll start with a simple project that just has a single `Products` model to demonstrate how to audit changes to products specifically, but the process will apply to any number of models in a real application. Assume this is a back office application for maintaining an e-commerce system. This project uses a Postgres database, which supports the json column type and is useful for representing model changes. We'll also add the [devise](https://github.com/heartcombo/devise) gem so we can have different users log in and make changes to products. I'm using Ruby 3.2 and Rails 7.0.6 but you can check the [PaperTrail Compatibility](https://github.com/paper-trail-gem/paper_trail#1a-compatibility) for older versions support.
+We'll start with a simple project that just has a single `Products` model to demonstrate how to audit changes to products specifically, but the process will apply to any number of models in a real application. Assume this is a back office application for maintaining an e-commerce system. This project uses a Postgres database, which supports the json column type and is useful for representing model changes. We'll also add the [devise](https://github.com/heartcombo/devise) gem so we can have different users log in and make changes to products.
+
+I'm using Ruby 3.2 and Rails 7.0.6 but you can check the [PaperTrail Compatibility](https://github.com/paper-trail-gem/paper_trail#1a-compatibility) for older versions support. You can also check out the complete [project on Github](https://github.com/danielabar/audit_demo).
 
 ```bash
 # Create a new Rails project using a Postgres database
@@ -30,6 +32,10 @@ bin/rails g scaffold Product name:string code:string price:decimal inventory:int
 # Create the `products` table
 bin/rails db:migrate
 ```
+
+<aside class="markdown-aside">
+For a real application, you would add constraints to the migration that creates the product table and corresponding validations in the Product model such as code and name are required, inventory and price must be greater than 0, etc. But for this demo, we'll leave it out so we can quickly focus on model auditing.
+</aside>
 
 Add [devise](https://github.com/heartcombo/devise) to the Gemfile so we can have user logins, to later demonstrate how PaperTrail can keep track of *who* made a change. While you're here, also add the [faker](https://github.com/faker-ruby/faker) gem to the development and test sections, we'll use this later to generate sample data:
 
@@ -77,6 +83,10 @@ Rails.application.routes.draw do
 end
 ```
 
+<aside class="markdown-aside">
+Interested in learning more about the Rails router? Checkout this awesome <a class="markdown-link" href="https://www.akshaykhot.com/understanding-rails-router-why-what-how/">post</a> that will demystify a lot of the syntax and concepts.
+</aside>
+
 To ensure there's always a logged in user that's accessing the product views, specify the `authenticate_user!` method in the product controller's `before_action` callback:
 
 ```ruby
@@ -86,6 +96,10 @@ class ProductsController < ApplicationController
   #...
 end
 ```
+
+<aside class="markdown-aside">
+This post is using the simplest possible configuration of Devise so we can quickly demo how PaperTrail will use it to record who made a change. However, there's a lot more complexity to integrating Devise into a real application for production. See the <a class="markdown-link" href="https://github.com/heartcombo/devise/wiki">docs</a> for more details.
+</aside>
 
 Now let's seed the database with a few users and products. I'm using the [faker](https://github.com/faker-ruby/faker) gem to quickly generate some realistic looking product data. To keep the `db/seeds.rb` file clean, I've split up the user and product seeds into separate files. For a small project like this, they could go all in the same file, but it quickly gets messy as the project grows, so I like to get in the habit of splitting up the seeds files right from the start:
 
@@ -119,13 +133,17 @@ User.create!(email: "test2@example.com", password: "Password1")
 end
 ```
 
-Finally let's load the seeds into the database, I'm using the `replant` task which first truncates all the model tables. This makes it fast to re-run any time you want to reseed the database:
+Finally load the seeds into the database, I'm using the `replant` task which first truncates all the model tables. This makes it fast to re-run any time you want to reseed the database:
 
 ```bash
 bin/rails db:seed:replant
 ```
 
 At this point, you should be able to start a Rails server with `bin/rails s`, navigate to [http://localhost:3000](http://localhost:3000), get redirected to [http://localhost:3000/users/sign_in](http://localhost:3000/users/sign_in), login as one of the example users from the seeds such as `test1@example.com/Password1`. You'll then be redirected to the product listing view which shows all products. You can click "Show product" on any product, then click "Edit" and make any changes.
+
+<aside class="markdown-aside">
+You may have noticed we quickly got a working application up and running without writing a whole lot of code. The heavy lifting was done by the scaffold generator. This post goes more in depth on <a class="markdown-link" href="https://www.rubyguides.com/2020/03/rails-scaffolding/">scaffolding</a>, and there's some mention of it in the <a class="markdown-link" href="https://guides.rubyonrails.org/command_line.html#bin-rails-generate">Rails Command Line</a> guide.
+</aside>
 
 ## Add PaperTrail
 
@@ -225,9 +243,13 @@ class CreateProductVersions < ActiveRecord::Migration[7.0]
 end
 ```
 
+<aside class="markdown-aside">
+Opting for json or jsonb data types for the object and object_changes columns will  expand the capabilities of the PaperTrail <a class="markdown-link" href="https://github.com/paper-trail-gem/paper_trail#3e-queries">query API</a> in comparison to using text columns. Not sure whether to use json or jsonb? Checkout the Postgres docs on <a class="markdown-link" href="https://www.postgresql.org/docs/current/datatype-json.html">JSON Types</a> to learn the difference.
+</aside>
+
 ## Model Changes
 
-By default, PaperTrail assumes all model changes are being persisted in a single `versions` table. We've updated the migration to create a product-specific versions table, but there are some code changes to be made as well to configure PaperTrail so it knows about this change.
+By default, PaperTrail assumes all model changes are being persisted in a single `versions` table. We've updated the migration to create a product-specific versions table, but there are some [code changes](https://github.com/paper-trail-gem/paper_trail#6a-custom-version-classes) to be made as well to configure PaperTrail so it knows about this change.
 
 The first change is to specify the `versions` option on the `has_paper_trail` macro for the `Product` model, to indicate the class that represents the product versions (this class doesn't exist yet, we'll get to that next):
 
@@ -240,7 +262,7 @@ class Product < ApplicationRecord
 end
 ```
 
-Now add a new model class `ProductVersion` that inherits from `PaperTrail::Version` and specify the table name from the modified migration:
+Now add a new model class `ProductVersion` that inherits from [PaperTrail::Version](https://github.com/paper-trail-gem/paper_trail/blob/master/lib/paper_trail/frameworks/active_record/models/paper_trail/version.rb) and specify the table name from the modified migration:
 
 ```ruby
 # app/models/product_version.rb
@@ -362,7 +384,7 @@ product.versions
 ]
 ```
 
-We can also connect directly to the database to verify the data is persisted in the `product_versions` table. Use the `bin/rails db` command to launch a psql session. Then query the `product_versions` table for `item_id` of `103` (which is the primary key of the product record we edited earlier):
+We can also connect directly to the database to verify the data is persisted in the `product_versions` table. Use the [bin/rails dbconsole](https://guides.rubyonrails.org/command_line.html#bin-rails-dbconsole) command to launch a psql session. Then query the `product_versions` table for `item_id` of `103` (which is the primary key of the product record we edited earlier):
 
 ```sql
 audit_demo=> select whodunnit, object_changes from product_versions where item_id = 103;
@@ -384,20 +406,8 @@ A real application will have multiple models that need to be audited. For exampl
 
 ## Conclusion
 
-This post has provided a step-by-step guide to optimizing model auditing within a Rails application using the PaperTrail gem. By configuring separate, model-specific audit tables, you've gained insights into efficiently tracking changes while avoiding potential performance issues tied to a centralized audit structure.
+This post has provided a step-by-step guide to optimizing model auditing within a Rails application using the PaperTrail gem. By configuring separate, model-specific audit tables, you've gained insights into efficiently tracking changes while avoiding potential performance issues tied to a centralized audit structure. There's a lot more you can do with PaperTrail such as limiting what events get audited and reverting to previous versions. Checkout the [docs](https://github.com/paper-trail-gem/paper_trail) for more details.
 
 ## TODO
-* Conclusion para wip
-* maybe: Additionally, we'll discuss why using JSON columns to store the object and object_changes is a superior choice compared to YAML or text.
-* Link to demo repo: https://github.com/danielabar/audit_demo
-* Aside: My project has some changes from the default postgres setup in that postgres is running on Docker, not critical to this demo but if you also want to run Postgres in Docker instead of directly on your laptop, see this post (todo link)
-* Aside: There's a lot more complexity to configuring Devise but out of scope for this post, link to docs/wiki/etc for more details
-* Aside: For more in depth on rails routing syntax, link to excellent post: https://www.akshaykhot.com/understanding-rails-router-why-what-how/
-* Aside: json vs jsonb out of scope for this post, link to a ref like Postgres docs explaining differences
-* Aside: Not adding product validations as this post is focused on auditing, a real app would have validation rules (and associated db constraints)
-* What is/explain `PaperTrail::Version`
-* By default, PaperTrail stores `object` and `object_changes` as YAML format in text database columns (longtext for MySQL). You can specify an alternate serializer such as JSON. Even more convenient, when using Postgres and specifying either `json` or `jsonb` as column types in migration, PaperTrail will automatically use the JSON serializer, therefore no need to explicitly configure it.
-* Related to above: maybe mention benefits of json vs text in that it opens up some of the PaperTrail query APIs in finding a specific change?
-* Mention all the UI, routes, controllers for CRUD on products was auto generated by the Rails `scaffold` generator, link to docs for more details.
-* There's a lot more to PaperTrail, read the docs to learn more about what you can do with it and further customizations. Also link to tutorial how the versions can be displayed in the UI, and even revert to an older version.
+* Nice to have: Visual showing all models audited in one versions table vs each model gets its own version table.
 * Maybe tests
