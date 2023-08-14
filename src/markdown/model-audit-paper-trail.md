@@ -10,7 +10,13 @@ related:
   - "Rails Strong Params for GET Request"
 ---
 
-Model auditing plays a important role in tracking changes within a Rails application. While several gems are available to implement this functionality, today we'll delve into the benefits of using [PaperTrail](https://github.com/paper-trail-gem/paper_trail). By default, PaperTrail consolidates all model audit records into a single `versions` table, which could lead to performance and scaling challenges when dealing with numerous audited models. Fortunately, there's a better approach. This post will walk through the steps to configure PaperTrail to create separate `{model}_versions` tables for each model, such as `product_versions`, `order_versions`, `customer_versions`, etc. This optimization can improve performance and organization in your application's auditing process.
+Model auditing plays a important role in tracking changes within a Rails application. While several gems are available to implement this functionality, today we'll delve into the benefits of using [PaperTrail](https://github.com/paper-trail-gem/paper_trail). By default, PaperTrail consolidates all model audit records into a single `versions` table, which could lead to performance and scaling challenges when dealing with numerous audited models. Conceptually, it looks like this:
+
+![paper trail same version](../images/papertrail-same-version.png "paper trail same version")
+
+Fortunately, there's a better approach. This post will walk through the steps to configure PaperTrail to create separate `{model}_versions` tables for each model, such as `product_versions`, `order_versions`, `customer_versions`, etc. This optimization can improve performance and organization in your application's auditing process. Conceptually, it will look like this:
+
+![paper trail different version](../images/papertrail-different-version.png "paper trail different version")
 
 ## Project Setup
 
@@ -281,7 +287,7 @@ class ApplicationVersion < ActiveRecord
 end
 ```
 
-## Populate Whodunnit
+## Who Made the Change?
 
 PaperTrail can optionally populate a `whodunnit` column in the `xxx_versions` table to record the logged in user that made the change. If the controller has a `current_user` method available, a controller callback can be specified that will automatically populate `whodunnit` with `current_user.id`. Since this project is using devise, there is a `current_user` method available on the controller, so we can specify the callback on the base controller as follows:
 
@@ -409,5 +415,5 @@ A real application will have multiple models that need to be audited. For exampl
 This post has provided a step-by-step guide to optimizing model auditing within a Rails application using the PaperTrail gem. By configuring separate, model-specific audit tables, you've gained insights into efficiently tracking changes while avoiding potential performance issues tied to a centralized audit structure. There's a lot more you can do with PaperTrail such as limiting what events get audited and reverting to previous versions. Checkout the [docs](https://github.com/paper-trail-gem/paper_trail) for more details.
 
 ## TODO
-* Nice to have: Visual showing all models audited in one versions table vs each model gets its own version table.
+* Brief explanation `authenticate_user!` devise helper method
 * Maybe tests
