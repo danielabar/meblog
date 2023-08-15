@@ -20,7 +20,7 @@ Fortunately, there's a better approach. This post will walk through the steps to
 
 ## Project Setup
 
-We'll start with a simple project that just has a single `Products` model to demonstrate how to audit changes to products specifically, but the process will apply to any number of models in a real application. Assume this is a back office application for maintaining an e-commerce system. This project uses a Postgres database, which supports the json column type and is useful for representing model changes. We'll also add the [devise](https://github.com/heartcombo/devise) gem so we can have different users log in and make changes to products.
+We'll start with a simple project that has a single `Products` model to demonstrate how to audit changes to products specifically, but the process will apply to any number of models in a real application. Assume this is a back office application for maintaining an e-commerce system. This project uses a Postgres database, which supports the json column type and is useful for representing model changes. We'll also add the [devise](https://github.com/heartcombo/devise) gem so we can have different users log in and make changes to products.
 
 I'm using Ruby 3.2 and Rails 7.0.6 but you can check the [PaperTrail Compatibility](https://github.com/paper-trail-gem/paper_trail#1a-compatibility) for older versions support. You can also check out the complete [project on Github](https://github.com/danielabar/audit_demo).
 
@@ -93,7 +93,7 @@ end
 Interested in learning more about the Rails router? Checkout this awesome <a class="markdown-link" href="https://www.akshaykhot.com/understanding-rails-router-why-what-how/">post</a> that will demystify a lot of the syntax and concepts.
 </aside>
 
-To ensure there's always a logged in user that's accessing the product views, specify the `authenticate_user!` method in the product controller's `before_action` callback:
+To ensure there's always a logged in user that's accessing the product views, specify the `authenticate_user!` method in the product controller's `before_action` callback (this is a helper method provided by devise):
 
 ```ruby
 # app/controllers/products_controller.rb
@@ -104,7 +104,7 @@ end
 ```
 
 <aside class="markdown-aside">
-This post is using the simplest possible configuration of Devise so we can quickly demo how PaperTrail will use it to record who made a change. However, there's a lot more complexity to integrating Devise into a real application for production. See the <a class="markdown-link" href="https://github.com/heartcombo/devise/wiki">docs</a> for more details.
+This post is using the simplest possible configuration of Devise so we can quickly demo how PaperTrail will use it to record who made a change. There's a lot more complexity to integrating Devise into a real application for production. See the <a class="markdown-link" href="https://github.com/heartcombo/devise/wiki">docs</a> for more details.
 </aside>
 
 Now let's seed the database with a few users and products. I'm using the [faker](https://github.com/faker-ruby/faker) gem to quickly generate some realistic looking product data. To keep the `db/seeds.rb` file clean, I've split up the user and product seeds into separate files. For a small project like this, they could go all in the same file, but it quickly gets messy as the project grows, so I like to get in the habit of splitting up the seeds files right from the start:
@@ -228,22 +228,40 @@ Make the following changes to the migration file:
 * Change the `object` and `object_changes` columns to be of type `json` (or `jsonb` if using Postgres) rather than `text`.
 * Remove the `TEXT_BYTES` constant as we're using json rather than text columns.
 
-Here is the resulting migration file after making the above changes:
+Here is the resulting migration file after making the above changes. I've added comments explaining what each column will store:
 
 ```ruby
 # db/migrate/20230806120211_create_product_versions.rb
 class CreateProductVersions < ActiveRecord::Migration[7.0]
   def change
     create_table :product_versions do |t|
+      # Stores the model name, for model-specific version tables,
+      # will always be the same value per table, eg: "Product"
       t.string   :item_type, null: false
+
+      # The primary key of the model record being audited,
+      # for this case, will be a value from products.id
       t.bigint   :item_id,   null: false
+
+      # The type of change happening to this model, eg:
+      # create, update, delete
       t.string   :event,     null: false
+
+      # Optionally record who made the change
       t.string   :whodunnit
+
+      # JSON representation of the model BEFORE the change
       t.json     :object
+
+      # JSON representation of the changes made to the model attributes.
+      # Stores information about the attribute, its old value, and new value.
       t.json     :object_changes
+
+      # Timestamp when the audit record was created
       t.datetime :created_at
     end
 
+    # Create compound index for efficient querying
     add_index :product_versions, %i[item_type item_id]
   end
 end
@@ -255,7 +273,7 @@ Opting for json or jsonb data types for the object and object_changes columns wi
 
 ## Model Changes
 
-By default, PaperTrail assumes all model changes are being persisted in a single `versions` table. We've updated the migration to create a product-specific versions table, but there are some [code changes](https://github.com/paper-trail-gem/paper_trail#6a-custom-version-classes) to be made as well to configure PaperTrail so it knows about this change.
+By default, PaperTrail assumes all model changes are being persisted in a single `versions` table. We've updated the migration to create a product-specific versions table `product_versions`, but there are some [code changes](https://github.com/paper-trail-gem/paper_trail#6a-custom-version-classes) to be made as well to configure PaperTrail so it knows about this change.
 
 The first change is to specify the `versions` option on the `has_paper_trail` macro for the `Product` model, to indicate the class that represents the product versions (this class doesn't exist yet, we'll get to that next):
 
@@ -277,7 +295,7 @@ class ProductVersion < PaperTrail::Version
 end
 ```
 
-Finally, since all the audited models will be persisted in custom versions tables and the default `versions` table will not exist in this app, we need to tell PaperTrail that the base `ApplicationVersion` class is abstract. Add it as follows:
+Finally, since all the audited models will be persisted in custom versions tables and the default `versions` table will not exist in this app, we need to tell PaperTrail that the base `ApplicationVersion` class is abstract by specifying `self.abstract_class = true`. This is used in ActiveRecord models to indicate that a particular class should not be considered as a concrete table in the database:
 
 ```ruby
 # app/models/application_version.rb
@@ -289,7 +307,7 @@ end
 
 ## Who Made the Change?
 
-PaperTrail can optionally populate a `whodunnit` column in the `xxx_versions` table to record the logged in user that made the change. If the controller has a `current_user` method available, a controller callback can be specified that will automatically populate `whodunnit` with `current_user.id`. Since this project is using devise, there is a `current_user` method available on the controller, so we can specify the callback on the base controller as follows:
+PaperTrail can optionally populate a `whodunnit` column in the `{model}_versions` table to record the logged in user that made the change. If the controller has a `current_user` method available, a controller callback can be specified that will automatically populate `whodunnit` with `current_user.id`. Since this project is using devise, there is a [current_user](https://github.com/heartcombo/devise#controller-filters-and-helpers) helper method available on the controller, so we can specify the callback on the base controller as follows:
 
 ```ruby
 # app/controllers/application_controller.rb
@@ -358,7 +376,7 @@ product.versions
 
 # It returns an array of records from `product_versions` table
 # `whodunnit` shows email address of logged in user that made the change
-# `object` column persists how the product looked before the change
+# `object` column persists how the product looked BEFORE the change
 # `object_changes` shows every value we updated
 =>
 [
@@ -400,7 +418,7 @@ audit_demo=> select whodunnit, object_changes from product_versions where item_i
 (1 row)
 ```
 
-As shown from both the Rails and database consoles, PaperTrail has successfully recorded the update to this product record.
+As shown from both the Rails and database consoles, PaperTrail has successfully recorded the update to this product record in the `product_versions` table.
 
 ## Other Models
 
@@ -413,7 +431,3 @@ A real application will have multiple models that need to be audited. For exampl
 ## Conclusion
 
 This post has provided a step-by-step guide to optimizing model auditing within a Rails application using the PaperTrail gem. By configuring separate, model-specific audit tables, you've gained insights into efficiently tracking changes while avoiding potential performance issues tied to a centralized audit structure. There's a lot more you can do with PaperTrail such as limiting what events get audited and reverting to previous versions. Checkout the [docs](https://github.com/paper-trail-gem/paper_trail) for more details.
-
-## TODO
-* Brief explanation `authenticate_user!` devise helper method
-* Maybe tests
