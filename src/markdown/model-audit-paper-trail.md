@@ -10,7 +10,7 @@ related:
   - "Rails Strong Params for GET Request"
 ---
 
-Model auditing plays a important role in tracking changes within a Rails application. While several gems are available to implement this functionality, today we'll delve into the benefits of using [PaperTrail](https://github.com/paper-trail-gem/paper_trail). By default, PaperTrail consolidates all model audit records into a single `versions` table, which could lead to performance and scaling challenges when dealing with numerous audited models. Conceptually, it looks like this:
+Model auditing plays an important role in tracking changes within a Rails application. While several gems are available to implement this functionality, today we'll delve into the benefits of using [PaperTrail](https://github.com/paper-trail-gem/paper_trail). By default, PaperTrail consolidates all model audit records into a single `versions` table, which could lead to performance and scaling challenges when dealing with numerous audited models. Conceptually, it looks like this:
 
 ![paper trail same version](../images/papertrail-same-version.png "paper trail same version")
 
@@ -273,7 +273,7 @@ Opting for json or jsonb data types for the object and object_changes columns wi
 
 ## Model Changes
 
-By default, PaperTrail assumes all model changes are being persisted in a single `versions` table. We've updated the migration to create a product-specific versions table `product_versions`, but there are some [code changes](https://github.com/paper-trail-gem/paper_trail#6a-custom-version-classes) to be made as well to configure PaperTrail so it knows about this change.
+By default, PaperTrail assumes all model changes are being persisted in a single `versions` table. We've updated the migration to create a product-specific versions table `product_versions`, but there are some code changes to be made as well to configure PaperTrail for [custom version classes]((https://github.com/paper-trail-gem/paper_trail#6a-custom-version-classes)).
 
 The first change is to specify the `versions` option on the `has_paper_trail` macro for the `Product` model, to indicate the class that represents the product versions (this class doesn't exist yet, we'll get to that next):
 
@@ -305,7 +305,7 @@ class ApplicationVersion < ActiveRecord
 end
 ```
 
-## Who Made the Change?
+## Whodunnit
 
 PaperTrail can optionally populate a `whodunnit` column in the `{model}_versions` table to record the logged in user that made the change. If the controller has a `current_user` method available, a controller callback can be specified that will automatically populate `whodunnit` with `current_user.id`. Since this project is using devise, there is a [current_user](https://github.com/heartcombo/devise#controller-filters-and-helpers) helper method available on the controller, so we can specify the callback on the base controller as follows:
 
@@ -345,15 +345,11 @@ Now we're ready to try this out and see the product-specific audit table populat
 * From the product view page, click `Edit`.
 * Make a few edits to the product and click the Update button.
 
-For example, I've selected a product with code `SPNS6254`, here are its original values:
+For example, I've selected a product with code `SPNS6254`, and made some edits to increase the price (inflation!), decrease the inventory count, and make a small text change to the description:
 
-![paper trail edit product before](../images/papertrail-edit-product-before.png "paper trail edit product before")
+![paper trail edit product](../images/papertrail-edit-product.png "paper trail edit product")
 
-Here are some edits to increase the price from 21.68 to 22.76 (inflation!), decrease the inventory count from 14 to 10, and update the description to add the word `edited` at the end:
-
-![paper trail edit product after](../images/papertrail-edit-product-after.png "paper trail edit product after")
-
-Now launch a Rails console with `bin/rails c` to see what PaperTrail has saved for this update:
+Now launch a Rails console with `bin/rails c` to see what PaperTrail has saved for this update. Notice the versions for the product are returned as an array of `ProductVersion` model instances, which is the custom version class we created earlier:
 
 ```ruby
 # Find the product we just edited
