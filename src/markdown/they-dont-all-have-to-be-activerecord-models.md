@@ -1,7 +1,7 @@
 ---
 title: "They Don't All Have To Be ActiveRecord Models"
 featuredImage: "../images/not-ar-model-vandan-patel-C63NHsUUR1A-unsplash.jpg"
-description: "tbd"
+description: "Learn how to handle forms in Rails when the UI does not map one to one with the underlying data model."
 date: "2023-09-01"
 category: "rails"
 related:
