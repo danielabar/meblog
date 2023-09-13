@@ -12,13 +12,13 @@ related:
 
 If you’ve worked on a software development project of any significant complexity, you’ve probably observed that it nearly always takes longer to deliver than the planned timeline. There are many reasons for this including incomplete initial understanding of requirements, salespeople providing unrealistic timelines to close a deal, and unforseen technical challenges.
 
-But even if the scope is well understood, and developers are empowered provide estimates rather than being imposed on by outside forces, timelines can still slip. This post will cover some additional factors that take time, but are often unaccounted for, to help in providing more realistic estimates. When asked how long some new feature will take to build, developers are often focused on the effort to write the code, and possibly also the unit tests. However there are many other items that need to get done to get the feature released and into customers hands, but are often not included in estimates. Let's delve into some of these.
+But even if the scope is well understood, and developers are empowered provide estimates rather than being imposed on by outside forces, things still take longer than expected. Why is that? This post will cover some additional factors that are often unaccounted for, but a crucial part of the process. When asked how long some new feature will take to build, developers are often focused on the effort to write the code, and possibly also the unit tests. However there are many other items that need to get done to get the feature released and into customers hands, but are often not included in estimates. Let's delve into some of these.
 
 ## Ticket Description
 
-Some time needs to be spent in writing a useful description of what will be worked on in whatever ticketing system the project is using such as Jira, Gitlab, Trello etc. The purpose is to provide both business and technical context so everyone can understand why this change is being made, and what areas of the code are impacted. It should include how the planned code changes relate to the business requirement. On some teams this task is done by a product manager, but I've found its beneficial to have the developer write this, or at least contribute to it, to confirm their understanding. One option is to have the product person write the business part, then have the developer add some technical context. It doesn't need to be too detailed such as getting into the method and variable names.
+Some time needs to be spent in writing a useful description of what will be worked on in whatever ticketing system the project is using such as Jira, Gitlab, Trello etc. The purpose is to provide both business and technical context so everyone can understand why this change is being made, and what areas of the code are impacted. It should include how the planned code changes relate to the business requirement. On some teams this task is done by a product manager, but I've found its beneficial to have the developer write this, or at least contribute to it, to confirm their understanding and ensure everyone is on the same page. One option is to have the product person write the business part, then have the developer add some technical context. It doesn't need to be too detailed such as getting into the method and variable names.
 
-The benefit of taking the time for this activity is that it provides traceability. That is, all the commit messages to version control will contain the ticket number. Then future developers reading the code will be able to go back to the ticket to understand why the changes were made. This will also help the PR (pull request) reviewer in getting a broader understanding of the code changes. It can be tempting to skip this part and write a quick one-liner in the ticket such as "fix search results", but this apparent time-savings is an illusion. Every person that goes back to try and understand what was done will have to spend extra time tracking down the original developer and/or product person to ask them questions or dig into the code or production logs. The total human time spent on this can be much greater than the additional time taken to write a useful description before development starts.
+The benefit of taking the time for this activity is that it provides traceability. That is, all the commit messages to version control will contain the ticket number. Then future developers reading the code will be able to go back to the ticket to understand why the changes were made. This will also help the PR (pull request) reviewer in getting a broader understanding of the code changes. It can be tempting to skip this part and write a quick one-liner in the ticket such as "add advanced search", but this apparent time-savings is an illusion. Every person that goes back to try and understand what was done will have to spend extra time tracking down the original developer and/or product person to ask them questions or dig into the code or production logs. The total human time spent on this can be much greater than the additional time taken to write a useful description before development starts.
 
 ## Local Verification
 
@@ -28,13 +28,17 @@ However, many projects are not structured this way. The existing seed data may b
 
 Some projects rely on third party services that either do not support a sandbox mode, or the integration only works in a deployed environment with a particular url. If the feature being developed depends on this service, development can take longer because the developer needs to deploy their changes to the test environment in order to see them working "for real".
 
-Another complexity can be when projects are broken down into microservices, but the boundaries between them are ambiguous, which can result in any given feature requiring changes to multiple services. This will take additional time as developer has to setup multiple projects and juggle multiple change sets and PRs.
+Another complexity can be when projects are broken down into microservices, but the boundaries between them are ambiguous. This can result in any given feature requiring changes to multiple services. This will take additional time as developer has to setup multiple projects and juggle multiple change sets and PRs.
 
 ## Test Automation
 
-This refers to all levels of test automation including unit, integration, and end-to-end. The effort to write these tests needs to be baked into the development time and not treated as a separate activity. Otherwise its tempting to break this up into a follow-on task as in "we're in such a hurry now, we'll catch up with the testing later when things are more calm". I've seen this movie before and it never ends well. There will never be a "good" time to write tests later. If the product/feature is successful, there will always be more and more work to be done and the team will regret not having thorough test automation, especially in the end-to-end category.
+This refers to all levels of test automation including unit, integration, *and* end-to-end. The effort to write these tests needs to be baked into the development time and not treated as a separate activity. Otherwise its tempting to break this up into a follow-on task as in "we're in such a hurry now, we'll catch up with the testing later when things are more calm". I've seen this movie before and it never ends well. There will never be a "good" time to write tests later. If the product/feature is successful, there will always be more and more work to be done and the team will regret not having thorough test automation, especially in the end-to-end category. End to end tests can be harder to write and do take time, but pay off in the ability to add new features and have confidence that all the existing features continue to work, without manual testing effort.
 
-Another thing I've seen is sometimes the end-to-end tests are treated as someone else's responsibility such as a QA engineer. However, it's better for all testing activity to be part of the development lifecycle so issues can be caught early during development.
+Another thing I've seen is sometimes the end-to-end tests are treated as someone else's responsibility such as the QA team. However, it's better for all testing activity to be part of the development lifecycle so issues can be caught early during development.
+
+<aside class="markdown-aside">
+This is not to suggest that QA is not needed, but it can be incorporated in terms of thinking of test cases, and then having the developer implement those test cases during development. A great tool for this is <a class="markdown-link" href="https://cucumber.io/">Cucumber</a>, which supports having the tests written in as close to "plain English" as possible. This means less technical team members such as QA or a product manager can contribute to the development of the test cases.
+</aside>
 
 ## Engineering Docs
 
@@ -46,7 +50,7 @@ While its great to have thorough automated test coverage, it's also important to
 
 ## Git Cleanup
 
-For this section, I'm assuming [Git](https://git-scm.com/book/en/v2) is being used for version control but this could apply to any version control system. Since it's a good practice to commit early and commit often, during development, there will inevitably be a lot of "stream of consciousness" commit messages such as:
+For this section, I'm assuming [Git](https://git-scm.com/book/en/v2) is being used for version control but this could apply to any version control system. Since it's a good practice to commit early and commit often, during development, there will inevitably be a lot of [stream of consciousness](https://en.wikipedia.org/wiki/Stream_of_consciousness) commit messages such as:
 
 ```
 * fixing things
@@ -65,11 +69,13 @@ Prior to submitting work for review, it's beneficial to take the time to reorgan
 * [ACME-123] Update documentation for user management
 ```
 
-If you've never reorganized your git commits, see this excellent explainer from Thoughtbot on [interactive rebase](https://thoughtbot.com/blog/git-interactive-rebase-squash-amend-rewriting-history), which can guide you through this process.
+<aside class="markdown-aside">
+If you've never reorganized your git commits, see this excellent explainer from Thoughtbot on <a class="markdown-link" href="https://thoughtbot.com/blog/git-interactive-rebase-squash-amend-rewriting-history/">interactive rebase</a>, which can guide you through this process.
+</aside>
 
-## Submit a Pull Request
+## Pull Request
 
-This sounds easy enough, especially if you're using Github and the [gh command line](https://cli.github.com/) utility. Submitting a pull request (PR) can be as fast as typing `gh pr create` in your terminal and hitting <kbd class="markdown-kbd">Enter</kbd> a few times to accept the defaults. However, a PR with only the branch name as the title and a one-liner description such as "added user authentication" is insufficient for an effective code review process. There are two sections of important writing that should be included in a PR:
+This sounds easy enough, especially if you're using Github and the [gh command line](https://cli.github.com/) utility. Submitting a pull request (PR) can be as fast as typing `gh pr create` in your terminal and hitting <kbd class="markdown-kbd">Enter</kbd> a few times to accept the defaults. However, a PR with only the branch name as the title and a one-liner description such as "added user authentication" is insufficient for an effective code review. There are two sections of important writing that should be included in a PR:
 
 **Description:** This covers technical details of the change, such as the overall approach that was taken, any architectural decisions made, and explanations of complex logic or algorithms. Include interesting details you'd like to draw the reviewer's attention to, such as performance optimizations or if a non-standard solution was needed. If some especially difficult challenges or trade-offs were encountered during development, mention them as well.
 
@@ -79,16 +85,12 @@ This sounds easy enough, especially if you're using Github and the [gh command l
 
 While waiting for their pull request to be reviewed, the developer needs to switch to another task, such as picking up someone else's code to review, or working on a small bugfix or technical debt item that doesn't depend on the current work awaiting review. When the feedback does come in on their PR, then another context shift is necessary to address the comments. Another source of context shifting can be if an urgent production issue arises, or priorities change and the developer needs to switch to a different, now more important task.
 
-All of these activities take additional time, and depending on how busy the team is, it could take a day or more to receive feedback on the PR.
+All of these activities take additional time, and depending on how busy the team is, it could take a few days or more to receive feedback on the PR, address it, then have the reviewer go over it again.
 
 ## Final Push
 
 After the code review feedback has been addressed and the PR approved, the developer needs to merge, and follow the procedure to get the code into production. Ideally a [CI/CD](https://en.wikipedia.org/wiki/CI/CD) pipeline is in place to automate this activity, but there could still be some effort involved such as monitoring the deployment job, verifying the feature in production, and checking production logs to ensure all is well.
 
-## TODO
-* needs a little more explanation why end-to-end testing should be developers responsibility and not qa (although qa could play a role in thinking of further end-to-end test cases)
-* maybe related to above point: add aside about Cucumber being a good tool to integrate less technical sources of test cases such as from PM or QA because tests are written more or less in "plain English"
-* maybe cover: when manager asks how long? picturing the feature working in production and customers can use it, developer when asked how long? how long it takes to type up the code
-* maybe something like: "what to do with all this information?" advice to devs - think about all this when providing estimates, advise to managers - not to be surprised by estimates that seem larger than you'd think even for a seemingly simple change
-* intro para edit
-* conclusion para
+## Conclusion
+
+So what to do with all this information? It's important to remember than when a manager is asking how long a feature will take, they really mean how many days between today and the day the feature is in production and customers are able to use it. This post has covered many other activities besides writing the code that are needed for this to happen. If you're a developer, keep these in mind when providing estimates. If you're a manager, also keep this in mind when you hear the estimates, that it covers a lot more than just implementation.
