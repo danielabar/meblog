@@ -10,9 +10,9 @@ related:
   - "Find Jira Tickets Faster"
 ---
 
-If you’ve worked on a software development project of any significant complexity, you’ve probably observed that it nearly always takes longer to deliver than the planned timeline. There are many reasons for this including incomplete initial understanding of requirements, salespeople providing unrealistic timelines to close a deal, and unforseen technical challenges.
+If you’ve worked on a software development project of any significant complexity, you’ve probably observed that it nearly always takes longer to deliver than the planned timeline. There are many reasons for this including incomplete initial understanding of requirements, salespeople providing unrealistic promises to close a deal, and unforseen technical challenges.
 
-But even if the scope is well understood, and developers are empowered provide estimates rather than being imposed on by outside forces, things still take longer than expected. Why is that? This post will cover some additional factors that are often unaccounted for, but a crucial part of the process. When asked how long some new feature will take to build, developers are often focused on the effort to write the code, and possibly also the unit tests. However there are many other items that need to get done to get the feature released and into customers hands, but are often not included in estimates. Let's delve into some of these.
+But even if the scope and tech stack is well understood, and developers are empowered provide estimates rather than being imposed on by outside forces, things still take longer than expected. Why is that? This post will cover some additional factors that are often unaccounted for, but a crucial part of the process. When asked how long some new feature will take to build, developers are often focused on the effort to write the code, and possibly also the unit tests. However there are many other items that need to get done to get the feature released and into customers hands, but are often not included in estimates. Let's delve into some of these.
 
 ## Ticket Description
 
@@ -28,7 +28,7 @@ However, many projects are not structured this way. The existing seed data may b
 
 Some projects rely on third party services that either do not support a sandbox mode, or the integration only works in a deployed environment with a particular url. If the feature being developed depends on this service, development can take longer because the developer needs to deploy their changes to the test environment in order to see them working "for real".
 
-Another complexity can be when projects are broken down into microservices, but the boundaries between them are ambiguous. This can result in any given feature requiring changes to multiple services. This will take additional time as developer has to setup multiple projects and juggle multiple change sets and PRs.
+Another complexity can be when projects are broken down into microservices, but the boundaries between them are ambiguous. This can result in any given feature requiring changes to multiple services. This will take additional time as developer has to setup multiple projects and juggle multiple change sets.
 
 ## Test Automation
 
@@ -46,18 +46,21 @@ Another task that may be needed is adding or maintaining existing engineering do
 
 ## Deployed Verification
 
-While its great to have thorough automated test coverage, it's also important to try out the code "for real" in a deployed environment. Ideally there are a few other environments besides production (eg: dev, qa, staging, etc.) for developers to deploy their branches to and make sure it works in a production-like environment. This is also a good opportunity to have the product manager or other team members try it out and provide feedback. Some time needs to be allocated to this, not just for the actual deployment and verification, but for the inevitable environment issues that may arise and require troubleshooting. Issues such as different environments may have different configuration, a networking issue may prevent access to a service that worked fine from the developers laptop, may realize that additional logs are needed for debugging, etc.
+While its great to have thorough automated test coverage, it's also important to try out the code "for real" in a deployed environment. Ideally there are a few other environments besides production (eg: dev, qa, staging, etc.) for developers to deploy their branches to and make sure it works in a production-like environment. This is also a good opportunity to have the product manager or other team members try it out and provide feedback. This could include QA if manual QA is being used on the project.
+
+Time needs to be allocated to this, not just for the actual deployment and verification, but for the inevitable environment issues that may arise and require troubleshooting. Issues such as different environments may have different configuration, a networking issue may prevent access to a service that worked fine from the developers laptop, may realize that additional logs are needed for debugging, etc.
+
+To the extent that manual QA is being used on the project, this may result in some back and forth between QA and developer with some more code being written to address issues found by QA. Again, this is more time.
 
 ## Git Cleanup
 
-For this section, I'm assuming [Git](https://git-scm.com/book/en/v2) is being used for version control but this could apply to any version control system. Since it's a good practice to commit early and commit often, during development, there will inevitably be a lot of [stream of consciousness](https://en.wikipedia.org/wiki/Stream_of_consciousness) commit messages such as:
+For this section, I'm assuming [Git](https://git-scm.com/book/en/v2) is being used for version control but this could apply to any version control system. Since it's a good practice to commit early and commit often, during development, there will inevitably be a lot of [stream of consciousness](https://en.wikipedia.org/wiki/Stream_of_consciousness) commit messages to the feature branch such as:
 
 ```
 * fixing things
 * rubocop
 * model wip
 * something or other...
-* more #@&%$ rubocop
 ```
 
 Prior to submitting work for review, it's beneficial to take the time to reorganize and clean these up so that the set of commits tells a coherent story of the development. This is also a good time to ensure each commit message has the associated ticket number. The result will be helpful for the reviewer to understand how the feature came together and for future developers running `git blame`. For example:
@@ -75,21 +78,23 @@ If you've never reorganized your git commits, see this excellent explainer from 
 
 ## Pull Request
 
-This sounds easy enough, especially if you're using Github and the [gh command line](https://cli.github.com/) utility. Submitting a pull request (PR) can be as fast as typing `gh pr create` in your terminal and hitting <kbd class="markdown-kbd">Enter</kbd> a few times to accept the defaults. However, a PR with only the branch name as the title and a one-liner description such as "added user authentication" is insufficient for an effective code review. There are two sections of important writing that should be included in a PR:
+Code can't just be pushed from a developers laptop to production, it first has to be reviewed with a [pull request](https://docs.github.com/en/pull-requests/collaborating-with-pull-requests/proposing-changes-to-your-work-with-pull-requests/about-pull-requests) (PR). The process of creating a PR seems easy enough, especially if you're using Github and the [gh](https://cli.github.com/) command line utility. It can be as fast as typing `gh pr create` in your terminal and hitting <kbd class="markdown-kbd">Enter</kbd> a few times to accept the defaults. However, a PR with only the branch name as the title and a one-liner description such as "added user authentication" is insufficient for an effective code review.
 
-**Description:** This covers technical details of the change, such as the overall approach that was taken, any architectural decisions made, and explanations of complex logic or algorithms. Include interesting details you'd like to draw the reviewer's attention to, such as performance optimizations or if a non-standard solution was needed. If some especially difficult challenges or trade-offs were encountered during development, mention them as well.
+There are two important sections that the developer submitting the PR needs to take the time to write:
+
+**Description:** This covers technical details of the change, such as the overall approach that was taken, any architectural decisions made, and explanations of complex logic or algorithms. Include interesting details you'd like to draw the reviewer's attention to, such as performance optimizations, departure from conventions, or difficult challenges and trade-offs that were encountered during development.
 
 **Try it out:** This section is to provide step-by-step instructions for the reviewer, how they can checkout the branch and exercise the code changes on their laptop. Essentially whatever steps the original developer took to verify the feature works should be repeatable by the reviewer. This can catch some "works on my machine" issues. In my experience, following this process has caught many more issues than simply scanning the code changes in the PR. It's also a useful historical reference for future developers maintaining this code, to know how it can be exercised.
 
 ## Context Shift
 
-While waiting for their pull request to be reviewed, the developer needs to switch to another task, such as picking up someone else's code to review, or working on a small bugfix or technical debt item that doesn't depend on the current work awaiting review. When the feedback does come in on their PR, then another context shift is necessary to address the comments. Another source of context shifting can be if an urgent production issue arises, or priorities change and the developer needs to switch to a different, now more important task.
+While waiting for their pull request to be reviewed, the developer needs to switch to another task, such as picking up someone else's code to review, or working on a small bugfix or technical debt item that doesn't depend on the current work awaiting review. When the feedback does come in on their PR, then another context shift is necessary to address the comments, and make further code changes if necessary. Another source of context shifting can be if an urgent production issue arises, or priorities change and the developer needs to switch to a different, now more important task.
 
 All of these activities take additional time, and depending on how busy the team is, it could take a few days or more to receive feedback on the PR, address it, then have the reviewer go over it again.
 
 ## Final Push
 
-After the code review feedback has been addressed and the PR approved, the developer needs to merge, and follow the procedure to get the code into production. Ideally a [CI/CD](https://en.wikipedia.org/wiki/CI/CD) pipeline is in place to automate this activity, but there could still be some effort involved such as monitoring the deployment job, verifying the feature in production, and checking production logs to ensure all is well.
+After the code review feedback has been addressed and the PR approved, the developer needs to merge the PR, and follow the procedure to get the code into production. Ideally a [CI/CD](https://en.wikipedia.org/wiki/CI/CD) pipeline is in place to automate this activity, but there could still be some effort involved such as monitoring the deployment job, verifying the feature in production, and checking production logs to ensure all is well.
 
 ## Conclusion
 
