@@ -10,6 +10,8 @@ related:
   - "Use UUID for primary key with Rails and Postgres"
 ---
 
+**Update (September 2023):** Rails projects using fixtures will need one additional permission for the Postgres role. See [initialization](../rails-postgres-docker#initialization) section for more details.
+
 When scaffolding a new Rails project, the database flag can be used to specify a database other than the default SQLite, such as Postgres. However, the generated configuration will assume that the database is running on localhost, i.e. installed directly on your laptop or development machine. If instead you'd like the database running in a Docker container, a few more steps are necessary. This post will walk you through how to setup a new Rails project with a Postgres database running in a Docker container rather than the default SQLite running on localhost. It will be demonstrated using the [Rails Getting Started Guide](https://guides.rubyonrails.org/getting_started.html) which builds an example blog application. All the code explained in this post can be found in this [blogpg project](https://github.com/danielabar/blogpg) on Github.
 
 <aside class="markdown-aside">
@@ -99,8 +101,34 @@ We'll use this feature of the Postgres image to [create a role](https://www.post
 
 ```sql
 -- Only used for development where Postgres is run in Docker
-create role blogpg with createdb login password 'blogpg';
+create role blogpg with CREATEDB login password 'blogpg';
 ```
+
+If your project uses [fixtures](https://guides.rubyonrails.org/testing.html#the-low-down-on-fixtures) for loading sample data, you may encounter the following error when running `bin/rails db:seed` or when running tests, both of which attempt to load the fixtures via `db:fixtures:load`:
+
+```
+WARNING: Rails was not able to disable referential integrity.
+
+This is most likely caused due to missing permissions.
+Rails needs superuser privileges to disable referential integrity.
+
+cause: PG::InsufficientPrivilege: ERROR:  permission denied: "RI_ConstraintTrigger_c_24650" is a system trigger
+
+Tasks: TOP => db:fixtures:load
+```
+
+This is because when loading fixtures, Rails first deletes all the existing data in the database, and the fastest way to do that is to first disable referential integrity (i.e. foreign keys and check constraints). However, Postgres requires that the user doing this must have a role with `SUPERUSER` privileges. The role created in the example above only has `CREATEDB` privilege which is insufficient. To resolve this, include `SUPERUSER` privilege when creating the role as follows:
+
+```sql
+-- Only used for development where Postgres is run in Docker
+create role blogpg with CREATEDB SUPERUSER login password 'blogpg';
+```
+
+According to the Postgres docs on creating roles:
+
+> Superuser status is dangerous and should be used only when really needed.
+
+In this case, it is *only* being used for development purposes. Your production role should not have this.
 
 <aside class="markdown-aside">
 Roles and users are similar concepts in Postgres, although there are some differences. A full discussion of this topic is outside the scope of this post, see this <a class="markdown-link" href="https://dba.stackexchange.com/questions/82271/postgresql-roles-versus-users-grant-permissions">question on DBA Stack Exchange</a> for more details.
