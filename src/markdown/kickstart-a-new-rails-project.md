@@ -193,6 +193,21 @@ group :development, :test do
 end
 ```
 
+Configure FactoryBot in `spec/rails_helper.rb`:
+
+```ruby
+RSpec.configure do |config|
+  # Other config...
+
+  # Allows tests to use FactoryBot methods like `build`, `build_stubbed`, `create` etc.
+  # without having to be preceded by FactoryBot. For example:
+  # subject(:retrospective) { build_stubbed(:retrospective) }
+  # instead of
+  # subject(:retrospective) { FactoryBot.build_stubbed(:retrospective) }
+  config.include FactoryBot::Syntax::Methods
+end
+```
+
 Shoulda matchers for expressive model testing:
 
 ```ruby
@@ -202,9 +217,11 @@ group :test do
 end
 ```
 
-After installing, add config block to `spec/rails_helper.rb`:
+After installing, add config block at the end of `spec/rails_helper.rb`:
 
 ```ruby
+# Other config...
+
 Shoulda::Matchers.configure do |config|
   config.integrate do |with|
     with.test_framework :rspec
@@ -280,8 +297,8 @@ end
 ## TODO
 * Intro para needs work
 * Mention will walkthrough setting up an actual application that I'm starting on retro-pulse (link to repo if have pushed it)
-* Include example of model class with result of annotate
-* Explain why I prefer structure.sql over schema.rb
+* Include example of model class with result of annotate (not just model: also rspec model test and factorybot factory!)
+* Explain why using structure.sql over schema.rb
 * Explain benefits of rack-mini-profiler
 * Briefly explain benefits of Rubopcop extensions (eg: ignore generated files, modern monitors are bigger and higher res, both width - line length - and length as in block/method length can be a little longer than defaults)
 * Explain briefly some rubocop customizations
