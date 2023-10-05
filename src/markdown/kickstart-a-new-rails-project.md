@@ -10,61 +10,65 @@ related:
   - "Start a Rails 6 Project with RSpec"
 ---
 
-Embarking on a new Rails project is both thrilling and challenging. To ensure a smooth start, it's essential to lay down a practical and efficient groundwork. In this guide, we'll dive into the nuts and bolts of setting up a new Rails project with a focus on simplicity and productivity. We'll explore critical steps like configuring PostgreSQL and integrating Tailwind CSS, optimizing your development environment through Docker, and adopting developer-friendly tools like RSpec, FactoryBot, and more. This guide is all about sharing practical tips and proven practices that I've found invaluable in my own journey. So, let's cut to the chase and get your Rails project off to a strong start.
-
-## Rough Notes WIP...
+Starting a new Rails project is an exciting time, but it also comes with its fair share of setup tasks to ensure your project kicks off on the right foot. In this blog post, I'll walk through some important steps that I like to follow to set up a Rails project for success. From configuring the database to ensuring code quality and style, and setting up essential development tools. Let's get started.
 
 ## Initialization
 
-At the time of this writing:
+At the time of this writing, here are the versions of Ruby and Rails that I'm using:
 
 ```bash
 ruby --version
-# ruby 3.2.2 (2023-03-30 revision e51014f9c0) [arm64-darwin22]
+# ruby 3.2.2
 
 rails --version
 # Rails 7.0.8
 ```
 
-Generate new project with Postgres and TailwindCSS:
+Use the `rails new` generator to generate new project with Postgres:
 
 ```bash
-rails new retro-pulse --css tailwind --database=postgresql
+rails new my-awesome-app --database=postgresql
 ```
 
-Note: This assumes you're previously installed postgres, for example: `brew install postgresql@14`
+This assumes you're previously installed Postgres, for example: `brew install postgresql@14`. If you don't specify the `--database` flag in the generator command, it will use SQLite, which can be ok for a very small project or for someone who's just getting started with Rails and wants to keep things very simple. But later if you want to deploy it to a PaaS like Heroku or Render that use ephemeral environments, it won't work and will require switching to Postgres.
 
-Aside: Yes TailwindCSS can be controversial, and before I had tried it, my thought was "why not just stick with vanilla CSS?", but then I took a course (share notes and course link) and formed a different opinion. I guess this goes in the bucket of "don't knock it till you try it".
+<aside class="markdown-aside">
+Opting for Postgres offers many benefits, including robust data integrity, support for complex data types, advanced indexing options, compatibility with geo-spatial data, and access to community extensions.
+</aside>
 
-## Database
+## Database Setup
 
-Run Postgres in a Docker container (link to my other post), also mention its convenient if you later want to add redis for sidekiq or actioncable for example.
-Maybe quickly show docker-compose.yml, init.sql and database.yml, without all the explanations, and link to my post for more details.
+After the project has been generated, I recommend running Postgres in a Docker container rather than directly on your laptop. This makes it convenient to add other services like Redis for Sidekiq or ActionCable later on. You can check out my detailed guide in this previous post [Setup a Rails Project with Postgres and Docker](../rails-postgres-docker).
 
-Ensure `structure.sql` will be generated instead of `schema.rb`, when migrations are run:
+Once you've set up Postgres, ensure that your Rails project is configured to generate a `structure.sql` file instead of `schema.rb` for your database schema. This can be done by adding the following line to your `config/application.rb` file:
+
 ```ruby
-# config/application.rb
 config.active_record.schema_format = :sql
 ```
 
-Before moving on to further setup, this is a good time to ensure database can be started and created with `bin/setup`, should see output like:
+The benefit of this is you may in the future have a migration that executes some SQL that cannot be expressed by the DSL provided by Rails. See the Rails Guides on [Schema Dumps](https://edgeguides.rubyonrails.org/active_record_migrations.html#types-of-schema-dumps) for more details.
+
+Before moving on to further setup, this is a good time to ensure database can be started and created with `bin/setup`. If the database is configured correctly, the output of this command should include:
 ```
 == Preparing database ==
-Created database 'retro_pulse'
-Created database 'retro_pulse_test'
+Created database 'my_awesome_app'
+Created database 'my_awesome_app_test'
 ```
 
-Then launch a psql session with `bin/rails db`, which will connect you to the dev database. Then run `\d` at the psql prompt to list tables, you should see:
+Then launch a psql session with `bin/rails db`, which will connect you to the development database. Then run `\d` at the psql prompt to list tables, you should see:
+
 ```
                  List of relations
  Schema |         Name         | Type  |    Owner
 --------+----------------------+-------+-------------
- public | ar_internal_metadata | table | retro_pulse
- public | schema_migrations    | table | retro_pulse
+ public | ar_internal_metadata | table | my_awesome_app
+ public | schema_migrations    | table | my_awesome_app
 (2 rows)
 ```
 
-Add [annotate](https://github.com/ctran/annotate_models) gem to development and test sections of Gemfile:
+### Annotate Gem for Schema Information
+
+For a clearer understanding of your database schema and to save time when working with models, consider adding the [annotate](https://github.com/ctran/annotate_models) gem to your development and test sections of the Gemfile.
 
 ```ruby
 # Gemfile
@@ -74,23 +78,75 @@ group :development, :test do
 end
 ```
 
-Run the [install command](https://github.com/ctran/annotate_models#configuration-in-rails) so that running database migrations will automatically prepend schema information to the models and tests (more on testing later). This is beneficial when working with a model, such as adding scopes or other methods, to see what columns, indexes, and constraints are available.
+After adding it, run the installation command:
 
 ```bash
-bundle install
 rails g annotate:install
 ```
 
-## Code Quality and Style
+This ensures that anytime database migrations are run, the schema information will be automatically prepended to the models, tests, and factories (more on testing later). This is beneficial when working with a model, such as adding scopes or other methods, to see what columns, indexes, and constraints are available.
 
-Uncomment `gem "rack-mini-profiler"`
-
-Add Rubocop and some official [extensions](https://docs.rubocop.org/rubocop/extensions.html):
+For example, given the following migration to create a `products` table:
 
 ```ruby
-# Gemfile
+class CreateProducts < ActiveRecord::Migration[7.0]
+  def change
+    create_table :products do |t|
+      t.string :name, null: false
+      t.string :code, null: false
+      t.decimal :price, null: false
+      t.integer :inventory, null: false, default: 0
+
+      t.timestamps
+    end
+  end
+end
+```
+
+And corresponding Product model:
+
+```ruby
+class Product < ApplicationRecord
+  # ...
+end
+```
+
+After running the migration with `bin/rails db:migrate`, the model class will be updated with the schema information as comments at the beginning of the file:
+
+```ruby
+# == Schema Information
+#
+# Table name: products
+#
+#  id         :integer          not null, primary key
+#  code       :string           not null
+#  inventory  :integer          default(0), not null
+#  name       :string           not null
+#  price      :decimal(, )      not null
+#  created_at :datetime         not null
+#  updated_at :datetime         not null
+#
+class Product < ApplicationRecord
+  # ...
+end
+```
+
+The same schema comments will also get added to the model test `spec/models/product_spec.rb` and factory `spec/factories/product.rb` (given that these files exist at the time you run migrations).
+
+## Code Quality and Style
+
+Maintaining clean and consistent code is essential for any project. Here's how you can set up code quality and style checks for your Rails project.
+
+### Rack Mini Profiler
+
+Uncomment the `gem "rack-mini-profiler"` line in your Gemfile to enable Rack Mini Profiler. This tool helps you identify performance bottlenecks in your application by providing real-time metrics on database queries, rendering times, and memory usage. See this [guide](https://stackify.com/rack-mini-profiler-a-complete-guide-on-rails-performance/) for more details on how to use it.
+
+### Rubocop for Code Quality
+
+For code quality checks, add Rubocop and some official extensions to the development group in the Gemfile:
+
+```ruby
 group :development do
-  # Code quality
   gem "rubocop"
   gem "rubocop-rails"
   gem 'rubocop-rspec'
@@ -101,7 +157,10 @@ group :development do
 end
 ```
 
-Then add .rubocop.yml in project root with some customizations:
+After adding these gems, create a `.rubocop.yml` file in your project's root directory with custom configurations. This is because you'll nearly always want to customize the Rubocop defaults. The details will vary by project, but here's where I like to start:
+* Excluding generated files.
+* Not enforcing code comment docs (although I'm a huge fan of [engineering documentation](../about-those-docs), enforcing it with `Style/Documentation` can lead to useless comments like `# This is the product model`).
+* Increase some max lengths to account for modern large and high resolution monitors.
 
 ```yml
 require:
@@ -145,23 +204,15 @@ Metrics/MethodLength:
 Layout/LineLength:
   Max: 120
 
-# Only if not using I18n
-Rails/I18nLocaleTexts:
-  Enabled: false
-
 RSpec/ExampleLength:
   Max: 15
 ```
 
-## Testing...
+## Automated Tests
 
-Rails ships with minitest and test fixtures for automated testing, but I prefer to use RSpec with FactoryBot for explicit test data creation rather than having test data automatically loaded by fixtures. Ref: [Mystery Guest](https://thoughtbot.com/blog/mystery-guest).
+While Rails comes with minitest for testing, I prefer using RSpec, together with FactoryBot for a BDD approach to testing, and explicit test data creation. Here's how to set it up.
 
-RSpec instead of Minitest, shoulda matchers.
-
-Ref my post on starting a project with RSpec.
-
-Add `rspec-rails` gem to dev and test groups so that generators/rake tasks don't need to be preceded by RAILS_ENV=test, ref: https://github.com/rspec/rspec-rails#installation
+Add `rspec-rails` gem to the Gemfile:
 
 ```ruby
 # Gemfile
@@ -170,21 +221,42 @@ group :development, :test do
 end
 ```
 
-Install and bootstrap:
+It's placed in the development and test groups so that generators and rake tasks don't need to be preceded by `RAILS_ENV=test`. See the [installation docs](https://github.com/rspec/rspec-rails#installation) for more details.
+
+After adding the gem, run the following commands to install and bootstrap RSpec:
+
 ```bash
 bundle install
 bin/rails generate rspec:install
 ```
 
-TODO: Still requires config/initializor/generator? -> NO
+Cleanup the old `test` directory from rails new generator to avoid confusion (assuming there's nothing important in here):
 
-Cleanup old test dir from rails new generator to avoid confusion `rm -rf test`
+```bash
+rm -rf test
+```
 
-Optional generate binstub: `bundle binstubs rspec-core` so you can run `bin/rspec` instead of `bundle exec rspec` to run tests.
+Optionally, you can generate a binstub for RSpec to make running tests more convenient:
 
-FactoryBot for creating test data (mention use build_stubbed where possible over create for performance)
+```bash
+bundle binstubs rspec-core
+```
 
-Add to dev/test section of Gemfile. Note this causes Rails to generate factories instead of fixtures, this is exactly what I want. See [docs](https://github.com/thoughtbot/factory_bot_rails#generators) if you want different behaviour
+Now instead of having to type `bundle exec rspec` to run tests, this can be shorted to `bin/rspec`.
+
+### Factories
+
+By default, Rails ships with fixtures, which are yaml files that represent test data. They will be automatically loaded into the test database before every test run. While they are fast (due to database constraints being dropped before data loading), as a project and the data model grows, particularly with associations, fixtures can become a source of complexity. I prefer to use FactoryBot for more explicit data creation per each test that needs it.
+
+To create test data easily, add the `factory_bot_rails` gem to your development and test groups in the Gemfile:
+
+```ruby
+group :development, :test do
+  gem "factory_bot_rails"
+end
+```
+
+This will cause Rails to generate factories instead of fixtures when running for example `bin/rails generate model SomeModel`. See the [FactoryBot Generator docs](https://github.com/thoughtbot/factory_bot_rails#generators) if you want different behaviour.
 
 ```ruby
 # Gemfile
@@ -193,7 +265,7 @@ group :development, :test do
 end
 ```
 
-Configure FactoryBot in `spec/rails_helper.rb`:
+Next, configure FactoryBot in `spec/rails_helper.rb`:
 
 ```ruby
 RSpec.configure do |config|
@@ -201,14 +273,18 @@ RSpec.configure do |config|
 
   # Allows tests to use FactoryBot methods like `build`, `build_stubbed`, `create` etc.
   # without having to be preceded by FactoryBot. For example:
-  # subject(:retrospective) { build_stubbed(:retrospective) }
+  # subject(:product) { create(:product) }
   # instead of
-  # subject(:retrospective) { FactoryBot.build_stubbed(:retrospective) }
+  # subject(:product) { FactoryBot.create(:product) }
   config.include FactoryBot::Syntax::Methods
 end
 ```
 
-Shoulda matchers for expressive model testing:
+See this post for more discussion on [factories vs fixtures](https://harled.ca/blog/the_battle_of_factories_vs_fixtures_when_using_rspec).
+
+### Should Matchers
+
+This is another gem I like to add to support more expressive model testing. Add it to your test group in the Gemfile:
 
 ```ruby
 # Gemfile
@@ -217,11 +293,10 @@ group :test do
 end
 ```
 
-After installing, add config block at the end of `spec/rails_helper.rb`:
+After adding the gem, configure it at the end of your `spec/rails_helper.rb` file:
 
 ```ruby
 # Other config...
-
 Shoulda::Matchers.configure do |config|
   config.integrate do |with|
     with.test_framework :rspec
@@ -295,13 +370,10 @@ end
 ```
 
 ## TODO
-* Intro para needs work
-* Mention will walkthrough setting up an actual application that I'm starting on retro-pulse (link to repo if have pushed it)
+* Testing section WIP
+* mention `build_stubbed` over `create` where possible for performance
 * Include example of model class with result of annotate (not just model: also rspec model test and factorybot factory!)
-* Explain why using structure.sql over schema.rb
-* Explain benefits of rack-mini-profiler
-* Briefly explain benefits of Rubopcop extensions (eg: ignore generated files, modern monitors are bigger and higher res, both width - line length - and length as in block/method length can be a little longer than defaults)
-* Explain briefly some rubocop customizations
+* Briefly explain benefits of Rubopcop extensions
 * Show example of model with presence validation, and one-liner shoulda matcher rspec
 * Show example of Solargraph, hover over something from Rails, then click through, goes into the right gem version and shows the code
 * Maybe mention each project may require more, but this is the bare minimum I've found that I always reach for in every project. Eg: `dotenv-rails` - always needed or optional?
