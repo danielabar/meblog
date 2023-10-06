@@ -66,9 +66,9 @@ Then launch a psql session with `bin/rails db`, which will connect you to the de
 (2 rows)
 ```
 
-### Annotate Gem for Schema Information
+### Annotate
 
-For a clearer understanding of your database schema and to save time when working with models, consider adding the [annotate](https://github.com/ctran/annotate_models) gem to your development and test sections of the Gemfile.
+For a clearer understanding of the database schema and to save time when working with models, I like to add the [annotate](https://github.com/ctran/annotate_models) gem to the development and test sections of the Gemfile.
 
 ```ruby
 # Gemfile
@@ -84,7 +84,7 @@ After adding it, run the installation command:
 rails g annotate:install
 ```
 
-This ensures that anytime database migrations are run, the schema information will be automatically prepended to the models, tests, and factories (more on testing later). This is beneficial when working with a model, such as adding scopes or other methods, to see what columns, indexes, and constraints are available.
+This ensures that anytime database migrations are run, the schema information will be automatically prepended to the models, tests, and factories (more on [testing](../testing) later). This is beneficial when working with a model, such as adding scopes or other methods, to see what columns, indexes, and constraints are available.
 
 For example, given the following migration to create a `products` table:
 
@@ -133,15 +133,15 @@ end
 
 The same schema comments will also get added to the model test `spec/models/product_spec.rb` and factory `spec/factories/product.rb` (given that these files exist at the time you run migrations).
 
-## Code Quality and Style
+## Code Quality
 
 Maintaining clean and consistent code is essential for any project. Here's how you can set up code quality and style checks for your Rails project.
 
-### Rack Mini Profiler
+### Profiler
 
 Uncomment the `gem "rack-mini-profiler"` line in your Gemfile to enable Rack Mini Profiler. This tool helps you identify performance bottlenecks in your application by providing real-time metrics on database queries, rendering times, and memory usage. See this [guide](https://stackify.com/rack-mini-profiler-a-complete-guide-on-rails-performance/) for more details on how to use it.
 
-### Rubocop for Code Quality
+### Rubocop
 
 For code quality checks, add Rubocop and some official extensions to the development group in the Gemfile:
 
@@ -208,11 +208,11 @@ RSpec/ExampleLength:
   Max: 15
 ```
 
-## Automated Tests
+## Testing
 
-While Rails comes with minitest for testing, I prefer using RSpec, together with FactoryBot for a BDD approach to testing, and explicit test data creation. Here's how to set it up.
+While Rails comes with minitest for testing, I prefer using RSpec, together with FactoryBot for a [BDD](https://en.wikipedia.org/wiki/Behavior-driven_development) approach to testing, and explicit test data creation. Here's how to set this up.
 
-Add `rspec-rails` gem to the Gemfile:
+Add `rspec-rails` gem to the Gemfile. It's placed in the development and test groups so that generators and rake tasks don't need to be preceded by `RAILS_ENV=test`. See the [installation docs](https://github.com/rspec/rspec-rails#installation) for more details.
 
 ```ruby
 # Gemfile
@@ -220,8 +220,6 @@ group :development, :test do
   gem "rspec-rails"
 end
 ```
-
-It's placed in the development and test groups so that generators and rake tasks don't need to be preceded by `RAILS_ENV=test`. See the [installation docs](https://github.com/rspec/rspec-rails#installation) for more details.
 
 After adding the gem, run the following commands to install and bootstrap RSpec:
 
@@ -242,11 +240,15 @@ Optionally, you can generate a binstub for RSpec to make running tests more conv
 bundle binstubs rspec-core
 ```
 
-Now instead of having to type `bundle exec rspec` to run tests, this can be shorted to `bin/rspec`.
+Now instead of having to type `bundle exec rspec` to run tests, this can be shortened to `bin/rspec`.
 
 ### Factories
 
-By default, Rails ships with fixtures, which are yaml files that represent test data. They will be automatically loaded into the test database before every test run. While they are fast (due to database constraints being dropped before data loading), as a project and the data model grows, particularly with associations, fixtures can become a source of complexity. I prefer to use FactoryBot for more explicit data creation per each test that needs it.
+By default, Rails supports fixtures, which are yaml files that represent test data. They will be automatically loaded into the test database before every test run. While they are fast (due to database constraints being dropped before data loading), as a project and the data model grows, particularly with associations, fixtures can become a source of complexity. I prefer to use FactoryBot for more explicit data creation for each test that needs it.
+
+<aside class="markdown-aside">
+A full discussion of the pros and cons of factories and fixtures is outside the scope of this post. See this post <a class="markdown-link" href="https://harled.ca/blog/the_battle_of_factories_vs_fixtures_when_using_rspec">The Battle of Factories vs Fixtures</a> for more on this topic.
+</aside>
 
 To create test data easily, add the `factory_bot_rails` gem to your development and test groups in the Gemfile:
 
@@ -256,7 +258,7 @@ group :development, :test do
 end
 ```
 
-This will cause Rails to generate factories instead of fixtures when running for example `bin/rails generate model SomeModel`. See the [FactoryBot Generator docs](https://github.com/thoughtbot/factory_bot_rails#generators) if you want different behaviour.
+This will cause Rails to generate factories instead of fixtures when running for example `bin/rails generate model SomeModel`. See the [FactoryBot Generator docs](https://github.com/thoughtbot/factory_bot_rails#generators) if you want different behavior.
 
 ```ruby
 # Gemfile
@@ -270,21 +272,25 @@ Next, configure FactoryBot in `spec/rails_helper.rb`:
 ```ruby
 RSpec.configure do |config|
   # Other config...
-
-  # Allows tests to use FactoryBot methods like `build`, `build_stubbed`, `create` etc.
-  # without having to be preceded by FactoryBot. For example:
-  # subject(:product) { create(:product) }
-  # instead of
-  # subject(:product) { FactoryBot.create(:product) }
   config.include FactoryBot::Syntax::Methods
 end
 ```
 
-See this post for more discussion on [factories vs fixtures](https://harled.ca/blog/the_battle_of_factories_vs_fixtures_when_using_rspec).
+The above configuration supports using the FactoryBot methods directly in tests, for example:
 
-### Should Matchers
+```ruby
+# With config
+let(:product) { build_stubbed(:product) }
 
-This is another gem I like to add to support more expressive model testing. Add it to your test group in the Gemfile:
+# Without config
+let(:product) { FactoryBot.build_stubbed(:product) }
+```
+
+**Performance tip:** Use FactoryBot's `build_stubbed` over `create` where possible to speed up your test suite. Read this [post from Thoughtbot](https://thoughtbot.com/blog/use-factory-bots-build-stubbed-for-a-faster-test) for more details.
+
+### Shoulda Matchers
+
+For more expressive model testing, I like to add the `shoulda-matchers` gem. Add it to the test group in the Gemfile:
 
 ```ruby
 # Gemfile
@@ -293,9 +299,11 @@ group :test do
 end
 ```
 
-After adding the gem, configure it at the end of your `spec/rails_helper.rb` file:
+After adding the gem, configure it at the end of the `spec/rails_helper.rb` file:
 
 ```ruby
+# spec/rails_helper.rb
+
 # Other config...
 Shoulda::Matchers.configure do |config|
   config.integrate do |with|
@@ -305,13 +313,33 @@ Shoulda::Matchers.configure do |config|
 end
 ```
 
-Before moving on, make sure everything is wired up properly by generating an example model, and ensure both the rspec test and factory is generated for it. Do this on a branch or after you've committed up to this point so you can safely get rid of it later:
+Here's an example of using shoulda matchers in an RSpec model test. Given the following `User` model:
+
+```ruby
+# app/models/user.rb
+class User < ApplicationRecord
+  validates :name, presence: true
+  validates :email, presence: true
+end
+```
+
+The `presence` validations can be tested with one-liners as follows:
+
+```ruby
+# spec/models/user_spec.rb
+RSpec.describe User, type: :model do
+  it { should validate_presence_of(:name) }
+  it { should validate_presence_of(:email) }
+end
+```
+
+Before moving on, make sure everything is wired up properly by generating an example model, and ensure both the rspec test and factory is generated for it. For example:
 
 ```bash
 bin/rails generate model Product name:string description:text price:decimal available:boolean
 ```
 
-Output should show something like this - migration, model, model spec and product factory:
+The output of this command should show that the migration, model, model spec and product factory have been created:
 
 ```
 invoke  active_record
@@ -323,15 +351,19 @@ invoke      factory_bot
 create        spec/factories/products.rb
 ```
 
-Clean up with:
+Afterward, you can safely clean up the generated files:
 
 ```bash
 bin/rails destroy model Product
 ```
 
-## Other Dev Tooling
+## Dev Tooling
 
-Faker gem for seed data (can also use it in factories for test data):
+Here are a few more tools I like to add to enhance my workflow.
+
+### Faker
+
+The `faker` gem is a handy tool for generating seed data during development and can also be used in factories for test data. Add it to your development and test groups in the Gemfile:
 
 ```ruby
 # Gemfile
@@ -340,9 +372,38 @@ group :development, :test do
 end
 ```
 
-Add solargraph gem, TODO: explanation! Cmd + click into gems from VSCode (goes along with VSCode extension). Ideally the RubyLSP extension from Shopify would provide this, but not yet at the time of this writing:
+Here's an example of how it can be used to seed the development database:
 
-Intelligent code assistance and help with code navigation, documentation, and autocompletion in Ruby/Rails projects
+```ruby
+# db/seeds.rb
+10.times do
+  product = Product.create(
+    name: Faker::Commerce.product_name,
+    description: Faker::Lorem.paragraph,
+    price: Faker::Commerce.price(range: 10.0..1000.0),
+    available: Faker::Boolean.boolean
+  )
+end
+```
+
+Faker can also be used in factories, for example:
+
+```ruby
+FactoryBot.define do
+  factory :product do
+    name { Faker::Commerce.product_name }
+    description { Faker::Lorem.paragraph }
+    price { Faker::Commerce.price(range: 10.0..1000.0) }
+    available { Faker::Boolean.boolean }
+  end
+end
+```
+
+### Solargraph
+
+Solargraph is a gem for Intelligent code assistance. When used together with the [Solargraph VSCode extension](https://marketplace.visualstudio.com/items?itemName=castwide.solargraph), it supports code navigation, documentation, and autocompletion.
+
+Add it to the development group in the Gemfile:
 
 ```ruby
 # Gemfile
@@ -351,14 +412,27 @@ group :development do
 end
 ```
 
-## Service Layer Placeholder
+Once Solargraph is setup, here's an example of it in action. Hovering over a Rails class in VSCode with Solargraph setup will show the documentation like this:
 
-Configure `app/services` dir with `.keep` file. Needs explanation, Rails not opinionated about how you organize business logic. Projects go through phases like:
-- at first simple, not too many models, logic is in controller - easy to write but hard to test
-- gradually some logic starts to move to AR models - but these are really about querying the database, and they get too big, especially the main models such as a `Product` model in an e-commerce app
-- then eventually services (or interactors - todo link) get introduced. But there's never time to go back and refactor all business logic out of controllers and models into services so the project ends up like an archaeological dig, depending on how far back in time you go, will find different techniques. I've seen this so often that might as well go in with a services layer from the beginning to keep things clean and organized.
+![rails kickstart solargraph hover](../images/kickstart-rails-solargraph-hover.png "rails kickstart solargraph hover")
 
-Need to add it to Rails auto load path:
+Hitting <kbd class="markdown-kbd">F12</kbd> will jump into the code, for example:
+
+![rails kickstart solargraph jump into code](../images/kickstart-rails-solargraph-jump-into-code.png "rails kickstart solargraph jump into code")
+
+## Services
+
+Lastly, consider configuring an `app/services` directory in your Rails project. While Rails is not opinionated about how you organize business logic, having a services layer from the beginning can keep your codebase clean and organized as the project grows.
+
+Add an empty `.keep` file in this directory so it will get committed to git:
+
+```bash
+# from project root
+mkdir app/services
+touch app/services/.keep
+```
+
+Then add the following line to `config/application.rb` file to include the `app/services` directory in Rails' autoload path:
 
 ```ruby
 # config/application.rb
@@ -369,13 +443,13 @@ class Application < Rails::Application
 end
 ```
 
+## Conclusion
+
+This blog post has covered important steps in starting a Rails project, including database setup, code quality and style, testing, additional dev tooling, and introducing a service layer from the start. By following these steps and practices, your Rails project should be well-prepared for efficient development and maintainability.
+
 ## TODO
-* Testing section WIP
-* mention `build_stubbed` over `create` where possible for performance
-* Include example of model class with result of annotate (not just model: also rspec model test and factorybot factory!)
 * Briefly explain benefits of Rubopcop extensions
-* Show example of model with presence validation, and one-liner shoulda matcher rspec
-* Show example of Solargraph, hover over something from Rails, then click through, goes into the right gem version and shows the code
+* Maybe swap order of rubocop and profiler sub-sub-sections
 * Maybe mention each project may require more, but this is the bare minimum I've found that I always reach for in every project. Eg: `dotenv-rails` - always needed or optional?
-* conclusion para
+* change all initial mentions of gems to links to the github repos or official docs
 * edit
