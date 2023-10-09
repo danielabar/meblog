@@ -67,7 +67,7 @@ class CreateProducts < ActiveRecord::Migration[7.0]
     create_table :products do |t|
       t.string :name, null: false
       t.string :code, null: false
-      t.decimal :price, null: false
+      t.decimal :price, null: false, precision: 8, scale: 2
       t.integer :inventory, null: false, default: 0
 
       t.timestamps
@@ -88,7 +88,7 @@ Here is the corresponding `Product` model with some validations added. I'm using
 #  code       :string           not null
 #  inventory  :integer          default(0), not null
 #  name       :string           not null
-#  price      :decimal(, )      not null
+#  price      :decimal(8,2)     not null
 #  created_at :datetime         not null
 #  updated_at :datetime         not null
 #
@@ -109,7 +109,7 @@ end
 ```
 
 <aside class="markdown-aside">
-Not critical to this demo, but since the prices are stored as a decimal column in the database, a format method is added to the model, and the inspect method is overridden to use it. This is so when products are displayed in the console for debugging purposes, it will show a price like 47.53 rather than 0.4753e2. Also note that for a real application, the precision and scale would be defined such as decimal(10, 2) but this simple demo is using the default SQLite database which doesn't support specifying these.
+Not critical to this demo, but since the prices are stored as a decimal column in the database, a format method is added to the model, and the inspect method is overridden to use it. This is so when products are displayed in the console for debugging purposes, it will show a price like 47.53 rather than 0.4753e2.
 </aside>
 
 In development, the `products` table is populated with seed data, using the [faker](https://github.com/faker-ruby/faker) gem:
