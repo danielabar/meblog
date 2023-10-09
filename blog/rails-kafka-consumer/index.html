@@ -108,7 +108,7 @@ When it comes to Kafka topic naming conventions, there are many different <a cla
 <span class="grvsc-line"><span class="grvsc-source"><span class="mtk1">    create_table </span><span class="mtk4">:products</span><span class="mtk1"> </span><span class="mtk7">do</span><span class="mtk1"> |t|</span></span></span>
 <span class="grvsc-line"><span class="grvsc-source"><span class="mtk1">      t.</span><span class="mtk5">string</span><span class="mtk1"> </span><span class="mtk4">:name</span><span class="mtk1">, </span><span class="mtk4">null:</span><span class="mtk1"> </span><span class="mtk4">false</span></span></span>
 <span class="grvsc-line"><span class="grvsc-source"><span class="mtk1">      t.</span><span class="mtk5">string</span><span class="mtk1"> </span><span class="mtk4">:code</span><span class="mtk1">, </span><span class="mtk4">null:</span><span class="mtk1"> </span><span class="mtk4">false</span></span></span>
-<span class="grvsc-line"><span class="grvsc-source"><span class="mtk1">      t.</span><span class="mtk5">decimal</span><span class="mtk1"> </span><span class="mtk4">:price</span><span class="mtk1">, </span><span class="mtk4">null:</span><span class="mtk1"> </span><span class="mtk4">false</span></span></span>
+<span class="grvsc-line"><span class="grvsc-source"><span class="mtk1">      t.</span><span class="mtk5">decimal</span><span class="mtk1"> </span><span class="mtk4">:price</span><span class="mtk1">, </span><span class="mtk4">null:</span><span class="mtk1"> </span><span class="mtk4">false</span><span class="mtk1">, </span><span class="mtk4">precision:</span><span class="mtk1"> </span><span class="mtk4">8</span><span class="mtk1">, </span><span class="mtk4">scale:</span><span class="mtk1"> </span><span class="mtk4">2</span></span></span>
 <span class="grvsc-line"><span class="grvsc-source"><span class="mtk1">      t.</span><span class="mtk5">integer</span><span class="mtk1"> </span><span class="mtk4">:inventory</span><span class="mtk1">, </span><span class="mtk4">null:</span><span class="mtk1"> </span><span class="mtk4">false</span><span class="mtk1">, </span><span class="mtk4">default:</span><span class="mtk1"> </span><span class="mtk4">0</span></span></span>
 <span class="grvsc-line"><span class="grvsc-source"></span></span>
 <span class="grvsc-line"><span class="grvsc-source"><span class="mtk1">      t.</span><span class="mtk5">timestamps</span></span></span>
@@ -125,7 +125,7 @@ When it comes to Kafka topic naming conventions, there are many different <a cla
 <span class="grvsc-line"><span class="grvsc-source"><span class="mtk3">#  code       :string           not null</span></span></span>
 <span class="grvsc-line"><span class="grvsc-source"><span class="mtk3">#  inventory  :integer          default(0), not null</span></span></span>
 <span class="grvsc-line"><span class="grvsc-source"><span class="mtk3">#  name       :string           not null</span></span></span>
-<span class="grvsc-line"><span class="grvsc-source"><span class="mtk3">#  price      :decimal(, )      not null</span></span></span>
+<span class="grvsc-line"><span class="grvsc-source"><span class="mtk3">#  price      :decimal(8,2)     not null</span></span></span>
 <span class="grvsc-line"><span class="grvsc-source"><span class="mtk3">#  created_at :datetime         not null</span></span></span>
 <span class="grvsc-line"><span class="grvsc-source"><span class="mtk3">#  updated_at :datetime         not null</span></span></span>
 <span class="grvsc-line"><span class="grvsc-source"><span class="mtk3">#</span></span></span>
@@ -144,7 +144,7 @@ When it comes to Kafka topic naming conventions, there are many different <a cla
 <span class="grvsc-line"><span class="grvsc-source"><span class="mtk1">  </span><span class="mtk7">end</span></span></span>
 <span class="grvsc-line"><span class="grvsc-source"><span class="mtk7">end</span></span></span></code></pre>
 <aside class="markdown-aside">
-Not critical to this demo, but since the prices are stored as a decimal column in the database, a format method is added to the model, and the inspect method is overridden to use it. This is so when products are displayed in the console for debugging purposes, it will show a price like 47.53 rather than 0.4753e2. Also note that for a real application, the precision and scale would be defined such as decimal(10, 2) but this simple demo is using the default SQLite database which doesn't support specifying these.
+Not critical to this demo, but since the prices are stored as a decimal column in the database, a format method is added to the model, and the inspect method is overridden to use it. This is so when products are displayed in the console for debugging purposes, it will show a price like 47.53 rather than 0.4753e2.
 </aside>
 <p class="markdown-para">In development, the <code>products</code> table is populated with seed data, using the <a href="https://github.com/faker-ruby/faker" class="markdown-link">faker</a> gem:</p>
 <pre class="grvsc-container gatsby-highlight monokai" data-language="ruby" data-index="4"><code class="grvsc-code"><span class="grvsc-line"><span class="grvsc-source"><span class="mtk3"># db/seeds.rb</span></span></span>
