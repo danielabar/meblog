@@ -10,7 +10,7 @@ related:
   - "Start a Rails 6 Project with RSpec"
 ---
 
-Starting a new Rails project is an exciting time, but it also comes with its fair share of setup tasks to ensure your project kicks off on the right foot. In this blog post, I'll walk through some important steps that I like to follow to set up a Rails project for success. From configuring the database to ensuring code quality and style, and setting up essential development tools. Let's get started.
+Starting a new Rails project is an exciting time, but it also comes with its fair share of setup tasks to ensure your project kicks off on the right foot. This post will walk through some important steps that I like to follow to set up a Rails project for success. From configuring the database to ensuring code quality and style, and setting up essential development tools. Let's get started.
 
 ## Initialization
 
@@ -81,7 +81,8 @@ end
 After adding it, run the installation command:
 
 ```bash
-rails g annotate:install
+bundle install
+bin/rails generate annotate:install
 ```
 
 This ensures that anytime database migrations are run, the schema information will be automatically prepended to the models, tests, and factories (more on [testing](../testing) later). This is beneficial when working with a model, such as adding scopes or other methods, to see what columns, indexes, and constraints are available.
@@ -103,7 +104,7 @@ class CreateProducts < ActiveRecord::Migration[7.0]
 end
 ```
 
-And corresponding Product model:
+And the corresponding Product model:
 
 ```ruby
 class Product < ApplicationRecord
@@ -137,27 +138,38 @@ The same schema comments will also get added to the model test `spec/models/prod
 
 Maintaining clean and consistent code is essential for any project. Here's how you can set up code quality and style checks for your Rails project.
 
-### Profiler
-
-Uncomment the `gem "rack-mini-profiler"` line in your Gemfile to enable Rack Mini Profiler. This tool helps you identify performance bottlenecks in your application by providing real-time metrics on database queries, rendering times, and memory usage. See this [guide](https://stackify.com/rack-mini-profiler-a-complete-guide-on-rails-performance/) for more details on how to use it.
-
 ### Rubocop
 
-For code quality checks, add Rubocop and some official extensions to the development group in the Gemfile:
+For code quality checks, add [Rubocop](https://github.com/rubocop/rubocop) and some official extensions to the development group in the Gemfile:
 
 ```ruby
 group :development do
+  # Static code analysis for Ruby
   gem "rubocop"
+
+  # Additional RuboCop rules for Ruby on Rails
   gem "rubocop-rails"
-  gem 'rubocop-rspec'
-  gem 'rubocop-performance'
-  gem 'rubocop-thread_safety'
-  gem 'rubocop-factory_bot'
-  gem 'rubocop-capybara'
+
+  # RuboCop rules for RSpec tests
+  gem "rubocop-rspec"
+
+  # Performance-related RuboCop rules
+  gem "rubocop-performance"
+
+  # RuboCop rules to check for thread safety
+  gem "rubocop-thread_safety"
+
+  # RuboCop rules for FactoryBot usage
+  gem "rubocop-factory_bot"
+
+  # RuboCop rules for Capybara tests
+  gem "rubocop-capybara"
 end
+
 ```
 
 After adding these gems, create a `.rubocop.yml` file in your project's root directory with custom configurations. This is because you'll nearly always want to customize the Rubocop defaults. The details will vary by project, but here's where I like to start:
+* Require all the extensions I added in the Gemfile.
 * Excluding generated files.
 * Not enforcing code comment docs (although I'm a huge fan of [engineering documentation](../about-those-docs), enforcing it with `Style/Documentation` can lead to useless comments like `# This is the product model`).
 * Increase some max lengths to account for modern large and high resolution monitors.
@@ -208,9 +220,24 @@ RSpec/ExampleLength:
   Max: 15
 ```
 
+### Profiler
+
+Uncomment the `gem "rack-mini-profiler"` line in the development group of the Gemfile and run `bundle install` to enable Rack Mini Profiler:
+
+```ruby
+# Gemfile
+group :development do
+  # Add speed badges [https://github.com/MiniProfiler/rack-mini-profiler]
+  gem "rack-mini-profiler"
+end
+```
+
+This tool helps you identify performance bottlenecks in your application by providing real-time metrics on database queries, rendering times, and memory usage. The first time I saw it, I thought it only provides the time it took to render the current view, but it's so much more than that. See this [guide](https://stackify.com/rack-mini-profiler-a-complete-guide-on-rails-performance/) for more details on how to use it.
+
+
 ## Testing
 
-While Rails comes with minitest for testing, I prefer using RSpec, together with FactoryBot for a [BDD](https://en.wikipedia.org/wiki/Behavior-driven_development) approach to testing, and explicit test data creation. Here's how to set this up.
+While Rails comes with minitest for testing, I prefer using [RSpec](https://github.com/rspec/rspec-rails), together with [FactoryBot](https://github.com/thoughtbot/factory_bot) for a BDD (Behavior Driven Development) approach to testing, and explicit test data creation. Here's how to set this up.
 
 Add `rspec-rails` gem to the Gemfile. It's placed in the development and test groups so that generators and rake tasks don't need to be preceded by `RAILS_ENV=test`. See the [installation docs](https://github.com/rspec/rspec-rails#installation) for more details.
 
@@ -258,14 +285,7 @@ group :development, :test do
 end
 ```
 
-This will cause Rails to generate factories instead of fixtures when running for example `bin/rails generate model SomeModel`. See the [FactoryBot Generator docs](https://github.com/thoughtbot/factory_bot_rails#generators) if you want different behavior.
-
-```ruby
-# Gemfile
-group :development, :test do
-  gem "factory_bot_rails"
-end
-```
+This will cause Rails to generate factories instead of fixtures when running for example `bin/rails generate model SomeModel`. See the [generator docs](https://github.com/thoughtbot/factory_bot_rails#generators) if you want different behavior.
 
 Next, configure FactoryBot in `spec/rails_helper.rb`:
 
@@ -286,16 +306,16 @@ let(:product) { build_stubbed(:product) }
 let(:product) { FactoryBot.build_stubbed(:product) }
 ```
 
-**Performance tip:** Use FactoryBot's `build_stubbed` over `create` where possible to speed up your test suite. Read this [post from Thoughtbot](https://thoughtbot.com/blog/use-factory-bots-build-stubbed-for-a-faster-test) for more details.
+**Performance tip:** Use FactoryBot's `build_stubbed` method rather than `create` where possible to speed up your test suite. Read this [post from Thoughtbot](https://thoughtbot.com/blog/use-factory-bots-build-stubbed-for-a-faster-test) for more details.
 
 ### Shoulda Matchers
 
-For more expressive model testing, I like to add the `shoulda-matchers` gem. Add it to the test group in the Gemfile:
+For more expressive model testing, I like to add the [shoulda-matchers](https://github.com/thoughtbot/shoulda-matchers) gem. Add it to the test group in the Gemfile:
 
 ```ruby
 # Gemfile
 group :test do
-  gem 'shoulda-matchers', '~> 5.0'
+  gem "shoulda-matchers"
 end
 ```
 
@@ -332,6 +352,8 @@ RSpec.describe User, type: :model do
   it { should validate_presence_of(:email) }
 end
 ```
+
+See the docs on [matchers](https://github.com/thoughtbot/shoulda-matchers#matchers) for a full list of what can be expressed in tests.
 
 Before moving on, make sure everything is wired up properly by generating an example model, and ensure both the rspec test and factory is generated for it. For example:
 
@@ -401,7 +423,7 @@ end
 
 ### Solargraph
 
-Solargraph is a gem for Intelligent code assistance. When used together with the [Solargraph VSCode extension](https://marketplace.visualstudio.com/items?itemName=castwide.solargraph), it supports code navigation, documentation, and autocompletion.
+[Solargraph](https://github.com/castwide/solargraph) is a gem for Intelligent code assistance. When used together with the Solargraph VSCode [extension](https://marketplace.visualstudio.com/items?itemName=castwide.solargraph), it supports code navigation, documentation, and autocompletion.
 
 Add it to the development group in the Gemfile:
 
@@ -419,6 +441,30 @@ Once Solargraph is setup, here's an example of it in action. Hovering over a Rai
 Hitting <kbd class="markdown-kbd">F12</kbd> will jump into the code, for example:
 
 ![rails kickstart solargraph jump into code](../images/kickstart-rails-solargraph-jump-into-code.png "rails kickstart solargraph jump into code")
+
+### Dotenv
+
+The last bit of dev tooling I like to add is the [dotenv](https://github.com/bkeepers/dotenv) gem. This automatically loads environment files from a `.env` file in the project root, into `ENV` for development and testing. Add it to the development and test groups of the Gemfile:
+
+```ruby
+group :development, :test do
+  gem "dotenv-rails"
+  # ...
+end
+```
+
+Then modify the `.gitignore` file in the project root to ignore the `.env` file, this is because secrets (even dev secrets) should not be committed to version control:
+
+```sh
+# Ignore environment variables
+.env
+```
+
+Then create  `.env` and `.env.template` files in the project root. The first one will be ignored, the second one is committed to provide developers with an example of what environment variables the application needs:
+
+```bash
+touch .env .env.template
+```
 
 ## Services
 
@@ -445,11 +491,72 @@ end
 
 ## Conclusion
 
-This blog post has covered important steps in starting a Rails project, including database setup, code quality and style, testing, additional dev tooling, and introducing a service layer from the start. By following these steps and practices, your Rails project should be well-prepared for efficient development and maintainability.
+This blog post has covered important steps when starting a Rails project, including database setup, code quality and style, testing, additional dev tooling, and introducing a service layer from the start. Some projects may require more (see this post from Evil Martians on [Gemfile of Dreams](https://evilmartians.com/chronicles/gemfile-of-dreams-libraries-we-use-to-build-rails-apps)), but this is the bare minimum that I always reach for. By following these steps and practices, your Rails project should be well-prepared for efficient development and maintainability.
 
-## TODO
-* Briefly explain benefits of Rubopcop extensions
-* Maybe swap order of rubocop and profiler sub-sub-sections
-* Maybe mention each project may require more, but this is the bare minimum I've found that I always reach for in every project. Eg: `dotenv-rails` - always needed or optional?
-* change all initial mentions of gems to links to the github repos or official docs
-* edit
+Finally, for convenience, here are all the gems to add to the Gemfile in one step:
+
+```ruby
+# Gemfile
+group :development, :test do
+  gem "annotate"
+  gem "rspec-rails"
+  gem "factory_bot_rails"
+  gem "faker"
+  gem "dotenv-rails"
+end
+
+group :development do
+  gem "rubocop"
+  gem "rubocop-rails"
+  gem "rubocop-rspec"
+  gem "rubocop-performance"
+  gem "rubocop-thread_safety"
+  gem "rubocop-factory_bot"
+  gem "rubocop-capybara"
+  gem "rack-mini-profiler"
+  gem "solargraph"
+end
+
+group :test do
+  gem "shoulda-matchers"
+end
+```
+
+All the installation commands:
+
+```bash
+bundle install
+bin/rails generate annotate:install
+bin/rails generate rspec:install
+bundle binstubs rspec-core
+rm -rf test
+touch .env .env.template
+mkdir app/services
+touch app/services/.keep
+```
+
+And configuration:
+
+```ruby
+# config/application.rb
+module SomeApp
+  class Application < Rails::Application
+    config.active_record.schema_format = :sql
+    config.autoload_paths << Rails.root.join("services")
+  end
+end
+```
+
+```ruby
+# spec/rails_helper.rb
+RSpec.configure do |config|
+  config.include FactoryBot::Syntax::Methods
+end
+
+Shoulda::Matchers.configure do |config|
+  config.integrate do |with|
+    with.test_framework :rspec
+    with.library :rails
+  end
+end
+```
