@@ -962,6 +962,33 @@ class ProductInventoryConsumer < ApplicationConsumer
 end
 ```
 
+## Offset Management
+
+One more thing to be aware when consuming messages in a loop as per this is example, is the consumer offsets. The last committed offset is the last message position in a topic partition that the consumer has confirmed to have read. This is important because in the event of a crash or if the service is restarted for whatever reason, the consumer will use the last commit offset to pick up where it left off. For example, if the consumer has a last commit offset of `26`, then the next time it starts reading from this topic and partition, it will start at position `27`.
+
+By default, the Karafka gem handles [offset commit management](https://karafka.io/docs/Offset-management/) by automatically committing once every 5 seconds. Now suppose there was a failure in the middle of processing a batch of messages, but the consumer offset had not yet been committed. In this case, when the consumer was restarted, it might re-process some messages that it had already read. In this simple example, the updates are idempotent so it doesn't matter much if they run again. However, if you want to avoid ever re-processing a message, then you can modify the consumer loop to call Karafka's `mark_as_consumed` method after each message has been processed:
+
+```ruby
+class ProductInventoryConsumer < ApplicationConsumer
+  def consume
+    messages.each do |message|
+      Rails.logger.info(
+        "ProductInventoryConsumer consuming Topic: #{topic.name}, \
+        Message: #{message.payload},\
+        Offset: #{message.offset}"
+      )
+      service = UpdateProductInventoryService.new(message.payload)
+      handle_service_errors(message, service.errors) unless service.process
+
+      # Mark this message as consumed so in the event of a crash/restart,
+      # it will not be consumed again.
+      mark_as_consumed
+    end
+  end
+  # ...
+end
+```
+
 ## Conclusion
 
-This post has covered a technique for integrating Kafka into a Rails application using the [Karafka](https://karafka.io/docs/) gem, including how to do error handling and use the dead letter queue. We also learned how to avoid complexity in the consumer by limiting its responsibilities to communicating with Kafka, while introducing a model for validations, and a service for business logic. This makes each component easier to maintain. This post got quite lengthy so I'm not including the tests here, but you can try out the [demo project](https://github.com/danielabar/karafka_rails_consumer_demo) including tests in the [spec](https://github.com/danielabar/karafka_rails_consumer_demo/tree/main/spec) directory on Github.
+This post has covered a technique for integrating Kafka into a Rails application using the [Karafka](https://karafka.io/docs/) gem, including how to do error handling and use of the dead letter queue. We also learned how to avoid complexity in the consumer by limiting its responsibilities to communicating with Kafka, while introducing a model for validations, and a service for business logic. This makes each component easier to maintain. This post got quite lengthy so I'm not including the tests here, but you can try out the [demo project](https://github.com/danielabar/karafka_rails_consumer_demo) including tests in the [spec](https://github.com/danielabar/karafka_rails_consumer_demo/tree/main/spec) directory on Github.
