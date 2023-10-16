@@ -169,10 +169,10 @@ end
 ```
 
 After adding these gems, create a `.rubocop.yml` file in your project's root directory with custom configurations. This is because you'll nearly always want to customize the Rubocop defaults. The details will vary by project, but here's where I like to start:
-* Require all the extensions I added in the Gemfile.
+* Require all the extensions specified in Gemfile.
 * Excluding generated files.
 * Not enforcing code comment docs (although I'm a huge fan of [engineering documentation](../about-those-docs), enforcing it with `Style/Documentation` can lead to useless comments like `# This is the product model`).
-* Increase some max lengths to account for modern large and high resolution monitors.
+* Increase some max lengths to account for modern high resolution monitors and to avoid arbitrarily splitting up cohesive methods.
 
 ```yml
 require:
@@ -423,7 +423,7 @@ end
 
 ### Solargraph
 
-[Solargraph](https://github.com/castwide/solargraph) is a gem for Intelligent code assistance. When used together with the Solargraph VSCode [extension](https://marketplace.visualstudio.com/items?itemName=castwide.solargraph), it supports code navigation, documentation, and autocompletion.
+[Solargraph](https://solargraph.org/) is a gem for Intelligent code assistance. When used together with the Solargraph VSCode [extension](https://marketplace.visualstudio.com/items?itemName=castwide.solargraph), it supports code navigation, documentation, and autocompletion.
 
 Add it to the development group in the Gemfile:
 
@@ -432,6 +432,12 @@ Add it to the development group in the Gemfile:
 group :development do
   gem "solargraph"
 end
+```
+
+After running `bundle install`, solargraph will also install YARD. Run this command to generate documentation for installed gems:
+
+```bash
+bundle exec yard gems
 ```
 
 Once Solargraph is setup, here's an example of it in action. Hovering over a Rails class in VSCode with Solargraph setup will show the documentation like this:
@@ -444,7 +450,7 @@ Hitting <kbd class="markdown-kbd">F12</kbd> will jump into the code, for example
 
 ### Dotenv
 
-The last bit of dev tooling I like to add is the [dotenv](https://github.com/bkeepers/dotenv) gem. This automatically loads environment files from a `.env` file in the project root, into `ENV` for development and testing. Add it to the development and test groups of the Gemfile:
+The last bit of dev tooling I like to add is the [dotenv](https://github.com/bkeepers/dotenv) gem. This automatically loads environment files from a `.env` file in the project root, into [ENV](https://docs.ruby-lang.org/en/3.2/ENV.html) for development and testing. Add it to the development and test groups of the Gemfile:
 
 ```ruby
 group :development, :test do
@@ -466,9 +472,35 @@ Then create  `.env` and `.env.template` files in the project root. The first one
 touch .env .env.template
 ```
 
+<aside class="markdown-aside">
+The above is just a simple setup for dotenv. You can actually define multiple dot files containing env vars, and dotenv will load them according to some override rules. Depending on how you structure these, some of them could be committed. See the dotenv <a class="markdown-link" href="https://github.com/bkeepers/dotenv#frequently-answered-questions">frequently asked questions</a> for more details.
+</aside>
+
+### Editorconfig
+
+While not Rails specific, [editorconfig](https://EditorConfig.org) is useful to have in all projects to maintain consistent whitespace in every file. To use it, add a `.editorconfig` in the project root such as:
+
+```
+# top-most EditorConfig file
+root = true
+
+# Unix-style newlines with a newline ending every file
+[*]
+end_of_line = lf
+insert_final_newline = true
+indent_style = space
+indent_size = 2
+```
+
+And then install an [editor plugin](https://editorconfig.org/#download) for your editor/IDE of choice.
+
+<aside class="markdown-aside">
+It may seem like there's some overlap between editorconfig and other popular tools for linting and formatting. Here's some <a class="markdown-link" href="https://stackoverflow.com/questions/48363647/editorconfig-vs-eslint-vs-prettier-is-it-worthwhile-to-use-them-all">discussion</a> on how all these tools fit together.
+</aside>
+
 ## Services
 
-Lastly, consider configuring an `app/services` directory in your Rails project. While Rails is not opinionated about how you organize business logic, having a services layer from the beginning can keep your codebase clean and organized as the project grows.
+Lastly, consider configuring an `app/services` directory in your Rails project. While Rails is not opinionated about how you organize business logic, having a services layer from the beginning can keep your codebase organized as the project grows.
 
 Add an empty `.keep` file in this directory so it will get committed to git:
 
@@ -489,9 +521,13 @@ class Application < Rails::Application
 end
 ```
 
+<aside class="markdown-aside">
+Services are an area that brings about much discussion in the Rails community.  There are many different opinions on how to implement them, or whether they are needed at all. This is outside the scope of this post, but if you'd like to learn more about this, checkout this <a class="markdown-link" href="https://stackoverflow.com/questions/52526322/what-do-folks-use-app-services-in-rails-applications">Q & A on SO</a>, <a class="markdown-link" href="https://rubyvideo.dev/talks/railsconf-2022-your-service-layer-needn-t-be-fancy-it-just-needs-to-exist-by-david-copeland">RailsConf 2022 talk</a>, and a post about <a class="markdown-link" href="https://www.codewithjason.com/code-without-service-objects/">not using service objects</a>.
+</aside>
+
 ## Conclusion
 
-This blog post has covered important steps when starting a Rails project, including database setup, code quality and style, testing, additional dev tooling, and introducing a service layer from the start. Some projects may require more (see this post from Evil Martians on [Gemfile of Dreams](https://evilmartians.com/chronicles/gemfile-of-dreams-libraries-we-use-to-build-rails-apps)), but this is the bare minimum that I always reach for. By following these steps and practices, your Rails project should be well-prepared for efficient development and maintainability.
+This post has covered important steps when starting a Rails project, including database setup, code quality and style, testing, additional dev tooling, and introducing a service layer from the start. Some projects may require more (see this post from Evil Martians on [Gemfile of Dreams](https://evilmartians.com/chronicles/gemfile-of-dreams-libraries-we-use-to-build-rails-apps)), but this is the bare minimum that I always reach for. By following these steps and practices, your Rails project should be well-prepared for efficient development and maintainability.
 
 Finally, for convenience, here are all the gems to add to the Gemfile in one step:
 
@@ -522,7 +558,7 @@ group :test do
 end
 ```
 
-All the installation commands:
+The setup commands:
 
 ```bash
 bundle install
@@ -530,9 +566,9 @@ bin/rails generate annotate:install
 bin/rails generate rspec:install
 bundle binstubs rspec-core
 rm -rf test
-touch .env .env.template
+bundle exec yard gems
 mkdir app/services
-touch app/services/.keep
+touch app/services/.keep .editorconfig .rubocop.yml .env .env.template
 ```
 
 And configuration:
