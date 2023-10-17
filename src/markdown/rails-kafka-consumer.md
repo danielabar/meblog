@@ -964,7 +964,7 @@ end
 
 ## Offset Management
 
-One more thing to be aware when consuming messages in a loop as per this is example, is the consumer offsets. The last committed offset is the last message position in a topic partition that the consumer has confirmed to have read. This is important because in the event of a crash or if the service is restarted for whatever reason, the consumer will use the last commit offset to pick up where it left off. For example, if the consumer has a last commit offset of `26`, then the next time it starts reading from this topic and partition, it will start at position `27`.
+One more thing to be aware when consuming messages in a loop, is the consumer offsets. The last committed offset is the last message position in a topic partition that the consumer has confirmed to have read. This is important because in the event of a crash or if the service is restarted for whatever reason, the consumer will use the last commit offset to pick up where it left off. For example, if the consumer has a last commit offset of `26`, then the next time it starts reading from this topic and partition, it will start at position `27`.
 
 By default, the Karafka gem handles [offset commit management](https://karafka.io/docs/Offset-management/) by automatically committing once every 5 seconds. Now suppose there was a failure in the middle of processing a batch of messages, but the consumer offset had not yet been committed. In this case, when the consumer was restarted, it might re-process some messages that it had already read. In this simple example, the updates are idempotent so it doesn't matter much if they run again. However, if you want to avoid ever re-processing a message, then you can modify the consumer loop to call Karafka's `mark_as_consumed` method after each message has been processed:
 
@@ -980,7 +980,7 @@ class ProductInventoryConsumer < ApplicationConsumer
       service = UpdateProductInventoryService.new(message.payload)
       handle_service_errors(message, service.errors) unless service.process
 
-      # Mark this message as consumed so in the event of a crash/restart,
+      # Commit this message's offset, so in the event of a crash/restart,
       # it will not be consumed again.
       mark_as_consumed
     end
