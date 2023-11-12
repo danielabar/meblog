@@ -20,7 +20,6 @@ category=$2
 
 # Calculate the first day of the next month and format it as 'YYYY-MM-01'
 next_month=$(date -v +1m +'%Y-%m-01')
-output_file="src/markdown/${article}.md"
 
 # Define the file path where the Markdown file will be created
 file_path="src/markdown/${article}.md"
