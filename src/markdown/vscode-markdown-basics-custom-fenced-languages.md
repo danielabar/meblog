@@ -49,7 +49,7 @@ cd ~/Applications/Visual\ Studio\ Code.app/Contents/Resources/app/extensions
 vim markdown-basics/snippets/markdown.code-snippets
 ```
 
-The contents of the `markdown.code-snippets` file have been condensed into a single line so it's difficult to read, but this actually is a VSCode json file. In the version below, I've applied some formatting so it starts to make more sense. The entry we're interested in is `Insert fenced code block`:
+The contents of the `markdown.code-snippets` file have been condensed into a single line so it's difficult to read, but this actually is a VSCode json file. In the version below, I've applied some formatting to make it easier to read. The entry we're interested in is `Insert fenced code block`:
 
 ```json
 {
@@ -65,11 +65,43 @@ The contents of the `markdown.code-snippets` file have been condensed into a sin
 }
 ```
 
-Aha, now we can see where the list of languages comes from - in the `body` entry of the fenced code block snippet.
+Now we can see where the list of languages comes from: It's defined as a comma separated list between pipe symbols `|...|` in the `body` entry of the fenced code block snippet. Here's an explanation of what the `Insert fenced code block` snippet does:
+
+**prefix:** Specifies the trigger word or phrase that activates the snippet. In this case, typing "fenced codeblock" followed by  <kbd class="markdown-kbd">Ctrl</kbd> + <kbd class="markdown-kbd">Space</kbd> will insert this code block.
+
+**body**: Defines the content of the snippet, i.e. what will be rendered into the document when the snippet is actioned. It can contain any mix of literals and special symbols. The first line uses a special syntax with `${1|python,c,c++,c#,ruby,go,java,php,htm,css,javascript,json,markdown,console|}`. This creates a dropdown menu with the listed languages, and the user can choose one. The selected language will replace the placeholder `${1}`, which is the first tab stop.
+
+`$0` is the final tab stop, indicating where the cursor will be placed after the user has filled in the necessary information.
+
+**description:** Provides a brief description of the snippet. In this case, it describes the purpose of the snippet, which is to insert a fenced code block with syntax highlighting for a chosen programming language.
+
+Here's some visuals of this snippet in action, pointing out each part of it. Starting in any Markdown document:
+
+![vscode fenced snippet explainer](../images/vscode-fenced-snippet-explainer.png "vscode fenced snippet explainer")
+
+![vscode fenced snippet explainer detail](../images/vscode-fenced-snippet-explainer-detail.png "vscode fenced snippet explainer detail")
+
+One final detail about this snippet - the `body` contains another special symbol after the language list: `${TM_SELECTED_TEXT}`. This is a placeholder that represents the currently selected text in the editor. If there's any text selected when the snippet is triggered, it will be inserted at this position. This is useful when you've already written some code in your markdown document, and you want to highlight it and then insert the fenced codeblock snippet *around* the code.
+
+Here is `${TM_SELECTED_TEXT}` in action:
+
+![vscode fenced snippet code first](../images/vscode-fenced-snippet-code-first.png "vscode fenced snippet code first")
+
+Use <kbd class="markdown-kbd">Command</kbd> + <kbd class="markdown-kbd">Shift</kbd> + <kbd class="markdown-kbd">P</kbd> to bring up the Command Palette (or <kbd class="markdown-kbd">ctrl</kbd> for Windows). Type `snippets`, then select `Snippets: Insert Snippet` as shown below:
+
+![vscode fenced snippet command palette](../images/vscode-fenced-snippet-command-palette.png "vscode fenced snippet command palette")
+
+Then start typing to find the `fenced codeblock` snippet, and hit <kbd class="markdown-kbd">Enter</kbd> to action it:
+
+![vscode fenced snippet command palette fenced](../images/vscode-fenced-snippet-command-palette-fenced.png "vscode fenced snippet command palette fenced")
+
+Then the line you highlighted will be wrapped in the fenced code block, with the language list selection open:
+
+![vscode fenced wrapped](../images/vscode-fenced-wrapped.png "vscode fenced wrapped")
+
+Now that we've found where the language list is defined, it may be tempting to simply edit the snippets file in the `~/Applications/Visual\ Studio\ Code.app/Contents/Resources/app/extensions` directory to add more languages here. But I don't recommend this solution. Why? Because the next time VSCode updates, if there are any changes to the Markdown Language Basics extension, your custom edits will be lost.
 
 ## Customizing the Language List
-
-It may be tempting to simply edit the snippets file in the `~/Applications/Visual\ Studio\ Code.app/Contents/Resources/app/extensions` directory to add whatever languages you need, but I don't recommend this solution. Why? Because the next time VSCode updates, if there are any changes to the Markdown Language Basics extension, your custom edits will be lost.
 
 A more durable solution is to create your own snippets file for Markdown content. This gets saved in your home directory, and gets backed up if you have Sync settings enabled, so it will survive application updates.
 
@@ -96,8 +128,8 @@ This will open a `markdown.json` file in VSCode, the path will be in your home d
 }
 ```
 
-Now we can add an entry in this file for the fenced code block snippet. We start with a copy of the original found earlier in the VSCode extensions directory, then make our customizations. For me these are:
-1. Updated the prefix to `fenc`.
+Now we can add an entry in this file for the fenced code block snippet. We start with a copy of the original found earlier in the VSCode extensions directory, then make our customizations. Here is what I changed:
+1. Updated the prefix to `fenc` (for fenced custom but you can use whatever you like)
 2. Added `erb,bash,yml,mermaid` in the language list.
 3. Updated the description to indicate this is a custom block.
 
@@ -131,8 +163,6 @@ After selecting the custom option, you should see the new languages you added sh
 ![vscode fenced erb](../images/vscode-fenced-erb.png "vscode fenced erb")
 
 ## TODO
-* WIP main content
-* maybe aside/assumption that reader already knows what snippets are? link to my earlier post and vscode docs
-* explain `TM_SELECTED_TEXT`
+* Be consistent with command vs cmd in keyboard shortcuts, and mention Windows versions
 * conclusion para
 * edit
