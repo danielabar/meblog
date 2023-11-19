@@ -10,7 +10,7 @@ related:
   - "Navigate Back & Forth in VS Code"
 ---
 
-VSCode is a great editor for authoring markdown documents. I use it frequently for writing engineering documentation and blog posts. VSCode comes bundled with some Markdown extensions that make authoring easier, such as including snippets to generate markdown syntax such as images, links, bold, etc. For technical writing, a commonly used feature is to generate a block of code that is syntax highlighted according to the language (Ruby, Python, JavaScript, etc.). This is provided through the `fen` (fenced code block) snippet. However, I ran into a limitation of this snippet where it didn't support all the languages I needed to include in my docs. This post will explain a solution to customizing the list of languages provided by the built-in Markdown extension.
+VSCode is a great editor for authoring markdown documents. I use it frequently for writing engineering documentation and blog posts. VSCode comes bundled with some Markdown extensions that make authoring easier, such as including snippets to generate markdown syntax such as images, links, bold, etc. For technical writing, a commonly used feature is to generate a block of code that is syntax highlighted according to the language (Ruby, Python, JavaScript, etc.). This is provided through the "fenced code block" snippet. However, I ran into a limitation of this snippet where it didn't support all the languages I needed to include in my docs. This post will explain a solution to customizing the list of languages provided by the built-in Markdown extension.
 
 ## Fenced Code Block Overview
 
@@ -58,7 +58,11 @@ The contents of the `markdown.code-snippets` file have been condensed into a sin
   ...
   "Insert fenced code block": {
     "prefix":"fenced codeblock",
-    "body":["```${1|python,c,c++,c#,ruby,go,java,php,htm,css,javascript,json,markdown,console|}","${TM_SELECTED_TEXT}$0","```"],
+    "body":[
+      "```${1|python,c,c++,c#,ruby,go,java,php,htm,css,javascript,json,markdown,console|}",
+      "${TM_SELECTED_TEXT}$0",
+      "```"
+    ],
     "description":"Insert fenced code block"
   },
   ...
@@ -75,19 +79,19 @@ Now we can see where the list of languages comes from: It's defined as a comma s
 
 **description:** Provides a brief description of the snippet. In this case, it describes the purpose of the snippet, which is to insert a fenced code block with syntax highlighting for a chosen programming language.
 
-Here's some visuals of this snippet in action, pointing out each part of it. Starting in any Markdown document, type in "fenced codeblock" (or just the first few characters of this phrase), and then hit <kbd class="markdown-kbd">ctrl</kbd> + <kbd class="markdown-kbd">space</kbd>:
+Here's some visuals of this snippet in action, pointing out each part of it. Starting in any Markdown document, type in "fenced codeblock" (or just the first few characters of this phrase), and then hit <kbd class="markdown-kbd">Ctrl</kbd> + <kbd class="markdown-kbd">space</kbd>:
 
 ![vscode fenced snippet explainer](../images/vscode-fenced-snippet-explainer.png "vscode fenced snippet explainer")
 
 ![vscode fenced snippet explainer detail](../images/vscode-fenced-snippet-explainer-detail.png "vscode fenced snippet explainer detail")
 
-One final detail about this snippet - the `body` contains another special symbol after the language list: `${TM_SELECTED_TEXT}`. This is a placeholder that represents the currently selected text in the editor. If there's any text selected when the snippet is triggered, it will be inserted at this position. This is useful when you've already written some code in your markdown document, and you want to highlight it and then insert the fenced codeblock snippet *around* the code.
+One final detail about this snippet - the `body` contains another special symbol after the language list: `${TM_SELECTED_TEXT}`. This is a placeholder that represents the currently selected text in the editor. If there's any text selected when the snippet is triggered, it will be inserted at this position. This is useful when you've already written some code in your markdown document, and you want to highlight it and then insert the fenced codeblock snippet *around* the code you've already written.
 
 Here is `${TM_SELECTED_TEXT}` in action:
 
 ![vscode fenced snippet code first](../images/vscode-fenced-snippet-code-first.png "vscode fenced snippet code first")
 
-Use <kbd class="markdown-kbd">Cmd</kbd> + <kbd class="markdown-kbd">Shift</kbd> + <kbd class="markdown-kbd">P</kbd> to bring up the Command Palette (or <kbd class="markdown-kbd">ctrl</kbd> for Windows). Type `snippets`, then select `Snippets: Insert Snippet` as shown below:
+Use <kbd class="markdown-kbd">Cmd</kbd> + <kbd class="markdown-kbd">Shift</kbd> + <kbd class="markdown-kbd">P</kbd> to bring up the Command Palette (or <kbd class="markdown-kbd">Ctrl</kbd> for Windows). Type `snippets`, then select `Snippets: Insert Snippet` as shown below:
 
 ![vscode fenced snippet command palette](../images/vscode-fenced-snippet-command-palette.png "vscode fenced snippet command palette")
 
@@ -105,7 +109,7 @@ Now that we've found where the language list is defined, it may be tempting to s
 
 A more durable solution is to create your own snippets file for Markdown content. This gets saved in your home directory, and gets backed up if you have Sync settings enabled, so it will survive application updates.
 
-Start by opening the Command Palette with <kbd class="markdown-kbd">Cmd</kbd> + <kbd class="markdown-kbd">Shift</kbd> + <kbd class="markdown-kbd">P</kbd> (or <kbd class="markdown-kbd">ctrl</kbd> on Windows). Search and select the option: `Snippets: Configure User Snippets`. If it's your first time creating custom snippets, select select `markdown` from the list of languages. If you've created markdown snippets before, then there will be an option for `markdown.json`, select that.
+Start by opening the Command Palette with <kbd class="markdown-kbd">Cmd</kbd> + <kbd class="markdown-kbd">Shift</kbd> + <kbd class="markdown-kbd">P</kbd> (or <kbd class="markdown-kbd">Ctrl</kbd> on Windows). Search and select the option: `Snippets: Configure User Snippets`. If it's your first time creating custom snippets, select select `markdown` from the list of languages. If you've created markdown snippets before, then there will be an option for `markdown.json`, select that.
 
 This will open a `markdown.json` file in VSCode, the path will be in your home directory, although the details could be different depending on Mac vs Windows installation. It will look something like this:
 
@@ -154,7 +158,7 @@ You could also change the order of the languages, or remove some entries. Save y
 
 ## Using Custom Snippet
 
-Now that our custom snippet is in place, we can try it out in any markdown file. For example, to add a fenced code block for `erb` language, start typing `fen`, then <kbd class="markdown-kbd">ctrl</kbd> + <kbd class="markdown-kbd">space</kbd>. This time you should see the "Custom Fenced Code Block" option show up in the intellisense. This is coming from the custom snippet file created earlier:
+Now that our custom snippet is in place, we can try it out in any markdown file. For example, to add a fenced code block for `erb` language, start typing `fen`, then <kbd class="markdown-kbd">Ctrl</kbd> + <kbd class="markdown-kbd">space</kbd>. This time you should see the "Custom Fenced Code Block" option show up in the intellisense. This is coming from the custom snippet file created earlier:
 
 ![vscode fenced custom snippet](../images/vscode-fenced-custom-snippet.png "vscode fenced custom snippet")
 
@@ -164,4 +168,4 @@ After selecting the custom option, you should see the new languages you added sh
 
 ## Conclusion
 
-In conclusion, customizing the language list for fenced code blocks in VSCode's Markdown editor can enhance your efficiency and adapt to your specific documentation needs. While the built-in fen snippet is a good starting point, its default language list might not cover all your requirements. By creating and configuring your own custom snippet, as explained in this post, you can integrate additional language options into the intellisense menu.
+Customizing the language list for fenced code blocks in VSCode's Markdown editor can enhance your efficiency and adapt to your specific documentation needs. While the built-in fenced code block snippet is a good starting point, its default language list might not cover all your requirements. By creating and configuring your own custom snippet, as explained in this post, you can integrate additional language options into the intellisense menu.
