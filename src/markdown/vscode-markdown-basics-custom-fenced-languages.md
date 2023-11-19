@@ -18,7 +18,7 @@ Before getting into the solution, here's a quick overview of the fenced code blo
 
 ![vscode fenced code block built in](../images/vscode-fenced-code-block-built-in.png "vscode fenced code block built in")
 
-Notice that some of the options have help text beside them such as `Insert fenced code block` and `Insert fenced math`. These are snippets, a snippet is a reusable and customizable code fragment that can be quickly inserted into a file to facilitate code writing and save time on boilerplate.
+Notice that some of the options have help text beside them such as `Insert fenced code block` and `Insert fenced math`. These are *snippets*: reusable and customizable code fragments that can be quickly inserted into a file to facilitate code writing and save time on boilerplate.
 
 If you go ahead and select the option for `fenced codeblock`, then it will insert a markdown fenced code block in your document. You'll see two lines of three backticks each, with an empty line between them, and the language `python` selected by default. A new intellisense menu is now displayed where you can select the language for the code block. This will control what syntax highlighting gets applied when the markdown is rendered. It looks like this:
 
@@ -28,7 +28,7 @@ Now you can use the arrow keys to select a language, or just start typing for wh
 
 ![vscode fenced r ruby](../images/vscode-fenced-r-ruby.png "vscode fenced r ruby")
 
-When the language you want is highlighted, hit <kbd class="markdown-kbd">Enter</kbd> to select it, this will result in a new fenced code block added to the markdown document, with your language selected, and the cursor inside the code block ready for you to type in code:
+When the language you want is highlighted, hit <kbd class="markdown-kbd">Enter</kbd> to select it. This will result in a new fenced code block added to the markdown document, with your language selected, and the cursor inside the code block ready for you to type in code:
 
 ![vscode fenced ruby example](../images/vscode-fenced-ruby-example.png "vscode fenced ruby example")
 
@@ -75,7 +75,7 @@ Now we can see where the list of languages comes from: It's defined as a comma s
 
 **description:** Provides a brief description of the snippet. In this case, it describes the purpose of the snippet, which is to insert a fenced code block with syntax highlighting for a chosen programming language.
 
-Here's some visuals of this snippet in action, pointing out each part of it. Starting in any Markdown document:
+Here's some visuals of this snippet in action, pointing out each part of it. Starting in any Markdown document, type in "fenced codeblock" (or just the first few characters of this phrase), and then hit <kbd class="markdown-kbd">ctrl</kbd> + <kbd class="markdown-kbd">space</kbd>:
 
 ![vscode fenced snippet explainer](../images/vscode-fenced-snippet-explainer.png "vscode fenced snippet explainer")
 
@@ -87,7 +87,7 @@ Here is `${TM_SELECTED_TEXT}` in action:
 
 ![vscode fenced snippet code first](../images/vscode-fenced-snippet-code-first.png "vscode fenced snippet code first")
 
-Use <kbd class="markdown-kbd">Command</kbd> + <kbd class="markdown-kbd">Shift</kbd> + <kbd class="markdown-kbd">P</kbd> to bring up the Command Palette (or <kbd class="markdown-kbd">ctrl</kbd> for Windows). Type `snippets`, then select `Snippets: Insert Snippet` as shown below:
+Use <kbd class="markdown-kbd">Cmd</kbd> + <kbd class="markdown-kbd">Shift</kbd> + <kbd class="markdown-kbd">P</kbd> to bring up the Command Palette (or <kbd class="markdown-kbd">ctrl</kbd> for Windows). Type `snippets`, then select `Snippets: Insert Snippet` as shown below:
 
 ![vscode fenced snippet command palette](../images/vscode-fenced-snippet-command-palette.png "vscode fenced snippet command palette")
 
@@ -105,7 +105,7 @@ Now that we've found where the language list is defined, it may be tempting to s
 
 A more durable solution is to create your own snippets file for Markdown content. This gets saved in your home directory, and gets backed up if you have Sync settings enabled, so it will survive application updates.
 
-Start by opening the Command Palette, on a Mac, the keyboard shortcut is <kbd class="markdown-kbd">Cmd</kbd> + <kbd class="markdown-kbd">Shift</kbd> + <kbd class="markdown-kbd">P</kbd>. Search and select the option: `Snippets: Configure User Snippets`. If it's your first time creating custom snippets, select select `markdown` from the list of languages. If you've created markdown snippets before, then there will be an option for `markdown.json`, select that.
+Start by opening the Command Palette with <kbd class="markdown-kbd">Cmd</kbd> + <kbd class="markdown-kbd">Shift</kbd> + <kbd class="markdown-kbd">P</kbd> (or <kbd class="markdown-kbd">ctrl</kbd> on Windows). Search and select the option: `Snippets: Configure User Snippets`. If it's your first time creating custom snippets, select select `markdown` from the list of languages. If you've created markdown snippets before, then there will be an option for `markdown.json`, select that.
 
 This will open a `markdown.json` file in VSCode, the path will be in your home directory, although the details could be different depending on Mac vs Windows installation. It will look something like this:
 
@@ -150,7 +150,7 @@ The resulting custom markdown snippets file looks like this:
 }
 ```
 
-Save your changes.
+You could also change the order of the languages, or remove some entries. Save your changes.
 
 ## Using Custom Snippet
 
@@ -162,7 +162,6 @@ After selecting the custom option, you should see the new languages you added sh
 
 ![vscode fenced erb](../images/vscode-fenced-erb.png "vscode fenced erb")
 
-## TODO
-* Be consistent with command vs cmd in keyboard shortcuts, and mention Windows versions
-* conclusion para
-* edit
+## Conclusion
+
+In conclusion, customizing the language list for fenced code blocks in VSCode's Markdown editor can enhance your efficiency and adapt to your specific documentation needs. While the built-in fen snippet is a good starting point, its default language list might not cover all your requirements. By creating and configuring your own custom snippet, as explained in this post, you can integrate additional language options into the intellisense menu.
