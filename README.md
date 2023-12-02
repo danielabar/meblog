@@ -43,6 +43,25 @@ If some pages don't refresh as expected, try this task which will first wipe out
 make devclean
 ```
 
+GraphQL queries to get distinct categories:
+
+```graphql
+{
+  posts: allMarkdownRemark(
+    filter: { fileAbsolutePath: { regex: "/src/markdown/" } }
+    sort: {frontmatter: {category: ASC}}
+  ) {
+    distinct(field: { frontmatter: { category: SELECT} })
+  }
+  courses: allMarkdownRemark(
+    filter: { fileAbsolutePath: { regex: "/src/learning/" } }
+    sort: {frontmatter: {category: ASC}}
+  ) {
+    distinct(field: { frontmatter: { category: SELECT} })
+  }
+}
+```
+
 To test the production build locally:
 
 ```bash
