@@ -103,11 +103,42 @@ SlackRubyBotServer::Events.configure do |config|
 end
 ```
 
+Add the Api endpoints provided by the `slack-ruby-bot-server` gem at `/` in `config/routes.rb`:
+
+```ruby
+Rails.application.routes.draw do
+  mount Api => "/"
+end
+```
+
 At this point, you should be able to start a Rails server with `bin/dev`. Also if you launch a Rails console with `bin/rails c`, you should be able to see the `Team` model, which is defined in the `slack-ruby-bot-server` gem. There are no teams populated at the moment, because we haven't yet written the code to add this app to a Slack workspace:
 
 ```ruby
 Team.all
 # empty collection
+```
+
+Still in the Rails console, you can view the API routes provided by the slack-ruby-bot-server gem:
+
+```ruby
+Api.routes.each do |route|
+  method = route.request_method.ljust(10)
+  path = route.path
+  puts "#{method} #{path} #{controller}"
+  nil
+end
+nil
+
+# GET        /api(.:format)
+# GET        /api/status(.:format)
+# GET        /api/teams/:id(.:format)
+# GET        /api/teams(.:format)
+# POST       /api/teams(.:format)
+# GET        /api/swagger_doc(.:format)
+# GET        /api/swagger_doc/:name(.:format)
+# POST       /api/slack/command(.:format)
+# POST       /api/slack/action(.:format)
+# POST       /api/slack/event(.:format)
 ```
 
 You can also view the `teams` table schema by connecting directly to a database console with `bin/rails db`, and then:
@@ -116,21 +147,21 @@ You can also view the `teams` table schema by connecting directly to a database 
 -- This is for Postgres
 \d teams
 --                                                   Table "public.teams"
---            Column            |              Type              | Collation | Nullable |              Default
--- -----------------------------+--------------------------------+-----------+----------+-----------------------------------
---  id                          | bigint                         |           | not null | nextval('teams_id_seq'::regclass)
---  team_id                     | character varying              |           |          |
---  name                        | character varying              |           |          |
---  domain                      | character varying              |           |          |
---  token                       | character varying              |           |          |
---  oauth_scope                 | character varying              |           |          |
---  oauth_version               | character varying              |           | not null | 'v1'::character varying
---  bot_user_id                 | character varying              |           |          |
---  activated_user_id           | character varying              |           |          |
---  activated_user_access_token | character varying              |           |          |
---  active                      | boolean                        |           |          | true
---  created_at                  | timestamp(6) without time zone |           | not null |
---  updated_at                  | timestamp(6) without time zone |           | not null |
+--            Column            |              Type              | Nullable |              Default
+-- -----------------------------+--------------------------------+----------+-----------------------------------
+--  id                          | bigint                         | not null | nextval('teams_id_seq'::regclass)
+--  team_id                     | character varying              |          |
+--  name                        | character varying              |          |
+--  domain                      | character varying              |          |
+--  token                       | character varying              |          |
+--  oauth_scope                 | character varying              |          |
+--  oauth_version               | character varying              | not null | 'v1'::character varying
+--  bot_user_id                 | character varying              |          |
+--  activated_user_id           | character varying              |          |
+--  activated_user_access_token | character varying              |          |
+--  active                      | boolean                        |          | true
+--  created_at                  | timestamp(6) without time zone | not null |
+--  updated_at                  | timestamp(6) without time zone | not null |
 -- Indexes:
 --     "teams_pkey" PRIMARY KEY, btree (id)
 ```
@@ -173,16 +204,65 @@ After clicking "Create App", you'll be navigated to the "Basic Information" sett
 
 ![slack app credentials](../images/slack-app-credentials.png "slack app credentials")
 
+Click on the OAuth & Permissions section from the left hand section under Features and enter the following Redirect URL. The host name should be the forwarding address you saw when starting ngrok in the previous step. Your Client ID is from the Basic Information section.
+
+```
+https://12e4-203-0-113-42.ngrok-free.app?scope=incoming-webhook&client_id=your_client_id
+```
+
+Recall that ngrok is forwarding to localhost:3000, so the above url will land on the root route of the Rails app. Let's make sure that gets handled in the next step.
+
+## Rails Send OAuth Request
+
+We need to create an "Add to Slack" link that will be displayed on the home page of the Rails app. When the user clicks on it, they will be taken to Slack where they will be asked if they agree to authenticate Retro Pulse (which will add the app to their chosen Slack Workspace). After the user agrees, Slack will send a request to the Redirect URL you defined in the previous section. It will contain the OAuth code. This needs to be exchanged for a token, to do this, we'll write a small amount of JavaScript with a StimulusJS controller that takes the code, and submits a POST to the `/api/teams` endpoint provided by the slack-ruby-bot-server gem. That endpoint will do the work of exchanging the code provided in the redirect url by Slack, for a token, which will be persisted in the `teams` table.
+
+To start, add a WelcomeController with only an index method. The method is empty as we'll just be using conventions to display the associated welcome index view:
+
+```ruby
+# app/controllers/welcome_controller.rb
+class WelcomeController < ApplicationController
+  def index; end
+end
+```
+
+Now add the associated welcome index view:
+
+```erb
+<div>
+  <a href="<%= SlackRubyBotServer::Config.oauth_authorize_url %>?scope=<%= SlackRubyBotServer::Config.oauth_scope_s %>&client_id=<%= ENV['SLACK_CLIENT_ID'] %>">
+    <img alt="Add to Slack" height="40" width="139" src="https://platform.slack-edge.com/img/add_to_slack.png" srcset="https://platform.slack-edge.com/img/add_to_slack.png 1x, https://platform.slack-edge.com/img/add_to_slack@2x.png 2x">
+  </a>
+</div>
+```
+
+Run the Rails server with `bin/dev` and navigate to [http://localhost:3000](http://localhost:3000). You should see an "Add to Slack" button. Open developer tools and inspect the generated url for the Slack button. It will include the OAuth scopes and Client ID you configured earlier:
+
+Generated url:
+
+```
+https://slack.com/oauth/v2/authorize?
+  scope=commands,chat:write,users:read,chat:write.public
+  &client_id=your_client_id
+```
+
+If you click the button you'll be taken to a Slack page showing that the app is requesting permission to access your Slack workspace. My workspace for development is named "TestBotDev":
+
+![slack app oauth request permission](../images/slack-app-oauth-request-permissions.png "slack app oauth request permission")
+
+It shows all the OAuth permissions the Retro Pulse app is requesting. But don't click the "Allow" button yet. We still have some work to do on the Rails side to handle this.
+
+## Rails Receive OAuth Response
+
+WIP...
+
 ## TODO
 * title
-* feature image
-* related
 * intro para
 * main content
 * conclusion para
 * edit
+* connecting multi-part series, include a "you are here"
 * list my versions
-* organize into sub-sections
 * Possibly [diagram](https://excalidraw.com/) of Slack Oauth2 flow with Rails app and ngrok
 * Somewhere: tradeoff between using a gem that does a lot of the heavy lifting, but introduces seeming "magic" vs writing it all yourself via first principles (use Slack http api directly with a gem like Faraday or http party)
 * Aside: for extra security, use [token rotation](https://api.slack.com/authentication/rotation), but I couldn't find that this is implemented in slack-ruby-bot-server-events gem
