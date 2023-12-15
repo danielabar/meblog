@@ -111,14 +111,14 @@ Rails.application.routes.draw do
 end
 ```
 
-At this point, you should be able to start a Rails server with `bin/dev`. Also if you launch a Rails console with `bin/rails c`, you should be able to see the `Team` model, which is defined in the `slack-ruby-bot-server` gem. There are no teams populated at the moment, because we haven't yet written the code to add this app to a Slack workspace:
+The `slack-ruby-bot-server` gem exposes routes using [Grape](https://github.com/ruby-grape/grape). Since the details are not specified in `config/routes.rb`, if you run `bin/rails routes` in a terminal right now, you'll only see:
 
-```ruby
-Team.all
-# empty collection
+```
+Prefix Verb   URI Pattern   Controller#Action
+api           /             Api
 ```
 
-Still in the Rails console, you can view the API routes provided by the slack-ruby-bot-server gem:
+However, you can run a Rails console `bin/rails c`, and run the code below to list the API routes provided by the slack-ruby-bot-server gem:
 
 ```ruby
 Api.routes.each do |route|
@@ -139,6 +139,15 @@ nil
 # POST       /api/slack/command(.:format)
 # POST       /api/slack/action(.:format)
 # POST       /api/slack/event(.:format)
+```
+
+The particular one we're interested in is `POST /api/teams`, this will be a critical part of the OAuth flow explained later in this post.
+
+At this point, you should be able to start a Rails server with `bin/dev`. Also if you launch a Rails console with `bin/rails c`, you should be able to see the `Team` model, which is defined in the `slack-ruby-bot-server` gem. There are no teams populated at the moment, because we haven't yet written the code to add this app to a Slack workspace:
+
+```ruby
+Team.all
+# empty collection
 ```
 
 You can also view the `teams` table schema by connecting directly to a database console with `bin/rails db`, and then:
@@ -202,11 +211,25 @@ For the App Name, enter "Retro Pulse" (or whatever you'd like if you want to nam
 
 ![slack app name workspace](../images/slack-app-name-workspace.png "slack app name workspace")
 
-After clicking "Create App", you'll be navigated to the "Basic Information" settings of your newly created app. Copy the values Client ID, Client Secret, Signing Secret, and Verification Token from the App Credentials section, to the corresponding entries in `.env` you created earlier:
+After clicking "Create App", you'll be navigated to the "Basic Information" settings of your newly created app. Copy the values Client ID, Client Secret, Signing Secret, and Verification Token from the App Credentials section, to the corresponding entries in the `.env` file you created earlier in the Rails app project root:
 
 ![slack app credentials](../images/slack-app-credentials.png "slack app credentials")
 
-Click on the OAuth & Permissions section from the left hand section under Features:
+Still in the Basic Information section, scroll down to the section titled "Display Information", it will look something like this:
+
+![slack app display info](../images/slack-app-display-info.png "slack app display info").
+
+Fill in the details with something descriptive, here's what I used:
+
+* App name: Retro Pulse
+* Short description: Collect ongoing feedback for your team's retrospective meeting
+* Long description: This is a simple app to collect ongoing feedback via Slack for team retrospectives. While the retro meeting is typically held at the end of a sprint, shape up cycle, or project, it's useful for team members to be able to quickly submit feedback whenever it occurs during project development, otherwise good ideas or feedback can be forgotten about by the time the retro meeting is booked.
+
+Optionally, you can upload a logo and adjust the background color for how the app will appear in Slack. As I'm not a designer, I asked Bing Chat to draw a logo for me. Putting this all together, here's what my Display Information looks like:
+
+![slack app display info filled](../images/slack-app-display-info-filled.png "slack app display info filled")
+
+Next, click on the OAuth & Permissions section from the left hand section under Features:
 
 ![slack app oauth setting](../images/slack-app-oauth-setting.png "slack app oauth setting")
 
@@ -216,7 +239,7 @@ Enter the following Redirect URL. The host name should be the forwarding address
 https://12e4-203-0-113-42.ngrok-free.app?scope=incoming-webhook&client_id=your_client_id
 ```
 
-Recall that ngrok is forwarding to localhost:3000, so the above url will land on the root route of the Rails app. Let's make sure that gets handled in the next step.
+Recall that ngrok is forwarding to `http://localhost:3000`, so the above url will land on the root route of the Rails app. Let's make sure that gets handled in the next step.
 
 ## Rails Send OAuth Request
 
@@ -231,7 +254,7 @@ class WelcomeController < ApplicationController
 end
 ```
 
-Now add the associated welcome index view. This view generates a link to the Slack OAuth authorization url, with the scopes and client ID we configured earlier. The image source is from `platform.slack-edge.com`.
+Now add the associated welcome index view. This view generates a link to the Slack OAuth authorization url, with the scopes and client ID we configured earlier. We're using `SlackRubyBotServer` to do this. The image source is from `platform.slack-edge.com`.
 
 ```erb
 <%# app/views/welcome/index.html.erb %>
@@ -252,7 +275,19 @@ Rails.application.routes.draw do
 end
 ```
 
-Run the Rails server with `bin/dev` and navigate to [http://localhost:3000](http://localhost:3000). You should see a clickable "Add to Slack" button. Open developer tools and inspect the generated url for the Slack button. It will include the OAuth scopes and Client ID you configured earlier:
+To confirm the routes available in our app currently, run `bin/rails routes` in a terminal, you should get:
+
+```
+Prefix Verb   URI Pattern   Controller#Action
+api           /             Api
+root   GET    /             welcome#index
+```
+
+Run the Rails server with `bin/dev` and navigate to [http://localhost:3000](http://localhost:3000). You should see a clickable "Add to Slack" button like this:
+
+![slack app start oauth](../images/slack-app-start-oauth.png "slack app start oauth")
+
+Open developer tools and inspect the generated url for the Slack button. It will include the OAuth scopes and Client ID you configured earlier:
 
 Generated url:
 
@@ -272,7 +307,7 @@ It shows all the OAuth permissions the Retro Pulse app is requesting. But don't 
 
 When the user clicks the "Allow" button from the Slack OAuth permission page, Slack will send a request to the Redirect URL you defined in the previous section. Recall we defined the Redirect URL to be the homepage served at the root of the Rails application `/`, which is handled by the WelcomeController and view.
 
-The Redirect URL will contain the OAuth `code`. This needs to be exchanged for a token, to do this, we'll write a small amount of JavaScript with a [StimulusJS](https://stimulus.hotwired.dev/handbook/origin) controller that takes the code, and submits a POST to the `/api/teams` endpoint provided by the slack-ruby-bot-server gem. That endpoint will do the work of exchanging the code provided in the redirect url by Slack, for a token, which will be persisted in the `teams` table. i.e. the gem will do most of the work, but as it only provides a POST endpoint, and Slack is sending us a GET, we need a small amount of JavaScript to glue this together.
+The Redirect URL will contain the OAuth `code`. This needs to be exchanged for a token, to do this, we'll write a small amount of JavaScript with a [StimulusJS](https://stimulus.hotwired.dev/handbook/origin) controller that takes the code, and submits a POST to the `/api/teams` endpoint provided by the slack-ruby-bot-server gem. That endpoint will do the work of exchanging the code provided in the redirect url by Slack, for a token, which will be persisted in the `teams` table. The gem will do most of the work, but as it only provides a POST endpoint, and Slack is sending us a GET, we need a small amount of JavaScript to glue this together.
 
 Start by generating the Stimulus controller:
 
@@ -302,6 +337,7 @@ Update the Welcome index view to add an HTML element (we'll just use a div) with
     <img alt="Add to Slack" height="40" width="139" src="https://platform.slack-edge.com/img/add_to_slack.png">
   </a>
 
+  <%# === Add a div here to connect to the StimulusJS controller === %>
   <div data-controller="slack-team-registration">
   </div>
 </div>
@@ -323,13 +359,13 @@ export default class extends Controller {
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ code })
       })
-        .then(response => response.json())
-        .then(data => {
-          console.log("Successfully registered new team!")
-        })
-        .catch(error => {
-          console.log("An error occurred while registering the team.")
-        });
+      .then(response => response.json())
+      .then(data => {
+        console.log("Successfully registered new team!")
+      })
+      .catch(error => {
+        console.log("An error occurred while registering the team.")
+      });
     }
   }
 }
@@ -345,6 +381,7 @@ It would be nice to show the user a message while the POST to `/api/teams` is in
   </a>
 
   <div data-controller="slack-team-registration">
+    <%# === Add a target for the StimulusJS controller === %>
     <span data-slack-team-registration-target="message"></span>
   </div>
 </div>
@@ -372,15 +409,15 @@ export default class extends Controller {
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ code, state })
       })
-        .then(response => response.json())
-        .then(data => {
-          this.messageTarget.innerHTML = `Team successfully registered!`;
-          this.messageTarget.style.display = "block";
-        })
-        .catch(error => {
-          this.messageTarget.innerHTML = "An error occurred while registering the team.";
-          this.messageTarget.style.display = "block";
-        });
+      .then(response => response.json())
+      .then(data => {
+        this.messageTarget.innerHTML = `Team successfully registered!`;
+        this.messageTarget.style.display = "block";
+      })
+      .catch(error => {
+        this.messageTarget.innerHTML = "An error occurred while registering the team.";
+        this.messageTarget.style.display = "block";
+      });
     }
   }
 }
@@ -436,17 +473,145 @@ Rails.application.configure do
 end
 ```
 
+Remember to restart the Rails server after making changes to `config/environments/development.rb` and `.env` files.
+
 ## Run the OAuth Flow
 
-Finally, we're ready to put together all these parts and try out the OAuth flow. Restart your Rails server at `bin/dev`, navigate to [http://localhost:3000]([http://localhost:3000]), then click on the "Add to Slack" button.
+Now, we're ready to put together all these parts and try out the OAuth flow. Restart your Rails server at `bin/dev`, navigate to [http://localhost:3000]([http://localhost:3000]), then click on the "Add to Slack" button:
 
-WIP: Show expected result in Rails server output, ngrok requests, Rails console to see new Team model populated.
+![slack app start oauth](../images/slack-app-start-oauth.png "slack app start oauth")
+
+You should be redirected to a url at Slack that contains your Client ID and the OAuth scopes that this app requires (which we configured earlier with `SlackRubyBotServer`). It looks something like this:
+
+```
+https://your-workspace.slack.com/oauth
+  ?client_id=your-client-id
+  &scope=commands,chat:write,users:read,chat:write.public
+  &user_scope=
+  &redirect_uri=
+  &state=
+  &granular_bot_scope=1
+  &single_channel=0
+  &install_redirect=
+  &tracked=1
+  &team=1
+```
+
+This time click the "Allow" button:
+
+![slack app oauth allow](../images/slack-app-oauth-allow.png "slack app oauth allow")
+
+Clicking the "Allow" button will make Slack redirect back to the Rails app, at the ngrok forwarding address we setup in the Slack UI earlier when defining our app. The URL will look as shown below. The important piece of information here is the `code` parameter, which we will need to exchange for an OAuth token shortly:
+
+```
+https://your-ngrok-address.ngrok-free.app/
+  ?scope=incoming-webhook
+  &client_id=your-client-id
+  &code=temp-oauth-code
+  &state=
+```
+
+The very first time you're using the ngrok address, ngrok will display an intermediary page. Your values will be different but it looks something like this:
+
+![slack app first time ngrok warning](../images/slack-app-first-time-ngrok-warning.png "slack app first time ngrok warning")
+
+Go ahead and click the "Visit Site" button, then this request will hit the root of our Rails app running at `http://localhost:3000` (because ngrok is forwarding traffic there).
+
+This will render the Rails app homepage which is handled by the `WelcomeController`. Recall we added a StimulusJS controller to detect if a `code` parameter is in the URL, which it is right now, so the Stimulus controller will submit a POST to the `/api/teams` endpoint. At this point you should see a "Working" message, this is the StimulusJS controller waiting for a result from the `POST /api/teams` endpoint:
+
+![slack app team wait](../images/slack-app-team-wait.png "slack app team wait")
+
+The Rails server will show that it's processing the `POST /api/teams` request. Unfortunately it does not show the activity where it exchanges the `code` for a `token` with Slack, but this is what the [teams endpoint](https://github.com/slack-ruby/slack-ruby-bot-server/blob/master/lib/slack-ruby-bot-server/api/endpoints/teams_endpoint.rb#L33-L115) is doing behind the scenes. When it receives the token from Slack, it receives additional information including your Slack team name, workspace name, and the user id that activated the Slack App.
+
+The teams endpoint then checks if a team with the given token or Slack team_id already exists, and if not, will create one in the database. This activity can be seen in the Rails server output. Here is a simplified view:
+
+```
+Started POST "/api/teams"
+  Team Load (2.2ms)  SELECT "teams".* FROM "teams" WHERE "teams"."token" = $1 LIMIT $2
+    [["token", "the-token-returned-by-slack"], ["LIMIT", 1]]
+  Team Load (1.5ms)  SELECT "teams".* FROM "teams" WHERE "teams"."team_id" = $1 LIMIT $2
+    [["team_id", "your-slack-team-id"], ["LIMIT", 1]]
+  TRANSACTION (3.0ms)  BEGIN
+  Team Create (4.3ms)  INSERT INTO "teams"
+    ("team_id", "name", "domain", "token", "oauth_scope", "oauth_version", "bot_user_id", "activated_user_id", "activated_user_access_token", "active", "created_at", "updated_at")
+    VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12)
+    RETURNING "id"
+    [
+      ["team_id", "your-slack-team-id"],
+      ["name", "TestBotDev"],
+      ["domain", nil],
+      ["token", "the-token-returned-by-slack"],
+      ["oauth_scope", "commands,chat:write,users:read,chat:write.public"],
+      ["oauth_version", "v2"],
+      ["bot_user_id", "your-slack-bot-user-id"],
+      ["activated_user_id", "slack-user-that-allowed-this-app"],
+      ["activated_user_access_token", "the-token-returned-by-slack"],
+      ["active", true],
+      ["created_at", "2023-12-15 13:02:52.784031"],
+      ["updated_at", "2023-12-15 13:02:52.784031"]
+    ]
+  TRANSACTION (2.3ms)  COMMIT
+```
+
+When the `POST /api/teams` endpoint completes, it returns a response to the StimulusJS controller that called it. The success response will be `201 Created` with response body containing the `teams` record that was just created:
+
+```json
+{
+  "id": 4,
+  "team_id": "your-slack-team-id",
+  "name": "your-slack-workspace",
+  "active": true,
+  "created_at": "2023-12-15T13:02:52.784Z",
+  "updated_at": "2023-12-15T13:02:52.784Z"
+}
+```
+
+Finally, when the StimulusJS controller receives a success response, it updates the display to a success message:
+
+![slack app team registered](../images/slack-app-team-registered.png "slack app team registered")
+
+You can also confirm the team was created in a Rails console `bin/rails c`:
+
+```ruby
+team = Team.first
+# Team Load (1.1ms)  SELECT "teams".* FROM "teams" ORDER BY "teams"."id" ASC LIMIT $1  [["LIMIT", 1]]
+#<Team:0x000000010aad10a0
+#  id: 4,
+#  team_id: "your-slack-team-id",
+#  name: "your-slack-workspace",
+#  domain: nil,
+#  token: "the-oauth-token-returned-by-slack",
+#  oauth_scope: "commands,chat:write,users:read,chat:write.public",
+#  oauth_version: "v2",
+#  bot_user_id: "your-slack-bot-user-id",
+#  activated_user_id: "slack-user-that-allowed-this-app",
+#  activated_user_access_token: "the-oauth-token-returned-by-slack",
+#  active: true,
+#  created_at: Fri, 15 Dec 2023 13:02:52.784031000 UTC +00:00,
+#  updated_at: Fri, 15 Dec 2023 13:02:52.784031000 UTC +00:00>
+```
+
+At this point, if you open your Slack desktop app, it should show that the Retro Pulse app has been added in the Apps section:
+
+![slack app added](../images/slack-app-added.png "slack app added")
+
+If you click on it and then select the "About" tab, Slack will display the information we entered earlier:
+
+![slack app desktop info](../images/slack-app-desktop-info.png "slack app desktop info")
+
+## Next Steps
+
+We now have an authenticated Slack app added to our workspace, backed by a Rails application. The next step will be to make it do something useful. Specifically, we'd like to add some slash commands so that a new retrospective can be opened from any Slack channel in the workspace. For example, suppose we're working on a project named "Quantum Canvas", and Sprint 3 has just started. We'd like to enter a message in a channel to tell the Retro Pulse app to open a retrospective named "Quantum Canvas Sprint 3":
+
+![slack app retro open](../images/slack-app-retro-open.png "slack app retro open")
+
+This is called a slash command. See part 2 of this series to learn how to configure this in the Slack and Rails apps.
 
 ## TODO
 * title
 * intro para
 * main content
-* conclusion para
+* conclusion para (or next steps since its a series)
 * edit
 * connecting multi-part series, include a "you are here"
 * list my Ruby, Rails versions
@@ -458,3 +623,4 @@ WIP: Show expected result in Rails server output, ngrok requests, Rails console 
 * List tree/nested deps of Slack gems so its clear what we all have access to (see `docs/gems_for_slack.md` in retro-pulse project) for explanation. Need to understand slack-ruby-client how to call it, so that when reading Slack api docs, you can use it to access any api method.
 * explain why retro-pulse needs each of the oauth_scopes
 * explain what the app does and show some screenshots
+* Aside: Full explanation of OAuth is outside the scope of this post, see this Slack article: https://api.slack.com/authentication/oauth-v2
