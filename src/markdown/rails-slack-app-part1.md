@@ -10,15 +10,46 @@ related:
   - "Rails CORS Middleware For Multiple Resources"
 ---
 
-This is the first post in a multi-part series on building a Slack application with Rails. The app we'll be building is Retro Pulse (description TBD). In this first post, we'll get a new Rails app up and running, and get OAuth working so we can connect our Rails app to Slack. There's a few moving parts to get set up and configured before we can have a working application.
+This is the first of a multi-part series on building a Slack application with Rails. In this first post, we'll get a new Rails app up and running, and get OAuth working so we can authenticate our Rails app to Slack. There's a few moving parts to get set up and configured before we can have a working application.
 
 ## Introducing Retro Pulse
 
-Before getting into the technical details, let's take a look at what we'll be building...
+Before getting into the technical details, let's take a look at the app we'll be building: Retro Pulse. The idea is to improve the agile retrospective process. Normally a retrospective meeting is booked at the end of a sprint and everyone who contributed to the project is asked to provide their feedback such as what the team should keep on doing, what they should stop doing, and something new to try for the next sprint. But sometimes the sprints can get so hectic, its hard to remember at the end everything that happened, and so, valuable feedback can be lost.
+
+Wouldn't it be nice if a retrospective board could be opened at the beginning of a sprint like this:
+
+![slack app demo retro open slash hint](../images/slack-app-demo-retro-open-slash-hint.png "slack app demo retro open slash hint")
+
+Suppose our project name is "Quantum Canvas" and we're just starting on Sprint 3:
+
+![slack app demo retro open slash command](../images/slack-app-demo-retro-open-slash-command.png "slack app demo retro open slash command")
+
+The app responds with a confirmation that the retrospective has been opened with a link to the board (a view hosted on the Rails app):
+
+![slack app demo retro open success](../images/slack-app-demo-retro-open-success.png "slack app demo retro open success")
+
+Then whenever a thought occurs to anyone on the team during the sprint about how things are going, they can request to submit their feedback quickly via Slack:
+
+![slack app demo retro feedback slash hint](../images/slack-app-demo-retro-feedback-slash-hint.png "slack app demo retro feedback slash hint")
+
+The app responds with a form where the team member can select what kind of feedback this is (keep, stop, or try):
+
+![slack app demo feedback modal](../images/slack-app-demo-feedback-modal.png "slack app demo feedback modal")
+
+The team member can fill in their feedback:
+
+![slack app demo retro feedback keep](../images/slack-app-demo-retro-feedback-keep.png "slack app demo retro feedback keep")
+
+After submitting the form, the app responds with a DM to the user confirming their feedback has been received
+Then when its time to have the retrospective meeting, a lot of feedback has already been captured:
+
+![slack app demo retro feedback received](../images/slack-app-demo-retro-feedback-received.png "slack app demo retro feedback received")
+
+TODO: Later, when it's time to start the retrospective meeting /retro-discuss...
 
 ## Create Rails App
 
-Start by generating a new Rails project. I'm using TailwindCSS although you can leave that out if you prefer to use SASS or vanilla CSS. I'm also using PostgreSQL but you can stick with the default SQLite if you prefer:
+Ok, now let's build it! Start by generating a new Rails project. I'm using TailwindCSS although you can leave that out if you prefer to use SASS or vanilla CSS. I'm also using PostgreSQL but you can stick with the default SQLite if you prefer:
 
 ```bash
 rails new retro-pulse --css tailwind --database=postgresql
@@ -608,9 +639,6 @@ We now have an authenticated Slack app added to our workspace, backed by a Rails
 This is called a slash command. See part 2 of this series to learn how to configure this in the Slack and Rails apps.
 
 ## TODO
-* title
-* intro para
-* main content
 * conclusion para (or next steps since its a series)
 * edit
 * connecting multi-part series, include a "you are here"
