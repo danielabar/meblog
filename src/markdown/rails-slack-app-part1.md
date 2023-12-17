@@ -132,6 +132,16 @@ SlackRubyBotServer.configure do |config|
 end
 ```
 
+A brief explanation of why each of these scopes is required:
+
+**commands:** Necessary for enabling slash commands in Slack. It allows the app to receive and respond to slash commands invoked by users in channels or direct messages.
+
+**chat:write:** Grants the app the ability to send messages to channels where the app is installed and to DM (direct message) users. The app will use this to DM a user who has submitted feedback to confirm their feedback was received.
+
+**users:read:** Provides access to user profile information. The app will use this to persist the Slack user information of the user that submitted the retrospective feedback (unless they choose to remain anonymous).
+
+**chat:write.public** Grants the app the ability to send messages to channels it isn't a member of. The app will use this to post messages confirming a retrospective has been opened or closed.
+
 Configure the slack-ruby-bot-server-events gem with the Slack signing secret (we still have `TBD` for that in `.env`, but will be populating it shortly):
 
 ```ruby
@@ -654,7 +664,6 @@ This is called a slash command. See part 2 of this series to learn how to config
 * ref Slack OAuth: https://api.slack.com/authentication/oauth-v2
 * Assumptions: Reader has beginner to intermediate familiarity with Rails and is also familiar with Slack (as an end user, not developer).
 * List tree/nested deps of Slack gems so its clear what we all have access to (see `docs/gems_for_slack.md` in retro-pulse project) for explanation. Need to understand slack-ruby-client how to call it, so that when reading Slack api docs, you can use it to access any api method.
-* explain why retro-pulse needs each of the oauth_scopes
 * explain what the app does and show some screenshots
 * Aside: Full explanation of OAuth is outside the scope of this post, see this Slack article: https://api.slack.com/authentication/oauth-v2
 * edit
