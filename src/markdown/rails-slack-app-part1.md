@@ -1,7 +1,7 @@
 ---
 title: "Build a Rails App with Slack Part 1: OAuth"
 featuredImage: "../images/slack-feat-img-part1.jpg"
-description: "tbd"
+description: "Learn how to build a Slack application with Rails in this comprehensive multi-part series. Part 1 covers setting up a new Rails app, configuring OAuth for authentication, and laying the foundation for Retro Pulse, an app designed to enhance agile retrospectives on Slack. Follow along for step-by-step instructions and valuable insights into integrating Slack with Ruby on Rails."
 date: "2024-05-01"
 category: "rails"
 related:
@@ -10,7 +10,15 @@ related:
   - "Rails CORS Middleware For Multiple Resources"
 ---
 
-This is the first of a multi-part series on building a Slack application with Rails. In this first post, we'll get a new Rails app up and running, and get OAuth working so we can authenticate our Rails app to Slack. There's a few moving parts to get set up and configured before we can have a working application.
+Welcome to the first installment of this multi-part series on building a Slack application with Rails. This series will guide you through the process of creating a Slack application with Rails. The series is structured as follows:
+
+* Part 1: OAuth (YOU ARE HERE)
+* [Part 2: Slash Command with Text Response](TBD)
+* [Part 3: Slash Command with Modal Response](TBD)
+* [Part 4: Action Modal Submission](TBD)
+* [Part 5: Display and Close Retro](TBD)
+
+Feel free to jump to a specific part of interest using the links above or follow along sequentially for a comprehensive understanding of building a Slack app with Rails. Now, let's get started with Part 1, where we'll set up a new Rails app and implement OAuth for authenticating Retro Pulse with Slack.
 
 ## Introducing Retro Pulse
 
@@ -636,12 +644,9 @@ We now have an authenticated Slack app added to our workspace, backed by a Rails
 
 ![slack app retro open](../images/slack-app-retro-open.png "slack app retro open")
 
-This is called a slash command. See part 2 of this series to learn how to configure this in the Slack and Rails apps.
+This is called a slash command. See part 2 of this series to learn how to configure this in the Slack and implement it in Rails app.
 
 ## TODO
-* conclusion para (or next steps since its a series)
-* edit
-* connecting multi-part series, include a "you are here"
 * list my Ruby, Rails versions
 * Possibly [diagram](https://excalidraw.com/) of Slack Oauth2 flow with Rails app and ngrok
 * Somewhere: tradeoff between using a gem that does a lot of the heavy lifting, but introduces seeming "magic" vs writing it all yourself via first principles (use Slack http api directly with a gem like Faraday or http party)
@@ -652,3 +657,4 @@ This is called a slash command. See part 2 of this series to learn how to config
 * explain why retro-pulse needs each of the oauth_scopes
 * explain what the app does and show some screenshots
 * Aside: Full explanation of OAuth is outside the scope of this post, see this Slack article: https://api.slack.com/authentication/oauth-v2
+* edit
