@@ -63,9 +63,20 @@ Ok, now let's build it! Start by generating a new Rails project. I'm using Tailw
 rails new retro-pulse --css tailwind --database=postgresql
 ```
 
-In order to make the Slack integration as easy as possible, we'll be working with the [slack-ruby-bot-server-events](https://github.com/slack-ruby/slack-ruby-bot-server-events) gem. This is actually an extension to the [slack-ruby-bot-server](https://github.com/slack-ruby/slack-ruby-bot-server) gem, which exposes RESTful routes for Slack team handling (although for this simple app, we won't be enabling public distribution so it will be for your team only). The slack-ruby-bot-server-events gem adds some niceties for handling Slack slash commands, actions, and events. It also expects otr-activerecord and pagy_cursor dependencies to be installed so we'll add those as well.
+In order to make the Slack integration as easy as possible, we'll be working with the following gems:
+1. [slack-ruby-client](https://github.com/slack-ruby/slack-ruby-client): Send messages to Slack via the Web API.
+2. [slack-ruby-bot-server](https://github.com/slack-ruby/slack-ruby-bot-server): Exposes RESTful routes for managing Slack team with OAuth integration. Uses `slack-ruby-client` under the hood.
+3. [slack-ruby-bot-server-events](https://github.com/slack-ruby/slack-ruby-bot-server-events): Extends functionality of `slack-ruby-bot-server` with a mini-framework for handling Slack slash commands, actions, and events.
 
-In the main section of the project `Gemfile`, add:
+The dependency between these Slack gems looks like this:
+
+```
+└── slack-ruby-bot-server-events
+    └── slack-ruby-bot-server
+        └── slack-ruby-client
+```
+
+We only need to include `slack-ruby-bot-server-events` in our Gemfile, which will bring in the others. But this gem has a few other dependencies so add the following to the main section of the project `Gemfile`:
 
 ```ruby
 # Slack Integration
@@ -73,6 +84,10 @@ gem "slack-ruby-bot-server-events"
 gem "otr-activerecord"
 gem "pagy_cursor"
 ```
+
+<aside class="markdown-aside">
+Choosing between leveraging existing gems and building a Slack integration from scratch using an HTTP client involves a tradeoff. Gems like [slack-ruby-client](https://github.com/slack-ruby/slack-ruby-client), [slack-ruby-bot-server](https://github.com/slack-ruby/slack-ruby-bot-server), and [slack-ruby-bot-server-events](https://github.com/slack-ruby/slack-ruby-bot-server-events) streamline the process, abstracting away complexities and providing a structured framework. While this approach offers efficiency and allows a focus on application-specific features, it's important to note that there is a learning curve associated with understanding how these gems work to avoid the perception of 'magic.' Conversely, a DIY approach grants high customization but demands more development time. This series adopts the gem-based route, striking a balance between ease of implementation and functionality.
+</aside>
 
 Since integrating with Slack requires managing Slack-specific secrets, also add the [dotenv-rails](https://github.com/bkeepers/dotenv) gem to the development and test groups. This will allow us to manage secrets with environment variables rather than hard-coding them into the application.
 
@@ -659,7 +674,6 @@ This is called a slash command. See part 2 of this series to learn how to config
 ## TODO
 * list my Ruby, Rails versions
 * Possibly [diagram](https://excalidraw.com/) of Slack Oauth2 flow with Rails app and ngrok
-* Somewhere: tradeoff between using a gem that does a lot of the heavy lifting, but introduces seeming "magic" vs writing it all yourself via first principles (use Slack http api directly with a gem like Faraday or http party)
 * Aside: for extra security, use [token rotation](https://api.slack.com/authentication/rotation), but I couldn't find that this is implemented in slack-ruby-bot-server-events gem
 * ref Slack OAuth: https://api.slack.com/authentication/oauth-v2
 * Assumptions: Reader has beginner to intermediate familiarity with Rails and is also familiar with Slack (as an end user, not developer).
