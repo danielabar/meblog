@@ -1,6 +1,6 @@
 ---
 title: "Build a Rails App with Slack Part 1: OAuth"
-featuredImage: "../images/slack-feat-img-part1.jpg"
+featuredImage: "../images/slack-feat-img-part1-ruby.png"
 description: "Learn how to build a Slack application with Rails in this comprehensive multi-part series. Part 1 covers setting up a new Rails app, configuring OAuth for authentication, and laying the foundation for Retro Pulse, an app designed to enhance agile retrospectives on Slack. Follow along for step-by-step instructions and valuable insights into integrating Slack with Ruby on Rails."
 date: "2024-05-01"
 category: "rails"
@@ -12,31 +12,35 @@ related:
 
 Welcome to the first installment of this multi-part series on building a Slack application with Rails. This series will guide you through the process of creating a Slack application with Rails. The series is structured as follows:
 
-* Part 1: OAuth (YOU ARE HERE)
+* Part 1: Rails new, Slack, and OAuth (YOU ARE HERE)
 * [Part 2: Slash Command with Text Response](TBD)
 * [Part 3: Slash Command with Modal Response](TBD)
 * [Part 4: Action Modal Submission](TBD)
 * [Part 5: Display and Close Retro](TBD)
 
-Feel free to jump to a specific part of interest using the links above or follow along sequentially for a comprehensive understanding of building a Slack app with Rails. Now, let's get started with Part 1, where we'll set up a new Rails app and implement OAuth for authenticating with Slack.
+Feel free to jump to a specific part of interest using the links above or follow along sequentially for a comprehensive understanding of building a Slack app with Rails.
+
+This post assumes the reader has at least a beginner level familiarity with Ruby on Rails. It's also assumed the reader has used Slack as an end user with basic interactions such as joining channels, sending messages, and participating in conversations.
+
+Now, let's get started with Part 1, where we'll set up a new Rails app and implement OAuth for authenticating with Slack.
 
 ## Introducing Retro Pulse
 
 Before getting into the technical details, let's take a look at the app we'll be building: Retro Pulse. The idea is to improve the agile retrospective process. Normally a retrospective meeting is booked at the end of a sprint and everyone who contributed to the project is asked to provide their feedback such as what the team should keep on doing, what they should stop doing, and something new to try for the next sprint. But sometimes the sprints can get so hectic, its hard to remember at the end everything that happened, and so, valuable feedback can be lost.
 
-Wouldn't it be nice if a retrospective board could be opened at the beginning of a sprint like this:
+Wouldn't it be nice if a retrospective board could be opened at the beginning of a sprint with a Slack slash command like this:
 
 ![slack app demo retro open slash hint](../images/slack-app-demo-retro-open-slash-hint.png "slack app demo retro open slash hint")
 
-Suppose our project name is "Quantum Canvas" and we're just starting on Sprint 3:
+Given a project named "Quantum Canvas" and the team is just starting on Sprint 3:
 
 ![slack app demo retro open slash command](../images/slack-app-demo-retro-open-slash-command.png "slack app demo retro open slash command")
 
-The app responds with a confirmation that the retrospective has been opened with a link to the board (a view hosted on the Rails app):
+After hitting <kbd class="markdown-kbd">Enter</kbd>, the app responds with a confirmation that the retrospective has been opened with a link to the board (a view hosted on the Rails app):
 
 ![slack app demo retro open success](../images/slack-app-demo-retro-open-success.png "slack app demo retro open success")
 
-Then whenever a thought occurs to anyone on the team during the sprint about how things are going, they can request to submit their feedback quickly via Slack:
+Then whenever a thought occurs to anyone on the team during the sprint about how things are going, they can request to submit their feedback quickly via Slack using another slash command:
 
 ![slack app demo retro feedback slash hint](../images/slack-app-demo-retro-feedback-slash-hint.png "slack app demo retro feedback slash hint")
 
@@ -58,9 +62,15 @@ TODO: Later, when it's time to start the retrospective meeting /retro-discuss...
 
 ## Create Rails App
 
-Ok, now let's build it! Start by generating a new Rails project. I'm using TailwindCSS although you can leave that out if you prefer to use SASS or vanilla CSS. I'm also using PostgreSQL but you can stick with the default SQLite if you prefer:
+Ok, now let's build it! Start by generating a new Rails project. I'm using TailwindCSS although you can leave that out if you prefer to use SASS or vanilla CSS. I'm also using PostgreSQL but you can stick with the default SQLite if you prefer. I'm also showing the versions I'm using, but Any Ruby 3.x and Rails 7.x should be fine:
 
 ```bash
+ruby --version
+# ruby 3.2.2
+
+rails --version
+# Rails 7.0.8
+
 rails new retro-pulse --css tailwind --database=postgresql
 ```
 
@@ -102,7 +112,7 @@ Then run `bundle install`.
 
 ## Configure Rails for Slack
 
-This next section explains the configuration changes needed to the Rails app to support Slack integration with the slack gems.
+This next section explains the configuration changes needed to the Rails app to support integration with the Slack gems.
 
 Add a `.env` file to the root of the project with `touch .env`, we'll be filling in the values shortly:
 
@@ -115,7 +125,7 @@ SLACK_VERIFICATION_TOKEN=TBD
 
 Update the `.gitignore` file in the project root to ignore `.env`.
 
-Update the `config.ru` file in the project root to also start the Slack server. This will expose RESTful endpoints to handle Slack teams. The `config.ru` file got generated earlier when you ran `rails new...`. Here is the original version:
+Update the `config.ru` file in the project root to also start the Slack server provided by the `slack-ruby-bot-server` gem. This will expose RESTful endpoints to handle Slack teams. The `config.ru` file got generated earlier when you ran `rails new...`. Here is the original version:
 
 ```ruby
 # This file is used by Rack-based servers to start the application.
@@ -138,6 +148,10 @@ run Rails.application
 Rails.application.load_server
 ```
 
+<aside class="markdown-aside">
+The config.ru file serves as the Rack configuration file, defining how the application should be run with the Rack protocol. See this post <a class="markdown-link" href="https://www.writesoftwarewell.com/definitive-guide-to-rack/">The Definitive Guide to Rack for Rails Developers</a> to learn more about Rack.
+</aside>
+
 Configure the `slack-ruby-bot-server` by defining the OAuth [scopes](https://api.slack.com/scopes) the Slack app will require. Scopes give your app permission to perform actions, such as posting messages in your workspace. Here are the specific scopes the Retro Pulse app requires:
 
 ```ruby
@@ -157,6 +171,10 @@ A brief explanation of why each of these scopes is required:
 **users:read:** Provides access to user profile information. The app will use this to persist the Slack user information of the user that submitted the retrospective feedback (unless they choose to remain anonymous).
 
 **chat:write.public** Grants the app the ability to send messages to channels it isn't a member of. The app will use this to post messages confirming a retrospective has been opened or closed.
+
+<aside class="markdown-aside">
+A full discussion of the OAuth protocol is outside the scope of this post. See the <a class="markdown-link" href="https://api.slack.com/authentication/oauth-v2">Installing with OAuth</a> document from Slack for a detailed explanation and illustration.
+</aside>
 
 Configure the `slack-ruby-bot-server-events` gem with the Slack signing secret (we still have `TBD` for that in `.env`, but will be populating it shortly):
 
@@ -189,7 +207,7 @@ However, you can run a Rails console `bin/rails c`, and run the code below to li
 Api.routes.each do |route|
   method = route.request_method.ljust(10)
   path = route.path
-  puts "#{method} #{path} #{controller}"
+  puts "#{method} #{path}"
   nil
 end
 nil
@@ -488,6 +506,10 @@ export default class extends Controller {
 }
 ```
 
+<aside class="markdown-aside">
+For even stronger security, Slack also supports <a class="markdown-link" href="https://api.slack.com/authentication/rotation">token rotation</a>, although I couldn't find support for that in the slack-ruby-bot-server gem. So for this relatively simple app, I will not be using this feature.
+</aside>
+
 ## Rails Blocked Host
 
 The OAuth flow isn't going to work quite yet, there's one more thing we need to do on the Rails side to allow incoming requests that aren't `localhost`. Recall we have ngrok running at something like `https://12e4-203-0-113-42.ngrok-free.app`, which will forward requests to the Rails app running at `http://localhost:3000`. However as of Rails 6, the `ActionDispatch::HostAuthorization` middleware will [block any requests that aren't localhost](../rails-blocked-host-docker-fix). This means when Slack sends us the Redirect URL containing the OAuth code, it will never hit our Welcome controller because the middleware will reject it.
@@ -673,10 +695,6 @@ We now have an authenticated Slack app added to our workspace, backed by a Rails
 This is called a slash command. See [Part 2](TBD) of this series to learn how to configure this in the Slack and implement it in Rails app.
 
 ## TODO
-* list my Ruby, Rails versions
-* Possibly [diagram](https://excalidraw.com/) of Slack Oauth2 flow with Rails app and ngrok
-* Aside: for extra security, use [token rotation](https://api.slack.com/authentication/rotation), but I couldn't find that this is implemented in slack-ruby-bot-server-events gem
-* ref Slack OAuth: https://api.slack.com/authentication/oauth-v2
-* Assumptions: Reader has beginner to intermediate familiarity with Rails and is also familiar with Slack (as an end user, not developer).
-* Aside: Full explanation of OAuth is outside the scope of this post, see this Slack article: https://api.slack.com/authentication/oauth-v2
+* show retro discuss and close slash commands and the retro board in the Rails app when ready (or figure out a way to have the whole thing over Slack assuming a remote/distributed team)
+* Maybe mention issue that all teams endpoints are public: https://github.com/slack-ruby/slack-ruby-bot-server/issues/171
 * edit
