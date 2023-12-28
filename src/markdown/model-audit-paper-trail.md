@@ -2,7 +2,7 @@
 title: "Efficient Model Auditing with PaperTrail"
 featuredImage: "../images/papertrail-efficient-model-auditing.jpg"
 description: "Learn how to optimize model auditing in your Rails application using the PaperTrail gem by setting up separate audit tables for each model, enhancing performance and organization in the auditing process"
-date: "2024-01-01"
+date: "2024-05-01"
 category: "rails"
 related:
   - "Understanding ActiveRecord Dependent Options"
