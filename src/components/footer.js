@@ -6,7 +6,7 @@ const Footer = () => {
   return (
     <footer className={styles.container} data-testid="footer">
       <hr className={styles.sep} />
-      <p className={styles.copy}>All materials © Daniela Baron 2023</p>
+      <p className={styles.copy}>All materials © Daniela Baron 2024</p>
       <div className={styles.social}>
         <a
           href="https://twitter.com/DanielaMBaron"
