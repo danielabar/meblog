@@ -12,7 +12,7 @@ related:
 
 Today I'd like to share a cautionary tale about using ChatGPT to improve some Rails model querying code, and how the Rails Guides and API docs turned out to be a better resource in this case.
 
-## Problem
+## The Problem
 
 I'm working on a Rails application to handle agile retrospective meetings for teams. The Retrospective model has an enum to indicate whether the retrospective is open or closed. There can only be one open retrospective at a time, which is represented with a custom validation rule. Here is the model:
 
@@ -53,13 +53,13 @@ class Retrospective < ApplicationRecord
 end
 ```
 
-Throughout the application, I frequently needed to access the one and only open retrospective. After some time, I noticed this code appeared multiple times throughout the code in the services layer:
+Throughout the application, I frequently need to access the one and only open retrospective. After some time, I noticed this code appeared multiple times throughout the services layer:
 
 ```ruby
 Retrospective.find_by(status: Retrospective.statuses[:open])
 ```
 
-In the future, the logic to find the retrospective could change (for example, if the application is enhanced for multi-tenancy). To avoid code duplication, and having the services be dependent on these details of the retrospective model, I decided to refactor by adding a class method `find_open` on the model:
+In the future, the logic to find the retrospective could change, for example, if the application is enhanced for multi-tenancy. To avoid code duplication, and having the services be dependent on these details of the retrospective model, I decided to refactor by adding a class method `find_open` on the model:
 
 ```ruby
 class Retrospective < ApplicationRecord
@@ -75,7 +75,7 @@ class Retrospective < ApplicationRecord
 end
 ```
 
-Then all the services that needed access to the open retrospective could simply call the `find_open` method:
+Then all the services that need access to the open retrospective can simply call the `find_open` method on the model class:
 
 ```ruby
 # app/services/some_service.rb
@@ -103,7 +103,7 @@ class Retrospective < ApplicationRecord
 end
 ```
 
-Looks reasonable right? Let's try this out in a Rails console. I started from an empty database:
+Looks reasonable? Let's try this out in a Rails console. I started from an empty database:
 
 ```ruby
 # Create an open retrospective
@@ -136,7 +136,7 @@ result.class
 # => Retrospective(id: integer, title: string, created_at: datetime, updated_at: datetime, status: enum)
 ```
 
-So far so good. When the scope is invoked, the Rails console output shows a SQL SELECT running to find retrospectives where the status is `open`. Then the scope returns the `retro1` model, which is the only open retrospective in the database.
+When the scope is invoked, the Rails console output shows a SQL SELECT running to find retrospectives where the status is `open`. Then the scope returns the model titled "My Project Sprint 2", which is the only open retrospective in the database. So far so good.
 
 However, what will the scope return when there are no open retrospectives? I was expecting a `nil` return, but here's what actually happened:
 
@@ -152,7 +152,7 @@ result = Retrospective.open_retrospective
 # FROM "retrospectives"
 # WHERE "retrospectives"."status" = $1 LIMIT $2  [["status", "open"], ["LIMIT", 1]]
 
-# === RUNS ANOTHER QUERY TO FETCH ALL RETROSPECTIVES!
+# === THEN RUNS ANOTHER QUERY TO FETCH ALL RETROSPECTIVES!
 # SELECT "retrospectives".* FROM "retrospectives"
 
 result
@@ -184,7 +184,7 @@ In this case, the return result from the scope is an [ActiveRecord::Relation](ht
 
 Not only was I not getting `nil` as expected, but this could cause a performance problem as the application grows and there are large numbers of records in the `retrospectives` table.
 
-I explained the situation to ChatGPT and it did that thing where it apologizes, then gives you the same solution again that doesn't fix the problem.
+I explained the situation to ChatGPT and it did that thing where it apologizes, then provides the same solution again that doesn't fix the problem. (I encountered a similar issue awhile back trying to find the syntax for a [distinct GraphQL query](../gatsby5-distinct-query#ai-to-the-rescue) in a Gatsby project)
 
 ## Ask the Docs
 
@@ -194,7 +194,7 @@ I started with the guide on the [Active Record Query Interface](https://guides.r
 
 > Scoping allows you to specify commonly-used queries which can be referenced as method calls on the association objects or models. With these scopes, you can use every method previously covered such as where, joins and includes. All scope bodies should return an ActiveRecord::Relation or nil to allow for further methods (such as other scopes) to be called on it.
 
-The phrase that jumped out at me was: **All scope bodies should return an ActiveRecord::Relation**
+This phrase is key: **All scope bodies should return an ActiveRecord::Relation**
 
 Let's take another look at the scope that ChatGPT generated:
 
@@ -256,7 +256,7 @@ result = Retrospective.open_retrospective
 result.class
 # => Retrospective::ActiveRecord_Relation
 
-# Re-open one of the retrospectives
+# Re-open one of the retrospectives with the enum method
 Retrospective.find_by(title: "My Project Sprint 2").open!
 
 # Use the scope again, this time it returns a relation
@@ -265,7 +265,7 @@ result = Retrospective.open_retrospective
 # [ <Retrospective:0xb2faa0 id: 22, title: "My Project Sprint 2", status: "closed"> ]
 ```
 
-Since `where` always returns a relation (unlike `find_by` which returns the model instance), usage of this scope in application code will have to call `first` to get the model instance:
+Since `where` always returns a relation (unlike `find_by` which returns the model instance), usage of this scope in application code can call `first` to get the model instance:
 
 ```ruby
 # anywhere in service code that needs the one open retro
@@ -274,16 +274,12 @@ retro = Retrospective.open_retrospective.first
 
 ## Lessons Learned
 
-A few things I learned from this experience:
+A few things learned from this experience:
 
-Always try out positive and negative cases, especially for code written by ChatGPT. Recall the positive case seemed to work, but unexpected results were encountered in the negative case.
+It seems that ChatGPT saw my original code using the finder method, and knew that scopes are a good solution for query re-usability, so it simply placed the finder in a scope. It did not make the inference that `find_by` doesn't return an ActiveRecord relation, therefore it doesn't make sense to put that in a scope.
 
-While ChatGPT can have a positive impact on developer productivity, it may not fully understand the frameworks and libraries you're using, resulting in the introduction of subtle bugs in the code.
+Always try positive and negative cases, whether its code you wrote yourself, or suggested by AI. Recall the positive case seemed to work, but unexpected results were encountered in the negative case.
 
-The [Rails Guides](https://guides.rubyonrails.org/) and [API docs](https://api.rubyonrails.org/) are a fantastic resource for all things Rails. If you ever run into seemingly "weird" behaviour with Rails, there's a good chance you'll find an explanation here.
+While ChatGPT can improve developer productivity, it may not fully understand the frameworks and libraries you're using, resulting in the introduction of subtle bugs. For now, any code it generates requires careful double-checking before committing.
 
-## TODO
-* intro para
-* edit
-* speculate about what happened with ChatGPT: It saw my original find_by, and knew that scopes are more idiomatic, but didn't make the leap that find_by doesn't return an AR relation so it should have converted it to an equivalent `where` query instead of using the finder method. Maybe that leap is too much to ask of an LLM? Maybe it will ingest this post and get better for the next version? I don't know, but in the meantime, it's good to keep those old fashioned documentation reading skills alive and well.
-* reschedule `article/2024-01-01 model audit paper trail` for 2024-05-01
+The [Rails Guides](https://guides.rubyonrails.org/) and [API docs](https://api.rubyonrails.org/) are fantastic resources. If you ever run into seemingly "weird" behaviour with Rails, there's a good chance you'll find an explanation here.
