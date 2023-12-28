@@ -240,13 +240,50 @@ class Retrospective < ApplicationRecord
 end
 ```
 
-WIP...
+Trying this version in the Rails console `bin/rails c`:
+
+```ruby
+# Starting from all retrospectives closed:
+Retrospective.select(:id, :title, :status)
+# [
+#   <Retrospective:0xb2fb40 id: 23, title: "My Project Sprint 1", status: "closed">,
+#   <Retrospective:0xb2faa0 id: 22, title: "My Project Sprint 2", status: "closed">
+# ]
+
+# This time, using the scope returns an empty relation:
+result = Retrospective.open_retrospective
+# => []
+result.class
+# => Retrospective::ActiveRecord_Relation
+
+# Re-open one of the retrospectives
+Retrospective.find_by(title: "My Project Sprint 2").open!
+
+# Use the scope again, this time it returns a relation
+# with the one open retrospective
+result = Retrospective.open_retrospective
+# [ <Retrospective:0xb2faa0 id: 22, title: "My Project Sprint 2", status: "closed"> ]
+```
+
+Since `where` always returns a relation (unlike `find_by` which returns the model instance), usage of this scope in application code will have to call `first` to get the model instance:
+
+```ruby
+# anywhere in service code that needs the one open retro
+retro = Retrospective.open_retrospective.first
+```
+
+## Lessons Learned
+
+A few things I learned from this experience:
+
+Always try out positive and negative cases, especially for code written by ChatGPT. Recall the positive case seemed to work, but unexpected results were encountered in the negative case.
+
+While ChatGPT can have a positive impact on developer productivity, it may not fully understand the frameworks and libraries you're using, resulting in the introduction of subtle bugs in the code.
+
+The [Rails Guides](https://guides.rubyonrails.org/) and [API docs](https://api.rubyonrails.org/) are a fantastic resource for all things Rails. If you ever run into seemingly "weird" behaviour with Rails, there's a good chance you'll find an explanation here.
 
 ## TODO
 * intro para
-* WIP: main content
-* Rails console showing behaviour of scope using `where` (try the case where there's no results because we already have both retrospectives closed, then open one of them and try the scope again)
-* conclusion para (lessons learned...)
 * edit
 * speculate about what happened with ChatGPT: It saw my original find_by, and knew that scopes are more idiomatic, but didn't make the leap that find_by doesn't return an AR relation so it should have converted it to an equivalent `where` query instead of using the finder method. Maybe that leap is too much to ask of an LLM? Maybe it will ingest this post and get better for the next version? I don't know, but in the meantime, it's good to keep those old fashioned documentation reading skills alive and well.
 * reschedule `article/2024-01-01 model audit paper trail` for 2024-05-01
