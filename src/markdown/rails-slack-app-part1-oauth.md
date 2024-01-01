@@ -18,7 +18,7 @@ Welcome to the first installment of this multi-part series on building a Slack a
 * [Part 4: Slack Action Modal Submission](../rails-slack-app-part4-action-modal-submission)
 * [Part 5: Slack Slash Command with Block Kit Response](../rails-slack-app-part5-slash-block-kit-response)
 
-Feel free to jump to a specific part of interest using the links above or follow along sequentially for a comprehensive understanding of building a Slack app with Rails. You can also checkout the [source code on Github](https://github.com/danielabar/retro-pulse) for the application we'll be building.
+Feel free to jump to a specific part of interest using the links above or follow along sequentially. You can also checkout the [source code on Github](https://github.com/danielabar/retro-pulse) for the application we'll be building.
 
 This post assumes the reader has at least a beginner level familiarity with Ruby on Rails. It's also assumed the reader has used [Slack](https://slack.com/) as an end user with basic interactions such as joining channels, sending messages, and participating in conversations.
 
@@ -66,9 +66,19 @@ The app responds with all the comments that have been collected in that category
 
 ![slack app demo keep comments](../images/slack-app-demo-keep-comments.png "slack app demo keep comments")
 
+Finally, when the retrospective meeting is over, it can be closed with another slash command:
+
+![slack app demo slash close](../images/slack-app-demo-slash-close.png "slack app demo slash close")
+
+Which the app responds to with a confirmation message that the retrospective has been closed:
+
+![slack-app-demo-close-response](../images/slack-app-demo-close-response.png "slack-app-demo-close-response")
+
 ## Create Rails App
 
-Ok, now let's build Retro Pulse! Start by generating a new Rails project. I'm using PostgreSQL but you can stick with the default SQLite if you prefer. I'm also showing the versions I'm using, but any Ruby 3.x and Rails 7.x should be fine:
+Ok, now let's build Retro Pulse! Start by generating a new Rails project. I'm using PostgreSQL but you can stick with the default SQLite if you prefer. I'm also using TailwindCSS for some very light styling of the application landing page, but you can stick with vanilla CSS if you prefer, or skip the styling altogether as it's not critical to the Slack flow.
+
+Any Ruby 3.x and Rails 7.x should be fine:
 
 ```bash
 ruby --version
@@ -77,7 +87,7 @@ ruby --version
 rails --version
 # Rails 7.0.8
 
-rails new retro-pulse --database=postgresql
+rails new retro-pulse --database=postgresql --css tailwind
 ```
 
 In order to make the Slack integration as easy as possible, we'll be working with the following gems:
@@ -697,6 +707,72 @@ At this point, if you open your Slack desktop app, it should show that the Retro
 If you click on it and then select the "About" tab, Slack will display the information we entered earlier:
 
 ![slack app desktop info](../images/slack-app-desktop-info.png "slack app desktop info")
+
+## Style Landing Page
+
+This part is optional, but makes for a nicer user experience. Up until this point, the welcome index view (i.e. the view that's rendered when navigating to the root `/` of the Rails application) displays only the Add to Slack button. This doesn't provide any information about what this app does. For this section, I've added some TailwindCSS styles for a very basic layout and appearance.
+
+The application layout is updated to include the application name and logo:
+
+```erb
+<%# app/views/layouts/application.html.erb %>
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>RetroPulse</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <%= csrf_meta_tags %>
+    <%= csp_meta_tag %>
+    <%= stylesheet_link_tag "tailwind", "inter-font", "data-turbo-track": "reload" %>
+
+    <%= stylesheet_link_tag "application", "data-turbo-track": "reload" %>
+    <%= javascript_importmap_tags %>
+  </head>
+
+  <body class="bg-gray-100">
+    <header class="bg-blue-500 text-white py-4">
+      <div class="container mx-auto flex justify-between items-center">
+        <%= link_to root_path, class: "flex items-center" do %>
+          <img src="<%= asset_path('logo.jpeg') %>" alt="Retro Pulse" class="h-16 w-auto mb-2">
+          <h1 class="text-xl font-bold ml-2">Retro Pulse</h1>
+        <% end %>
+      </div>
+    </header>
+
+    <main class="container mx-auto mt-8 p-5 bg-white rounded shadow">
+      <%= yield %>
+    </main>
+  </body>
+</html>
+```
+
+And the welcome index view is updated to include a description of the application:
+
+```erb
+<%# app/views/welcome/index.html.erb %>
+<div class="flex justify-center items-center">
+  <div class="text-left max-w-md mx-auto">
+    <div class="mb-8 text-gray-700">
+      <p class="text-xl font-semibold leading-snug">About Retro Pulse</p>
+      <p class="text-base leading-relaxed">
+        Retro Pulse is designed to streamline the agile retrospective process with Slack slash commands. While traditional retrospectives are often scheduled at the end of a sprint, shape up cycle, or project, Retro Pulse recognizes the need for a more fluid feedback mechanism. With Retro Pulse, team members can easily submit feedback as it arises during project development, ensuring that valuable insights are captured and not lost in the shuffle.
+      </p>
+    </div>
+
+    <a href="<%= SlackRubyBotServer::Config.oauth_authorize_url %>?scope=<%= SlackRubyBotServer::Config.oauth_scope_s %>&client_id=<%= ENV['SLACK_CLIENT_ID'] %>">
+      <img alt="Add to Slack" height="40" width="139" src="https://platform.slack-edge.com/img/add_to_slack.png">
+    </a>
+
+    <div data-controller="slack-team-registration" class="mt-8">
+      <span data-slack-team-registration-target="message"></span>
+    </div>
+  </div>
+</div>
+```
+
+Resulting in a simple layout as follows:
+
+![retro pulse landing](../images/retro-pulse-landing.png "retro pulse landing")
 
 ## Next Steps
 
