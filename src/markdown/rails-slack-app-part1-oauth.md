@@ -2,7 +2,7 @@
 title: "Build a Rails App with Slack Part 1: OAuth"
 featuredImage: "../images/slack-feat-img-part1-ruby.png"
 description: "Learn how to build a Slack application with Rails in this comprehensive multi-part series. Part 1 covers setting up a new Rails app, configuring OAuth for authentication, and laying the foundation for Retro Pulse, an app designed to enhance agile retrospectives on Slack. Follow along for step-by-step instructions and valuable insights into integrating Slack with Ruby on Rails."
-date: "2024-05-01"
+date: "2024-06-01"
 category: "rails"
 related:
   - "Add a Kafka Consumer to Rails"
