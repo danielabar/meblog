@@ -13,12 +13,12 @@ related:
 Welcome to the first installment of this multi-part series on building a Slack application with Rails. This series will guide you through the process of creating a Slack application with Rails. The series is structured as follows:
 
 * Part 1: Rails new, Slack, and OAuth (You Are Here)
-* [Part 2: Slash Command with Text Response](TBD)
-* [Part 3: Slash Command with Modal Response](TBD)
-* [Part 4: Action Modal Submission](TBD)
-* [Part 5: Display and Close Retro](TBD)
+* [Part 2: Slack Slash Command with Text Response](../rails-slack-app-part2-slash-text-response)
+* [Part 3: Slack Slash Command with Modal Response](../rails-slack-app-part3-slash-modal-response)
+* [Part 4: Slack Action Modal Submission](../rails-slack-app-part4-action-modal-submission)
+* [Part 5: Slack Slash Command with Block Kit Response](../rails-slack-app-part5-slash-block-kit-response)
 
-Feel free to jump to a specific part of interest using the links above or follow along sequentially for a comprehensive understanding of building a Slack app with Rails.
+Feel free to jump to a specific part of interest using the links above or follow along sequentially for a comprehensive understanding of building a Slack app with Rails. You can also checkout the [source code on Github](https://github.com/danielabar/retro-pulse) for the application we'll be building.
 
 This post assumes the reader has at least a beginner level familiarity with Ruby on Rails. It's also assumed the reader has used [Slack](https://slack.com/) as an end user with basic interactions such as joining channels, sending messages, and participating in conversations.
 
@@ -34,7 +34,7 @@ Given a project named "Quantum Canvas" and the team is just starting on Sprint 3
 
 ![slack app demo retro open slash command](../images/slack-app-demo-retro-open-slash-command.png "slack app demo retro open slash command")
 
-After hitting <kbd class="markdown-kbd">Enter</kbd>, the app responds with a confirmation that the retrospective has been opened with a link to the board (a view hosted on the Rails app):
+After hitting <kbd class="markdown-kbd">Enter</kbd>, the app responds with a confirmation that the retrospective has been opened:
 
 ![slack app demo retro open success](../images/slack-app-demo-retro-open-success.png "slack app demo retro open success")
 
@@ -227,6 +227,10 @@ nil
 ```
 
 The particular one we're interested in is `POST /api/teams`, this will be a critical part of the OAuth flow explained later in this post.
+
+<aside class="markdown-aside">
+At the time of this writing, there's an open <a href="https://github.com/slack-ruby/slack-ruby-bot-server/issues/171" class="markdown-link">issue</a> in the slack-ruby-bot-server gem about all the teams endpoints being open. For this simple educational app that doesn't have public distribution, it's not a blocker. But if it is an issue for your app, read the discussion for options.
+</aside>
 
 At this point, you should be able to start a Rails server with `bin/dev`. Also if you launch a Rails console with `bin/rails c`, you should be able to see the `Team` model, which is defined in the `slack-ruby-bot-server` gem. There are no teams populated at the moment, because we haven't yet written the code to add this app to a Slack workspace. Again, we didn't have to write any model code for `Team` as its already provided by `slack-ruby-bot-server`:
 
@@ -700,9 +704,4 @@ We now have an authenticated Slack app added to our workspace, backed by a Rails
 
 ![slack app retro open](../images/slack-app-retro-open.png "slack app retro open")
 
-See [Part 2](TBD) of this series to learn how to configure this in the Slack application and handle it in the Rails app.
-
-## TODO
-* Part 5 needs a better title, something about responding with a rich text UI...
-* Maybe mention issue that all teams endpoints are public: https://github.com/slack-ruby/slack-ruby-bot-server/issues/171
-* edit
+See [Part 2 of this series](../rails-slack-app-part2-slash-text-response) to learn how to setup your very first Slack Slash Command and handle it in Rails.
