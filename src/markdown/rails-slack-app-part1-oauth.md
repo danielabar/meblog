@@ -76,7 +76,7 @@ Which the app responds to with a confirmation message that the retrospective has
 
 ## Create Rails App
 
-Ok, now let's build Retro Pulse! Start by generating a new Rails project. I'm using PostgreSQL but you can stick with the default SQLite if you prefer. I'm also using TailwindCSS for some very light styling of the application landing page, but you can stick with vanilla CSS if you prefer, or skip the styling altogether as it's not critical to the Slack flow.
+Ok, now let's build Retro Pulse! Start by generating a new Rails project. I'm using PostgreSQL because later we'll be using [enum types](../rails-enum-mysql-postgres) on some of the models. I'm also using TailwindCSS for some very light styling of the application landing page, but you can stick with vanilla CSS if you prefer, or skip the styling altogether as it's not critical to the Slack flow.
 
 Any Ruby 3.x and Rails 7.x should be fine:
 
