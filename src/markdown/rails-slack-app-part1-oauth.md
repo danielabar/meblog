@@ -10,7 +10,7 @@ related:
   - "Rails CORS Middleware For Multiple Resources"
 ---
 
-Welcome to the first installment of this multi-part series on building a Slack application with Rails. This series will guide you through the process of creating a Slack application with Rails. The series is structured as follows:
+Welcome to the second installment of this multi-part series on building a Slack application with Rails. This series will guide you through the process of creating a Slack application with Rails and is structured as follows:
 
 * Part 1: Rails new, Slack, and OAuth (You Are Here)
 * [Part 2: Slack Slash Command with Text Response](../rails-slack-app-part2-slash-text-response)

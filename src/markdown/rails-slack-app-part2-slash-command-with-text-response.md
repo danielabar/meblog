@@ -10,7 +10,7 @@ related:
   - "Roll Your Own Search with Rails and Postgres: Search Engine"
 ---
 
-Welcome to the second installment of this multi-part series on building a Slack application with Rails. This series will guide you through the process of creating a Slack application with Rails. The series is structured as follows:
+Welcome to the second installment of this multi-part series on building a Slack application with Rails. This series will guide you through the process of creating a Slack application with Rails and is structured as follows:
 
 * [Part 1: Rails new, Slack, and OAuth](../rails-slack-app-part1-oauth)
 * Part 2: Slack Slash Command with Text Response (You Are Here)
@@ -31,6 +31,19 @@ The interaction looks like this:
 After hitting <kbd class="markdown-kbd">Enter</kbd>, the app responds with a confirmation that the retrospective has been opened:
 
 ![slack app demo retro open success](../images/slack-app-demo-retro-open-success.png "slack app demo retro open success")
+
+In the Rails console `bin/rails c` of the Rails application backing the Slack app, the Retrospective has been created:
+
+```ruby
+Retrospective.last
+# Retrospective Load (1.1ms)  SELECT "retrospectives".* FROM "retrospectives" ORDER BY "retrospectives"."id" DESC LIMIT $1  [["LIMIT", 1]]
+# <Retrospective:
+#   id: 31,
+#   title: "Quantum Canvas Sprint 3",
+#   created_at: ...,
+#   updated_at: ...,
+#   status: "open">
+```
 
 ## Create Slash Command in Slack
 
@@ -58,7 +71,7 @@ Click the "Save" button, which at the time of this writing, appears all the way 
 
 The next step is to update the Rails app to handle the HTTP POST to `/api/slack/command` that Slack will send whenever a user submits the `/retro-pulse something` Slash command. Recall that we're using the [slack-ruby-bot-server-events](https://github.com/slack-ruby/slack-ruby-bot-server-events) gem, which takes care of a lot of the boilerplate including providing a controller to parse the body, and logic to verify the `X-Slack-Signature` HTTP header.
 
-Start by creating a `bot` directory in the root of the Rails project as shown below:
+Start by creating a `bot` directory in the root of the Rails project as shown below. The `bot` directory is a sibling to the Rails `app` directory:
 
 ```bash
 # from root of Rails project
@@ -171,7 +184,9 @@ Enter `http://127.0.0.1:4040` in a browser. This will allow you to inspect all H
 
 ![slack ngrok inspect](../images/slack-ngrok-inspect.png "slack ngrok inspect")
 
-This shows all the form parameters that Slack sent in the HTTP `POST /api/slack/command`. You can also view the HTTP headers. These include the `X-Slack-Request-Timestamp` and `X-Slack-Signature` headers that are verified by the `slack-ruby-bot-server-events` gem. If you weren't using a gem for this, you'd have to write this verification code yourself:
+This shows all the form parameters that Slack sent in the HTTP `POST /api/slack/command`. Notice these include `team_id` and `channel_id`. These get parsed out by the `slack-ruby-bot-server-events` gem and are available on the `command` object in the block of the slash command handler.
+
+You can also view the HTTP headers. These include the `X-Slack-Request-Timestamp` and `X-Slack-Signature` headers that are verified by the `slack-ruby-bot-server-events` gem. If you weren't using a gem for this, you'd have to write this verification code yourself:
 
 ![slack ngrok inspect headers](../images/slack-ngrok-inspect-headers.png "slack ngrok inspect headers")
 
@@ -214,7 +229,7 @@ class AddStatusToRetrospectives < ActiveRecord::Migration[7.0]
 end
 ```
 
-Here is the `Retrospective` model with validations, and a scope to find the one and only open retrospective:
+Here is the `Retrospective` model with schema annotations and validations:
 
 ```ruby
 # == Schema Information
@@ -240,8 +255,6 @@ class Retrospective < ApplicationRecord
   validates :title, presence: true, uniqueness: true
   validates :status, presence: true
   validate :only_one_open_retrospective
-
-  scope :open_retrospective, -> { where(status: statuses[:open]) }
 
   private
 
@@ -305,6 +318,10 @@ SlackRubyBotServer::Events.configure do |config|
 end
 ```
 
+<aside class="markdown-aside">
+The chat_postMessage method is just a glimpse into the rich set of Web API methods offered by Slack. If you're curious to explore more functionalities, check out the comprehensive <a class="markdown-link" href="https://api.slack.com/methods">Slack API documentation</a> for a complete list.
+</aside>
+
 Restart the Rails server `bin/dev` after making these changes. Now you should be able to enter something like `/retro-open My Project Sprint 1` in the Slack workspace and have the app respond with a success message:
 
 ![slack app retro open success](../images/slack-app-retro-open-success.png "slack app retro open success")
@@ -333,24 +350,178 @@ While the `retro_open.rb` slash command handler works, there are some issues to 
 * The code is getting long and difficult to read.
 * It might be a good idea to sanitize the title text from the user before saving it to the database, although adding this will make the code even longer.
 * There's some code duplication in the multiple calls to `slack_client.chat_postMessage(...)` where the only thing that varies is the message text.
-* There's no (easy) way to test all this logic.
+* There's no (easy) way to test all this logic, and this problem will compound over time as more requirements are added and the logic grows in complexity.
 
-If you compare the command handler framework provided by the `slack-ruby-bot-server-events` gem to a Rails controller, then what we have here is the same problem that can affect any Rails application: Where to put the business logic?
+If you compare the command handler framework provided by the `slack-ruby-bot-server-events` gem to a Rails controller, then what we have here is the same problem that can affect any Rails application: Where to put the [business logic](https://en.wikipedia.org/wiki/Business_logic)?
 
-In the case of a Slack application, the command handlers can be thought of as a type of "Slack controller". We would like to have these only focused on extracting the necessary data from the Slack command, and then have the business logic live somewhere else, where it's easier to test. There are a number of different options for organizing business logic in Rails applications. From my experience, here's what I've encountered:
+In the case of a Slack application, the command handlers can be thought of as a type of "Slack controller". We would like to have these only focused on extracting the necessary data from the Slack command, and then have the business logic live somewhere else, where it's easier to test.
+
+There are a number of different options for organizing business logic in Rails applications:
 
 * Leave it in the controller and test it with request (aka integration) tests.
 * Put it in ActiveRecord model methods.
 * Use ActiveSupport [concerns](https://www.writesoftwarewell.com/how-rails-concerns-work-and-how-to-use-them/).
-* Use ActiveRecord callbacks to distribute the logic if some should run before and/or after database updates.
+* Use ActiveRecord [callbacks](https://guides.rubyonrails.org/active_record_callbacks.html) to distribute the logic across the lifecycle of the ActiveRecord model.
 * Introduce POROs (Plain Old Ruby Objects) in the `/app/models` directory and put the business logic in these model methods.
-* Introduce a [services layer](https://www.rubyvideo.dev/talks/railsconf-2022-your-service-layer-needn-t-be-fancy-it-just-needs-to-exist-by-david-copeland) (video link).
+* Use [services](https://www.rubyvideo.dev/talks/railsconf-2022-your-service-layer-needn-t-be-fancy-it-just-needs-to-exist-by-david-copeland) (video link).
 * Use interactors.
 
+All of these have their pros and cons, and a full discussion of the tradeoffs is outside the scope of this post. For this project, I chose to use interactors, implemented with the [interactor gem](https://github.com/collectiveidea/interactor). The advantage of this approach is it provides a well documented, easy to test, and consistent pattern for implementing business logic.
+
+## OpenRetrospective Interactor
+
+An interactor is a single purpose object with a `call` method that's given all the information it needs to do its work via a `context`. If something goes wrong, the interactor can flag this with `context.fail!`.
+
+For clarity, interactors are typically named for the business action they perform. In this example, we'll create an interactor named `OpenRetrospective` to contain the business logic of creating a retrospective in open status, and posting messages to Slack about the success or failure of this action. Notice it is *not* named `CreateRetrospective` as this sounds more like a simple CRUD (Create, Read, Update, Delete) operation. The idea with an interactor is that it encapsulates more complex business logic than simple CRUD. In this case, we need to do more than just create the retrospective, we also need to inform the Slack channel about it.
+
+After adding `gem "interactor"` to the `Gemfile` and running `bundle install`, create a directory `app/interactors` and add the following:
+
+```ruby
+# app/interactors/open_retrospective.rb
+class OpenRetrospective
+  include Interactor
+  include ActionView::Helpers::SanitizeHelper
+
+  def call
+    title = strip_tags(context.title).strip
+    retrospective = Retrospective.new(title:)
+
+    if retrospective.save
+      message = ":memo: Opened retro `#{retrospective.title}`"
+      context.slack_client.chat_postMessage(
+        channel: context.channel_id,
+        mrkdwn: true,
+        text: message
+      )
+    else
+      error_message = ":warning: Could not create retro `#{title}`, error: #{retrospective.errors.full_messages}"
+      context.slack_client.chat_postMessage(
+        channel: context.channel_id,
+        mrkdwn: true,
+        text: error_message
+      )
+    end
+  rescue StandardError => e
+    error_message = "Error in OpenRetrospective: #{e.message}"
+    backtrace = e.backtrace.join("\n")
+    Rails.logger.error("#{error_message}\n#{backtrace}")
+    context.fail!
+  end
+end
+```
+
+Some notes about the above code:
+
+* There is just one public method `call` that encapsulates all the business logic to open a new retrospective.
+* Any reference to `context.something` means that the caller must provide this value when invoking the interactor. This interactor expects to be provided a `title` to initialize the retrospective model, and a `slack_client` and `channel_id` to communicate success or failure to the channel.
+* The `strip_tags` method from `ActionView::Helpers::SanitizeHelper` has been brought in to sanitize the user content before saving it to the database.
+* If you're using Rubocop, the `call` method may be lighting up with method length and complexity warnings, this will be addressed shortly.
+
+Now we can modify the slash command handler to remove the business logic, and instead call the interactor, passing in the `command_text` for the retrospective title, and the `slack_client` and `channel_id` for communication:
+
+```ruby
+# bot/slash_commands/retro_open.rb
+SlackRubyBotServer::Events.configure do |config|
+  config.on :command, "/retro-open" do |command|
+    team = Team.find_by(team_id: command[:team_id])
+    slack_client = Slack::Web::Client.new(token: team.token)
+    channel_id = command[:channel_id]
+    command_text = command[:text]
+    command.logger.info "=== COMMAND: retro-open, Team: #{team.name}, Channel: #{channel_id}, Title: #{command_text}"
+
+    # Anything passed in the `call` method becomes available as `context.something` in the interactor
+    OpenRetrospective.call(title: command_text, channel_id:, slack_client:)
+    nil
+  end
+end
+```
+
+If you restart the Rails server `bin/dev`, then try the slash command again in Slack, the behaviour is the same. You may first have to launch a Rails console `bin/rails c` and destroy all the existing retrospectives to get a clean start.
+
+The benefit is that the interactor is easy to test. The interactor gem Readme explains [how to test](https://github.com/collectiveidea/interactor?tab=readme-ov-file#testing-interactors). Once the tests are in place, the `call` method can be further refactored to eliminate the Rubocop warnings about method length and complexity. In the version below, I've broken up the logic into smaller methods, provided some re-use for the call to `chat_postMessage`, and also added some documentation:
+
+```ruby
+class OpenRetrospective
+  include Interactor
+  include ActionView::Helpers::SanitizeHelper
+
+  # Create a new retrospective in +open+ status with the given text,
+  # and reply back in the Slack channel with with a confirmation message.
+  #
+  # HTML tags and leading/trailing whitespace will be removed from text.
+  #
+  # === Example:
+  #   OpenRetrospective.call(title: "New Retro", channel_id: "123", slack_client: Slack::Web::Client.new)
+  #
+  # === Parameters:
+  # - +title+: The title for the retrospective.
+  # - +channel_id+: The ID of the Slack channel where the command was issued.
+  # - +slack_client+: An instance of the Slack client for communication.
+  #
+  # === Return:
+  # [void]
+  def call
+    initialize_retrospective
+    process_retrospective
+  rescue StandardError => e
+    log_error(e)
+    context.fail!
+  end
+
+  private
+
+  def initialize_retrospective
+    @title = strip_tags(context.title).strip
+    @retrospective = Retrospective.new(title: @title)
+  end
+
+  def process_retrospective
+    if @retrospective.save
+      handle_successful_save
+    else
+      handle_failed_save
+    end
+  end
+
+  def handle_successful_save
+    message = ":memo: Opened retro `#{@retrospective.title}`"
+    post_message(message)
+  end
+
+  def handle_failed_save
+    error_message = ":warning: Could not create retro `#{@title}`, error: #{@retrospective.errors.full_messages}"
+    post_message(error_message)
+  end
+
+  def post_message(message)
+    context.slack_client.chat_postMessage(
+      channel: context.channel_id,
+      mrkdwn: true,
+      text: message
+    )
+  end
+
+  def log_error(error)
+    error_message = "Error in OpenRetrospective: #{error.message}"
+    backtrace = error.backtrace.join("\n")
+    Rails.logger.error("#{error_message}\n#{backtrace}")
+  end
+end
+```
+
+This post is already pretty lengthy so I'm not including the interactor tests here, but you can [check them out on Github](https://github.com/danielabar/retro-pulse/blob/main/spec/interactors/open_retrospective_spec.rb) as part of the completed project.
+
+## Next Steps
+
+At this point, we have an authenticated Slack app added to our workspace from [Part 1 of this series]((../rails-slack-app-part1-oauth)). And now in Part 2 we've added the ability to open a new retrospective with a user provided title from a slash command in Slack, and to respond with a markdown message indicating whether the retrospective was opened successfully or if a validation error occurred.
+
+The next step will be to add another slash command `/retro-feedback` that rather than responding with a simple text message, will respond with a modal form where the user can fill in a comment on how the sprint is going. It will look like this:
+
+![slack app demo modal form](../images/slack-app-demo-modal-form.png "slack app demo modal form")
+
+Read on to [Part 3: Slack Slash Command with Modal Response](../rails-slack-app-part3-slash-modal-response) to learn how to do this.
+
 ## TODO
-* WIP: main content
-* WIP: refactor, explain options for where to put business logic and why for this app will go with interactor
 * In the "Receive Slash Command in Rails" section: recall the Team model got populated in Part 1 of this series when we ran the OAuth flow to add this app to a Slack workspace.
 * Explain about escape option when defining slash command: Turning this on will modify the parameters sent with a command by a user. It will wrap URLs in angle brackets (ie. <http://example.com>) and it will translate channel or user mentions into their correlated IDs. Ref: https://api.slack.com/interactivity/slash-commands   (not important in this app)
-* conclusion para
 * edit
