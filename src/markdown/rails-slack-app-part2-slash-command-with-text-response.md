@@ -6,15 +6,15 @@ date: "2024-06-02"
 category: "rails"
 related:
   - "They Don't All Have To Be ActiveRecord Models"
-  - "SQLite Varchar Surprise"
-  - "Roll Your Own Search with Rails and Postgres: Search Engine"
+  - "When RSpec Doesn't Rollback"
+  - "Rails Enums with MySQL or Postgres"
 ---
 
 Welcome to the second installment of this multi-part series on building a Slack application with Rails. This series will guide you through the process of creating a Slack application with Rails and is structured as follows:
 
 * [Part 1: Rails new, Slack, and OAuth](../rails-slack-app-part1-oauth)
 * Part 2: Slack Slash Command with Text Response (You Are Here)
-* [Part 3: Slack Slash Command with Modal Response](../rails-slack-app-part3-slash-modal-response)
+* [Part 3: Slack Slash Command with Modal Response](../rails-slack-app-part3-slash-command-with-modal-response)
 * [Part 4: Slack Action Modal Submission](../rails-slack-app-part4-action-modal-submission)
 * [Part 5: Slack Slash Command with Block Kit Response](../rails-slack-app-part5-slash-block-kit-response)
 
