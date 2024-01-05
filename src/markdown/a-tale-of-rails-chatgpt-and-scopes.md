@@ -188,7 +188,7 @@ I explained the situation to ChatGPT and it did that thing where it apologizes, 
 
 ## Ask the Docs
 
-When AI doesn't provide the solution, it's good to lean on skills we engineers developed before the existence of such tools. Read the documentation! Industry old-timers may remember this as [RTFM](https://en.wikipedia.org/wiki/RTFM).
+When AI doesn't provide the solution, it's good to lean on skills we engineers developed before the existence of such tools: Read the documentation! Industry veterans may remember this as [RTFM](https://en.wikipedia.org/wiki/RTFM).
 
 I started with the guide on the [Active Record Query Interface](https://guides.rubyonrails.org/active_record_querying.html), more specifically, the section on [scopes](https://guides.rubyonrails.org/active_record_querying.html#scopes). Here I found this illuminating description:
 
@@ -272,6 +272,10 @@ Since `where` always returns a relation (unlike `find_by` which returns the mode
 retro = Retrospective.open_retrospective.first
 ```
 
+<aside class="markdown-aside">
+In this particular case, since the only search criteria is for an attribute that happens to be an enum, there's a simpler solution. `Retrospective.open` could be used to find all open retrospectives (of which, there would only be one due to the custom validation rule). This is because enum attributes on a model automatically add class level <a class="markdown-link" href="https://danielabaron.me/blog/rails-enum-mysql-postgres/#enum-scopes">scope methods</a>. However, for this exercise, I was interested in understanding scopes more generally.
+</aside>
+
 ## Lessons Learned
 
 A few things learned from this experience:
@@ -282,4 +286,4 @@ Always try positive and negative cases, whether its code you wrote yourself, or 
 
 While ChatGPT can improve developer productivity, it may not fully understand the frameworks and libraries you're using, resulting in the introduction of subtle bugs. For now, any code it generates requires careful double-checking before committing.
 
-The [Rails Guides](https://guides.rubyonrails.org/) and [API docs](https://api.rubyonrails.org/) are fantastic resources. If you ever run into seemingly "weird" behaviour with Rails, there's a good chance you'll find an explanation here.
+The [Rails Guides](https://guides.rubyonrails.org/) and [API docs](https://api.rubyonrails.org/) are fantastic resources. If you ever run into seemingly unexpected behaviour with Rails, there's a good chance you'll find an explanation there.
