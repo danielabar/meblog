@@ -10,10 +10,10 @@ related:
   - "Rails CORS Middleware For Multiple Resources"
 ---
 
-Welcome to the second installment of this multi-part series on building a Slack application with Rails. This series will guide you through the process of creating a Slack application with Rails and is structured as follows:
+Welcome to the first installment of this multi-part series on building a Slack application with Rails. This series will guide you through the process of creating a Slack application with Rails and is structured as follows:
 
 * Part 1: Rails new, Slack, and OAuth (You Are Here)
-* [Part 2: Slack Slash Command with Text Response](../rails-slack-app-part2-slash-text-response)
+* [Part 2: Slack Slash Command with Text Response](../rails-slack-app-part2-slash-command-with-text-response)
 * [Part 3: Slack Slash Command with Modal Response](../rails-slack-app-part3-slash-modal-response)
 * [Part 4: Slack Action Modal Submission](../rails-slack-app-part4-action-modal-submission)
 * [Part 5: Slack Slash Command with Block Kit Response](../rails-slack-app-part5-slash-block-kit-response)
@@ -780,4 +780,4 @@ We now have an authenticated Slack app added to our workspace, backed by a Rails
 
 ![slack app retro open](../images/slack-app-retro-open.png "slack app retro open")
 
-See [Part 2 of this series](../rails-slack-app-part2-slash-text-response) to learn how to setup your very first Slack Slash Command and handle it in Rails.
+See [Part 2 of this series](../rails-slack-app-part2-slash-command-with-text-response) to learn how to setup your very first Slack Slash Command and handle it in Rails.
