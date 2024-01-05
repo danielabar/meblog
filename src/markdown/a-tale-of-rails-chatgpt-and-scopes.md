@@ -184,11 +184,11 @@ In this case, the return result from the scope is an [ActiveRecord::Relation](ht
 
 Not only was I not getting `nil` as expected, but this could cause a performance problem as the application grows and there are large numbers of records in the `retrospectives` table.
 
-I explained the situation to ChatGPT and it did that thing where it apologizes, then provides the same solution again that doesn't fix the problem. (I encountered a similar issue awhile back trying to find the syntax for a [distinct GraphQL query](../gatsby5-distinct-query#ai-to-the-rescue) in a Gatsby project)
+I explained the situation to ChatGPT and it did that thing where it apologizes, then provides the same solution again that doesn't fix the problem. (I encountered a similar issue awhile back trying to find the syntax for a [distinct GraphQL query](../gatsby5-distinct-query#ai-to-the-rescue))
 
 ## Ask the Docs
 
-When AI fails, it's good to lean on skills we engineers developed before the existence of such tools. Read the documentation! (industry old-timers may remember this as [RTFM](https://en.wikipedia.org/wiki/RTFM)).
+When AI doesn't provide the solution, it's good to lean on skills we engineers developed before the existence of such tools. Read the documentation! Industry old-timers may remember this as [RTFM](https://en.wikipedia.org/wiki/RTFM).
 
 I started with the guide on the [Active Record Query Interface](https://guides.rubyonrails.org/active_record_querying.html), more specifically, the section on [scopes](https://guides.rubyonrails.org/active_record_querying.html#scopes). Here I found this illuminating description:
 
@@ -202,7 +202,7 @@ Let's take another look at the scope that ChatGPT generated:
 scope :open_retrospective, -> { find_by(status: statuses[:open]) }
 ```
 
-This leads to the next question: What does the `find_by` method return? The answer to this can be found in the [Rails API docs for find_by](https://api.rubyonrails.org/classes/ActiveRecord/FinderMethods.html#method-i-find_by). Quoting the relevant snippet:
+What does the `find_by` method return? The answer to this can be found in the [Rails API docs for find_by](https://api.rubyonrails.org/classes/ActiveRecord/FinderMethods.html#method-i-find_by). Quoting the relevant snippet:
 
 > Finds the first record matching the specified conditions... If no record is found, returns nil.
 
