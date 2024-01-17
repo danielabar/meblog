@@ -1,16 +1,16 @@
 ---
-title: "rails-query-perf"
+title: "Efficient Database Queries in Rails: A Practical Approach"
 featuredImage: "../images/rails-query-perf-kurt-cotoaga-0b5g9_pnMqc-unsplash.jpg"
-description: "tbd"
+description: "Explore a practical guide to optimizing database queries in Rails applications. Learn step-by-step enhancements, from indexing strategies to column selection."
 date: "2024-02-01"
 category: "rails"
 related:
-  - "tbd"
-  - "tbd"
-  - "tbd"
+  - "A Tale of Rails, ChatGPT, and Scopes"
+  - "Understanding ActiveRecord Dependent Options"
+  - "Homebrew Postgresql Service not Starting Resolved"
 ---
 
-Intro para...
+This post will walk through a step-by-step approach to PostgreSQL query enhancement in Rails applications. From indexing strategies to efficient column selection, you'll learn some techniques to ensure optimal query performance.
 
 ## Brainstorming Outline
 
@@ -93,16 +93,16 @@ end
 ```
 
 Run explain/analyze on same query again after adding index:
-```sql
---                                                                 QUERY PLAN
--- -------------------------------------------------------------------------------------------------------------------------------------------
---  Bitmap Heap Scan on trips  (cost=67.58..592.59 rows=3521 width=48) (actual time=0.724..3.849 rows=3863 loops=1)
---    Recheck Cond: (completed_at >= '2024-01-04 12:20:54.270716'::timestamp without time zone)
---    Heap Blocks: exact=481
---    ->  Bitmap Index Scan on index_trips_on_completed_at  (cost=0.00..66.70 rows=3521 width=0) (actual time=0.603..0.604 rows=3863 loops=1)
---          Index Cond: (completed_at >= '2024-01-04 12:20:54.270716'::timestamp without time zone)
---  Planning Time: 0.242 ms
---  Execution Time: 4.229 ms
+```
+                                                                 QUERY PLAN
+ -------------------------------------------------------------------------------------------------------------------------------------------
+  Bitmap Heap Scan on trips  (cost=67.58..592.59 rows=3521 width=48) (actual time=0.724..3.849 rows=3863 loops=1)
+    Recheck Cond: (completed_at >= '2024-01-04 12:20:54.270716'::timestamp without time zone)
+    Heap Blocks: exact=481
+    ->  Bitmap Index Scan on index_trips_on_completed_at  (cost=0.00..66.70 rows=3521 width=0) (actual time=0.603..0.604 rows=3863 loops=1)
+          Index Cond: (completed_at >= '2024-01-04 12:20:54.270716'::timestamp without time zone)
+  Planning Time: 0.242 ms
+  Execution Time: 4.229 ms
 ```
 
 The difference in the query plans before and after adding an index on the `completed_at` column is significant, and it demonstrates the performance improvements gained by utilizing an index.
@@ -162,37 +162,195 @@ Now that use of `completed_at` is optimized, we can continue development of the 
 
 Note use of nested joins and custom string joins.
 Naive approach with select *:
+Problem with naive select * approach is second time pulling in users table attributes override drivers/users
 
 ```ruby
 class Trip < ApplicationRecord
-  # problem with naive select * approach is second time pulling in users table attributes override drivers/users
   def self.admin_report
-    joins(trip_request: [:start_location, :rider])
+    joins(trip_request: [:start_location])
+      .joins('INNER JOIN users AS riders ON riders.id = trip_requests.rider_id')
       .joins('INNER JOIN users AS drivers ON drivers.id = trips.driver_id')
       .where('trips.completed_at > ?', 1.week.ago)
-      .select('trips.*, locations.*, drivers.*, users.*')
-      .order(completed_at: :desc)
+      .select('trips.*, locations.*, drivers.*, riders.*')
   end
 end
 ```
 
+In Rails console. Note that even though results is a relation of Trip models, each instance contains attributes from trips, locations, and users table. However, since both drivers and riders are actually from the same `users` table, the last one pulled in (riders in this case) "wins" and so the result only has the rider attributes.
+
+```ruby
+results = Trip.admin_report
+
+results.first.attributes
+{"id"=>61943,
+ "trip_request_id"=>56017,
+ "driver_id"=>60456,
+ "completed_at"=>Wed, 10 Jan 2024 07:21:26.462838000 CST -06:00,
+ "rating"=>5,
+ "address"=>"New York, NY",
+ "city"=>nil,
+ "state"=>"NY",
+ "position"=>#<struct ActiveRecord::Point x=40.7143528, y=-74.0059731>,
+ "first_name"=>"Shantelle",
+ "last_name"=>"Kris",
+ "email"=>"Shantelle-Kris-522@email.com",
+ "type"=>"Rider",
+ "password_digest"=>"$2a$12...",
+ "trips_count"=>nil,
+ "drivers_license_number"=>nil}
+```
+
+Take generated SQL and run through explain/analyze:
+
+```sql
+EXPLAIN (ANALYZE) SELECT
+    trips.*,
+    locations.*,
+    drivers.*,
+    riders.*
+FROM "trips"
+INNER JOIN "trip_requests" ON "trip_requests"."id" = "trips"."trip_request_id"
+INNER JOIN "locations" ON "locations"."id" = "trip_requests"."start_location_id"
+INNER JOIN users AS riders ON riders.id = trip_requests.rider_id
+INNER JOIN users AS drivers ON drivers.id = trips.driver_id
+WHERE (trips.completed_at > '2024-01-10 12:05:39.639423');
+```
+
+The execution time has gone up, even though the query is still using the index on `trips.completed_at`, this query is more complex due to the multiple joins.
+
+```
+                                                                              QUERY PLAN
+-----------------------------------------------------------------------------------------------------------------------------------------------------------------------
+ Hash Join  (cost=1399.44..2692.88 rows=524 width=453) (actual time=11.736..24.510 rows=559 loops=1)
+   Hash Cond: (trips.driver_id = drivers.id)
+   ->  Nested Loop  (cost=529.22..1821.28 rows=524 width=294) (actual time=1.109..13.507 rows=559 loops=1)
+         ->  Hash Join  (cost=528.93..1643.10 rows=524 width=139) (actual time=1.085..12.227 rows=559 loops=1)
+               Hash Cond: (trip_requests.start_location_id = locations.id)
+               ->  Hash Join  (cost=527.89..1637.76 rows=524 width=56) (actual time=1.054..11.992 rows=559 loops=1)
+                     Hash Cond: (trip_requests.id = trips.trip_request_id)
+                     ->  Seq Scan on trip_requests  (cost=0.00..917.10 rows=50010 width=16) (actual time=0.004..4.868 rows=50010 loops=1)
+                     ->  Hash  (cost=521.34..521.34 rows=524 width=48) (actual time=1.028..1.032 rows=559 loops=1)
+                           Buckets: 1024  Batches: 1  Memory Usage: 53kB
+                           ->  Bitmap Heap Scan on trips  (cost=12.35..521.34 rows=524 width=48) (actual time=0.116..0.896 rows=559 loops=1)
+                                 Recheck Cond: (completed_at > '2024-01-10 12:05:39.639423'::timestamp without time zone)
+                                 Heap Blocks: exact=328
+                                 ->  Bitmap Index Scan on index_trips_on_completed_at  (cost=0.00..12.22 rows=524 width=0) (actual time=0.060..0.060 rows=559 loops=1)
+                                       Index Cond: (completed_at > '2024-01-10 12:05:39.639423'::timestamp without time zone)
+               ->  Hash  (cost=1.02..1.02 rows=2 width=87) (actual time=0.019..0.021 rows=2 loops=1)
+                     Buckets: 1024  Batches: 1  Memory Usage: 9kB
+                     ->  Seq Scan on locations  (cost=0.00..1.02 rows=2 width=87) (actual time=0.011..0.013 rows=2 loops=1)
+         ->  Index Scan using users_pkey on users riders  (cost=0.29..0.34 rows=1 width=159) (actual time=0.002..0.002 rows=1 loops=559)
+               Index Cond: (id = trip_requests.rider_id)
+   ->  Hash  (cost=595.10..595.10 rows=22010 width=159) (actual time=10.601..10.601 rows=22010 loops=1)
+         Buckets: 32768  Batches: 1  Memory Usage: 3221kB
+         ->  Seq Scan on users drivers  (cost=0.00..595.10 rows=22010 width=159) (actual time=0.021..4.849 rows=22010 loops=1)
+ Planning Time: 1.046 ms
+ Execution Time: 24.936 ms
+```
+
 ## Fourth Attempt: Select only the columns you need
+
+The previous query selected all columns from all of the joined tables. But recall the business requirements were that we only need to display a few of these. Let's "narrow" the amount of data by restricting the columns in the select to only what we need. This also allows us to do some string concatenation to distinguish between driver and rider names.
 
 ```ruby
   def self.admin_report
-    joins(trip_request: [:start_location, :rider])
+    joins(trip_request: [:start_location])
+      .joins('INNER JOIN users AS riders ON riders.id = trip_requests.rider_id')
       .joins('INNER JOIN users AS drivers ON drivers.id = trips.driver_id')
       .where('trips.completed_at > ?', 1.week.ago)
       .select('trips.completed_at, trips.rating, locations.address,
                drivers.first_name || \' \' || drivers.last_name AS driver_name,
-               users.first_name || \' \' || users.last_name AS rider_name')
-      .order(completed_at: :desc)
+               riders.first_name || \' \' || riders.last_name AS rider_name')
   end
 ```
 
+In Rails console, attributes contain exactly what's needed to display in the view, and no more:
+
+```ruby
+results = Trip.admin_report
+results.first.attributes
+# {
+#   "completed_at" => Wed, 10 Jan 2024 07:12:42.960652000 CST -06:00,
+#   "rating" => nil,
+#   "address" => "New York, NY",
+#   "driver_name" => "Rasheeda Brakus",
+#   "rider_name" => "Corina Gorczany",
+#   "id" => nil
+# }
+```
+
+Explain/analyze the query:
+
+```sql
+EXPLAIN (ANALYZE) SELECT
+  trips.completed_at,
+  trips.rating,
+  locations.address,
+  drivers.first_name || ' ' || drivers.last_name AS driver_name,
+  riders.first_name || ' ' || riders.last_name AS rider_name
+FROM trips
+INNER JOIN trip_requests ON trip_requests.id = trips.trip_request_id
+INNER JOIN locations ON locations.id = trip_requests.start_location_id
+INNER JOIN users AS riders ON riders.id = trip_requests.rider_id
+INNER JOIN users AS drivers ON drivers.id = trips.driver_id
+WHERE trips.completed_at > '2024-01-10 12:27:19.062944';
+```
+
+```
+                                                                              QUERY PLAN
+-----------------------------------------------------------------------------------------------------------------------------------------------------------------------
+ Hash Join  (cost=1398.27..2693.98 rows=516 width=88) (actual time=8.572..20.188 rows=559 loops=1)
+   Hash Cond: (trips.driver_id = drivers.id)
+   ->  Nested Loop  (cost=528.05..1817.24 rows=516 width=41) (actual time=1.246..12.363 rows=559 loops=1)
+         ->  Hash Join  (cost=527.76..1641.78 rows=516 width=32) (actual time=1.224..11.156 rows=559 loops=1)
+               Hash Cond: (trip_requests.start_location_id = locations.id)
+               ->  Hash Join  (cost=526.71..1636.51 rows=516 width=24) (actual time=1.191..10.985 rows=559 loops=1)
+                     Hash Cond: (trip_requests.id = trips.trip_request_id)
+                     ->  Seq Scan on trip_requests  (cost=0.00..917.10 rows=50010 width=16) (actual time=0.005..4.199 rows=50010 loops=1)
+                     ->  Hash  (cost=520.26..520.26 rows=516 width=24) (actual time=1.167..1.174 rows=559 loops=1)
+                           Buckets: 1024  Batches: 1  Memory Usage: 38kB
+                           ->  Bitmap Heap Scan on trips  (cost=12.29..520.26 rows=516 width=24) (actual time=0.138..1.060 rows=559 loops=1)
+                                 Recheck Cond: (completed_at > '2024-01-10 12:27:19.062944'::timestamp without time zone)
+                                 Heap Blocks: exact=328
+                                 ->  Bitmap Index Scan on index_trips_on_completed_at  (cost=0.00..12.16 rows=516 width=0) (actual time=0.081..0.081 rows=559 loops=1)
+                                       Index Cond: (completed_at > '2024-01-10 12:27:19.062944'::timestamp without time zone)
+               ->  Hash  (cost=1.02..1.02 rows=2 width=20) (actual time=0.020..0.021 rows=2 loops=1)
+                     Buckets: 1024  Batches: 1  Memory Usage: 9kB
+                     ->  Seq Scan on locations  (cost=0.00..1.02 rows=2 width=20) (actual time=0.012..0.013 rows=2 loops=1)
+         ->  Index Scan using users_pkey on users riders  (cost=0.29..0.34 rows=1 width=21) (actual time=0.002..0.002 rows=1 loops=559)
+               Index Cond: (id = trip_requests.rider_id)
+   ->  Hash  (cost=595.10..595.10 rows=22010 width=21) (actual time=7.296..7.296 rows=22010 loops=1)
+         Buckets: 32768  Batches: 1  Memory Usage: 1492kB
+         ->  Seq Scan on users drivers  (cost=0.00..595.10 rows=22010 width=21) (actual time=0.007..3.716 rows=22010 loops=1)
+ Planning Time: 1.649 ms
+ Execution Time: 20.553 ms
+```
+
+Comparing results of reduced select columns. Recall this query has the same joins as previous, but have reduced the "width" of the output:
+
+1. **Smaller Result Width:**
+   - Query A selects all columns from the involved tables using `SELECT *`.
+   - Query B specifies a smaller set of columns, including only those needed for the final result.
+
+2. **Smaller Hash Join Width:**
+   - The Hash Join operations in both queries involve joining on the "driver_id" column.
+   - In Query A, the result width of the Hash Join is larger (453) compared to Query B (88) due to the larger number of selected columns.
+
+3. **Index Scan and Bitmap Heap Scan:**
+   - The Bitmap Heap Scan on the "trips" table in both queries involves checking the condition "completed_at > '2024-01-10 12:05:39.639423'" or "completed_at > '2024-01-10 12:27:19.062944'".
+   - The reduced number of selected columns in Query B might lead to a smaller index and bitmap size, potentially improving performance.
+
+4. **Memory Usage:**
+   - The Hash Join in Query A has a larger memory usage (3221kB) compared to Query B (1492kB).
+   - The reduction in the number of selected columns contributes to a smaller memory footprint in Query B.
+
+In general, selecting only the necessary columns can lead to performance improvements for several reasons, such as reduced disk I/O, smaller memory requirements, and potentially faster data transmission between nodes.
+
 ## Fifth Attempt: Restrict rows further if possible
 
-Eg: Use case might be to only focus on trips with low ratings:
+Eg: Use case might be to only focus on trips with low ratings. i.e. discussions between engineering and product to make sure data is focused on solving the underlying business problem, in this case, admins would like to focus on trips with low ratings, so we can further restrict the volume of data by reducing the rows.
+
+Note that there already is an index on `trips.rating`.
 
 ```ruby
   def self.admin_report
@@ -206,6 +364,87 @@ Eg: Use case might be to only focus on trips with low ratings:
       .order(completed_at: :desc)
   end
 ```
+
+Results are "shaped" the same as before but have less of them:
+
+```ruby
+results = Trip.admin_report
+results.length
+# => 78
+```
+
+Explain/analyze the query:
+
+```sql
+EXPLAIN (ANALYZE) SELECT
+  trips.completed_at,
+  trips.rating,
+  locations.address,
+  drivers.first_name || ' ' || drivers.last_name AS driver_name,
+  riders.first_name || ' ' || riders.last_name AS rider_name
+FROM trips
+INNER JOIN trip_requests ON trip_requests.id = trips.trip_request_id
+INNER JOIN locations ON locations.id = trip_requests.start_location_id
+INNER JOIN users AS riders ON riders.id = trip_requests.rider_id
+INNER JOIN users AS drivers ON drivers.id = trips.driver_id
+WHERE (trips.completed_at > '2024-01-10 13:08:58.257990')
+  AND (trips.rating <= 3);
+```
+
+```
+                                                                                 QUERY PLAN
+-----------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+ Nested Loop  (cost=97.88..1340.17 rows=75 width=88) (actual time=0.514..1.937 rows=78 loops=1)
+   Join Filter: (trip_requests.start_location_id = locations.id)
+   Rows Removed by Join Filter: 78
+   ->  Seq Scan on locations  (cost=0.00..1.02 rows=2 width=20) (actual time=0.012..0.015 rows=2 loops=1)
+   ->  Materialize  (cost=97.88..1336.34 rows=75 width=42) (actual time=0.247..0.937 rows=78 loops=2)
+         ->  Nested Loop  (cost=97.88..1335.96 rows=75 width=42) (actual time=0.488..1.819 rows=78 loops=1)
+               ->  Nested Loop  (cost=97.59..862.59 rows=75 width=33) (actual time=0.463..1.492 rows=78 loops=1)
+                     ->  Nested Loop  (cost=97.30..837.09 rows=75 width=24) (actual time=0.449..1.240 rows=78 loops=1)
+                           ->  Bitmap Heap Scan on trips  (cost=97.01..298.02 rows=75 width=24) (actual time=0.436..0.645 rows=78 loops=1)
+                                 Recheck Cond: ((completed_at > '2024-01-10 13:08:58.25799'::timestamp without time zone) AND (rating <= 3))
+                                 Heap Blocks: exact=72
+                                 ->  BitmapAnd  (cost=97.01..97.01 rows=75 width=0) (actual time=0.419..0.421 rows=0 loops=1)
+                                       ->  Bitmap Index Scan on index_trips_on_completed_at  (cost=0.00..12.05 rows=501 width=0) (actual time=0.083..0.083 rows=559 loops=1)
+                                             Index Cond: (completed_at > '2024-01-10 13:08:58.25799'::timestamp without time zone)
+                                       ->  Bitmap Index Scan on index_trips_on_rating  (cost=0.00..84.67 rows=7518 width=0) (actual time=0.314..0.314 rows=7531 loops=1)
+                                             Index Cond: (rating <= 3)
+                           ->  Index Scan using trip_requests_pkey on trip_requests  (cost=0.29..7.19 rows=1 width=16) (actual time=0.007..0.007 rows=1 loops=78)
+                                 Index Cond: (id = trips.trip_request_id)
+                     ->  Index Scan using users_pkey on users riders  (cost=0.29..0.34 rows=1 width=21) (actual time=0.003..0.003 rows=1 loops=78)
+                           Index Cond: (id = trip_requests.rider_id)
+               ->  Memoize  (cost=0.30..6.55 rows=1 width=21) (actual time=0.004..0.004 rows=1 loops=78)
+                     Cache Key: trips.driver_id
+                     Cache Mode: logical
+                     Hits: 8  Misses: 70  Evictions: 0  Overflows: 0  Memory Usage: 9kB
+                     ->  Index Scan using users_pkey on users drivers  (cost=0.29..6.54 rows=1 width=21) (actual time=0.003..0.003 rows=1 loops=70)
+                           Index Cond: (id = trips.driver_id)
+ Planning Time: 1.168 ms
+ Execution Time: 2.360 ms
+```
+
+Significant execution time improvement from further restricting the number of rows.
+
+The performance improvement in Query C compared to Query B can be attributed to several factors, as indicated by the execution plans. Here are some key reasons why Query C is faster:
+
+1. **Index Scans Optimization:**
+   - Both Query B and Query C use Bitmap Index Scans on the "index_trips_on_completed_at" and "index_trips_on_rating" indexes. However, Query C benefits from the additional filter condition `(trips.rating <= 3)`, allowing the database to leverage the "index_trips_on_rating" index efficiently.
+
+2. **BitmapAnd Operation:**
+   - Query C introduces a BitmapAnd operation that combines the results of two Bitmap Index Scans, optimizing the process of satisfying both filter conditions (`completed_at` and `rating <= 3`). This can lead to a more efficient evaluation of the WHERE clause.
+
+3. **Materialization and Caching:**
+   - Query C includes a Materialize operation, which caches the result of the Nested Loop Join involving the "trips," "trip_requests," and "users" tables. This caching mechanism can contribute to performance improvement by avoiding repeated calculations.
+
+4. **Smaller Result Set:**
+   - The additional filter condition in Query C (`rating <= 3`) reduces the number of rows that need to be processed in subsequent join operations. This can lead to a smaller result set, potentially requiring less processing and memory.
+
+5. **Nested Loop Join Optimization:**
+   - The Nested Loop Join in Query C involves joining with the "locations" table. The Join Filter condition is `trip_requests.start_location_id = locations.id`. The optimizer may choose a more efficient strategy for this join, considering the additional filter condition.
+
+6. **Reduced Memory Usage:**
+   - The overall memory usage for Query C might be lower due to optimizations and the smaller result set, leading to better utilization of system resources.
 
 ## Scratch Schema
 
@@ -369,10 +608,12 @@ bin/rails data_generators:generate_all
 
 ## TODO
 * Only have 50_000 rows in trips/trip_requests, need 10M or more to see effect of index? Need pure sql loading solution, will be too slow via db/seeds.rb
-* For each attempt, use explain/analyze to understand perf implications
-* title
-* related
-* intro para
+* need more work on explanation of why at each step there was perf improvement based on analyzing the plan
+* add perf book ref
+* add results.length to the previous queries (was ~559?)
+* `EXPLAIN` vs `EXPLAIN (ANALYZE)` (both show the plan but analyze option passed to explain also executes the query to get actual cost rather than just estimate produced  by explain alone)
+* introduce rideshare schema and models
 * main content
 * conclusion para
+* remove scratch content
 * edit
