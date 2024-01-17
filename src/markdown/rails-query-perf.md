@@ -12,19 +12,9 @@ related:
 
 This post will walk through a step-by-step approach to PostgreSQL query enhancement in Rails applications. From indexing strategies to efficient column selection, you'll learn some techniques to ensure optimal query performance.
 
-## Brainstorming Outline
+## Getting Started
 
-- start with task of admin dashboard to show recently completed trips (will just focus on query logic rather than display/view)
-- simple schema diagram: User, TripRequest, Trip, Location (note that User is using STI with type for Driver and Rider)
-- Also show corresponding Ruby models with associations and delegate so its clear how they can be joined (eg: TripRequest joins to Location twice, once as start_location and again as end_location: `belongs_to :start_location, class_name: 'Location'`)
-- First Attempt: where there's no index on `trips.completed_at` (don't do joins at this point to keep explain analyze output simple): `Trip.where('trips.completed_at > ?', 1.week.ago)`
-- show explain analyze -> sequence scan
-- add index on completed_at -> note strong_migrations gem installed on project that errors on "naive" approach to adding index, fix it with concurrently, explain about avoiding locking table for reads and writes while index is applied
-- Second Attempt: run `Trip.where(...)` again with explain analyze and compare improvement with index
-- possibly also reference free visualization tool and how to extract detailed explain/analyze in json format
-- Third Attempt: join location, riders, and drivers info but naively select *
-- Fourth Attempt: reduce number of columns by selecting only what's needed in the report
-- Fifth Attempt: reduce rows by focusing only on low trip ratings
+To get started quicker with a Rails app, schema design, and data, I've forked the Rideshare Rails application. Rideshare is a Rails app on [GitHub](https://github.com/andyatkinson/rideshare) that's used for exercises in the book High Performance PostgreSQL for Rails. I had the opportunity to provide a technical review for the beta version of this book. Many insights shared in this post are derived from the valuable lessons learned during that review process. If you're interested in the book, it can be [purchased here](https://pragprog.com/titles/aapsql/high-performance-postgresql-for-rails/)
 
 ## Business Requirement
 
@@ -446,6 +436,20 @@ The performance improvement in Query C compared to Query B can be attributed to 
 6. **Reduced Memory Usage:**
    - The overall memory usage for Query C might be lower due to optimizations and the smaller result set, leading to better utilization of system resources.
 
+## Brainstorming Outline
+
+- start with task of admin dashboard to show recently completed trips (will just focus on query logic rather than display/view)
+- simple schema diagram: User, TripRequest, Trip, Location (note that User is using STI with type for Driver and Rider)
+- Also show corresponding Ruby models with associations and delegate so its clear how they can be joined (eg: TripRequest joins to Location twice, once as start_location and again as end_location: `belongs_to :start_location, class_name: 'Location'`)
+- First Attempt: where there's no index on `trips.completed_at` (don't do joins at this point to keep explain analyze output simple): `Trip.where('trips.completed_at > ?', 1.week.ago)`
+- show explain analyze -> sequence scan
+- add index on completed_at -> note strong_migrations gem installed on project that errors on "naive" approach to adding index, fix it with concurrently, explain about avoiding locking table for reads and writes while index is applied
+- Second Attempt: run `Trip.where(...)` again with explain analyze and compare improvement with index
+- possibly also reference free visualization tool and how to extract detailed explain/analyze in json format
+- Third Attempt: join location, riders, and drivers info but naively select *
+- Fourth Attempt: reduce number of columns by selecting only what's needed in the report
+- Fifth Attempt: reduce rows by focusing only on low trip ratings
+
 ## Scratch Schema
 
 ```sql
@@ -609,7 +613,6 @@ bin/rails data_generators:generate_all
 ## TODO
 * Only have 50_000 rows in trips/trip_requests, need 10M or more to see effect of index? Need pure sql loading solution, will be too slow via db/seeds.rb
 * need more work on explanation of why at each step there was perf improvement based on analyzing the plan
-* add perf book ref
 * add results.length to the previous queries (was ~559?)
 * `EXPLAIN` vs `EXPLAIN (ANALYZE)` (both show the plan but analyze option passed to explain also executes the query to get actual cost rather than just estimate produced  by explain alone)
 * introduce rideshare schema and models
