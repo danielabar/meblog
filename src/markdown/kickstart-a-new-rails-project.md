@@ -10,6 +10,8 @@ related:
   - "Start a Rails 6 Project with RSpec"
 ---
 
+**Update:** Since originally writing this post, I have learned about the [Rails config file](https://www.writesoftwarewell.com/railsrc-rails-configuration-file/) that can make some of these steps faster.
+
 Starting a new Rails project is an exciting time, but it also comes with its fair share of setup tasks to ensure your project kicks off on the right foot. This post will walk through some important steps that I like to follow to set up a Rails project for success. From configuring the database to ensuring code quality and style, and setting up essential development tools. Let's get started.
 
 ## Initialization
