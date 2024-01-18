@@ -14,33 +14,89 @@ This post will walk through a step-by-step approach to PostgreSQL query enhancem
 
 ## Getting Started
 
-To get started quicker with a Rails app, schema design, and data, I've forked the Rideshare Rails application. Rideshare is a Rails app on [GitHub](https://github.com/andyatkinson/rideshare) that's used for exercises in the book High Performance PostgreSQL for Rails. I had the opportunity to provide a technical review for the beta version of this book. Many insights shared in this post are derived from the valuable lessons learned during that review process. If you're interested in the book, it can be [purchased here](https://pragprog.com/titles/aapsql/high-performance-postgresql-for-rails/)
+To get started quicker with a Rails app, schema design, and data, I've forked the Rideshare Rails application. Rideshare is a Rails app on [GitHub](https://github.com/andyatkinson/rideshare) that's used for exercises in the book High Performance PostgreSQL for Rails. I had the opportunity to provide a technical review for the beta version of this book. Many insights shared in this post are derived from the valuable lessons learned during that review process. If you're interested in the book, it can be [purchased here](https://pragprog.com/titles/aapsql/high-performance-postgresql-for-rails/).
 
-## Business Requirement
+## Introducing Rideshare
 
-Create a dashboard view for admins that shows all trips that where completed within the last week. Each row in this view should display:
-- completed date
-- rating
-- driver first and last name
-- rider first and last name
-- city where the trip started
+Rideshare is an API-only Rails application that implements a portion of a fictional rideshare service. Think of Uber or Lyft. The core Rideshare models are Drivers, Riders, Trips, Trip Requests. The schema is shown below:
 
+![rideshare erd](../images/rideshare-erd.png "rideshare erd")
 
-## First Attempt
+Single Table Inheritance (STI) is used to represent both Drivers and Riders in the Users table. This means that rows where `users.type = 'Driver'` are Drivers, and can be joined to Trips on `driver_id`. Rows where `users.type = 'Rider'` are Riders, and can be joined to TripRequests on `rider_id`.
 
-Before getting into the complexity of joins, let's just focus on the main requirement, which is to show recently completed trips, using `completed_at` timestamp column on the `Trip` model.
+For the exercises in this post, we will not be concerned with TripPositions, Vehicles, or VehicleReservations.
+
+Here are the corresponding model classes, only focusing on the declared associations between them:
 
 ```ruby
+class User < ApplicationRecord
+end
+
 class Trip < ApplicationRecord
-  def self.admin_report
-    where('completed_at >= ?', 1.week.ago)
-  end
+  belongs_to :trip_request
+  belongs_to :driver, class_name: 'User'
+  has_many :trip_positions
+
+  delegate :rider, to: :trip_request, allow_nil: false
+end
+
+class Location < ApplicationRecord
+end
+
+class TripRequest < ApplicationRecord
+  belongs_to :rider, class_name: 'User'
+  belongs_to :start_location, class_name: 'Location'
+  belongs_to :end_location, class_name: 'Location'
+  has_one :trip
 end
 ```
 
-Given 50,000 rows in trip_requests.
+## Building an Admin Report
 
-Run in Rails console `Trip.admin_report` to see query that is generated. Then take this query and run explain/analyze in `bin/rails db` console. Explain to show query execution plan, and analyze to run it and get information on how long it takes.
+We have a business requirement to create a dashboard type view for the admin team that manages Rideshare. They would like to have a view that shows recently completed trips. Each trip should display:
+- Trip completed date
+- Rating given by the rider
+- Driver that provided the trip
+- Rider that took the trip
+- Location where the trip started
+
+Being an API-only application, we will only focus on the query part of this logic in the model(s), and assume a separate front end application will take care of rendering the report.
+
+## First Attempt
+
+Before getting into the complexity of joins to get all the data, let's first focus on the main requirement, which is to show recently completed trips. We can use the `completed_at` timestamp column on the `Trip` model in a scope as follows:
+
+```ruby
+class Trip < ApplicationRecord
+  scope :recently_completed, -> {
+    where('completed_at >= ?', 1.week.ago)
+  }
+  # ...
+end
+```
+
+Let's try this out in a Rails console `bin/rails c`
+
+```ruby
+results = Trip.recently_completed
+# SELECT "trips"."id", "trips"."trip_request_id", "trips"."driver_id", "trips"."completed_at", "trips"."rating", "trips"."created_at", "trips"."updated_at"
+# FROM "trips" WHERE (completed_at >= '2024-01-10 12:29:18.260820')
+
+results.length
+# => 559
+
+results.first.attributes
+# =>
+# {"id"=>6011,
+#  "trip_request_id"=>6031,
+#  "driver_id"=>61038,
+#  "completed_at"=>Wed, 10 Jan 2024 07:12:42.960652000 CST -06:00,
+#  "rating"=>nil,
+#  "created_at"=>Wed, 10 Jan 2024 02:12:42.960652000 CST -06:00,
+#  "updated_at"=>Wed, 10 Jan 2024 07:12:42.960652000 CST -06:00}
+```
+
+In development mode, the console output displays the SQL query that ActiveRecord generated when the scope was executed. To understand the efficiency of this query, we need to view the query execution plan. To do this, launch a database console with `bin/rails dbconsole` and then enter the SQL query that was generated by ActiveRecord, preceded by the `EXPLAIN (ANALYZE)` command at the psql prompt:
 
 ```sql
 EXPLAIN (ANALYZE) SELECT "trips"."id"
@@ -51,7 +107,7 @@ EXPLAIN (ANALYZE) SELECT "trips"."id"
   , "trips"."created_at"
   , "trips"."updated_at"
 FROM "trips"
-WHERE (completed_at >= '2024-01-04 12:20:54.270716');
+WHERE (completed_at >= '2024-01-10 12:29:18.260820');
 
 --                                               QUERY PLAN
 -- ------------------------------------------------------------------------------------------------------
@@ -62,15 +118,103 @@ WHERE (completed_at >= '2024-01-04 12:20:54.270716');
 --  Execution Time: 11.880 ms
 ```
 
+In PostgreSQL, the `EXPLAIN` statement is used to analyze and show the execution plan of a SQL query. It shows how the database engine is planning to execute the query, such as which indexes are used. While `EXPLAIN` can be run on its own, its typically used together with the `ANALYZE` option. This option tells PostgreSQL to actually execute the query, so the output will include runtime statistics such as the number of rows processed and execution time.
+
+From the output above we can see that a sequential scan was performed to retrieve rows from the `trips` table:
+
+```
+Seq Scan on trips  (cost=0.00..1106.00 rows=3521 width=48) (actual time=0.013..11.413 rows=3863 loops=1)
+```
+
+It also shows that the query took nearly 12 ms to execute, which is relatively slow for such a simple query:
+
+```
+Execution Time: 11.880 ms
+```
+
+A sequential scan means that PostgreSQL is scanning the entire table sequentially to find rows that meet the condition specified in the WHERE clause - this is why its so slow. And it will continue to get slower as the number of trips increases. Which means this version of the query won't "scale" as the application grows.
+
+To understand why a slow sequential scan is being used to filter `trips` rows based on `completed_at`, we can take a look at the `trips` table schema. Still in the database console, the `\d table_name` meta command can be used to display any table schema:
+
+```
+=> \d trips
+
+                                           Table "rideshare.trips"
+     Column      |              Type              | Collation | Nullable |              Default
+-----------------+--------------------------------+-----------+----------+-----------------------------------
+ id              | bigint                         |           | not null | nextval('trips_id_seq'::regclass)
+ trip_request_id | bigint                         |           | not null |
+ driver_id       | integer                        |           | not null |
+ completed_at    | timestamp without time zone    |           |          |
+ rating          | integer                        |           |          |
+ created_at      | timestamp(6) without time zone |           | not null |
+ updated_at      | timestamp(6) without time zone |           | not null |
+Indexes:
+    "trips_pkey" PRIMARY KEY, btree (id)
+    "index_trips_on_driver_id" btree (driver_id)
+    "index_trips_on_rating" btree (rating)
+    "index_trips_on_trip_request_id" btree (trip_request_id)
+Check constraints:
+    "chk_rails_4743ddc2d2" CHECK (completed_at > created_at) NOT VALID
+    "rating_check" CHECK (rating >= 1 AND rating <= 5)
+Foreign-key constraints:
+    "fk_rails_6d92acb430" FOREIGN KEY (trip_request_id) REFERENCES trip_requests(id)
+    "fk_rails_e7560abc33" FOREIGN KEY (driver_id) REFERENCES users(id)
+```
+
+The `Indexes` section of the output above lists all the indexes that are available on the `trips` table. Notice there is no index on `completed_at`. So the next step in improving this query is to add an index.
+
 ## Second Attempt: Add Index
+
+To add an index to an existing table in a Rails application, start by generating a database migration:
 
 ```bash
 rails generate migration AddIndexToTripsCompletedAt
 ```
 
-Note use of `disable_ddl_transaction!` and `algorithm: :concurrently`. This will avoid locking table while index is being added, so that the application can remain responsive.
+Fill in the `change` method, specifying what table the index should be added to, and on what column:
 
-[Strong Migrations](https://github.com/ankane/strong_migrations)
+```ruby
+# db/migrate/20240111132403_add_index_to_trips_completed_at.rb
+class AddIndexToTripsCompletedAt < ActiveRecord::Migration[7.1]
+  def change
+    add_index :trips, :completed_at
+  end
+end
+```
+
+Run the migration with `bin/rails db:migrate`. However, in the Rideshare application, an error results and the migration is not applied:
+
+```
+Migrating to AddIndexToTripsCompletedAt (20240111132403)
+== 20240111132403 AddIndexToTripsCompletedAt: migrating =======================
+  TRANSACTION (0.7ms)  BEGIN
+   (1.6ms)  SHOW server_version_num
+   (0.7ms)  SET statement_timeout TO 3600000
+   (0.7ms)  SET lock_timeout TO 10000
+  TRANSACTION (0.7ms)  ROLLBACK
+   (0.8ms)  SELECT pg_advisory_unlock(5537362570877065845)
+bin/rails aborted!
+StandardError: An error has occurred, this and all later migrations canceled: (StandardError)
+
+=== Dangerous operation detected #strong_migrations ===
+
+Adding an index non-concurrently blocks writes. Instead, use:
+
+class AddIndexToTripsCompletedAt < ActiveRecord::Migration[7.1]
+  disable_ddl_transaction!
+
+  def change
+    add_index :trips, :completed_at, algorithm: :concurrently
+  end
+end
+```
+
+This error is coming from the [Strong Migrations](https://github.com/ankane/strong_migrations) gem that is included in Rideshare. This gem prevents "dangerous" migrations from being added to the project.
+
+The problem with this particular migration is that adding an index  will lock the table that it's being added to, which means the application won't be able to read or write from/to the `trips` table while this migration is in progress. Since adding an index can take a long time on large tables, this will result in application errors.
+
+Since access to the `trips` table is critical to the functioning of the application, we can avoid potential downtime, by following the advice generated by the [Strong Migrations](https://github.com/ankane/strong_migrations) gem. Notice the error message specified  how the migration should be written:
 
 ```ruby
 class AddIndexToTripsCompletedAt < ActiveRecord::Migration[7.1]
@@ -81,6 +225,12 @@ class AddIndexToTripsCompletedAt < ActiveRecord::Migration[7.1]
   end
 end
 ```
+
+Specifying `algorithm: :concurrently` tells Postgres to add the index without locking the table. This way the application will remain responsive while the migration is running.
+
+`disable_ddl_transaction!` disables the transaction for Data Definition Language statements, which is needed to create the index `concurrently`.
+
+With this change in place, `bin/rails db:migrate` completes successfully and the index is now added.
 
 Run explain/analyze on same query again after adding index:
 ```
@@ -506,37 +656,14 @@ CREATE TABLE rideshare.trip_requests (
 );
 ```
 
-## Scratch Models
-
-```ruby
-class User < ApplicationRecord
-end
-
-class Trip < ApplicationRecord
-  belongs_to :trip_request
-  belongs_to :driver, class_name: 'User', counter_cache: true
-  has_many :trip_positions
-
-  delegate :rider, to: :trip_request, allow_nil: false
-end
-
-class Location < ApplicationRecord
-end
-
-class TripRequest < ApplicationRecord
-  belongs_to :rider, class_name: 'User'
-  belongs_to :start_location, class_name: 'Location'
-  belongs_to :end_location, class_name: 'Location'
-  has_one :trip
-end
-```
-
 ## Scratch Trip Model with all versions of admin_report
 
+Has since been converted to scope `recently_completed`
+
 ```ruby
 class Trip < ApplicationRecord
   belongs_to :trip_request
-  belongs_to :driver, class_name: 'User', counter_cache: true
+  belongs_to :driver, class_name: 'User'
   delegate :rider, to: :trip_request, allow_nil: false
 
   # First attempt: Only focus on recently completed trips with no index on completed_at column
@@ -611,11 +738,16 @@ bin/rails data_generators:generate_all
 
 
 ## TODO
+* WIP: introduce rideshare schema and models
+* Mention the database is postgres
+* mention seeds or link to generate task from rideshare? But I modified it for variability in completed_at
 * Only have 50_000 rows in trips/trip_requests, need 10M or more to see effect of index? Need pure sql loading solution, will be too slow via db/seeds.rb
+* show error from naive adding index, explain use of strong migration gem to prevent slow migrations from locking tables (Eg: adding index)
 * need more work on explanation of why at each step there was perf improvement based on analyzing the plan
 * add results.length to the previous queries (was ~559?)
 * `EXPLAIN` vs `EXPLAIN (ANALYZE)` (both show the plan but analyze option passed to explain also executes the query to get actual cost rather than just estimate produced  by explain alone)
-* introduce rideshare schema and models
+* aside: rails-erd gem was used to generate the diagram: https://github.com/voormedia/rails-erd
+* aside: Need so much data because when filtering rows for tables with low row counts, PostgreSQL may decide to scan the whole table instead of using an index. i.e. need to ensure seeds generate significant enough data size, if only have 10 or so rows, Postgres may decide not to use the index even if its there.
 * main content
 * conclusion para
 * remove scratch content
