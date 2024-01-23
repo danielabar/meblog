@@ -14,19 +14,19 @@ This post will walk through a step-by-step approach to PostgreSQL query enhancem
 
 ## Getting Started
 
-To get started quicker with a Rails app, schema design, and data, I've forked the Rideshare Rails application. Rideshare is a Rails app on [GitHub](https://github.com/andyatkinson/rideshare) that's used for exercises in the book High Performance PostgreSQL for Rails. I had the opportunity to provide a technical review for the beta version of this book. Many insights shared in this post are derived from the valuable lessons learned during that review process. If you're interested in the book, it can be [purchased here](https://pragprog.com/titles/aapsql/high-performance-postgresql-for-rails/).
+To get started quicker with a Rails app, schema design, and data, I've forked the [Rideshare Rails application](https://github.com/andyatkinson/rideshare) on Github. Rideshare is a Rails app that's used for exercises in the book *High Performance PostgreSQL for Rails*. I had the opportunity to provide a technical review for the beta version of this book. Many insights shared in this post are derived from the lessons learned during that review process. If you're interested in the book, it can be [purchased here](https://pragprog.com/titles/aapsql/high-performance-postgresql-for-rails/).
 
 ## Introducing Rideshare
 
-Rideshare is an API-only Rails application that implements a portion of a fictional rideshare service. Think of Uber or Lyft. The core Rideshare models are Drivers, Riders, Trips, Trip Requests. The schema is shown below:
+Rideshare is an API-only Rails application that implements a portion of a fictional rideshare service. Think of Uber or Lyft. The core Rideshare models are Drivers, Riders, Trips, Trip Requests. The database is PostgreSQL. The schema is shown below:
 
 ![rideshare erd](../images/rideshare-erd.png "rideshare erd")
 
-Single Table Inheritance (STI) is used to represent both Drivers and Riders in the Users table. This means that rows where `users.type = 'Driver'` are Drivers, and can be joined to Trips on `driver_id`. Rows where `users.type = 'Rider'` are Riders, and can be joined to TripRequests on `rider_id`.
+All the foreign key columns are indexed. Single Table Inheritance (STI) is used to represent both Drivers and Riders in the Users table. This means that rows where `users.type = 'Driver'` are Drivers, and can be joined to Trips on `driver_id`. Rows where `users.type = 'Rider'` are Riders, and can be joined to TripRequests on `rider_id`.
 
 For the exercises in this post, we will not be concerned with TripPositions, Vehicles, or VehicleReservations.
 
-Here are the corresponding model classes, only focusing on the declared associations between them:
+Here are the corresponding model classes, only focusing on the associations between them:
 
 ```ruby
 class User < ApplicationRecord
@@ -51,6 +51,14 @@ class TripRequest < ApplicationRecord
 end
 ```
 
+**Generating Data:** Rideshare comes with a task to generate sample data `bin/rails data_generators:generate_all`. I've modified it to generate 1000 Drivers and Riders, and 50,000 Trips and Trip Requests. I've also modified it to generate random variability in the `trips.completed_at` date from anywhere between 1 and 90 days ago.
+
+The data generator can be re-run at any time, but first run the truncate task `bin/rails db:truncate_all` to quickly remove all data.
+
+<aside class="markdown-aside">
+In optimizing query performance, it's important to populate the local database with a sufficient amount of data to deter PostgreSQL from relying solely on sequential scans. For instance, if the local database contains only around 10 records per table, the query analysis results will differ significantly from the production environment, where the database may have a much larger volume of data.
+</aside>
+
 ## Building an Admin Report
 
 We have a business requirement to create a dashboard type view for the admin team that manages Rideshare. They would like to have a view that shows recently completed trips. Each trip should display:
@@ -60,7 +68,7 @@ We have a business requirement to create a dashboard type view for the admin tea
 - Rider that took the trip
 - Location where the trip started
 
-Being an API-only application, we will only focus on the query part of this logic in the model(s), and assume a separate front end application will take care of rendering the report.
+Being an API-only application, we will only focus on the query part of this logic, and assume a separate front end application will take care of rendering the report.
 
 ## First Attempt
 
@@ -98,6 +106,10 @@ results.first.attributes
 
 In development mode, the console output displays the SQL query that ActiveRecord generated when the scope was executed. To understand the efficiency of this query, we need to view the query execution plan. To do this, launch a database console with `bin/rails dbconsole` and then enter the SQL query that was generated by ActiveRecord, preceded by the `EXPLAIN (ANALYZE)` command at the psql prompt:
 
+<aside class="markdown-aside">
+`bin/rails dbconsole` uses the database connection information specified in `config/database.yml` to make a connection to the database your project is using. Since this project uses PostgreSQL, it's equivalent to running `psql postgresql://role:@host:port/database_name`. To save yourself even more typing, the alias `bin/rails db` can be used.
+</aside>
+
 ```sql
 EXPLAIN (ANALYZE) SELECT "trips"."id"
   , "trips"."trip_request_id"
@@ -118,7 +130,7 @@ WHERE (completed_at >= '2024-01-10 12:29:18.260820');
 --  Execution Time: 11.880 ms
 ```
 
-In PostgreSQL, the `EXPLAIN` statement is used to analyze and show the execution plan of a SQL query. It shows how the database engine is planning to execute the query, such as which indexes are used. While `EXPLAIN` can be run on its own, its typically used together with the `ANALYZE` option. This option tells PostgreSQL to actually execute the query, so the output will include runtime statistics such as the number of rows processed and execution time.
+In PostgreSQL, the `EXPLAIN` statement is used to analyze and show the execution plan of a SQL query. It shows how the database engine is planning to execute the query, such as which indexes will be used and estimated costs. While `EXPLAIN` can be run on its own, its typically used together with the `ANALYZE` option. This option tells PostgreSQL to actually execute the query, so the output will include runtime statistics such as the number of rows processed, actual cost, and execution time.
 
 From the output above we can see that a sequential scan was performed to retrieve rows from the `trips` table:
 
@@ -132,7 +144,7 @@ It also shows that the query took nearly 12 ms to execute, which is relatively s
 Execution Time: 11.880 ms
 ```
 
-A sequential scan means that PostgreSQL is scanning the entire table sequentially to find rows that meet the condition specified in the WHERE clause - this is why its so slow. And it will continue to get slower as the number of trips increases. Which means this version of the query won't "scale" as the application grows.
+A sequential scan means that PostgreSQL is scanning the entire table sequentially to find rows that meet the condition specified in the WHERE clause. This is a very slow operation, and will continue to get slower as the number of trips increases. Which means this version of the query won't "scale" as the application grows.
 
 To understand why a slow sequential scan is being used to filter `trips` rows based on `completed_at`, we can take a look at the `trips` table schema. Still in the database console, the `\d table_name` meta command can be used to display any table schema:
 
@@ -226,7 +238,7 @@ class AddIndexToTripsCompletedAt < ActiveRecord::Migration[7.1]
 end
 ```
 
-Specifying `algorithm: :concurrently` tells Postgres to add the index without locking the table. This way the application will remain responsive while the migration is running.
+Specifying `algorithm: :concurrently` tells PostgreSQL to add the index without locking the table. This way the application will remain responsive while the migration is running.
 
 `disable_ddl_transaction!` disables the transaction for Data Definition Language statements, which is needed to create the index `concurrently`.
 
@@ -268,7 +280,7 @@ And the overall time to complete this query is just over 4ms, a significant impr
 Execution Time: 4.229 ms
 ```
 
-This is because the index allows Postgres to quickly locate and retrieve the relevant rows.
+This is because the index allows PostgreSQL to quickly locate and retrieve the relevant rows.
 
 ### Maybe Visualize
 
@@ -293,7 +305,7 @@ psql -h 127.0.0.1 -p 5439 -U owner -d rideshare_development -XqAt -f queries/exp
 
 Now that use of `completed_at` is optimized, we can continue development of the admin dashboard query. Recall we also need to show driver and rider information, as well as the trip location. To do this, we'll use the ActiveRecord [joins](https://api.rubyonrails.org/classes/ActiveRecord/QueryMethods.html#method-i-joins) method.
 
-To get location information, the Trip model must be joined to `trip_request`, which must then be joined to `start_location` via a nested join. Getting rider and driver information is a little more complicated as we need to join the `users` table twice, once for Riders (which are joined on trip_request.rider_id), and another time for Drivers (which are joined on trips.driver_id). The same `where` clause as before is used to filter on recent trips.
+To get location information, the Trip model must be joined to `trip_request`, which must then be joined to `start_location` via a nested join. Getting rider and driver information is a little more complicated as we need to join the `users` table twice, once for Riders (which are joined on trip_request.rider_id), and another time for Drivers (which are joined on trips.driver_id). This requires the use of a string join rather than just specifying the model. The same `where` clause as before is used to filter on recent trips.
 
 By default, the result of `joins` will only select the columns from the model class on which its invoked, `Trip` in this case. But since the report needs to also show Driver, Rider, and Location information, this scope adds a `select` clause to get all fields from all tables:
 
@@ -301,10 +313,10 @@ By default, the result of `joins` will only select the columns from the model cl
 class Trip < ApplicationRecord
   scope :recently_completed, -> {
     joins(trip_request: [:start_location])
-      .joins('INNER JOIN users AS riders ON riders.id = trip_requests.rider_id')
-      .joins('INNER JOIN users AS drivers ON drivers.id = trips.driver_id')
-      .where('trips.completed_at > ?', 1.week.ago)
-      .select('trips.*, locations.*, drivers.*, riders.*')
+      .joins("INNER JOIN users AS riders ON riders.id = trip_requests.rider_id")
+      .joins("INNER JOIN users AS drivers ON drivers.id = trips.driver_id")
+      .where("trips.completed_at > ?", 1.week.ago)
+      .select("trips.*, locations.*, drivers.*, riders.*")
   }
 end
 ```
@@ -406,10 +418,14 @@ Hash Cond: (trip_requests.start_location_id = locations.id)
 ...
 ```
 
-It's also fetching more data due to the SELECT clause specifying all columns on all tables in the joins. Another way to improve performance is to reduce the "width" of the results.
+It's also fetching more data due to the SELECT clause specifying all columns on all tables in the joins:
+```ruby
+.select("trips.*, locations.*, drivers.*, riders.*")
+```
 
+Another way to improve performance is to reduce the "width" of the results.
 
-## Fourth Attempt: Select only the columns you need
+## Fourth Attempt: Reduce Columns
 
 The previous query selected all columns from all of the joined tables. But recall the business requirements were that we only need to display a few of these. Let's "narrow" the amount of data by restricting the columns in the select to only what we need. This also allows us to do some string concatenation to distinguish between driver and rider names.
 
@@ -510,11 +526,23 @@ Hash Join  (cost=1399.44..2692.88 rows=524 width=453) (actual time=11.736..24.51
 
 Selecting only the necessary columns can lead to performance improvements including reduced disk I/O and smaller memory requirements.
 
-## Fifth Attempt: Restrict rows further if possible
+## Fifth Attempt: Reduce Rows
 
-Another way to improve performance is to reduce the total number of rows by adding additional criteria to further filter the results. This could require some discussion between engineering and product teams to make sure everyone understands the business problem that is being solved. For example, in this case, it turns out the admin team really wants to focus on recent trips with low ratings, so they can investigate what happened on some of those trips to improve customer experience. Up until now, they've been sorting the results client side by low rating, and investigating those.
+Another way to improve performance is to reduce the total number of rows returned by the query with additional filters (i.e. SQL WHERE clauses). This could require some discussion between engineering and product teams to make sure everyone understands the business problem that is being solved. For example, in this case, it turns out the admin team really wants to focus on recent trips with low ratings, so they can investigate what happened on some of those trips to improve customer experience. They've defined a "low" rating as 3 or fewer stars, based on a 5 star rating system. Up until now, they've been sorting the results client side by low rating, and investigating those.
 
-Given this better understanding of the requirements, another `where` condition can be added to the scope, to only retrieve trips where the rating is less than or equal to 3 (it's a 5 star rating system). Note that there already is an index on `trips.rating`.
+Given this better understanding of the requirements, another `where` condition can be added to the scope, to only retrieve trips where the rating is less than or equal to 3.
+
+**CAUTION:** When adding further `where` clauses to reduce the amount of data being returned, always check whether there's an index on the column you're planning to filter by. Otherwise, you could inadvertently make performance worse while trying to improve it! In this case, there already is an index on `trips.rating`. We saw this earlier when inspecting the table schema with `\d trips` in the database console:
+
+```
+=> \d trips
+...
+Indexes:
+  "index_trips_on_rating" btree (rating)
+  ...
+```
+
+Here is the modified scope adding an additional `where` clause on `trip.rating` to only retrieve low ratings
 
 ```ruby
 class Trip < ApplicationRecord
@@ -531,14 +559,22 @@ class Trip < ApplicationRecord
 end
 ```
 
-This time, the results are "shaped" the same as before because the SELECT columns are the same, but the total number of results is smaller:
+This time, the results are "shaped" the same as before because the SELECT columns are the same, but the total number of results is smaller. This also ensures the query only returns trips with ratings, as before, we were also getting results with `nil` ratings, i.e. customer didn't bother to leave a rating.
 
 ```ruby
-results = Trip.admin_report
-# query tbd...
-
+results = Trip.recently_completed
 results.length
 # => 78
+
+results.first.attributes
+# {
+#   "completed_at"=>Mon, 22 Jan 2024 07:07:11.312416000 CST -06:00,
+#   "rating"=>2,
+#   "address"=>"New York, NY",
+#   "driver_name"=>"Bobbi Cronin",
+#   "rider_name"=>"Anibal Hammes",
+#   "id"=>nil
+# }
 ```
 
 Explain/analyze the query:
@@ -592,189 +628,24 @@ WHERE (trips.completed_at > '2024-01-10 13:08:58.257990')
  Execution Time: 2.360 ms
 ```
 
-Significant execution time improvement from further restricting the number of rows.
-
-The performance improvement in Query C compared to Query B can be attributed to several factors, as indicated by the execution plans. Here are some key reasons why Query C is faster:
-
-1. **Index Scans Optimization:**
-   - Both Query B and Query C use Bitmap Index Scans on the "index_trips_on_completed_at" and "index_trips_on_rating" indexes. However, Query C benefits from the additional filter condition `(trips.rating <= 3)`, allowing the database to leverage the "index_trips_on_rating" index efficiently.
-
-2. **BitmapAnd Operation:**
-   - Query C introduces a BitmapAnd operation that combines the results of two Bitmap Index Scans, optimizing the process of satisfying both filter conditions (`completed_at` and `rating <= 3`). This can lead to a more efficient evaluation of the WHERE clause.
-
-3. **Materialization and Caching:**
-   - Query C includes a Materialize operation, which caches the result of the Nested Loop Join involving the "trips," "trip_requests," and "users" tables. This caching mechanism can contribute to performance improvement by avoiding repeated calculations.
-
-4. **Smaller Result Set:**
-   - The additional filter condition in Query C (`rating <= 3`) reduces the number of rows that need to be processed in subsequent join operations. This can lead to a smaller result set, potentially requiring less processing and memory.
-
-5. **Nested Loop Join Optimization:**
-   - The Nested Loop Join in Query C involves joining with the "locations" table. The Join Filter condition is `trip_requests.start_location_id = locations.id`. The optimizer may choose a more efficient strategy for this join, considering the additional filter condition.
-
-6. **Reduced Memory Usage:**
-   - The overall memory usage for Query C might be lower due to optimizations and the smaller result set, leading to better utilization of system resources.
-
-## Brainstorming Outline
-
-- start with task of admin dashboard to show recently completed trips (will just focus on query logic rather than display/view)
-- simple schema diagram: User, TripRequest, Trip, Location (note that User is using STI with type for Driver and Rider)
-- Also show corresponding Ruby models with associations and delegate so its clear how they can be joined (eg: TripRequest joins to Location twice, once as start_location and again as end_location: `belongs_to :start_location, class_name: 'Location'`)
-- First Attempt: where there's no index on `trips.completed_at` (don't do joins at this point to keep explain analyze output simple): `Trip.where('trips.completed_at > ?', 1.week.ago)`
-- show explain analyze -> sequence scan
-- add index on completed_at -> note strong_migrations gem installed on project that errors on "naive" approach to adding index, fix it with concurrently, explain about avoiding locking table for reads and writes while index is applied
-- Second Attempt: run `Trip.where(...)` again with explain analyze and compare improvement with index
-- possibly also reference free visualization tool and how to extract detailed explain/analyze in json format
-- Third Attempt: join location, riders, and drivers info but naively select *
-- Fourth Attempt: reduce number of columns by selecting only what's needed in the report
-- Fifth Attempt: reduce rows by focusing only on low trip ratings
-
-## Scratch Schema
-
-```sql
-CREATE TABLE rideshare.trips (
-    id bigint NOT NULL,
-    trip_request_id bigint NOT NULL,
-    driver_id integer NOT NULL,
-    completed_at timestamp without time zone,
-    rating integer,
-    created_at timestamp(6) without time zone NOT NULL,
-    updated_at timestamp(6) without time zone NOT NULL,
-    CONSTRAINT rating_check CHECK (((rating >= 1) AND (rating <= 5)))
-);
-
-CREATE TABLE rideshare.users (
-    id bigint NOT NULL,
-    first_name character varying NOT NULL,
-    last_name character varying NOT NULL,
-    email character varying NOT NULL,
-    type character varying NOT NULL,
-    created_at timestamp(6) without time zone NOT NULL,
-    updated_at timestamp(6) without time zone NOT NULL,
-    password_digest character varying,
-    trips_count integer,
-    drivers_license_number character varying(100)
-);
-
-CREATE TABLE rideshare.locations (
-    id bigint NOT NULL,
-    address character varying NOT NULL,
-    created_at timestamp(6) without time zone NOT NULL,
-    updated_at timestamp(6) without time zone NOT NULL,
-    city character varying,
-    state character(2) NOT NULL,
-    "position" point NOT NULL,
-    CONSTRAINT state_length_check CHECK ((length(state) = 2))
-);
-
-CREATE TABLE rideshare.trip_positions (
-    id bigint NOT NULL,
-    "position" point NOT NULL,
-    trip_id bigint NOT NULL,
-    created_at timestamp(6) without time zone NOT NULL,
-    updated_at timestamp(6) without time zone NOT NULL
-);
-
-CREATE TABLE rideshare.trip_requests (
-    id bigint NOT NULL,
-    rider_id integer NOT NULL,
-    start_location_id integer NOT NULL,
-    end_location_id integer NOT NULL,
-    created_at timestamp(6) without time zone NOT NULL,
-    updated_at timestamp(6) without time zone NOT NULL
-);
+This time the query execution time is just over 2ms, a significant improvement over the previous ~20ms. This is due to the additional filter condition `(rating <= 3)` that reduces the number of rows that need to eb processed in join operations. You can also see the execution is using the index on rating:
+```
+->  Bitmap Index Scan on index_trips_on_rating
+      (cost=0.00..84.67 rows=7518 width=0) (actual time=0.314..0.314 rows=7531 loops=1)
+      Index Cond: (rating <= 3)
 ```
 
-## Scratch Trip Model with all versions of admin_report
+## Conclusion
 
-Has since been converted to scope `recently_completed`
+This post has covered techniques to enhance PostgreSQL query performance in Rails applications. We began by examining query execution plans using the `EXPLAIN (ANALYZE)` feature to understand how PostgreSQL processes queries. We then explored indexing, covering the addition of indexes for performance improvement and how to do so without causing downtime or table locking.
 
-```ruby
-class Trip < ApplicationRecord
-  belongs_to :trip_request
-  belongs_to :driver, class_name: 'User'
-  delegate :rider, to: :trip_request, allow_nil: false
-
-  # First attempt: Only focus on recently completed trips with no index on completed_at column
-  # Second attempt: Re-run after adding index on completed_at, check results of explain/analyze for perf improvement
-  def self.admin_report
-    where('trips.completed_at > ?', 1.week.ago)
-      .order(completed_at: :desc)
-  end
-
-  # Third attempt: Get additional data needed for admin report using joins, nested joins, and custom string join
-  # ref: https://api.rubyonrails.org/classes/ActiveRecord/QueryMethods.html#method-i-joins
-  # problem with naive select * approach is second time pulling in users table attributes override drivers/users
-  # also, loads in more data than what we need because admin report doesn't need all those columns from every table
-  # def self.admin_report
-  #   joins(trip_request: [:start_location, :rider])
-  #     .joins('INNER JOIN users AS drivers ON drivers.id = trips.driver_id')
-  #     .where('trips.completed_at > ?', 1.week.ago)
-  #     .select('trips.*, locations.*, drivers.*, users.*')
-  #     .order(completed_at: :desc)
-  # end
-
-  # Fourth attempt: Specify only the columns you need in select rather than *
-  # def self.admin_report
-  #   joins(trip_request: [:start_location, :rider])
-  #     .joins('INNER JOIN users AS drivers ON drivers.id = trips.driver_id')
-  #     .where('trips.completed_at > ?', 1.week.ago)
-  #     .select('trips.completed_at, trips.rating, locations.address,
-  #              drivers.first_name || \' \' || drivers.last_name AS driver_name,
-  #              users.first_name || \' \' || users.last_name AS rider_name')
-  #     .order(completed_at: :desc)
-  # end
-
-  # Fifth attempt: focus only on trips with low ratings
-  # def self.admin_report
-  #   joins(trip_request: [:start_location, :rider])
-  #     .joins('INNER JOIN users AS drivers ON drivers.id = trips.driver_id')
-  #     .where('trips.completed_at > ?', 1.week.ago)
-  #     .where('trips.rating <= ?', 3)
-  #     .select('trips.completed_at, trips.rating, locations.address,
-  #              drivers.first_name || \' \' || drivers.last_name AS driver_name,
-  #              users.first_name || \' \' || users.last_name AS rider_name')
-  #     .order(completed_at: :desc)
-  # end
-
-  # Maybe also mention pagination with limit/offset
-end
-```
-
-## Scratch Pure SQL Solution
-
-```sql
-SELECT t.completed_at
-  , t.rating
-  , l.address
-  , ud.first_name || ' ' || ud.last_name as driver_name
-  , ur.first_name || ' ' || ur.last_name as rider_name
-FROM trips t
-  INNER JOIN trip_requests tr ON tr.id = t.trip_request_id
-  INNER JOIN locations l on l.id = tr.start_location_id
-  INNER JOIN users ud ON ud.id = t.driver_id
-  INNER JOIN users ur on ur.id = tr.rider_id
-ORDER BY t.completed_at DESC;
-```
-
-## Scratch Working with Rideshare
-
-```bash
-bin/rails db:truncate_all
-bin/rails data_generators:generate_all
-```
+Further into query optimization, we discussed the importance of careful column selection in the `SELECT` statement, demonstrating how narrowing down the retrieved data can improve performance. Lastly, we emphasized aligning database queries with business needs, illustrating how additional filters can reduce the number of processed rows and enhance scalability. These strategies provide developers with the tools to create efficient and resilient Rails applications with PostgreSQL.
 
 ## TODO
-* WIP: introduce rideshare schema and models
-* WIP: main content
+* possibly re-run all on the same day with freshly seeded 50K to get consistent data, dates, counts, etc.
 * WIP: need more work on explanation of why at each step there was perf improvement based on analyzing the plan
-* Mention the database is postgres
-* Mention that all the FK columns are already indexed
-* Link to generate task for seeds from rideshare. Mention that I modified it to generate 50_000 rows and added random variability in `completed_at` date.
-* At end of fifth attempt - caution to check for indexes on any additional filters being added to the query
-* `EXPLAIN` vs `EXPLAIN (ANALYZE)` (both show the plan but analyze option passed to explain also executes the query to get actual cost rather than just estimate produced  by explain alone)
+* WIP: edit
+* Put query plan in collapsible sections and only highlight certain parts? See `src/markdown/activerecord-dependent-options.md`
 * aside: rails-erd gem was used to generate the diagram: https://github.com/voormedia/rails-erd
-* aside: Need so much data because when filtering rows for tables with low row counts, PostgreSQL may decide to scan the whole table instead of using an index. i.e. need to ensure seeds generate significant enough data size, if only have 10 or so rows, Postgres may decide not to use the index even if its there.
-* conclusion para
-* remove scratch content
-* edit
-* Nice to have: Only have 50_000 rows in trips/trip_requests, need 10M or more to see effect of index? Need pure sql loading solution, will be too slow via db/seeds.rb (but tricky due to 1-1 relationship between trip_requests and trips tables)
+* Define custom options for erd gem to generate STI and only include the models of interest for this post: https://voormedia.github.io/rails-erd/customise.html inheritance: true, only="User,Location,TripRequest,Trip,TripPosition", maybe also polymorphism: true
+* Nice to have: Only have 50_000 rows in trips/trip_requests, need ~1M to see effect of index? Need pure sql loading solution, will be too slow via db/seeds.rb (but tricky due to 1-1 relationship between trip_requests and trips tables)
