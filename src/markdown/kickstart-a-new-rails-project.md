@@ -10,8 +10,6 @@ related:
   - "Start a Rails 6 Project with RSpec"
 ---
 
-**Update:** Since originally writing this post, I have learned about the [Rails config file](https://www.writesoftwarewell.com/railsrc-rails-configuration-file/) that can make some of these steps faster.
-
 Starting a new Rails project is an exciting time, but it also comes with its fair share of setup tasks to ensure your project kicks off on the right foot. This post will walk through some important steps that I like to follow to set up a Rails project for success. From configuring the database to ensuring code quality and style, and setting up essential development tools. Let's get started.
 
 ## Initialization
@@ -375,7 +373,7 @@ invoke      factory_bot
 create        spec/factories/products.rb
 ```
 
-Afterward, you can safely clean up the generated files:
+Afterward, you can safely clean up the generated files since this was just a test:
 
 ```bash
 bin/rails destroy model Product
@@ -524,18 +522,38 @@ end
 ```
 
 <aside class="markdown-aside">
-Services are an area that brings about much discussion in the Rails community.  There are many different opinions on how to implement them, or whether they are needed at all. This is outside the scope of this post, but if you'd like to learn more about this, checkout this <a class="markdown-link" href="https://stackoverflow.com/questions/52526322/what-do-folks-use-app-services-in-rails-applications">Q & A on SO</a>, <a class="markdown-link" href="https://rubyvideo.dev/talks/railsconf-2022-your-service-layer-needn-t-be-fancy-it-just-needs-to-exist-by-david-copeland">RailsConf 2022 talk</a>, and a post about <a class="markdown-link" href="https://www.codewithjason.com/code-without-service-objects/">not using service objects</a>.
+Services are an area that brings about much discussion in the Rails community. There are many different opinions on how to implement them, or whether they are needed at all. This is outside the scope of this post, but if you'd like to learn more about this, checkout this <a class="markdown-link" href="https://stackoverflow.com/questions/52526322/what-do-folks-use-app-services-in-rails-applications">Q & A on SO</a>, <a class="markdown-link" href="https://rubyvideo.dev/talks/railsconf-2022-your-service-layer-needn-t-be-fancy-it-just-needs-to-exist-by-david-copeland">RailsConf 2022 talk</a>, and a post about <a class="markdown-link" href="https://www.codewithjason.com/code-without-service-objects/">not using service objects</a>.
 </aside>
 
-## Conclusion
+## Automation
 
-This post has covered important steps when starting a Rails project, including database setup, code quality and style, testing, additional dev tooling, and introducing a service layer from the start. Some projects may require more (see this post from Evil Martians on [Gemfile of Dreams](https://evilmartians.com/chronicles/gemfile-of-dreams-libraries-we-use-to-build-rails-apps)), but this is the bare minimum that I always reach for. By following these steps and practices, your Rails project should be well-prepared for efficient development and maintainability.
+Since originally writing this post, I have learned about the [Rails config file](https://www.writesoftwarewell.com/railsrc-rails-configuration-file/) that can make some of these steps faster. It turns out Rails allows you to specify much of this information in a config file, then it will be applied automatically any time `rails new some_app` is run.
 
-Finally, for convenience, here are all the gems to add to the Gemfile in one step:
+To automate most of the steps covered in this post, add a `.railsrc` file to your home directory, and also create a `template.rb` file (this can go in any directory):
+
+```bash
+# The config file goes in your home directory
+touch ~/.railsrc
+
+# The template file can go anywhere,
+# just remember where you put it!
+touch ~/rails/template.rb
+```
+
+Then edit the `.railsrc` file with the following:
+
+```
+--database=postgresql
+
+--template=~/rails/template.rb
+```
+
+You can add any option that's supported by the `rails new` command. For example, if you usually use TailwindCSS for styling, you could also add `--css tailwind` to the config file. The `--template` option points to wherever you created the `template.rb` file.
+
+Now in `template.rb`, enter:
 
 ```ruby
-# Gemfile
-group :development, :test do
+gem_group :development, :test do
   gem "annotate"
   gem "rspec-rails"
   gem "factory_bot_rails"
@@ -543,7 +561,7 @@ group :development, :test do
   gem "dotenv-rails"
 end
 
-group :development do
+gem_group :development do
   gem "rubocop"
   gem "rubocop-rails"
   gem "rubocop-rspec"
@@ -551,39 +569,40 @@ group :development do
   gem "rubocop-thread_safety"
   gem "rubocop-factory_bot"
   gem "rubocop-capybara"
-  gem "rack-mini-profiler"
   gem "solargraph"
 end
 
-group :test do
+gem_group :test do
   gem "shoulda-matchers"
 end
-```
 
-The setup commands:
+# adds lines to `config/application.rb`
+environment 'config.active_record.schema_format = :sql'
+environment 'config.autoload_paths << Rails.root.join("services")'
 
-```bash
-bundle install
-bin/rails generate annotate:install
-bin/rails generate rspec:install
-bundle binstubs rspec-core
-rm -rf test
-bundle exec yard gems
-mkdir app/services
-touch app/services/.keep .editorconfig .rubocop.yml .env .env.template
-```
-
-And configuration:
-
-```ruby
-# config/application.rb
-module SomeApp
-  class Application < Rails::Application
-    config.active_record.schema_format = :sql
-    config.autoload_paths << Rails.root.join("services")
-  end
+# commands to run after `bundle install`
+after_bundle do
+  run "bin/rails generate annotate:install"
+  run "bin/rails generate rspec:install"
+  run "rm -rf test"
+  run "bundle binstubs rspec-core"
+  run "bundle exec yard gems"
+  run "mkdir app/services"
+  run "touch app/services/.keep .editorconfig .rubocop.yml .env .env.template"
 end
 ```
+
+**Notes:**
+
+* The `gem_group` sections will add the gems to the specified group in the project `Gemfile`.
+* The `environment` command will add the specified line to `config/application.rb`.
+* The `run` command will run any shell command. Place these in the `after_bundle` block to have the commands run after `bundle install` has completed.
+
+See the [Rails Guides on Templates](https://guides.rubyonrails.org/rails_application_templates.html) for all the options that can be specified in this file.
+
+With this in place, the next time you run `rails new my_app`, you'll have an app setup with all the tools and configuration you like to use.
+
+This leaves just a small amount of configuration to be done manually for `spec/rails_helper.rb` to configure FactoryBot and Shoulda Matchers:
 
 ```ruby
 # spec/rails_helper.rb
@@ -598,3 +617,7 @@ Shoulda::Matchers.configure do |config|
   end
 end
 ```
+
+## Conclusion
+
+This post has covered important steps when starting a Rails project, including database setup, code quality and style, testing, additional dev tooling, and introducing a service layer from the start. Some projects may require more (see this post from Evil Martians on [Gemfile of Dreams](https://evilmartians.com/chronicles/gemfile-of-dreams-libraries-we-use-to-build-rails-apps)), but this is the bare minimum that I always reach for. By following these steps and practices, your Rails project should be well-prepared for efficient development and maintainability.
