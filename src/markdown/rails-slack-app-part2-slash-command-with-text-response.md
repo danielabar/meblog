@@ -280,7 +280,11 @@ SlackRubyBotServer::Events.configure do |config|
   # If a "/retro-open" slash command is received from Slack,
   # then execute this block.
   config.on :command, "/retro-open" do |command|
+    # Use `command[:team_id]` from request parameters sent to us
+    # by Slack to find the Team model persisted in the database
     team = Team.find_by(team_id: command[:team_id])
+
+    # This is the Slack channel we need to respond back to
     channel_id = command[:channel_id]
 
     # If user entered /retro-open foo
