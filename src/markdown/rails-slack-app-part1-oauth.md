@@ -12,7 +12,7 @@ related:
 
 Welcome to the first installment of this multi-part series on building a Slack application with Rails. This series will guide you through the process of creating a Slack application with Rails and is structured as follows:
 
-* Part 1: Rails new, Slack, and OAuth (You Are Here)
+* Part 1: Rails new, Slack, and OAuth (=== YOU ARE HERE ===)
 * [Part 2: Slack Slash Command with Text Response](../rails-slack-app-part2-slash-command-with-text-response)
 * [Part 3: Slack Slash Command with Modal Response](../rails-slack-app-part3-slash-command-with-modal-response)
 * [Part 4: Slack Action Modal Submission](../rails-slack-app-part4-action-modal-submission)
