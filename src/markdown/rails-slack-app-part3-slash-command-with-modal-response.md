@@ -14,7 +14,7 @@ Welcome to the third installment of this multi-part series on building a Slack a
 
 * [Part 1: Rails new, Slack, and OAuth](../rails-slack-app-part1-oauth)
 * [Part 2: Slack Slash Command with Text Response](../rails-slack-app-part2-slash-command-with-text-response)
-* Part 3: Slack Slash Command with Modal Response (You Are Here)
+* Part 3: Slack Slash Command with Modal Response (=== YOU ARE HERE ===)
 * [Part 4: Slack Action Modal Submission](../rails-slack-app-part4-action-modal-submission)
 * [Part 5: Slack Slash Command with Block Kit Response](../rails-slack-app-part5-slash-block-kit-response)
 
@@ -22,7 +22,7 @@ Feel free to jump to a specific part of interest using the links above or follow
 
 This post assumes the reader has at least a beginner level familiarity with Ruby on Rails. It's also assumed the reader has used [Slack](https://slack.com/) as an end user with basic interactions such as joining channels, sending messages, and participating in conversations.
 
-Part 1 of this series introduced [Retro Pulse](../rails-slack-app-part1-oauth#introducing-retro-pulse), a Slack app built with Rails for agile teams to manage their retrospectives entirely with Slack. Part 2 explained how to implement a Slack Slash command to open a retrospective and return a markdown text response to the same Slack channel that initiated the request. Now in Part 3, we will learn how to implement another slash command `/retro-feedback` that will respond with a modal form, allowing the user to enter some feedback for the retrospective such as something the team should keep on doing, or stop doing, or something new to try.
+Part 1 of this series introduced [Retro Pulse](../rails-slack-app-part1-oauth#introducing-retro-pulse), a Slack app built with Rails for agile teams to manage their retrospectives entirely with Slack. [Part 2](../rails-slack-app-part2-slash-command-with-text-response) explained how to implement a Slack Slash command to open a retrospective and return a markdown text response to the same Slack channel that initiated the request. Now in Part 3, we will learn how to implement another slash command `/retro-feedback` that will respond with a modal form, allowing the user to enter some feedback for the retrospective such as something the team should keep on doing, or stop doing, or something new to try.
 
 The interaction starts with a user entering the `/retro-feedback` slash command in a Slack workspace where the [Retro Pulse](../rails-slack-app-part1-oauth#introducing-retro-pulse) app has been added:
 
@@ -173,8 +173,10 @@ SlackRubyBotServer::Events.configure do |config|
 end
 ```
 
-Notes:
+**Notes:**
+
 * `trigger_id` was extracted from the Slack request sent to the Rails app when the user entered `/retro-feedback`, we need to send it back to Slack as part of the request to open a modal so that Slack can "connect" the original user's request with this modal response.
+* `callback_id` is a unique identifier assigned to the modal, helping your Slack app distinguish different modals from one another when user submits it. We'll see how this is useful in the next post on processing user form submission.
 * `title` will be displayed at the top of the modal.
 * The `submit` and `close` attributes are optional. That is to say, Slack will always generate these buttons, but you can optionally define them in the payload to override the default text that is displayed on the buttons.
 * The `blocks` section is required. It contains an array of Slack block elements that make up the modal content. In this simple example, we only have a single element, a multi-line input with some placeholder text and a label. See the Slack docs on [Reference Blocks](https://api.slack.com/reference/block-kit/blocks) for all supported elements and options.
@@ -191,36 +193,60 @@ Now that we understand the basics of generating a modal response, we're ready to
 
 Some of this we've already seen how to do including generating the title, a multi-line text input, and the Cancel and Submit buttons. The new parts are the dropdown value for Category (keep, stop, and try), and the optional checkbox for submitting the feedback anonymously.
 
-The Slack docs on static select explain the expected structure of a dropdown with a static list of options, which is exactly what we need. Focusing on only the `blocks` section of the modal payload:
+To generate a select input element with a static list of options, Slack provides the [static_select](https://api.slack.com/reference/block-kit/block-elements#static_select) type. This allows you to specify a placeholder such as "Select category", and a list of options. Each option has display text and the value that will be submitted if user selects this option. Adding the category `static_select` input type to our list of blocks looks like this:
 
 ```ruby
 # bot/slash_commands/retro_feedback.rb
 SlackRubyBotServer::Events.configure do |config|
   config.on :command, "/retro-feedback" do |command|
-    # ...
-
+    # extract params from command
     modal_payload = {
+      trigger_id: trigger_id,
       view: {
         type: "modal",
         callback_id: "feedback_form",
-        # ...
+        title: { ... },
+        submit: { ... },
+        close: { ... },
         blocks: [
-          {...},
+          { type: "input", block_id: "comment_block", ... },
           {
             type: "input",
-            block_id: "comment_block",
+            block_id: "category_block",
             element: {
-              type: "plain_text_input",
-              action_id: "comment_input",
-              multiline: true,
+              type: "static_select",
+              action_id: "category_select",
               placeholder: {
                 type: "plain_text",
-                text: "Enter some text"
-              }
+                text: "Select category"
+              },
+              options: [
+                {
+                  text: {
+                    type: "plain_text",
+                    text: "Something we should keep doing"
+                  },
+                  value: "keep"
+                },
+                {
+                  text: {
+                    type: "plain_text",
+                    text: "Something we should stop doing"
+                  },
+                  value: "stop"
+                },
+                {
+                  text: {
+                    type: "plain_text",
+                    text: "Something to try"
+                  },
+                  value: "try"
+                }
+              ]
             },
             label: {
               type: "plain_text",
-              text: "Comment"
+              text: "Category"
             }
           }
         ]
@@ -233,60 +259,345 @@ SlackRubyBotServer::Events.configure do |config|
 end
 ```
 
+To complete the modal generation, we also need to add the Anonymous checkbox. This is for user's that don't want their Slack username displayed later when the retrospective feedback is being discussed. Again we can check the Slack Block Kit reference docs on the [checkbox element](https://api.slack.com/reference/block-kit/block-elements#checkboxes), and learn that the type is `checkboxes`, and it requires an array of options. We'll also set `optional: true` to tell Slack that this isn't required. Here's what the `blocks` array looks like with the checkbox element added:
+
 ```ruby
-[
-  {
-    "type": "section",
-    "block_id": "section678",
-    "text": {
-      "type": "mrkdwn",
-      "text": "Pick an item from the dropdown list"
-    },
-    "accessory": {
-      "action_id": "text1234",
-      "type": "static_select",
-      "placeholder": {
-        "type": "plain_text",
-        "text": "Select an item"
-      },
-      "options": [
-        {
-          "text": {
-            "type": "plain_text",
-            "text": "*this is plain_text text*"
-          },
-          "value": "value-0"
-        },
-        {
-          "text": {
-            "type": "plain_text",
-            "text": "*this is plain_text text*"
-          },
-          "value": "value-1"
-        },
-        {
-          "text": {
-            "type": "plain_text",
-            "text": "*this is plain_text text*"
-          },
-          "value": "value-2"
-        }
-      ]
+# bot/slash_commands/retro_feedback.rb
+SlackRubyBotServer::Events.configure do |config|
+  config.on :command, "/retro-feedback" do |command|
+    # extract params from command...
+    modal_payload = {
+      trigger_id: trigger_id,
+      view: {
+        type: "modal",
+        callback_id: "feedback_form",
+        title: { ... },
+        submit: { ... },
+        close: { ... },
+        blocks: [
+          { type: "input", block_id: "comment_block", ... },
+          { type: "input", block_id: "category_block", ... },
+          {
+            type: "input",
+            block_id: "anonymous_block",
+            optional: true,
+            element: {
+              type: "checkboxes",
+              action_id: "anonymous_checkbox",
+              options: [
+                {
+                  text: {
+                    type: "plain_text",
+                    text: "Yes"
+                  },
+                  value: "true"
+                }
+              ]
+            },
+            label: {
+              type: "plain_text",
+              text: "Anonymous"
+            }
+          }
+        ]
+      }
     }
-  }
-]
+
+    slack_client.views_open(modal_payload)
+    nil
+  end
+end
 ```
 
-However, before doing that, there's a problem that needs to be addressed. If you're using Rubocop, you're probably getting a violation of `Metrics/BlockLength` on `bot/slash_commands/retro_feedback.rb`. Even with the simple modal example, the code quickly gets too long, and this will only get worse as we add more block elements such as the category dropdown. This issue can be addressed similarly to what was done in Part 2 of this series, where we [refactored the overly long command handler](../rails-slack-app-part2-slash-command-with-text-response#refactor), by moving the business logic into an interactor named `InitiateFeedbackForm`.
+Restarting the Rails server at this point, and then running `/retro-feedback` in Slack will now generate the form with all the required inputs.
 
-The `InitiateFeedbackForm` interactor will receive the trigger_id and slack_client from the command handler, build the modal response, and send it back to the slack channel.
+However, before declaring this task done, there's a problem. This code is way too long (if using Rubocop, the `Metrics/BlockLength` violation will be indicated). Furthermore, having it in the command handler makes it impossible to test. This will be addressed in the next section.
 
+## Refactor
 
+The issue of an overly long command handler can be addressed in a similar manner to what was done in Part 2 of this series, where we refactored the command handler by [moving the business logic](../rails-slack-app-part2-slash-command-with-text-response#openretrospective-interactor) into an interactor named `OpenRetrospective`.
+
+We'll do something similar now by introducing an `InitiateFeedbackForm` interactor, which will receive the `trigger_id` and `slack_client` from the command handler, build the modal response, and send it back to the slack channel. This will simplify the command handler to look like this:
+
+```ruby
+# bot/slash_commands/retro_feedback.rb
+SlackRubyBotServer::Events.configure do |config|
+  config.on :command, "/retro-feedback" do |command|
+    team_id = command[:team_id]
+    team = Team.find_by(team_id:)
+    slack_client = Slack::Web::Client.new(token: team.token)
+    channel_id = command[:channel_id]
+    trigger_id = command[:trigger_id]
+    command.logger.info "=== COMMAND: retro-feedback, Team: #{team.name}, Channel: #{channel_id}"
+
+    # Pass in the `trigger_id` and `slack_client` as context to the interactor
+    InitiateFeedbackForm.call(trigger_id:, slack_client:)
+    nil
+  end
+end
+```
+
+The interactor is responsible for building the modal payload, and sending it back to the channel using the slack client:
+
+```ruby
+# app/interactors/initiate_feedback_form.rb
+class InitiateFeedbackForm
+  include Interactor
+
+  def call
+    modal_payload = build_modal_payload
+    context.slack_client.views_open(modal_payload)
+  rescue StandardError => e
+    error_message = "Error in InitiateFeedbackForm: #{error.message}"
+    backtrace = error.backtrace.join("\n")
+    Rails.logger.error("#{error_message}\n#{backtrace}")
+    context.fail!
+  end
+
+  private
+
+  # Use `trigger_id` from context passed in by the Slack command handler
+  def build_modal_payload
+    {
+      trigger_id: context.trigger_id,
+      view: {
+        type: "modal",
+        callback_id: "feedback_form",
+        title: { ... },
+        submit: { ... },
+        close: { ... },
+        blocks: [
+          { type: "input", block_id: "comment_block", ... },
+          { type: "input", block_id: "category_block", ... },
+          { type: "input", block_id: "anonymous_block", ... }
+        ]
+      }
+    }
+  end
+
+  def send_modal
+    context.slack_client.views_open(@modal_payload)
+  end
+end
+```
+
+While this eliminates the Rubocop warnings from the Slack command handler `bot/slash_commands/retro_feedback.rb`, it introduces a new problem. The `build_modal_payload` method of the `InitiateFeedbackForm` is too long, which Rubocop will flag with the `Metrics/MethodLength` rule. It looks condensed above because I've replaced many sections with `...` to easily fit it in a smaller view, but the actual payload is over 100 lines long!
+
+One way to deal with this would be to break up the building of individual portions of the modal payload into smaller methods. For example, extract a method such as `build_title_block` that only deals with the title logic:
+
+```ruby
+# app/interactors/initiate_feedback_form.rb
+class InitiateFeedbackForm
+  include Interactor
+
+  def call
+    # ...
+  end
+
+  private
+
+  def build_modal_payload
+    {
+      trigger_id: context.trigger_id,
+      view: {
+        type: "modal",
+        callback_id: "feedback_form",
+        title: build_title_block,
+        submit: { ... },
+        close: { ... },
+        blocks: [
+          { type: "input", block_id: "comment_block", ... },
+          { type: "input", block_id: "category_block", ... },
+          { type: "input", block_id: "anonymous_block", ... }
+        ]
+      }
+    }
+  end
+
+  def build_title_block
+    {
+      type: "plain_text",
+      text: "Retrospective Feedback",
+      emoji: true
+    }
+  end
+end
+```
+
+This pattern could be carried on for every element of the modal. However, in this case, since the logic is so closely tied to the Slack API, it could be cleaner to extract Slack-specific form building logic into the `lib` directory as a new module `SlackFormBuilder`:
+
+```ruby
+# lib/slack_form_builder.rb
+module SlackFormBuilder
+  module_function
+
+  def build_title_block
+    {
+      type: "plain_text",
+      text: "Retrospective Feedback",
+      emoji: true
+    }
+  end
+
+  def build_submit_block
+    {
+      type: "plain_text",
+      text: "Submit",
+      emoji: true
+    }
+  end
+
+  def build_close_block
+    {
+      type: "plain_text",
+      text: "Cancel",
+      emoji: true
+    }
+  end
+
+  def build_category_block
+    {
+      type: "input",
+      block_id: "category_block",
+      element: build_static_select_element,
+      label: {
+        type: "plain_text",
+        text: "Category"
+      }
+    }
+  end
+
+  def build_static_select_element
+    {
+      type: "static_select",
+      action_id: "category_select",
+      placeholder: {
+        type: "plain_text",
+        text: "Select category"
+      },
+      options: [
+        build_option("Something we should keep doing", "keep"),
+        build_option("Something we should stop doing", "stop"),
+        build_option("Something to try", "try")
+      ]
+    }
+  end
+
+  def build_option(text, value)
+    {
+      text: {
+        type: "plain_text",
+        text:
+      },
+      value:
+    }
+  end
+
+  def build_comment_block
+    {
+      type: "input",
+      block_id: "comment_block",
+      element: build_plain_text_input_element("Enter your feedback"),
+      label: {
+        type: "plain_text",
+        text: "Comment"
+      }
+    }
+  end
+
+  def build_plain_text_input_element(placeholder_text)
+    {
+      type: "plain_text_input",
+      action_id: "comment_input",
+      multiline: true,
+      placeholder: {
+        type: "plain_text",
+        text: placeholder_text
+      }
+    }
+  end
+
+  def build_anonymous_block
+    {
+      type: "input",
+      block_id: "anonymous_block",
+      optional: true,
+      element: build_checkboxes_element,
+      label: {
+        type: "plain_text",
+        text: "Anonymous"
+      }
+    }
+  end
+
+  def build_checkboxes_element
+    {
+      type: "checkboxes",
+      action_id: "anonymous_checkbox",
+      options: [
+        build_option("Yes", "true")
+      ]
+    }
+  end
+end
+```
+
+<aside class="markdown-aside">
+Note that the <a class="markdown-link" href="https://docs.ruby-lang.org/en/3.2/Module.html#method-i-module_function">module_function</a> method creates module functions for the named methods. This allows these functions to be called with the module as a receiver, and also become available as instance methods to classes that mix in the module. The ability to call the functions directly on the module is convenient for <a class="markdown-link" href="https://github.com/danielabar/retro-pulse/blob/main/spec/lib/slack_form_builder_spec.rb">unit testing</a>.
+</aside>
+
+With the `SlackFormBuilder` module in place that does all the work of building the Slack block kit form components, the `InitiateFeedbackForm` interactor can be shortened and simplified to use it as follows:
+
+```ruby
+class InitiateFeedbackForm
+  include Interactor
+
+  # Mixin our custom module so we can access the methods
+  # such as `build_title_block` as instance methods
+  include SlackFormBuilder
+
+  def call
+    modal_payload = build_modal_payload
+    context.slack_client.views_open(modal_payload)
+  rescue StandardError => e
+    error_message = "Error in InitiateFeedbackForm: #{error.message}"
+    backtrace = error.backtrace.join("\n")
+    Rails.logger.error("#{error_message}\n#{backtrace}")
+
+    context.fail!
+  end
+
+  private
+
+  # Make use of the SlackFormBuilder module methods
+  def build_modal_payload
+    {
+      trigger_id: context.trigger_id,
+      view: {
+        type: "modal",
+        callback_id: "feedback_form",
+        title: build_title_block,
+        submit: build_submit_block,
+        close: build_close_block,
+        blocks: [
+          build_category_block,
+          build_comment_block,
+          build_anonymous_block
+        ]
+      }
+    }
+  end
+end
+```
+
+## Next Steps
+
+At this point, we've built the capability for a Slack user to enter a custom slash command `/retro-feedback`, and have the app respond with a nicely formatted modal. The user can then select the category of the retrospective feedback (whether it's something the team should keep on doing, stop doing, or try for next time), enter their feedback in a multi-line input, and optionally check off if they wish to remain anonymous. In the [next post in this series](../rails-slack-app-part4-action-modal-submission), we'll learn how to handle the form submission, save the user's feedback in the database, and send a private direct message back to the user to confirm their feedback was received.
 
 ## TODO
 
-* figure out in what order to show select options, anon checkbox, vs refactoring to interactor because its getting too long?
 * In intro section, add one more screenshot showing the filled out form and user hovering over submit button. Eg: To try, Github plugin to send automated reminders about stale PRs still awaiting reviews.
+* Mention discussion of services, interactors, etc was discussed in part 2: (../rails-slack-app-part2-slash-command-with-text-response#refactor)
 * Image showing on one side the Example Modal, and on the other side, the code containing modal payload and arrows between each attribute and modal visual
-* Reference slack static select: https://api.slack.com/reference/block-kit/block-elements#select
 * Update rdoc comments on ALL interactors in original code and this series to proper format as per: https://github.com/ruby/rdoc/blob/master/ExampleRDoc.rdoc?plain=1
+* In part 1 when showing screenshots of how app works, include example of anonymous feedback vs showing the slack user id that submitted the feedback
