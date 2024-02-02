@@ -152,6 +152,10 @@ A sequential scan means that PostgreSQL reads the entire table, and *then* filte
 Rows Removed by Filter: 46137
 ```
 
+<aside class="markdown-aside">
+There's more nuance here in that this particular query doesn't have a `LIMIT` clause. When that's present, PostgreSQL will "short circuit" and stop processing when it finds enough matches. See this post that digs deeper into <a class="markdown-link" href="https://andyatkinson.com/blog/2024/01/25/PostgreSQL-rows-removed-by-filter-meaning">Rows Removed By Filter</a>.
+</aside>
+
 To understand why a slow sequential scan is being used to filter `trips` rows based on `completed_at`, we can take a look at the `trips` table schema. Still in the database console, the `\d table_name` meta-command can be used to display any table schema:
 
 ```
