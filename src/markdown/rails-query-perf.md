@@ -24,8 +24,6 @@ Rideshare is an API-only Rails application that implements a portion of a fictio
 
 All the foreign key columns are indexed. Single Table Inheritance (STI) is used to represent both Drivers and Riders in the Users table. This means that rows where `users.type = 'Driver'` are Drivers, and can be joined to Trips on `driver_id`. Rows where `users.type = 'Rider'` are Riders, and can be joined to TripRequests on `rider_id`.
 
-For the exercises in this post, we will not be concerned with TripPositions, Vehicles, or VehicleReservations.
-
 Here are the corresponding model classes, only focusing on the associations between them:
 
 ```ruby
@@ -669,5 +667,4 @@ Further into query optimization, we discussed the importance of careful column s
 * WIP: edit
 * Put query plan in collapsible sections and only highlight certain parts? See `src/markdown/activerecord-dependent-options.md`
 * aside: rails-erd gem was used to generate the diagram: https://github.com/voormedia/rails-erd
-* Define custom options for erd gem to generate STI and only include the models of interest for this post: https://voormedia.github.io/rails-erd/customise.html inheritance: true, only="User,Location,TripRequest,Trip,TripPosition", maybe also polymorphism: true
 * Nice to have: Only have 50_000 rows in trips/trip_requests, need ~1M to see effect of index? Need pure sql loading solution, will be too slow via db/seeds.rb (but tricky due to 1-1 relationship between trip_requests and trips tables)
