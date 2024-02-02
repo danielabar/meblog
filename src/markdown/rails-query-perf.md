@@ -132,7 +132,7 @@ WHERE (completed_at >= '2024-01-10 12:29:18.260820');
 
 In PostgreSQL, the `EXPLAIN` statement is used to analyze and show the execution plan of a SQL query. It shows how the database engine is planning to execute the query, such as which indexes will be used and estimated costs. The cost is a unit-less value representing the estimated computational effort required for the operation. Lower values are generally better.
 
-While `EXPLAIN` can be run on its own, its typically used together with the `ANALYZE` option. This option tells PostgreSQL to actually execute the query, so the output will include statistics such as the number of rows processed, actual cost, and execution time.
+While `EXPLAIN` can be run on its own, its typically used together with the `ANALYZE` option. This option tells PostgreSQL to actually execute the query, so the output will include statistics such as the number of rows processed, and execution time.
 
 From the output above we can see that a sequential scan was performed to retrieve rows from the `trips` table:
 
@@ -186,7 +186,7 @@ Foreign-key constraints:
 
 The `Indexes` section of the output above lists all the indexes that are available on the `trips` table. Notice there is no index on `completed_at`.
 
-While the current version of the query may be sufficient for the current scale, this operation will become progressively slower as the number of trips increases. This means that the overall efficiency and performance of the application may be negatively impacted over time. Improving the scalability of the application involves optimizing queries to be less resource-intensive, and adding an index to the `completed_at` column, is a step towards achieving this goal. Scaling, in this context, refers to the ability of the database system to handle a growing workload efficiently. By addressing the performance bottlenecks, such as slow sequential scans, the application can better leverage the capabilities of the PostgreSQL instance as the workload increases.
+While the existing query may be sufficient for the current scale, this operation will become progressively slower as the number of trips increases. This means that the overall efficiency and performance of the application may be negatively impacted over time. Improving the scalability of the application involves optimizing queries to be less resource-intensive, and adding an index to the `completed_at` column, is a step towards achieving this goal. Scaling, in this context, refers to the ability of the database system to handle a growing workload efficiently. By addressing the performance bottlenecks, such as slow sequential scans, the application can better leverage the capabilities of the PostgreSQL instance as the workload increases.
 
 So the next step in improving this query is to add an index, which can help with accessing the data at a lower cost.
 
