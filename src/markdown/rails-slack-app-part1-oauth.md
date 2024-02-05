@@ -62,7 +62,7 @@ Any category of feedback can be selected, usually we start with the "keep" categ
 
 ![slack app demo retro discuss slash keep](../images/slack-app-demo-retro-discuss-slash-keep.png "slack app demo retro discuss slash keep")
 
-The app responds with all the comments that have been collected in that category:
+The app responds with all the comments that have been collected in that category. Note that if the user selected the "Anonymous" checkbox when filling out the feedback form, then the label `anonymous` will be displayed under the feedback. Otherwise, their Slack username will be displayed:
 
 ![slack app demo keep comments](../images/slack-app-demo-keep-comments.png "slack app demo keep comments")
 
