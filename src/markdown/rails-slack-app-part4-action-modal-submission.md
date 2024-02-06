@@ -1,5 +1,5 @@
 ---
-title: "Build a Rails App with Slack Part 4: Slash Action Modal Submission"
+title: "Build a Rails App with Slack Part 4: Receive Modal Submission"
 featuredImage: "../images/slack-feat-img-part2-john-towner-p-rN-n6Miag-unsplash.jpg"
 description: "Learn how to build a Slack application with Rails in this comprehensive multi-part series. Part 4 covers handling a modal submission action, saving the feedback to the database, and replying to the user with a private DM confirming their submission."
 date: "2024-06-04"
@@ -225,22 +225,412 @@ Enable the interactivity toggle:
 
 ![slack app interactivity toggle](../images/slack-app-interactivity-toggle.png "slack app interactivity toggle")
 
-Fill in your ngrok forwarding address in the Request URL field. This is the URL that Slack will POST a message to when the user submits the feedback modal. Recall we setup [ngrok in Part 1](../rails-slack-app-part1-oauth#ngrok) of this series:
+Fill in your ngrok forwarding address in the Request URL field, and then `/api/slack/action`. This is the URL that Slack will POST a message to when the user submits the feedback modal. Recall we setup [ngrok in Part 1](../rails-slack-app-part1-oauth#ngrok) of this series:
+
+TODO: URL should end with: `api/slack/action`
 
 ![slack app interactivity enter url](../images/slack-app-interactivity-enter-url.png "slack app interactivity enter url")
 
 As soon as you enter a valid URL, it will be saved automatically.
 
-## Rails Slack Action Handler
+## Receive Form Submission in Rails
 
-WIP...
+Now that the Slack app has been configured to POST the form submission to the Rails app (via Ngrok), we need to write a handler to receive this payload. In Part 2 of this series, we learned how to use the slack-ruby-bot-server-events to setup a command handler to [receive a slash command](../rails-slack-app-part2-slash-command-with-text-response#receive-slash-command-in-rails). Now we'll do something similar, but for receiving the form submission. The slack-ruby-bot-server-events gem calls these "Actions".
+
+Starting from the root of the project, create the following directories and files:
+
+```bash
+# The `bot` directory was created in Part 2 of this series
+touch bot/actions.rb
+mkdir bot/actions
+touch bot/actions/view_submission.rb
+```
+
+You should have a directory structure that looks like this. Note that the `bot` directory is a sibling to the Rails `app` directory, and the `slash_commands` were created in Parts 2 and 3 of this series:
+
+```
+.
+├── app
+└── bot
+    ├── actions
+    │   └── view_submission.rb
+    ├── actions.rb
+    ├── slash_commands
+    │   ├── retro_feedback.rb
+    │   └── retro_open.rb
+    └── slash_commands.rb
+```
+
+Add the following in `bot/actions.rb` to load all the actions, there's only one for now:
+
+```ruby
+# bot/actions.rb
+require_relative "actions/view_submission"
+```
+
+Fill in the implementation for the `view_submission` action handler. For now, it will only log out the payload it received:
+
+```ruby
+# bot/actions/view_submission.rb
+SlackRubyBotServer::Events.configure do |config|
+
+  # Essentially this is saying to the SlackRubyBotServer,
+  # If a "view_submission" interaction is received from Slack,
+  # then execute this block.
+  config.on :action, "view_submission" do |action|
+    payload = action[:payload]
+    action.logger.info "=== ACTION: payload = #{payload}"
+
+    # Return `nil`, otherwise the slack-ruby-bot-server-events gem
+    # replies to the channel with a message "true"
+    nil
+  end
+end
+```
+
+Then update `config.ru` file in the root of the Rails app to load the action handlers in the `bot` directory. This will ensure the the Slack bot code is loaded when Rails starts:
+
+```ruby
+# This file is used by Rack-based servers to start the application.
+require_relative "config/environment"
+
+# This line was added in Part 2 of this series
+require_relative "bot/slash_commands"
+
+# === NEW: Load Slack action handlers ===
+require_relative "bot/actions"
+
+# We added this line previously in Part 1 of this series:
+SlackRubyBotServer::App.instance.prepare!
+
+run Rails.application
+Rails.application.load_server
+```
+
+To see the action handler working, restart the Rails server `bin/dev`. Then in any Slack workspace that has the Retro Pulse app installed, enter the `/retro-feedback` slash command to launch the feedback modal. Fill it in by selecting any Category, enter some test text in the Comment, and check off the Anonymous option:
+
+![slack app modal test](../images/slack-app-modal-test.png "slack app modal test")
+
+Then click the Submit button in Slack, and watch the Rails server output. It will show something like this:
+
+```
+Started POST "/api/slack/action" for 34.201.19.177 at 2024-02-06 07:10:16 -0500
+
+INFO -- : === ACTION: payload = {"type"=>"view_submission", "team"=>{"id"=>"your-team-id", ...}
+```
+
+**What's going on:**
+
+The above output from the Rails server shows that a POST to `/api/slack/action` is being processed. Recall when we configured Slack interactivity earlier, we told Slack to post payloads to this url. Slack is actually posting to the ngrok url, which forwards to the Rails server running on `localhost:3000`.
+
+To view the "raw" request sent by Slack, open a browser at `http://127.0.0.1:4040`. This is the web interface exposed by ngrok which shows all HTTP requests and responses that were received by ngrok and responded to by the Rails app. For example, the form we just submitted was posted to ngrok as a url-encoded form with the following HTTP headers and body:
+
+```
+POST /api/slack/action HTTP/1.1
+Host: 05f9-70-51-246-153.ngrok-free.app
+User-Agent: Slackbot 1.0 (+https://api.slack.com/robots)
+Content-Length: 4137
+Accept: application/json,*/*
+Accept-Encoding: gzip,deflate
+Content-Type: application/x-www-form-urlencoded
+X-Forwarded-For: 32.423.15.766
+X-Forwarded-Host: 12e4-203-0-113-42.ngrok-free.app
+X-Forwarded-Proto: https
+X-Slack-Request-Timestamp: 1707220000
+X-Slack-Signature: v0=88a...
+
+payload=%7B%22type%22%3A%22view_submission%...
+```
+
+The `POST /api/slack/action` is handled by the routing provided by the [slack-ruby-bot-server-events](https://github.com/slack-ruby/slack-ruby-bot-server-events) gem, which takes care of a lot of the boilerplate including providing a controller to parse the raw url-encoded form body, and logic to verify the `X-Slack-Signature` HTTP header.
+
+Then the `slack-ruby-bot-server-events` gem's controller for `/api/slack/action` parses out the specific action name, which it finds in the `type` section of the payload. From this example, the type is `view_submission`. The gem will then run all [callbacks that are registered for that action](https://github.com/slack-ruby/slack-ruby-bot-server-events?tab=readme-ov-file#implement-callbacks).
+
+Since we added `config.on :action, "view_submission"` in `view_submission.rb`, this is how the `slack-ruby-bot-server-events` gem knows it should run our custom logic. The raw url-encoded form data received from Slack has been converted into a hash that's available as `action[:payload]`.
+
+## Saving Feedback
+
+Now that we have communication between Slack and the Rails app working to receive the form submission, we need to parse out the contents of the payload to save the user's retrospective feedback.
+
+The payload contains all the field names and corresponding values submitted by the user for the custom modal we built in Part 3, along with additional information such as the Slack team, user, trigger ID, and API application ID.
+
+Here is the full payload for the test we submitted earlier:
+
+```ruby
+{
+  "type" => "view_submission",
+  "team" => {
+    "id" => "your-team-id",
+    "domain" => "your-slack-domain"
+  },
+  "user" => {
+    "id" => "your-slack-user-id",
+    "username" => "your-slack-user-name",
+    "name" => "your-slack-user-name",
+    "team_id" => "your-team-id"
+  },
+  "api_app_id" => "your-app-id",
+  "token" => "your-token",
+  "trigger_id" => "123.456",
+  "view" => {
+    "id" => "the-view-id",
+    "team_id" => "your-team-id",
+    "type" => "modal",
+    "blocks" => [
+      {
+        "type" => "input",
+        "block_id" => "category_block",
+        "label" => {
+          "type" => "plain_text",
+          "text" => "Category",
+          "emoji" => true
+        },
+        "optional" => false,
+        "dispatch_action" => false,
+        "element" => {
+          "type" => "static_select",
+          "action_id" => "category_select",
+          "placeholder" => {
+            "type" => "plain_text",
+            "text" => "Select category",
+            "emoji" => true
+          },
+          "options" => [
+            {
+              "text" => {
+                "type" => "plain_text",
+                "text" => "Something we should keep doing",
+                "emoji" => true
+              },
+              "value" => "keep"
+            },
+            {
+              "text" => {
+                "type" => "plain_text",
+                "text" => "Something we should stop doing",
+                "emoji" => true
+              },
+              "value" => "stop"
+            },
+            {
+              "text" => {
+                "type" => "plain_text",
+                "text" => "Something to try",
+                "emoji" => true
+              },
+              "value" => "try"
+            }
+          ]
+        }
+      },
+      {
+        "type" => "input",
+        "block_id" => "comment_block",
+        "label" => {
+          "type" => "plain_text",
+          "text" => "Comment",
+          "emoji" => true
+        },
+        "optional" => false,
+        "dispatch_action" => false,
+        "element" => {
+          "type" => "plain_text_input",
+          "action_id" => "comment_input",
+          "placeholder" => {
+            "type" => "plain_text",
+            "text" => "Enter your feedback",
+            "emoji" => true
+          },
+          "multiline" => true,
+          "dispatch_action_config" => {
+            "trigger_actions_on" => ["on_enter_pressed"]
+          }
+        }
+      },
+      {
+        "type" => "input",
+        "block_id" => "anonymous_block",
+        "label" => {
+          "type" => "plain_text",
+          "text" => "Anonymous",
+          "emoji" => true
+        },
+        "optional" => true,
+        "dispatch_action" => false,
+        "element" => {
+          "type" => "checkboxes",
+          "action_id" => "anonymous_checkbox",
+          "options" => [
+            {
+              "text" => {
+                "type" => "plain_text",
+                "text" => "Yes",
+                "emoji" => true
+              },
+              "value" => "true"
+            }
+          ]
+        }
+      }
+    ]
+  },
+  "private_metadata" => "",
+  "callback_id" => "feedback_form",
+  "state" => {
+    "values" => {
+      "category_block" => {
+        "category_select" => {
+          "type" => "static_select",
+          "selected_option" => {
+            "text" => {
+              "type" => "plain_text",
+              "text" => "Something we should keep doing",
+              "emoji" => true
+            },
+            "value" => "keep"
+          }
+        }
+      },
+      "comment_block" => {
+        "comment_input" => {
+          "type" => "plain_text_input",
+          "value" => "This is a test of the modal submission action handler in Rails"
+        }
+      },
+      "anonymous_block" => {
+        "anonymous_checkbox" => {
+          "type" => "checkboxes",
+          "selected_options" => [
+            {
+              "text" => {
+                "type" => "plain_text",
+                "text" => "Yes",
+                "emoji" => true
+              },
+              "value" => "true"
+            }
+          ]
+        }
+      }
+    }
+  },
+  "hash" => "abc.123",
+  "title" => {
+    "type" => "plain_text",
+    "text" => "Retrospective Feedback",
+    "emoji" => true
+  },
+  "clear_on_close" => false,
+  "notify_on_close" => false,
+  "close" => {
+    "type" => "plain_text",
+    "text" => "Cancel",
+    "emoji" => true
+  },
+  "submit" => {
+    "type" => "plain_text",
+    "text" => "Submit",
+    "emoji" => true
+  },
+  "previous_view_id" => nil,
+  "root_view_id" => "the-view-id",
+  "app_id" => "your-app-id",
+  "external_id" => "",
+  "app_installed_team_id" => "your-team-id",
+  "bot_id" => "your-bot-id"
+}
+```
+
+It's a lot to take in, but it can be condensed as follows:
+
+The `blocks` section is a repetition of the blocks we defined earlier in Part 3 when creating the form, which follows the Slack Block Kit format. We can disregard this section.
 
 ## TODO
 
-- show example modal submission payload via ngrok
-- section: handle slack action: parse payload, refactor to interactor and slack form parser lib/module, save to new comment model instance
+- FIX: payload format, state is NESTED in view
+- WIP: section: handle slack action: parse payload, refactor to interactor and slack form parser lib/module, save to new comment model instance
+- fix `images/slack-app-interactivity-enter-url.png` to show `/api/slack/action`
 - related
 - feature image
 - aside for more details on AR association dependent options
 - ref: Slack server events gem handles interaction payloads with "Actions": https://github.com/slack-ruby/slack-ruby-bot-server-events?tab=readme-ov-file#actions
 - aside: learned about applying db check constraints via Rails migrations in Rails Postgres perf book - link to it
+
+```ruby
+{"type"=>"view_submission",
+ "team"=>{"id"=>"T0-your-team-id", "domain"=>"your-slack-domain"},
+ "user"=>{"id"=>"U0-your-slack-user-id", "username"=>"your.slack.user.name", "name"=>"your.slack.user.name", "team_id"=>"T0-your-team-id"},
+ "api_app_id"=>"A0-your-slack-app-id",
+ "token"=>"za...",
+ "trigger_id"=>"659...",
+ "view"=>
+  {"id"=>"V0-viw-id",
+   "team_id"=>"T0-your-team-id",
+   "type"=>"modal",
+   "blocks"=>
+    [{"type"=>"input",
+      "block_id"=>"category_block",
+      "label"=>{"type"=>"plain_text", "text"=>"Category", "emoji"=>true},
+      "optional"=>false,
+      "dispatch_action"=>false,
+      "element"=>
+       {"type"=>"static_select",
+        "action_id"=>"category_select",
+        "placeholder"=>{"type"=>"plain_text", "text"=>"Select category", "emoji"=>true},
+        "options"=>
+         [{"text"=>{"type"=>"plain_text", "text"=>"Something we should keep doing", "emoji"=>true}, "value"=>"keep"},
+          {"text"=>{"type"=>"plain_text", "text"=>"Something we should stop doing", "emoji"=>true}, "value"=>"stop"},
+          {"text"=>{"type"=>"plain_text", "text"=>"Something to try", "emoji"=>true}, "value"=>"try"}]}},
+     {"type"=>"input",
+      "block_id"=>"comment_block",
+      "label"=>{"type"=>"plain_text", "text"=>"Comment", "emoji"=>true},
+      "optional"=>false,
+      "dispatch_action"=>false,
+      "element"=>
+       {"type"=>"plain_text_input",
+        "action_id"=>"comment_input",
+        "placeholder"=>{"type"=>"plain_text", "text"=>"Enter your feedback", "emoji"=>true},
+        "multiline"=>true,
+        "dispatch_action_config"=>{"trigger_actions_on"=>["on_enter_pressed"]}}},
+     {"type"=>"input",
+      "block_id"=>"anonymous_block",
+      "label"=>{"type"=>"plain_text", "text"=>"Anonymous", "emoji"=>true},
+      "optional"=>true,
+      "dispatch_action"=>false,
+      "element"=>
+       {"type"=>"checkboxes",
+        "action_id"=>"anonymous_checkbox",
+        "options"=>[{"text"=>{"type"=>"plain_text", "text"=>"Yes", "emoji"=>true}, "value"=>"true"}]}}],
+   "private_metadata"=>"",
+   "callback_id"=>"feedback_form",
+   "state"=>
+    {"values"=>
+      {"category_block"=>
+        {"category_select"=>
+          {"type"=>"static_select",
+           "selected_option"=>
+            {"text"=>{"type"=>"plain_text", "text"=>"Something we should keep doing", "emoji"=>true},
+             "value"=>"keep"}}},
+       "comment_block"=>
+        {"comment_input"=>
+          {"type"=>"plain_text_input", "value"=>"This is a test of the modal submission action handler in Rails"}},
+       "anonymous_block"=>
+        {"anonymous_checkbox"=>
+          {"type"=>"checkboxes",
+           "selected_options"=>[{"text"=>{"type"=>"plain_text", "text"=>"Yes", "emoji"=>true}, "value"=>"true"}]}}}},
+   "hash"=>"1707...",
+   "title"=>{"type"=>"plain_text", "text"=>"Retrospective Feedback", "emoji"=>true},
+   "clear_on_close"=>false,
+   "notify_on_close"=>false,
+   "close"=>{"type"=>"plain_text", "text"=>"Cancel", "emoji"=>true},
+   "submit"=>{"type"=>"plain_text", "text"=>"Submit", "emoji"=>true},
+   "previous_view_id"=>nil,
+   "root_view_id"=>"V0-some-root-view-id",
+   "app_id"=>"A0-your-slack-app-id",
+   "external_id"=>"",
+   "app_installed_team_id"=>"T0-your-team-id",
+   "bot_id"=>"B0-your-slack-bot-id"},
+ "response_urls"=>[],
+ "is_enterprise_install"=>false,
+ "enterprise"=>nil}
+```
