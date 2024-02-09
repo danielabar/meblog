@@ -352,203 +352,128 @@ Since we added `config.on :action, "view_submission"` in `view_submission.rb`, t
 
 Now that we have communication between Slack and the Rails app working to receive the form submission, we need to parse out the contents of the payload to save the user's retrospective feedback.
 
-The payload contains all the field names and corresponding values submitted by the user for the custom modal we built in Part 3, along with additional information such as the Slack team, user, trigger ID, and API application ID.
-
-Here is the full payload for the test we submitted earlier:
+The payload contains all the field names and corresponding values submitted by the user for the custom modal we built in Part 3, along with additional information such as the Slack team, user, trigger ID, and API application ID. Here is a condensed version of the payload for the test we submitted earlier:
 
 ```ruby
-{
-  "type" => "view_submission",
-  "team" => {
-    "id" => "your-team-id",
-    "domain" => "your-slack-domain"
-  },
-  "user" => {
-    "id" => "your-slack-user-id",
-    "username" => "your-slack-user-name",
-    "name" => "your-slack-user-name",
-    "team_id" => "your-team-id"
-  },
-  "api_app_id" => "your-app-id",
-  "token" => "your-token",
-  "trigger_id" => "123.456",
-  "view" => {
-    "id" => "the-view-id",
-    "team_id" => "your-team-id",
-    "type" => "modal",
-    "blocks" => [
-      {
-        "type" => "input",
-        "block_id" => "category_block",
-        "label" => {
-          "type" => "plain_text",
-          "text" => "Category",
-          "emoji" => true
-        },
-        "optional" => false,
-        "dispatch_action" => false,
-        "element" => {
-          "type" => "static_select",
-          "action_id" => "category_select",
-          "placeholder" => {
-            "type" => "plain_text",
-            "text" => "Select category",
-            "emoji" => true
-          },
-          "options" => [
-            {
-              "text" => {
-                "type" => "plain_text",
-                "text" => "Something we should keep doing",
-                "emoji" => true
-              },
-              "value" => "keep"
-            },
-            {
-              "text" => {
-                "type" => "plain_text",
-                "text" => "Something we should stop doing",
-                "emoji" => true
-              },
-              "value" => "stop"
-            },
-            {
-              "text" => {
-                "type" => "plain_text",
-                "text" => "Something to try",
-                "emoji" => true
-              },
-              "value" => "try"
-            }
-          ]
-        }
-      },
-      {
-        "type" => "input",
-        "block_id" => "comment_block",
-        "label" => {
-          "type" => "plain_text",
-          "text" => "Comment",
-          "emoji" => true
-        },
-        "optional" => false,
-        "dispatch_action" => false,
-        "element" => {
-          "type" => "plain_text_input",
-          "action_id" => "comment_input",
-          "placeholder" => {
-            "type" => "plain_text",
-            "text" => "Enter your feedback",
-            "emoji" => true
-          },
-          "multiline" => true,
-          "dispatch_action_config" => {
-            "trigger_actions_on" => ["on_enter_pressed"]
-          }
-        }
-      },
-      {
-        "type" => "input",
-        "block_id" => "anonymous_block",
-        "label" => {
-          "type" => "plain_text",
-          "text" => "Anonymous",
-          "emoji" => true
-        },
-        "optional" => true,
-        "dispatch_action" => false,
-        "element" => {
-          "type" => "checkboxes",
-          "action_id" => "anonymous_checkbox",
-          "options" => [
-            {
-              "text" => {
-                "type" => "plain_text",
-                "text" => "Yes",
-                "emoji" => true
-              },
-              "value" => "true"
-            }
-          ]
-        }
-      }
-    ]
-  },
-  "private_metadata" => "",
-  "callback_id" => "feedback_form",
-  "state" => {
-    "values" => {
-      "category_block" => {
-        "category_select" => {
-          "type" => "static_select",
-          "selected_option" => {
-            "text" => {
-              "type" => "plain_text",
-              "text" => "Something we should keep doing",
-              "emoji" => true
-            },
-            "value" => "keep"
-          }
-        }
-      },
-      "comment_block" => {
-        "comment_input" => {
-          "type" => "plain_text_input",
-          "value" => "This is a test of the modal submission action handler in Rails"
-        }
-      },
-      "anonymous_block" => {
-        "anonymous_checkbox" => {
-          "type" => "checkboxes",
-          "selected_options" => [
-            {
-              "text" => {
-                "type" => "plain_text",
-                "text" => "Yes",
-                "emoji" => true
-              },
-              "value" => "true"
-            }
-          ]
-        }
-      }
-    }
-  },
-  "hash" => "abc.123",
-  "title" => {
-    "type" => "plain_text",
-    "text" => "Retrospective Feedback",
-    "emoji" => true
-  },
-  "clear_on_close" => false,
-  "notify_on_close" => false,
-  "close" => {
-    "type" => "plain_text",
-    "text" => "Cancel",
-    "emoji" => true
-  },
-  "submit" => {
-    "type" => "plain_text",
-    "text" => "Submit",
-    "emoji" => true
-  },
-  "previous_view_id" => nil,
-  "root_view_id" => "the-view-id",
-  "app_id" => "your-app-id",
-  "external_id" => "",
-  "app_installed_team_id" => "your-team-id",
-  "bot_id" => "your-bot-id"
+{"type"=>"view_submission",
+ "team"=>{"id"=>"T0-your-team-id", "domain"=>"your-slack-domain"},
+ "user"=>{"id"=>"U0-your-slack-user-id", "username"=>"your.slack.user.name"},
+ "api_app_id"=>"A0-your-slack-app-id",
+ "token"=>"za...",
+ "trigger_id"=>"659...",
+ "view"=>
+  {
+   "type"=>"modal",
+   "callback_id"=>"feedback_form",
+   "blocks"=>[... ],
+   "state"=>
+    {"values"=>
+      {"category_block"=>
+        {"category_select"=>
+          {"type"=>"static_select",
+           "selected_option"=>
+            {"text"=>{"type"=>"plain_text", "text"=>"Something we should keep doing"},
+             "value"=>"keep"}}},
+       "comment_block"=>
+        {"comment_input"=>
+          {"type"=>"plain_text_input", "value"=>"This is a test of the modal submission action handler in Rails"}},
+       "anonymous_block"=>
+        {"anonymous_checkbox"=>
+          {"type"=>"checkboxes",
+           "selected_options"=>[{"text"=>{"type"=>"plain_text", "text"=>"Yes"}, "value"=>"true"}]}}}},
+   },
 }
 ```
 
-It's a lot to take in, but it can be condensed as follows:
+The payload indicates that it is of type `view_submission` and contains some information about the Slack `team` and `user`.
 
-The `blocks` section is a repetition of the blocks we defined earlier in Part 3 when creating the form, which follows the Slack Block Kit format. We can disregard this section.
+The `view` section contains a `blocks` section, which is a repetition of the blocks we defined earlier in Part 3 when creating the form, which follows the Slack Block Kit format. We can disregard this section.
+
+The `view` section also contains a `state` section, which is the most important part of the payload. Here is where we find the actual values the user filled in the modal form. For example, the category option the user selected is available in `payload["view"]["state"]["values"]["category_block"]["category_select"]["selected_option"]["value"]`.
+
+The attributes of the payload need to be parsed out for instantiating and saving a `Comment` model in the Rails app. I find it helpful to create a mapping table before writing the code, to be confident that all the data is available:
+
+| Comment           | Slack Payload Attribute                                                                           |
+| ----------------- | ------------------------------------------------------------------------------------------------- |
+| category          | ["view"]["state"]["values"]["category_block"]["category_select"]["selected_option"]["value"]      |
+| content           | ["view"]["state"]["values"]["comment_block"]["comment_input"]["value"]                            |
+| slack_user_id     | ["user"]["id"]                                                                                    |
+| slack_username    | ["user"]["username"]                                                                              |
+| anonymous         | ["view"]["state"]["values"]["anonymous_block"]["anonymous_checkbox"]["selected_options"].present? |
+
+To determine whether the user checked off the Anonymous option in the form, we have to check whether the `selected_options` of the checkbox portion of the payload exist. If yes, it means the user checked this option, otherwise, there will be no `selected_options` at all.
+
+Now that we know how to parse the Slack payload to extract what's needed to build a Comment model, we can come back to the `view_submission` action handler, and implement the logic to create a new Comment:
+
+```ruby
+# bot/actions/view_submission.rb
+SlackRubyBotServer::Events.configure do |config|
+  config.on :action, "view_submission" do |action|
+    payload = action[:payload]
+    action.logger.info "=== ACTION: payload = #{payload}"
+
+    anonymous = payload["view"]["state"]["values"]["anonymous_block"]["anonymous_checkbox"]["selected_options"].present?
+
+    Comment.create!(
+      retrospective: Retrospective.find_by(status: Retrospective.statuses[:open]),
+      content: payload["view"]["state"]["values"]["comment_block"]["comment_input"]["value"],
+      anonymous:,
+      category: payload["view"]["state"]["values"]["category_block"]["category_select"]["selected_option"]["value"],
+      slack_user_id: anonymous ? nil : payload["user"]["id"],
+      slack_username: anonymous ? nil : payload["user"]["username"]
+    )
+
+    # Return `nil`, otherwise the slack-ruby-bot-server-events gem
+    # replies to the channel with a message "true"
+    nil
+  end
+end
+```
+
+After restarting the Rails server `bin/dev`, and submitting the form again from Slack `/retro-feedback`, you should see the following in the Rails server output, indicating that a new Comment has been saved with the payload values. I've added some annotations:
+
+```
+=== Log the action payload
+INFO -- : === ACTION: payload = {"type"=>"view_submission", "team"=>{"id"=>"T0...}
+
+=== Find the open retrospective to associate the new Comment with:
+Retrospective Load (1.6ms)  SELECT "retrospectives".*
+                            FROM "retrospectives"
+                            WHERE "retrospectives"."status" = $1
+                            ORDER BY "retrospectives"."id" ASC LIMIT $2
+                            [["status", "open"], ["LIMIT", 1]]
+
+== Insert a new Comment record in the database
+== Since Anonymous checkbox was selected, slack info fields are nil
+TRANSACTION (1.8ms)  BEGIN
+  Comment Create (5.6ms)
+    INSERT INTO "comments"
+    ("content", "anonymous", "retrospective_id", "created_at", "updated_at", "category", "slack_user_id", "slack_username")
+    VALUES ($1, $2, $3, $4, $5, $6, $7, $8)
+    RETURNING "id"
+    [
+      ["content", "This is a test of the modal submission action handler in Rails"],
+      ["anonymous", true],
+      ["retrospective_id", 31],
+      ["created_at", "2024-02-09 12:53:38.577358"],
+      ["updated_at", "2024-02-09 12:53:38.577358"],
+      ["category", "keep"],
+      ["slack_user_id", nil],
+      ["slack_username", nil]]
+TRANSACTION (2.1ms)  COMMIT
+```
+
+## Refactor
+
+While the current solution works, there are some problems with it:
+
+1. There's no response from the Rails app to Slack, to let the user know that their feedback was received.
+2. There's no error handling. For example, the Comment may fail to be saved due to validation rules.
+3. Having all the business logic directly in the action handler makes it impossible to test.
 
 ## TODO
 
-- FIX: payload format, state is NESTED in view
-- WIP: section: handle slack action: parse payload, refactor to interactor and slack form parser lib/module, save to new comment model instance
+- WIP: refactor to interactor and slack form parser lib/module, save to new comment model instance
 - fix `images/slack-app-interactivity-enter-url.png` to show `/api/slack/action`
 - related
 - feature image
