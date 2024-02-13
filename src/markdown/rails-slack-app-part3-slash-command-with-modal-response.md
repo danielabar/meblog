@@ -5,7 +5,7 @@ description: "Learn how to build a Slack application with Rails in this comprehe
 date: "2024-06-03"
 category: "rails"
 related:
-  - "Understanding ActiveRecord Dependent Options"
+  - "Setup a Rails Project with Postgres and Docker"
   - "ActiveRecord JSON Column with MySQL and MariaDB"
   - "Roll Your Own Search with Rails and Postgres: Search Engine"
 ---
@@ -14,7 +14,7 @@ Welcome to the third installment of this multi-part series on building a Slack a
 
 * [Part 1: Rails new, Slack, and OAuth](../rails-slack-app-part1-oauth)
 * [Part 2: Slack Slash Command with Text Response](../rails-slack-app-part2-slash-command-with-text-response)
-* Part 3: Slack Slash Command with Modal Response (=== YOU ARE HERE ===)
+* Part 3: Slack Slash Command with Modal Response === YOU ARE HERE ===
 * [Part 4: Slack Action Modal Submission](../rails-slack-app-part4-action-modal-submission)
 * [Part 5: Slack Slash Command with Block Kit Response](../rails-slack-app-part5-slash-block-kit-response)
 
@@ -22,7 +22,7 @@ Feel free to jump to a specific part of interest using the links above or follow
 
 This post assumes the reader has at least a beginner level familiarity with Ruby on Rails. It's also assumed the reader has used [Slack](https://slack.com/) as an end user with basic interactions such as joining channels, sending messages, and participating in conversations.
 
-Part 1 of this series introduced [Retro Pulse](../rails-slack-app-part1-oauth#introducing-retro-pulse), a Slack app built with Rails for agile teams to manage their retrospectives entirely with Slack. [Part 2](../rails-slack-app-part2-slash-command-with-text-response) explained how to implement a Slack Slash command to open a retrospective and return a markdown text response to the same Slack channel that initiated the request. Now in Part 3, we will learn how to implement another slash command `/retro-feedback` that will respond with a modal form, allowing the user to enter some feedback for the retrospective such as something the team should keep on doing, or stop doing, or something new to try.
+Part 1 of this series introduced [Retro Pulse](../rails-slack-app-part1-oauth#introducing-retro-pulse), a Slack app built with Rails for agile teams to manage their retrospectives with Slack. [Part 2](../rails-slack-app-part2-slash-command-with-text-response) explained how to implement a Slack slash command to open a retrospective and return a markdown text response to the same Slack channel that initiated the request. Now in Part 3, we will learn how to implement another slash command `/retro-feedback` that will respond with a modal form, allowing the user to enter some feedback for the retrospective such as something the team should keep on doing, or stop doing, or something new to try.
 
 The interaction starts with a user entering the `/retro-feedback` slash command in a Slack workspace where the [Retro Pulse](../rails-slack-app-part1-oauth#introducing-retro-pulse) app has been added:
 
