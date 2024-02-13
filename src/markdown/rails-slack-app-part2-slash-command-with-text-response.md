@@ -13,7 +13,7 @@ related:
 Welcome to the second installment of this multi-part series on building a Slack application with Rails. This series will guide you through the process of creating a Slack application with Rails and is structured as follows:
 
 * [Part 1: Rails new, Slack, and OAuth](../rails-slack-app-part1-oauth)
-* Part 2: Slack Slash Command with Text Response (=== YOU ARE HERE ===)
+* Part 2: Slack Slash Command with Text Response === YOU ARE HERE ===
 * [Part 3: Slack Slash Command with Modal Response](../rails-slack-app-part3-slash-command-with-modal-response)
 * [Part 4: Slack Action Modal Submission](../rails-slack-app-part4-action-modal-submission)
 * [Part 5: Slack Slash Command with Block Kit Response](../rails-slack-app-part5-slash-block-kit-response)
@@ -22,7 +22,7 @@ Feel free to jump to a specific part of interest using the links above or follow
 
 This post assumes the reader has at least a beginner level familiarity with Ruby on Rails. It's also assumed the reader has used [Slack](https://slack.com/) as an end user with basic interactions such as joining channels, sending messages, and participating in conversations.
 
-Part 1 of this series introduced [Retro Pulse](../rails-slack-app-part1-oauth#introducing-retro-pulse), a Slack app built with Rails for agile teams to manage their retrospectives entirely with Slack. Part 2 (this post) will explain how to implement the Slack Slash command to open a retrospective and return a markdown text response to the same Slack channel that initiated the request.
+Part 1 of this series introduced [Retro Pulse](../rails-slack-app-part1-oauth#introducing-retro-pulse), a Slack app built with Rails for agile teams to manage their retrospectives with Slack. Part 2 (this post) will explain how to implement the Slack slash command to open a retrospective and return a markdown text response to the same Slack channel that initiated the request.
 
 The interaction looks like this:
 
