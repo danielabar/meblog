@@ -56,7 +56,7 @@ Then click on the "Create New Command" button, and fill in the form as follows:
 
 **Usage Hint:** Leave blank.
 
-**Escape Channels:** Leave this unchecked. Turning this on will modify the parameters sent with a command by a user such as  wrapping URLs in angle brackets and translating channel or user mentions into their correlated IDs. It's not necessary for this app. See the [Slack docs](https://api.slack.com/interactivity/slash-commands) if your app needs this option.
+**Escape Channels:** Leave this unchecked. Turning this on will modify the parameters sent with a command by a user such as wrapping URLs in angle brackets and translating channel or user mentions into their correlated IDs. It's not necessary for this app. See the [Slack docs](https://api.slack.com/interactivity/slash-commands) if your app needs this option.
 
 Then click the "Save" button which appears all the way at the bottom right hand corner.
 
@@ -101,6 +101,20 @@ SlackRubyBotServer::Events.configure do |config|
   end
 end
 ```
+
+Also, use `require_relative` to load this new command in the `bot/slash_commands.rb` file. We created this file in Part 2 when introducing slash commands:
+
+```ruby
+# bot/slash_commands.rb
+
+# This line was added in Part 2 of this series
+require_relative "slash_commands/retro_open"
+
+# === NEW ===
+require_relative "slash_commands/retro_feedback"
+```
+
+This file is loaded by `config.ru` to ensure that all the Slack handlers are loaded when Rails starts.
 
 At this point, if you restart the Rails server, and then enter `/retro-feedback` in any channel in a Slack workspace with the Retro Pulse app has been installed, you should see some info logging in the Rails server output displaying your team name and the channel id. Of course, nothing will happen on the Slack side because the code isn't responding yet. The next section explains how to generate a modal response.
 
