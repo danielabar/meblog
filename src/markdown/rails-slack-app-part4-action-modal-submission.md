@@ -420,6 +420,7 @@ SlackRubyBotServer::Events.configure do |config|
 
     anonymous = payload["view"]["state"]["values"]["anonymous_block"]["anonymous_checkbox"]["selected_options"].present?
 
+    # This comment will be associated with the one and only open Retrospective
     Comment.create!(
       retrospective: Retrospective.find_by(status: Retrospective.statuses[:open]),
       content: payload["view"]["state"]["values"]["comment_block"]["comment_input"]["value"],
@@ -663,4 +664,4 @@ In this part of the series on building a Slack app with Rails, we've learned how
 ## TODO
 
 - WIP: edit
-- feature image
+- feature image (collaboration, teamwork, group discussion, people working together, feedback loops, interaction, writing notes, engaging in disucssions, using digital devicesi n collaborative setting, organized workspaces, checklists, messaging apps, chat interfaces, people having conversations, people working towards a common goal)
