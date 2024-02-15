@@ -74,9 +74,10 @@ In Part 2 of this series, we learned how to add a [handler to receive slash comm
 
 Create a new file in the `bot/slash_commands` directory that will get triggered whenever a user submits the `/retro-discuss` command. The `command` object exposed by the `slack-ruby-bot-server-events` gem contains many of the request parameters sent by Slack including the `team_id`, `channel_id`, and `text` that user entered.
 
-This first attempt retrieves the commands by category for the open retrospective, concatenates their `content` attributes, and sends back a simple text response to the channel:
+This first attempt retrieves the comments by category for the open retrospective, concatenates their `content` attributes, and sends back a simple text response to the channel:
 
 ```ruby
+# bot/slash_commands/retro_discuss.rb
 SlackRubyBotServer::Events.configure do |config|
   # Essentially this is saying to the SlackRubyBotServer,
   # If a "/retro-discuss" slash command is received from Slack,
@@ -122,7 +123,7 @@ end
 
 The `Comment` model was introduced in Part 4 of this series, [have a quick read there](../rails-slack-app-part4-action-modal-submission#comment-model) if you need a refresher of what it looks like.
 
-Also, use `require_relative` to load this new command in the `bot/slash_commands.rb` file. We created this file in Part 2 when introducing slash commands:
+Use `require_relative` to load this new command in the `bot/slash_commands.rb` file. We created this file in Part 2 when introducing slash commands:
 
 ```ruby
 # bot/slash_commands.rb
@@ -143,17 +144,152 @@ After restarting the Rails server `bin/dev`, and entering `/retro-discuss keep` 
 
 ![slack app retro feedback comma separated](../images/slack-app-retro-feedback-comma-separated.png "slack app retro feedback comma separated")
 
-
-Technically this works, but the visuals are not very good. Returning the response in plain text like this makes it difficult to distinguish one comment from another. And we'd also like to see who posted it and when. We'll cover making the response more visually appealing in the next section.
+Technically this works, but the visuals are not very good. Returning the response in plain text makes it difficult to distinguish one comment from another. We'd also like to see who posted it and when. The next section covers how to make the response more visually appealing.
 
 ## Using Block Kit to Format the Response
 
+Part 3 of this series [introduced Slack's Block Kit](../rails-slack-app-part3-slash-command-with-modal-response#respond-with-example-modal) for building the interactive modal to collect user feedback. Block Kit can also be used to compose a message that is sent via Slack's [chat_postMessage](https://api.slack.com/methods/chat.postMessage) API.
+
+We've already been using the `chat_postMessage` API throughout this series to send simple messages. For example, in Part 2 it was used to reply to the channel that a retrospective had been created:
+
+```ruby
+slack_client = Slack::Web::Client.new(token: team.token)
+slack_client.chat_postMessage(
+  channel: channel_id,
+  mrkdwn: true,
+  text: ":memo: Opened retro `#{retrospective.title}`"
+)
+```
+
+Which looks like this:
+
+![slack app demo retro open success](../images/slack-app-demo-retro-open-success.png "slack app demo retro open success")
+
+Instead of `text`, the `chat_postMessage` API can accept a `blocks` attribute, which is a JSON array, where each element must be a valid [block](https://api.slack.com/reference/block-kit/blocks). If all this sounds a little abstract, an example should help to clear things up.
+
+### Section and Divider
+
+In the version of `bot/slash_commands/retro_discuss.rb` shown below, the `text: comments_text` has been removed and instead an array of blocks is built. For each comment, there is a `section` block to render the content of the comment, followed by a `divider` block to visually distinguish one comment from the other:
+
+```ruby
+# bot/slash_commands/retro_discuss.rb
+SlackRubyBotServer::Events.configure do |config|
+  # ...
+
+  # Retrieve the comments for the open Retrospective, for this category
+  comments = retrospective.comments.where(category: command_text)
+
+  # Build an array of comment blocks
+  comments_blocks = []
+  # Add the comment content
+  comments.each do |comment|
+    comments_blocks << {
+      type: "section",
+      text: {
+        type: "mrkdwn",
+        text: comment.content
+      }
+    }
+    # Add a divider after each comment
+    comments_blocks << { type: "divider" }
+  end
+
+  # Send `blocks` instead of `text`
+  slack_client.chat_postMessage(
+    channel: channel_id,
+    blocks: comments_blocks
+  )
+end
+```
+
+TODO: Maybe move this sentence to end of this section:
+Notice that each block must have a `type` attribute. See the Slack documentation on [Reference Blocks](https://api.slack.com/reference/block-kit/blocks) for the full list of block types and how to use them.
+
+Restarting the Rails server `bin/dev` and entering `/retro-discuss keep` again in the Slack workspace will result in this response:
+
+![slack-app-comment-block-section-divider](../images/slack-app-comment-block-section-divider.png "slack-app-comment-block-section-divider")
+
+This time the response is easier to read because each comment is rendered in its own "section", which is similar to a `<div>` in HTML, and followed by a divider, which is similar to an `<hr>` element in HTML.
+
+### Contextual Information
+
+We'd also like to see the user that posted the comment and when it was posted. Since this information is not as visually important as the content of the comment itself, it can go in a [context](https://api.slack.com/reference/block-kit/blocks#context) block, which is used to display contextual information.
+
+The `context` block functions as a "parent" block. It accepts a list of "children" `elements`, each of which must be a valid block. So we'll have one element to show the user information, and another element to show the date. The `emoji: true` attribute is set on the elements so we can render emoji's as well. This helps with the visual cues to indicate what kind of information this is.
+
+Here is the updated version of the code that adds contextual information about each comment. Note that we need to check if its an "anonymous" comment when rendering the user name. For the posted date, we format the comment model's `created_at` timestamp:
+
+```ruby
+# bot/slash_commands/retro_discuss.rb
+SlackRubyBotServer::Events.configure do |config|
+  # ...
+
+  # Retrieve the comments for the open Retrospective, for this category
+  comments = retrospective.comments.where(category: command_text)
+
+  # Build an array of comment blocks
+  comments_blocks = []
+  comments.each do |comment|
+  # Add the comment content
+    comments_blocks << {
+      type: "section",
+      text: {
+        type: "mrkdwn",
+        text: comment.content
+      }
+    }
+    # Add the user and date as contextual info
+    comments_blocks << {
+      type: "context",
+      elements: [
+        {
+          type: "plain_text",
+          emoji: true,
+          text: ":bust_in_silhouette: #{comment.anonymous ? 'anonymous' : comment.slack_username}"
+        },
+        {
+          type: "plain_text",
+          emoji: true,
+          text: ":calendar: #{comment.created_at.strftime('%Y-%m-%d')}"
+        }
+      ]
+    }
+    # Add a divider after each comment
+    comments_blocks << { type: "divider" }
+  end
+
+  slack_client.chat_postMessage(
+    channel: channel_id,
+    blocks: comments_blocks
+  )
+end
+```
+
+The above code results in the following response to the `/retro-discuss keep` slash command:
+
+![slack-app-comment-blocks-context](../images/slack-app-comment-blocks-context.png "slack-app-comment-blocks-context")
+
+This is looking much better.
+
+### Header
+
+WIP...
+
+## Refactor
+
+
 ## TODO
 
-- explain some basic block kit like how to display each comment text in a section
-- maybe a screenshot of final response with arrows pointing out each type of block kit
-- gets way too long to have in the slash handler, plus we also need validation (eg: what if given no category or invalid category?)
+- WIP: explain some basic block kit like how to display each comment text in a section
 - refactor to interactor, and SlackCommentBuilder module
+  - gets way too long to have in the slash handler, plus we also need validation (eg: what if given no category or invalid category?)
+- aside with technique for blocks debugging if get "invalid blocks response", debug log your blocks array and paste into Slack's visual block kit builder, it will red underline the problem with a useful error message (unfortunately can't get this message via API?). ref comment in `app/interactors/discuss_retrospective.rb` If Slack responds with "invalid blocks" error, take this output, convert to JSON, and paste it in Slack's Block Kit Builder to see what's wrong. https://app.slack.com/block-kit-builder (must be logged into a Slack workspace to use this feature)
+- maybe a screenshot of final response with arrows pointing out each type of block kit
+- section for working with Slack app manifest, especially if using free tier of ngrok, every time restart, get a new url therefore need to update every url in Slack app. To avoid manual effort, I commit a  `app_manifest_template.json` in project which has all the url's specified as `SERVER_HOST_NAME`. Then I built a rake task `lib/tasks/app_manifest.rake` to update the server host name based on what's defined in `.env`. It generates `app_manifest.json` which is ignored, then you can copy/paste that to your Slack app definition (show where to edit manifest in slack app settings). If on a mac and want to save some more manual effort of copying from app_manifest.json, use my Makefile task which also copies the result to the clipboard.
+- aside re: Makefile, link to my other post on Old Ruby New Mac for benefit of introducing Makefile to save typing on long frequently used commands.
+- conclusion (maybe mention other features/enhancements such as a user being able to view all the feedback they've submitted so far, being able to edit it). Include all the Slack reference docs and gem docs as a summary.
 - feature image
 - related
 - edit
+- In Receive Slash Command in Rails section, mention the Retrospective and Comment models were introduced in Parts 2 and 3 of this series respectively with links.
+- in image shown for "each having several sentences", add arrow calling out the comma separator between the comments
