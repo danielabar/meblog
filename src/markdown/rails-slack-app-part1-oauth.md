@@ -326,7 +326,7 @@ Fill in the details, here's what I used:
 
 **Long description:** This is a simple app to collect ongoing feedback via Slack for team retrospectives. While the retro meeting is typically held at the end of a sprint, shape up cycle, or project, it's useful for team members to be able to quickly submit feedback whenever it occurs during project development, otherwise good ideas or feedback can be forgotten about by the time the retro meeting is booked.
 
-Optionally, you can upload a logo and adjust the background color for how the app will appear in Slack. As I'm not a designer, I asked [Bing Chat](https://www.bing.com/search?q=Bing+AI&showconv=1) to draw a logo for me. Putting this all together, here's what my Display Information looks like:
+Optionally, you can upload a logo and adjust the background color for how the app will appear in Slack. As I'm not a designer, I asked Microsoft's [Copilot](https://copilot.microsoft.com/) to draw a logo for me. Putting this all together, here's what my Display Information looks like:
 
 ![slack app display info filled](../images/slack-app-display-info-filled.png "slack app display info filled")
 
