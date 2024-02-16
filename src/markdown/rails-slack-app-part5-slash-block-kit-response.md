@@ -103,7 +103,8 @@ SlackRubyBotServer::Events.configure do |config|
     retrospective = Retrospective.find_by(status: Retrospective.statuses[:open])
 
     # Retrieve the comments for the open Retrospective, for this category
-    comments = retrospective.comments.where(category: command_text)
+    category = command_text
+    comments = retrospective.comments.where(category: category)
 
     # Concatenate all the comments.content into a single comma separated text
     comments_text = comments.map(&:content).join(", ")
@@ -177,7 +178,8 @@ SlackRubyBotServer::Events.configure do |config|
   # ...
 
   # Retrieve the comments for the open Retrospective, for this category
-  comments = retrospective.comments.where(category: command_text)
+  category = command_text
+  comments = retrospective.comments.where(category: category)
 
   # Build an array of comment blocks
   comments_blocks = []
@@ -225,7 +227,8 @@ SlackRubyBotServer::Events.configure do |config|
   # ...
 
   # Retrieve the comments for the open Retrospective, for this category
-  comments = retrospective.comments.where(category: command_text)
+  category = command_text
+  comments = retrospective.comments.where(category: category)
 
   # Build an array of comment blocks
   comments_blocks = []
@@ -273,22 +276,326 @@ This is looking much better.
 
 ### Header
 
-WIP...
+Last thing to add is a header showing the category of the feedback, and a smaller sub-section just below the header to display how many comments were found for that category. The category is defined as an enum in the `Comment` model. Rather than just displaying the word "keep" or "stop", a `header` method can be added to convert it to an phrase for display as follows:
+
+```ruby
+# app/models/comment.rb
+class Comment < ApplicationRecord
+  belongs_to :retrospective
+
+  enum category: {
+    keep: "keep",
+    stop: "stop",
+    try: "try"
+  }
+
+  # === NEW: Convert category enum to phrase
+  def self.header(category)
+    case category.to_sym
+    when :keep
+      "What we should keep on doing"
+    when :stop
+      "What we should stop doing"
+    when :try
+      "Something to try for next time"
+    else
+      "Unknown category"
+    end
+  end
+end
+```
+
+Now the `Comment.header()` method can be used in building the header in the `/retro_discuss` handler as follows:
+
+```ruby
+# bot/slash_commands/retro_discuss.rb
+SlackRubyBotServer::Events.configure do |config|
+  # ...
+
+  # Retrieve the comments for the open Retrospective, for this category
+  category = command_text
+  comments = retrospective.comments.where(category: category)
+
+  # Build an array of comment blocks
+  comments_blocks = []
+
+  # Add the header block
+  comments_blocks << {
+    type: "header",
+    text: {
+      type: "plain_text",
+      text: Comment.header(category)
+    }
+  }
+
+  # Add a sub-header as a section, use markdown!
+  comments_blocks << {
+    type: "section",
+    text: {
+      type: "mrkdwn",
+      text: "Found *#{comments.size}* comments in this category:"
+    }
+  }
+
+  # Add a divider to separate the sub-header from the comments
+  comments_blocks << { type: "divider" }
+
+  comments.each do |comment|
+    # comment content...
+  end
+
+  slack_client.chat_postMessage(
+    channel: channel_id,
+    blocks: comments_blocks
+  )
+end
+```
+
+Note that the `text` attribute of the `section` type can set to `mrkdwn`. In this case the `comments.size` value is wrapped in `*` so that it renders as bold in the Slack response. Putting this all together, we now see a nicely formatted response:
+
+![slack-app-comment-blocks-with-header.png](../images/slack-app-comment-blocks-with-header.png "slack-app-comment-blocks-with-header.png")
 
 ## Refactor
 
+While the current version of the code in the `/retro-discuss` handler works, there are also many problems with it:
+
+* It's way too long, triggering the Rubocop `Metrics/BlockLength` rule.
+* The verbose syntax of the Slack blocks mixed in with the business logic makes it difficult to understand what this code is actually doing.
+* There's no validation - for example, what if the user types in `/retro-discuss foo` or doesn't provide a category at all? In this case the app should reply with a helpful message letting the user know to provide a valid category.
+
+This will be resolved in a similar way to what was done in [Part 4 of this series]((../rails-slack-app-part4-action-modal-submission#refactor)): by introducing an interactor `DiscussRetrospective` to handle the validation and business logic, and a `SlackCommentBuilder` module for the responsibility of building the Slack blocks array.
+
+Starting with the `SlackCommentBuilder` module, containing smaller methods to build each type of block we'll need and some methods that put them all together:
+
+```ruby
+# lib/slack_comment_builder.rb
+module SlackCommentBuilder
+  module_function
+
+  def build_header_block(comments, category_display)
+    [
+      build_header(category_display),
+      build_section("Found *#{comments.size}* comments in this category:"),
+      build_divider
+    ]
+  end
+
+  def build_comment_blocks(comments)
+    comments.flat_map do |comment|
+      [
+        build_comment_content(comment),
+        build_comment_context(comment),
+        build_divider
+      ]
+    end
+  end
+
+  def build_header(category_display)
+    {
+      type: "header",
+      text: {
+        type: "plain_text",
+        text: category_display
+      }
+    }
+  end
+
+  def build_section(text)
+    {
+      type: "section",
+      text: {
+        type: "mrkdwn",
+        text:
+      }
+    }
+  end
+
+  def build_comment_content(comment)
+    build_section(comment.content)
+  end
+
+  def build_comment_context(comment)
+    {
+      type: "context",
+      elements: [
+        build_context_element(":bust_in_silhouette: #{comment.user_info}"),
+        build_context_element(":calendar: #{comment.created_at.strftime('%Y-%m-%d')}")
+      ]
+    }
+  end
+
+  def build_context_element(text)
+    {
+      type: "plain_text",
+      emoji: true,
+      text:
+    }
+  end
+
+  def build_divider
+    { type: "divider" }
+  end
+end
+```
+
+And here is the `DiscussRetrospective` interactor:
+
+```ruby
+class DiscussRetrospective
+  include Interactor
+  include SlackCommentBuilder
+
+  def call
+    retrospective = Retrospective.open_retrospective.first
+    return no_open_retrospective_message if retrospective.nil?
+
+    category = extract_valid_category
+    return invalid_category_message unless category
+
+    comments = retrospective.comments_by_category(category: context.category)
+    post_message(comments)
+  rescue StandardError => e
+    log_error(e)
+    context.fail!
+  end
+
+  private
+
+  def no_open_retrospective_message
+    message = "There is no open retrospective. Please run `/retro-open` to open one."
+    send_error_message(message)
+  end
+
+  def extract_valid_category
+    category = context.category&.to_sym
+    return category if Comment.categories.key?(category)
+
+    nil
+  end
+
+  def invalid_category_message
+    valid_categories = Comment.categories.keys.map(&:to_s).join(", ")
+    message = "Invalid discussion category. Please provide a valid category (#{valid_categories})."
+    send_error_message(message)
+  end
+
+  def post_message(comments)
+    blocks = build_header_block(comments, Comment.header(context.category))
+    blocks += build_comment_blocks(comments)
+    send_message(blocks)
+  end
+
+  def send_message(blocks)
+    # If Slack responds with "invalid blocks" error, take this output, convert to JSON,
+    # and paste it in Slack's Block Kit Builder to see what's wrong.
+    Rails.logger.debug { "=== BLOCKS: #{blocks.inspect}" }
+    context.slack_client.chat_postMessage(
+      channel: context.channel_id,
+      text: "fallback TBD",
+      blocks:
+    )
+  end
+
+  def send_error_message(text)
+    warning_icon = ":warning:"
+    context.slack_client.chat_postMessage(
+      channel: context.channel_id,
+      text: "#{warning_icon} #{text}"
+    )
+  end
+
+  def log_error(error)
+    error_message = "Error in DiscussRetrospective: #{error.message}"
+    backtrace = error.backtrace.join("\n")
+    Rails.logger.error("#{error_message}\n#{backtrace}")
+  end
+end
+```
+
+**What's going on:**
+
+* The inputs `category`, `channel_id`, and `slack_client` are provided via `context`.
+* Validation is performed on `category`, if its `nil` or an unknown category, an error message is sent back to the channel.
+* Given that `category` is valid, the comments for this category are retrieved from the open `Retrospective`
+* The `comments` are then passed to the methods of `SlackCommentBuilder` to build the blocks array.
+* The resulting `blocks` are sent back to the channel.
+
+Finally, we update the `/retro-discuss` handler to delegate to the `DiscussRetrospective` interactor, passing it the inputs it needs:
+
+```ruby
+# bot/slash_commands/retro_discuss.rb
+SlackRubyBotServer::Events.configure do |config|
+  # Essentially this is saying to the SlackRubyBotServer,
+  # If a "/retro-discuss" slash command is received from Slack,
+  # then execute this block.
+  config.on :command, "/retro-discuss" do |command|
+    # Use `command[:team_id]` from request parameters sent to us
+    # by Slack to find the Team model persisted in the database
+    team = Team.find_by(team_id: command[:team_id])
+
+    # Instantiate a slack client with the team token
+    # so we can communicate back to the channel
+    slack_client = Slack::Web::Client.new(token: team.token)
+
+    # This is the Slack channel we need to respond back to
+    channel_id = command[:channel_id]
+
+    # If user entered /retro-discuss keep
+    # in Slack, then command_text will be: keep
+    command_text = command[:text]
+    command.logger.info "=== COMMAND: retro-discuss, Team: #{team.name}, Channel: #{channel_id}, Text: #{command_text}"
+
+    # Delegate to the interactor passing in `command_text` as the category, and channel_id and slack_client
+    DiscussRetrospective.call(category: command_text, channel_id:, slack_client:)
+
+    # Return `nil`, otherwise the slack-ruby-bot-server-events gem
+    # replies to the channel with a message "true"
+    nil
+  end
+end
+```
+
+## Debugging Blocks
+
+WIP...
+
+## App Manifest
+
+WIP...
+
+## Deployment
+
+A full discussion of how to deploy Rails apps to production is out of scope for this post. But here's a few things to note for this app:
+
+Up until now, the Rails app has been running on a laptop, with ngrok forwarding traffic from Slack to `localhost`. For production use, you'll need to deploy your Rails application to a publicly accessible host, eg: `https://yourcompany-retropulse.com`. Then update all the url's in the Slack app to point to where the Rails app is running. You'll also need to make sure all the Slack environment variables (`SLACK_CLIENT_ID`, `SLACK_CLIENT_SECRET`, `SLACK_SIGNING_SECRET`, and `SLACK_VERIFICATION_TOKEN`) are populated in production.
+
+## Conclusion
+
+Congratulations on making it to the end of this series on building a Slack application with Rails! I hope you've found it helpful. Throughout this series, we've covered many aspects of Slack integration, from OAuth authentication to implementing slash commands and interactive modals using Block Kit. In this final installment, we explored how to display feedback collected during retrospective meetings, bringing our app to completion.
+
+For further exploration and reference, here are some useful links and resources:
+
+- [Retro Pulse GitHub Repository](https://github.com/danielabar/retro-pulse)
+- [Slack Ruby Client](https://github.com/slack-ruby/slack-ruby-client)
+- [Slack Ruby Bot Server](https://github.com/slack-ruby/slack-ruby-bot-server)
+- [Slack Ruby Bot Server Events](https://github.com/slack-ruby/slack-ruby-bot-server-events)
+- [Slack OAuth Documentation](https://api.slack.com/authentication/oauth-v2)
+- [ngrok - Secure Tunnels to Localhost](https://ngrok.com/)
+- [Your Slack Apps](https://api.slack.com/apps) (requires login)
+- [Interactor Gem for Ruby](https://github.com/collectiveidea/interactor)
+- [Slack Modals Documentation](https://api.slack.com/surfaces/modals)
+- [Slack Block Kit Documentation](https://api.slack.com/reference/block-kit/blocks)
+- [Slack Interactivity Documentation](https://api.slack.com/messaging/interactivity)
+- [Slack API Methods](https://api.slack.com/methods)
 
 ## TODO
 
-- WIP: explain some basic block kit like how to display each comment text in a section
-- refactor to interactor, and SlackCommentBuilder module
-  - gets way too long to have in the slash handler, plus we also need validation (eg: what if given no category or invalid category?)
 - aside with technique for blocks debugging if get "invalid blocks response", debug log your blocks array and paste into Slack's visual block kit builder, it will red underline the problem with a useful error message (unfortunately can't get this message via API?). ref comment in `app/interactors/discuss_retrospective.rb` If Slack responds with "invalid blocks" error, take this output, convert to JSON, and paste it in Slack's Block Kit Builder to see what's wrong. https://app.slack.com/block-kit-builder (must be logged into a Slack workspace to use this feature)
 - maybe a screenshot of final response with arrows pointing out each type of block kit
 - section for working with Slack app manifest, especially if using free tier of ngrok, every time restart, get a new url therefore need to update every url in Slack app. To avoid manual effort, I commit a  `app_manifest_template.json` in project which has all the url's specified as `SERVER_HOST_NAME`. Then I built a rake task `lib/tasks/app_manifest.rake` to update the server host name based on what's defined in `.env`. It generates `app_manifest.json` which is ignored, then you can copy/paste that to your Slack app definition (show where to edit manifest in slack app settings). If on a mac and want to save some more manual effort of copying from app_manifest.json, use my Makefile task which also copies the result to the clipboard.
 - aside re: Makefile, link to my other post on Old Ruby New Mac for benefit of introducing Makefile to save typing on long frequently used commands.
-- conclusion (maybe mention other features/enhancements such as a user being able to view all the feedback they've submitted so far, being able to edit it). Include all the Slack reference docs and gem docs as a summary.
 - feature image
+- meta description
 - related
 - edit
 - In Receive Slash Command in Rails section, mention the Retrospective and Comment models were introduced in Parts 2 and 3 of this series respectively with links.
