@@ -2,7 +2,7 @@
 title: "Efficient Database Queries in Rails: A Practical Approach"
 featuredImage: "../images/rails-query-perf-kurt-cotoaga-0b5g9_pnMqc-unsplash.jpg"
 description: "Explore a practical guide to optimizing database queries in Rails applications. Learn step-by-step enhancements, from indexing strategies to column selection."
-date: "2024-02-01"
+date: "2024-03-01"
 category: "rails"
 related:
   - "A Tale of Rails, ChatGPT, and Scopes"
