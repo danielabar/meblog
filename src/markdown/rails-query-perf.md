@@ -302,25 +302,6 @@ This is because the index allows PostgreSQL to quickly locate and retrieve the r
 Bitmap Heap Scan on trips  (cost=67.58..592.59 rows=3521 width=48) (actual time=0.724..3.849 rows=3863 loops=1)
 ```
 
-### Maybe Visualize
-
-To use free web based tool: https://explain.dalibo.com/ (need to be ok with sharing query and plan publicly):
-
-Put your query in a file (eg in `queries` dir):
-```sql
--- queries/explain1.sql
-EXPLAIN (ANALYZE, COSTS, VERBOSE, BUFFERS, FORMAT JSON)
-SELECT ...
-```
-
-Run it, redirecting output to file, then copy to clipboard. These flags make it suitable for machine consumption:
-```bash
-psql -h 127.0.0.1 -p 5439 -U owner -d rideshare_development -XqAt -f queries/explain1.sql > queries/analyze1.json
-cat queries/analyze1.json | pbcopy
-# OR
-psql -h 127.0.0.1 -p 5439 -U owner -d rideshare_development -XqAt -f queries/explain1.sql | tee queries/analyze1.json | pbcopy
-```
-
 ## Third Attempt: Joins
 
 Now that use of `completed_at` is optimized, we can continue development of the admin dashboard query. Recall we also need to show driver and rider information, as well as the trip location. To do this, we'll use the ActiveRecord [joins](https://api.rubyonrails.org/classes/ActiveRecord/QueryMethods.html#method-i-joins) method.
@@ -669,6 +650,45 @@ This time the query execution time is just over 2ms, a significant improvement o
       (cost=0.00..84.67 rows=7518 width=0) (actual time=0.314..0.314 rows=7531 loops=1)
       Index Cond: (rating <= 3)
 ```
+
+## Visualize Query Plan
+
+Understanding query plans can be challenging, especially when dealing with complex queries. However, there's a simple and free web-based tool that can help you make sense of them: [explain.dalibo.com](https://explain.dalibo.com/). Here's how to use it.
+
+**Prepare Your Query**: Start by putting your query into a file. For instance, you can create a directory called `queries` and save your SQL query in a file within it. In addition to the `ANALYZE` argument that we've been using, also pass in `COSTS, VERBOSE, BUFFERS, FORMAT JSON` to `EXPLAIN` as shown below. This will include additional information in the query plan output and format the results as JSON:
+
+```sql
+-- queries/fifth.sql
+EXPLAIN (ANALYZE, COSTS, VERBOSE, BUFFERS, FORMAT JSON) SELECT
+  trips.completed_at,
+  trips.rating,
+  locations.address,
+  drivers.first_name || ' ' || drivers.last_name AS driver_name,
+  riders.first_name || ' ' || riders.last_name AS rider_name
+FROM trips
+INNER JOIN trip_requests ON trip_requests.id = trips.trip_request_id
+INNER JOIN locations ON locations.id = trip_requests.start_location_id
+INNER JOIN users AS riders ON riders.id = trip_requests.rider_id
+INNER JOIN users AS drivers ON drivers.id = trips.driver_id
+WHERE (trips.completed_at > '2024-01-10 13:08:58.257990')
+  AND (trips.rating <= 3);
+```
+
+**Run the Query**: Execute the query from your terminal, ensuring to redirect the output to a file. The `-XqAt` flags make the output machine-readable.
+
+```bash
+psql -h 127.0.0.1 \
+-p 5439 -U owner \
+-d rideshare_development \
+-XqAt -f queries/fifth.sql > queries/fifth.json
+# open `queries/fifth.json` in your editor of choice and copy the contents
+```
+
+**Visualize Your Plan**: Visit [explain.dalibo.com](https://explain.dalibo.com/) and paste the generated plan text and query. Then, hit Submit. The tool will generate a visualization of your query plan. Here's an example of how the visualization might look for the fifth attempt version of the query from this post:
+
+![fifth attempt visualized](../images/fifth-attempt-visualized.png "fifth attempt visualized")
+
+With this tool, deciphering the intricacies of the PostgreSQL query plans becomes a little more approachable. Just be mindful that using it involves sharing your query and its plan publicly.
 
 ## Conclusion
 
