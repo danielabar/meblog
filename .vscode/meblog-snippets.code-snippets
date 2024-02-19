@@ -36,5 +36,21 @@
 			"</details>"
 		],
 		"description": "Detail Summary Code for my blog"
-	}
+	},
+  "aside": {
+    "prefix": "aside",
+    "body": [
+      "<aside class=\"markdown-aside\">",
+      "${1:content}",
+      "</aside>"
+      "\n",
+      $0
+    ],
+    "description": "Generate Aside for my blog"
+  },
+  "linka": {
+    "prefix": "linka",
+    "body": "<a class=\"markdown-link\" href=\"${1:link}\">${2:display}</a> $0",
+    "description": "Generate an anchor link in a blog aside section"
+  }
 }
