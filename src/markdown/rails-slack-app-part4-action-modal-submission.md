@@ -665,3 +665,8 @@ In this part of the series on building a Slack app with Rails, we've learned how
 
 - WIP: edit
 - feature image (collaboration, teamwork, group discussion, people working together, feedback loops, interaction, writing notes, engaging in disucssions, using digital devicesi n collaborative setting, organized workspaces, checklists, messaging apps, chat interfaces, people having conversations, people working towards a common goal)
+- update aside for postgres book something like:
+<aside class="markdown-aside">
+Are you interested in learning more about maintaining data correctness and consistency when working with Rails and PostgreSQL? The book <a class="markdown-link"
+href="https://pragprog.com/titles/aapsql/high-performance-postgresql-for-rails/">High Performance PostgreSQL for Rails</a> is a comprehensive guide to optimizing your PostgreSQL database for use with Rails. From indexing and partitioning to advanced query optimization and database maintenance. With many practical examples, you'll be able to take your Rails app to the next level of performance and reliability. Give it a read and see how it can help you build better apps faster!
+</aside>
