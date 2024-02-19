@@ -18,7 +18,7 @@ To get started quicker with a Rails app, schema design, and data, I've forked th
 
 ## Introducing Rideshare
 
-Rideshare is an API-only Rails application that implements a portion of a fictional rideshare service. Think of Uber or Lyft. The core Rideshare models are Drivers, Riders, Trips, Trip Requests. The database is PostgreSQL. The schema is shown below:
+Rideshare is an API-only Rails application that implements a portion of a fictional rideshare service. Think of Uber or Lyft. The core Rideshare models are Drivers, Riders, Trips, Trip Requests. The database is PostgreSQL. The schema is shown below and was generated with the [rails-erd](https://github.com/voormedia/rails-erd) gem:
 
 ![rideshare erd](../images/rideshare-erd.png "rideshare erd")
 
@@ -675,8 +675,3 @@ This time the query execution time is just over 2ms, a significant improvement o
 This post has covered techniques to enhance PostgreSQL query performance in Rails applications. We began by examining query execution plans using the `EXPLAIN (ANALYZE)` feature to understand how PostgreSQL processes queries. We then explored indexing, covering the addition of an index for performance improvements and how to do so without causing downtime or table locking.
 
 Further into query optimization, we discussed the importance of careful column selection in the `SELECT` statement, demonstrating how narrowing down the retrieved data can improve performance. Lastly, we emphasized aligning database queries with business needs, illustrating how additional filters can reduce the number of processed rows and enhance scalability. These strategies provide developers with the tools to create efficient and resilient Rails applications with PostgreSQL.
-
-## TODO
-* WIP: edit
-* aside: rails-erd gem was used to generate the diagram: https://github.com/voormedia/rails-erd
-* Nice to have: Only have 50_000 rows in trips/trip_requests, need ~1M to see effect of index? Need pure sql loading solution, will be too slow via db/seeds.rb (but tricky due to 1-1 relationship between trip_requests and trips tables)
