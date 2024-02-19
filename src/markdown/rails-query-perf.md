@@ -327,7 +327,7 @@ Now that use of `completed_at` is optimized, we can continue development of the 
 
 To get location information, the Trip model must be joined to `trip_request`, which must then be joined to `start_location` via a nested join. Getting rider and driver information is a little more complicated as we need to join the `users` table twice, once for Riders (which are joined on trip_request.rider_id), and another time for Drivers (which are joined on trips.driver_id). This requires the use of a string join rather than just specifying the model. The same `where` clause as before is used to filter on recent trips.
 
-By default, the result of `joins` will only select the columns from the model class on which its invoked, `Trip` in this case. But since the report needs to also show Driver, Rider, and Location information, this scope adds a `select` clause to get all fields from all tables:
+By default, the result of `joins` will only select the columns from the model class on which its invoked, `Trip` in this case. But since the report needs to also show Driver, Rider, and Location information, this scope adds a `SELECT` clause to get all fields from all tables using the ActiveRecord [select](https://api.rubyonrails.org/classes/ActiveRecord/QueryMethods.html#method-i-select) method:
 
 ```ruby
 class Trip < ApplicationRecord
@@ -446,7 +446,9 @@ For example, the join from the `trips` table to the `trip_requests` table is sho
 PgMustard, a paid tool that helps to review query plans hosts a very useful <a class="markdown-link" href="https://www.pgmustard.com/docs/explain">EXPLAIN Glossary</a> with definitions of many of the terms shown in PostgreSQL plans.
 </aside>
 
-This version of the query is also fetching more data due to the SELECT clause specifying all columns on all tables in the joins:
+**CAUTION:** When using joins, there should be an index on each foreign key column. In the example above, these are: `trips.trip_request_id`, `trip_requests.start_location_id`, `trip_requests.rider_id`, and `trips.driver_id`. If you used `references` when generating the migration with Rails, or specified `t.references :some_model, foreign_key: true` in the Rails migration file, then Rails will automatically generate an index on that column in addition to the foreign key constraint.
+
+This version of the query is also fetching more data due to the `SELECT` clause specifying all columns on all tables in the joins:
 
 ```ruby
 .select("trips.*, locations.*, drivers.*, riders.*")
@@ -456,7 +458,7 @@ Another way to improve performance is to reduce the "width" of the results.
 
 ## Fourth Attempt: Reduce Columns
 
-The previous query selected all columns from all of the joined tables. But recall the business requirements were that we only need to display a few of these. Let's "narrow" the amount of data by restricting the columns in the select to only what we need. This also allows us to do some string concatenation to distinguish between driver and rider names.
+The previous query selected all columns from all of the joined tables. But recall the business requirements were that we only need to display a few of these. Let's "narrow" the amount of data by restricting the columns in the `SELECT` clause to only what we need. This also allows us to do some string concatenation to distinguish between driver and rider names.
 
 ```ruby
 class Trip < ApplicationRecord
@@ -465,9 +467,9 @@ class Trip < ApplicationRecord
       .joins('INNER JOIN users AS riders ON riders.id = trip_requests.rider_id')
       .joins('INNER JOIN users AS drivers ON drivers.id = trips.driver_id')
       .where('trips.completed_at > ?', 1.week.ago)
-      .select('trips.completed_at, trips.rating, locations.address,
-               drivers.first_name || \' \' || drivers.last_name AS driver_name,
-               riders.first_name || \' \' || riders.last_name AS rider_name')
+      .select("trips.completed_at, trips.rating, locations.address,
+               CONCAT(drivers.first_name, ' ', drivers.last_name) driver_name,
+               CONCAT(riders.first_name, ' ', riders.last_name) rider_name")
   }
   # ...
 end
@@ -500,8 +502,8 @@ EXPLAIN (ANALYZE) SELECT
   trips.completed_at,
   trips.rating,
   locations.address,
-  drivers.first_name || ' ' || drivers.last_name AS driver_name,
-  riders.first_name || ' ' || riders.last_name AS rider_name
+  CONCAT(drivers.first_name, ' ', drivers.last_name) driver_name,
+  CONCAT(riders.first_name, ' ', riders.last_name) rider_name
 FROM trips
 INNER JOIN trip_requests ON trip_requests.id = trips.trip_request_id
 INNER JOIN locations ON locations.id = trip_requests.start_location_id
@@ -543,7 +545,7 @@ This time the performance is slightly improved:
 Execution Time: 20.553 ms
 ```
 
-It still needs to perform all the joins, but less overall data is being fetched from the database. This can be observed by the smaller `width` attribute in the `Hash Join` operations. The `width` refers to the total number of bytes required to store the output of the join operation, and is proportional to the number of columns in the SELECT clause.
+It still needs to perform all the joins, but less overall data is being fetched from the database. This can be observed by the smaller `width` attribute in the `Hash Join` operations. The `width` refers to the total number of bytes required to store the output of the join operation, and is proportional to the number of columns in the `SELECT` clause.
 
 For example, focusing on the top level Hash Join operation, this query has a width of 88:
 
@@ -592,7 +594,7 @@ class Trip < ApplicationRecord
 end
 ```
 
-This time, the results are "shaped" the same as before because the SELECT columns are the same, but the total number of results is smaller. This also ensures the query only returns trips with ratings, as before, we were also getting results with `nil` ratings, i.e. customer didn't bother to leave a rating.
+This time, the results are "shaped" the same as before because the `SELECT` columns are the same, but the total number of results is smaller. This also ensures the query only returns trips with ratings, as before, we were also getting results with `nil` ratings, i.e. customer didn't bother to leave a rating.
 
 ```ruby
 results = Trip.recently_completed
@@ -661,7 +663,7 @@ WHERE (trips.completed_at > '2024-01-10 13:08:58.257990')
  Execution Time: 2.360 ms
 ```
 
-This time the query execution time is just over 2ms, a significant improvement over the previous ~20ms. This is due to the additional filter condition `(rating <= 3)` that reduces the number of rows that need to eb processed in join operations. You can also see the execution is using the index on rating:
+This time the query execution time is just over 2ms, a significant improvement over the previous ~20ms. This is due to the additional filter condition `(rating <= 3)` that reduces the number of rows that need to be processed in join operations. You can also see the execution is using the index on rating:
 ```
 ->  Bitmap Index Scan on index_trips_on_rating
       (cost=0.00..84.67 rows=7518 width=0) (actual time=0.314..0.314 rows=7531 loops=1)
@@ -670,13 +672,11 @@ This time the query execution time is just over 2ms, a significant improvement o
 
 ## Conclusion
 
-This post has covered techniques to enhance PostgreSQL query performance in Rails applications. We began by examining query execution plans using the `EXPLAIN (ANALYZE)` feature to understand how PostgreSQL processes queries. We then explored indexing, covering the addition of indexes for performance improvement and how to do so without causing downtime or table locking.
+This post has covered techniques to enhance PostgreSQL query performance in Rails applications. We began by examining query execution plans using the `EXPLAIN (ANALYZE)` feature to understand how PostgreSQL processes queries. We then explored indexing, covering the addition of an index for performance improvements and how to do so without causing downtime or table locking.
 
 Further into query optimization, we discussed the importance of careful column selection in the `SELECT` statement, demonstrating how narrowing down the retrieved data can improve performance. Lastly, we emphasized aligning database queries with business needs, illustrating how additional filters can reduce the number of processed rows and enhance scalability. These strategies provide developers with the tools to create efficient and resilient Rails applications with PostgreSQL.
 
 ## TODO
-* WIP: need more work on explanation of why at each step there was perf improvement based on analyzing the plan
 * WIP: edit
-* Aside or reference in Conclusion: Explain Glossary for definition of all terms used in explain output: https://www.pgmustard.com/docs/explain
 * aside: rails-erd gem was used to generate the diagram: https://github.com/voormedia/rails-erd
 * Nice to have: Only have 50_000 rows in trips/trip_requests, need ~1M to see effect of index? Need pure sql loading solution, will be too slow via db/seeds.rb (but tricky due to 1-1 relationship between trip_requests and trips tables)
