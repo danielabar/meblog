@@ -341,7 +341,9 @@ class Trip < ApplicationRecord
 end
 ```
 
-Here is what it looks like in a Rails console. Note that even though `results` is a relation of Trip models, each instance contains attributes from trips, locations, and users table. However, since both drivers and riders are actually from the same `users` table, the last one pulled in (`riders` in this case) "wins" and so the result only has the rider attributes. I've added `===` comments to highlight which model each set of attributes comes from:
+Here is what it looks like in a Rails console. Note that even though `results` is a relation of Trip models, each instance contains attributes from trips, locations, and users tables. However, since both drivers and riders are actually from the same `users` table, the last one pulled in (`riders` in this case) "wins" and so the result only has the rider attributes. This could be due to the use of STI (Single Table Inheritance) to model Drivers and Riders. This will be addressed in the next section.
+
+I've added `===` comments to highlight which model each set of attributes comes from:
 
 ```ruby
 results = Trip.recently_completed
@@ -384,7 +386,7 @@ results.first.attributes
 Now this query can be analyzed in a database console session `bin/rails dbconsole`:
 
 ```sql
-EXPLAIN (ANALYZE, BUFFERS) SELECT
+EXPLAIN (ANALYZE) SELECT
     trips.*,
     locations.*,
     drivers.*,
@@ -424,21 +426,28 @@ WHERE (trips.completed_at > '2024-01-10 12:05:39.639423');
 --  Execution Time: 24.936 ms
 ```
 
-This time execution time has gone up, even though the query is still using the index on `trips.completed_at`:
+The SQL explain plan above shows this is a more complex query than the previous attempts. Execution time has gone up, even though the query is still using the index on `trips.completed_at`:
 
 ```
 Execution Time: 24.936 ms
 ```
 
-This is due to the multiple joins, which are shown in the query execution plan as `Hash Cond`, which is the condition for the join operation, examples:
+This is in part due to the multiple joins. Joins between tables are expressed in the plan as a combination of a `Hash` node, a `Hash Join` which implements the join details, and a `Hash Cond`, which shows the conditions that were used to perform the join, using the `Hash` node.
+
+For example, the join from the `trips` table to the `trip_requests` table is shown in the plan as:
 
 ```
-Hash Cond: (trips.driver_id = drivers.id)
-Hash Cond: (trip_requests.start_location_id = locations.id)
-...
+->  Hash Join  (cost=527.89..1637.76 rows=524 width=56) (actual time=1.054..11.992 rows=559 loops=1)
+      Hash Cond: (trip_requests.id = trips.trip_request_id)
+      ->  Hash  (cost=521.34..521.34 rows=524 width=48) (actual time=1.028..1.032 rows=559 loops=1)
 ```
 
-It's also fetching more data due to the SELECT clause specifying all columns on all tables in the joins:
+<aside class="markdown-aside">
+PgMustard, a paid tool that helps to review query plans hosts a very useful <a class="markdown-link" href="https://www.pgmustard.com/docs/explain">EXPLAIN Glossary</a> with definitions of many of the terms shown in PostgreSQL plans.
+</aside>
+
+This version of the query is also fetching more data due to the SELECT clause specifying all columns on all tables in the joins:
+
 ```ruby
 .select("trips.*, locations.*, drivers.*, riders.*")
 ```
@@ -463,6 +472,10 @@ class Trip < ApplicationRecord
   # ...
 end
 ```
+
+<aside class="markdown-aside">
+As of Rails 7.1, the `select` method can accept a hash of columns and aliases rather than raw SQL when specifying columns from the join tables. However, if the select uses SQL functions as in this case where concatenation is used to generate the driver and rider names, then raw SQL is still required. Checkout this <a class="markdown-link" href="https://blog.kiprosh.com/rails-7-1-allows-activerecord-querymethods-select-and-reselect-to-receive-hash-values/">post</a> for more details.
+</aside>
 
 Running this query in the Rails console shows the attributes contain exactly what's needed to display in the view, with no extraneous data.
 
@@ -662,9 +675,8 @@ This post has covered techniques to enhance PostgreSQL query performance in Rail
 Further into query optimization, we discussed the importance of careful column selection in the `SELECT` statement, demonstrating how narrowing down the retrieved data can improve performance. Lastly, we emphasized aligning database queries with business needs, illustrating how additional filters can reduce the number of processed rows and enhance scalability. These strategies provide developers with the tools to create efficient and resilient Rails applications with PostgreSQL.
 
 ## TODO
-* possibly re-run all on the same day with freshly seeded 50K to get consistent data, dates, counts, etc.
 * WIP: need more work on explanation of why at each step there was perf improvement based on analyzing the plan
 * WIP: edit
-* Put query plan in collapsible sections and only highlight certain parts? See `src/markdown/activerecord-dependent-options.md`
+* Aside or reference in Conclusion: Explain Glossary for definition of all terms used in explain output: https://www.pgmustard.com/docs/explain
 * aside: rails-erd gem was used to generate the diagram: https://github.com/voormedia/rails-erd
 * Nice to have: Only have 50_000 rows in trips/trip_requests, need ~1M to see effect of index? Need pure sql loading solution, will be too slow via db/seeds.rb (but tricky due to 1-1 relationship between trip_requests and trips tables)
