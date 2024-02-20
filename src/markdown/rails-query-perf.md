@@ -1,12 +1,12 @@
 ---
 title: "Efficient Database Queries in Rails: A Practical Approach"
-featuredImage: "../images/rails-query-perf-kurt-cotoaga-0b5g9_pnMqc-unsplash.jpg"
+featuredImage: "../images/rails-query-perf-torsten-dederichs-p_c4k2pXkkk-unsplash.jpg"
 description: "Explore a practical guide to optimizing database queries in Rails applications. Learn step-by-step enhancements, from indexing strategies to column selection."
 date: "2024-03-01"
 category: "rails"
 related:
-  - "A Tale of Rails, ChatGPT, and Scopes"
-  - "Understanding ActiveRecord Dependent Options"
+  - "Roll Your Own Search with Rails and Postgres: Search Engine"
+  - "Use UUID for primary key with Rails and Postgres"
   - "Homebrew Postgresql Service not Starting Resolved"
 ---
 
@@ -298,7 +298,7 @@ And the overall time to complete this query is just over 4ms, a significant impr
 Execution Time: 4.229 ms
 ```
 
-This is because the index allows PostgreSQL to quickly locate and retrieve the relevant rows. Where the index helps is in a faster filtering operation based on the query conditions. Note that since this isn't an "index-only scan", a `Bitmap Heap Scan` was still required to access data from the table, which is shown in the first line of the query plan:
+This is because the index allows PostgreSQL to quickly locate and retrieve the relevant rows. Where the index helps is in a faster filtering operation based on the query conditions. Note that since this isn't an [index-only scan](https://www.postgresql.org/docs/current/indexes-index-only-scans.html), a `Bitmap Heap Scan` was still required to access data from the table, which is shown in the first line of the query plan:
 
 ```
 Bitmap Heap Scan on trips  (cost=67.58..592.59 rows=3521 width=48) (actual time=0.724..3.849 rows=3863 loops=1)
@@ -380,6 +380,9 @@ INNER JOIN "locations" ON "locations"."id" = "trip_requests"."start_location_id"
 INNER JOIN users AS riders ON riders.id = trip_requests.rider_id
 INNER JOIN users AS drivers ON drivers.id = trips.driver_id
 WHERE (trips.completed_at > '2024-01-10 12:05:39.639423');
+```
+
+```
 --                                                                              QUERY PLAN
 -----------------------------------------------------------------------------------------------------------------------------------------------------------------------
 --  Hash Join  (cost=1399.44..2692.88 rows=524 width=453) (actual time=11.736..24.510 rows=559 loops=1)
@@ -548,9 +551,9 @@ Selecting only the necessary columns can lead to performance improvements includ
 
 Another way to improve performance is to reduce the total number of rows returned by the query with additional filters (i.e. SQL WHERE clauses). This could require some discussion between engineering and product teams to make sure everyone understands the business problem that is being solved. For example, in this case, it turns out the admin team really wants to focus on recent trips with low ratings, so they can investigate what happened on some of those trips to improve customer experience. They've defined a "low" rating as 3 or fewer stars, based on a 5 star rating system. Up until now, they've been sorting the results client side by low rating, and investigating those.
 
-Given this better understanding of the requirements, another `where` condition can be added to the scope, to only retrieve trips where the rating is less than or equal to 3.
+Given this better understanding of the requirements, another `WHERE` condition can be added to the scope, to only retrieve trips where the rating is less than or equal to 3.
 
-**CAUTION:** When adding further `where` clauses to reduce the amount of data being returned, always check whether there's an index on the column you're planning to filter by. Otherwise, you could inadvertently make performance worse while trying to improve it! In this case, there already is an index on `trips.rating`. We saw this earlier when inspecting the table schema with `\d trips` in the database console:
+**CAUTION:** When adding further `WHERE` clauses to reduce the amount of data being returned, always check whether there's an index on the column you're planning to filter by. Otherwise, you could inadvertently make performance worse while trying to improve it! In this case, there already is an index on `trips.rating`. We saw this earlier when inspecting the table schema with `\d trips` in the database console:
 
 ```
 => \d trips
@@ -577,7 +580,7 @@ class Trip < ApplicationRecord
 end
 ```
 
-This time, the results are "shaped" the same as before because the `SELECT` columns are the same, but the total number of results is smaller. This also ensures the query only returns trips with ratings, as before, we were also getting results with `nil` ratings, i.e. customer didn't bother to leave a rating.
+This time, the results are "shaped" the same as before because the `SELECT` columns are the same, but the total number of results is smaller. This also ensures the query only returns trips with ratings, as before, we were also getting results with `nil` ratings, i.e. where the customer didn't leave to leave a rating.
 
 ```ruby
 results = Trip.recently_completed
@@ -655,7 +658,7 @@ This time the query execution time is just over 2ms, a significant improvement o
 
 ## Visualize Query Plan
 
-Understanding query plans can be challenging, especially when dealing with complex queries. However, there's a simple and free web-based tool that can help you make sense of them: [explain.dalibo.com](https://explain.dalibo.com/). Here's how to use it.
+Understanding query plans can be challenging, especially when dealing with complex queries. However, there's a simple and free web-based tool that can help make sense of them: [explain.dalibo.com](https://explain.dalibo.com/). Here's how to use it.
 
 **Prepare Your Query**: Start by putting your query into a file. For instance, you can create a directory called `queries` and save your SQL query in a file within it. In addition to the `ANALYZE` argument that we've been using, also pass in `COSTS, VERBOSE, BUFFERS, FORMAT JSON` to `EXPLAIN` as shown below. This will include additional information in the query plan output and format the results as JSON:
 
@@ -686,7 +689,7 @@ psql -h 127.0.0.1 \
 # open `queries/fifth.json` in your editor of choice and copy the contents
 ```
 
-**Visualize Your Plan**: Visit [explain.dalibo.com](https://explain.dalibo.com/) and paste the generated plan text and query. Then, hit Submit. The tool will generate a visualization of your query plan. Here's an example of how the visualization might look for the fifth attempt version of the query from this post:
+**Visualize Your Plan**: Visit [explain.dalibo.com](https://explain.dalibo.com/) and paste the generated plan text and query. Then, hit Submit. The tool will generate a visualization of your query plan. Here's an example of the visualization for the fifth attempt version of the query from this post:
 
 ![fifth attempt visualized](../images/fifth-attempt-visualized.png "fifth attempt visualized")
 
