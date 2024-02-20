@@ -49,13 +49,15 @@ class TripRequest < ApplicationRecord
 end
 ```
 
-**Generating Data:** Rideshare comes with a task to generate sample data `bin/rails data_generators:generate_all`. I've modified it to generate 1000 Drivers and Riders, and 50,000 Trips and Trip Requests. I've also modified it to generate random variability in the `trips.completed_at` date from anywhere between 1 and 90 days ago.
+**Generating Data**
 
-The data generator can be re-run at any time, but first run the truncate task `bin/rails db:truncate_all` to quickly remove all data.
+Rideshare comes with a task to generate sample data `bin/rails data_generators:generate_all`. I've modified it to generate 1000 Drivers and Riders, and 50,000 Trips and Trip Requests. I've also modified it to generate random variability in the `trips.completed_at` date from anywhere between 1 and 90 days ago. The data generator can be re-run at any time, but first run the truncate task `bin/rails db:truncate_all` to quickly remove all data.
 
-<aside class="markdown-aside">
-In optimizing query performance, it's important to populate the local database with a sufficient amount of data to deter PostgreSQL from relying solely on sequential scans. For instance, if the local database contains only around 10 records per table, that wouldn't be enough data to have useful query and performance analysis information.
-</aside>
+While generating fake data for testing purposes can provide a valuable simulation of a sizeable database, seeded data tends to be very efficiently laid out, sequentially. This results in an unrealistically high number of rows in fewer pages. When the data is packed so efficiently, performance can be good for sequential scans. An equivalent range of data that grew and churned organically in production over time via `INSERT`, `UPDATE`, and `DELETE`, statements will result in a more dispersed distribution of data across pages.
+
+Therefore, when addressing a specific performance issues encountered in a production database, it might be necessary to replicate the environment in a test setup, by copying relevant portions of production data to a separate testing environment. This may also require anonymizing sensitive data during the copy process. The <a class="markdown-link" href="(https://pragprog.com/titles/aapsql/high-performance-postgresql-for-rails/)">High Performance PostgreSQL for Rails</a> goes through this exercise with an example `users` table.
+
+However, for the purpose of this blog post, we'll be focused on optimizing a query to meet a new business requirement, so we don't need to worry about the complexities of a live environment.
 
 ## Building an Admin Report
 
