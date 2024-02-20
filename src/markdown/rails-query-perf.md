@@ -680,9 +680,9 @@ WHERE (trips.completed_at > '2024-01-10 13:08:58.257990')
 
 ```bash
 psql -h 127.0.0.1 \
--p 5439 -U owner \
--d rideshare_development \
--XqAt -f queries/fifth.sql > queries/fifth.json
+  -p 5439 -U owner \
+  -d rideshare_development \
+  -XqAt -f queries/fifth.sql > queries/fifth.json
 # open `queries/fifth.json` in your editor of choice and copy the contents
 ```
 
