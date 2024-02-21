@@ -14,7 +14,7 @@ This post will walk through a step-by-step approach to PostgreSQL query enhancem
 
 ## Getting Started
 
-To get started quicker with a Rails app, schema design, and data, I've forked the [Rideshare Rails application](https://github.com/andyatkinson/rideshare) on GitHub. Rideshare is a Rails app that's used for exercises in the book *High Performance PostgreSQL for Rails*. I had the opportunity to provide a technical review for the beta version of this book. Many insights shared in this post are derived from the lessons learned during that review process. If you're interested in the book, it can be [purchased here](https://pragprog.com/titles/aapsql/high-performance-postgresql-for-rails/).
+To get started quicker with a Rails application, schema design, and data, I've forked the [Rideshare Rails application](https://github.com/andyatkinson/rideshare) on GitHub. This is used for exercises in the book *High Performance PostgreSQL for Rails*. I had the opportunity to provide a technical review for the beta version of this book. Many insights shared in this post are derived from the lessons learned during that review process. If you're interested in the book, it can be [purchased here](https://pragprog.com/titles/aapsql/high-performance-postgresql-for-rails/).
 
 ## Introducing Rideshare
 
