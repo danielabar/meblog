@@ -660,7 +660,7 @@ This time the query execution time is just over 2ms, a significant improvement o
 
 Understanding query plans can be challenging, especially when dealing with complex queries. However, there's a simple and free web-based tool that can help make sense of them: [explain.dalibo.com](https://explain.dalibo.com/). Here's how to use it.
 
-**Prepare Your Query**: Start by putting your query into a file. For instance, you can create a directory called `queries` and save your SQL query in a file within it. In addition to the `ANALYZE` argument that we've been using, also pass in `COSTS, VERBOSE, BUFFERS, FORMAT JSON` to `EXPLAIN` as shown below. This will include additional information in the query plan output and format the results as JSON:
+**Prepare Your Query**: Start by putting your query into a file. For instance, you can create a directory called `queries` and save your SQL query in a file within it. In addition to the `ANALYZE` argument that we've been using, also pass in `COSTS, VERBOSE, BUFFERS, FORMAT JSON` to `EXPLAIN` as shown below. This will include additional information in the query plan output, such as the amount of disk data that was fetched, and format the results as JSON:
 
 ```sql
 -- queries/fifth.sql
@@ -697,6 +697,6 @@ With this tool, deciphering the intricacies of the PostgreSQL query plans become
 
 ## Conclusion
 
-This post has covered techniques to enhance PostgreSQL query performance in Rails applications. We began by examining query execution plans using the `EXPLAIN (ANALYZE)` feature to understand how PostgreSQL processes queries. We then explored indexing, covering the addition of an index for performance improvements and how to do so without causing downtime or table locking.
+This post has covered techniques to enhance PostgreSQL query performance in Rails applications. We began by examining a query execution plan using the `EXPLAIN (ANALYZE)` feature to understand how PostgreSQL processes queries. We then explored indexing, covering the addition of an index for performance improvements and how to do so without causing downtime or table locking.
 
 Further into query optimization, we discussed the importance of careful column selection in the `SELECT` statement, demonstrating how narrowing down the retrieved data can improve performance. Lastly, we emphasized aligning database queries with business needs, illustrating how additional filters can reduce the number of processed rows and enhance scalability. Finally we learned how to visualize query plans with a free web-based tool. These strategies provide developers with the tools to create efficient and resilient Rails applications with PostgreSQL.
