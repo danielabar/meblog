@@ -2,7 +2,7 @@
 title: "Some Elegance with Rails Caching"
 featuredImage: "../images/rails-cache-elegance-frankie-lopez-hKSJiRZ-ngk-unsplash.jpg"
 description: "Explore the elegance of Rails caching using the 'fetch' method to optimize performance and easily handle slow operations."
-date: "2024-03-01"
+date: "2024-06-01"
 category: "rails"
 related:
   - "Understanding ActiveRecord Dependent Options"
