@@ -834,7 +834,7 @@ Unlike models, views, and controllers, a service is not a built-in Rails compone
 <span class="grvsc-line"><span class="grvsc-source"></span></span>
 <span class="grvsc-line"><span class="grvsc-source"><span class="mtk1">      </span><span class="mtk3"># Commit this message&#39;s offset, so in the event of a crash/restart,</span></span></span>
 <span class="grvsc-line"><span class="grvsc-source"><span class="mtk1">      </span><span class="mtk3"># it will not be consumed again.</span></span></span>
-<span class="grvsc-line"><span class="grvsc-source"><span class="mtk1">      mark_as_consumed</span></span></span>
+<span class="grvsc-line"><span class="grvsc-source"><span class="mtk1">      </span><span class="mtk5">mark_as_consumed</span><span class="mtk1">(message)</span></span></span>
 <span class="grvsc-line"><span class="grvsc-source"><span class="mtk1">    </span><span class="mtk7">end</span></span></span>
 <span class="grvsc-line"><span class="grvsc-source"><span class="mtk1">  </span><span class="mtk7">end</span></span></span>
 <span class="grvsc-line"><span class="grvsc-source"><span class="mtk1">  </span><span class="mtk3"># ...</span></span></span>
