@@ -10,7 +10,7 @@ related:
   - "Homebrew Postgresql Service not Starting Resolved"
 ---
 
-This post will walk through a step-by-step approach to PostgreSQL query enhancement in Rails applications. From indexing strategies to efficient column selection, you'll learn some techniques to ensure optimal query performance.
+This post will walk through a step-by-step approach to PostgreSQL query enhancement in Rails applications. From indexing strategies to running migrations without downtime, to efficient column selection, you'll learn some techniques to ensure optimal query performance.
 
 ## Getting Started
 
@@ -22,7 +22,7 @@ Rideshare is an API-only Rails application that implements a portion of a fictio
 
 ![rideshare erd](../images/rideshare-erd.png "rideshare erd")
 
-Single Table Inheritance (STI) is used to represent both Drivers and Riders in the Users table. This means that rows where `users.type = 'Driver'` are Drivers, and can be joined to Trips on `driver_id`. Rows where `users.type = 'Rider'` are Riders, and can be joined to TripRequests on `rider_id`.
+Single Table Inheritance ([STI](https://api.rubyonrails.org/classes/ActiveRecord/Inheritance.html)) is used to represent both Drivers and Riders in the Users table. This means that rows where `users.type = 'Driver'` are Drivers, and can be joined to Trips on `driver_id`. Rows where `users.type = 'Rider'` are Riders, and can be joined to TripRequests on `rider_id`.
 
 Here are the corresponding model classes, only focusing on the associations between them:
 
@@ -151,6 +151,7 @@ Execution Time: 11.880 ms
 A sequential scan means that PostgreSQL reads the entire table, and *then* filters the rows out that match the query conditions. The number of rows removed by filtering are shown in the execution plan:
 
 ```
+Filter: (completed_at >= '2024-01-04 12:20:54.270716'::timestamp without time zone)
 Rows Removed by Filter: 46137
 ```
 
@@ -186,7 +187,15 @@ Foreign-key constraints:
     "fk_rails_e7560abc33" FOREIGN KEY (driver_id) REFERENCES users(id)
 ```
 
-The `Indexes` section of the output above lists all the indexes that are available on the `trips` table. Notice there is no index on `completed_at`.
+The `Indexes` section of the output above lists all the indexes that are available on the `trips` table. Notice there is no index on `completed_at`:
+
+```
+Indexes:
+  "trips_pkey" PRIMARY KEY, btree (id)
+  "index_trips_on_driver_id" btree (driver_id)
+  "index_trips_on_rating" btree (rating)
+  "index_trips_on_trip_request_id" btree (trip_request_id)
+```
 
 While the existing query may be sufficient for the current scale, this operation will become progressively slower as the number of trips increases. This means that the overall efficiency and performance of the application may be negatively impacted over time.
 
@@ -256,9 +265,9 @@ class AddIndexToTripsCompletedAt < ActiveRecord::Migration[7.1]
 end
 ```
 
-Specifying `algorithm: :concurrently` tells PostgreSQL to add the index without locking the table. This way the application will remain responsive while the migration is running.
+Specifying `algorithm: :concurrently` tells PostgreSQL to add the index without locking the table. This means the `trips` table can continue to be queried while the index is being added, which keeps the application responsive. The trade-off with `:concurrently` is that it makes the operation take about twice as long.
 
-`disable_ddl_transaction!` disables the transaction for Data Definition Language statements, which is needed to create the index `concurrently`.
+`disable_ddl_transaction!` disables the transaction for DDL (Data Definition Language) statements, because the concurrent approach can't be executed inside a transaction.
 
 With this change in place, `bin/rails db:migrate` completes successfully and the index is now added.
 
@@ -319,7 +328,11 @@ The query plan output can list many different operations, only a small number of
 
 Now that use of `completed_at` is optimized, we can continue development of the admin dashboard query. Recall we also need to show driver and rider information, as well as the trip location. To do this, we'll use the ActiveRecord [joins](https://api.rubyonrails.org/classes/ActiveRecord/QueryMethods.html#method-i-joins) method.
 
-To get location information, the Trip model must be joined to `trip_request`, which must then be joined to `start_location` via a nested join. Getting rider and driver information requires joining the `users` table twice, once for Riders (which are joined on `trip_request.rider_id`), and another time for Drivers (which are joined on `trips.driver_id`), due to use of Single Table Inheritance that models Drivers and Riders with the same underlying `users` table. This requires the use of a string join rather than just specifying the model. The same `where` clause as before is used to filter on recent trips.
+To get location information, the Trip model must be joined to `trip_request`, which must then be joined to `start_location` via a nested join.
+
+Getting rider and driver information requires joining the `users` table twice, once for Riders (which are joined on `trip_request.rider_id`), and another time for Drivers (which are joined on `trips.driver_id`), due to use of Single Table Inheritance that models Drivers and Riders with the same underlying `users` table. This requires the use of a string join rather than just specifying the model.
+
+The same `where` clause as before is used to filter on recent trips.
 
 By default, the result of the ActiveRecord `joins` method will only select the columns from the model class on which its invoked, `Trip` in this case. But since the report needs to also show Driver, Rider, and Location information, this scope adds a `SELECT` clause to get all fields from all tables using the ActiveRecord [select](https://api.rubyonrails.org/classes/ActiveRecord/QueryMethods.html#method-i-select) method:
 
@@ -423,7 +436,7 @@ WHERE (trips.completed_at > '2024-01-10 12:05:39.639423');
 --  Execution Time: 24.936 ms
 ```
 
-The SQL explain plan above shows this is a more complex query than the previous attempts. It includes many operations but we'll be focusing on the join operations.
+The SQL explain plan above shows this is a more complex query than the previous attempts. It includes many more operations than can be covered in this post, so we'll only be focusing on the join operations.
 
 Execution time has gone up, even though the query is still using the index on `trips.completed_at`:
 
@@ -445,7 +458,7 @@ Here's a definition of the Hash Join operation from the [pgMustard glossary](htt
 
 > An implementation of join in which one of the collections of rows to be joined is hashed on the join keys using a separate 'Hash' node. PostgreSQL then iterates over the other collection of rows, for each one looking it up in the hash table to see if there are any rows it should be joined to.
 
-**CAUTION:** When using joins, there should be an index on each foreign key column. In the example above, these are: `trips.trip_request_id`, `trip_requests.start_location_id`, `trip_requests.rider_id`, and `trips.driver_id`. If you used `references` when generating the migration with Rails, or specified `t.references :some_model, foreign_key: true` in the Rails migration file, then Rails will automatically generate an index on that column in addition to the foreign key constraint. In the Rideshare schema, all foreign keys are indexed.
+**CAUTION:** When using joins, there should be an index on each foreign key column. In the example above, these are: `trips.trip_request_id`, `trip_requests.start_location_id`, `trip_requests.rider_id`, and `trips.driver_id`. If you used `references` when generating the migration with Rails, or specified `t.references :some_model, foreign_key: true` in the Rails migration file, then Rails (as of 5.2) will automatically generate an index on that column in addition to the foreign key constraint. In the Rideshare schema, all foreign keys are indexed.
 
 This version of the query is also fetching more data due to the `SELECT` clause specifying all columns on all tables in the joins:
 
@@ -457,7 +470,9 @@ Another way to improve performance is to reduce the "width" of the results.
 
 ## Fourth Attempt: Reduce Columns
 
-The previous query selected all columns from all of the joined tables. But recall the business requirements were that we only need to display a few of these. Let's "narrow" the amount of data by restricting the columns in the `SELECT` clause to only what we need. This also allows us to do some string concatenation to distinguish between driver and rider names.
+The previous query selected all columns from all of the joined tables. For example, each result was including user details such as password digest and drivers license number. But recall the business requirements were that we only need to display a subset of user and trip information.
+
+Let's "narrow" the amount of data by restricting the columns in the `SELECT` clause to only what we need. This also supports string concatenation to distinguish between driver and rider names:
 
 ```ruby
 class Trip < ApplicationRecord
@@ -475,7 +490,7 @@ end
 ```
 
 <aside class="markdown-aside">
-As of Rails 7.1, the `select` method can accept a hash of columns and aliases rather than raw SQL when specifying columns from the join tables. However, if the select uses SQL functions as in this case where concatenation is used to generate the driver and rider names, then raw SQL is still required. Checkout this <a class="markdown-link" href="https://blog.kiprosh.com/rails-7-1-allows-activerecord-querymethods-select-and-reselect-to-receive-hash-values/">post</a> for more details.
+As of Rails 7.1, the `select` method can <a class="markdown-link" href="https://blog.kiprosh.com/rails-7-1-allows-activerecord-querymethods-select-and-reselect-to-receive-hash-values/">accept a hash of columns and aliases</a> rather than raw SQL when specifying columns from the join tables. However, if the `select` uses SQL functions as in this case where concatenation is used to generate the driver and rider names, then raw SQL is still required.
 </aside>
 
 Running this query in the Rails console shows the attributes contain exactly what's needed to display in the view, with no extraneous data.
@@ -555,7 +570,7 @@ For example, focusing on the top level Hash Join operation, this query has a wid
 Hash Join  (cost=1398.27..2693.98 rows=516 width=88) (actual time=8.572..20.188 rows=559 loops=1)
 ```
 
-Whereas the previous version of the query where all columns from all tables were being retrieved shows an overall width of 453:
+Whereas the [previous version of the query](../rails-query-perf#third-attempt-joins) where all columns from all tables were being retrieved shows an overall width of 453:
 
 ```
 Hash Join  (cost=1399.44..2692.88 rows=524 width=453) (actual time=11.736..24.510 rows=559 loops=1)
@@ -565,11 +580,13 @@ Selecting only the necessary columns can lead to performance improvements includ
 
 ## Fifth Attempt: Reduce Rows
 
-Another way to improve performance is to reduce the total number of rows returned by the query with additional filters (i.e. SQL `WHERE` clauses). This could require some discussion between engineering and product teams to make sure everyone understands the business problem that is being solved. For example, in this case, it turns out the admin team really wants to focus on recent trips with *low ratings*, so they can investigate what happened on some of those trips to improve customer experience. They've defined a "low" rating as 3 or fewer stars, based on a 5 star rating system. Up until now, they've been sorting the results client side by rating, and investigating those.
+Another way to improve performance is to reduce the total number of rows returned by the query with additional filters (i.e. SQL `WHERE` clauses). This could require some discussion between engineering and product teams to make sure everyone understands the business problem that is being solved.
+
+In this case, it turns out the Rideshare admins want to focus only on recent trips with *low ratings*, so they can investigate what happened on some of those trips to improve customer experience. They've defined a "low" rating as 3 or fewer stars, based on a 5 star rating system. Up until now, they've been sorting the results client side by rating, and investigating those.
 
 Given this better understanding of the requirements, another `WHERE` condition can be added to the scope, to only retrieve trips where the rating is less than or equal to 3.
 
-**CAUTION:** When adding further `WHERE` clauses to reduce the amount of data being returned, always check whether there's an index on the column you're planning to filter by. Otherwise, you could inadvertently make performance worse while trying to improve it! In this case, there already is an index on `trips.rating`. We saw this earlier when inspecting the table schema with `\d trips` in the database console:
+**CAUTION:** When adding further `WHERE` clauses to reduce the amount of data being returned, always check whether there's an index on the column you're planning to filter by. Otherwise, you could inadvertently make performance worse while trying to improve it! In this case, there already is an index on `trips.rating`. We saw this [earlier](../rails-query-perf#first-attempt) when inspecting the table schema with `\d trips` in the database console:
 
 ```
 => \d trips
@@ -589,9 +606,9 @@ class Trip < ApplicationRecord
       .joins('INNER JOIN users AS drivers ON drivers.id = trips.driver_id')
       .where('trips.completed_at > ?', 1.week.ago)
       .where('trips.rating <= ?', 3)
-      .select('trips.completed_at, trips.rating, locations.address,
-               drivers.first_name || \' \' || drivers.last_name AS driver_name,
-               riders.first_name || \' \' || riders.last_name AS rider_name')
+      .select("trips.completed_at, trips.rating, locations.address,
+        CONCAT(drivers.first_name, ' ', drivers.last_name) driver_name,
+        CONCAT(riders.first_name, ' ', riders.last_name) rider_name")
   }
 end
 ```
@@ -688,7 +705,7 @@ Understanding query plans can be challenging, especially when dealing with compl
 **Prepare Your Query**: Start by putting your query into a file. For instance, you can create a directory called `queries` and save your SQL query in a file within it. In addition to the `ANALYZE` argument that we've been using, also pass in `COSTS, VERBOSE, BUFFERS, FORMAT JSON` to `EXPLAIN` as shown below. This will include additional information in the query plan output, such as the amount of disk data that was fetched, and format the results as JSON:
 
 ```sql
--- queries/fifth.sql
+-- queries/recently_completed_trips.sql
 EXPLAIN (ANALYZE, COSTS, VERBOSE, BUFFERS, FORMAT JSON) SELECT
   trips.completed_at,
   trips.rating,
@@ -710,22 +727,22 @@ WHERE (trips.completed_at > '2024-01-10 13:08:58.257990')
 psql -h 127.0.0.1 \
   -p 5432 -U owner \
   -d rideshare_development \
-  -XqAt -f queries/fifth.sql > queries/fifth.json
-# open `queries/fifth.json` in your editor of choice and copy the contents
+  -XqAt -f queries/recently_completed_trips.sql > queries/fifth.json
+# copy the contents of `queries/recently_completed_trips.json`
 ```
 
 **Visualize Your Plan**: Visit [explain.dalibo.com](https://explain.dalibo.com/) and paste the generated plan text and query. Then, hit Submit. The tool will generate a visualization of your query plan. Here's an example of the visualization for the fifth attempt version of the query from this post. It shows the different types of scans that were used and how the data gets combined. The duration of each operation is also shown:
 
 ![fifth attempt visualized](../images/fifth-attempt-visualized.png "fifth attempt visualized")
 
-With this tool, deciphering the intricacies of the PostgreSQL query plans becomes a little more approachable. Just be mindful that using it involves sharing your query and its plan publicly.
+You can also click on the down caret icon beside any node to get more details about that operation. For example, focusing on the `Bitmap Index Scan` for use of the rating index on the `trips` table:
+
+![rails-postgres-perf-node-visualized](../images/rails-postgres-perf-node-visualized.png "rails-postgres-perf-node-visualized")
+
+With this tool, deciphering the details of PostgreSQL query plans becomes a little more approachable. Just be mindful that using it involves sharing your query and its plan publicly. If privacy is a concern regarding sharing your query and its plan publicly, consider using [pgAdmin](https://www.pgadmin.org/), an open-source administrative tool for PostgreSQL that you can install on your local machine, which also offers a visualization feature for query plans.
 
 ## Conclusion
 
 This post has covered techniques to enhance PostgreSQL query performance in Rails applications. We began by examining a query execution plan using the `EXPLAIN (ANALYZE)` feature to understand how PostgreSQL processes queries. We then explored indexing, covering the addition of an index for performance improvements and how to do so without causing downtime or table locking.
 
-Further into query optimization, we discussed the importance of careful column selection in the `SELECT` statement, demonstrating how narrowing down the retrieved data can improve performance. Lastly, we emphasized aligning database queries with business needs, illustrating how additional filters can reduce the number of processed rows and enhance scalability. Finally we learned how to visualize query plans with a free web-based tool. These strategies provide developers with the tools to create efficient and resilient Rails applications with PostgreSQL.
-
-## TODO
-
-* Mention pgadmin also has an explain visualizer tool if don't want to use the public one: https://www.pgadmin.org/ and http://postgresonline.com/journal/archives/27-Reading-PgAdmin-Graphical-Explain-Plans.html
+Further into query optimization, we discussed the importance of careful column selection in the `SELECT` statement, demonstrating how narrowing down the retrieved data can improve performance. We then covered aligning database queries with business needs, illustrating how additional filters can reduce the number of processed rows and enhance scalability. Finally we learned how to visualize query plans with a free web-based tool. These strategies provide developers with the tools to create efficient and resilient Rails applications with PostgreSQL.
