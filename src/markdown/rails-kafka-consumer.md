@@ -982,7 +982,7 @@ class ProductInventoryConsumer < ApplicationConsumer
 
       # Commit this message's offset, so in the event of a crash/restart,
       # it will not be consumed again.
-      mark_as_consumed
+      mark_as_consumed(message)
     end
   end
   # ...
