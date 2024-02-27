@@ -486,9 +486,6 @@ class DiscussRetrospective
   end
 
   def send_message(blocks)
-    # If Slack responds with "invalid blocks" error, take this output, convert to JSON,
-    # and paste it in Slack's Block Kit Builder to see what's wrong.
-    Rails.logger.debug { "=== BLOCKS: #{blocks.inspect}" }
     context.slack_client.chat_postMessage(
       channel: context.channel_id,
       text: "fallback TBD",
@@ -555,9 +552,84 @@ SlackRubyBotServer::Events.configure do |config|
 end
 ```
 
+At this point, we have a functioning Slack application built with Rails. There's just a few more topics to cover before wrapping up.
+
 ## Debugging Blocks
 
-WIP...
+A common issue that can occur when working with the block kit UI is that you accidentally put together the blocks in an invalid way or specify some attribute value that's not allowed. For example, suppose in `SlackCommentBuilder` module, we had specified a `type: "button"` instead of `type: "plain_text"` for the context element:
+
+```ruby
+# lib/slack_comment_builder.rb
+module SlackCommentBuilder
+  def build_context_element(text)
+    {
+      # intentionally generate error by specifying an invalid type
+      # type: "plain_text",
+      type: "button",
+      emoji: true,
+      text:
+    }
+  end
+end
+```
+
+In this case, when the message is sent to Slack using the `slack_client`:
+
+```ruby
+# app/interactors/discuss_retrospective.rb
+class DiscussRetrospective
+  def send_message(blocks)
+    context.slack_client.chat_postMessage(
+      channel: "some_channel_id",
+      text: "some_fallback_text",
+      blocks: blocks # Invalid due to bug in SlackCommentBuilder
+    )
+  end
+end
+```
+
+Slack will return an `invalid blocks` error. When working with the `slack-ruby-bot-server-events` gem, it uses the `slack_ruby_client` gem, which in turn uses `faraday` to communicate with the Slack API via HTTP. Here's what this error looks like in the Rails server output:
+
+```
+Error in DiscussRetrospective: invalid_blocks
+slack-ruby-client-2.2.0/lib/slack/web/faraday/response/raise_error.rb:19:in `on_complete'
+faraday-2.7.11/lib/faraday/middleware.rb:18:in `block in call'
+...
+retro-pulse/app/interactors/discuss_retrospective.rb:54:in `post_message'
+retro-pulse/app/interactors/discuss_retrospective.rb:25:in `call'
+```
+
+Unfortunately, the error doesn't include specify *what* is wrong with the blocks. To resolve these kinds of errors, add a debug statement that outputs the json value of the blocks, just before the blocks get sent to Slack:
+
+```ruby
+# app/interactors/discuss_retrospective.rb
+class DiscussRetrospective
+  def send_message(blocks)
+    Rails.logger.debug { "=== BLOCKS: #{blocks.to_json}" }
+
+    context.slack_client.chat_postMessage(
+      channel: "some_channel_id",
+      text: "some_fallback_text",
+      blocks: blocks
+    )
+  end
+end
+```
+
+When this code runs, the Rails server output will include a debug line like this:
+
+```
+=== BLOCKS: [{"type":"header","text":{"type":"plain_text","text":"What we should keep on doing"}}...]
+```
+
+Highlight and copy the entire blocks array from the Rails server output: `[...]`.
+
+Then open a browser tab to Slack's [Block Kit Builder](https://api.slack.com/tools/block-kit-builder). You need to be signed in to a Slack workspace to use this feature.
+This renders a split screen view where on the right hand side you can enter any blocks JSON, and on the left hand side it will show you the rendered result. If invalid blocks JSON is entered, then Slack will show a red X mark beside the invalid line. Hovering over it will display what's wrong with this line.
+
+For example, pasting in the blocks JSON from the buggy version of our code and hovering over the red X shows that `button` is in invalid type for the `context` block. The message helpfully lists the valid values which are: `"image", "plain_text", "mrkdwn"`:
+
+![slack block kit builder error](../images/slack-block-kit-builder-error.png "slack block kit builder error")
 
 ## App Manifest
 
@@ -590,13 +662,12 @@ For further exploration and reference, here are some useful links and resources:
 
 ## TODO
 
-- aside with technique for blocks debugging if get "invalid blocks response", debug log your blocks array and paste into Slack's visual block kit builder, it will red underline the problem with a useful error message (unfortunately can't get this message via API?). ref comment in `app/interactors/discuss_retrospective.rb` If Slack responds with "invalid blocks" error, take this output, convert to JSON, and paste it in Slack's Block Kit Builder to see what's wrong. https://app.slack.com/block-kit-builder (must be logged into a Slack workspace to use this feature)
 - maybe a screenshot of final response with arrows pointing out each type of block kit
 - section for working with Slack app manifest, especially if using free tier of ngrok, every time restart, get a new url therefore need to update every url in Slack app. To avoid manual effort, I commit a  `app_manifest_template.json` in project which has all the url's specified as `SERVER_HOST_NAME`. Then I built a rake task `lib/tasks/app_manifest.rake` to update the server host name based on what's defined in `.env`. It generates `app_manifest.json` which is ignored, then you can copy/paste that to your Slack app definition (show where to edit manifest in slack app settings). If on a mac and want to save some more manual effort of copying from app_manifest.json, use my Makefile task which also copies the result to the clipboard.
 - aside re: Makefile, link to my other post on Old Ruby New Mac for benefit of introducing Makefile to save typing on long frequently used commands.
 - feature image
 - meta description
-- related
+- related - include faraday post
 - edit
 - In Receive Slash Command in Rails section, mention the Retrospective and Comment models were introduced in Parts 2 and 3 of this series respectively with links.
 - in image shown for "each having several sentences", add arrow calling out the comma separator between the comments
