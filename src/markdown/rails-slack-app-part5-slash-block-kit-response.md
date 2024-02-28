@@ -58,7 +58,7 @@ Then click on the "Create New Command" button, and fill in the form as follows:
 
 **Command:** `/retro-discuss`. This is what the user will type into a Slack message to initiate an interaction with the Retro Pulse Rails app.
 
-**Request URL:** For example: `https://12e4-203-0-113-42.ngrok-free.app/api/slack/command`. This is where Slack will send an HTTP POST request when the user submits this slash command from Slack. The hostname is your ngrok forwarding address that you got from starting [ngrok in part 1 of this series](../rails-slack-app-part1-oauth#ngrok). The route `/api/slack/command` is defined in the `slack-ruby-bot-server` gem that we included as part of our [Rails app in part 1 of this series](../rails-slack-app-part1-oauth#create-rails-app).
+**Request URL:** For example: `https://12e4-203-0-113-42.ngrok-free.app/api/slack/command`. This is where Slack will send an HTTP POST request when the user submits this slash command from Slack. The hostname is your ngrok forwarding address that you got from starting [ngrok in Part 1 of this series](../rails-slack-app-part1-oauth#ngrok). The route `/api/slack/command` is defined in the `slack-ruby-bot-server` gem that we included as part of our [Rails app in Part 1 of this series](../rails-slack-app-part1-oauth#create-rails-app).
 
 **Short Description:** `Discuss retrospective feedback`. This will be displayed as the user types in the slash command.
 
@@ -124,7 +124,7 @@ end
 
 The `Comment` model was introduced in Part 4 of this series, [have a quick read there](../rails-slack-app-part4-action-modal-submission#comment-model) if you need a refresher of what it looks like.
 
-Use `require_relative` to load this new command in the `bot/slash_commands.rb` file. We created this file in Part 2 when introducing slash commands:
+Use `require_relative` to load this new command in the `bot/slash_commands.rb` file. We [created this file in Part 2](../rails-slack-app-part2-slash-command-with-text-response#receive-slash-command-in-rails) when introducing slash commands:
 
 ```ruby
 # bot/slash_commands.rb
@@ -166,7 +166,7 @@ Which looks like this:
 
 ![slack app demo retro open success](../images/slack-app-demo-retro-open-success.png "slack app demo retro open success")
 
-Instead of `text`, the `chat_postMessage` API can accept a `blocks` attribute, which is a JSON array, where each element must be a valid [block](https://api.slack.com/reference/block-kit/blocks). If all this sounds a little abstract, an example should help to clear things up.
+Instead of `text`, the `chat_postMessage` API can accept a `blocks` attribute, which is a JSON array. Each element in the array must be a valid [block](https://api.slack.com/reference/block-kit/blocks). If all this sounds a little abstract, an example should help to clear things up.
 
 ### Section and Divider
 
@@ -181,8 +181,9 @@ SlackRubyBotServer::Events.configure do |config|
   category = command_text
   comments = retrospective.comments.where(category: category)
 
-  # Build an array of comment blocks
+  # Initialize an array of comment blocks
   comments_blocks = []
+
   # Add the comment content
   comments.each do |comment|
     comments_blocks << {
@@ -204,7 +205,6 @@ SlackRubyBotServer::Events.configure do |config|
 end
 ```
 
-TODO: Maybe move this sentence to end of this section:
 Notice that each block must have a `type` attribute. See the Slack documentation on [Reference Blocks](https://api.slack.com/reference/block-kit/blocks) for the full list of block types and how to use them.
 
 Restarting the Rails server `bin/dev` and entering `/retro-discuss keep` again in the Slack workspace will result in this response:
@@ -219,7 +219,7 @@ We'd also like to see the user that posted the comment and when it was posted. S
 
 The `context` block functions as a "parent" block. It accepts a list of "children" `elements`, each of which must be a valid block. So we'll have one element to show the user information, and another element to show the date. The `emoji: true` attribute is set on the elements so we can render emoji's as well. This helps with the visual cues to indicate what kind of information this is.
 
-Here is the updated version of the code that adds contextual information about each comment. Note that we need to check if its an "anonymous" comment when rendering the user name. For the posted date, we format the comment model's `created_at` timestamp:
+Here is the updated version of the code that adds contextual information about each comment. Note the check for "anonymous" comment when rendering the user name. For the posted date, the comment model's `created_at` timestamp is formatted to display in `YYYY-MM-DD` format:
 
 ```ruby
 # bot/slash_commands/retro_discuss.rb
@@ -230,8 +230,9 @@ SlackRubyBotServer::Events.configure do |config|
   category = command_text
   comments = retrospective.comments.where(category: category)
 
-  # Build an array of comment blocks
+  # Initialize an array of comment blocks
   comments_blocks = []
+
   comments.each do |comment|
   # Add the comment content
     comments_blocks << {
@@ -316,7 +317,7 @@ SlackRubyBotServer::Events.configure do |config|
   category = command_text
   comments = retrospective.comments.where(category: category)
 
-  # Build an array of comment blocks
+  # Initialize an array of comment blocks
   comments_blocks = []
 
   # Add the header block
@@ -328,7 +329,8 @@ SlackRubyBotServer::Events.configure do |config|
     }
   }
 
-  # Add a sub-header as a section, use markdown!
+  # Add a sub-header as a section
+  # Use markdown to bold the number of comments
   comments_blocks << {
     type: "section",
     text: {
@@ -351,21 +353,23 @@ SlackRubyBotServer::Events.configure do |config|
 end
 ```
 
-Note that the `text` attribute of the `section` type can set to `mrkdwn`. In this case the `comments.size` value is wrapped in `*` so that it renders as bold in the Slack response. Putting this all together, we now see a nicely formatted response:
+Note that the `text` attribute of the `section` type can set to `mrkdwn`. In this case the `comments.size` value is wrapped in `*` so that it renders as bold in the Slack response.
+
+Putting this all together, the app responds with a fully formatted list of comments as shown below:
 
 ![slack-app-comment-blocks-with-header.png](../images/slack-app-comment-blocks-with-header.png "slack-app-comment-blocks-with-header.png")
 
 ## Refactor
 
-While the current version of the code in the `/retro-discuss` handler works, there are also many problems with it:
+While the current version of the code in the `/retro-discuss` handler works, there are several issues:
 
-* It's way too long, triggering the Rubocop `Metrics/BlockLength` rule.
+* It's too long, triggering the Rubocop `Metrics/BlockLength` rule.
 * The verbose syntax of the Slack blocks mixed in with the business logic makes it difficult to understand what this code is actually doing.
 * There's no validation - for example, what if the user types in `/retro-discuss foo` or doesn't provide a category at all? In this case the app should reply with a helpful message letting the user know to provide a valid category.
 
-This will be resolved in a similar way to what was done in [Part 4 of this series]((../rails-slack-app-part4-action-modal-submission#refactor)): by introducing an interactor `DiscussRetrospective` to handle the validation and business logic, and a `SlackCommentBuilder` module for the responsibility of building the Slack blocks array.
+This will be resolved in a similar way to what was done in Part 4 of this series, which is to [introduce an interactor](../rails-slack-app-part4-action-modal-submission#refactor) `DiscussRetrospective` to handle the validation and business logic, and a `SlackCommentBuilder` module for the responsibility of building the Slack blocks array.
 
-Starting with the `SlackCommentBuilder` module, containing smaller methods to build each type of block we'll need and some methods that put them all together:
+Starting with the `SlackCommentBuilder` module. This contains smaller methods to build each type of block and some methods to put them all together:
 
 ```ruby
 # lib/slack_comment_builder.rb
@@ -633,13 +637,82 @@ For example, pasting in the blocks JSON from the buggy version of our code and h
 
 ## App Manifest
 
-WIP...
+Throughout this series, we've been using Slack's web UI to build up the application. This has involved opening a browser tab to [Your Slack Apps](https://api.slack.com/apps) (need to be signed in to Slack workspace), then using the Settings and Features sections to tell Slack what this app supports. For example, to enable receiving a modal form submission in Part 4, we had to enable interactivity by filling out the URL that Slack should POST to:
+
+![slack app interactivity enter url](../images/slack-app-interactivity-enter-url.png "slack app interactivity enter url")
+
+That URL is an [ngrok](../rails-slack-app-part1-oauth#ngrok) address that's forwarding requests from Slack to the Rails app running on localhost. We setup ngrok in Part 1 of this series. An issue to be aware of with the free ngrok version is that every time you restart it, it assigns a new url. That means going back into the Slack app configuration and updating all url's such as in the interactivity and slash commands sections. This is tedious and error prone.
+
+To save yourself this manual effort, there is an easier way. Under the Features section of your Slack app, select "App Manifest". This provides a text representation of the Slack app in either YAML or JSON format. Click on the JSON format, it will look something like this:
+
+![slack app manifest](../images/slack-app-manifest.png "slack app manifest")
+
+Notice all the url's and Slack client id are in this file.
+
+Make a copy of the JSON contents, and paste it into a new file in the Rails project root named `app_manifest_template.json`. Update this file, making the following replacements:
+
+1. Update all occurrences of the ngrok IP address with `SERVER_HOST_NAME`
+2. Update all occurrences of your slack client id with `SLACK_CLIENT_ID`
+
+Here's an example of [app_manifest_template.json](https://github.com/danielabar/retro-pulse/blob/main/app_manifest_template.json) from the complete source on Github.
+
+Recall that `SERVER_HOST_NAME` and `SLACK_CLIENT_ID` were configured as environment variables in [Part 1](../rails-slack-app-part1-oauth#rails-blocked-host) of this series.
+Now we'll add a rake task that will generate the real manifest file from the template, replacing the environment variables with their actual values from the `.env` file:
+
+```ruby
+# lib/tasks/app_manifest.rake
+namespace :manifest do
+  desc 'Generate and update app_manifest.json from app_manifest_template.json'
+  task generate: :environment do
+    require 'json'
+    require 'dotenv'
+
+    # Load environment variables from .env file in the project root directory
+    Dotenv.load(File.join(Rails.root, '.env'))
+
+    # Read the template JSON file from the project root
+    template_file = File.read(File.join(Rails.root, 'app_manifest_template.json'))
+
+    # Perform global replacements for SERVER_HOST_NAME and SLACK_CLIENT_ID
+    updated_content = template_file
+      .gsub('SERVER_HOST_NAME', ENV['SERVER_HOST_NAME'])
+      .gsub('SLACK_CLIENT_ID', ENV['SLACK_CLIENT_ID'])
+
+    # Write the updated JSON to app_manifest.json in the project root
+    File.open(File.join(Rails.root, 'app_manifest.json'), 'w') do |file|
+      file.write(updated_content)
+    end
+
+    puts 'app_manifest.json has been generated and updated.'
+  end
+end
+```
+
+This will generate the real manifest file `app_manifest.json`. Make sure this is in `.gitignore` as it's a generated file and contains a secret.
+
+Now, every time you restart ngrok, you'll do the following:
+
+1. Update the new ngrok IP address in `.env`
+2. Run the rake task: `bundle exec rake manifest:generate`
+3. Copy the contents of `app_manifest.json` into the [Your Slack App](https://api.slack.com/apps) Features: Manifest section, and save the changes.
+
+Then you can restart the Rails server with `bin/dev` and it will receive requests from Slack via the new ngrok forwarding address.
 
 ## Deployment
 
 A full discussion of how to deploy Rails apps to production is out of scope for this post. But here's a few things to note for this app:
 
 Up until now, the Rails app has been running on a laptop, with ngrok forwarding traffic from Slack to `localhost`. For production use, you'll need to deploy your Rails application to a publicly accessible host, eg: `https://yourcompany-retropulse.com`. Then update all the url's in the Slack app to point to where the Rails app is running. You'll also need to make sure all the Slack environment variables (`SLACK_CLIENT_ID`, `SLACK_CLIENT_SECRET`, `SLACK_SIGNING_SECRET`, and `SLACK_VERIFICATION_TOKEN`) are populated in production.
+
+By default, the Slack app is *not* available for public distribution. The Retro Pulse app described in this series is intended for just one team so this is fine, essentially it would only be installed in your workspace, which is the same one you've been developing it under.
+
+However, if you have a different kind of application and want to distribute it more widely, it requires activating public distribution. To do this, select the "Manage Distribution" option under Settings when logged into [Your Slack App](https://api.slack.com/apps):
+
+![slack app settings manage distribution](../images/slack-app-settings-manage-distribution.png "slack app settings manage distribution")
+
+Then Make sure all the required steps are checked off as shown below, then click on Activate Public Distribution (only if you want *any* company/team/workspace to be able to install the app):
+
+![slack app public distribution](../images/slack-app-public-distribution.png "slack app public distribution")
 
 ## Conclusion
 
@@ -662,9 +735,6 @@ For further exploration and reference, here are some useful links and resources:
 
 ## TODO
 
-- maybe a screenshot of final response with arrows pointing out each type of block kit
-- section for working with Slack app manifest, especially if using free tier of ngrok, every time restart, get a new url therefore need to update every url in Slack app. To avoid manual effort, I commit a  `app_manifest_template.json` in project which has all the url's specified as `SERVER_HOST_NAME`. Then I built a rake task `lib/tasks/app_manifest.rake` to update the server host name based on what's defined in `.env`. It generates `app_manifest.json` which is ignored, then you can copy/paste that to your Slack app definition (show where to edit manifest in slack app settings). If on a mac and want to save some more manual effort of copying from app_manifest.json, use my Makefile task which also copies the result to the clipboard.
-- aside re: Makefile, link to my other post on Old Ruby New Mac for benefit of introducing Makefile to save typing on long frequently used commands.
 - feature image
 - meta description
 - related - include faraday post
