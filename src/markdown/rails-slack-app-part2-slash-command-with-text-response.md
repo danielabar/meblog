@@ -2,7 +2,7 @@
 title: "Build a Rails App with Slack Part 2: Slash Command with Text Response"
 featuredImage: "../images/slack-feat-img-part2-john-towner-p-rN-n6Miag-unsplash.jpg"
 description: "Learn how to build a Slack application with Rails in this comprehensive multi-part series. Part 2 covers configuring and handling a Slack Slash Command to perform a business action and responding with a markdown text response in the channel."
-date: "2024-06-02"
+date: "2024-07-02"
 category: "rails"
 related:
   - "They Don't All Have To Be ActiveRecord Models"

@@ -2,10 +2,10 @@
 title: "Build a Rails App with Slack Part 4: Receive Modal Submission"
 featuredImage: "../images/slack-feat-img-part2-john-towner-p-rN-n6Miag-unsplash.jpg"
 description: "Learn how to build a Slack application with Rails in this comprehensive multi-part series. Part 4 covers handling a modal submission action, saving the feedback to the database, and replying to the user with a private DM confirming their submission."
-date: "2024-06-04"
+date: "2024-07-04"
 category: "rails"
 related:
-  - "Rails Enums with MySQL or Postgres"
+  - "Capybara Webdriver Element not Clickable Resolved"
   - "Understanding ActiveRecord Dependent Options"
   - "Add Rubocop to an Existing Rails Project"
 ---
@@ -580,7 +580,7 @@ class SaveRetrospectiveFeedback
   end
 
   def save_comment
-    retrospective = Retrospective.open_retrospective.first
+    retrospective = Retrospective.find_by(status: Retrospective.statuses[:open])
 
     comment = Comment.new(
       content: @feedback_info[:comment],
