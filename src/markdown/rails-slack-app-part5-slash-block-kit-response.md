@@ -1,6 +1,6 @@
 ---
 title: "Build a Rails App with Slack Part 5: Slash Command With Block Kit Response"
-featuredImage: "../images/slack-feat-img-part2-john-towner-p-rN-n6Miag-unsplash.jpg"
+featuredImage: "../images/slack-feat-img-5-david-trinks-pt-MFjIy4Q0-unsplash.jpg"
 description: "Learn how to build a Slack application with Rails in this comprehensive multi-part series. Part 4 covers receiving a slash command and responding with a visually appealing block kit UI response."
 date: "2024-07-05"
 category: "rails"
@@ -735,5 +735,4 @@ For further exploration and reference, here are some useful links and resources:
 
 ## TODO
 
-- feature image
-- edit
+- WIP: edit

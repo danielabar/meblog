@@ -1,6 +1,6 @@
 ---
 title: "Build a Rails App with Slack Part 3: Slash Command with Modal Response"
-featuredImage: "../images/slack-feat-img-part2-john-towner-p-rN-n6Miag-unsplash.jpg"
+featuredImage: "../images/slack-feat-img-3-ian-stauffer-zPgO1nKX8IU-unsplash.png"
 description: "Learn how to build a Slack application with Rails in this comprehensive multi-part series. Part 3 covers configuring and handling a Slack Slash Command to perform a business action and responding with a modal form response in the channel."
 date: "2024-07-03"
 category: "rails"

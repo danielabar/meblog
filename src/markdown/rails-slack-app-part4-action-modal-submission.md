@@ -1,6 +1,6 @@
 ---
 title: "Build a Rails App with Slack Part 4: Receive Modal Submission"
-featuredImage: "../images/slack-feat-img-part2-john-towner-p-rN-n6Miag-unsplash.jpg"
+featuredImage: "../images/slack-feat-img-4-david-trinks-vHTWOMrQs7k-unsplash.jpg"
 description: "Learn how to build a Slack application with Rails in this comprehensive multi-part series. Part 4 covers handling a modal submission action, saving the feedback to the database, and replying to the user with a private DM confirming their submission."
 date: "2024-07-04"
 category: "rails"
@@ -664,7 +664,6 @@ In this part of the series on building a Slack app with Rails, we've learned how
 ## TODO
 
 - WIP: edit
-- feature image (collaboration, teamwork, group discussion, people working together, feedback loops, interaction, writing notes, engaging in disucssions, using digital devicesi n collaborative setting, organized workspaces, checklists, messaging apps, chat interfaces, people having conversations, people working towards a common goal)
 - update aside for postgres book something like:
 <aside class="markdown-aside">
 Are you interested in learning more about maintaining data correctness and consistency when working with Rails and PostgreSQL? The book <a class="markdown-link"
