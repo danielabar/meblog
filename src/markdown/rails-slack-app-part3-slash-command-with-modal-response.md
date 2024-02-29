@@ -2,10 +2,10 @@
 title: "Build a Rails App with Slack Part 3: Slash Command with Modal Response"
 featuredImage: "../images/slack-feat-img-part2-john-towner-p-rN-n6Miag-unsplash.jpg"
 description: "Learn how to build a Slack application with Rails in this comprehensive multi-part series. Part 3 covers configuring and handling a Slack Slash Command to perform a business action and responding with a modal form response in the channel."
-date: "2024-06-03"
+date: "2024-07-03"
 category: "rails"
 related:
-  - "Setup a Rails Project with Postgres and Docker"
+  - "Old Ruby and New Mac"
   - "ActiveRecord JSON Column with MySQL and MariaDB"
   - "Roll Your Own Search with Rails and Postgres: Search Engine"
 ---
@@ -610,6 +610,7 @@ At this point, we've built the capability for a Slack user to enter a custom sla
 
 ## TODO
 
+* Nice to have: `InitiateFeedbackForm` interactor should first validate that there is an open retro, otherwise send text error message via DM to user if we can get the user at this point?
 * In intro section, add one more screenshot showing the filled out form and user hovering over submit button. Eg: To try, Github plugin to send automated reminders about stale PRs still awaiting reviews.
 * Mention discussion of services, interactors, etc was discussed in part 2: (../rails-slack-app-part2-slash-command-with-text-response#refactor)
 * Image showing on one side the Example Modal, and on the other side, the code containing modal payload and arrows between each attribute and modal visual

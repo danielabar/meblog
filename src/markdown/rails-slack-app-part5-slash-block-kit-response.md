@@ -1,13 +1,13 @@
 ---
 title: "Build a Rails App with Slack Part 5: Slash Command With Block Kit Response"
 featuredImage: "../images/slack-feat-img-part2-john-towner-p-rN-n6Miag-unsplash.jpg"
-description: "Learn how to build a Slack application with Rails in this comprehensive multi-part series. Part 4 covers handling a modal submission action, saving the feedback to the database, and replying to the user with a private DM confirming their submission."
-date: "2024-06-05"
+description: "Learn how to build a Slack application with Rails in this comprehensive multi-part series. Part 4 covers receiving a slash command and responding with a visually appealing block kit UI response."
+date: "2024-07-05"
 category: "rails"
 related:
-  - "Rails Enums with MySQL or Postgres"
-  - "Understanding ActiveRecord Dependent Options"
-  - "Add Rubocop to an Existing Rails Project"
+  - "Testing Faraday with RSpec"
+  - "A Tale of Rails, ChatGPT, and Scopes"
+  - "Rails Feature Test Solved by Regex"
 ---
 
 Welcome to the fifth installment of this multi-part series on building a Slack application with Rails. This series will guide you through the process of creating a Slack application with Rails and is structured as follows:
@@ -122,7 +122,7 @@ SlackRubyBotServer::Events.configure do |config|
 end
 ```
 
-The `Comment` model was introduced in Part 4 of this series, [have a quick read there](../rails-slack-app-part4-action-modal-submission#comment-model) if you need a refresher of what it looks like.
+The `Comment` model was introduced in Part 4 of this series, [have a quick read there](../rails-slack-app-part4-action-modal-submission#comment-model) if you need a refresher of what it looks like. The `Retrospective` model was introduced in [Part 2](../rails-slack-app-part2-slash-command-with-text-response#implement-slash-command).
 
 Use `require_relative` to load this new command in the `bot/slash_commands.rb` file. We [created this file in Part 2](../rails-slack-app-part2-slash-command-with-text-response#receive-slash-command-in-rails) when introducing slash commands:
 
@@ -141,11 +141,11 @@ require_relative "slash_commands/retro_discuss"
 
 This file is loaded by `config.ru` to ensure that all the Slack handlers are loaded when Rails starts.
 
-After restarting the Rails server `bin/dev`, and entering `/retro-discuss keep` in a Slack workspace that has the Retro Pulse app installed, it will respond with something like this. In the example below, there are two comments, each having several sentences:
+After restarting the Rails server `bin/dev`, and entering `/retro-discuss keep` in a Slack workspace that has the Retro Pulse app installed, it will respond with something like this. In the example below, there are two comments, each having several sentences, separated by a comma:
 
 ![slack app retro feedback comma separated](../images/slack-app-retro-feedback-comma-separated.png "slack app retro feedback comma separated")
 
-Technically this works, but the visuals are not very good. Returning the response in plain text makes it difficult to distinguish one comment from another. We'd also like to see who posted it and when. The next section covers how to make the response more visually appealing.
+Technically this works, but it's difficult to determine where one comment ends and the next begins. We'd also like to see who posted it and when. The next section covers how to make the response more visually appealing.
 
 ## Using Block Kit to Format the Response
 
@@ -450,7 +450,7 @@ class DiscussRetrospective
   include SlackCommentBuilder
 
   def call
-    retrospective = Retrospective.open_retrospective.first
+    retrospective = Retrospective.find_by(status: Retrospective.statuses[:open])
     return no_open_retrospective_message if retrospective.nil?
 
     category = extract_valid_category
@@ -736,8 +736,4 @@ For further exploration and reference, here are some useful links and resources:
 ## TODO
 
 - feature image
-- meta description
-- related - include faraday post
 - edit
-- In Receive Slash Command in Rails section, mention the Retrospective and Comment models were introduced in Parts 2 and 3 of this series respectively with links.
-- in image shown for "each having several sentences", add arrow calling out the comma separator between the comments
