@@ -22,7 +22,7 @@ Feel free to jump to a specific part of interest using the links above or follow
 
 This post assumes the reader has at least a beginner level familiarity with Ruby on Rails. It's also assumed the reader has used [Slack](https://slack.com/) as an end user with basic interactions such as joining channels, sending messages, and participating in conversations.
 
-Part 1 of this series introduced [Retro Pulse](../rails-slack-app-part1-oauth#introducing-retro-pulse), a Slack app built with Rails for agile teams to manage their retrospectives with Slack. [Part 2](../rails-slack-app-part2-slash-command-with-text-response) explained how to implement a Slack slash command to open a retrospective and return a markdown text response to the same Slack channel that initiated the request. [Part 3]((../rails-slack-app-part3-slash-command-with-modal-response)) covered how to implement a slash command that responds with a modal form, allowing the user to enter feedback for the retrospective. In [Part 4](../rails-slack-app-part4-action-modal-submission), we learned how to handle the modal form submission to save the user's feedback in the database, and reply back with a DM to let the user know their feedback was saved.
+Part 1 of this series introduced [Retro Pulse](../rails-slack-app-part1-oauth#introducing-retro-pulse), a Slack app built with Rails for agile teams to manage their retrospectives with Slack. [Part 2](../rails-slack-app-part2-slash-command-with-text-response) explained how to implement a Slack slash command to open a retrospective and return a markdown text response to the same Slack channel that initiated the request. [Part 3](../rails-slack-app-part3-slash-command-with-modal-response) covered how to implement a slash command that responds with a modal form, allowing the user to enter feedback for the retrospective. In [Part 4](../rails-slack-app-part4-action-modal-submission), we learned how to handle the modal form submission to save the user's feedback in the database, and reply back with a direct message to let the user know their feedback was saved.
 
 Now in Part 5, we'll be implementing the last part of the application, which is to display the feedback when the team is ready to have their retrospective meeting. The interaction looks like this:
 
@@ -34,7 +34,7 @@ Usually the meeting starts with a discussion of what the team should keep on doi
 
 ![slack app demo retro discuss slash keep](../images/slack-app-demo-retro-discuss-slash-keep.png "slack app demo retro discuss slash keep")
 
-The app responds with all the comments that have been collected in that category. Here we can also see a header and a count of how many comments were entered. Below each comment section, it shows the date the comment was entered on and either the Slack username or "anonymous" if the person who entered this comment had selected the Anonymous option:
+The app responds with all the comments that have been collected in that category. It also displays a header and a count of how many comments were entered. Below each comment section, it shows the date the comment was entered on and either the Slack username or "anonymous" if the person who entered this comment had selected to remain anonymous:
 
 ![slack app demo keep comments](../images/slack-app-demo-keep-comments.png "slack app demo keep comments")
 
@@ -58,13 +58,13 @@ Then click on the "Create New Command" button, and fill in the form as follows:
 
 **Command:** `/retro-discuss`. This is what the user will type into a Slack message to initiate an interaction with the Retro Pulse Rails app.
 
-**Request URL:** For example: `https://12e4-203-0-113-42.ngrok-free.app/api/slack/command`. This is where Slack will send an HTTP POST request when the user submits this slash command from Slack. The hostname is your ngrok forwarding address that you got from starting [ngrok in Part 1 of this series](../rails-slack-app-part1-oauth#ngrok). The route `/api/slack/command` is defined in the `slack-ruby-bot-server` gem that we included as part of our [Rails app in Part 1 of this series](../rails-slack-app-part1-oauth#create-rails-app).
+**Request URL:** For example: `https://12e4-203-0-113-42.ngrok-free.app/api/slack/command`. This is where Slack will send an HTTP POST request when the user submits this slash command from Slack. The hostname is your ngrok forwarding address that you got from starting [ngrok in Part 1 of this series](../rails-slack-app-part1-oauth#ngrok). The route `/api/slack/command` is defined in the [slack-ruby-bot-server](https://github.com/slack-ruby/slack-ruby-bot-server) gem that's included in the Retro Pulse Rails app.
 
 **Short Description:** `Discuss retrospective feedback`. This will be displayed as the user types in the slash command.
 
 **Usage Hint:** `keep stop try`. Since this particular slash command requires a parameter, which will be used to retrieve the comments for that category, the usage hint is also shown to the user as they type in the slash command.
 
-**Escape Channels:** Leave this unchecked. Turning this on will modify the parameters sent with a command by a user such as wrapping URLs in angle brackets and translating channel or user mentions into their correlated IDs. It's not necessary for this app. See the [Slack docs](https://api.slack.com/interactivity/slash-commands) if your app needs this option.
+**Escape Channels:** Leave this unchecked. Turning this on will modify the parameters sent with a command by a user such as wrapping URLs in angle brackets and translating channel or user mentions into their correlated IDs. It's not necessary for this app. See the Slack [documentation](https://api.slack.com/interactivity/slash-commands) if your app needs this option.
 
 After filling out the slash command form, click the "Save" button which appears all the way at the bottom right hand corner.
 
@@ -170,7 +170,7 @@ Instead of `text`, the `chat_postMessage` API can accept a `blocks` attribute, w
 
 ### Section and Divider
 
-In the version of `bot/slash_commands/retro_discuss.rb` shown below, the `text: comments_text` has been removed and instead an array of blocks is built. For each comment, there is a `section` block to render the content of the comment, followed by a `divider` block to visually distinguish one comment from the other:
+In the version of `bot/slash_commands/retro_discuss.rb` shown below, the `text: comments_text` has been removed and instead an array of blocks is built. For each comment, there a `section` block is created for rendering the content of the comment, followed by a `divider` block to visually distinguish one comment from the other:
 
 ```ruby
 # bot/slash_commands/retro_discuss.rb
@@ -211,7 +211,7 @@ Restarting the Rails server `bin/dev` and entering `/retro-discuss keep` again i
 
 ![slack-app-comment-block-section-divider](../images/slack-app-comment-block-section-divider.png "slack-app-comment-block-section-divider")
 
-This time the response is easier to read because each comment is rendered in its own "section", which is similar to a `<div>` in HTML, and followed by a divider, which is similar to an `<hr>` element in HTML.
+This time the response is easier to read because each comment is rendered in its own `section` block, which is similar to a `<div>` in HTML, and followed by a `divider` block, which is similar to an `<hr>` element in HTML.
 
 ### Contextual Information
 
@@ -277,7 +277,7 @@ This is looking much better.
 
 ### Header
 
-Last thing to add is a header showing the category of the feedback, and a smaller sub-section just below the header to display how many comments were found for that category. The category is defined as an enum in the `Comment` model. Rather than just displaying the word "keep" or "stop", a `header` method can be added to convert it to an phrase for display as follows:
+The last thing to add is a header showing the category of the feedback, and a smaller sub-section just below the header to display how many comments were found for that category. The category is defined as an enum in the `Comment` model. Rather than just displaying the word "keep" or "stop", a `header` method can be added to convert it to an phrase for display as follows:
 
 ```ruby
 # app/models/comment.rb
@@ -367,7 +367,7 @@ While the current version of the code in the `/retro-discuss` handler works, the
 * The verbose syntax of the Slack blocks mixed in with the business logic makes it difficult to understand what this code is actually doing.
 * There's no validation - for example, what if the user types in `/retro-discuss foo` or doesn't provide a category at all? In this case the app should reply with a helpful message letting the user know to provide a valid category.
 
-This will be resolved in a similar way to what was done in Part 4 of this series, which is to [introduce an interactor](../rails-slack-app-part4-action-modal-submission#refactor) `DiscussRetrospective` to handle the validation and business logic, and a `SlackCommentBuilder` module for the responsibility of building the Slack blocks array.
+This will be resolved in a similar way to what was done in Part 2 of this series, which is to [introduce an interactor](../rails-slack-app-part2-slash-command-with-text-response#openretrospective-interactor) `DiscussRetrospective` to handle the validation and business logic. We'll also introduce a `SlackCommentBuilder` module for the responsibility of building the Slack blocks array.
 
 Starting with the `SlackCommentBuilder` module. This contains smaller methods to build each type of block and some methods to put them all together:
 
@@ -515,13 +515,13 @@ end
 
 **What's going on:**
 
-* The inputs `category`, `channel_id`, and `slack_client` are provided via `context`.
+* The inputs `category`, `channel_id`, and `slack_client` are provided via the [context](https://github.com/collectiveidea/interactor?tab=readme-ov-file#context) object, which contains everything the interactor needs to do its work.
 * Validation is performed on `category`, if its `nil` or an unknown category, an error message is sent back to the channel.
 * Given that `category` is valid, the comments for this category are retrieved from the open `Retrospective`
 * The `comments` are then passed to the methods of `SlackCommentBuilder` to build the blocks array.
 * The resulting `blocks` are sent back to the channel.
 
-Finally, we update the `/retro-discuss` handler to delegate to the `DiscussRetrospective` interactor, passing it the inputs it needs:
+Finally, the `/retro-discuss` handler is updated, removing all the previous business logic, and instead it delegates to the `DiscussRetrospective` interactor, passing it the inputs it needs:
 
 ```ruby
 # bot/slash_commands/retro_discuss.rb
@@ -567,7 +567,6 @@ A common issue that can occur when working with the block kit UI is that you acc
 module SlackCommentBuilder
   def build_context_element(text)
     {
-      # intentionally generate error by specifying an invalid type
       # type: "plain_text",
       type: "button",
       emoji: true,
@@ -582,6 +581,7 @@ In this case, when the message is sent to Slack using the `slack_client`:
 ```ruby
 # app/interactors/discuss_retrospective.rb
 class DiscussRetrospective
+  # ...
   def send_message(blocks)
     context.slack_client.chat_postMessage(
       channel: "some_channel_id",
@@ -592,7 +592,7 @@ class DiscussRetrospective
 end
 ```
 
-Slack will return an `invalid blocks` error. When working with the `slack-ruby-bot-server-events` gem, it uses the `slack_ruby_client` gem, which in turn uses `faraday` to communicate with the Slack API via HTTP. Here's what this error looks like in the Rails server output:
+Slack will return an `invalid blocks` error. When working with the [slack-ruby-bot-server-events](https://github.com/slack-ruby/slack-ruby-bot-server-events) gem, it uses the [slack-ruby-client](https://github.com/slack-ruby/slack-ruby-client) gem, which in turn uses [faraday](https://github.com/lostisland/faraday) to communicate with the Slack API via HTTP. Here's what this error looks like in the Rails server output:
 
 ```
 Error in DiscussRetrospective: invalid_blocks
@@ -641,7 +641,7 @@ Throughout this series, we've been using Slack's web UI to build up the applicat
 
 ![slack app interactivity enter url](../images/slack-app-interactivity-enter-url.png "slack app interactivity enter url")
 
-That URL is an [ngrok](../rails-slack-app-part1-oauth#ngrok) address that's forwarding requests from Slack to the Rails app running on localhost. We setup ngrok in Part 1 of this series. An issue to be aware of with the free ngrok version is that every time you restart it, it assigns a new url. That means going back into the Slack app configuration and updating all url's such as in the interactivity and slash commands sections. This is tedious and error prone.
+That URL is an [ngrok](../rails-slack-app-part1-oauth#ngrok) address that's forwarding requests from Slack to the Rails app running on localhost. We setup ngrok in Part 1 of this series. An issue to be aware of with the free ngrok version is that every time you restart it, it assigns a new url. That means going back into the Slack app configuration and updating all url's such as the OAuth redirect, interactivity, and slash commands sections. This is tedious and error prone.
 
 To save yourself this manual effort, there is an easier way. Under the Features section of your Slack app, select "App Manifest". This provides a text representation of the Slack app in either YAML or JSON format. Click on the JSON format, it will look something like this:
 
@@ -654,10 +654,10 @@ Make a copy of the JSON contents, and paste it into a new file in the Rails proj
 1. Update all occurrences of the ngrok IP address with `SERVER_HOST_NAME`
 2. Update all occurrences of your slack client id with `SLACK_CLIENT_ID`
 
-Here's an example of [app_manifest_template.json](https://github.com/danielabar/retro-pulse/blob/main/app_manifest_template.json) from the complete source on Github.
+Here's an example of [app_manifest_template.json](https://github.com/danielabar/retro-pulse/blob/main/app_manifest_template.json) from the complete source of the Retro Pulse application on Github.
 
-Recall that `SERVER_HOST_NAME` and `SLACK_CLIENT_ID` were configured as environment variables in [Part 1](../rails-slack-app-part1-oauth#rails-blocked-host) of this series.
-Now we'll add a rake task that will generate the real manifest file from the template, replacing the environment variables with their actual values from the `.env` file:
+`SERVER_HOST_NAME` and `SLACK_CLIENT_ID` were configured as environment variables in [Part 1](../rails-slack-app-part1-oauth#rails-blocked-host) of this series.
+Add the following rake task to generate the real manifest file from the template, replacing the environment variables with their actual values from the `.env` file:
 
 ```ruby
 # lib/tasks/app_manifest.rake
@@ -700,7 +700,7 @@ Then you can restart the Rails server with `bin/dev` and it will receive request
 
 ## Deployment
 
-A full discussion of how to deploy Rails apps to production is out of scope for this post. But here's a few things to note for this app:
+A full discussion of how to deploy Rails apps to production is out of scope for this post. But here's a few things to note for this app.
 
 Up until now, the Rails app has been running on a laptop, with ngrok forwarding traffic from Slack to `localhost`. For production use, you'll need to deploy your Rails application to a publicly accessible host, eg: `https://yourcompany-retropulse.com`. Then update all the url's in the Slack app to point to where the Rails app is running. You'll also need to make sure all the Slack environment variables (`SLACK_CLIENT_ID`, `SLACK_CLIENT_SECRET`, `SLACK_SIGNING_SECRET`, and `SLACK_VERIFICATION_TOKEN`) are populated in production.
 
@@ -721,18 +721,14 @@ Congratulations on making it to the end of this series on building a Slack appli
 For further exploration and reference, here are some useful links and resources:
 
 - [Retro Pulse GitHub Repository](https://github.com/danielabar/retro-pulse)
-- [Slack Ruby Client](https://github.com/slack-ruby/slack-ruby-client)
-- [Slack Ruby Bot Server](https://github.com/slack-ruby/slack-ruby-bot-server)
-- [Slack Ruby Bot Server Events](https://github.com/slack-ruby/slack-ruby-bot-server-events)
+- [Slack Ruby Client Gem](https://github.com/slack-ruby/slack-ruby-client)
+- [Slack Ruby Bot Server Gem](https://github.com/slack-ruby/slack-ruby-bot-server)
+- [Slack Ruby Bot Server Events Gem](https://github.com/slack-ruby/slack-ruby-bot-server-events)
 - [Slack OAuth Documentation](https://api.slack.com/authentication/oauth-v2)
 - [ngrok - Secure Tunnels to Localhost](https://ngrok.com/)
 - [Your Slack Apps](https://api.slack.com/apps) (requires login)
-- [Interactor Gem for Ruby](https://github.com/collectiveidea/interactor)
+- [Interactor Gem](https://github.com/collectiveidea/interactor)
 - [Slack Modals Documentation](https://api.slack.com/surfaces/modals)
 - [Slack Block Kit Documentation](https://api.slack.com/reference/block-kit/blocks)
 - [Slack Interactivity Documentation](https://api.slack.com/messaging/interactivity)
 - [Slack API Methods](https://api.slack.com/methods)
-
-## TODO
-
-- WIP: edit
