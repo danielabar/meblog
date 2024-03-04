@@ -36,7 +36,7 @@ After submitting the form, the app responds with a direct message (DM) to the us
 
 ## Comment Model
 
-Before implementing the Slack portion of this, we need to ensure there's a place in the database to save the user's retrospective comments. In Part 2 of this series, we introduced the [Retrospective model](../rails-slack-ap-part2-slash-command-with-text-response#implement-slash-command), with `title` and `status` attributes:
+Before implementing the Slack portion of this, we need to ensure there's a place in the database to save the user's retrospective comments. In Part 2 of this series, we introduced the [Retrospective model](../rails-slack-app-part2-slash-command-with-text-response#implement-slash-command), with `title` and `status` attributes:
 
 ```ruby
 # == Schema Information
@@ -80,7 +80,7 @@ class CreateComments < ActiveRecord::Migration[7.0]
 end
 ```
 
-We also need to know what kind of comment this is, i.e. whether this is something the team should *keep* on doing, *stop* doing, or *try* something new for next time. Let's add a `category` column to the `comments` table as a [Postgres enum](../rails-enum-mysql-postgres):
+We also need to know what kind of comment this is, i.e. whether this is something the team should *keep* on doing, *stop* doing, or *try* something new for next time. This can be modelled with a [Postgres enum](../rails-enum-mysql-postgres):
 
 ```ruby
 class AddCategoryToComments < ActiveRecord::Migration[7.0]
@@ -136,7 +136,7 @@ class Comment < ApplicationRecord
 end
 ```
 
-The retrospective model is also updated to indicate it `has_many` comments. The `dependent: :destroy` option is used because it ensures that when a `Retrospective` record is deleted, all associated `Comment` records belonging to that retrospective are also deleted. This prevents orphaned records by ensuring that comments tied to a specific retrospective are removed when the retrospective is no longer needed:
+The retrospective model is also updated to indicate it `has_many` comments. The `dependent: :destroy` option is used to ensure that when a `Retrospective` record is deleted, all associated `Comment` records belonging to that retrospective are also deleted. This prevents orphaned records by ensuring that comments tied to a specific retrospective are removed when the retrospective is no longer needed:
 
 ```ruby
 # == Schema Information
@@ -160,7 +160,7 @@ end
 ```
 
 <aside class="markdown-aside">
-If you want to learn more about all the ActiveRecord dependent options and how they affect removing associated models from the database, checkout this post I wrote on <a href="https://danielabaron.me/blog/activerecord-dependent-options/" class="markdown-link">Activerecord Dependent Options</a>.
+If you want to learn more about ActiveRecord dependent options and how they affect removing associated models from the database, checkout this post I wrote on <a href="https://danielabaron.me/blog/activerecord-dependent-options/" class="markdown-link">Activerecord Dependent Options</a>.
 </aside>
 
 ## Anonymous Enforcement
@@ -197,7 +197,7 @@ class Comment < ApplicationRecord
 end
 ```
 
-However, the above validation rules will only be performed at the application level. Someone with direct database access would still be able to insert invalid data. To ensure data integrity at the database level, we can also add a [CHECK CONSTRAINT](https://www.postgresql.org/docs/current/ddl-constraints.html#DDL-CONSTRAINTS-CHECK-CONSTRAINTS) to the table. This can be done with the Rails migration method `add_check_constraint`. Here is the migration:
+However, the above validation rules will only be performed at the application level. Someone with direct database access would still be able to insert invalid data. To ensure data integrity at the database level, a [CHECK CONSTRAINT](https://www.postgresql.org/docs/current/ddl-constraints.html#DDL-CONSTRAINTS-CHECK-CONSTRAINTS) can be added to the table using the Rails migration method `add_check_constraint`:
 
 ```ruby
 class AddCheckConstraintForSlackInfoInComments < ActiveRecord::Migration[7.0]
@@ -234,7 +234,7 @@ Enable the interactivity toggle:
 
 ![slack app interactivity toggle](../images/slack-app-interactivity-toggle.png "slack app interactivity toggle")
 
-Fill in your ngrok forwarding address in the Request URL field, and then `/api/slack/action`. This is the URL that Slack will POST a message to when the user submits the feedback modal. Recall we setup [ngrok in Part 1](../rails-slack-app-part1-oauth#ngrok) of this series:
+Fill in your ngrok forwarding address in the Request URL field, and then `/api/slack/action`. This is the URL that Slack will POST a message to when the user submits the feedback modal. [Ngrok was setup](../rails-slack-app-part1-oauth#ngrok) in Part 1 of this series.
 
 ![slack app interactivity enter url](../images/slack-app-interactivity-enter-url.png "slack app interactivity enter url")
 
@@ -242,7 +242,7 @@ As soon as you enter a valid URL, it will be saved automatically.
 
 ## Receive Form Submission in Rails
 
-Now that the Slack app has been configured to POST the form submission to the Rails app (via Ngrok), we need to write a handler to receive this payload. In Part 2 of this series, we learned how to use the `slack-ruby-bot-server-events` gem to setup a command handler to [receive a slash command](../rails-slack-app-part2-slash-command-with-text-response#receive-slash-command-in-rails). Now we'll do something similar, but for receiving the form submission. The `slack-ruby-bot-server-events` gem calls these [Actions](https://github.com/slack-ruby/slack-ruby-bot-server-events?tab=readme-ov-file#actions).
+Now that the Slack app has been configured to POST the form submission to the Rails app (via Ngrok), we need to write a handler to receive this payload. In Part 2 of this series, we learned how to use the [slack-ruby-bot-server-events](https://github.com/slack-ruby/slack-ruby-bot-server-events) gem to setup a command handler to [receive a slash command](../rails-slack-app-part2-slash-command-with-text-response#receive-slash-command-in-rails). Now we'll do something similar, but for receiving the form submission. The `slack-ruby-bot-server-events` gem calls these [Actions](https://github.com/slack-ruby/slack-ruby-bot-server-events?tab=readme-ov-file#actions).
 
 Starting from the root of the project, create the following directory and files:
 
@@ -295,7 +295,7 @@ SlackRubyBotServer::Events.configure do |config|
 end
 ```
 
-Then update `config.ru` file in the root of the Rails app to load the action handlers in the `bot` directory. This will ensure the the Slack bot code is loaded when Rails starts:
+Update `config.ru` file in the root of the Rails app to load the action handlers in the `bot` directory. This will ensure the the Slack bot code is loaded when Rails starts:
 
 ```ruby
 # This file is used by Rack-based servers to start the application.
@@ -357,7 +357,7 @@ Since we added `config.on :action, "view_submission"` in `view_submission.rb`, t
 
 ## Saving Feedback
 
-Now that we have communication between Slack and the Rails app working to receive the form submission, we need to parse out the contents of the payload to save the user's retrospective feedback.
+Now that the communication between Slack and Rails is working to receive the form submission, the next step is to parse out the contents of the payload to save the user's retrospective feedback.
 
 The payload contains all the field names and corresponding values submitted by the user for the [custom modal we built in Part 3](../rails-slack-app-part3-slash-command-with-modal-response#respond-with-retro-feedback-modal), along with additional information such as the Slack team, user, trigger ID, and API application ID. Here is a condensed version of the payload for the test we submitted earlier:
 
@@ -400,7 +400,7 @@ The `view` section also contains a `state` section. Here is where we find the ac
 
 The attributes of the payload need to be parsed out for instantiating and saving a `Comment` model in the Rails app. I find it helpful to create a mapping table before writing the code, to be confident that all the data is available:
 
-| Comment           | Slack Payload Attribute                                                                           |
+| Comment Model     | Slack Payload Attribute                                                                           |
 | ----------------- | ------------------------------------------------------------------------------------------------- |
 | category          | ["view"]["state"]["values"]["category_block"]["category_select"]["selected_option"]["value"]      |
 | content           | ["view"]["state"]["values"]["comment_block"]["comment_input"]["value"]                            |
@@ -438,7 +438,7 @@ SlackRubyBotServer::Events.configure do |config|
 end
 ```
 
-To make a better user experience, the app should reply with a DM (direct message) to the user that submitted the feedback, confirming their feedback has been saved. To do this, we'll use the [postMessage API](https://api.slack.com/methods/chat.postMessage) provided by Slack. This was used in Part 2 of this series to send a message to the channel that a [retrospective was opened](../rails-slack-app-part2-slash-command-with-text-response#implement-slash-command). This time, instead of replying to the channel, we want to reply only to the user. This can be done by specifying the Slack user id as the `channel` argument.
+To make a better user experience, the app should reply with a DM (direct message) to the user that submitted the feedback, confirming their feedback has been saved. The [postMessage API](https://api.slack.com/methods/chat.postMessage) provided by Slack can be used for this. This was used in Part 2 of this series to send a message to the channel that a [retrospective was opened](../rails-slack-app-part2-slash-command-with-text-response#implement-slash-command). This time, instead of replying to the channel, the app should reply only to the user. This is accomplished by specifying the Slack user id as the `channel` argument.
 
 Here is the modified view_submission handler, with a DM back to the user:
 
@@ -521,7 +521,7 @@ While the current solution works, there are some problems with it:
 3. Having all the business logic directly in the action handler makes it impossible to test.
 4. Having all the form parsing together with the business logic makes the code hard to read.
 
-We'll solve these problems in the same way as was done in [Part2](../rails-slack-app-part2-slash-command-with-text-response#openretrospective-interactor) of this series, by introducing an interactor named `SaveRetrospectiveFeedback`. To keep the interactor clean, we'll also introduce a `SlackFormParser` module for extracting the information needed from the Slack view_submission form.
+These problems can be solved in the same way as was done in [Part2](../rails-slack-app-part2-slash-command-with-text-response#openretrospective-interactor) of this series, by introducing an interactor named `SaveRetrospectiveFeedback`. To keep the interactor clean, we'll also introduce a `SlackFormParser` module for extracting the information needed from the Slack view_submission form.
 
 Here is the `SlackFormParser` module
 
@@ -621,7 +621,7 @@ class SaveRetrospectiveFeedback
 end
 ```
 
-Then the view_submission action handler can be simplified because most of the logic has moved to the interactor:
+The view_submission action handler can be simplified because most of the logic has moved to the interactor:
 
 ```ruby
 # bot/actions/view_submission.rb
@@ -661,7 +661,3 @@ Populating a `callback_id` is useful for an application that generates many diff
 ## Next Steps
 
 In this part of the series on building a Slack app with Rails, we've learned how to receive a form submission from Slack, parse it to extract the data the user filled in, save it to the database, and reply with a DM to the Slack user confirming their feedback was saved. At this point, we almost have a complete application working. Read on to the last part in this series, where we'll [build a block kit response to a slash command](../rails-slack-app-part5-slash-block-kit-response), to support the team in discussing all the retrospective feedback that has been submitted.
-
-## TODO
-
-- WIP: edit
