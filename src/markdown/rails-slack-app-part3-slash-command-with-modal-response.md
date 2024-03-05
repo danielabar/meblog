@@ -32,11 +32,13 @@ After hitting <kbd class="markdown-kbd">Enter</kbd>, the app responds with a mod
 
 ![slack-app-demo-retro-feedback-modal](../images/slack-app-demo-retro-feedback-modal.png "slack-app-demo-retro-feedback-modal")
 
-The modal has a dropdown for Category:
+The modal has a dropdown for the category of feedback:
 
 ![slack app demo feedback modal](../images/slack-app-demo-feedback-modal.png "slack app demo feedback modal")
 
-After selecting a category, the user can enter a multi-line comment containing their feedback, optionally check the Anonymous option if they don't want their Slack username shown alongside their feedback, and Submit the form.
+After selecting a category, the user can enter a multi-line comment containing their feedback, optionally check the Anonymous option if they don't want their Slack username shown alongside their feedback, and Submit the form. For example:
+
+![slack app modal try filled in](../images/slack-app-modal-try-filled-in.png "slack app modal try filled in")
 
 We'll be looking at handling the form submission in a future post. This post is focused on generating the modal response.
 
@@ -329,7 +331,7 @@ However, before declaring this task done, there's a problem. This code is way to
 
 ## Refactor
 
-The issue of an overly long command handler can be addressed in a similar manner to what was done in Part 2 of this series, where we refactored the command handler by [moving the business logic](../rails-slack-app-part2-slash-command-with-text-response#openretrospective-interactor) into an interactor named `OpenRetrospective`.
+The issue of an overly long command handler can be addressed in a similar manner to what was done in Part 2 of this series, where the command handler was refactored by moving the business logic into an interactor named `OpenRetrospective`. A brief discussion of [how to organize business logic in Rails applications](../rails-slack-app-part2-slash-command-with-text-response#refactor) was also covered in Part 2.
 
 We'll do something similar now by introducing an `InitiateFeedbackForm` interactor, which will receive the `trigger_id` and `slack_client` from the command handler, build the modal response, and send it back to the slack channel. This will simplify the command handler to look like this:
 
@@ -351,7 +353,7 @@ SlackRubyBotServer::Events.configure do |config|
 end
 ```
 
-The interactor is responsible for building the modal payload, and sending it back to the channel using the slack client:
+The interactor is responsible for building the modal payload, and sending it back to the channel using the slack client.
 
 ```ruby
 # app/interactors/initiate_feedback_form.rb
@@ -438,7 +440,7 @@ class InitiateFeedbackForm
 end
 ```
 
-This pattern could be carried on for every element of the modal. However, in this case, since the logic is so closely tied to the Slack API, it could be cleaner to extract Slack-specific form building logic into the `lib` directory as a new module `SlackFormBuilder`:
+This pattern could be carried on for every element of the modal. However, in this case, since the logic is so closely tied to the Slack API, it will be cleaner to extract Slack-specific form building logic into the `lib` directory as a new module `SlackFormBuilder`:
 
 ```ruby
 # lib/slack_form_builder.rb
@@ -604,15 +606,69 @@ class InitiateFeedbackForm
 end
 ```
 
+## Validation
+
+One last thing the `InitiateFeedbackForm` needs to do is verify that an open retrospective actually exists, and if not, it should notify the user with a direct message (DM) that made the request. There's no point in letting the user provide feedback if there's nowhere to save it to.
+
+In order to send a direct message, we'll need to know the Slack user that made the `/retro-feedback` request. This can be extracted from the `command` object exposed by the command handler, and passed on to the interactor context:
+
+```ruby
+# bot/slash_commands/retro_feedback.rb
+SlackRubyBotServer::Events.configure do |config|
+  config.on :command, "/retro-feedback" do |command|
+    team_id = command[:team_id]
+    team = Team.find_by(team_id:)
+    slack_client = Slack::Web::Client.new(token: team.token)
+    channel_id = command[:channel_id]
+    trigger_id = command[:trigger_id]
+
+    # === NEW: Extract the user_id ===
+    user_id = command[:user_id]
+
+    # === NEW: Also pass in user_id ===
+    InitiateFeedbackForm.call(trigger_id:, slack_client:, user_id:)
+    nil
+  end
+end
+```
+
+Then the `InitiateFeedbackForm` is modified to check for an open retrospective, and send the user an error message using the [chat_postMessage](https://api.slack.com/methods/chat.postMessage) API from the `slack_client`:
+
+```ruby
+class InitiateFeedbackForm
+  include Interactor
+  include SlackFormBuilder
+
+  def call
+    retrospective = Retrospective.find_by(status: Retrospective.statuses[:open])
+    return no_open_retrospective_message if retrospective.nil?
+    # ...
+  end
+
+  private
+
+  # ...
+
+  # Specifying `user_id` for the channel will send a direct message to the user
+  def no_open_retrospective_message
+    message = "There is no open retrospective. Please run `/retro-open` to open one."
+    warning_icon = ":warning:"
+    context.slack_client.chat_postMessage(
+      channel: context.user_id,
+      text: "#{warning_icon} #{message}"
+    )
+  end
+end
+```
+
+With this change in place, if a user enters `/retro-feedback` in a Slack workspace with the Retro Pulse app installed, and there is no open retrospective, they will get a notification from the app as shown below:
+
+![sack app dm notify and message](../images/slack-app-dm-notify-and-message.png "sack app dm notify and message")
+
 ## Next Steps
 
-At this point, we've built the capability for a Slack user to enter a custom slash command `/retro-feedback`, and have the app respond with a nicely formatted modal. The user can then select the category of the retrospective feedback (whether it's something the team should keep on doing, stop doing, or try for next time), enter their feedback in a multi-line input, and optionally check off if they wish to remain anonymous. In the [next post in this series](../rails-slack-app-part4-action-modal-submission), we'll learn how to handle the form submission, save the user's feedback in the database, and send a private direct message back to the user to confirm their feedback was received.
+At this point, we've built the capability for a Slack user to enter a custom slash command `/retro-feedback`, and have the app respond with a nicely formatted modal. The user can then select the category of the retrospective feedback (whether it's something the team should keep on doing, stop doing, or try for next time), enter their feedback in a multi-line input, and optionally check off if they wish to remain anonymous. In the [next post in this series](../rails-slack-app-part4-action-modal-submission), we'll learn how to handle the form submission, save the user's feedback in the database, and send a direct message back to the user to confirm their feedback was received.
 
 ## TODO
 
-* Nice to have: `InitiateFeedbackForm` interactor should first validate that there is an open retro, otherwise send text error message via DM to user if we can get the user at this point?
-* In intro section, add one more screenshot showing the filled out form and user hovering over submit button. Eg: To try, Github plugin to send automated reminders about stale PRs still awaiting reviews.
-* Mention discussion of services, interactors, etc was discussed in part 2: (../rails-slack-app-part2-slash-command-with-text-response#refactor)
-* Image showing on one side the Example Modal, and on the other side, the code containing modal payload and arrows between each attribute and modal visual
-* Update rdoc comments on ALL interactors in original code and this series to proper format as per: https://github.com/ruby/rdoc/blob/master/ExampleRDoc.rdoc?plain=1
 * In part 1 when showing screenshots of how app works, include example of anonymous feedback vs showing the slack user id that submitted the feedback
