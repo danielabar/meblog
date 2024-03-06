@@ -10,6 +10,8 @@ related:
   - "Off with the Digital Distractions!"
 ---
 
+**Update (March 2024):** I recently had an engaging conversation on the Geeking Out podcast with host Adriana Villela, where we discussed the challenges of keeping up with rapid changes in the tech world. We covered various learning methods, acknowledging that there's no one-size-fits-all approach. Drawing from my 20+ years of experience in the field, I shared some of my favorite learning resources and techniques. Additionally, I opened up about my own learning journey where I had to learn HashiCorp Nomad from scratch as part of a platform migration. If you're interested in gaining valuable insights into learning processes, I recommend [giving the episode a listen](https://geeking-out.simplecast.com/episodes/the-one-where-we-geek-out-on-how-to-learn-daniela-baron).
+
 As a software developer, you constantly have to learn new things to keep up. Some areas, such as front end web development change faster than others but regardless of what area you're working in, there's a good chance that things have changed since you started your career. It's important to keep learning to take advantage of new opportunities and avoid being stuck in the same job forever, or being laid off from that job and struggling to find a new one because your skills have gone out of date.
 
 So what's the best way to keep up to date? In this post, I'll walk you through several of the ways that I have learned over the years, and share some pros and cons of each.
