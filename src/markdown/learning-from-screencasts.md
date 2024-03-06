@@ -10,6 +10,8 @@ related:
   - "Off with the Digital Distractions!"
 ---
 
+**Update (March 2024):** I recently had an engaging conversation on the Geeking Out podcast with host Adriana Villela, where we discussed the challenges of keeping up with rapid changes in the tech world. We covered various learning methods, acknowledging that there's no one-size-fits-all approach. Drawing from my 20+ years of experience in the field, I shared some of my favorite learning resources and techniques. Additionally, I opened up about my own learning journey where I had to learn HashiCorp Nomad from scratch as part of a platform migration. If you're interested in gaining valuable insights into learning processes, I recommend [giving the episode a listen](https://geeking-out.simplecast.com/episodes/the-one-where-we-geek-out-on-how-to-learn-daniela-baron).
+
 This post will cover some techniques to get the most out of online learning with screencasts. There are many services offering this including [Pluralsight](https://www.pluralsight.com/product/skills), [LinkedIn Learning](https://www.linkedin.com/learning/subscription/topics), [Wes Bos Courses](https://wesbos.com/courses), and [Learn UI Design](https://www.learnui.design/) to name just a few. I happen to have the most experience with Pluralsight, but the advice in this post applies to all screencast style courses. Note that these are generally paid services.
 
 ## Definition
