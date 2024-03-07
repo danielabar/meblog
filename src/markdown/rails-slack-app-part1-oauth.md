@@ -92,7 +92,7 @@ rails new retro-pulse --database=postgresql --css tailwind
 
 In order to make the Slack integration as easy as possible, we'll be working with the following gems:
 1. [slack-ruby-client](https://github.com/slack-ruby/slack-ruby-client): Send messages to Slack via the Web API.
-2. [slack-ruby-bot-server](https://github.com/slack-ruby/slack-ruby-bot-server): Exposes RESTful routes for managing Slack team with OAuth integration. Uses `slack-ruby-client` under the hood.
+2. [slack-ruby-bot-server](https://github.com/slack-ruby/slack-ruby-bot-server): Exposes RESTful routes for managing Slack teams with OAuth integration. Uses `slack-ruby-client` under the hood.
 3. [slack-ruby-bot-server-events](https://github.com/slack-ruby/slack-ruby-bot-server-events): Extends functionality of `slack-ruby-bot-server` with a mini-framework for handling Slack slash commands, actions, and events.
 
 The dependency between these Slack gems looks like this:
@@ -113,10 +113,10 @@ gem "pagy_cursor"
 ```
 
 <aside class="markdown-aside">
-Choosing between leveraging existing gems and building a Slack integration from scratch using an HTTP client involves a tradeoff. The gems mentioned above abstract away complexities and providing a structured framework. While this approach offers efficiency and allows a focus on application-specific features, it's important to note that there is a learning curve associated with understanding how these gems work to avoid the perception of "magic." Conversely, a DIY approach grants high customization but demands more development time. This series adopts the gem-based route, striking a balance between ease of implementation and functionality.
+Choosing between leveraging existing gems vs building Slack integration from scratch using an HTTP client involves a tradeoff. The gems mentioned above abstract away complexities and providing a structured framework. While this approach offers efficiency and allows a focus on application-specific features, it's important to note that there is a learning curve associated with understanding how these gems work to avoid the perception of "magic." Conversely, a DIY approach grants high customization but demands more development time. This series adopts the gem-based route, striking a balance between ease of implementation and functionality.
 </aside>
 
-Since integrating with Slack requires managing Slack-specific secrets, also add the [dotenv-rails](https://github.com/bkeepers/dotenv) gem to the development and test groups. This will allow us to manage secrets with environment variables rather than hard-coding them into the application.
+Since integrating with Slack requires managing Slack-specific secrets, also add the [dotenv-rails](https://github.com/bkeepers/dotenv) gem to the development and test groups. This supports secrets management with environment variables rather than hard-coding them into the application.
 
 ```ruby
 group :development, :test do
@@ -141,7 +141,7 @@ SLACK_VERIFICATION_TOKEN=TBD
 
 Update the `.gitignore` file in the project root to ignore `.env`.
 
-Update the `config.ru` file in the project root to also start the Slack server provided by the `slack-ruby-bot-server` gem. This will expose RESTful endpoints to handle Slack teams. The `config.ru` file got generated earlier when you ran `rails new...`. Here is the original version:
+Update the `config.ru` file in the project root to also start the server provided by the `slack-ruby-bot-server` gem. This will expose RESTful endpoints to handle Slack teams. The `config.ru` file got generated earlier when you ran `rails new...`. Here is the original version:
 
 ```ruby
 # This file is used by Rack-based servers to start the application.
@@ -168,7 +168,7 @@ Rails.application.load_server
 The config.ru file serves as the Rack configuration file, defining how the application should be run with the Rack protocol. See this post <a class="markdown-link" href="https://www.writesoftwarewell.com/definitive-guide-to-rack/">The Definitive Guide to Rack for Rails Developers</a> to learn more about Rack.
 </aside>
 
-Configure the `slack-ruby-bot-server` by defining the OAuth [scopes](https://api.slack.com/scopes) the Slack app will require. Scopes give the app permission to perform actions, such as posting messages in a workspace. Here are the specific scopes Retro Pulse requires:
+Configure `slack-ruby-bot-server` by defining the OAuth [scopes](https://api.slack.com/scopes) the Slack app will require. Scopes give the app permission to perform actions, such as posting messages in a workspace. Here are the specific scopes Retro Pulse requires:
 
 ```ruby
 # config/initializers/slack_ruby_bot_server.rb
@@ -188,7 +188,7 @@ A brief explanation of why each of these scopes is required:
 
 **chat:write.public** Grants the app the ability to send messages to channels it isn't a member of. The app will use this to post messages confirming a retrospective has been opened and to display all the feedback.
 
-Configure the `slack-ruby-bot-server-events` gem with the Slack signing secret (we still have `TBD` for that in `.env`, but will be populating it shortly):
+Configure `slack-ruby-bot-server-events` with the Slack signing secret (it's still a `TBD` in `.env`, but will be populated shortly):
 
 ```ruby
 # config/initializers/slack_ruby_bot_server_events.rb
@@ -249,7 +249,7 @@ Team.all
 # empty collection
 ```
 
-You can also view the `teams` table schema by connecting directly to a database console with `bin/rails db`, and then:
+You can also view the `teams` table schema by connecting directly to a database console with `bin/rails db`, and then use the `\d` meta-command:
 
 ```sql
 -- This is for Postgres
@@ -278,7 +278,7 @@ The `teams` table got generated by the `slack-ruby-bot-server` gem when we added
 
 ## Ngrok
 
-Our Rails application is running on `http://localhost:3000`. However, Slack needs a publicly accessible URL to send requests to when events like OAuth redirects or slash commands are triggered. When you configure a callback URL or specify an endpoint for Slack to communicate with, it needs to be an address that Slack's servers can reach over the internet. Since localhost is specific to each user's local machine and not accessible externally, Slack wouldn't be able to send requests to your local development server.
+The Rails application is running on `http://localhost:3000`. However, Slack needs a publicly accessible URL to send requests to when events like OAuth redirects or slash commands are triggered. When you configure a callback URL or specify an endpoint for Slack to communicate with, it needs to be an address that Slack's servers can reach over the internet. Since localhost is specific to each user's local machine and not accessible externally, Slack wouldn't be able to send requests to your local development server.
 
 This is where [ngrok](https://ngrok.com/) comes in. Ngrok creates a secure tunnel to your local development environment and provides a public URL that forwards requests to your localhost. It acts as an intermediary, allowing external services like Slack to communicate with your local development server. By using ngrok, you can expose your local server to the internet and provide a public URL that can be used as a callback or endpoint for Slack to send requests to during development.
 
