@@ -718,7 +718,7 @@ Then Make sure all the required steps are checked off as shown below, then click
 
 Congratulations on making it to the end of this series on building a Slack application with Rails! I hope you've found it helpful. Throughout this series, we've covered many aspects of Slack integration, from OAuth authentication to implementing slash commands and interactive modals using Block Kit. In this final installment, we explored how to display feedback collected during retrospective meetings, bringing our app to completion.
 
-For further exploration and reference, here are some useful links and resources:
+There are many further enhancements that could be made. For example, to support public distribution and multiple teams, the Retrospective model could be associated to the Team model. Then all searches for an open retrospective would have to be scoped by `team_id`. It might also be nice to let users list the feedback they've submitted so far and allow them to edit it. For further exploration and reference, here are some useful resources:
 
 - [Retro Pulse GitHub Repository](https://github.com/danielabar/retro-pulse)
 - [Slack Ruby Client Gem](https://github.com/slack-ruby/slack-ruby-client)
