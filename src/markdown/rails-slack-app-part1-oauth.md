@@ -408,11 +408,11 @@ https://slack.com/oauth/v2/authorize?
   &client_id=your_client_id
 ```
 
-If you click the "Add to Slack" button, you'll be taken to a Slack page showing that the app is requesting permission to access your Slack workspace. My workspace for development is named "TestBotDev":
+If you click the "Add to Slack" button, you'll be taken to a Slack page showing that the app is requesting permission to access your Slack workspace. I've annotated the screenshot with the OAuth scopes we [configured earlier](../rails-slack-app-part1-oauth/#configure-rails-for-slack):
 
-![slack app oauth request permission](../images/slack-app-oauth-request-permissions.png "slack app oauth request permission")
+![slack app oauth request permission](../images/slack-app-oauth-request-permissions-annotated.png "slack app oauth request permission")
 
-It shows all the OAuth permissions the Retro Pulse app is requesting. But don't click the "Allow" button yet. We still have some work to do on the Rails side to handle this.
+Don't click the "Allow" button yet. We still have some work to do on the Rails side to handle this.
 
 ## Rails Receive OAuth Response
 
@@ -541,14 +541,16 @@ export default class extends Controller {
 ```
 
 <aside class="markdown-aside">
-For even stronger security, Slack also supports <a class="markdown-link" href="https://api.slack.com/authentication/rotation">OAuth token rotation</a>, although I couldn't find support for that in the `slack-ruby-bot-server` gem. So for this relatively simple app, I will not be using this feature.
+For stronger security, Slack also supports <a class="markdown-link" href="https://api.slack.com/authentication/rotation">OAuth token rotation</a>, although I couldn't find support for that in the `slack-ruby-bot-server` gem. So for this relatively simple app, I will not be using this feature.
 </aside>
 
 ## Rails Blocked Host
 
-The OAuth flow isn't going to work quite yet, there's one more thing we need to do on the Rails side to allow incoming requests that aren't `localhost`. Recall we have ngrok running at something like `https://12e4-203-0-113-42.ngrok-free.app`, which will forward requests to the Rails app running at `http://localhost:3000`. However as of Rails 6, the `ActionDispatch::HostAuthorization` middleware will [block any requests that aren't localhost](../rails-blocked-host-docker-fix). This means when Slack sends us the Redirect URL containing the OAuth code, it will never hit our Welcome controller because the HostAuthorization middleware will reject it.
+The OAuth flow isn't going to work quite yet, there's one more thing required on the Rails side to allow incoming requests that aren't `localhost`. Recall that ngrok running at something like `https://12e4-203-0-113-42.ngrok-free.app`, which will forward requests to the Rails app running at `http://localhost:3000`.
 
-To resolve this, we need to specify the ngrok forwarding address in `config/environments/development.rb` so that it will be allowed:
+As of Rails 6, the `ActionDispatch::HostAuthorization` middleware will [block any requests that aren't localhost](../rails-blocked-host-docker-fix). This means when Slack sends the Redirect URL containing the OAuth code, it will never hit the Welcome controller because the `HostAuthorization` middleware will reject it.
+
+To resolve this, add the ngrok forwarding address in `config/environments/development.rb` so that it will be allowed:
 
 ```ruby
 # config/environments/development.rb
@@ -598,11 +600,11 @@ Remember to restart the Rails server after making changes to `config/environment
 
 ## Run the OAuth Flow
 
-Now, we're ready to put together all these parts and try out the OAuth flow. Restart your Rails server at `bin/dev`, navigate to [http://localhost:3000]([http://localhost:3000]), then click on the "Add to Slack" button:
+Now, we're ready to put together all these parts and try out the OAuth flow. Restart the Rails server at `bin/dev`, navigate to [http://localhost:3000]([http://localhost:3000]), then click on the "Add to Slack" button:
 
 ![slack app start oauth](../images/slack-app-start-oauth.png "slack app start oauth")
 
-You should be redirected to a url at Slack that contains your Client ID and the OAuth scopes that this app requires (which we configured earlier with `SlackRubyBotServer`). The URL you get redirected to looks something like this:
+You should be redirected to a url at Slack that contains your Client ID and the OAuth scopes that this app requires (which we configured earlier). The URL you get redirected to looks something like this:
 
 ```
 https://your-workspace.slack.com/oauth
@@ -622,7 +624,7 @@ This time click the "Allow" button:
 
 ![slack app oauth allow](../images/slack-app-oauth-allow.png "slack app oauth allow")
 
-Clicking the "Allow" button will make Slack redirect back to the Rails app, at the ngrok forwarding address we setup in the Slack UI [earlier when defining our app](../rails-slack-app-part1#create-slack-app). The URL will look as shown below. The important piece of information here is the `code` parameter, which we will need to exchange for an OAuth token shortly:
+Clicking the "Allow" button will make Slack redirect back to the Rails app, at the ngrok forwarding address we setup in the Slack UI [earlier when defining our app](../rails-slack-app-part1-oauth#create-slack-app). The URL will look as shown below. The important piece of information here is the `code` parameter, which we will need to exchange for an OAuth token:
 
 ```
 https://your-ngrok-address.ngrok-free.app/
@@ -632,17 +634,17 @@ https://your-ngrok-address.ngrok-free.app/
   &state=
 ```
 
-The very first time you're using the ngrok address, ngrok will display an intermediary page. Your values will be different but it looks something like this:
+The first time you're using the ngrok address, ngrok will display an intermediary page. Your values will be different but it looks something like this:
 
 ![slack app first time ngrok warning](../images/slack-app-first-time-ngrok-warning.png "slack app first time ngrok warning")
 
-Go ahead and click the "Visit Site" button, then this request will hit the root of our Rails app running at `http://localhost:3000` (because ngrok is forwarding traffic there).
+Go ahead and click the "Visit Site" button, then this request will reach the root of the Rails app running at `http://localhost:3000` (because ngrok is forwarding traffic there).
 
 This will render the Rails app homepage which is handled by the `WelcomeController`. Recall we added a StimulusJS controller to detect if a `code` parameter is in the URL, which it is right now, so the Stimulus controller will submit a POST to the `/api/teams` endpoint. At this point you should see a "Working" message, this is the StimulusJS controller waiting for a result from the `POST /api/teams` endpoint:
 
 ![slack app team wait](../images/slack-app-team-wait.png "slack app team wait")
 
-The Rails server will show that it's processing the `POST /api/teams` request. Unfortunately it does not show the activity where it exchanges the `code` for a `token` with Slack, but this is what the [teams endpoint](https://github.com/slack-ruby/slack-ruby-bot-server/blob/master/lib/slack-ruby-bot-server/api/endpoints/teams_endpoint.rb#L33-L115) provided by the `slack-ruby-bot-server` is doing behind the scenes. When it receives the token from Slack, it receives additional information including your Slack team name, workspace name, and the user id that activated the Slack App.
+The Rails server will show that it's processing the `POST /api/teams` request. Unfortunately it does not show the activity where it exchanges the `code` for a `token` with Slack, but this is what the [teams endpoint](https://github.com/slack-ruby/slack-ruby-bot-server/blob/master/lib/slack-ruby-bot-server/api/endpoints/teams_endpoint.rb#L33-L115) provided by the `slack-ruby-bot-server` gem is doing behind the scenes. When it receives the token from Slack, it receives additional information including your Slack team name, workspace name, and the user id that activated the Slack App.
 
 The teams endpoint then checks if a team with the given token or Slack team_id already exists, and if not, will create one in the database. This activity can be seen in the Rails server output. Here is a simplified view:
 
@@ -793,7 +795,3 @@ We now have an authenticated Slack app added to our workspace, backed by a Rails
 ![slack app retro open](../images/slack-app-retro-open.png "slack app retro open")
 
 See [Part 2 of this series](../rails-slack-app-part2-slash-command-with-text-response) to learn how to setup your very first Slack Slash Command and handle it in Rails.
-
-## TODO
-
-* Update `slack-app-oauth-request-permissions.png` with the OAuth scopes and arrows pointing to each. Add explanation that Slack turns each of these into "plain English" for the end user to understand
