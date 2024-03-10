@@ -11,6 +11,7 @@
     "deploy": "gatsby clean && gatsby build && gh-pages -d public",
     "develop": "gatsby develop -H 0.0.0.0",
     "format": "prettier --write \"**/*.{js,jsx}\"",
+    "format:about": "prettier --write \"src/pages/about.js\"",
     "serve": "gatsby serve -H 0.0.0.0",
     "servebuild": "gatsby clean && gatsby build && gatsby serve -H 0.0.0.0",
     "servebuild_noclean": "gatsby build && gatsby serve -H 0.0.0.0",
