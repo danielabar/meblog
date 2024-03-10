@@ -16,16 +16,16 @@ const About = () => (
         With over two decades in software development, I've worked across many
         industries and technology stacks, predominantly focusing on web
         applications in projects, products, and SaaS solutions. My journey began
-        with Java, transitioning seamlessly into full-stack JavaScript, with
-        brief sojourns into Python and GoLang before finding my professional
-        haven in Ruby on Rails nearly five years ago. It's in this environment
+        with Java, transitioning into full-stack JavaScript with the growing popularity of Node.js and single page apps. Then after
+        brief sojourns into Python and GoLang, I found my professional
+        haven in Ruby on Rails about five years ago. It's in this environment
         that I've found not only happiness but also peak productivity.
       </p>
 
       <p className={styles.para}>
-        But let's rewind a bit. My fascination with computer science began
-        during my first year at university. An introductory course, covering
-        everything from hardware to programming, introduced me to the world of
+        But let's rewind a bit. My fascination with software development began
+        during my first year at university. An introductory computer course, covering
+        everything from hardware to programming, to networking and theoretical computer science introduced me to the world of
         coding through the Karel programming language. I was captivated by the
         elegance of programming, spending countless hours perfecting assignments
         and even adding extra features just for fun. Little did I know that this
@@ -39,7 +39,7 @@ const About = () => (
         education had equipped me with a solid foundation in computer science
         theory, the demands of the job were markedly different. Instead of loop
         invariants and Big-O complexity analysis, I found myself navigating the
-        intricacies of version control, database management, and the art of
+        intricacies of communicating within a multi-disciplinary team, version control, database management, and the art of
         translating design comps into pixel-perfect HTML and CSS (before box
         model standardization!). Fortunately I had several wonderful mentors to
         guide me through the on-the-job learning process.
@@ -59,9 +59,8 @@ const About = () => (
       <p className={styles.para}>
         Moreover, as an experienced practitioner, I actively mentor and guide
         fellow engineers, believing strongly in the power of knowledge sharing
-        to elevate the entire team. I'm deeply invested in fostering
-        reproducible local environments, advocating for architectural
-        improvements, and consistently striving for performance optimization and
+        to elevate the entire team. I'm deeply invested in advocating for architectural
+        improvements, tackling technical debt, and consistently striving for performance optimization and
         observability best practices.
       </p>
 
