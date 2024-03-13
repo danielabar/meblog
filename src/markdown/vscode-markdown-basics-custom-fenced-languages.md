@@ -2,7 +2,7 @@
 title: "VSCode Markdown Basics: Customize Fenced Code Block Choices"
 featuredImage: "../images/vscode-fenced-code-block-randy-fath-07dDz_PI05k-unsplash.jpg"
 description: "Customize the fenced code block snippet in VSCode to include additional languages for a more efficient markdown writing experience in engineering docs and blog posts."
-date: "2024-04-01"
+date: "2024-05-01"
 category: "vscode"
 related:
   - "Improve Productivity with VS Code Snippets"
