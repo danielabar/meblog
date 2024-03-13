@@ -1,5 +1,5 @@
 ---
-title: "Efficient Model Auditing with PaperTrail"
+title: "Optimized Model Auditing with PaperTrail"
 featuredImage: "../images/papertrail-efficient-model-auditing.jpg"
 description: "Learn how to optimize model auditing in your Rails application using the PaperTrail gem by setting up separate audit tables for each model, enhancing performance and organization in the auditing process"
 date: "2024-04-01"
@@ -10,7 +10,7 @@ related:
   - "Rails Strong Params for GET Request"
 ---
 
-Model auditing plays an important role in tracking changes within a Rails application. While several gems are available to implement this functionality, today we'll delve into the benefits of using [PaperTrail](https://github.com/paper-trail-gem/paper_trail). By default, PaperTrail consolidates all model audit records into a single `versions` table, which could lead to performance and scaling challenges when dealing with numerous audited models. Conceptually, it looks like this:
+Model auditing plays an important role in tracking changes within a Rails application. While several gems are available to implement this functionality, today we'll take a closer look at [PaperTrail](https://github.com/paper-trail-gem/paper_trail). By default, PaperTrail consolidates all model audit records into a single `versions` table, which could lead to performance and scaling challenges when dealing with numerous audited models. Conceptually, it looks like this:
 
 ![paper trail same version](../images/papertrail-same-version.png "paper trail same version")
 
