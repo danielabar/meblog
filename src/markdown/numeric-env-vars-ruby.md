@@ -12,7 +12,7 @@ related:
 
 This post will explain how to avoid a common pitfall with numeric environment variable handling in Ruby.
 
-I recently encountered an error when running some code that calls a third party API to fetch some data. This code uses the [Quickbooks Ruby](https://github.com/ruckus/quickbooks-ruby?tab=readme-ov-file#querying-in-batches) gem to fetch some accounting data for a financial services application. According to the gem documentation, the usage is as follows:
+I recently encountered an error when running some code that calls a third party API to fetch data. This code uses the Quickbooks Ruby gem to fetch accounting data for a financial services application. According to the gem [documentation](https://github.com/ruckus/quickbooks-ruby?tab=readme-ov-file#querying-in-batches), the usage is as follows:
 
 ```ruby
 query = nil # or specify a custom query
@@ -23,9 +23,9 @@ Customer.query_in_batches(query, per_page: 1000) do |batch|
 end
 ```
 
-The idea is similar to [Active Record Batches](https://api.rubyonrails.org/classes/ActiveRecord/Batches.html) in Rails, to avoid loading a massive collection into memory all at once. With this API, the `per_page` option is used to control the batch size.
+The idea with splitting up the result in batches is similar to [Active Record Batches](https://api.rubyonrails.org/classes/ActiveRecord/Batches.html) in Rails, to avoid loading a massive collection into memory all at once. With this API, the `per_page` option is used to control the batch size.
 
-## The Problem
+## The Bug
 
 However, when I was attempting to run the application code that calls this API from my laptop, it was returning this error message:
 
@@ -44,19 +44,15 @@ RESPONSE BODY:
 </IntuitResponse>
 ```
 
-This seemed very strange as this code had been in production for many years and working without errors.
-
-The stack trace pointed to this part of the application code that calls the API:
+This seemed very strange as this code had been in production for many years and working without errors. The stack trace pointed to this part of the application code that calls the API:
 
 ```ruby
-Customer.query_in_batches(query, per_page: Settings.api_batch_size) do |batch|
+Customer.query_in_batches(query, per_page: Settings.batch_size) do |batch|
   # ...
 end
 ```
 
-So rather than a hard-coded default value of `1000` as per the example in the gem documentation, some custom configuration code was being called.
-
-The `Settings` class had this:
+So rather than a hard-coded default value of `1000` as per the example in the gem documentation, some custom configuration code `Settings.batch_size` was being called. Here is the relevant snippet of the `Settings` class:
 
 ```ruby
 class Settings
@@ -74,7 +70,7 @@ A cursory glance at the implementation of `Settings.batch_size` suggests the fol
 * Convert the `BATCH_SIZE` environment variable to an integer (because *all* environment variables read in are strings).
 * If `BATCH_SIZE` is defined in the environment, use it, otherwise, use a default batch size of `1000`.
 
-And yet, the error message was indicating that a `0` batch size had been specified, which is invalid:
+i.e. use the value of the `BATCH_SIZE` environment variable if it's set, otherwise, use the fallback value of `1000`. But, the error message was indicating that a `0` batch size had been specified, which is invalid:
 
 ```xml
 <Detail>QueryValidationError: value 0 is too small. Min allowed value is 1</Detail>
@@ -92,7 +88,7 @@ echo $BATCH_SIZE
 # 300
 ```
 
-When this project runs locally, it uses the [dotenv](https://github.com/bkeepers/dotenv) gem to load environment variables from a `.env` file in the project root. Inspecting this file revealed that `BATCH_SIZE` was not defined. According to the `Settings.batch_size` implementation, it should have been fine for `BATCH_SIZE` to not be specified, in which case, it should have defaulted to a batch size of 1000. But instead, the `batch_size` method was returning 0.
+When this project runs locally, it uses the [dotenv](https://github.com/bkeepers/dotenv) gem to load environment variables from a `.env` file in the project root. Inspecting this file revealed that `BATCH_SIZE` was nowhere to be found in this file, i.e. it was not set. According to the `Settings.batch_size` implementation, it should have been fine for `BATCH_SIZE` to not be specified, in which case, it should have defaulted to a batch size of 1000. But instead, the `batch_size` method was returning 0.
 
 To understand why this was the case, I launched a local [irb console](https://rubyreferences.github.io/rubyref/intro/irb.html) with the `BATCH_SIZE` environment variable set to `300` as follows:
 
@@ -112,12 +108,12 @@ ENV["BATCH_SIZE"]
 ENV["BATCH_SIZE"].class
 # => String
 
-# Convert the string to an integer
+# Convert batch size env var to an integer
 ENV["BATCH_SIZE"].to_i
 # => 300
 
 # This returns the env var value because its
-# populated, rather than the default of 1000
+# populated (truthy), rather than the default of 1000
 ENV["BATCH_SIZE"].to_i || 1000
 # => 300
 ```
@@ -126,19 +122,56 @@ So far so good, when the `BATCH_SIZE` environment variable is set to a numeric v
 
 Next, I ran another irb console, this time just `irb`, i.e. to simulate an environment where `BATCH_SIZE` is not set:
 
-TODO...
-
 ```ruby
+# Fetch `BATCH_SIZE` environment variable
+# This time it returns nil because its not set
+ENV["BATCH_SIZE"]
+# => nil
 
+# When not set, the env var is of type NilClass
+ENV["BATCH_SIZE"].class
+# => NilClass
+
+# What happens when `nil` is converted to an integer?
+ENV["BATCH_SIZE"].to_i
+# => 0
+
+# What happens when evaluating 0 OR something?
+ENV["BATCH_SIZE"].to_i || 1000
+# => 0
 ```
+
+The code in the above irb session demonstrates the problem. Despite the intention of the `Settings` method to return `1000` when the `BATCH_SIZE` environment variable isn't set, what actually happens is that it returns `0`. This then gets passed on to the third party API as the value of batch size, which raises an error because `0` is an invalid value for batching the response.
+
+## Root Cause
+
+There are several points to understand about why a `0` is being returned when the requested environment variable isn't set:
+
+Running `to_i` on `nil` always returns `0` in Ruby. This means the result of `ENV["ANYTHING_THATS_NOT_SET"].to_i` will be `0`. See the Ruby docs on [NilClass#to_i](https://docs.ruby-lang.org/en/3.2/NilClass.html#method-i-to_i).
+
+The result of `0 || 1000` is `0`, not `1000` as some might expect coming from other languages. The first part of this is to understand that the [|| operator](https://docs.ruby-lang.org/en/master/syntax/operators_rdoc.html#label-7C-7C-2C+or) is a short circuit operator that returns the result of the first expression that is truthy.
+
+Since the `||` OR operator is returning 0, this must mean that `0` is truthy in Ruby! This might be surprising to those coming to Ruby from other languages such as Python or JavaScript where `0` is considered falsey. According to the Ruby docs on [booleans and nil](https://ruby-doc.org/core-2.2.3/doc/syntax/literals_rdoc.html#label-Booleans+and+nil):
+
+> nil and false are both false values. nil is sometimes used to indicate “no value” or “unknown” but evaluates to false in conditional expressions. true is a true value. All objects except nil and false evaluate to a true value in conditional expressions.
+
+The key phrase is "**All objects except nil and false evaluate to a true value in conditional expressions**". Since `0` is not `nil` or `false`, it evaluates to `true` in conditional expressions such as `||`. Further, since it occurs on the left hand side of the short circuit OR in the `Settings` code, as in `0 || 1000`, it means `0` is the first truthy value and returned.
+
+<aside class="markdown-aside">
+This Stack Overflow post contains further discussion on <a class="markdown-link" href="https://stackoverflow.com/questions/10387515/why-treat-0-as-true-in-ruby">why 0 is treated as truthy in Ruby</a>.
+</aside>
+
+## Solution
+
+
 
 ## TODO
 * title
 * WIP: intro para
 * WIP: main content
-* break up into sub-sections
 * conclusion para
 * clarify this could happen in a plain Ruby project, doesn't have to be Rails
 * maybe very brief explanation of dotenv as per https://github.com/bkeepers/dotenv?tab=readme-ov-file#usage
 * maybe also try unexpected env var setting like "foo"?
+* mention I'm on ruby 3.2.2
 * edit
