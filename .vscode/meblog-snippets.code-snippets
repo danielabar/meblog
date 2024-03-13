@@ -52,5 +52,10 @@
     "prefix": "linka",
     "body": "<a class=\"markdown-link\" href=\"${1:link}\">${2:display}</a> $0",
     "description": "Generate an anchor link in a blog aside section"
+  },
+  "img": {
+    "prefix": "img",
+    "body": "![${1:alt}](${2:path} \"${1:alt}\")",
+    "description": "Markdown image with alt text and title."
   }
 }

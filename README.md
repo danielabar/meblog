@@ -182,6 +182,7 @@ The following all needs to work:
 - [mock components with jest](https://thoughtbot.com/blog/mocking-react-components-with-jest)
 - [run just one test](https://stackoverflow.com/questions/28725955/how-do-i-test-a-single-file-using-jest)
 - [Gatsby and Cypress](https://www.gatsbyjs.com/docs/how-to/testing/end-to-end-testing/)
+- [Gatsby Remark Images](https://www.gatsbyjs.com/plugins/gatsby-remark-images/)
 
 ## Original Docs from Starter
 
