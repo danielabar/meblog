@@ -2,7 +2,7 @@
 title: "Kickstart a New Rails Project"
 featuredImage: "../images/kickstart-rails-alexas_fotos-wdxT3xl8Dfo-unsplash.jpg"
 description: "Discover the essential steps and gems for launching a new Rails project. From setting up services in Docker containers to harnessing the power of RSpec, FactoryBot, and other must-have tools."
-date: "2024-03-01"
+date: "2024-08-01"
 category: "rails"
 related:
   - "Setup a Rails Project with Postgres and Docker"
@@ -10,7 +10,9 @@ related:
   - "Start a Rails 6 Project with RSpec"
 ---
 
-Starting a new Rails project is an exciting time, but it also comes with its fair share of setup tasks to ensure your project kicks off on the right foot. This post will walk through some important steps that I like to follow to set up a Rails project for success. From configuring the database to ensuring code quality and style, and setting up essential development tools. Let's get started.
+Starting a new Rails project is an exciting time, but it also comes with its fair share of setup tasks to ensure your project kicks off on the right foot. This post will walk through some important steps that I like to follow to set up a Rails project for success. From configuring the database to ensuring code quality and style, and setting up essential development tools.
+
+While this post is structured to guide you through each section manually, you can optionally skip to the [automation](../kickstart-a-new-rails-project#automation) section to learn how to customize the output of `rails new` using a template file, which will automate and streamline the process. Let's get started.
 
 ## Initialization
 
@@ -582,13 +584,24 @@ environment 'config.autoload_paths << Rails.root.join("services")'
 
 # commands to run after `bundle install`
 after_bundle do
+  # setup model annotation
   run "bin/rails generate annotate:install"
+
+  # setup RSpec testing
   run "bin/rails generate rspec:install"
   run "rm -rf test"
   run "bundle binstubs rspec-core"
+
+  # documentation for solargraph
   run "bundle exec yard gems"
+
+  # create directories and files
   run "mkdir app/services"
-  run "touch app/services/.keep .editorconfig .rubocop.yml .env .env.template"
+  run "touch app/services/.keep .rubocop.yml .env .env.template"
+
+  # copy new files that should always be in project
+  copy_file "/path/to/.editorconfig", ".editorconfig"
+  copy_file "/path/to/.rubocop.yml", ".rubocop.yml"
 end
 ```
 
@@ -597,6 +610,7 @@ end
 * The `gem_group` sections will add the gems to the specified group in the project `Gemfile`.
 * The `environment` command will add the specified line to `config/application.rb`.
 * The `run` command will run any shell command. Place these in the `after_bundle` block to have the commands run after `bundle install` has completed.
+* The `copy_file` command will copy a source file from an absolute path to a target in the generated Rails application. In the example above I keep a copy of my standard `.editorconfig`, `rubocop.yml` in a directory on my laptop, then these get copied over to the project root.
 
 See the [Rails Guides on Templates](https://guides.rubyonrails.org/rails_application_templates.html) for all the options that can be specified in this file.
 
@@ -620,4 +634,4 @@ end
 
 ## Conclusion
 
-This post has covered important steps when starting a Rails project, including database setup, code quality and style, testing, additional dev tooling, and introducing a service layer from the start. Some projects may require more (see this post from Evil Martians on [Gemfile of Dreams](https://evilmartians.com/chronicles/gemfile-of-dreams-libraries-we-use-to-build-rails-apps)), but this is the bare minimum that I always reach for. By following these steps and practices, your Rails project should be well-prepared for efficient development and maintainability.
+This post has covered important steps when starting a Rails project, including database setup, code quality and style, testing, additional dev tooling, and introducing a service layer from the start. Some projects may require more (see this post from Evil Martians on [Gemfile of Dreams](https://evilmartians.com/chronicles/gemfile-of-dreams-libraries-we-use-to-build-rails-apps)), but this is the bare minimum that I always reach for. By following these steps and practices, your Rails project should be well prepared for efficient development and maintainability.
