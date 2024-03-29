@@ -2,7 +2,7 @@
 title: "Avoid this Bug with Numeric Environment Variables in Ruby"
 featuredImage: "../images/bug-numeric-env-var-james-wainscoat-GGewLGcQD-I-unsplash.jpg"
 description: "Learn how to avoid a common pitfall when handling numeric environment variables in Ruby, safeguarding against unexpected behavior even when values are unset or unexpected."
-date: "2024-08-01"
+date: "2024-09-01"
 category: "ruby"
 related:
   - "Configurable Retry with Ruby"
@@ -174,7 +174,7 @@ To summarize, the problem is caused by a combination of the following factors:
 
 ## Solution
 
-The solution is to use the [ENV.fetch](https://docs.ruby-lang.org/en/3.2/ENV.html#method-c-fetch) method, rather than accessing `ENV` with `[]`. The `fetch` method accepts an optional default value, which will be returned if the requested environment variable isn't set. Since the original intent of the code is to use a fallback value of `1000` when the `BATCH_SIZE` environment variable isn't set, the `fetch` method is exactly what's needed here.
+The solution is to use the [ENV.fetch](https://docs.ruby-lang.org/en/3.2/ENV.html#method-c-fetch) method when accessing an environment variable that might not be set, rather than accessing `ENV` with `[]`. The `fetch` method accepts an optional default value, which will be returned if the requested environment variable isn't set. Since the original intent of the code is to use a fallback value of `1000` when the `BATCH_SIZE` environment variable isn't set, the `fetch` method is exactly what's needed here.
 
 It still requires the use of `to_i` because if the environment variable is set, then it will still be retrieved as a string. If it's not set, then the numeric default of `1000` will be returned, but there's no harm in calling `to_i` on it as that will still return an integer:
 
