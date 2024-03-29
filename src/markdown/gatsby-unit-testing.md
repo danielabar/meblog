@@ -671,7 +671,7 @@ export const query = graphql`
 `
 ```
 
-The main difference is that for pages or templates that use `graphql`, recall that this is mocked out, therefore will not return any results. From the initial Gatsby unit test setup [instructions]((https://www.gatsbyjs.com/docs/how-to/testing/unit-testing/)), you should have:
+The main difference is that for pages or templates that use `graphql`, recall that this is mocked out, therefore will not return any results. From the initial Gatsby unit test setup [instructions](https://www.gatsbyjs.com/docs/how-to/testing/unit-testing/), you should have:
 
 ```js
 // __mocks__/gatsby.js
