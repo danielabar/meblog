@@ -7,7 +7,7 @@ category: "rails"
 related:
   - "Understanding ActiveRecord Dependent Options"
   - "Rails Enums with MySQL or Postgres"
-  - "Rails Strong Params for GET Request"
+  - "Efficient Database Queries in Rails: A Practical Approach"
 ---
 
 Model auditing plays an important role in tracking changes within a Rails application. While several gems are available to implement this functionality, today we'll take a closer look at [PaperTrail](https://github.com/paper-trail-gem/paper_trail). By default, PaperTrail consolidates all model audit records into a single `versions` table, which could lead to performance and scaling challenges when dealing with numerous audited models. Conceptually, it looks like this:
@@ -273,7 +273,7 @@ Opting for json or jsonb data types for the object and object_changes columns wi
 
 ## Model Changes
 
-By default, PaperTrail assumes all model changes are being persisted in a single `versions` table. We've updated the migration to create a product-specific versions table `product_versions`, but there are some code changes to be made as well to configure PaperTrail for [custom version classes]((https://github.com/paper-trail-gem/paper_trail#6a-custom-version-classes)).
+By default, PaperTrail assumes all model changes are being persisted in a single `versions` table. We've updated the migration to create a product-specific versions table `product_versions`, but there are some code changes to be made as well to configure PaperTrail for [custom version classes](https://github.com/paper-trail-gem/paper_trail#6a-custom-version-classes).
 
 The first change is to specify the `versions` option on the `has_paper_trail` macro for the `Product` model, to indicate the class that represents the product versions (this class doesn't exist yet, we'll get to that next):
 
