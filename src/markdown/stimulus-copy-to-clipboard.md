@@ -227,15 +227,16 @@ For the copy to clipboard functionality, we need a reference to the content div 
 </div>
 ```
 
-To get a reference to the `content` element in the Stimulus controller, add it to the [static](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Classes/static) targets array. Then it can be used in any function as `this.contentTarget`:
+To get a reference to the `content` element in the Stimulus controller, add it to the [static](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Classes/static) targets array. Then it can be used in any function as `this.contentTarget. I find it helpful to add comments above the `static targets` declaration with the DOM to JavaScript mappings:
 
 ```javascript
 // app/javascript/controllers/clipboard_controller.js
 import { Controller } from "@hotwired/stimulus"
 
 export default class extends Controller {
-  // Entries in the `targets` array connect to DOM elements
-  // eg: data-clipboard-target="content"
+  // DOM                                JavaScript
+  //---------------------------------------------------
+  // data-clipboard-target="content"    this.contentTarget
   static targets = ["content"]
 
   copy() {
@@ -313,13 +314,17 @@ To get a reference to a DOM element with Stimulus, we need another target, which
 </div>
 ```
 
-Then update the static `targets` list in the clipboard controller to add `button`:
+Then update the static `targets` list in the clipboard controller to add `button`. I've also updated the comments showing how the button target gets mapped from the DOM to JavaScript:
 
 ```javascript
 import { Controller } from "@hotwired/stimulus"
 
 export default class extends Controller {
   // === ADD BUTTON AS TARGET HERE ===
+  // DOM                                JavaScript
+  //---------------------------------------------------
+  // data-clipboard-target="content"    this.contentTarget
+  // data-clipboard-target="button"     this.buttonTarget
   static targets = ["content", "button"]
 
   copy() {
@@ -357,11 +362,95 @@ export default class extends Controller {
 
 ## Values
 
-At this point, the feature is functional and could be considered complete. But there's a few further customizations that could be made to make this more re-usable across your application. For example, there may be some places where the success text should show something else such as "Done". You may also want variability in the delay, for example 3 seconds rather than 2 seconds.
+At this point, the feature is functional and could be considered complete. But there's a few further customizations that could be made to make this more re-usable across your application. For example, there may be some places where the success text should show something else such as "Done". You may also want variability in the delay, for example 3 seconds or just 1 second rather than 2 seconds.
 
 Currently these values are hard-coded in the controller. It would be nice if the app developer could provide these as inputs to the controller. In Stimulus, this is accomplished with [values](https://stimulus.hotwired.dev/reference/values).
 
-WIP...
+Start by declaring what inputs the Stimulus controller should accept with the `static values` declaration. This accepts an object where the keys are the input variable names, and the values are the data types that the input will be converted to as it's read from the DOM into a JavaScript variable.
+
+In the version of the controller below, two input values have been added to customize the behaviour:
+
+1. `confirm`, which is a String to indicate what confirmation text the button should show after successful copy.
+2. `delayMs`, which is a number in milliseconds before the original button text is displayed again
+
+Stimulus also supports declaring what the default values should be in case none are provided in the template:
+
+```javascript
+import { Controller } from "@hotwired/stimulus"
+
+// Connects to data-controller="clipboard"
+export default class extends Controller {
+  // ...
+
+  // === DECLARE INPUT VARIABLES HERE ===
+  static values = {
+    confirm: { type: String, default: 'Copied' },
+    delayMs: { type: Number, default: 2000 }
+  }
+
+  copy() {
+    // ...
+  }
+}
+```
+
+Then we can update the view to pass these values in to the controller. Suppose the button text should be updated to `Done` rather than `Copied`, and we'd like a `3000` millisecond delay instead of the default `2000`:
+
+```erb
+<%# app/views/welcome/index.html.erb %>
+
+<%# === SPECIFY ADDITIONAL INPUT VALUES ON THE DOM ELEMENT === %>
+<%# === WHERE THE STIMULUS CONTROLLER IS DECLARED === %>
+<div data-controller="clipboard"
+  data-clipboard-confirm-value="Done"
+  data-clipboard-delay-ms-value="3000">
+    ...
+</div>
+```
+
+Then we can update the Stimulus controller to use these values instead of the hard-coded `Copied` and `2000`. I've also updated the `static values` comment to include a mapping from the DOM elements to the JavaScript variables:
+
+```javascript
+import { Controller } from "@hotwired/stimulus"
+
+// Connects to data-controller="clipboard"
+export default class extends Controller {
+  // DOM                                JavaScript
+  //---------------------------------------------------
+  // data-clipboard-target="content"    this.contentTarget
+  // data-clipboard-target="button"     this.buttonTarget
+  static targets = ["content", "button"]
+
+  // DOM                                    JavaScript
+  //---------------------------------------------------
+  // data-clipboard-confirm-value="foo"     this.confirmValue
+  // data-clipboard-delay-ms-value="num ms" this.delayMsValue
+  static values = {
+    confirm: { type: String, default: 'Copied' },
+    delayMs: { type: Number, default: 2000 }
+  }
+
+  copy() {
+    const text = this.contentTarget.innerText
+    navigator.clipboard.writeText(text)
+      .then(() => {
+        // === USE `confirmValue`
+        // this.buttonTarget.textContent = "Copied";
+        this.buttonTarget.textContent = this.confirmValue;
+        setTimeout(() => {
+          this.buttonTarget.textContent = "Copy";
+        // USE `delayMsValue`
+        // }, 2000);
+        }, this.delayMsValue);
+      })
+      .catch((error) => {
+        console.error('Failed to copy text to clipboard:', error);
+      });
+  }
+}
+```
+
+Note the naming conventions: `camelCase` is used in JavaScript, whereas `kebab-case` is used in the DOM. So `data-clipboard-delay-ms-value` becomes `this.delayMs`.
 
 ## TODO
 * generate screenshot of interaction from working demo
@@ -370,7 +459,6 @@ WIP...
 * main content
   * new rails app `rails new`
   * welcome controller with index only action `bin/rails g controller welcome index`
-  * After the essential feature is working, introduce customization: what text to display after copied, and for how long - `values`
 * conclusion para
 * maybe aside link to kickstart post re: customizing `rails new...`
 * Maybe also show stimulus controllers can use js debug from browser dev tools just like any other js code
@@ -386,6 +474,8 @@ WIP...
 * caveat maintainability? Would be nice to have dev tooling that links views to controllers, or allows refactor/impact analysis such as selecting a controller and showing all views/partials/templates its used in. Or being able to click on a target or value element from a template, and have it navigate to the controller definition.
 * summary/complete solution, and from into "for those in a hurry, jump to complete solution"
 * Instead of hard-coded 'Copy' in controller, could it read the original value into a variable, and then put it back to what it was
+* Somewhere show version of code from demo repo with DOM to JavaScript mappings as comments in controller
+* Aside about unit testing? not in docs, some discussion here: https://discuss.hotwired.dev/t/add-a-doc-about-unit-testing-stimulus-controllers/4142 and https://discuss.hotwired.dev/t/testing-stimulus/90
 * edit
 
 ### Temp
