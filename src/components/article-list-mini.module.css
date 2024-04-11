@@ -22,6 +22,10 @@
   margin-bottom: 5px
 }
 
+.articleTitle:hover {
+  border-bottom: 1px solid var(--base-font-color);
+}
+
 .articleDate {
   color: #1A0D1F;
   font-size: 18px;

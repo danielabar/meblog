@@ -83,22 +83,30 @@ exports[`Home Page renders with layout, article list, and all-link 1`] = `
                 <h2>
                   Recent Posts
                 </h2>
-                <div>
-                  <h3>
-                    First Title
-                  </h3>
+                <a
+                  href="/blog/some-slug"
+                >
                   <div>
-                    July 2021
+                    <span>
+                      First Title
+                    </span>
+                    <div>
+                      July 2021
+                    </div>
                   </div>
-                </div>
-                <div>
-                  <h3>
-                    Second Title
-                  </h3>
+                </a>
+                <a
+                  href="/blog/some-other-slug"
+                >
                   <div>
-                    August 2021
+                    <span>
+                      Second Title
+                    </span>
+                    <div>
+                      August 2021
+                    </div>
                   </div>
-                </div>
+                </a>
               </section>
               <section
                 data-testid="article-list-mini"
@@ -106,22 +114,30 @@ exports[`Home Page renders with layout, article list, and all-link 1`] = `
                 <h2>
                   Popular Posts
                 </h2>
-                <div>
-                  <h3>
-                    First Title
-                  </h3>
+                <a
+                  href="/blog/some-slug"
+                >
                   <div>
-                    July 2021
+                    <span>
+                      First Title
+                    </span>
+                    <div>
+                      July 2021
+                    </div>
                   </div>
-                </div>
-                <div>
-                  <h3>
-                    Second Title
-                  </h3>
+                </a>
+                <a
+                  href="/blog/some-other-slug"
+                >
                   <div>
-                    August 2021
+                    <span>
+                      Second Title
+                    </span>
+                    <div>
+                      August 2021
+                    </div>
                   </div>
-                </div>
+                </a>
               </section>
             </div>
           </div>
@@ -286,22 +302,30 @@ exports[`Home Page renders with layout, article list, and all-link 1`] = `
               <h2>
                 Recent Posts
               </h2>
-              <div>
-                <h3>
-                  First Title
-                </h3>
+              <a
+                href="/blog/some-slug"
+              >
                 <div>
-                  July 2021
+                  <span>
+                    First Title
+                  </span>
+                  <div>
+                    July 2021
+                  </div>
                 </div>
-              </div>
-              <div>
-                <h3>
-                  Second Title
-                </h3>
+              </a>
+              <a
+                href="/blog/some-other-slug"
+              >
                 <div>
-                  August 2021
+                  <span>
+                    Second Title
+                  </span>
+                  <div>
+                    August 2021
+                  </div>
                 </div>
-              </div>
+              </a>
             </section>
             <section
               data-testid="article-list-mini"
@@ -309,22 +333,30 @@ exports[`Home Page renders with layout, article list, and all-link 1`] = `
               <h2>
                 Popular Posts
               </h2>
-              <div>
-                <h3>
-                  First Title
-                </h3>
+              <a
+                href="/blog/some-slug"
+              >
                 <div>
-                  July 2021
+                  <span>
+                    First Title
+                  </span>
+                  <div>
+                    July 2021
+                  </div>
                 </div>
-              </div>
-              <div>
-                <h3>
-                  Second Title
-                </h3>
+              </a>
+              <a
+                href="/blog/some-other-slug"
+              >
                 <div>
-                  August 2021
+                  <span>
+                    Second Title
+                  </span>
+                  <div>
+                    August 2021
+                  </div>
                 </div>
-              </div>
+              </a>
             </section>
           </div>
         </div>
