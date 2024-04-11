@@ -12,8 +12,7 @@ import "@fontsource/bai-jamjuree/700.css"
 import SEO from "../components/SEO"
 import Layout from "../components/layout"
 import Intro from "../components/intro"
-import ArticleList from "../components/article-list"
-import AllLink from "../components/all-link"
+import ArticleListMini from "../components/article-list-mini"
 import * as styles from "./index.module.css"
 
 const Index = ({ data }) => (
@@ -21,17 +20,21 @@ const Index = ({ data }) => (
     <div className={styles.container}>
       <SEO title="Home" pathname="/" />
       <Intro />
-      <ArticleList articles={data.allMarkdownRemark.edges} />
-      <AllLink marginTop="30px" />
+      <div className={styles.articles}>
+        <ArticleListMini articles={data.allMarkdownRemark.edges} title="Recent Posts"/>
+        <ArticleListMini articles={data.allMarkdownRemark.edges} title="Popular Posts"/>
+      </div>
     </div>
   </Layout>
 )
 
 export default Index
 
+// TODO: Integrate csv data source for popular posts
+// then make this have two data sections like `src/templates/post.js`
 export const query = graphql`{
   allMarkdownRemark(
-    limit: 5,
+    limit: 3,
     filter: { fileAbsolutePath: { regex: "/src/markdown/" } }
     sort: {frontmatter: {date: DESC}}
   ) {

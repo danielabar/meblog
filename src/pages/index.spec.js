@@ -13,6 +13,7 @@ jest.mock("../components/SEO", () => {
   }
 })
 
+// TODO: Revisit after have csv data source integrated for popular posts
 const homeData = {
   allMarkdownRemark: {
     edges: [
@@ -54,11 +55,12 @@ describe("Home Page", () => {
     expect(container).toMatchSnapshot()
 
     expect(screen.getByTestId("header")).toBeInTheDocument()
-    expect(screen.getByTestId("article-list")).toBeInTheDocument()
-    expect(screen.getByTestId("all-wrapper")).toBeInTheDocument()
+
+    const articleLists = screen.queryAllByTestId("article-list-mini");
+    expect(articleLists.length).toBe(2);
     expect(screen.getByTestId("footer")).toBeInTheDocument()
 
-    expect(screen.getByText("First Title")).toBeInTheDocument()
-    expect(screen.getByText("Second Title")).toBeInTheDocument()
+    expect(screen.getByText("Recent Posts")).toBeInTheDocument()
+    expect(screen.getByText("Popular Posts")).toBeInTheDocument()
   })
 })
