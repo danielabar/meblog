@@ -3,13 +3,9 @@
   max-width: 1000px;
 }
 
-/* TODO: Experiment with justify-content */
-/* ref: https: //css-tricks.com/snippets/css/a-guide-to-flexbox/ */
 .articles {
   display: flex;
-  margin-top: 30px;
-}
-
-.all {
+  gap: 50px;
+  justify-content: space-between;
   margin-top: 30px;
 }
