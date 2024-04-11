@@ -32,3 +32,10 @@
   font-size: 18px;
   opacity: 0.8;
 }
+
+@media (max-width: 768px) {
+  .container {
+    flex: initial; /* Resets flex-grow, flex-shrink, and flex-basis to their initial values */
+    width: auto; /* Resets width to auto */
+  }
+}
