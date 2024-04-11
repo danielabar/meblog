@@ -9,15 +9,16 @@ const Intro = () => (
       Node.js, React, Ember, Angular, Go, Python, and Java.
     </p>
     <p className={styles.para}>
-      I have a passion for crafting high quality software and enhancing team
-      effectiveness with detailed PR reviews, integrating linting tools,
-      automated testing, CI/CD, and developing maintainable code for the long
-      term. I lead by example, showing how these practices can be put into
-      action and encouraging others to follow suit.
+      Passionate about building high-quality software and enhancing team
+      effectiveness, I employ detailed PR reviews, integrate linting tools,
+      conduct automated testing, and implement CI/CD, all with a focus on developing maintainable code
+      for the long term. Leading by example, I demonstrate how these practices
+      can be implemented and inspire others to follow suit.
     </p>
     <p className={styles.para}>
-      I also continue to hone my skills with ongoing education, and enjoy
-      sharing my experiences through blogging and mentoring.
+      Continuously sharpening my skills through ongoing education, and
+      contributing to the community through blogging and developing open source projects are also important
+      aspects of my professional journey.
     </p>
   </section>
 )
