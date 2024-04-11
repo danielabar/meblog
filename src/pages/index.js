@@ -15,23 +15,43 @@ import Intro from "../components/intro"
 import ArticleListMini from "../components/article-list-mini"
 import * as styles from "./index.module.css"
 
-const Index = ({ data }) => (
-  <Layout>
-    <div className={styles.container}>
-      <SEO title="Home" pathname="/" />
-      <Intro />
-      <div className={styles.articles}>
-        <ArticleListMini articles={data.allMarkdownRemark.edges} title="Recent Posts"/>
-        <ArticleListMini articles={data.allMarkdownRemark.edges} title="Popular Posts"/>
+// TODO: Could this be be in /lib for easier testing?
+const simplifyMarkdownEdges = markdownEdges => {
+  return markdownEdges.map(edge => ({
+    node: {
+      id: edge.node.id,
+      title: edge.node.frontmatter.title,
+      published_at: edge.node.frontmatter.date,
+      slug: edge.node.fields.slug
+    }
+  }));
+};
+
+const Index = props => {
+  const flattenedMarkdownEdges = simplifyMarkdownEdges(props.data.allMarkdownRemark.edges)
+
+  return (
+    <Layout>
+      <div className={styles.container}>
+        <SEO title="Home" pathname="/" />
+        <Intro />
+        <div className={styles.articles}>
+          <ArticleListMini
+            articles={flattenedMarkdownEdges}
+            title="Recent Posts"
+          />
+          <ArticleListMini
+            articles={props.data.popular.edges}
+            title="Popular Posts"
+          />
+        </div>
       </div>
-    </div>
-  </Layout>
-)
+    </Layout>
+  )
+}
 
 export default Index
 
-// TODO: Integrate csv data source for popular posts
-// then make this have two data sections like `src/templates/post.js`
 export const query = graphql`{
   allMarkdownRemark(
     limit: 3,
@@ -47,11 +67,19 @@ export const query = graphql`{
           date(formatString: "MMMM D, YYYY")
           category
         }
-        excerpt
-        html
         fields {
           slug
         }
+      }
+    }
+  }
+  popular: allPopularCsv {
+    edges {
+      node {
+        id
+        title
+        published_at
+        slug
       }
     }
   }

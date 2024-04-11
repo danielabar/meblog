@@ -13,20 +13,18 @@ jest.mock("../components/SEO", () => {
   }
 })
 
-// TODO: Revisit after have csv data source integrated for popular posts
 const homeData = {
   allMarkdownRemark: {
     edges: [
       {
         node: {
           id: "aaa111",
-          excerpt: "excerpt for first article",
           fields: {
             slug: "/blog/some-slug",
           },
           frontmatter: {
             category: "Rails",
-            date: "July 2021",
+            date: "July 1, 2021",
             title: "First Title",
           },
         },
@@ -34,19 +32,38 @@ const homeData = {
       {
         node: {
           id: "bbb222",
-          excerpt: "excerpt for second article",
           fields: {
             slug: "/blog/some-other-slug",
           },
           frontmatter: {
             category: "Docker",
-            date: "August 2021",
+            date: "August 1, 2021",
             title: "Second Title",
           },
         },
       },
     ],
   },
+  popular: {
+    edges: [
+      {
+        node: {
+          id: "ccc333",
+          title: "Very Popular Title",
+          published_at: "January 2, 2022",
+          slug: "/blog/very-popular/"
+        }
+      },
+      {
+        node: {
+          id: "ddd444",
+          title: "Also Popular Title",
+          published_at: "February 3, 2022",
+          slug: "/blog/also-popular/"
+        }
+      }
+    ]
+  }
 }
 
 describe("Home Page", () => {

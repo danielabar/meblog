@@ -91,7 +91,7 @@ exports[`Home Page renders with layout, article list, and all-link 1`] = `
                       First Title
                     </span>
                     <div>
-                      July 2021
+                      July 1, 2021
                     </div>
                   </div>
                 </a>
@@ -103,7 +103,7 @@ exports[`Home Page renders with layout, article list, and all-link 1`] = `
                       Second Title
                     </span>
                     <div>
-                      August 2021
+                      August 1, 2021
                     </div>
                   </div>
                 </a>
@@ -115,26 +115,26 @@ exports[`Home Page renders with layout, article list, and all-link 1`] = `
                   Popular Posts
                 </h2>
                 <a
-                  href="/blog/some-slug"
+                  href="/blog/very-popular/"
                 >
                   <div>
                     <span>
-                      First Title
+                      Very Popular Title
                     </span>
                     <div>
-                      July 2021
+                      January 2, 2022
                     </div>
                   </div>
                 </a>
                 <a
-                  href="/blog/some-other-slug"
+                  href="/blog/also-popular/"
                 >
                   <div>
                     <span>
-                      Second Title
+                      Also Popular Title
                     </span>
                     <div>
-                      August 2021
+                      February 3, 2022
                     </div>
                   </div>
                 </a>
@@ -310,7 +310,7 @@ exports[`Home Page renders with layout, article list, and all-link 1`] = `
                     First Title
                   </span>
                   <div>
-                    July 2021
+                    July 1, 2021
                   </div>
                 </div>
               </a>
@@ -322,7 +322,7 @@ exports[`Home Page renders with layout, article list, and all-link 1`] = `
                     Second Title
                   </span>
                   <div>
-                    August 2021
+                    August 1, 2021
                   </div>
                 </div>
               </a>
@@ -334,26 +334,26 @@ exports[`Home Page renders with layout, article list, and all-link 1`] = `
                 Popular Posts
               </h2>
               <a
-                href="/blog/some-slug"
+                href="/blog/very-popular/"
               >
                 <div>
                   <span>
-                    First Title
+                    Very Popular Title
                   </span>
                   <div>
-                    July 2021
+                    January 2, 2022
                   </div>
                 </div>
               </a>
               <a
-                href="/blog/some-other-slug"
+                href="/blog/also-popular/"
               >
                 <div>
                   <span>
-                    Second Title
+                    Also Popular Title
                   </span>
                   <div>
-                    August 2021
+                    February 3, 2022
                   </div>
                 </div>
               </a>
