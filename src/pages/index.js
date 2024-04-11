@@ -13,19 +13,8 @@ import SEO from "../components/SEO"
 import Layout from "../components/layout"
 import Intro from "../components/intro"
 import ArticleListMini from "../components/article-list-mini"
+import simplifyMarkdownEdges from "../../lib/node-edges-helper"
 import * as styles from "./index.module.css"
-
-// TODO: Could this be be in /lib for easier testing?
-const simplifyMarkdownEdges = markdownEdges => {
-  return markdownEdges.map(edge => ({
-    node: {
-      id: edge.node.id,
-      title: edge.node.frontmatter.title,
-      published_at: edge.node.frontmatter.date,
-      slug: edge.node.fields.slug
-    }
-  }));
-};
 
 const Index = props => {
   const flattenedMarkdownEdges = simplifyMarkdownEdges(props.data.allMarkdownRemark.edges)
