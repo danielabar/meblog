@@ -83,19 +83,21 @@ exports[`Home Page renders with layout, article list, and all-link 1`] = `
                 <h2>
                   Recent Posts
                 </h2>
-                <div
-                  class="article-mini"
-                >
+                <div>
                   <h3>
                     First Title
                   </h3>
+                  <div>
+                    July 2021
+                  </div>
                 </div>
-                <div
-                  class="article-mini"
-                >
+                <div>
                   <h3>
                     Second Title
                   </h3>
+                  <div>
+                    August 2021
+                  </div>
                 </div>
               </section>
               <section
@@ -104,19 +106,21 @@ exports[`Home Page renders with layout, article list, and all-link 1`] = `
                 <h2>
                   Popular Posts
                 </h2>
-                <div
-                  class="article-mini"
-                >
+                <div>
                   <h3>
                     First Title
                   </h3>
+                  <div>
+                    July 2021
+                  </div>
                 </div>
-                <div
-                  class="article-mini"
-                >
+                <div>
                   <h3>
                     Second Title
                   </h3>
+                  <div>
+                    August 2021
+                  </div>
                 </div>
               </section>
             </div>
@@ -282,19 +286,21 @@ exports[`Home Page renders with layout, article list, and all-link 1`] = `
               <h2>
                 Recent Posts
               </h2>
-              <div
-                class="article-mini"
-              >
+              <div>
                 <h3>
                   First Title
                 </h3>
+                <div>
+                  July 2021
+                </div>
               </div>
-              <div
-                class="article-mini"
-              >
+              <div>
                 <h3>
                   Second Title
                 </h3>
+                <div>
+                  August 2021
+                </div>
               </div>
             </section>
             <section
@@ -303,19 +309,21 @@ exports[`Home Page renders with layout, article list, and all-link 1`] = `
               <h2>
                 Popular Posts
               </h2>
-              <div
-                class="article-mini"
-              >
+              <div>
                 <h3>
                   First Title
                 </h3>
+                <div>
+                  July 2021
+                </div>
               </div>
-              <div
-                class="article-mini"
-              >
+              <div>
                 <h3>
                   Second Title
                 </h3>
+                <div>
+                  August 2021
+                </div>
               </div>
             </section>
           </div>

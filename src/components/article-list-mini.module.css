@@ -1,17 +1,29 @@
 /* TBD */
 .container {
-  /* margin-bottom: 30px;
-  margin-top: 10px;
-  line-height: 1.4;
-  font-size: 18px; */
 }
 
 .header {
   color: #81439C;
   font-size: 20px;
   font-weight: 500;
-  /* line-height: 25px; */
   letter-spacing: 1.5px;
   margin-bottom: 25px;
   text-transform: uppercase;
+}
+
+.article {
+  margin-bottom: 20px;
+}
+
+.articleTitle {
+  color: #1A0D1F;
+  font-size: 20px;
+  font-weight: 500;
+  margin-bottom: 5px
+}
+
+.articleDate {
+  color: #1A0D1F;
+  font-size: 18px;
+  opacity: 0.8;
 }
