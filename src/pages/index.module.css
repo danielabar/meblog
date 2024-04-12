@@ -1,8 +1,18 @@
 .container {
   margin: 0 auto;
-  max-width: 900px;
+  max-width: 950px;;
 }
 
-.all {
+.articles {
+  display: flex;
+  gap: 25px;
+  justify-content: space-between;
   margin-top: 30px;
+}
+
+@media (max-width: 768px) {
+  .articles {
+    flex-direction: column;
+    gap: 30px;
+  }
 }

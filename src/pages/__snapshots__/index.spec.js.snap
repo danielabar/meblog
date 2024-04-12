@@ -66,67 +66,79 @@ exports[`Home Page renders with layout, article list, and all-link 1`] = `
           <div>
             <div />
             <section>
-              I'm a software engineer based in Toronto, Canada. My interests include fullstack development, test automation, personal finance, listening to podcasts, reading, building side projects, health and fitness, and always learning new things.
+              <p>
+                I'm a software engineer with over 20 years experience delivering software solutions with many languages and frameworks including Ruby on Rails, Node.js, React, Ember, Angular, Go, Python, and Java.
+              </p>
+              <p>
+                Passionate about building high-quality software and enhancing team effectiveness, I employ detailed PR reviews, integrate linting tools, conduct automated testing, and implement CI/CD, all with a focus on developing maintainable code for the long term. Leading by example, I demonstrate how these practices can be implemented and inspire others to follow suit.
+              </p>
+              <p>
+                Continuously sharpening my skills through ongoing education, and contributing to the community through blogging and developing open source projects are also important aspects of my professional journey.
+              </p>
             </section>
-            <section
-              data-testid="article-list"
-            >
-              <article>
-                <div>
-                  <div>
-                    July 2021
-                  </div>
-                  <div>
-                    Rails
-                  </div>
-                </div>
-                <a
-                  href="/blog/some-slug"
-                >
-                  First Title
-                </a>
-                <div>
-                  excerpt for first article
-                </div>
-                <a
-                  href="/blog/some-slug"
-                >
-                  Read
-                </a>
-              </article>
-              <article>
-                <div>
-                  <div>
-                    August 2021
-                  </div>
-                  <div>
-                    Docker
-                  </div>
-                </div>
-                <a
-                  href="/blog/some-other-slug"
-                >
-                  Second Title
-                </a>
-                <div>
-                  excerpt for second article
-                </div>
-                <a
-                  href="/blog/some-other-slug"
-                >
-                  Read
-                </a>
-              </article>
-            </section>
-            <div
-              data-testid="all-wrapper"
-              style="margin-top: 30px;"
-            >
-              <a
-                href="/blog"
+            <div>
+              <section
+                data-testid="article-list-mini"
               >
-                All Articles
-              </a>
+                <h2>
+                  Recent Posts
+                </h2>
+                <a
+                  href="/blog/some-slug"
+                >
+                  <div>
+                    <span>
+                      First Title
+                    </span>
+                    <div>
+                      July 1, 2021
+                    </div>
+                  </div>
+                </a>
+                <a
+                  href="/blog/some-other-slug"
+                >
+                  <div>
+                    <span>
+                      Second Title
+                    </span>
+                    <div>
+                      August 1, 2021
+                    </div>
+                  </div>
+                </a>
+              </section>
+              <section
+                data-testid="article-list-mini"
+              >
+                <h2>
+                  Popular Posts
+                </h2>
+                <a
+                  href="/blog/very-popular/"
+                >
+                  <div>
+                    <span>
+                      Very Popular Title
+                    </span>
+                    <div>
+                      January 2, 2022
+                    </div>
+                  </div>
+                </a>
+                <a
+                  href="/blog/also-popular/"
+                >
+                  <div>
+                    <span>
+                      Also Popular Title
+                    </span>
+                    <div>
+                      February 3, 2022
+                    </div>
+                  </div>
+                </a>
+              </section>
             </div>
           </div>
         </div>
@@ -273,67 +285,79 @@ exports[`Home Page renders with layout, article list, and all-link 1`] = `
         <div>
           <div />
           <section>
-            I'm a software engineer based in Toronto, Canada. My interests include fullstack development, test automation, personal finance, listening to podcasts, reading, building side projects, health and fitness, and always learning new things.
+            <p>
+              I'm a software engineer with over 20 years experience delivering software solutions with many languages and frameworks including Ruby on Rails, Node.js, React, Ember, Angular, Go, Python, and Java.
+            </p>
+            <p>
+              Passionate about building high-quality software and enhancing team effectiveness, I employ detailed PR reviews, integrate linting tools, conduct automated testing, and implement CI/CD, all with a focus on developing maintainable code for the long term. Leading by example, I demonstrate how these practices can be implemented and inspire others to follow suit.
+            </p>
+            <p>
+              Continuously sharpening my skills through ongoing education, and contributing to the community through blogging and developing open source projects are also important aspects of my professional journey.
+            </p>
           </section>
-          <section
-            data-testid="article-list"
-          >
-            <article>
-              <div>
-                <div>
-                  July 2021
-                </div>
-                <div>
-                  Rails
-                </div>
-              </div>
-              <a
-                href="/blog/some-slug"
-              >
-                First Title
-              </a>
-              <div>
-                excerpt for first article
-              </div>
-              <a
-                href="/blog/some-slug"
-              >
-                Read
-              </a>
-            </article>
-            <article>
-              <div>
-                <div>
-                  August 2021
-                </div>
-                <div>
-                  Docker
-                </div>
-              </div>
-              <a
-                href="/blog/some-other-slug"
-              >
-                Second Title
-              </a>
-              <div>
-                excerpt for second article
-              </div>
-              <a
-                href="/blog/some-other-slug"
-              >
-                Read
-              </a>
-            </article>
-          </section>
-          <div
-            data-testid="all-wrapper"
-            style="margin-top: 30px;"
-          >
-            <a
-              href="/blog"
+          <div>
+            <section
+              data-testid="article-list-mini"
             >
-              All Articles
-            </a>
+              <h2>
+                Recent Posts
+              </h2>
+              <a
+                href="/blog/some-slug"
+              >
+                <div>
+                  <span>
+                    First Title
+                  </span>
+                  <div>
+                    July 1, 2021
+                  </div>
+                </div>
+              </a>
+              <a
+                href="/blog/some-other-slug"
+              >
+                <div>
+                  <span>
+                    Second Title
+                  </span>
+                  <div>
+                    August 1, 2021
+                  </div>
+                </div>
+              </a>
+            </section>
+            <section
+              data-testid="article-list-mini"
+            >
+              <h2>
+                Popular Posts
+              </h2>
+              <a
+                href="/blog/very-popular/"
+              >
+                <div>
+                  <span>
+                    Very Popular Title
+                  </span>
+                  <div>
+                    January 2, 2022
+                  </div>
+                </div>
+              </a>
+              <a
+                href="/blog/also-popular/"
+              >
+                <div>
+                  <span>
+                    Also Popular Title
+                  </span>
+                  <div>
+                    February 3, 2022
+                  </div>
+                </div>
+              </a>
+            </section>
           </div>
         </div>
       </div>

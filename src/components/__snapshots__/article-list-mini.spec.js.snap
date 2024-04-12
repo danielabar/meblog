@@ -1,34 +1,74 @@
 // Jest Snapshot v1, https://goo.gl/fbAQLP
 
-exports[`Intro renders correctly 1`] = `
+exports[`ArticleListMini renders correctly 1`] = `
 {
   "asFragment": [Function],
   "baseElement": <body>
     <div>
-      <section>
-        <p>
-          I'm a software engineer with over 20 years experience delivering software solutions with many languages and frameworks including Ruby on Rails, Node.js, React, Ember, Angular, Go, Python, and Java.
-        </p>
-        <p>
-          Passionate about building high-quality software and enhancing team effectiveness, I employ detailed PR reviews, integrate linting tools, conduct automated testing, and implement CI/CD, all with a focus on developing maintainable code for the long term. Leading by example, I demonstrate how these practices can be implemented and inspire others to follow suit.
-        </p>
-        <p>
-          Continuously sharpening my skills through ongoing education, and contributing to the community through blogging and developing open source projects are also important aspects of my professional journey.
-        </p>
+      <section
+        data-testid="article-list-mini"
+      >
+        <h2>
+          Recent Posts
+        </h2>
+        <a
+          href="/article-1"
+        >
+          <div>
+            <span>
+              Article 1
+            </span>
+            <div>
+              2024-04-10
+            </div>
+          </div>
+        </a>
+        <a
+          href="/article-2"
+        >
+          <div>
+            <span>
+              Article 2
+            </span>
+            <div>
+              2024-04-09
+            </div>
+          </div>
+        </a>
       </section>
     </div>
   </body>,
   "container": <div>
-    <section>
-      <p>
-        I'm a software engineer with over 20 years experience delivering software solutions with many languages and frameworks including Ruby on Rails, Node.js, React, Ember, Angular, Go, Python, and Java.
-      </p>
-      <p>
-        Passionate about building high-quality software and enhancing team effectiveness, I employ detailed PR reviews, integrate linting tools, conduct automated testing, and implement CI/CD, all with a focus on developing maintainable code for the long term. Leading by example, I demonstrate how these practices can be implemented and inspire others to follow suit.
-      </p>
-      <p>
-        Continuously sharpening my skills through ongoing education, and contributing to the community through blogging and developing open source projects are also important aspects of my professional journey.
-      </p>
+    <section
+      data-testid="article-list-mini"
+    >
+      <h2>
+        Recent Posts
+      </h2>
+      <a
+        href="/article-1"
+      >
+        <div>
+          <span>
+            Article 1
+          </span>
+          <div>
+            2024-04-10
+          </div>
+        </div>
+      </a>
+      <a
+        href="/article-2"
+      >
+        <div>
+          <span>
+            Article 2
+          </span>
+          <div>
+            2024-04-09
+          </div>
+        </div>
+      </a>
     </section>
   </div>,
   "debug": [Function],

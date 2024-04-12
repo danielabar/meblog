@@ -12,26 +12,38 @@ import "@fontsource/bai-jamjuree/700.css"
 import SEO from "../components/SEO"
 import Layout from "../components/layout"
 import Intro from "../components/intro"
-import ArticleList from "../components/article-list"
-import AllLink from "../components/all-link"
+import ArticleListMini from "../components/article-list-mini"
+import simplifyMarkdownEdges from "../../lib/node-edges-helper"
 import * as styles from "./index.module.css"
 
-const Index = ({ data }) => (
-  <Layout>
-    <div className={styles.container}>
-      <SEO title="Home" pathname="/" />
-      <Intro />
-      <ArticleList articles={data.allMarkdownRemark.edges} />
-      <AllLink marginTop="30px" />
-    </div>
-  </Layout>
-)
+const Index = props => {
+  const flattenedMarkdownEdges = simplifyMarkdownEdges(props.data.allMarkdownRemark.edges)
+
+  return (
+    <Layout>
+      <div className={styles.container}>
+        <SEO title="Home" pathname="/" />
+        <Intro />
+        <div className={styles.articles}>
+          <ArticleListMini
+            articles={flattenedMarkdownEdges}
+            title="Recent Posts"
+          />
+          <ArticleListMini
+            articles={props.data.popular.edges}
+            title="Popular Posts"
+          />
+        </div>
+      </div>
+    </Layout>
+  )
+}
 
 export default Index
 
 export const query = graphql`{
   allMarkdownRemark(
-    limit: 5,
+    limit: 3,
     filter: { fileAbsolutePath: { regex: "/src/markdown/" } }
     sort: {frontmatter: {date: DESC}}
   ) {
@@ -41,14 +53,22 @@ export const query = graphql`{
         id
         frontmatter {
           title
-          date(formatString: "MMMM YYYY")
+          date(formatString: "MMMM D, YYYY")
           category
         }
-        excerpt
-        html
         fields {
           slug
         }
+      }
+    }
+  }
+  popular: allPopularCsv {
+    edges {
+      node {
+        id
+        title
+        published_at
+        slug
       }
     }
   }

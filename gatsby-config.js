@@ -22,6 +22,7 @@ module.exports = {
     "gatsby-plugin-react-helmet",
     "gatsby-plugin-sitemap",
     "gatsby-plugin-workerize-loader",
+    "gatsby-transformer-csv",
     {
       resolve: `gatsby-transformer-remark`,
       options: {
@@ -117,6 +118,12 @@ module.exports = {
       resolve: `gatsby-source-filesystem`,
       options: {
         path: `${__dirname}/src/images/learning`,
+      },
+    },
+    {
+      resolve: `gatsby-source-filesystem`,
+      options: {
+        path: `${__dirname}/src/csv`,
       },
     },
   ],

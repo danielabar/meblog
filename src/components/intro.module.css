@@ -1,6 +1,11 @@
 .container {
-  margin-bottom: 30px;
-  margin-top: 10px;
+  margin-bottom: 50px;
+  margin-top: 50px;
   line-height: 1.4;
   font-size: 18px;
+}
+
+.para {
+  font-size: 20px;
+  margin-bottom: 25px;
 }
