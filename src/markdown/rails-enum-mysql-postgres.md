@@ -10,6 +10,8 @@ related:
   - "Roll Your Own Search with Rails and Postgres: Search Engine"
 ---
 
+**Update (April 2024):** As of Rails 7, it's possible to create PostgreSQL enums with the Rails migration DSL rather than using raw SQL as explained in this post. If you only need to support PostgreSQL, see the [Rails Guides](https://guides.rubyonrails.org/active_record_postgresql.html#enumerated-types) on this topic.
+
 This post will walk you through the steps to add an enum to a Rails model, backed by either a MySQL or Postgres database. If you're not familiar with enums, an example will be more illuminating than the official definition.
 
 Suppose you're building a recurring subscription service. This will need a `Plan` model that each subscription is associated with. The plan will have a column `recurring_interval` to indicate how frequently the plan renews. Specifically, the service offers yearly, monthly, weekly and daily plans. When a customer purchases a subscription, the code must calculate the renewal date based on the Plan's `recurring_interval`. Imagine some conditional logic checking the value of this column, if it's `year`, add a year to the purchase date, if it's `month`, add a month and so on.
@@ -211,7 +213,27 @@ plan_2.recurring_interval = "fortnight"
 # ArgumentError ('fortnight' is not a valid recurring_interval)
 ```
 
-Much better, this time we get an error from ActiveRecord when trying to set an invalid value for the `recurring_interval` field. ActiveRecord can tell us this value is invalid with a useful error message, without having to try to save to the database and waiting for a SQL error.
+Much better, this time we get an error from ActiveRecord when trying to set an invalid value for the `recurring_interval` field. ActiveRecord can tell us this value is invalid, without having to try to save to the database and waiting for a SQL error.
+
+The error message can be made even friendlier by adding an [inclusion](https://guides.rubyonrails.org/active_record_validations.html#inclusion) validation rule to the model, along with a custom message:
+
+```ruby
+# app/models/plan.rb
+
+class Plan < ApplicationRecord
+  enum recurring_interval: {
+    year: "year",
+    month: "month",
+    week: "week",
+    day: "day"
+  }
+
+  validates :frequency, inclusion: { in: Plan.frequency.keys,
+    message: "must be one of #{Plan.frequency.keys.join(', ')}" }
+end
+```
+
+Now trying to save a plan with an invalid frequency will result in error message: `plan must be one of year, month, week, day`.
 
 ## Enum Methods
 
