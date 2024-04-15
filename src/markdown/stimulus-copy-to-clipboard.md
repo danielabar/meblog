@@ -10,15 +10,23 @@ related:
   - "Rails Strong Params for GET Request"
 ---
 
-In this post, we'll explore how to implement a Copy to Clipboard feature using Stimulus within a Rails application. The interaction looks like this:
+In this post, we'll learn how to implement a Copy to Clipboard feature using Stimulus within a Rails application. Before diving into the specifics, let's take a moment to understand what Stimulus is.
 
-TODO: Screenshots...
+Stimulus is a JavaScript library that facilitates adding small, targeted enhancements to web applications. It's part of the [Hotwire](https://hotwired.dev/) stack, which is an innovative approach to building modern web apps without the complexity typically associated with heavy JavaScript frameworks for building single page apps. While Stimulus can be used as a standalone library from [npm](https://www.npmjs.com/package/@hotwired/stimulus), this post will show how it fits into a Rails application, where it enhances server-rendered HTML with just the right amount of interactivity, aka "JavaScript sprinkles".
 
-Before diving into the specifics, let's take a moment to understand what Stimulus is.
+Here's what we'll build - given some text and a button:
 
-Stimulus is a JavaScript library that facilitates adding small, targeted enhancements to web applications. It's part of the [Hotwire](https://hotwired.dev/) stack, which is an innovative approach to building modern web apps without the complexity typically associated with heavy JavaScript frameworks for building single page apps. While StimulusJS can be used as a standalone library from [npm](https://www.npmjs.com/package/@hotwired/stimulus), this post will show how it fits into a Rails application, where it enhances server-rendered HTML with just the right amount of interactivity, aka "JavaScript sprinkles".
+![stimulus copy clipboard demo 1](../images/stimulus-copy-clipboard-demo-1.jpg "stimulus copy clipboard demo 1")
 
-The copy button is an example of a feature that doesn't need server interaction - i.e. there's no need to send a request to the server, maintain state in the database and update the url of the application. This is why JavaScript, implemented with StimulusJS is a perfect solution for this. Let's get started building it.
+When the Copy button is clicked, the text is copied to the clipboard, and the button text updates to indicate it has been copied:
+
+![stimulus copy clipboard demo 2](../images/stimulus-copy-clipboard-demo-2.jpg "stimulus copy clipboard demo 2")
+
+At this point, the text starting with "The sun gently peeked.." can be pasted anywhere. A few seconds later, the button text updates to its original value:
+
+![stimulus copy clipboard demo 1](../images/stimulus-copy-clipboard-demo-1.jpg "stimulus copy clipboard demo 1")
+
+The copy button is an example of a feature that doesn't need server interaction - i.e. there's no need to send a request to the server, maintain state in the database and update the url of the application. This is why JavaScript, implemented with StimulusJS is a perfect solution for this. Let's get started.
 
 ## Initial Setup
 
@@ -227,16 +235,13 @@ For the copy to clipboard functionality, we need a reference to the content div 
 </div>
 ```
 
-To get a reference to the `content` element in the Stimulus controller, add it to the [static](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Classes/static) targets array. Then it can be used in any function as `this.contentTarget. I find it helpful to add comments above the `static targets` declaration with the DOM to JavaScript mappings:
+To get a reference to the `content` element in the Stimulus controller, add it to the [static](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Classes/static) targets array. Then it can be used in any function as `this.contentTarget`:
 
 ```javascript
 // app/javascript/controllers/clipboard_controller.js
 import { Controller } from "@hotwired/stimulus"
 
 export default class extends Controller {
-  // DOM                                JavaScript
-  //---------------------------------------------------
-  // data-clipboard-target="content"    this.contentTarget
   static targets = ["content"]
 
   copy() {
@@ -321,10 +326,6 @@ import { Controller } from "@hotwired/stimulus"
 
 export default class extends Controller {
   // === ADD BUTTON AS TARGET HERE ===
-  // DOM                                JavaScript
-  //---------------------------------------------------
-  // data-clipboard-target="content"    this.contentTarget
-  // data-clipboard-target="button"     this.buttonTarget
   static targets = ["content", "button"]
 
   copy() {
@@ -366,14 +367,12 @@ At this point, the feature is functional and could be considered complete. But t
 
 Currently these values are hard-coded in the controller. It would be nice if the app developer could provide these as inputs to the controller. In Stimulus, this is accomplished with [values](https://stimulus.hotwired.dev/reference/values).
 
-Start by declaring what inputs the Stimulus controller should accept with the `static values` declaration. This accepts an object where the keys are the input variable names, and the values are the data types that the input will be converted to as it's read from the DOM into a JavaScript variable.
+Start by declaring what inputs the Stimulus controller should accept with the `static values` declaration. This accepts an object where the keys are the input variable names, and the values are objects specifying the data types that the input will be converted to as it's read from the DOM into a JavaScript variable. You can also specify a default value in case none is provided from the DOM.
 
 In the version of the controller below, two input values have been added to customize the behaviour:
 
 1. `confirm`, which is a String to indicate what confirmation text the button should show after successful copy.
 2. `delayMs`, which is a number in milliseconds before the original button text is displayed again
-
-Stimulus also supports declaring what the default values should be in case none are provided in the template:
 
 ```javascript
 import { Controller } from "@hotwired/stimulus"
@@ -408,19 +407,64 @@ Then we can update the view to pass these values in to the controller. Suppose t
 </div>
 ```
 
-Then we can update the Stimulus controller to use these values instead of the hard-coded `Copied` and `2000`. I've also updated the `static values` comment to include a mapping from the DOM elements to the JavaScript variables:
+Then the Stimulus controller can be updated to use these values instead of the hard-coded `Copied` and `2000`:
 
 ```javascript
 import { Controller } from "@hotwired/stimulus"
 
 // Connects to data-controller="clipboard"
 export default class extends Controller {
+  static targets = ["content", "button"]
+
+  static values = {
+    confirm: { type: String, default: 'Copied' },
+    delayMs: { type: Number, default: 2000 }
+  }
+
+  copy() {
+    const text = this.contentTarget.innerText
+    navigator.clipboard.writeText(text)
+      .then(() => {
+        // === USE `confirmValue`
+        this.buttonTarget.textContent = this.confirmValue;
+        setTimeout(() => {
+          this.buttonTarget.textContent = "Copy";
+        // USE `delayMsValue`
+        }, this.delayMsValue);
+      })
+      .catch((error) => {
+        console.error('Failed to copy text to clipboard:', error);
+      });
+  }
+}
+```
+
+Note the naming conventions: `camelCase` is used in JavaScript, whereas `kebab-case` is used in the DOM. So `data-clipboard-delay-ms-value` on a DOM element becomes `this.delayMs` in the controller.
+
+## Targets vs Values
+
+Both targets and values end up as `this.something` in the controller, which can be a little confusing. The distinction is:
+
+Targets are DOM elements that the controller can reference. Use this when you need to perform DOM manipulation. These are specified by adding `data-{controllerName}-target="foo"` on any DOM element that the controller needs access to.
+
+Values are inputs that can be provided to the controller to vary its behaviour. These are specified by adding `data-{controllerName}-{variableName}="{variableValue}"` on the element where the controller is declared.
+
+To clarify, here is the final version of the controller with comments explaining the mapping from targets and values to the DOM:
+
+```javascript
+import { Controller } from "@hotwired/stimulus"
+
+// Connects to data-controller="clipboard"
+export default class extends Controller {
+  // Targets are DOM elements this controller can reference
+  //---------------------------------------------------
   // DOM                                JavaScript
   //---------------------------------------------------
   // data-clipboard-target="content"    this.contentTarget
   // data-clipboard-target="button"     this.buttonTarget
   static targets = ["content", "button"]
 
+  // Values are inputs provided from the DOM into the controller
   // DOM                                    JavaScript
   //---------------------------------------------------
   // data-clipboard-confirm-value="foo"     this.confirmValue
@@ -434,13 +478,9 @@ export default class extends Controller {
     const text = this.contentTarget.innerText
     navigator.clipboard.writeText(text)
       .then(() => {
-        // === USE `confirmValue`
-        // this.buttonTarget.textContent = "Copied";
         this.buttonTarget.textContent = this.confirmValue;
         setTimeout(() => {
           this.buttonTarget.textContent = "Copy";
-        // USE `delayMsValue`
-        // }, 2000);
         }, this.delayMsValue);
       })
       .catch((error) => {
@@ -450,17 +490,24 @@ export default class extends Controller {
 }
 ```
 
-Note the naming conventions: `camelCase` is used in JavaScript, whereas `kebab-case` is used in the DOM. So `data-clipboard-delay-ms-value` becomes `this.delayMs`.
+## Debugging
+
+WIP
+
+## Loading
+
+We didn't have to do anything special like registering or loading the controller. It just "showed up" in the app. This is because this project is using [import-maps](https://github.com/WICG/import-maps), which is the default for JavaScript when starting a new Rails 7 project. The Rails [integration](https://github.com/rails/importmap-rails) automatically loads all the Stimulus controller files from `app/javascript/controllers`. If you're using a different JS bundler such as Webpack or esbuild, it will require a few more steps. See the Stimulus docs on [installing](https://stimulus.hotwired.dev/handbook/installing) for more details.
+
+## Conclusion
+
+This post covered how to implement a Copy to Clipboard feature in a Rails application using Stimulus. It began with an overview of Stimulus and its role in adding interactivity to web apps. Then it explained how to use Stimulus *actions* to handle DOM events, *targets* to perform DOM manipulation, and *values* for customization of the controller's behaviour.
 
 ## TODO
-* generate screenshot of interaction from working demo
 * mention using Rails 7.1
 * brief mention I'm using TailwindCSS but doesn't matter for Stimulus, use whatever you like for styles
 * main content
   * new rails app `rails new`
   * welcome controller with index only action `bin/rails g controller welcome index`
-* conclusion para
-* maybe aside link to kickstart post re: customizing `rails new...`
 * Maybe also show stimulus controllers can use js debug from browser dev tools just like any other js code
 * References: Stimulus docs:
   * https://stimulus.hotwired.dev/
@@ -472,9 +519,7 @@ Note the naming conventions: `camelCase` is used in JavaScript, whereas `kebab-c
 * link to my github repo: stimulus_demo
 * assumptions: basic rails and JS knowledge, link to MDN on js events, eg: https://developer.mozilla.org/en-US/docs/Learn/JavaScript/Building_blocks/Events and https://developer.mozilla.org/en-US/docs/Web/API/Element/click_event, JS classes
 * caveat maintainability? Would be nice to have dev tooling that links views to controllers, or allows refactor/impact analysis such as selecting a controller and showing all views/partials/templates its used in. Or being able to click on a target or value element from a template, and have it navigate to the controller definition.
-* summary/complete solution, and from into "for those in a hurry, jump to complete solution"
 * Instead of hard-coded 'Copy' in controller, could it read the original value into a variable, and then put it back to what it was
-* Somewhere show version of code from demo repo with DOM to JavaScript mappings as comments in controller
 * Aside about unit testing? not in docs, some discussion here: https://discuss.hotwired.dev/t/add-a-doc-about-unit-testing-stimulus-controllers/4142 and https://discuss.hotwired.dev/t/testing-stimulus/90
 * edit
 
