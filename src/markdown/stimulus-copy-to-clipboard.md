@@ -26,6 +26,8 @@ At this point, the text starting with "The sun gently peeked.." can be pasted an
 
 ![stimulus copy clipboard demo 1](../images/stimulus-copy-clipboard-demo-1.jpg "stimulus copy clipboard demo 1")
 
+The completed project is on [Github](https://github.com/danielabar/stimulus_demo).
+
 The copy button is an example of a feature that doesn't need server interaction - i.e. there's no need to send a request to the server, maintain state in the database and update the url of the application. This is why JavaScript, implemented with StimulusJS is a perfect solution for this. Let's get started.
 
 ## Initial Setup
@@ -164,6 +166,8 @@ In this case, we need to handle the "click" event on the Copy button. To start, 
 </div>
 ```
 
+The syntax for the `data-action` value is `"event->controllerName#controllerFunction"`.
+
 Then add a `copy()` function in the controller. For now, it just logs that it was called. The `connect()` function has been removed as we don't need to run any code when the element enters the DOM.
 
 ```javascript
@@ -191,7 +195,7 @@ Since the `click` event is commonly used for button elements, Stimulus provides 
 <button data-action="clipboard#copy">Copy</button>
 ```
 
-Now that the click event handler is hooked up to the Stimulus clipboard controller, the next step is to update the `copy()` function to use the Clipboard API to copy the text in the content div. It will look something like this:
+Now that the click event handler is hooked up to the Stimulus clipboard controller, the next step is to update the `copy()` function to use the [Clipboard API](https://developer.mozilla.org/en-US/docs/Web/API/Clipboard) to copy the text in the content div. It will look something like this:
 
 ```javascript
 // app/javascript/controllers/clipboard_controller.js
@@ -212,6 +216,10 @@ export default class extends Controller {
   }
 }
 ```
+
+<aside class="markdown-aside">
+At the time of this writing (~mid 2024), the Clipboard API is not fully supported in all browsers. See the MDN docs for <a class="markdown-link" href="https://developer.mozilla.org/en-US/docs/Web/API/Clipboard#browser_compatibility">browser compatibility</a>.
+</aside>
 
 However, in order to do this, the controller needs to know what text to copy. The actual text is contained in the content div. This requires getting a reference to the DOM element `<div>the text in here</div>`. This is explained in the next section.
 
@@ -235,7 +243,7 @@ For the copy to clipboard functionality, we need a reference to the content div 
 </div>
 ```
 
-To get a reference to the `content` element in the Stimulus controller, add it to the [static](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Classes/static) targets array. Then it can be used in any function as `this.contentTarget`:
+To get a reference to the `content` element in the Stimulus controller, add it to the static targets array. Then it can be used in any function as `this.contentTarget`:
 
 ```javascript
 // app/javascript/controllers/clipboard_controller.js
@@ -319,7 +327,7 @@ To get a reference to a DOM element with Stimulus, we need another target, which
 </div>
 ```
 
-Then update the static `targets` list in the clipboard controller to add `button`. I've also updated the comments showing how the button target gets mapped from the DOM to JavaScript:
+Then update the static `targets` list in the clipboard controller to add `button`:
 
 ```javascript
 import { Controller } from "@hotwired/stimulus"
@@ -445,11 +453,11 @@ Note the naming conventions: `camelCase` is used in JavaScript, whereas `kebab-c
 
 Both targets and values end up as `this.something` in the controller, which can be a little confusing. The distinction is:
 
-Targets are DOM elements that the controller can reference. Use this when you need to perform DOM manipulation. These are specified by adding `data-{controllerName}-target="foo"` on any DOM element that the controller needs access to.
+**Targets** are DOM elements that the controller can reference. Use this when you need to perform DOM manipulation. These are specified by adding `data-{controllerName}-target="foo"` on any DOM element that the controller needs access to.
 
-Values are inputs that can be provided to the controller to vary its behaviour. These are specified by adding `data-{controllerName}-{variableName}="{variableValue}"` on the element where the controller is declared.
+**Values** are inputs that can be provided to the controller from the DOM to vary its behaviour. These are specified by adding `data-{controllerName}-{variableName}="{variableValue}"` on the element where the controller is declared.
 
-To clarify, here is the final version of the controller with comments explaining the mapping from targets and values to the DOM:
+Here is the final version of the controller with comments explaining the mapping from targets and values to the DOM:
 
 ```javascript
 import { Controller } from "@hotwired/stimulus"
@@ -492,15 +500,37 @@ export default class extends Controller {
 
 ## Debugging
 
-WIP
+Stimulus controllers can be debugged using the browser developer tools just like any other JavaScript. For example using Chrome, from the developer tools, click on the "Sources" tab:
+
+![stimulus demo debug sources tab](../images/stimulus-demo-debug-sources-tab.jpg "stimulus demo debug sources tab")
+
+Enter <kbd class="markdown-kbd">Command</kbd> + <kbd class="markdown-kbd">P</kbd> to bring up the sources fuzzy search (or if using Windows, follow the instructions displayed in the Sources tab for the shortcut), then start typing in "clipboard". It should find a match like this:
+
+![stimulus demo debug source fuzzy search](../images/stimulus-demo-debug-source-fuzzy-search.jpg "stimulus demo debug source fuzzy search")
+
+After hitting <kbd class="markdown-kbd">Enter</kbd> to action the file match, it will load the file in the Sources tab. Then you can add breakpoints as usual. For example, here I've added a breakpoint at the `navigator.clipboard` line and clicked on the Copy button:
+
+![stimulus demo debug breakpoint](../images/stimulus-demo-debug-breakpoint.jpg "stimulus demo debug breakpoint")
 
 ## Loading
 
 We didn't have to do anything special like registering or loading the controller. It just "showed up" in the app. This is because this project is using [import-maps](https://github.com/WICG/import-maps), which is the default for JavaScript when starting a new Rails 7 project. The Rails [integration](https://github.com/rails/importmap-rails) automatically loads all the Stimulus controller files from `app/javascript/controllers`. If you're using a different JS bundler such as Webpack or esbuild, it will require a few more steps. See the Stimulus docs on [installing](https://stimulus.hotwired.dev/handbook/installing) for more details.
 
+## Maintainability
+
+A few caveats about maintainability:
+
+On a large app with many Stimulus controllers, the template files will end up full of `data-controller`, `data-somecontroller-target` and `data-somecontroller-somevariable-value`. This could get confusing especially if there are multiple controllers in the same area of the DOM.
+
+It would be amazing to have IDE support such as hover/go-to definition from the template to the controller and vice versa. There is [Stimulus LSP](https://marketplace.visualstudio.com/items?itemName=marcoroth.stimulus-lsp) which provides some support. It has completion support in the template, validation, and using the go-to-definition shortcut on any data- attribute from the template goes to the controller, although always the top of the file, not the specific value or target line. Doesn't work the other way though, from controller to template(s). Free extension idea if anyone's looking for a side project 😀
+
+Another aspect of maintainability is automated testing. I couldn't find anything in the [Stimulus Reference](https://stimulus.hotwired.dev/reference/controllers) about unit testing controllers, although there is some discussion [here](https://discuss.hotwired.dev/t/add-a-doc-about-unit-testing-stimulus-controllers/4142) and [here](https://discuss.hotwired.dev/t/testing-stimulus/90).
+
+In the meantime, be sure to have system tests that cover any JavaScript interactivity from the Stimulus controllers. If using [Capybara](https://github.com/teamcapybara/capybara), this means configuring it with a [driver](https://github.com/teamcapybara/capybara?tab=readme-ov-file#drivers) capable of executing JavaScript.
+
 ## Conclusion
 
-This post covered how to implement a Copy to Clipboard feature in a Rails application using Stimulus. It began with an overview of Stimulus and its role in adding interactivity to web apps. Then it explained how to use Stimulus *actions* to handle DOM events, *targets* to perform DOM manipulation, and *values* for customization of the controller's behaviour.
+This post covered how to implement a Copy to Clipboard feature in a Rails application using Stimulus. It began with an overview of Stimulus and its role in adding interactivity to web apps. Then it explained how to create a new Stimulus *controller*, use Stimulus *actions* to handle DOM events, *targets* to perform DOM manipulation, and *values* for customization of the controller's behaviour. Finally it covered some aspects of maintainability to be aware of when using Stimulus.
 
 ## TODO
 * mention using Rails 7.1
@@ -508,19 +538,13 @@ This post covered how to implement a Copy to Clipboard feature in a Rails applic
 * main content
   * new rails app `rails new`
   * welcome controller with index only action `bin/rails g controller welcome index`
-* Maybe also show stimulus controllers can use js debug from browser dev tools just like any other js code
 * References: Stimulus docs:
   * https://stimulus.hotwired.dev/
   * https://stimulus.hotwired.dev/handbook/introduction
   * https://stimulus.hotwired.dev/handbook/installing (installation doc has naming conventions - very important!)
   * lifecycle callbacks: https://stimulus.hotwired.dev/reference/lifecycle-callbacks
   * actions: https://stimulus.hotwired.dev/reference/actions
-* Aside: At time of this writing, clipboard api not fully supported
-* link to my github repo: stimulus_demo
 * assumptions: basic rails and JS knowledge, link to MDN on js events, eg: https://developer.mozilla.org/en-US/docs/Learn/JavaScript/Building_blocks/Events and https://developer.mozilla.org/en-US/docs/Web/API/Element/click_event, JS classes
-* caveat maintainability? Would be nice to have dev tooling that links views to controllers, or allows refactor/impact analysis such as selecting a controller and showing all views/partials/templates its used in. Or being able to click on a target or value element from a template, and have it navigate to the controller definition.
-* Instead of hard-coded 'Copy' in controller, could it read the original value into a variable, and then put it back to what it was
-* Aside about unit testing? not in docs, some discussion here: https://discuss.hotwired.dev/t/add-a-doc-about-unit-testing-stimulus-controllers/4142 and https://discuss.hotwired.dev/t/testing-stimulus/90
 * edit
 
 ### Temp
