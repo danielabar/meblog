@@ -30,9 +30,15 @@ The completed project is on [Github](https://github.com/danielabar/stimulus_demo
 
 The copy button is an example of a feature that doesn't need server interaction - i.e. there's no need to send a request to the server, maintain state in the database and update the url of the application. This is why JavaScript, implemented with StimulusJS is a perfect solution for this. Let's get started.
 
+This post assumes a basic understanding of Rails controllers and views, and JavaScript, including events and DOM manipulation.
+
 ## Initial Setup
 
-Given a controller that makes some data available for a view as follows:
+For this project, I'm using Rails 7.1 and generated a controller that makes some data available for a view as follows:
+
+```bash
+bin/rails g controller welcome index
+```
 
 ```ruby
 # app/controllers/welcome_controller.rb
@@ -56,6 +62,16 @@ Here is the corresponding view that displays this content:
 <div>
   <%= @very_important_content %>
 </div>
+```
+
+Let's make it the default route:
+
+```ruby
+# config/routes.rb
+Rails.application.routes.draw do
+  get "welcome/index"
+  root "welcome#index"
+end
 ```
 
 Now we'd like to add a Copy button that copies the content text to the clipboard. To get started with the copy to clipboard feature, we first need a button that the user can click to start the interaction. Normally buttons would be contained in a form with an action that POSTs to the server. But this is going to be a client-side only interaction, therefore no form or action is needed:
@@ -129,21 +145,12 @@ export default class extends Controller {
 }
 ```
 
-Navigating to `http://localhost:3000` with the browser dev tools open to the Console tab should show:
+Navigating to `http://localhost:3000/` with the browser dev tools open to the Console tab should show:
 ```
 === CLIPBOARD CONTROLLER CONNECTED ===
 ```
 
-This is because the default route is the welcome route:
-
-```ruby
-Rails.application.routes.draw do
-  get "welcome/index"
-  root "welcome#index"
-end
-```
-
-And the welcome controller index action renders the `app/views/welcome/index.html.erb` view, which causes the div with `data-controller="clipboard"` attribute to enter the DOM, which in turn causes the `connect()` function in the Stimulus controller to run.
+Recall `welcome/index` is the default route. So when navigating to `/`, the welcome controller index action renders the `app/views/welcome/index.html.erb` view, which causes the div with `data-controller="clipboard"` attribute to enter the DOM, which in turn causes the `connect()` function in the clipboard Stimulus controller to run.
 
 ## Copy Button Action
 
@@ -151,11 +158,10 @@ Now that the controller is connected, it's time to make it do some actual work.
 
 Stimulus uses [actions](https://stimulus.hotwired.dev/reference/actions) for handling DOM events. An action connects a DOM element and an event listener fired on that element, to a function within the controller.
 
-In this case, we need to handle the "click" event on the Copy button. To start, we update the markup with the `data-action` attribute:
+In this case, we need to handle the "click" event on the Copy button. Update the markup by adding a `data-action` attribute on the button element:
 
 ```erb
 <%# app/views/welcome/index.html.erb %>
-
 <div data-controller="clipboard">
   <div>
     <%= @very_important_content %>
@@ -234,7 +240,7 @@ For the copy to clipboard functionality, we need a reference to the content div 
 
 <div data-controller="clipboard">
 
-  <%# === GRAB A REFERENCE TO THIS ELEMENT BY NAMING IT `content` === %>
+  <%# === GET A REFERENCE TO THIS ELEMENT BY NAMING IT `content` === %>
   <div data-clipboard-target="content">
     <%= @very_important_content %>
   </div>
@@ -250,10 +256,11 @@ To get a reference to the `content` element in the Stimulus controller, add it t
 import { Controller } from "@hotwired/stimulus"
 
 export default class extends Controller {
+  // ADD DOM ELEMENT TARGETS HERE
   static targets = ["content"]
 
   copy() {
-    // Now we can reference `this.contentTarget` to get
+    // Now we can reference `this.contentTarget` to get the
     // DOM element having data-clipboard-target="content"
     const text = this.contentTarget.innerText
     console.log(`=== TEXT TO BE COPIED: ${text} ===`)
@@ -281,6 +288,8 @@ export default class extends Controller {
 
   copy() {
     const text = this.contentTarget.innerText
+
+    // === USE THE CLIPBOARD API TO COPY `text`
     navigator.clipboard.writeText(text)
       .then(() => {
         console.log('Text copied to clipboard');
@@ -306,11 +315,11 @@ Then, entering <kbd class="markdown-kbd">Cmd</kbd> + <kbd class="markdown-kbd">V
 
 ## User Feedback
 
-Technically, the copy to clipboard feature is working, but here's no visible feedback to the user that the copy was successful. It would be nice to update the text of the Copy button to "Copied" for a few seconds, so the user knows it worked, and then change the text back to "Copy".
+Technically, the copy to clipboard feature is working, but there's no visible feedback to the user that the copy was successful. It would be nice to update the text of the Copy button to "Copied" for a few seconds, so the user knows it worked, and then change the text back to "Copy".
 
 In JavaScript, if you have a reference to a button element, it's text can be modified by setting it's [textContent](https://developer.mozilla.org/en-US/docs/Web/API/Node/textContent) property. So if we had a reference to the button element, we could change its text in the `copy()` function, after the clipboard `writeText` promise is resolved.
 
-To get a reference to a DOM element with Stimulus, we need another target, which was [explained earlier](../stimulus-copy-to-clipboard#targets). Let's add another one for the button element named `button`. Starting with the template. The button element already has a `data-` attribute for the copy action, but it's no problem to add another one to specify it as a target:
+To get a reference to a DOM element with Stimulus, we need another [target](../stimulus-copy-to-clipboard#targets). Let's add another one for the button element named `button`. Starting with the template. The button element already has a `data-` attribute for the copy action, but it's no problem to add another one to specify it as a target:
 
 ```erb
 <%# app/views/welcome/index.html.erb %>
@@ -318,10 +327,10 @@ To get a reference to a DOM element with Stimulus, we need another target, which
 <div data-controller="clipboard">
   ...
 
-  <%# === GRAB A REFERENCE TO THE BUTTON ELEMENT BY NAMING IT `button` === %>
+  <%# === GET A REFERENCE TO THE BUTTON ELEMENT BY NAMING IT `button` === %>
   <button
-    data-action="clipboard#copy">
-    data-clipboard-target="button"
+    data-action="clipboard#copy"
+    data-clipboard-target="button">
       Copy
   </button>
 </div>
@@ -342,7 +351,7 @@ export default class extends Controller {
 }
 ```
 
-Once the button is added as a target, it can be referenced in controller functions as `this.buttonTarget`. Now we can update the `copy()` function to update the button's text, then use a [setTimeout](https://developer.mozilla.org/en-US/docs/Web/API/setTimeout) to put the text back to what it was, after a 2 second delay:
+Once the button is added as a target, it can be referenced in controller functions as `this.buttonTarget`. Let's update the `copy()` function to update the button's text, then use a [setTimeout](https://developer.mozilla.org/en-US/docs/Web/API/setTimeout) to put the text back to what it was, after a 2 second delay:
 
 ```javascript
 import { Controller } from "@hotwired/stimulus"
@@ -371,7 +380,7 @@ export default class extends Controller {
 
 ## Values
 
-At this point, the feature is functional and could be considered complete. But there's a few further customizations that could be made to make this more re-usable across your application. For example, there may be some places where the success text should show something else such as "Done". You may also want variability in the delay, for example 3 seconds or just 1 second rather than 2 seconds.
+At this point, the feature is functional and could be considered complete. But there's a few customizations that could make this more re-usable across your application. For example, there may be some places where the success text should show something else such as "Done". You may also want variability in the delay, for example 3 seconds or just 1 second rather than 2 seconds.
 
 Currently these values are hard-coded in the controller. It would be nice if the app developer could provide these as inputs to the controller. In Stimulus, this is accomplished with [values](https://stimulus.hotwired.dev/reference/values).
 
@@ -532,91 +541,11 @@ In the meantime, be sure to have system tests that cover any JavaScript interact
 
 This post covered how to implement a Copy to Clipboard feature in a Rails application using Stimulus. It began with an overview of Stimulus and its role in adding interactivity to web apps. Then it explained how to create a new Stimulus *controller*, use Stimulus *actions* to handle DOM events, *targets* to perform DOM manipulation, and *values* for customization of the controller's behaviour. Finally it covered some aspects of maintainability to be aware of when using Stimulus.
 
-## TODO
-* mention using Rails 7.1
-* brief mention I'm using TailwindCSS but doesn't matter for Stimulus, use whatever you like for styles
-* main content
-  * new rails app `rails new`
-  * welcome controller with index only action `bin/rails g controller welcome index`
-* References: Stimulus docs:
-  * https://stimulus.hotwired.dev/
-  * https://stimulus.hotwired.dev/handbook/introduction
-  * https://stimulus.hotwired.dev/handbook/installing (installation doc has naming conventions - very important!)
-  * lifecycle callbacks: https://stimulus.hotwired.dev/reference/lifecycle-callbacks
-  * actions: https://stimulus.hotwired.dev/reference/actions
-* assumptions: basic rails and JS knowledge, link to MDN on js events, eg: https://developer.mozilla.org/en-US/docs/Learn/JavaScript/Building_blocks/Events and https://developer.mozilla.org/en-US/docs/Web/API/Element/click_event, JS classes
-* edit
+Here's some further reading on Stimulus from the official [documentation](https://stimulus.hotwired.dev/) site:
 
-### Temp
-
-Might also want to explore disabling button during delay period:
-
-```javascript
-import { Controller } from "@hotwired/stimulus"
-
-// Connects to data-controller="clipboard"
-export default class extends Controller {
-  static targets = ["content", "button"]
-
-  copy() {
-    const text = this.contentTarget.innerText;
-
-    // Disable the button
-    this.buttonTarget.disabled = true;
-
-    navigator.clipboard.writeText(text)
-      .then(() => {
-        this.buttonTarget.textContent = 'Copied';
-        setTimeout(() => {
-          this.buttonTarget.textContent = 'Copy';
-
-          // Re-enable the button after 2 seconds
-          this.buttonTarget.disabled = false;
-        }, 2000);
-      })
-      .catch((error) => {
-        console.error('Failed to copy text to clipboard:', error);
-        // Ensure the button is re-enabled in case of error
-        this.buttonTarget.disabled = false;
-      });
-  }
-}
-```
-
-Then would need additional styles, conditional?
-Would also need TailwindCSS build config to scan the controller if adding classes here
-
-```javascript
-import { Controller } from "@hotwired/stimulus"
-
-export default class extends Controller {
-  static targets = ["content", "button"]
-
-  copy() {
-    const text = this.contentTarget.innerText;
-
-    // Disable the button
-    this.buttonTarget.disabled = true;
-    this.buttonTarget.classList.add('opacity-50', 'cursor-not-allowed');
-
-    navigator.clipboard.writeText(text)
-      .then(() => {
-        this.buttonTarget.textContent = 'Copied';
-        setTimeout(() => {
-          this.buttonTarget.textContent = 'Copy';
-
-          // Re-enable the button after 2 seconds
-          this.buttonTarget.disabled = false;
-          this.buttonTarget.classList.remove('opacity-50', 'cursor-not-allowed');
-        }, 2000);
-      })
-      .catch((error) => {
-        console.error('Failed to copy text to clipboard:', error);
-        // Ensure the button is re-enabled in case of error
-        this.buttonTarget.disabled = false;
-        this.buttonTarget.classList.remove('opacity-50', 'cursor-not-allowed');
-      });
-  }
-}
-
-```
+* [Intro](https://stimulus.hotwired.dev/handbook/introduction)
+* [Installation](https://stimulus.hotwired.dev/handbook/installing) - contains important information about naming conventions!
+* [Lifecycle Callbacks](https://stimulus.hotwired.dev/reference/lifecycle-callbacks)
+* [Actions](https://stimulus.hotwired.dev/reference/actions)
+* [Targets](https://stimulus.hotwired.dev/reference/targets)
+* [Values](https://stimulus.hotwired.dev/reference/values)
