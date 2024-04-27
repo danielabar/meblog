@@ -12,7 +12,7 @@ related:
 
 In this post, we'll learn how to implement a Copy to Clipboard feature using Stimulus within a Rails application. Before diving into the specifics, let's take a moment to understand what Stimulus is.
 
-Stimulus is a JavaScript library that facilitates adding small, targeted enhancements to web applications. It's part of the [Hotwire](https://hotwired.dev/) stack, which is an innovative approach to building modern web apps without the complexity typically associated with heavy JavaScript frameworks for building single page apps. While Stimulus can be used as a standalone library from [npm](https://www.npmjs.com/package/@hotwired/stimulus), this post will show how it fits into a Rails application, where it enhances server-rendered HTML with just the right amount of interactivity, aka "JavaScript sprinkles".
+Stimulus is a JavaScript library that facilitates adding small, targeted enhancements to web applications. It's part of the [Hotwire](https://hotwired.dev/) stack, which is an innovative approach to building modern web apps without the complexity typically associated with heavy JavaScript frameworks for building single page apps. While Stimulus can be used as a [standalone library](https://www.npmjs.com/package/@hotwired/stimulus), this post will show how it fits into a Rails application, where it enhances server-rendered HTML with just the right amount of interactivity, aka "JavaScript sprinkles".
 
 Here's what we'll build - given some text and a button:
 
@@ -28,7 +28,7 @@ At this point, the text starting with "The sun gently peeked.." can be pasted an
 
 The completed project is on [Github](https://github.com/danielabar/stimulus_demo).
 
-The copy button is an example of a feature that doesn't need server interaction - i.e. there's no need to send a request to the server, maintain state in the database and update the url of the application. This is why JavaScript, implemented with StimulusJS is a perfect solution for this. Let's get started.
+The copy button is an example of a feature that doesn't need server interaction. There's no need to send a request to the server, maintain state in the database and update the url of the application. This is why JavaScript with Stimulus is a perfect solution for this. Let's get started.
 
 This post assumes a basic understanding of Rails controllers and views, and JavaScript, including events and DOM manipulation.
 
@@ -58,7 +58,6 @@ Here is the corresponding view that displays this content:
 
 ```erb
 <%# app/views/welcome/index.html.erb %>
-
 <div>
   <%= @very_important_content %>
 </div>
@@ -156,9 +155,9 @@ Recall `welcome/index` is the default route. So when navigating to `/`, the welc
 
 Now that the controller is connected, it's time to make it do some actual work.
 
-Stimulus uses [actions](https://stimulus.hotwired.dev/reference/actions) for handling DOM events. An action connects a DOM element and an event listener fired on that element, to a function within the controller.
+Stimulus uses [actions](https://stimulus.hotwired.dev/reference/actions) for handling DOM events. An action connects a DOM element and an event listener fired on that element, to a function within the controller. In this case, we need to handle the "click" event on the Copy button.
 
-In this case, we need to handle the "click" event on the Copy button. Update the markup by adding a `data-action` attribute on the button element:
+Update the markup by adding a `data-action` attribute on the button element:
 
 ```erb
 <%# app/views/welcome/index.html.erb %>
@@ -201,7 +200,9 @@ Since the `click` event is commonly used for button elements, Stimulus provides 
 <button data-action="clipboard#copy">Copy</button>
 ```
 
-Now that the click event handler is hooked up to the Stimulus clipboard controller, the next step is to update the `copy()` function to use the [Clipboard API](https://developer.mozilla.org/en-US/docs/Web/API/Clipboard) to copy the text in the content div. It will look something like this:
+The full list of shorthands can be found [here](https://stimulus.hotwired.dev/reference/actions#event-shorthand).
+
+Now that the click event handler is hooked up to the Stimulus clipboard controller, the next step is to update the `copy()` function to use the [Clipboard API](https://developer.mozilla.org/en-US/docs/Web/API/Clipboard) to copy the text in the content div. The structure will be as follows:
 
 ```javascript
 // app/javascript/controllers/clipboard_controller.js
@@ -227,7 +228,7 @@ export default class extends Controller {
 At the time of this writing (~mid 2024), the Clipboard API is not fully supported in all browsers. See the MDN docs for <a class="markdown-link" href="https://developer.mozilla.org/en-US/docs/Web/API/Clipboard#browser_compatibility">browser compatibility</a>.
 </aside>
 
-However, in order to do this, the controller needs to know what text to copy. The actual text is contained in the content div. This requires getting a reference to the DOM element `<div>the text in here</div>`. This is explained in the next section.
+The controller needs to know what text to copy. The actual text is contained in the content div. This requires getting a reference to the DOM element `<div>The sun gently peeked through...</div>`. This is explained in the next section.
 
 ## Targets
 
@@ -240,7 +241,7 @@ For the copy to clipboard functionality, we need a reference to the content div 
 
 <div data-controller="clipboard">
 
-  <%# === GET A REFERENCE TO THIS ELEMENT BY NAMING IT `content` === %>
+  <%# === MAKE THIS ELEMENT AVAILABLE IN CONTROLLER === %>
   <div data-clipboard-target="content">
     <%= @very_important_content %>
   </div>
@@ -249,7 +250,7 @@ For the copy to clipboard functionality, we need a reference to the content div 
 </div>
 ```
 
-To get a reference to the `content` element in the Stimulus controller, add it to the static targets array. Then it can be used in any function as `this.contentTarget`:
+To get a reference to the `content` element in the Stimulus controller, add it to the static targets array. Then it can be used in any function as `this.contentTarget`. The code below logs out the `innerText` value of the content div:
 
 ```javascript
 // app/javascript/controllers/clipboard_controller.js
@@ -319,7 +320,7 @@ Technically, the copy to clipboard feature is working, but there's no visible fe
 
 In JavaScript, if you have a reference to a button element, it's text can be modified by setting it's [textContent](https://developer.mozilla.org/en-US/docs/Web/API/Node/textContent) property. So if we had a reference to the button element, we could change its text in the `copy()` function, after the clipboard `writeText` promise is resolved.
 
-To get a reference to a DOM element with Stimulus, we need another [target](../stimulus-copy-to-clipboard#targets). Let's add another one for the button element named `button`. Starting with the template. The button element already has a `data-` attribute for the copy action, but it's no problem to add another one to specify it as a target:
+To get a reference to a DOM element, we need an additional [target](../stimulus-copy-to-clipboard#targets). Let's include one for the button element, naming it `button`. The button element already has a `data-` attribute for the [copy action](../stimulus-copy-to-clipboard#copy-button-action) we implemented earlier, and it's perfectly fine to have multiple `data-` attributes on the same element:
 
 ```erb
 <%# app/views/welcome/index.html.erb %>
@@ -410,7 +411,7 @@ export default class extends Controller {
 }
 ```
 
-Then we can update the view to pass these values in to the controller. Suppose the button text should be updated to `Done` rather than `Copied`, and we'd like a `3000` millisecond delay instead of the default `2000`:
+Then the view is updated to pass these values in to the controller. Suppose the button text should be updated to `Done` rather than `Copied`, and we'd like a `3000` millisecond delay instead of the default `2000`:
 
 ```erb
 <%# app/views/welcome/index.html.erb %>
@@ -456,7 +457,7 @@ export default class extends Controller {
 }
 ```
 
-Note the naming conventions: `camelCase` is used in JavaScript, whereas `kebab-case` is used in the DOM. So `data-clipboard-delay-ms-value` on a DOM element becomes `this.delayMs` in the controller.
+**Naming Convention:** `camelCase` is used in JavaScript, whereas `kebab-case` is used in the DOM. So `data-clipboard-delay-ms-value` on a DOM element becomes `this.delayMs` in the controller.
 
 ## Targets vs Values
 
@@ -464,7 +465,7 @@ Both targets and values end up as `this.something` in the controller, which can 
 
 **Targets** are DOM elements that the controller can reference. Use this when you need to perform DOM manipulation. These are specified by adding `data-{controllerName}-target="foo"` on any DOM element that the controller needs access to.
 
-**Values** are inputs that can be provided to the controller from the DOM to vary its behaviour. These are specified by adding `data-{controllerName}-{variableName}="{variableValue}"` on the element where the controller is declared.
+**Values** are inputs that can be provided to the controller from the DOM to vary its behaviour. Think of these as arguments provided to a function. These are specified by adding `data-{controllerName}-{variableName}="{variableValue}"` on the element where the controller is declared.
 
 Here is the final version of the controller with comments explaining the mapping from targets and values to the DOM:
 
@@ -531,11 +532,11 @@ A few caveats about maintainability:
 
 On a large app with many Stimulus controllers, the template files will end up full of `data-controller`, `data-somecontroller-target` and `data-somecontroller-somevariable-value`. This could get confusing especially if there are multiple controllers in the same area of the DOM.
 
-It would be amazing to have IDE support such as hover/go-to definition from the template to the controller and vice versa. There is [Stimulus LSP](https://marketplace.visualstudio.com/items?itemName=marcoroth.stimulus-lsp) which provides some support. It has completion support in the template, validation, and using the go-to-definition shortcut on any data- attribute from the template goes to the controller, although always the top of the file, not the specific value or target line. Doesn't work the other way though, from controller to template(s). Free extension idea if anyone's looking for a side project 😀
+It would be amazing to have IDE support such as hover/go-to definition from the template to the controller and vice versa. There is [Stimulus LSP](https://marketplace.visualstudio.com/items?itemName=marcoroth.stimulus-lsp) for VSCode, which provides some support. It has completion support in the template, validation, and using the go-to-definition shortcut on any data- attribute from the template goes to the controller, although always the top of the file, not the specific value or target line. Doesn't work the other way though, from controller to template(s). Free extension idea if anyone's looking for a side project 😀
 
-Another aspect of maintainability is automated testing. I couldn't find anything in the [Stimulus Reference](https://stimulus.hotwired.dev/reference/controllers) about unit testing controllers, although there is some discussion [here](https://discuss.hotwired.dev/t/add-a-doc-about-unit-testing-stimulus-controllers/4142) and [here](https://discuss.hotwired.dev/t/testing-stimulus/90).
+Another aspect of maintainability is automated testing. At the time of this writing, I couldn't find anything in the [Stimulus Reference](https://stimulus.hotwired.dev/reference/controllers) about unit testing controllers, although there is some discussion [here](https://discuss.hotwired.dev/t/add-a-doc-about-unit-testing-stimulus-controllers/4142) and [here](https://discuss.hotwired.dev/t/testing-stimulus/90).
 
-In the meantime, be sure to have system tests that cover any JavaScript interactivity from the Stimulus controllers. If using [Capybara](https://github.com/teamcapybara/capybara), this means configuring it with a [driver](https://github.com/teamcapybara/capybara?tab=readme-ov-file#drivers) capable of executing JavaScript.
+In the meantime, be sure to have system tests that cover any JavaScript interactivity from the Stimulus controllers. If using [Capybara](https://github.com/teamcapybara/capybara), this means configuring it with a [driver](https://github.com/teamcapybara/capybara?tab=readme-ov-file#drivers) capable of executing JavaScript and understanding its [waiting behaviour](https://github.com/teamcapybara/capybara?tab=readme-ov-file#asynchronous-javascript-ajax-and-friends).
 
 ## Conclusion
 
