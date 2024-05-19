@@ -201,6 +201,8 @@ class UsersController < ApplicationController
   # ...
   def new
     @user = User.new
+
+    # === NEW ===
     @user.build_address # Build a new address for the user
   end
   # ...
@@ -255,21 +257,229 @@ Now the user form partial `app/views/users/_form.html.erb` can be updated to use
 
 The `fields_for` helper yields a block, similar to `form_with`, but it does not generate the `<form>...</form>` tags. This makes it suitable for specifying additional model objects in the same form.
 
-WIP...
-Explain the concept and its benefits
-Provide an example with User has_one Address
-Show how to use form.fields_for in the erb template
+At this point, starting a Rails server with `bin/rails s` and then navigating to the new user url at `http://localhost:3000/users/new` will show the form now has both user and address fields:
 
-## The Problem: Validation Issues
-Explain how validation rules can cause issues when not all associated models are required
-Show an example of how this can lead to errors
+![nested attributes new user form](../images/nested-attributes-new-user-form.png "nested attributes new user form")
+
+The markup generated shows that the address fields are named differently to distinguish them from being direct attributes on the user model:
+
+```htm
+<form action="/users" method="post">
+  <input type="hidden" name="authenticity_token" value="abc123..." autocomplete="off">
+
+  <!-- User attributes are named user[field] -->
+  <label for="user_name">Name</label>
+  <input type="text" name="user[name]" id="user_name">
+
+  <label for="user_email">Email</label>
+  <input type="text" name="user[email]" id="user_email">
+
+  <!-- Address attributes are named user[address_attributes][field] -->
+  <label for="user_address_attributes_street">Street</label>
+  <input type="text" name="user[address_attributes][street]" id="user_address_attributes_street">
+
+  <label for="user_address_attributes_city">City</label>
+  <input type="text" name="user[address_attributes][city]" id="user_address_attributes_city">
+
+  <label for="user_address_attributes_state_province">State province</label>
+  <input type="text" name="user[address_attributes][state_province]" id="user_address_attributes_state_province">
+
+  <label for="user_address_attributes_country">Country</label>
+  <input type="text" name="user[address_attributes][country]" id="user_address_attributes_country">
+
+  <input type="submit" name="commit" value="Create User" data-disable-with="Create User">
+</form>
+```
+
+However, trying to submit this form won't work as expected. The user will be saved, but the associated address will not. Here is some example output from the Rails server when submitting this form with some example values. I've formatted it and added some annotations:
+
+```
+# === FORM SUBMITTED AND PROCESSED BY CONTROLLER ===
+Started POST "/users" for ::1 at 2024-05-19 09:17:51 -0400
+Processing by UsersController#create as TURBO_STREAM
+
+# === ADDRESS_ATTRIBUTES ARE NESTED IN PARAMETERS ===
+Parameters: {
+  "authenticity_token"=>"[FILTERED]",
+  "user"=>{"name"=>"Jane",
+  "email"=>"jane@example.com",
+  "address_attributes"=>{
+    "street"=>"123 Main St.",
+    "city"=>"Anytown",
+    "state_province"=>"Ontario",
+    "country"=>"Canada"}
+  },
+  "commit"=>"Create User"}
+
+# === ERROR FROM CONTROLLER BECAUSE ADDRESS_ATTRIBUTES ARE NOT PERMITTED ===
+Unpermitted parameter: :address_attributes. Context: {
+  controller: UsersController,
+  action: create,
+  ...
+}
+
+# === CHECK IF EMAIL ALREADY EXISTS, AND IF NOT, CREATE USER ===
+TRANSACTION (0.0ms)  begin transaction
+  User Exists? (0.7ms)  SELECT 1 AS one FROM "users" WHERE "users"."email" = ? LIMIT ?  [["email", "jane@example.com"], ["LIMIT", 1]]
+  User Create (0.1ms)  INSERT INTO "users" ("name", "email", "created_at", "updated_at")
+                       VALUES (?, ?, ?, ?)
+                       RETURNING "id"
+                       [["name", "Jane"], ["email", "Smith"], timestamps...]
+TRANSACTION (0.1ms)  commit transaction
+
+# === CREATED NEW USER WITH ID 14 BUT IT HAS NO ADDRESS ===
+Redirected to http://localhost:3000/users/14
+```
+
+The problem is that the `UsersController` generated from the scaffold command only knew about the user email and name attributes at the time:
+
+```ruby
+class UsersController < ApplicationController
+  # ...
+
+  private
+
+  def user_params
+    params.require(:user).permit(:name, :email)
+  end
+end
+```
+
+Since we're now also expecting `street`, `city`, etc from the address attributes, those need to be permitted as well:
+
+```ruby
+class UsersController < ApplicationController
+  # ...
+
+  private
+
+  def user_params
+    # === MODIFIED TO ALLOW ADDRESS ATTRIBUTES ===
+    params.require(:user).permit(:name, :email, address_attributes: %i[id street city state_province country])
+  end
+end
+```
+
+Now we can again try to create a new user, and this time the transaction will create both a user and associated address. Focusing on just the transaction part of the Rails server output:
+
+```
+TRANSACTION (0.1ms)  begin transaction
+  # === CHECK IF THIS EMAIL IS ALREADY TAKEN ===
+  User Exists? (1.1ms)  SELECT 1 AS one FROM "users" WHERE "users"."email" = ? LIMIT ?  [["email", "sarah@example.com"], ["LIMIT", 1]]
+
+  # === CREATE USER ===
+  User Create (0.2ms)  INSERT INTO "users" ("name", "email", "created_at", "updated_at")
+                       VALUES (?, ?, ?, ?)
+                       RETURNING "id"
+                       [["name", "Sarah"], ["email", "sarah@example.com"], timestamps...]
+
+  # === CREATE ADDRESS ASSOCIATED WITH THE USER ===
+  Address Create (0.1ms)  INSERT INTO "addresses" ("street", "city", "state_province", "country", "user_id", ...)
+                          VALUES (?, ?, ?, ?, ?, ?, ?, ?)
+                          RETURNING "id"
+                          [["street", "321 Main St."], ["city", "Somewhere"], ["state_province", "Quebec"], ["country", "Canada"], ["user_id", 15], timestamps...]
+  TRANSACTION (0.2ms)  commit transaction
+```
+
+## The Problem: Validation
+
+There is a problem with the current solution. In this particular app, it should allow the user to be created without an address. However, trying to create a new user while intentionally leaving the address fields blank will result in a validation error. For example, when submitting the form below:
+
+![nested attributes address blank](../images/nested-attributes-address-blank.png "nested attributes address blank")
+
+The server will render the new form with validation errors:
+
+![nested attributes address blank validation errors](../images/nested-attributes-address-validation-errors.png "nested attributes address blank validation errors")
+
+The Rails server output shows that the transaction was rolled back:
+
+```
+# === FORM SUBMITTED AND PROCESSED BY CONTROLLER ===
+Started POST "/users" for ::1 at 2024-05-19 09:55:59 -0400
+Processing by UsersController#create as TURBO_STREAM
+
+# === THIS TIME ADDRESS ATTRIBUTES ARE ALL EMPTY ===
+Parameters: {
+  "authenticity_token"=>"[FILTERED]",
+  "user"=>{
+    "name"=>"mary",
+    "email"=>"mary@example.com",
+    "address_attributes"=>{"street"=>"", "city"=>"", "state_province"=>"", "country"=>""}
+  },
+  "commit"=>"Create User"}
+
+# === NOTHING IS SAVED ===
+TRANSACTION (0.0ms)  begin transaction
+User Exists? (1.9ms)  SELECT 1 AS one FROM "users" WHERE "users"."email" = ? LIMIT ?  [["email", "mary@example.com"], ["LIMIT", 1]]
+TRANSACTION (0.0ms)  rollback transaction
+
+# === RENDERS THE NEW FORM AGAIN BUT WITH VALIDATION ERRORS ===
+Completed 422 Unprocessable Entity in 16ms (Views: 7.7ms | ActiveRecord: 2.8ms | Allocations: 15878)
+```
+
+This problem occurs because of the existing validation rules on the Address model:
+
+```ruby
+class Address < ApplicationRecord
+  belongs_to :user
+
+  validates :street, :city, :state_province, :country, presence: true
+end
+```
+
+When the user form is submitted with empty values for all the address fields, Rails is trying to create a new Address for this User with blank values, which fails the validation. And since the entire operation (User and Address creation) occurs in a transaction, it gets rolled back if any error occurs, which results in nothing being saved.
 
 ## Solution: reject_if Option
-Introduce the reject_if option and its purpose
-Explain the :all_blank option and how it works
-Provide an example of how to use reject_if with :all_blank
+
+What we'd like to tell Rails is: If any of the address fields have been filled in, then go ahead and validate them and save the address. However, if the user has not filled in any address field, it means they don't want to create an address. In this case, only create the User model, but do not attempt to create and associate a new Address model.
+
+Rails provides a solution to this with the `reject_if` option of the `accepts_nested_attributes_for` class method. According to the [docs](https://api.rubyonrails.org/classes/ActiveRecord/NestedAttributes/ClassMethods.html#method-i-accepts_nested_attributes_for), `reject_if`:
+
+> Allows you to specify a Proc or a Symbol pointing to a method that checks whether a record should be built for a certain attribute hash... Passing :all_blank instead of a Proc will create a proc that will reject a record where all the attributes are blank excluding any value for _destroy.
+
+Recall the User model currently has this:
+
+```ruby
+class User < ApplicationRecord
+  has_one :address, dependent: :destroy
+
+  # Requires the user to always enter an address
+  accepts_nested_attributes_for :address
+
+  validates :name, presence: true
+  validates :email, presence: true, uniqueness: true
+end
+```
+
+Let's try passing in the `:all_blank` symbol as a value to the `reject_if` option on `accepts_nested_attributes_for` method:
+
+```ruby
+class User < ApplicationRecord
+  has_one :address, dependent: :destroy
+
+  # === MODIFIED ===
+  # Give the user the option to leave address blank
+  accepts_nested_attributes_for :address, reject_if: :all_blank
+
+  validates :name, presence: true
+  validates :email, presence: true, uniqueness: true
+end
+```
+
+Now if you only fill out the user name and email in the form and submit, Rails will ignore all the empty address fields and not attempt to save an invalid address. In this case, it will only save a new User model.
 
 ## Experimenting with Variations
+
+In addition to the `:all_blank` symbol, the `reject_if` option also accepts a Proc. If this proc returns `true`, then the nested attributes hash will be ignored. If it returns `false`, then the nested attributes will be accepted and Rails will try to create and associate the child model. This allows for even more flexibility.
+
+For example, suppose this application automatically populates the Country to `Canada` because the majority of the users are Canadian. In this case, the user might still choose to not fill in street, city, etc. if they don't want to provide an address. With the current option of `reject_if: :all_blank`, Rails will detect that `user[address_attributes][country]` has been provided, and attempt to associate an address, which will fail validation because none of the other address fields have been provided.
+
+We can specify a proc for the `reject_if` option to apply this custom logic:
+
+```ruby
+# wip...
+```
+
 Explore using a Proc with reject_if
 Show how to use a Symbol pointing to a custom method in the User model
 
@@ -281,7 +491,7 @@ From https://api.rubyonrails.org/classes/ActionView/Helpers/FormHelper.html#meth
 
 ## Conclusion
 
-This post has covered the very useful combination of `accepts_nested_attributes_for` and `reject_if` options in Rails. Together, these enable creation of flexible forms to handle nested models with optional associations, streamlining data entry. Now, take the next step and explore the variations and possibilities offered by these features to enhance your Rails applications!
+This post has covered the very useful combination of `accepts_nested_attributes_for` class method, `fields_for` view helper, and `reject_if` options in Rails. Together, these enable creation of flexible forms to handle nested models with optional associations, streamlining data entry. Now, take the next step and explore the variations and possibilities offered by these features to enhance your Rails applications!
 
 
 ## TODO
@@ -291,6 +501,14 @@ This post has covered the very useful combination of `accepts_nested_attributes_
 * edit
 * aside about dynamic `build_...` method added by AR association: https://guides.rubyonrails.org/association_basics.html#methods-added-by-belongs-to-build-association-attributes
   * The build_address method is dynamically generated by Rails based on the has_one association declaration. This is a feature of Active Record's association builder. According to the official Rails guides, when you declare a has_one association, Rails automatically generates a builder method for that association. In this case, the build_address method is generated because of the has_one :address declaration.
+  * Behaviour can be observed in a Rails console:
+  ```ruby
+  user = User.first
+  address = user.build_address
+  # Checks if an associated address already exists, and returns an empty address object
+  # Address Load (0.2ms)  SELECT "addresses".* FROM "addresses" WHERE "addresses"."user_id" = ? LIMIT ?  [["user_id", 13], ["LIMIT", 1]]
+  # => #<Address:0x00000001048bdf30 id: nil, street: nil, city: nil, state_province: nil, country: nil, user_id: 13, created_at: nil, updated_at: nil>
+  ```
 Here are the relevant sections in the official Rails guides:
 [Rails Guides: Active Record Associations]((link unavailable))
 [Rails Guides: Active Record Association Builder]((link unavailable))
@@ -298,3 +516,4 @@ The API documentation for the has_one method also mentions the generation of the
 [ActiveRecord::Associations::ClassMethods#has_one]((link unavailable))
 Note that the build_address method is not explicitly documented in the API docs, as it is dynamically generated based on the association name. However, the guides and API documentation explain the general behavior of association builders and the generation of these methods.
 * Diff between https://api.rubyonrails.org/classes/ActionView/Helpers/FormBuilder.html#method-i-fields_for and https://api.rubyonrails.org/classes/ActionView/Helpers/FormHelper.html#method-i-fields_for
+* Aside: A real app would have dropdowns for city/state/province/country but that's not the focus of this demo app
