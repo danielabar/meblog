@@ -468,7 +468,7 @@ end
 
 Now if you only fill out the user name and email in the form and submit, Rails will ignore all the empty address fields and not attempt to save an invalid address. In this case, it will only save a new User model.
 
-## Experimenting with Variations
+## Variations
 
 In addition to the `:all_blank` symbol, the `reject_if` option also accepts a Proc. If this proc returns `true`, then the nested attributes hash will be ignored. If it returns `false`, then the nested attributes will be accepted and Rails will try to create and associate the child model. This allows for even more flexibility.
 
@@ -477,11 +477,43 @@ For example, suppose this application automatically populates the Country to `Ca
 We can specify a proc for the `reject_if` option to apply this custom logic:
 
 ```ruby
-# wip...
+class User < ApplicationRecord
+  validates :name, presence: true
+  validates :email, presence: true, uniqueness: true
+
+  has_one :address, dependent: :destroy
+
+  # === MODIFIED ===
+  # Only associate address if user has filled in street, city, and state_province
+  accepts_nested_attributes_for :address,
+                                reject_if: proc { |a|
+                                             a[:street].blank? && a[:city].blank? && a[:state_province].blank?
+                                           }
+end
 ```
 
-Explore using a Proc with reject_if
-Show how to use a Symbol pointing to a custom method in the User model
+Now if the form is submitted with the country populated, but all the other address fields are blank, then the association will be ignored. On the other hand, if any of street, city or state_province are provided, then the proc would return false, and Rails will attempt to save an address for this user.
+
+If you don't like the `proc` syntax, or have some more complex logic, you can use a symbol that references a method instead. For example, the following is equivalent:
+
+```ruby
+class User < ApplicationRecord
+  validates :name, presence: true
+  validates :email, presence: true, uniqueness: true
+
+  has_one :address, dependent: :destroy
+
+  # === MODIFIED ===
+  # Only associate address if user has filled in street, city, and state_province
+  accepts_nested_attributes_for :address, reject_if: :address_fields_all_blank?
+
+  private
+
+  def address_fields_all_blank?(address_attributes)
+    address_attributes[:street].blank? && address_attributes[:city].blank? && address_attributes[:state_province].blank?
+  end
+end
+```
 
 ## Additional Notes and Considerations
 Discuss how Rails generates hidden fields for associated models when editing
@@ -517,3 +549,4 @@ The API documentation for the has_one method also mentions the generation of the
 Note that the build_address method is not explicitly documented in the API docs, as it is dynamically generated based on the association name. However, the guides and API documentation explain the general behavior of association builders and the generation of these methods.
 * Diff between https://api.rubyonrails.org/classes/ActionView/Helpers/FormBuilder.html#method-i-fields_for and https://api.rubyonrails.org/classes/ActionView/Helpers/FormHelper.html#method-i-fields_for
 * Aside: A real app would have dropdowns for city/state/province/country but that's not the focus of this demo app
+* Make order of declarations in User model consistent across examples
