@@ -200,7 +200,7 @@ AllCops:
     - 'spec/spec_helper.rb'
 
 Style/FrozenStringLiteralComment:
-  Enabled: false
+  Enabled: true
 
 Style/Documentation:
   Enabled: false
