@@ -44,7 +44,7 @@ class Product < ApplicationRecord
 end
 ```
 
-Now let's introduce caching for the results of the slow operation `find_competing_prices`. Using a typical approach, which is to make calls to first `read` from the cache, and then `write` to the cache if the value isn't already cached:
+Now let's introduce caching for the results of the slow operation `find_competing_prices`. Using a typical approach, which is to make calls to first `read` from the cache, and then `write` to the cache if the value isn't already cached. The `cache_key` method will be explained shortly.
 
 ```ruby
 # app/models/product.rb
@@ -138,22 +138,28 @@ What its doing is looking in the cache for a key like `products/1/competing_pric
 
 ## Cache Invalidation
 
-You've probably heard that cache invalidation is one of the hard things in computer science ([jokes here](https://www.martinfowler.com/bliki/TwoHardThings.html)). Rails can help with this problem, in addition to the `cache_key` method, it also provides the `cache_key_with_version` method, which incorporates the model's `updated_at` timestamp. Let's see how this works in the Rails console:
+You've probably heard that cache invalidation is one of the hard things in computer science ([jokes](https://www.martinfowler.com/bliki/TwoHardThings.html)). Rails can help with this problem. In addition to the `cache_key` method, it also provides the [cache_key_with_version](https://api.rubyonrails.org/classes/ActiveRecord/Integration.html#method-i-cache_key_with_version) method, which incorporates the model's `updated_at` timestamp.
+
+Let's see how this works in the Rails console:
 
 ```ruby
-product = Product.first
-=> #<Product:0x00000001080c9618 id: 1, name: "whatever"...
+Product.select(:id, :name, :updated_at).first
+=> #<Product:0x0000000113bb3848 id: 6, name: "whatever", updated_at: Sun, 12 Nov 2023 16:35:53.983721000 UTC +00:00>
 
+# Notice this incorporates both the product id and updated_at timestamp
 product.cache_key_with_version
-=> "products/1-20231112133701474387"
+=> "products/6-20231112163553983721"
 
 # Updating the price also updates the model's `updated_at`
 product.update!(price: 32.99)
 => true
 
-# Now we have a different cache key!
+# Now we have a different cache key because updated_at has changed
+product.updated_at
+=> Tue, 04 Jun 2024 12:00:49.561587000 UTC +00:00
+
 product.cache_key_with_version
-=> "products/1-20231112151224007362"
+=> "products/6-20240604120049561587"
 ```
 
 This is useful if you need the cache to be populated with fresh data, anytime a model gets updated, then looked up in the cache again. In this case, our caching could be updated to use the `cache_key_with_version` method instead of `cache_key`:
