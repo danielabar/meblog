@@ -10,7 +10,7 @@ related:
   - "Understanding ActiveRecord Dependent Options"
 ---
 
-When building a web application for a  relational data model, handling nested models in a single form submission is a common requirement. Rails provides a powerful solution with the ActiveRecord method `accepts_nested_attributes_for`. This feature enables us to create a form that captures both the main model and its associated model(s), streamlining the user experience. However, this can sometimes lead to issues with validation. In this post, you'll learn how the `reject_if` option comes to the rescue, enabling creation of a flexible form that can handle optional associated models.
+When building a web application for a  relational data model, handling nested models in a single form submission is a common requirement. Rails provides a powerful solution with the ActiveRecord method `accepts_nested_attributes_for`. This feature supports creation of forms that capture the main model and its associated model(s), streamlining the user experience. However, this can sometimes lead to issues with validation. In this post, you'll learn how the `reject_if` option comes to the rescue, enabling creation of a flexible form that can handle optional associated models.
 
 You can also follow along with a [demo project](https://github.com/danielabar/nested_model_demo) on GitHub.
 
@@ -349,6 +349,18 @@ Since we're now also expecting `street`, `city`, etc from the address attributes
 class UsersController < ApplicationController
   # ...
 
+  # === NO CHANGE REQUIRED TO CREATE METHOD ===
+  # When user_params contains address_attributes,
+  # Rails will create both the user and address models
+  # in the same transaction.
+  def create
+    @user = User.new(user_params)
+
+    respond_to do |format|
+      if @user.save
+        # ...
+  end
+
   private
 
   # === MODIFIED TO ALLOW ADDRESS ATTRIBUTES ===
@@ -358,7 +370,7 @@ class UsersController < ApplicationController
 end
 ```
 
-Now we can again try to create a new user, and this time the transaction will create both a user and associated address. Focusing on just the transaction part of the Rails server output, shows the user and address records being created:
+Now we can again try to create a new user, and this time the transaction will create both a user and associated address. The Rails server output below shows the user and associated address record being created:
 
 ```
 TRANSACTION (0.1ms)  begin transaction
@@ -375,11 +387,18 @@ TRANSACTION (0.1ms)  begin transaction
   Address Create (0.1ms)  INSERT INTO "addresses" ("street", "city", "state_province", "country", "user_id", ...)
                           VALUES (?, ?, ?, ?, ?, ?, ?, ?)
                           RETURNING "id"
-                          [["street", "321 Main St."], ["city", "Somewhere"], ["state_province", "Quebec"], ["country", "Canada"], ["user_id", 15], timestamps...]
-  TRANSACTION (0.2ms)  commit transaction
+                          [
+                            ["street", "321 Main St."],
+                            ["city", "Somewhere"],
+                            ["state_province", "Quebec"],
+                            ["country", "Canada"],
+                            ["user_id", 15],
+                            timestamps...
+                          ]
+TRANSACTION (0.2ms)  commit transaction
 ```
 
-So now we're able to create both a User model, and associated Address model in a single form. Hurray!
+So now we're able to create both a User model, and associated Address model in a single form 🎉.
 
 ## Problem: Validation
 
@@ -458,7 +477,7 @@ class User < ApplicationRecord
 end
 ```
 
-Let's try passing in the `:all_blank` symbol as a value to the `reject_if` option on `accepts_nested_attributes_for` method:
+Let's try passing in the `:all_blank` symbol as a value to the `reject_if` option of the `accepts_nested_attributes_for` method:
 
 ```ruby
 class User < ApplicationRecord
@@ -473,7 +492,7 @@ class User < ApplicationRecord
 end
 ```
 
-Now if you only fill out the user name and email in the form and submit, Rails will ignore all the empty address fields and not attempt to save an invalid address. In this case, it will only save a new User model. However, if you specify all or any of the address fields, then Rails will attempt to create a new address and associate it to this user. Problem solved!
+Now if you only fill out the user name and email in the form and submit, Rails will ignore all the empty address fields and not attempt to save an invalid address. In this case, it will only save a new User model. However, if you specify all or any of the address fields, then Rails will attempt to create a new address and associate it to this user. Problem solved 🎉
 
 ## Variations
 
@@ -481,7 +500,7 @@ In addition to the `:all_blank` symbol, the `reject_if` option also accepts a Pr
 
 For example, suppose this application automatically populates the Country to `Canada` because the majority of the users are Canadian. In this case, the user might still choose to not fill in street, city, etc. if they don't want to provide an address. With the current option of `reject_if: :all_blank`, Rails will detect that `user[address_attributes][country]` has been provided, and attempt to associate an address, which will fail validation because none of the other address fields have been provided.
 
-We can specify a proc for the `reject_if` option to express the logic: only consider address if street, city or state/province have been provided:
+We can specify a proc for the `reject_if` option to express the logic: Only consider address if street, city or state/province have been provided:
 
 ```ruby
 class User < ApplicationRecord
@@ -602,4 +621,4 @@ Here is the generated markup with explanatory comments:
 
 ## Conclusion
 
-This post has covered the useful combination of `accepts_nested_attributes_for` class method, the `reject_if` option, and `fields_for` view helper. Together, these enable creation of flexible forms to handle nested models with optional associations, making data entry easier for users. Now you can take the next step and make use of these features to enhance your Rails applications.
+This post has covered the useful combination of `accepts_nested_attributes_for` method that can be added to a model, the `reject_if` option, and `fields_for` view helper. Together, these enable creation of flexible forms to handle nested models with optional associations, making data entry easier for users. Now you can take the next step and make use of these features to enhance your Rails applications.
