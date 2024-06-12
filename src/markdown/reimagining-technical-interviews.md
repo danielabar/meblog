@@ -1,6 +1,6 @@
 ---
 title: "Re-imagining Technical Interviews: Valuing Experience Over Exam Skills"
-featuredImage: "../reimagine-tech-interviews-dave-mcdermott-nEJmnfCCPmI-unsplash.jpg"
+featuredImage: "../images/reimagine-tech-interviews-dave-mcdermott-nEJmnfCCPmI-unsplash.jpg"
 description: "tbd"
 date: "2024-07-01"
 category: "career"
