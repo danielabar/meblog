@@ -107,6 +107,17 @@ Arguably, if a problem is so well specified and the scope so small that it can b
 
 By emphasizing a specific way of thinking and solving problems, companies may miss out on candidates who offer unique and diverse approaches to problem-solving. Diverse teams are known to drive innovation. By excluding those who do not excel in live coding interviews, companies risk creating homogenous teams that lack creative and innovative thinking.
 
+TODO: Where to fit in, at beginning of this section?
+I can think of a few jobs where the ability to think quickly on your feet in response to surprises is useful:
+* Courtroom lawyer
+* Standup comic
+* Improv actor
+* Combat pilot
+* Emergency room doctor
+
+TODO: Also this
+Imagine if every time a new project is proposed to an engineering team, every team member was forced to blurt out the first solution that came to mind. Then at the end of the project the delivered solution was compared to what everyone said at the beginning. And then performance evaluations were written based on how accurately the first thing people thought matched what actually got delivered. This is essentially what's happening in these live coding interviews.
+
 ### Lack of Empathy
 
 The nature of the live coding "solve this method" type of question induces a lack of empathy on the side of the assessor. This is because they already know the solution, so they're in a fixed mindset of either the candidate achieves a working solution or they don't. And if they've been doing this interview style for a long time, they've likely forgotten what it was like to not know the answer.
@@ -236,6 +247,8 @@ Yes, if you're preparing a team to enter a programming competition, absolutely, 
 
 TODO: Road runner image?
 
+Or if you're hiring for a computer science instructor, obviously in this role, the ability to work through these kinds of problems *and* talk about them out loud at the same time is part of the job.
+
 But in all seriousness...
 
 While live coding interviews often fail to accurately assess seasoned software engineers, they might be appropriate for specific types of companies, particularly early-stage startups. In these environments, the pace is extremely fast, and the priority is to deliver functional code as quickly as possible. Startups may operate in a "hackathon" style, where the ability to jump in and write code rapidly is crucial. Frequent emergencies and production issues, typical in such settings due to the lack of extensive testing and established processes, require engineers who can quickly address problems and implement solutions on the fly, and who don't mind the ensuing chaos.
@@ -259,6 +272,7 @@ Creating a more inclusive and effective hiring process is not just about fairnes
 * edit
 * meta tag description
 * aside or caveat at beginning: All of this is based on my experience applying as intermediate, senior, staff in web development. Other areas of tech such as gaming, embedded systems etc could be completely different.
+* interview process should be included in the JD
 * maybe ref LI post to show the discussion https://www.linkedin.com/posts/gabag26_leetcode-codinginterview-softwareengineering-activity-7203974232509173760-92WZ/
 * define leetcode
 * emphasize: I'm not suggesting to include *all* of these exercises - this is to get people thinking about alternative assessment techniques that capture real world conditions and lessen performance anxiety/stress.
