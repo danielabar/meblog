@@ -113,6 +113,10 @@ The nature of the live coding "solve this method" type of question induces a lac
 
 But in the real world, when a problem is first presented to developers, no one knows what the correct solution is. So as people propose and try out different ideas, they're not judged on right or wrong, but rather, that's the expected iterative process of software development.
 
+### Qualifier
+
+TODO: Some companies use this round as a qualifying round, meaning its the first step in the interview process and if the candidate doesn't pass, then they're immediately rejected. Trying to boil down 5, 10, even 15, 20 years worth of experience into a one hour high pressure, unrealistic test taking session just doesn't make sense.
+
 ## Making Things Better
 
 Now that we've thoroughly covered the problems with live coding as an interview technique, let's turn our attention to how the process could be improved.
@@ -142,6 +146,10 @@ The outcome of the above brainstorming can be used to guide the interview proces
 
 Notice how it's unlikely that "the ability to code a working solution from first seeing the problem statement, in under an hour, while talking aloud and someone watches" is on the list of things employees are evaluated on. It's also unlikely to find something like this in the retrospective what didn't go well section, i.e. "this sprint didn't go well because the developers couldn't figure out whether an array or hash was appropriate in this method".
 
+TODO Another important consideration is the format. Some topics are suitable for conversational/real-time - such as the candidate's past experiences. Other topics are more suited to async style, where the candidate works through a problem on their own, in quiet, and then there's a follow on conversation about the solution. "forging new knowledge" such as being asked to solve a specific coding challenge, or to think through a data modelling exercise is better done async, to mimic how this is done on the job.
+
+The next sections describe some alternatives.
+
 ### Example: TBD Title
 
 In my experience, the reason projects struggle is often related to communication issues, in understanding business requirements and understanding what other developers did previously. In this case, here's an alternative to the live coding round to assess both technical skills and the ability to communicate effectively:
@@ -152,9 +160,9 @@ Then the team assessing the candidate can send back answers to the questions (an
 
 Then the candidate can go ahead and solve the problem on their own time, with their own editor, tooling, keyboard shortcuts etc. Since each candidate may come up with different questions, the direction the solution may also vary. This is very reflective of how things happen in the real world. Based on questions developers think of, often product will be like "Good question! I hadn't thought of that case". Then the solution may take a different shape.
 
-As part of the assignment, the candidate should include *some* automated testing. This need not include 100% coverage as that's more time than can reasonably be asked of someone who is doing unpaid work. However, the goal here is to see if they can identify the critical path(s) in the code and ensure these are covered with meaningful tests. Leave it up to the candidate to decide what level of testing is appropriate.
+If writing automated tests is important to the company, as part of the assignment, the candidate should include *some* automated testing. This need not include 100% coverage as that's more time than can reasonably be asked of someone who is doing unpaid work. However, the goal here is to see if they can identify the critical path(s) in the code and ensure these are covered with meaningful tests. Leave it up to the candidate to decide what level of testing is appropriate.
 
-As part of the assignment, the candidate should also provide setup and "how to" instructions in the Readme so that the assessor can setup the project and reproduce the solution. And a brief write-up of their solution. Tell them that the goal of this write-up is to ensure that another developer could pick up where they left off and further enhance the product.
+If engineering documentation is important to the company, as part of the assignment, the candidate should also provide setup and "how to" instructions in the Readme so that the assessor can setup the project and reproduce the solution. And a brief write-up of their solution. Tell them that the goal of this write-up is to ensure that another developer could pick up where they left off and further enhance the product.
 
 After the candidate submits the solution, a follow-on meeting can be scheduled to discuss it. Such as what was the most challenging part, why the given solution was chosen, what trade-offs were considered etc. Part of the assessment can also include, how easy was it to follow along with the setup instructions? How easy would it be to enhance the solution to add more features?
 
@@ -162,13 +170,15 @@ Benefits of this alternative approach:
 
 Captures essential skills that deeply impact projects, beyond writing working code: question asking, analytical thought, appropriate level of testing, engineering documentation, overall communication.
 
-Due to the dynamic nature of what questions the candidate may ask, the solution could be different for each candidate. This means the assessor doesn't know the exact solution at the start of the assignment. This can improve empathy for the candidate in the process because everyone is figuring out the solution as part of the process. This avoids the fixed mindset of this candidate got the solution correct, good or incorrect, bad.
+Due to the dynamic nature of what questions the candidate may ask, the solution could be different for each candidate. This means the assessor doesn't know the exact solution at the start of the assignment. This can improve empathy for the candidate in the process because everyone is figuring out the solution as part of the process. This avoids the fixed mindset of this candidate got the solution correct, good or incorrect, bad. And this is how real software gets built.
 
 By adopting a more holistic and inclusive approach to technical assessments, companies can better evaluate a candidate's true potential and foster a more diverse and capable engineering team.
 
 ### Example: Add a Feature
 
 It's well known that engineers spend a lot more time reading code other people wrote, then figuring out where their new code fits in, rather than starting from a blank slate. A variation on the previous assessment (again to be done asynchronously) is to send the candidate some working code. Then the assignment is to enhance it with a new feature (again, going through a round of clarifying question asking). This is testing for the real world skill of being able to analyze existing code, figure out what if anything can be re-used, and to integrate new code.
+
+If doing this, make sure to send the existing code in a language the candidate is familiar with.
 
 ### Example: Fix a Bug
 
@@ -263,3 +273,11 @@ When is this actually useful?
 3. Production is down or particular page on website is broken that impacts revenue generation
 For the first two, most companies aren't doing that (I mean unless the company is a known host/sponsor of programming competitions, in this case, maybe they do need developers to be representative of this particular skill set, but this is not most companies), and the resulting code quality is not what most companies would want to maintain long term in any case. And even then, candidates in competitions and hack-a-thons are not asked to talk out loud about their process as they're coding.
 For the third one, since the modern introduction of containerized deployments and blue/green etc, the correct solution is to usually rollback the deployment rather than to try to fix the broken airplane in the air - TODO: image...
+
+* Ref Syntax Podcast: https://syntax.fm/show/781/potluck-the-value-of-typescript-vue-vs-svelte-leetcode 36:15 "Leetcode type interview questions"
+> Not a definitive judgement on someone's abilities or skills
+> I would hope that companies are getting away from these types of interviews
+> Knowing how to solve leetcode problems is a completely different skill than what we do on a daily basis
+> It's valuable in knowing did this person study leetcode style problems... It's a very specific skill set
+> When you test someone on a leetcode in an interview, you're testing are they good at solving leetcode problems, you're not testing are they good at writing software, working on a team, implementing features, communicating well, and all the other things that are important besides just being able to code real good
+> Best technical interview I've had, they dropped me into a sample code base, gave me an example ticket that would look exactly like what I would get on a day in the job, and worked through it together.
