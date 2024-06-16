@@ -218,6 +218,10 @@ I mean sure, practice these exercises if someone enjoys this kind of work, just 
 
 Multiply this out by all the engineers looking for a new role, say every few years, spending weeks on these practice exercises. How many more valuable things could have been achieved with all this time?
 
+### Just want to see how you think
+
+We know it's not like the real thing, we just want to see how you think. This still biases against people who are better at thinking out loud. And unless it's a pairing/mob shop, the ability to think out loud vs think internally shouldn't be a qualifier. As long as the candidates that are more internal thinkers can express themselves clearly in writing.
+
 ### Fairness
 
 Another push-back from companies when suggesting reasonable accommodations is the desire to be "fair" by having everyone go through the exact same process. However, forcing all candidates through the same gate-keeping mechanism isn't genuinely fair. The famous illustration of three people of different heights trying to view a baseball game over a fence perfectly captures this concept. If each person is given an equal-sized block to stand on, the tallest person doesn't need the block, and the shortest person still can't see over the fence. True fairness, or equity, means providing the shortest person with more blocks so that everyone has an equal opportunity to see the game.
