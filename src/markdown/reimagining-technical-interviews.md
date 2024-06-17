@@ -299,3 +299,6 @@ For the third one, since the modern introduction of containerized deployments an
 > It's valuable in knowing did this person study leetcode style problems... It's a very specific skill set
 > When you test someone on a leetcode in an interview, you're testing are they good at solving leetcode problems, you're not testing are they good at writing software, working on a team, implementing features, communicating well, and all the other things that are important besides just being able to code real good
 > Best technical interview I've had, they dropped me into a sample code base, gave me an example ticket that would look exactly like what I would get on a day in the job, and worked through it together.
+
+* Ref Reddit Discussion: https://www.reddit.com/r/cscareerquestions/comments/pbyn4v/comment/haf88zj/
+* Ref Reddit, if perf issue, re-evaluate business requirements: https://www.reddit.com/r/cscareerquestions/comments/pbyn4v/comment/haf9j5q/
