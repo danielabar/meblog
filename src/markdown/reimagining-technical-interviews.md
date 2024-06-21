@@ -271,6 +271,7 @@ Creating a more inclusive and effective hiring process is not just about fairnes
 
 ## TODO
 * WIP main content
+* ref graph traversal https://github.com/danielabar/globi-proto/blob/master/app/scripts/services/graphservice.js, svg path handling https://github.com/danielabar/canve-viz/commit/d026efa6b8f0c9841549040305e0694277bff4a4
 * polish up rough notes and bullet points
 * think about logical ordering of problems
 * edit
