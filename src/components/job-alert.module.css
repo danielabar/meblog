@@ -1,0 +1,23 @@
+.jobAlert {
+  background-color: var(--brand-lighten-50);
+  border: 1px solid var(--brand-lighten-20);
+  padding: 10px 20px;
+  text-align: center;
+  margin-bottom: 20px;
+}
+
+.jobAlert a {
+  font-weight: bold;
+  color: var(--link-color);
+  text-decoration: none;
+}
+
+.jobAlert a:hover {
+  text-decoration: underline;
+}
+
+.strongText {
+  font-weight: bold;
+  font-size: 1.1rem;
+  color: var(--brand-darken-10);
+}

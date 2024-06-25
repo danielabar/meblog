@@ -10,6 +10,22 @@ exports[`Layout renders correctly 1`] = `
           data-testid="header"
         >
           <div>
+            <p>
+              <strong>
+                Looking for a Rails Developer?
+              </strong>
+               
+              I am currently open to new opportunities, including contract roles. If your team needs a skilled Rails developer, please feel free to
+               
+              <a
+                href="https://www.linkedin.com/in/danielabaron/"
+              >
+                connect with me on LinkedIn
+              </a>
+              .
+            </p>
+          </div>
+          <div>
             <a
               href="/"
             >
@@ -155,6 +171,22 @@ exports[`Layout renders correctly 1`] = `
       <header
         data-testid="header"
       >
+        <div>
+          <p>
+            <strong>
+              Looking for a Rails Developer?
+            </strong>
+             
+            I am currently open to new opportunities, including contract roles. If your team needs a skilled Rails developer, please feel free to
+             
+            <a
+              href="https://www.linkedin.com/in/danielabaron/"
+            >
+              connect with me on LinkedIn
+            </a>
+            .
+          </p>
+        </div>
         <div>
           <a
             href="/"

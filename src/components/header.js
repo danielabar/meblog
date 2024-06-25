@@ -4,6 +4,7 @@ import useViewport from "../hooks/useviewport"
 import * as styles from "./header.module.css"
 import NavMenuResponsive from "./nav-menu-responsive"
 import NavMenu from "./nav-menu"
+import JobAlert from "./job-alert"
 
 const Header = () => {
   const { width } = useViewport()
@@ -15,13 +16,14 @@ const Header = () => {
 
   return (
     <header className={styles.container} data-testid="header">
-      <div className={styles.inner} >
+      <JobAlert />
+      <div className={styles.inner}>
         <Link to="/">
           <div className={styles.logo}>
             <div className={styles.profileWrapper}>
               <img
                 className={styles.profileImg}
-              src={"/images/dbaron_profile.png"}
+                src={"/images/dbaron_profile.png"}
                 alt="Profile"
               />
             </div>
