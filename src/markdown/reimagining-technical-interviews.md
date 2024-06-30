@@ -14,7 +14,7 @@ As I navigate the job search process anew, I'm struck by how sub-optimal technic
 
 ## Disclaimer
 
-Before diving into my observations and suggestions, it's important to note that my experiences are based on applying for senior/staff positions in web development. The tech industry is vast, encompassing areas such as gaming, embedded systems, data science, and more. Each of these fields has its own unique set of challenges, expectations, and interview processes. What I discuss here may not fully apply to those areas.
+Before diving into my observations and suggestions, it's important to note that my experiences are based on applying for senior/staff positions in web development. The tech industry is vast, encompassing areas such as gaming, embedded systems, data science, and more. Each of these fields has its own unique set of challenges, expectations, and interview processes. What I discuss here may not fully apply to all areas.
 
 ## Live Coding Round
 
@@ -34,7 +34,7 @@ The technical round of live coding interviews, while common, has several flaws t
 
 For companies that choose to use leetcode exercises for the evaluation, these are an unrealistic reflection of daily engineering work. Often, the complexity in software engineering comes from trying to figure out *what* to build rather than *how* to build it. In over 20 years of software development, I've never encountered a linked list!
 
-If and when a more algorithmic style of problem is encountered on the job, it can be looked up rather than having memorized computer science theory from one's school days. When these problems do come up on the job, they're usually on projects spanning weeks or even months, so the code is not arrived at in one hour. Some public examples I can share include [graph generation for an interactive exploration](https://github.com/danielabar/globi-proto/blob/master/app/scripts/services/graphservice.js) of marine ecosystem species,  [optimize text placement along an svg path](https://github.com/danielabar/canve-viz/commit/d026efa6b8f0c9841549040305e0694277bff4a4), [matrix manipulation for 3D computer graphics](https://github.com/danielabar/coursera-webgl/tree/master), and [generation of points along an arc for custom animation](https://github.com/danielabar/framegen/blob/master/FramegenCore/src/main/java/com/framegen/core/framehandler/option/ArcFrameHandler.java). All of these were long running projects that involved many iterations.
+If and when a more algorithmic style of problem is encountered on the job, it can be looked up rather than having memorized computer science theory from one's school days. When these problems do come up on the job, they're usually on projects spanning weeks or even months, so the code is not arrived at in one hour. Some public examples I can share include graph generation for an [interactive exploration of marine ecosystem species](https://github.com/danielabar/globi-proto/blob/master/app/scripts/services/graphservice.js),  [optimize text placement along an svg path](https://github.com/danielabar/canve-viz/commit/d026efa6b8f0c9841549040305e0694277bff4a4), [matrix manipulation for 3D computer graphics](https://github.com/danielabar/coursera-webgl/tree/master), and [generation of points along an arc for custom animation](https://github.com/danielabar/framegen/blob/master/FramegenCore/src/main/java/com/framegen/core/framehandler/option/ArcFrameHandler.java). All of these were long running projects that involved many iterations.
 
 As for Big-O complexity analysis, while this is a useful principle to understand, it doesn't make sense to gate-keep on this. I have resolved many performance issues over the years, and the root cause has never been from a method that was written in O(n) time when it could have been O(log n). Common causes of performance issues in web applications include: loading too much data from the server (eg: lack of pagination), missing database indices, database tuning/configuration, N+1 queries, lack of (or misconfigured) background task processing, or loading too much JavaScript, such as trackers or non-minified code in the browser.
 
@@ -46,11 +46,13 @@ An argument could be made that this is a useful interview technique for a junior
 
 Even if companies choose a problem from their domain rather than theoretical computer science type exercises, there are still problems with the timed live coding round.
 
-The artificial time constraint creates a "race against the clock mentality", which can create a "fight or flight" response:
+The artificial time constraint creates a "race against the clock mentality", which can create a "fight or flight" response.
 
 ![white rabbit race against the clock](../images/white-rabbit-late-crop.png "white rabbit race against the clock")
 
-There's some discussion in the [scientific literature](https://www.psychologytoday.com/us/blog/202301/does-the-amygdala-hijack-your-brain) as to whether the amygdala (brain region associated with fear and emotion processing) "hijacks" the pre-frontal cortex (brain region associated with logical reasoning) or whether they work in co-operation. I'm not a neuroscientist so I can only express how this scenario *feels*: When presented with a short time interval in which to solve a problem, all my brain can focus on is the clock ticking down the minutes. This makes my usual analytical skills fade into the background compared to the fear response, and negatively impacts my performance.
+There's some discussion in the [scientific literature](https://www.psychologytoday.com/us/blog/202301/does-the-amygdala-hijack-your-brain) as to whether the amygdala (brain region associated with fear and emotion processing) "hijacks" the pre-frontal cortex (brain region associated with logical reasoning) or whether they work in co-operation. I'm not a neuroscientist so I can only express how this scenario *feels*:
+
+When presented with a short time interval in which to solve a problem, all my brain can focus on is the clock ticking down the minutes. This makes my usual analytical skills fade into the background compared to the fear response, and negatively impacts my performance.
 
 Using "on the spot" coding/analysis/thinking-out-loud in under an hour is not a proxy for what an effective engineer actually does. In real-world settings, software engineers often have access to resources like documentation, the ability to collaborate with colleagues, and time to research and think through problems.
 
@@ -62,13 +64,13 @@ Also, in a typical development cycle, the very first solution that comes to mind
 
 ***Trip down memory lane...***
 
-I can recall very few scenarios in my decades long career where the ability to write some code, literally within a few hours, was critical to the team's success. In one instance, the team was told at the last minute that a VIP was scheduled to come by the next day for a demo. The product was working, but wasn't yet styled, so it looked broken. In this case, I had just a few hours to tidy up the styles to make a certain portion of the product to be demo-ed look functional. And even then, it was a product I had been working on for nearly half a year and was therefore very familiar with.
+I can recall very few scenarios in my decades long career where the ability to write some code, literally within a few hours, was critical to the team's success. In one instance, the team was told at the last minute that a VIP was scheduled to come by the next day for a demo. The product was working, but wasn't yet styled, so it looked broken. I had just a few hours to tidy up the styles to make some of the views look functional. And even then, it was a product I had been working on for nearly half a year and was therefore very familiar with. This kind of "emergency" work would not have been assigned to someone who had only just seen the code for the first time that day.
 
 ### Talking Out Loud
 
 Individuals who are introverted or prefer to process information internally may struggle with the expectation to think out loud and articulate their thought process in real-time.
 
-Speaking from my own experience, I find it nearly impossible to think about a solution to a coding problem *and* talk out loud about it at the same time. I can however explain it in a written format, after the problem is solved, and generate educational materials such as engineering documentation or a [blog post](../python-interview-question-in-ruby).
+Speaking from my own experience, I find it nearly impossible to think about a solution to a coding problem *and* talk out loud about it at the same time. I can however explain it in a written format, after the problem is solved, and generate educational materials such as [engineering documentation](../about-those-docs) or a [blog post](../python-interview-question-in-ruby).
 
 By rejecting candidates for not being able to think out loud and code at the same time, it creates the impression that only one particular way of thinking is valued.
 
@@ -184,6 +186,7 @@ The "hands-on-keyboard" time is often the fastest part of the process, more on t
 Some reasons I've seen projects take longer than expected include:
 
 * Lack of knowledge among the team as to the full scope of the project.
+* Shifting priorities requiring frequent context shifts.
 * Misunderstandings between client/product/design/engineering.
 * Designers waiting on business requirements from product.
 * Developers waiting on design comps where designers are striving for pixel perfection, when really, a napkin sketch would have sufficed to get the developers started ([ShapeUp](https://basecamp.com/shapeup) can help with this).
@@ -243,7 +246,7 @@ Another scenario could be a company that exclusively does pair, or even mob prog
 
 In this case, it would be beneficial for the company to clearly state this in the job description. For example, in a "How we work" section, they could explain that developers do not sit alone to think. Instead, they will always be paired with another developer or work at the same time with a team of developers, all looking at the same screen and taking turns with the keyboard. Candidates should know that they will be expected to constantly verbalize the solutions they're thinking about as they write the code. This will help to attract people that enjoy working like this.
 
-If a live coding round is necessary, provide candidates with a broad category of the problem beforehand so they can prepare accordingly. The scope of challenges engineers tackle is extensive, ranging from tasks like implementing graph algorithms or optimizing database queries to addressing intricate concurrency issues.
+If a live coding round is necessary, provide candidates with a broad category of the problem beforehand so they can prepare accordingly. The scope of challenges engineers tackle is extensive, ranging from tasks like implementing graph algorithms or optimizing database queries to addressing concurrency issues.
 
 ## Conclusion
 
