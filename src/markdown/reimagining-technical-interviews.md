@@ -1,7 +1,7 @@
 ---
 title: "Re-imagining Technical Interviews: Valuing Experience Over Exam Skills"
 featuredImage: "../images/reimagine-tech-interviews-dave-mcdermott-nEJmnfCCPmI-unsplash.jpg"
-description: "tbd"
+description: "Exploring the shortcomings of traditional technical interviews and advocating for more relevant assessment methods to better reflect the demands of modern software engineering roles."
 date: "2024-07-01"
 category: "career"
 related:
@@ -82,7 +82,9 @@ There are professions where the ability to think quickly on your feet in respons
 
 Occasionally, quick thinking is required of software engineers, such as when resolving a production outage or a bug that's blocking some a feature from functioning correctly. However, if companies qualify candidates primarily based on this ability, it gives the impression that the company regularly faces these emergencies, which might not be the intended message. Furthermore, if a company does frequently experience production emergencies, hiring the fastest coder may not address the root cause of these issues.
 
-TODO: Trip down memory lane: Story about deployment causing critical functionality to be broken, and this was in the days before containerized deployments, and CI/CD systems, and easy rollbacks so the bug had to be investigated and resolved within hours.
+***Trip down memory lane...***
+
+I recall one scenario earlier in my career where a deployment caused a critical feature to malfunction shortly after release. This incident occurred before the widespread adoption of containerized deployments and automated CI/CD pipelines, which simplify rollbacks and mitigate such risks. The team had to quickly diagnose and resolve the issue to restore functionality promptly. Since then, modern practices in deployment and continuous integration have significantly enhanced the ability to manage such challenges.
 
 ### Lack of Empathy
 
@@ -117,9 +119,7 @@ Then open up the project team's retrospectives for the past few months, and revi
 
 The outcome of the above brainstorming can be used to guide the interview process, thinking about how to assess for qualities the company needs for successful engineering teams. Of course technical proficiency will be up there, but so will other qualities.
 
-Another important consideration is the format. Some topics are suitable for a conversational/real-time format, such as discussions about the candidate's past experiences. Other topics are more suited to async style, where the candidate works through a problem on their own, in quiet, and then there's a follow on conversation about the solution.
-
-TODO edit: "forging new knowledge" such as being asked to solve a specific coding challenge, or to think through a data modelling exercise is better done async, to mimic how this is done on the job.
+Another important consideration is the format. Some topics are suitable for a conversational/real-time format, such as discussions about the candidate's past experiences. On the other hand, "forging new knowledge", where the candidate is asked to solve a problem, is more suited to async style, where the candidate works through a problem on their own, in quiet, and then there's a follow on conversation about the solution.
 
 The next sections describe some alternatives.
 
@@ -162,6 +162,10 @@ Another variation on the previous assessment is to send the candidate some exist
 If the role that's being hired for involves extensive PR reviews, this can be another type of assessment that can be done asynchronously.
 
 Ask candidates to review a piece of code, identify issues, and suggest improvements. This assesses their understanding of code quality and best practices. Evaluate how empathetic that candidate is and how they word their feedback.
+
+### Deep Dive Technical Walkthrough
+
+If the candidate has some existing work that they can share, another way to assess technical proficiency is to have them give a detailed technical walkthrough of a feature they've developed. This can cover the initial analysis, what problems were encountered in implementation, and how the final solution came together.
 
 ## Objections
 
@@ -223,53 +227,35 @@ It's important to recognize that different candidates have different strengths a
 
 ### Cheating
 
-A concern companies may have regarding take-home assignments is about "cheating" by using generative AI or referencing external resources like Google or Stack Overflow. While this is a valid concern, it's essential to consider the broader implications.
+A concern companies may have regarding take-home assignments is the possibility of cheating, such as using generative AI or referencing external resources like Google or Stack Overflow. Throughout history, new tools and technologies often faced skepticism and were initially viewed as cheating. For instance, when calculators were introduced, they were considered cheating in engineering and math exams. However, over time, they became widely accepted as essential productivity tools that enhance professionals' abilities.
 
-Historically, new tools and technologies have often been viewed with skepticism and even considered cheating. For example, when calculators were first introduced, they were seen as a form of cheating in engineering and math exams. However, over time, they became widely accepted as essential productivity tools that enhance professionals' abilities.
+Similarly, the use of online resources like Google, Stack Overflow, and more recently, generative AI should be seen not as cheating, but as leveraging available tools to solve complex problems efficiently. If an existing team member uses Copilot, Google, or Stack Overflow to find a solution to a work-related problem, is that considered cheating?
 
-Similarly, the use of online resources like Google and Stack Overflow, and more recently, generative AI should be viewed not as cheating, but as leveraging available tools to solve complex problems efficiently. In the real world, engineers frequently rely on documentation, libraries, and online resources to aid their work. Dismissing candidates for using these resources during a take-home assignment overlooks the reality of how engineering is practiced in professional settings.
-
-Furthermore, consider the implications for current employees. If a team member uses Google or Stack Overflow to find a solution to a work-related problem, would they be accused of cheating?
-
-TODO:
-- interview process needs to evolve with the available tools
-- eg: maybe tell the candidate to go ahead and use generative AI, and then explain what the problems are with the solution, and how it could be improved
-- the fact that tools can now auto-generate code immediately when asked (albeit not perfectly but getting better every day) is a signal that it no longer makes sense to gate-keep on this particular skill (generating code on the spot while someone watches). i.e. this makes about as much sense as testing if a candidate can do long division by hand rather than using a calculator
+The interview process needs to evolve with available tools. For example, allowing candidates to use generative AI during assessments can provide insights into their problem-solving approach, as in, can they spot the issues with the generated code such as bugs or maintainability issues. The ability of tools to generate code instantly, while not perfect, signals that gating candidates based on the skill of generating code on the spot may no longer be relevant.
 
 ## Suitable Scenarios for Live Coding Interviews
 
-Yes, if you're preparing a team to enter a programming competition, absolutely, coding as fast as possible to solve a very specific precisely worded problem, under time pressure is exactly the skill that's needed.
+While live coding interviews often fail to accurately assess seasoned software engineers, they might be appropriate for specific types of companies.
 
-TODO: Road runner image?
+For example, in early-stage startups, the pace is extremely fast, and the priority is to deliver functional code as quickly as possible. This is not unlike a [hackathon](https://en.wikipedia.org/wiki/Hackathon), where the ability to jump in and write code rapidly is crucial. Frequent emergencies and production issues, typical in such settings due to the lack of extensive testing and established processes, require engineers who can quickly address problems and implement solutions on the fly, and who thrive in the ensuing chaos.
 
-Or if you're hiring for a computer science instructor, obviously in this role, the ability to work through these kinds of problems *and* talk about them out loud at the same time is part of the job.
+Another scenario could be a company that exclusively does pair, or even mob programming, where engineers collaborate continuously, either in pairs or in larger groups, to write code together in real-time. This setup emphasizes real-time problem-solving, and constant "out loud" communication.
 
-But in all seriousness...
+In this case, it would be beneficial for the company to clearly state this in the job description. For example, in a "How we work" section, they could explain that developers do not sit alone to think. Instead, they will always be paired with another developer or work at the same time with a team of developers, all looking at the same screen and taking turns with the keyboard. Candidates should know that they will be expected to constantly verbalize the solutions they're thinking about as they write the code. This will help to attract people that enjoy working like this.
 
-While live coding interviews often fail to accurately assess seasoned software engineers, they might be appropriate for specific types of companies, particularly early-stage startups. In these environments, the pace is extremely fast, and the priority is to deliver functional code as quickly as possible. Startups may operate in a "hackathon" style, where the ability to jump in and write code rapidly is crucial. Frequent emergencies and production issues, typical in such settings due to the lack of extensive testing and established processes, require engineers who can quickly address problems and implement solutions on the fly, and who don't mind the ensuing chaos.
-
-TODO: If the company works primarily with pairing or mob style programming...
-
-BUT: Make this clear in the job description such as in a "How we work" section. Developers do not sit alone to think, in this role, you will always be paired with another developer or work at the same time with a team of developers all looking at the same screen and taking turns with the keyboard. You will be expected to constantly say out loud the solutions you're thinking about as you write the code.
+If a live coding round is necessary, provide candidates with a broad category of the problem beforehand so they can prepare accordingly. The scope of challenges engineers tackle is extensive, ranging from tasks like implementing graph algorithms or optimizing database queries to addressing intricate concurrency issues.
 
 ## Conclusion
 
 This post has covered the shortcomings of current technical interview methods, particularly focusing on the live coding round, which often fails to accurately assess the skills and capabilities crucial for real-world software engineering roles. From biased evaluation against diverse thinking styles to unrealistic time pressures and limited reflection of actual job demands, these practices can inadvertently exclude highly qualified candidates.
 
-However, there is hope for improvement. By reevaluating the assessment criteria to align more closely with the skills that drive successful engineering projects—such as problem-solving, communication, collaboration, and adaptability—companies can create a more effective and inclusive hiring process. Alternative methods like project-based evaluations, asynchronous assignments with emphasis on communication and documentation, and realistic scenarios that simulate real-world challenges can better identify candidates who will thrive in dynamic engineering environments.
-
-Ultimately, evolving the technical interviewing process to be more reflective of actual job requirements not only enhances the fairness and inclusivity of hiring practices but also strengthens teams by bringing in diverse perspectives and approaches to problem-solving. This shift can lead to more innovative solutions and greater success in delivering impactful software products.
+However, there is hope for improvement. By reevaluating the assessment criteria to align more closely with the skills that drive successful engineering projects, such as problem-solving, communication, collaboration, and adaptability, companies can create a more effective and inclusive hiring process. Alternative methods like project-based evaluations, asynchronous assignments with emphasis on communication and documentation, and realistic scenarios that simulate real-world challenges can better identify qualified candidates.
 
 ## TODO
-* WIP main content
-* WIP polish up rough notes and bullet points
-* think about logical ordering of problems
 * edit
 * real world -> on the job or find more suitable phrase
-* meta tag description
 * problems that are that well specified down to the method name, input and output format don't get assigned to seniors. And arguably with generative AI, these kinds of problems will no longer be done by human at all so does it even make sense to test for this?
 * exceptions for if company's domain does directly require comp sci theory, eg: navigating social graph, animation, physics, etc.
-* if must have a live coding round, send the candidate the broad category of problem so they can come prepared. The surface area of what engineers work on is vast. For example, traversing deeply nested arrays.
 * custom style for "trip down memory lane" sections?
 * interview process should be included in the JD (some companies are doing this, good!)
 * maybe ref LI post to show the discussion https://www.linkedin.com/posts/gabag26_leetcode-codinginterview-softwareengineering-activity-7203974232509173760-92WZ/
