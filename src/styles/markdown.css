@@ -44,6 +44,47 @@
   padding: 15px;
 }
 
+.markdown-memory-lane {
+  background-color: #f0f8ff;
+  /* Alice Blue */
+  border: 2px solid #add8e6;
+  /* Light Blue */
+  border-radius: 15px;
+  margin: 30px 0;
+  padding: 15px;
+  /* font-style: italic; */
+  /* Darker Steel Blue */
+  color: #3b6a8e;
+  /* Optional cloud pattern background */
+  /* background-image: url('path/to/clouds-pattern.svg'); */
+  /* background-size: cover; */
+}
+
+.markdown-memory-lane h3 {
+  font-style: italic;
+  font-size: 1.2rem;
+  font-weight: 600;
+  margin-top: 0;
+  margin-bottom: 15px;
+  /* Darker blue */
+  color: #2a4d69;
+}
+
+.markdown-memory-lane p {
+  margin-bottom: 10px;
+}
+
+.markdown-memory-lane-nostalgic {
+  background-color: var(--brand-complement-lighten-45);
+  border-left: 4px solid var(--brand-complement);
+  border-radius: 0px 8px 8px 0px;
+  margin: 30px 0 30px 0;
+  padding: 15px;
+  font-style: italic;
+  color: var(--brand-darken-20);
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+}
+
 .markdown-emphasis {
   font-style: italic;
 }
