@@ -14,13 +14,13 @@ As I navigate the job search process anew, I'm struck by how sub-optimal technic
 
 ## Disclaimer
 
-Before diving into my observations and suggestions, it's important to note that my experiences are based on applying for senior/staff positions in web development. The tech industry is vast, encompassing areas such as gaming, embedded systems, data science, and more. Each of these fields has its own unique set of challenges, expectations, and interview processes. What I discuss here may not fully apply to all areas.
+Before diving into my observations and suggestions, it's important to note that my experiences are based on applying for senior/staff positions in web development. The tech industry is vast, encompassing areas such as gaming, embedded systems, data science, and more. Each of these fields has its own unique set of challenges. What I discuss here may not apply to all areas.
 
 ## Live Coding Round
 
 Many companies, as the first part of the interview process have what's called a live coding round. In this session, the candidate gets on a video call with another engineer(s) at the hiring company, and is told to click a link to a shared coding environment such as CodeSignal, CoderPad, etc. There they are presented with a problem to solve, often in the form of write a method that takes arguments `foo`, `bar`, etc. and produces some output `baz`.
 
-This could be a [leetcode](https://en.wikipedia.org/wiki/LeetCode) style question involving computer science theory. For example [Reverse a Linked List](https://leetcode.com/problems/reverse-linked-list/description/), [Merge K Sorted Lists](https://leetcode.com/problems/merge-k-sorted-lists/description/), [Spiral Matrix](https://leetcode.com/problems/spiral-matrix/description/). Or it could be a question from the company's domain.
+This could be a [Leetcode](https://en.wikipedia.org/wiki/LeetCode) style question involving computer science theory. For example [Reverse a Linked List](https://leetcode.com/problems/reverse-linked-list/description/), [Merge K Sorted Lists](https://leetcode.com/problems/merge-k-sorted-lists/description/), [Spiral Matrix](https://leetcode.com/problems/spiral-matrix/description/). Or it could be a question from the company's domain.
 
 The candidate is told it's a timed exercise, and they're expected to solve the problem in the allotted time, usually under an hour. Furthermore, the candidate is expected to talk out loud as they're solving the coding challenge to explain their thought process. And on top of all that, they're expected to consider whether they're choosing the most appropriate data structures, efficiency (i.e. Big O complexity analysis), and clean code principles, aka legibility.
 
@@ -48,6 +48,10 @@ For example, one of my first work tasks was to integrate an affiliates program i
 </p>
 </aside>
 
+<aside class="markdown-aside">
+Some more discussion on Leetcode style interviewing can be found on <a class="markdown-link" href="https://www.reddit.com/r/cscareerquestions/comments/pbyn4v/comment/haf88zj/">Reddit Career Questions</a> and this <a class="markdown-link" href="https://syntax.fm/show/781/potluck-the-value-of-typescript-vue-vs-svelte-leetcode/">Syntax podcast</a> episode at 36:15.
+</aside>
+
 ### Time Pressure
 
 Even if companies choose a problem from their domain rather than theoretical computer science type exercises, there are still problems with the timed live coding round.
@@ -70,7 +74,7 @@ Also, in a typical development cycle, the very first solution that comes to mind
 
 <aside class="markdown-memory-lane">
 <h3>Trip down memory lane...</h3>
-I can recall very few scenarios in my decades long career where the ability to write some code, literally within a few hours, was critical to the team's success. In one instance, the team was told at the last minute that a VIP was scheduled to come by the next day for a demo. The product was working, but wasn't yet styled, so it looked broken. I had just a few hours to tidy up the styles to make some of the views look functional. And even then, it was a product I had been working on for nearly half a year and was therefore very familiar with. This urgent task would not have been assigned to someone who had only just seen the code for the first time that day.
+I can recall very few scenarios in my decades long career where the ability to write some code, literally within a few hours, was critical to the team's success. In one instance, the team was told at the last minute that an important client representative was scheduled to come by the next day for a demo. The product was working, but wasn't yet styled, so it looked broken. I had just a few hours to make the views look functional. And even then, it was a product I had been working on for nearly half a year and was therefore very familiar with. This urgent task would not have been assigned to someone who had only just seen the code for the first time that day.
 </aside>
 
 ### Talking Out Loud
@@ -83,9 +87,7 @@ By rejecting candidates for not being able to think out loud and code at the sam
 
 ### Bias Towards Quick Thinkers
 
-The ability to solve problems quickly under observation is not necessarily indicative of an individual's overall problem-solving skills or coding proficiency in a less pressured environment. Many complex software problems require extended periods of deep thought and experimentation, which are not represented in short, timed coding challenges. This is particularly true when hiring at a senior, staff, or higher level.
-
-By emphasizing a specific way of thinking and solving problems, companies may miss out on candidates who offer unique and diverse approaches to problem-solving. Diverse teams are known to drive innovation, and by excluding those who do not excel in live coding interviews, companies risk creating homogenous teams that lack creative and innovative thinking.
+The ability to solve problems quickly under observation is not necessarily indicative of an individual's overall problem solving skills or coding proficiency in a less pressured environment. Many complex software problems require extended periods of deep thought and experimentation, which are not represented in short, timed coding challenges.
 
 There are professions where the ability to think quickly on your feet in response to surprises is useful. For example courtroom lawyer, standup comic, improv actor, combat pilot, emergency room doctor. But I don't think software engineering generally fits into this list.
 
@@ -93,7 +95,7 @@ Occasionally, quick thinking is required of software engineers, such as when res
 
 <aside class="markdown-memory-lane">
 <h3>Trip down memory lane...</h3>
-I recall one scenario earlier in my career where a deployment caused a critical feature to malfunction shortly after release. This incident occurred before the widespread adoption of containerized deployments and automated CI/CD pipelines, which simplify rollbacks and mitigate such risks. I had to quickly diagnose and resolve the issue to restore functionality promptly. Since then, modern practices in deployment and continuous integration have significantly enhanced the ability to manage such challenges.
+I recall one scenario earlier in my career where a deployment caused a critical feature to malfunction shortly after release. This incident occurred before the widespread adoption of containerized deployments and automated CI/CD pipelines, which simplify rollbacks and mitigate such risks. I had to quickly diagnose and resolve the issue to restore functionality. Since then, modern practices in deployment and continuous integration have significantly enhanced the ability to manage such challenges.
 </aside>
 
 ### Lack of Empathy
@@ -131,7 +133,7 @@ The outcome of the above brainstorming can be used to guide the interview proces
 
 Another important consideration is the format. Some topics are suitable for a conversational/real-time format, such as discussions about the candidate's past experiences. On the other hand, "forging new knowledge", where the candidate is asked to solve a problem, is more suited to async style, where the candidate works through a problem on their own, in quiet, and then there's a follow on conversation about the solution.
 
-The next sections describe some alternatives.
+The next sections describe some alternatives. Not to suggest that *all* of these should be used, rather, this is to get people thinking about other ways of assessing technical proficiency, that reduce some of the performance anxiety.
 
 ### Greenfield a Small Project
 
@@ -177,7 +179,7 @@ If the candidate has some existing work that they can share, another way to asse
 
 ## Objections
 
-This next section addresses some objections to the idea of eliminating the leetcode/live-coding round in favour of an asynchronous assessment.
+This next section addresses some objections to the idea of eliminating the live coding round in favour of an asynchronous assessment.
 
 ### We Need to Move Quickly
 
@@ -192,30 +194,28 @@ The "hands-on-keyboard" time is often the fastest part of the process, more on t
 Some reasons I've seen projects take longer than expected include:
 
 * Lack of knowledge among the team as to the full scope of the project.
-* Shifting priorities requiring frequent context shifts.
+* Shifting priorities requiring frequent context changes.
 * Misunderstandings between client/product/design/engineering.
 * Designers waiting on business requirements from product.
 * Developers waiting on design comps where designers are striving for pixel perfection, when really, a napkin sketch would have sufficed to get the developers started ([ShapeUp](https://basecamp.com/shapeup) can help with this).
 * Overly engineered initial architecture that adds unnecessary overhead.
 * Unmaintained intermittent tests resulting in developers spending time investigating false negatives.
 * Lack of system/end-to-end testing requiring manual QA to avoid regressions, which creates bottlenecks.
-* Lack of (or out of date) engineering documentation such as how to setup the project or work with third party integrations. This makes even seemingly simple changes take longer for developers to figure out how to exercise the portion of the code requiring changes.
+* Lack of (or out of date) engineering documentation.
 * Inability to run some features on laptop due to complex microservices architecture, or third party integrations that can't be run locally.
 
 None of the above issues are resolved by hiring the fastest coder.
 
 <aside class="markdown-memory-lane">
 <h3>Trip down memory lane...</h3>
-Many years ago I worked with a senior engineer who refused to ever go to the product manager to ask questions because he thought the definition of a senior was someone who has all the answers. The features he would deliver were frequently incorrect and required numerous lengthy meetings with the product manager and tech lead to clarify and multiple iterations (including multiple PR reviews and QA rounds!) to get right. This engineer was a brilliant and speedy coder. He would have aced any leetcode interview, and yet the team was struggling to deliver on anything he worked on, and required additional effort from many other team members. Delivering the wrong code quickly helps no one. A leetcode style exam won't catch this because the requirements are specified so clearly.
+Many years ago I worked with an engineer who refused to ever go to the product manager to ask questions because he thought the definition of a senior was someone who has all the answers. The features he would deliver were frequently incorrect and required numerous lengthy meetings with the product manager and tech lead to clarify and multiple iterations (including multiple PR reviews and QA rounds!) to get right. This engineer was a brilliant and speedy coder. He would have aced any leetcode interview, and yet the team was struggling to deliver on anything he worked on, and required additional effort from many other team members. Delivering the wrong code quickly helps no one. A leetcode style exam won't catch this because the requirements are specified so clearly.
 </aside>
 
 ### You Should Practice
 
-When I've brought up the fact that these kind of "on the spot" puzzle solving skills are not required in actual engineering work, recruiters have acknowledged this, and then said "you should spend time practicing". Let's think about this: A company is hiring for, let's say a staff engineer, so they reach out to them based on their LinkedIn profile, and their years of experience. But somehow they're unable to assess that so now the candidate needs to spend their precious free time practicing for a test that doesn't even assess the actual skills they're being hired for?
+When I've brought up the fact that these kind of "on the spot" puzzle solving skills are not required in actual engineering work, recruiters have acknowledged this, and then said "you should spend time practicing". Does it really make sense to have someone spend precious free time practicing for a test that doesn't even assess the actual skills needed for the job?
 
-Multiply this out by all the engineers looking for a new role, say every few years, spending weeks on these practice exercises. How many more valuable things could have been achieved with all this time?
-
-Given that an engineer actually has some free time to dedicate to any sort of technical extra-curricular activity, I can think of so many more valuable things to be doing, for example:
+Multiply this out by all the engineers looking for a new role, say every few years, spending weeks on these practice exercises. How many more valuable things could have been achieved with all this time? Given that someone has some free time to dedicate to technical extra-curricular activities, I can think of so many more valuable things to be doing, for example:
 
 - Taking online courses to learn a new skill.
 - Reading technical books.
@@ -223,7 +223,7 @@ Given that an engineer actually has some free time to dedicate to any sort of te
 - Volunteering to build software for an charitable organization.
 - Writing technical articles, tutorials, create a course etc. to share what you're learning.
 
-To be clear, I'm not suggesting people *should* be spending their spare time doing any of the above. What I'm suggesting is that if someone has spare time that they'd like to spend on career development, the above can be more impactful than practicing LeetCode exercises.
+To be clear, I'm *not* suggesting people *should* be spending their spare time doing any of the above. What I'm suggesting is that if someone has spare time that they'd like to spend on career development, the above can be more impactful than practicing LeetCode exercises.
 
 ### Fairness
 
@@ -237,46 +237,26 @@ It's important to recognize that different candidates have different strengths a
 
 ### Cheating
 
-A concern companies may have regarding take-home assignments is the possibility of cheating, such as using generative AI or referencing external resources like Google or Stack Overflow. Throughout history, new tools and technologies often faced skepticism and were initially viewed as cheating. For instance, when calculators were introduced, they were considered cheating in engineering and math exams. However, over time, they became widely accepted as essential productivity tools that enhance professionals' abilities.
+A concern companies may have regarding take-home assignments is the possibility of cheating, such as using generative AI or referencing external resources like Google or Stack Overflow. Throughout history, new tools and technologies often faced skepticism and were initially viewed as cheating.
 
-Similarly, the use of online resources like Google, Stack Overflow, and more recently, generative AI should be seen not as cheating, but as leveraging available tools to solve complex problems efficiently. If an existing employee uses Copilot, Google, or Stack Overflow to find a solution to a work-related problem, is that considered cheating?
+However, the use of online resources like Google, Stack Overflow, and more recently, generative AI should be seen not as cheating, but as leveraging available tools to solve complex problems efficiently. If an existing employee uses Copilot, Google, or Stack Overflow to find a solution to a work-related problem, is that considered cheating?
 
 The interview process needs to evolve with available tools. For example, allowing candidates to use generative AI during assessments can provide insights into their problem-solving approach, as in, can they spot the issues with the generated code such as bugs or maintainability issues. The ability of tools to generate code instantly, while not perfect, signals that gating candidates based on the skill of generating code on the spot may no longer be relevant.
 
-## Suitable Scenarios for Live Coding Interviews
+## Suitable Scenarios for Live Coding
 
-While live coding interviews often fail to accurately assess seasoned software engineers, they might be appropriate for specific types of companies.
+There are some scenarios where live coding may be optimal.
 
-For example, in early-stage startups, the pace is extremely fast, and the priority is to deliver functional code as quickly as possible. This is not unlike a [hackathon](https://en.wikipedia.org/wiki/Hackathon), where the ability to jump in and write code rapidly is crucial. Frequent emergencies and production issues, typical in such settings due to the lack of extensive testing and established processes, require engineers who can quickly address problems and implement solutions on the fly.
+For example, in early-stage startups, the pace is extremely fast, and the priority is to deliver functional code as quickly as possible. This is not unlike a [hackathon](https://en.wikipedia.org/wiki/Hackathon), where the ability to jump in and write code rapidly is crucial. Frequent emergencies and production issues, which are likely in such settings due to the lack of extensive testing and established processes, require engineers who can quickly address problems and implement solutions on the fly.
 
 ![airplane quick fix](../images/airplane-quick-fix.jpg "airplane quick fix")
 
-Another scenario could be a company that exclusively does pair, or even mob programming, where engineers collaborate continuously, either in pairs or in larger groups, to write code together in real-time. This setup emphasizes real-time problem-solving, and constant "out loud" communication.
+Another scenario could be a company that exclusively does pair, or [mob programming](https://en.wikipedia.org/wiki/Team_programming#Mob_programming), where engineers collaborate continuously, either in pairs or in larger groups, to write code together in real-time. This setup emphasizes real-time problem-solving, and constant "out loud" communication.
 
-In this case, it would be beneficial for the company to clearly state this in the job description. For example, in a "How we work" section, they could explain that developers do not sit alone to think. Instead, they will be paired with another developer or work at the same time with a team of developers, all looking at the same screen and taking turns with the keyboard. Candidates should know that they will be expected to constantly verbalize the solutions they're thinking about as they write the code. This will help to attract people that enjoy working like this.
-
-If a live coding round is necessary, provide candidates with a broad category of the problem beforehand so they can prepare accordingly. And ideally, make this just one part of the overall process on which a candidate is being evaluated on, rather than a qualifier.
+If a live coding round is necessary, provide candidates with the category of the problem beforehand so they can focus their preparation efforts accordingly. And ideally, make this just one part of the overall process on which a candidate is being evaluated on, rather than a qualifier.
 
 ## Conclusion
 
 This post has covered the shortcomings of current technical interview methods, particularly focusing on the live coding round, which often fails to accurately assess the skills and capabilities crucial for real-world software engineering roles. From biased evaluation against diverse thinking styles to unrealistic time pressures, these practices can inadvertently exclude highly qualified candidates.
 
-However, there is hope for improvement. By reevaluating the assessment criteria to align more closely with the skills that drive successful engineering projects, such as problem-solving, communication, collaboration, and adaptability, companies can create a more effective and inclusive hiring process.
-
-## TODO
-* WIP: edit
-* exceptions for if company's domain does directly require comp sci theory, eg: navigating social graph, animation, physics, etc.
-* interview process should be included in the JD (some companies are doing this, good!)
-* maybe another objection: We don't have time for the async assessment. Then think about - do you have time to keep re-hiring if the leetcode/live-coding isn't accurately assessing for required skills?
-* emphasize: I'm not suggesting to include *all* of these exercises - this is to get people thinking about alternative assessment techniques that capture real world conditions and lessen performance anxiety/stress.
-
-* Ref Syntax Podcast: https://syntax.fm/show/781/potluck-the-value-of-typescript-vue-vs-svelte-leetcode 36:15 "Leetcode type interview questions"
-> Not a definitive judgement on someone's abilities or skills
-> I would hope that companies are getting away from these types of interviews
-> Knowing how to solve leetcode problems is a completely different skill than what we do on a daily basis
-> It's valuable in knowing did this person study leetcode style problems... It's a very specific skill set
-> When you test someone on a leetcode in an interview, you're testing are they good at solving leetcode problems, you're not testing are they good at writing software, working on a team, implementing features, communicating well, and all the other things that are important besides just being able to code real good
-> Best technical interview I've had, they dropped me into a sample code base, gave me an example ticket that would look exactly like what I would get on a day in the job, and worked through it together.
-
-* Ref Reddit Discussion: https://www.reddit.com/r/cscareerquestions/comments/pbyn4v/comment/haf88zj/
-* Ref Reddit, if perf issue, re-evaluate business requirements: https://www.reddit.com/r/cscareerquestions/comments/pbyn4v/comment/haf9j5q/
+However, there is hope for improvement. By reevaluating the assessment criteria to align more closely with the skills that drive successful engineering projects, a more effective and inclusive hiring process is possible.
