@@ -2,7 +2,7 @@
 title: "Re-imagining Technical Interviews: Valuing Experience Over Exam Skills"
 featuredImage: "../images/reimagine-tech-interviews-dave-mcdermott-nEJmnfCCPmI-unsplash.jpg"
 description: "Exploring the shortcomings of traditional technical interviews and advocating for more relevant assessment methods to better reflect the demands of modern software engineering roles."
-date: "2024-07-06"
+date: "2024-07-08"
 category: "career"
 related:
   - "The Development Iceberg: Unseen Efforts That Extend Project Schedules"
