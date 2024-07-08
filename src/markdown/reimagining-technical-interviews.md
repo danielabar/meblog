@@ -72,6 +72,8 @@ Using "on the spot" coding/analysis/thinking-out-loud in under an hour is not a 
 Having at least one night to "sleep on it" is also critical, as the brain uses sleep to integrate and solidify learnings from the day. Learn more about this in the book <a class="markdown-link" href="https://www.goodreads.com/book/show/34466963-why-we-sleep/">Why We Sleep</a> by Matthew Walker.
 </aside>
 
+Additionally, when a company provides a problem from their own domain, which they've been working on for years, it can be unrealistic to expect someone unfamiliar with it to understand and solve it in an hour. Onboarding and product training for a new employee typically take at least a few weeks. This mismatch in expectations can further exacerbate the stress and pressure felt during the interview.
+
 Also, in a typical development cycle, the very first solution that comes to mind is almost never the one that gets delivered to production. Instead, there's a period of days or even weeks spent refining the solution, addressing edge cases, and ensuring robustness. Yet, live coding interviews judge candidates based on their ability to immediately produce a fairly polished solution.
 
 <aside class="markdown-memory-lane">
