@@ -9,22 +9,6 @@ exports[`Header renders nav menu for wide widths 1`] = `
         data-testid="header"
       >
         <div>
-          <p>
-            <strong>
-              Looking for a Rails Developer?
-            </strong>
-             
-            I am currently open to new opportunities, including contract roles. If your team needs a skilled Rails developer, please feel free to
-             
-            <a
-              href="https://www.linkedin.com/in/danielabaron/"
-            >
-              connect with me on LinkedIn
-            </a>
-            .
-          </p>
-        </div>
-        <div>
           <a
             href="/"
           >
@@ -83,22 +67,6 @@ exports[`Header renders nav menu for wide widths 1`] = `
     <header
       data-testid="header"
     >
-      <div>
-        <p>
-          <strong>
-            Looking for a Rails Developer?
-          </strong>
-           
-          I am currently open to new opportunities, including contract roles. If your team needs a skilled Rails developer, please feel free to
-           
-          <a
-            href="https://www.linkedin.com/in/danielabaron/"
-          >
-            connect with me on LinkedIn
-          </a>
-          .
-        </p>
-      </div>
       <div>
         <a
           href="/"
@@ -216,22 +184,6 @@ exports[`Header renders nav menu responsive for narrow widths 1`] = `
         data-testid="header"
       >
         <div>
-          <p>
-            <strong>
-              Looking for a Rails Developer?
-            </strong>
-             
-            I am currently open to new opportunities, including contract roles. If your team needs a skilled Rails developer, please feel free to
-             
-            <a
-              href="https://www.linkedin.com/in/danielabaron/"
-            >
-              connect with me on LinkedIn
-            </a>
-            .
-          </p>
-        </div>
-        <div>
           <a
             href="/"
           >
@@ -288,22 +240,6 @@ exports[`Header renders nav menu responsive for narrow widths 1`] = `
     <header
       data-testid="header"
     >
-      <div>
-        <p>
-          <strong>
-            Looking for a Rails Developer?
-          </strong>
-           
-          I am currently open to new opportunities, including contract roles. If your team needs a skilled Rails developer, please feel free to
-           
-          <a
-            href="https://www.linkedin.com/in/danielabaron/"
-          >
-            connect with me on LinkedIn
-          </a>
-          .
-        </p>
-      </div>
       <div>
         <a
           href="/"
