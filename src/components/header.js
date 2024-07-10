@@ -4,7 +4,7 @@ import useViewport from "../hooks/useviewport"
 import * as styles from "./header.module.css"
 import NavMenuResponsive from "./nav-menu-responsive"
 import NavMenu from "./nav-menu"
-import JobAlert from "./job-alert"
+// import JobAlert from "./job-alert"
 
 const Header = () => {
   const { width } = useViewport()
@@ -16,7 +16,6 @@ const Header = () => {
 
   return (
     <header className={styles.container} data-testid="header">
-      <JobAlert />
       <div className={styles.inner}>
         <Link to="/">
           <div className={styles.logo}>
