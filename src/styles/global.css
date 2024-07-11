@@ -42,6 +42,11 @@
   --post-strikethrough-color: var(--brand-lighten-5);
   --post-strikethrough-font-color: #404040;
 
+  --memory-lane-background-color: #f0f8ff;
+  --memory-lane-border-color: #add8e6;
+  --memory-lane-text-color: #3b6a8e;
+  --memory-lane-heading-color: #2a4d69;
+
   --base-font-color: var(--brand-darken-35);
   --base-font-family: "Bai Jamjuree", -apple-system, system-ui, "Segoe UI",
     Roboto, Oxygen-Sans, Ubuntu, Cantarell, "Helvetica Neue", sans-serif;

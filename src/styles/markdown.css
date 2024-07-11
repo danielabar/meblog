@@ -44,6 +44,28 @@
   padding: 15px;
 }
 
+.markdown-memory-lane {
+  background-color: var(--memory-lane-background-color);
+  border: 2px solid var(--memory-lane-border-color);
+  border-radius: 15px;
+  margin: 30px 0;
+  padding: 15px;
+  color: var(--memory-lane-text-color);
+}
+
+.markdown-memory-lane h3 {
+  font-style: italic;
+  font-size: 1.2rem;
+  font-weight: 600;
+  margin-top: 0;
+  margin-bottom: 10px;
+  color: var(--memory-lane-heading-color);
+}
+
+.markdown-memory-lane p {
+  margin-bottom: 10px;
+}
+
 .markdown-emphasis {
   font-style: italic;
 }
