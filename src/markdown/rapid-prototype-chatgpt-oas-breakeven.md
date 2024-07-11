@@ -80,3 +80,4 @@ The line that starts at age 70 would have a greater slope because each payment i
 * description meta
 * edit
 * TODO: Ignoring annual inflation adjustments, comparing all values in today's dollars
+* TODO: `npx http-server` for super quick, easy local static server
