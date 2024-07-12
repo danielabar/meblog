@@ -9,6 +9,7 @@ My blog is built with [GatsbyJS](https://www.gatsbyjs.com/), initialized with [G
 5. SVG icons from [react-icons](https://github.com/react-icons/react-icons).
 6. Custom 404 page.
 7. Syntax highlighting with [gatsby-remark-vscode](https://www.gatsbyjs.com/plugins/gatsby-remark-vscode/).
+8. RSS with [gatsby-plugin-feed](https://www.gatsbyjs.com/docs/how-to/adding-common-features/adding-an-rss-feed/), [validate](https://validator.w3.org/feed/#validate_by_input)
 
 ## Setup
 
