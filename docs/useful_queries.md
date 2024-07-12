@@ -26,6 +26,37 @@
 }
 ```
 
+## Distinct Categories
+
+```graphql
+{
+  allMarkdownRemark(
+    filter: {
+      fileAbsolutePath: { regex: "/src/markdown/" }
+    }
+  ) {
+    distinct(field: { frontmatter: { category: SELECT } })
+  }
+}
+```
+
+## Table of Contents
+
+```graphql
+{
+  allMarkdownRemark(filter: { fileAbsolutePath: { regex: "/src/markdown/reimagining-technical-interviews/" } }) {
+    edges {
+      node {
+        frontmatter {
+          title
+        }
+        tableOfContents
+      }
+    }
+  }
+}
+```
+
 ## Popular Posts
 
 Given that csv transformer has been installed and configured.
