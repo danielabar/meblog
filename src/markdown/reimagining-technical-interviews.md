@@ -101,7 +101,7 @@ Furthermore, if a company does frequently experience production emergencies, hir
 
 <aside class="markdown-memory-lane">
 <h3>Trip down memory lane...</h3>
-I recall one scenario earlier in my career where a deployment caused a critical feature to malfunction shortly after release. This incident occurred before the widespread adoption of containerized deployments and automated CI/CD pipelines, which simplify rollbacks and mitigate such risks. I had to quickly diagnose and resolve the issue to restore functionality. Since then, modern practices in deployment and continuous integration have significantly enhanced the ability to manage these issues.
+I recall one scenario earlier in my career where a deployment caused a critical feature to malfunction shortly after release. This incident occurred before the widespread adoption of containerization, CI/CD pipelines, and strategies such as Blue Green and Canary deployments. I had to quickly diagnose and resolve the issue to restore functionality. Since then, modern practices in continuous integration and deployment have evolved to mitigate these risks.
 </aside>
 
 ### Lack of Empathy
