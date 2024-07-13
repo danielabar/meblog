@@ -9,7 +9,8 @@ module.exports = {
     titleTemplate: "%s · Daniela Baron",
     siteUrl: "https://danielabaron.me",
     url: "https://danielabaron.me",
-    description: "The personal website of Daniela Baron, software developer.",
+    description:
+      "Insights and experiences from Daniela Baron, a software engineer sharing problem-solving techniques, learning strategies, and career development.",
     image: "/images/dbaron_profile.png",
     twitterUsername: "@DanielaMBaron",
     googleSiteVerification: "zmLm6qu34TLdeqUUPDF_K6faoqGqQincxyNZk7VsHgY",
@@ -50,7 +51,7 @@ module.exports = {
                 image: "markdown-image",
                 linkReference: "markdown-link-ref",
                 imageReference: "markdown-image-ref",
-                table: "markdown-table"
+                table: "markdown-table",
               },
             },
           },
@@ -82,13 +83,77 @@ module.exports = {
             resolve: `gatsby-remark-vscode`,
             options: {
               theme: "Monokai", // Or install your favorite theme from GitHub
-              extensions: ["rest-client", "HCL", "applescript", "vscode-graphql-syntax", "vscode-ruby-syntax"],
+              extensions: [
+                "rest-client",
+                "HCL",
+                "applescript",
+                "vscode-graphql-syntax",
+                "vscode-ruby-syntax",
+              ],
               wrapperClassName: "gatsby-highlight",
               inlineCode: {
                 className: "my-inline",
                 marker: "•",
                 // theme: "Monokai",
               },
+            },
+          },
+          {
+            resolve: `gatsby-plugin-feed`,
+            options: {
+              query: `
+                {
+                  site {
+                    siteMetadata {
+                      title
+                      description
+                      siteUrl
+                      site_url: siteUrl
+                    }
+                  }
+                }
+              `,
+              feeds: [
+                {
+                  serialize: ({ query: { site, allMarkdownRemark } }) => {
+                    return allMarkdownRemark.edges.map(edge => {
+                      return Object.assign({}, edge.node.frontmatter, {
+                        description: edge.node.frontmatter.description,
+                        date: edge.node.frontmatter.date,
+                        url: site.siteMetadata.siteUrl + edge.node.fields.slug,
+                        guid: site.siteMetadata.siteUrl + edge.node.fields.slug,
+                        custom_elements: [
+                          { "content:encoded": edge.node.excerpt },
+                        ],
+                      })
+                    })
+                  },
+                  query: `
+                    {
+                      allMarkdownRemark(
+                        sort: { fields: [frontmatter___date], order: DESC },
+                        filter: { fileAbsolutePath: { regex: "/src/markdown/" } }
+                        limit: 10
+                      ) {
+                        edges {
+                          node {
+                            excerpt
+                            html
+                            fields { slug }
+                            frontmatter {
+                              title
+                              description
+                              date
+                            }
+                          }
+                        }
+                      }
+                    }
+                  `,
+                  output: "/rss.xml",
+                  title: "danielabaron.me RSS Feed",
+                },
+              ],
             },
           },
         ],
