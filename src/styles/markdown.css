@@ -152,9 +152,6 @@
   background-color: #ddd;
 }
 
-.markdown-table tr:has(td > .markdown-strong) {
-  background-color: #FFD700;
-}
 .markdown-table tr:has(td > .markdown-table-highlight) {
   background-color: #FFD700;
 }
