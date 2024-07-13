@@ -10,7 +10,7 @@ related:
   - "Build and Publish a Presentation with RevealJS and Github"
 ---
 
-When building software, especially for complex financial scenarios, it's crucial to determine if you're on the right track before investing significant effort in perfecting the architecture, ensuring 100% test coverage, and setting up CI/CD pipelines. Rapid prototyping allows you to quickly reach valuable insights and validate your approach. Recently, I had an opportunity to collaborate with [John Stapleton](https://openpolicyontario.com/), a subject matter expert on social assistance policy and poverty reduction, on an Old Age Security (OAS) breakeven calculator, targeted at low income Canadians. This post outlines how I used ChatGPT to quickly build a prototype and validate our ideas.
+When building software, especially for complex financial scenarios, it's crucial to determine if you're on the right track before investing significant effort in selecting the language to build in, framework, architecture, ensuring 100% test coverage, and setting up CI/CD pipelines. Rapid prototyping allows you to quickly reach valuable insights and validate your approach. Recently, I had an opportunity to collaborate with [John Stapleton](https://openpolicyontario.com/), a subject matter expert on social assistance policy and poverty reduction, on an Old Age Security (OAS) breakeven calculator, targeted at low income Canadians. This post outlines how I used ChatGPT to quickly build a prototype and validate our ideas.
 
 ## Problem
 
@@ -62,22 +62,63 @@ With the setup out of the way, it was time to start building.
 
 ## Building the Prototype
 
-WIP... Trying to explain the intuition behind using a line chart as a visualization...
-
 Recall the goal was to show that delaying OAS to a later age may not be worth it for many people as they would have to outlive the Statistics Canada life expectancy values to have more money overall by delaying.
 
-I started with some manual calculations, assuming the simplest case: Someone who is eligible for a full OAS pension at 65, and not eligible for GIS. For 2024, they would receive a monthly OAS amount of $713.34 if starting at age 65. This means by the time they turn 66, they would have received a total of $713.34 * 12 = $8,560.08, i.e. 12 monthly payments. And by age 67, they would have a total of $713.34 * 12 * 2 = $17,120.16, i.e. 12 monthly payments per year at 2 years. By age 70, this person would have accumulated 5 years worth of payments which is 60 months for a total of $713.34 * 12 * 5 = $42,800.40. You could picture this in a tabular form:
+### The Math
+
+I started with some manual calculations, assuming the simplest case: Someone who is eligible for a full OAS pension at 65, and not eligible for GIS. For 2024, they would receive a monthly OAS amount of $713.34 if starting at age 65. This means by the time they turn 66, they would have received a total of $713.34 * 12 = $8,560.08, i.e. 12 monthly payments. And by age 67, they would have a total of $713.34 * 12 * 2 = $17,120.16, i.e. 12 monthly payments per year at 2 years. By age 70, this person would have accumulated 5 years worth of payments which is 60 months for a total of $713.34 * 12 * 5 = $42,800.40.
 
 On the other hand, waiting until age 70 would increase the monthly payment by 36%, i.e. 0.06% for each month delay, so 5 years of delay === 60 months, and 60 * 0.06% = 36%. So that 713.34 monthly payment would turn into: $713.34 * 1.36 = $970.14. By the time this person turns 71, they would have a total of $970.14 * 12 = $11,641.68. While this sounds like an impressive amount more than the $8,560.08 amount they would have had in one year if starting at 65, the problem is they're missing out on the $42,800.40 they could have had by starting at age 65.
 
-I envisioned a line chart with the horizontal axis for age, and the vertical axis for total OAS received. Then two lines could be drawn on the chart, comparing the total OAS income over time for starting payments at age 65 versus age 70. Delaying to age 70 results in a 36% increase in monthly payments, but seniors miss out on the first 5 years of payments. The goal was to find the breakeven point—the age at which the total income from delaying finally catches up to starting earlier.
+I explained the OAS rules above to ChatGPT and asked it to generate a table with columns for age, going from age 66 through 90, calculate the OAS amount someone would have accumulated by that age if they had started at 65, and another column for starting at 70, and then to calculate the difference between starting at 70 and 65. Here are the results (I've highlighted age 84, explanation to follow):
 
-The line that starts at age 70 would have a greater slope because each payment is greater, but it would also start "pushed out to the right" because the payments from age 65 - 70 would be 0. The line that starts at age 65 would have a lower slope but starting right at 65. This mean the two lines would have to intersect at some point, and the age at which they intersect would be the break even age.
+| Age | Start at 65 ($) | Start at 70 ($) | Difference ($) |
+| --- | --------------- | --------------- | -------------- |
+| 66  | 8,560.08        | 0               | -8,560.08      |
+| 67  | 17,120.16       | 0               | -17,120.16     |
+| 68  | 25,680.24       | 0               | -25,680.24     |
+| 69  | 34,240.32       | 0               | -34,240.32     |
+| 70  | 42,800.40       | 0               | -42,800.40     |
+| 71  | 51,360.48       | 11,641.68       | -39,718.80     |
+| 72  | 59,920.56       | 23,283.36       | -36,637.20     |
+| 73  | 68,480.64       | 34,925.04       | -33,555.60     |
+| 74  | 77,040.72       | 46,566.72       | -30,474.00     |
+| 75  | 85,600.80       | 58,208.40       | -27,392.40     |
+| 76  | 94,160.88       | 69,850.08       | -24,310.80     |
+| 77  | 102,720.96      | 81,491.76       | -21,229.20     |
+| 78  | 111,281.04      | 93,133.44       | -18,147.60     |
+| 79  | 119,841.12      | 104,775.12      | -15,066.00     |
+| 80  | 128,401.20      | 116,416.80      | -11,984.40     |
+| 81  | 136,961.28      | 128,058.48      | -8,902.80      |
+| 82  | 145,521.36      | 139,700.16      | -5,821.20      |
+| 83  | 154,081.44      | 151,341.84      | -2,739.60      |
+| <span class="markdown-table-highlight">**84**</span>  | **162,641.52**      | **162,983.52**      | **341.88**          |
+| 85  | 171,201.60      | 174,625.20      | 3,423.60       |
+| 86  | 179,761.68      | 186,266.88      | 6,505.20       |
+| 87  | 188,321.76      | 197,908.56      | 9,586.80       |
+| 88  | 196,881.84      | 209,550.24      | 12,668.40      |
+| 89  | 205,441.92      | 221,191.92      | 15,750.00      |
+| 90  | 214,002.00      | 232,833.60      | 18,831.60      |
+
+The amounts represent the *total* OAS accumulated. Notice that even though starting at age 70 results in a higher monthly payment compared to starting at age 65, the *total* OAS accumulated is less up until age 84, when it starts to pull ahead. In other words, someone would have to live until at least age 84 to have a greater total amount. And even then, it's only a few hundred dollars, and their first 5 years (from 65 to 70) they had 0, and the years from 71 to 84 they had *less* than what they would have had starting earlier.
+
+Given that according to Statistics Canada combined life expectancy for 2024 is ~83, you can start to see that it may not make sense for many people to delay OAS to age 70.
+
+### Visualization
+
+While the table of numbers is useful, some people's eyes glaze over when presented with rows and rows of numbers. Another way to present this data could be with a line chart where:
+
+* The horizontal `x` axis is for age (i.e. time moving forward)
+* The vertical `y` axis is for total accumulated OAS
+
+Then the two streams of income (Start at 65, Start at 70) could be visualized as two separate lines on this chart, comparing the total OAS income over time for starting payments at age 65 versus age 70. Delaying to age 70 results in a 36% increase in monthly payments, but seniors miss out on the first 5 years of payments. The line that starts at age 70 would have a greater slope because each payment is greater, but it would also start "pushed out to the right" because the payments from age 65 - 70 would be 0. The line that starts at age 65 would have a lower slope but starting right at 65. This mean the two lines would have to intersect at some point, and the age at which they intersect would be the break even age.
 
 ## TODO
-* main content
+* WIP main content
+* WIP headings/subheadings
 * conclusion para
 * description meta
 * edit
 * TODO: Ignoring annual inflation adjustments, comparing all values in today's dollars
-* TODO: `npx http-server` for super quick, easy local static server
+* TODO: Mention `npx http-server` for super quick, easy local static server in init or build prototype section
+* TODO: Ref stats can life expectancy
