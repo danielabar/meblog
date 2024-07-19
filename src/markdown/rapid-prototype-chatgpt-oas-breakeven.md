@@ -380,9 +380,50 @@ Nice! 🎉
 
 ### User Input
 
-At this point, I was satisfied with the visualization. However, it still needed to support user input. For example, what if a user wants to delay to age 68 rather than 70, how would that impact the break even age?
+At this point, I was satisfied with the visualization. The next step was to add in some flexibility with user input. For example, what if a user wants to delay to age 68 rather than 70, how would that impact the break even age? The code up to this point was hard-coded assuming a user would be delaying to age 70.
+
+Starting with the UI, I asked ChatGPT to generate a responsive form using TailwindCSS styles with a dropdown for which age to delay taking OAS, between 66 and 70, and a submit button. There's no benefit to delaying beyond age 70 because the 0.6% increase per month of delay maxes out at 60 months delay, i.e. 5 years from age 65 which is 70. I told it to make the field required, and default to 70.
+
+It added the following form to the markup, just above the chart, contained in a panel with a subtle shadow:
+
+```htm
+<!-- Added a panel for the form -->
+<div class="bg-white p-4 rounded shadow mb-6">
+  <form id="oas-form">
+    <!-- Age taking OAS: 66, 67, 68, 69, 70 -->
+    <div class="mb-4">
+      <label for="age-taking-oas" class="block text-xl font-bold mb-2">Delay OAS to Age</label>
+      <select id="age-taking-oas" name="age_taking_oas"
+        class="w-full p-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500" required>
+        <option value="66">66</option>
+        <option value="67">67</option>
+        <option value="68">68</option>
+        <option value="69">69</option>
+        <option value="70" selected>70</option>
+      </select>
+    </div>
+
+    <!-- Submit Button -->
+    <div class="text-center">
+      <button type="submit"
+        class="w-full bg-blue-500 text-white font-bold py-3 px-4 rounded-lg hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-opacity-50">
+        Calculate
+      </button>
+    </div>
+  </form>
+</div>
+
+<!-- Existing chart element -->
+<canvas id="myChart"></canvas>
+```
+
+Which looks like this:
+
+![prototype oas simple form](../images/prototype-oas-simple-form.png "prototype oas simple form")
 
 ### Less than 40 years in Canada
+
+There's another complexity in that if someone has been in Canada for less than 40 years as an adult (i.e. after age 18) by the time they turn 65, then they're eligible for a fraction of the pension amount rather than the full amount.
 
 ### GIS Eligibility
 
@@ -395,7 +436,10 @@ At this point, I was satisfied with the visualization. However, it still needed 
 * conclusion para
 * description meta
 * edit
+* TODO: Combine "less than 40 years" with user input section or keep separate?
 * TODO: Ignoring annual inflation adjustments, comparing all values in today's dollars
 * TODO: Mention `npx http-server` for super quick, easy local static server in init or build prototype section
 * TODO: Ref stats can life expectancy
 * TODO: Obviously there's still a lot of work to do, such as extracting hard-coded numbers to meaningfully named constants, figuring out how to update the numbers from govt data, etc. But its important for a prototype, to STOP development once the idea is validated, otherwise you're creating more work for yourself in porting over more features to the "real thing", or you'll be tempted to make the prototype the real thing, which will burden you with unmaintainable code forever.
+* TODO: Aside: When generating JS functions, ChatGPT seems to recommend the `const findBreakevenAge = () => {...}` format but this results in creation of an anonymous function which makes for not very useful stacktraces. I prefer `function findBreakevenAge() {...}`
+* TODO: Screenshot somewhere showing how it looks on a phone? i.e. responsive by default
