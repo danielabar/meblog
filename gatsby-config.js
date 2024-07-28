@@ -157,8 +157,6 @@ module.exports = {
                       ) {
                         edges {
                           node {
-                            excerpt
-                            html
                             fields { slug }
                             frontmatter {
                               title
