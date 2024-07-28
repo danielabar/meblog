@@ -124,7 +124,6 @@ module.exports = {
                       const height =
                         edge.node.frontmatter.featuredImage.childImageSharp
                           .gatsbyImageData.height
-                      console.log(`=== DEBUG FEED IMAGE SIZE: WIDTH = ${width}, HEIGHT = ${height}`)
                       return Object.assign({}, edge.node.frontmatter, {
                         description: edge.node.frontmatter.description,
                         date: edge.node.frontmatter.date,
@@ -167,7 +166,7 @@ module.exports = {
                               date
                               featuredImage {
                                 childImageSharp {
-                                  gatsbyImageData(width: 900, layout: CONSTRAINED)
+                                  gatsbyImageData(width: 150, height: 150, layout: FIXED)
                                 }
                               }
                             }
