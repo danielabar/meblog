@@ -49,6 +49,7 @@ jobs:
         env:
           HEROKU_APP_NAME: ${{ secrets.HEROKU_APP_NAME }}
           HEROKU_API_KEY: ${{ secrets.HEROKU_API_KEY }}
+          HEROKU_POSTGRES_ADDON_NAME: ${{ secrets.HEROKU_POSTGRES_ADDON_NAME }}
         run: |
-          HEROKU_API_KEY=$HEROKU_API_KEY cat search.sql | heroku pg:psql --app $HEROKU_APP_NAME
+          HEROKU_API_KEY=$HEROKU_API_KEY cat search.sql | heroku pg:psql $HEROKU_POSTGRES_ADDON_NAME --app $HEROKU_APP_NAME
         shell: bash
