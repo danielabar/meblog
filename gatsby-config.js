@@ -117,13 +117,34 @@ module.exports = {
                 {
                   serialize: ({ query: { site, allMarkdownRemark } }) => {
                     return allMarkdownRemark.edges.map(edge => {
+                      const imageUrl = `${site.siteMetadata.siteUrl}${edge.node.frontmatter.featuredImage.childImageSharp.gatsbyImageData.images.fallback.src}`
+                      const width =
+                        edge.node.frontmatter.featuredImage.childImageSharp
+                          .gatsbyImageData.width
+                      const height =
+                        edge.node.frontmatter.featuredImage.childImageSharp
+                          .gatsbyImageData.height
+                      console.log(`=== DEBUG FEED IMAGE SIZE: WIDTH = ${width}, HEIGHT = ${height}`)
                       return Object.assign({}, edge.node.frontmatter, {
                         description: edge.node.frontmatter.description,
                         date: edge.node.frontmatter.date,
                         url: site.siteMetadata.siteUrl + edge.node.fields.slug,
                         guid: site.siteMetadata.siteUrl + edge.node.fields.slug,
+                        // Ref for media: https://stackoverflow.com/a/45870352/3991687
                         custom_elements: [
                           { "content:encoded": edge.node.excerpt },
+                          {
+                            "media:content": {
+                              _attr: {
+                                xmlns: "http://search.yahoo.com/mrss/",
+                                url: imageUrl,
+                                medium: "image",
+                                type: "image/jpeg",
+                                width: width,
+                                height: height,
+                              },
+                            },
+                          },
                         ],
                       })
                     })
@@ -131,7 +152,7 @@ module.exports = {
                   query: `
                     {
                       allMarkdownRemark(
-                        sort: { fields: [frontmatter___date], order: DESC },
+                        sort: {frontmatter: {date: DESC}}
                         filter: { fileAbsolutePath: { regex: "/src/markdown/" } }
                         limit: 10
                       ) {
@@ -144,6 +165,11 @@ module.exports = {
                               title
                               description
                               date
+                              featuredImage {
+                                childImageSharp {
+                                  gatsbyImageData(width: 900, layout: CONSTRAINED)
+                                }
+                              }
                             }
                           }
                         }
@@ -152,6 +178,18 @@ module.exports = {
                   `,
                   output: "/rss.xml",
                   title: "danielabaron.me RSS Feed",
+                  match: "^/blog/",
+                  // Ref for media namespace: https://stackoverflow.com/a/38591228/3991687
+                  setup: ({ query: { site, allMarkdownRemark }, ...rest }) => {
+                    const feed = {
+                      ...rest,
+                      site_url: site.siteMetadata.siteUrl,
+                      custom_namespaces: {
+                        media: "http://search.yahoo.com/mrss/",
+                      },
+                    }
+                    return feed
+                  },
                 },
               ],
             },
