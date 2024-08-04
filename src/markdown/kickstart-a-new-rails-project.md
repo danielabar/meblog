@@ -2,7 +2,7 @@
 title: "Kickstart a New Rails Project"
 featuredImage: "../images/kickstart-rails-alexas_fotos-wdxT3xl8Dfo-unsplash.jpg"
 description: "Discover the essential steps and gems for launching a new Rails project. From setting up services in Docker containers to harnessing the power of RSpec, FactoryBot, and other must-have tools."
-date: "2024-08-01"
+date: "2024-08-04"
 category: "rails"
 related:
   - "Setup a Rails Project with Postgres and Docker"
@@ -14,31 +14,15 @@ Starting a new Rails project is an exciting time, but it also comes with its fai
 
 While this post is structured to guide you through each section manually, you can optionally skip to the [automation](../kickstart-a-new-rails-project#automation) section to learn how to customize the output of `rails new` using a template file, which will automate and streamline the process. Let's get started.
 
-## Initialization
+## Database Setup
 
-At the time of this writing, here are the versions of Ruby and Rails that I'm using:
-
-```bash
-ruby --version
-# ruby 3.2.2
-
-rails --version
-# Rails 7.0.8
-```
-
-Use the `rails new` generator to generate new project with Postgres:
+Use the `rails new` command to generate new project, specifying PostgreSQL as the database:
 
 ```bash
 rails new my-awesome-app --database=postgresql
 ```
 
-This assumes you're previously installed Postgres, for example: `brew install postgresql@14`. If you don't specify the `--database` flag in the generator command, it will use SQLite, which can be ok for a very small project or for someone who's just getting started with Rails and wants to keep things very simple. But later if you want to deploy it to a PaaS like Heroku or Render that use ephemeral environments, it won't work and will require switching to Postgres.
-
-<aside class="markdown-aside">
-Opting for Postgres offers many benefits, including robust data integrity, support for complex data types, advanced indexing options, compatibility with geo-spatial data, and access to community extensions.
-</aside>
-
-## Database Setup
+This assumes you're previously installed Postgres, for example: `brew install postgresql@14`. If you don't specify the `--database` flag in the generator command, it will default to SQLite.
 
 After the project has been generated, I recommend running Postgres in a Docker container rather than directly on your laptop. This makes it convenient to add other services like Redis for Sidekiq or ActionCable later on. You can check out my detailed guide in this previous post [Setup a Rails Project with Postgres and Docker](../rails-postgres-docker).
 
@@ -142,7 +126,7 @@ Maintaining clean and consistent code is essential for any project. Here's how y
 
 ### Rubocop
 
-For code quality checks, add [Rubocop](https://github.com/rubocop/rubocop) and some official extensions to the development group in the Gemfile:
+For code quality checks, add [Rubocop](https://github.com/rubocop/rubocop) and some extensions to the development group in the Gemfile:
 
 ```ruby
 group :development do
@@ -171,9 +155,10 @@ end
 ```
 
 After adding these gems, create a `.rubocop.yml` file in your project's root directory with custom configurations. This is because you'll nearly always want to customize the Rubocop defaults. The details will vary by project, but here's where I like to start:
+
 * Require all the extensions specified in Gemfile.
-* Excluding generated files.
-* Not enforcing code comment docs (although I'm a huge fan of [engineering documentation](../about-those-docs), enforcing it with `Style/Documentation` can lead to useless comments like `# This is the product model`).
+* Exclude generated files.
+* Disable code comment docs (although I'm a huge fan of [engineering documentation](../about-those-docs), enforcing it with `Style/Documentation` can lead to useless comments like `# This is the product model`).
 * Increase some max lengths to account for modern high resolution monitors and to avoid arbitrarily splitting up cohesive methods.
 
 ```yml
@@ -450,6 +435,12 @@ Hitting <kbd class="markdown-kbd">F12</kbd> will jump into the code, for example
 
 ![rails kickstart solargraph jump into code](../images/kickstart-rails-solargraph-jump-into-code.png "rails kickstart solargraph jump into code")
 
+<aside class="markdown-aside">
+Since writing this, Shopify's <a class="markdown-link" href="https://marketplace.visualstudio.com/items?itemName=Shopify.ruby-lsp">Ruby LSP extension</a> for VSCode has added go-to definition and showing documentation on hover. I haven't yet tried these features but if they work well, then this could be an option instead of Solargraph.
+</aside>
+
+
+
 ### Dotenv
 
 The last bit of dev tooling I like to add is the [dotenv](https://github.com/bkeepers/dotenv) gem. This automatically loads environment files from a `.env` file in the project root, into [ENV](https://docs.ruby-lang.org/en/3.2/ENV.html) for development and testing. Add it to the development and test groups of the Gemfile:
@@ -634,4 +625,4 @@ end
 
 ## Conclusion
 
-This post has covered important steps when starting a Rails project, including database setup, code quality and style, testing, additional dev tooling, and introducing a service layer from the start. Some projects may require more (see this post from Evil Martians on [Gemfile of Dreams](https://evilmartians.com/chronicles/gemfile-of-dreams-libraries-we-use-to-build-rails-apps)), but this is the bare minimum that I always reach for. By following these steps and practices, your Rails project should be well prepared for efficient development and maintainability.
+This post has covered important steps when starting a Rails project, including database setup, code quality and style, testing, additional dev tooling, and introducing a service layer from the start. Some projects may require more (see this post from Evil Martians on [Gemfile of Dreams](https://evilmartians.com/chronicles/gemfile-of-dreams-libraries-we-use-to-build-rails-apps)), but this is the baseline that I like to start with. By following these steps and practices, your Rails project should be well prepared for efficient development and maintainability.
