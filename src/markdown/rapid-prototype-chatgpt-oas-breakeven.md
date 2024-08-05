@@ -10,7 +10,9 @@ related:
   - "Build and Publish a Presentation with RevealJS and Github"
 ---
 
-When building software, especially for complex financial scenarios, it's crucial to determine if you're on the right track before investing significant effort in selecting the language to build in, framework, architecture, automated testing, and setting up CI/CD pipelines. Rapid prototyping allows you to quickly reach valuable insights and validate your approach. Recently, I had an opportunity to collaborate with [John Stapleton](https://openpolicyontario.com/), a subject matter expert on social assistance policy and poverty reduction, on an Old Age Security (OAS) breakeven calculator, targeted at low income Canadians. This post outlines how I used ChatGPT to quickly build a prototype and validate our ideas.
+When building software, especially for complex financial scenarios, it's crucial to determine if you're on the right track before investing significant effort in selecting the language to build in, framework, architecture, automated testing, and setting up CI/CD pipelines. Rapid prototyping allows you to quickly reach valuable insights and validate your approach.
+
+I had an opportunity to collaborate with [John Stapleton](https://openpolicyontario.com/), a subject matter expert on social assistance policy and poverty reduction, on an Old Age Security (OAS) breakeven calculator, targeted at low income Canadians. This post will demonstrate how I used ChatGPT to quickly build a prototype and validate our ideas.
 
 ## Problem
 
@@ -60,11 +62,9 @@ Now anytime you push new changes while on the `gh-pages` branch, they will get d
 
 With the setup out of the way, it was time to start building.
 
-## Building the Prototype
+## Figure out the Math
 
 Recall the goal was to show that delaying OAS to a later age may not be worth it for many people as they would have to outlive the Statistics Canada life expectancy values to have more money overall by delaying.
-
-### The Math
 
 I started with some manual calculations, assuming the simplest case: Someone who is eligible for a full OAS pension at 65, and not eligible for GIS. For 2024, they would receive a monthly OAS amount of $713.34 if starting at age 65. This means by the time they turn 66, they would have received a total of $713.34 * 12 = $8,560.08, i.e. 12 monthly payments. And by age 67, they would have a total of $713.34 * 12 * 2 = $17,120.16, i.e. 12 monthly payments per year at 2 years. By age 70, this person would have accumulated 5 years worth of payments which is 60 months for a total of $713.34 * 12 * 5 = $42,800.40. And so on, for each year the person is still alive and collecting OAS.
 
@@ -104,7 +104,7 @@ Here are the results - I've highlighted age 84, explanation to follow:
 
 The amounts represent the *total* OAS accumulated. Even though starting at age 70 results in a higher monthly payment compared to starting at age 65, the *total* OAS accumulated is less up until age 84, when it starts to pull ahead. In other words, someone would have to live until at least age 84 to have a greater total amount. And even then, it's only a few hundred dollars. Given that according to Statistics Canada combined life expectancy for 2024 is ~83, you can start to see that it may not make sense for many people to delay OAS to age 70.
 
-### Visualization
+## Visualization
 
 While the table of numbers is useful, some people's eyes glaze over when presented with rows and rows of numbers. This data could also be presented as a line chart where:
 
@@ -265,7 +265,7 @@ Hovering over any point on a line, renders a tooltip with the age and total OAS 
 
 ![prototype oas tooltip](../images/oas-prototype-tooltip.png "prototype oas tooltip")
 
-### Highlight Break Even Point
+## Highlight Break Even Point
 
 The first attempt is not too bad, saving a lot of developer time in setting up the initial scaffold for rendering a chart and writing functions to generate the data. However, it required additional effort from the user to hover over the intersection point to see the details of the break even point.
 
@@ -378,7 +378,7 @@ And here is the visual result from these fixes:
 
 Nice! 🎉
 
-### User Input
+## User Input Form
 
 At this point, I was satisfied with the visualization. The next step was to add in some flexibility with user input. For example, what if a user wants to delay to age 68 rather than 70, how would that impact the break even age? The code up to this point was hard-coded assuming a user would be delaying to age 70.
 
@@ -421,25 +421,201 @@ Which looks like this:
 
 ![prototype oas simple form](../images/prototype-oas-simple-form.png "prototype oas simple form")
 
-### Less than 40 years in Canada
+## Responding to User Input
 
-There's another complexity in that if someone has been in Canada for less than 40 years as an adult (i.e. after age 18) by the time they turn 65, then they're eligible for a fraction of the pension amount rather than the full amount.
+I then asked ChatGPT to add a form submit event listener. This listener should extract the age at which the user selected to take OAS, and use that instead of the hard-coded age 70 when calculating the delayed income stream. I explained that for each month of delay, there's a 0.6% increase in the payment amount.
 
-### GIS Eligibility
+It modified the code as follows:
 
-### Text Explanation
+It came up with this (I'm just showing the modified portions of the code):
+
+```javascript
+// Form submit handler to intercept regular form submission
+document.getElementById('oas-form').addEventListener('submit', calculate);
+
+// Modify data generation to take dynamic starting age into account
+const generateChartDataDelayed = (ageTakingOas) => {
+  const recommendedAge = 65
+  const finalAge = 95;
+  const originalMonthlyAmount = 713.34
+
+  // Use user-provided age rather than hard-coded age 70 to determine the delay period
+  const delayedMonths = (ageTakingOas - recommendedAge) * 12
+  const multiplier = 1 + (delayedMonths * 0.006); // 0.6% increase per month
+  const monthlyAmount = originalMonthlyAmount * multiplier;
+
+  let dataPoints = [];
+  dataPoints.push({ x: ageTakingOas, y: 0 })
+
+  for (let age = ageTakingOas + 1; age <= finalAge; age++) {
+    let totalBenefit = (age - ageTakingOas) * 12 * monthlyAmount;
+    dataPoints.push({ x: age, y: totalBenefit });
+  }
+
+  return dataPoints;
+};
+
+// Add a calculate method as target of event listener to run every time form is submitted
+function calculate(evt) {
+  // Prevent regular form submission because this is a client side only app
+  evt.preventDefault();
+
+  // Extract user selected value for when they plan to start OAS
+  const ageTakingOas = Number(document.getElementById('age-taking-oas').value);
+
+  // Build data for chart, passing in user provided `ageTakingOas` for delayed income stream
+  const data = {
+    datasets: [
+        {
+          label: 'Starting at Age 65',
+          data: generateChartData(),
+          borderColor: 'rgb(75, 192, 192)',
+          tension: 0.1,
+          fill: false
+        },
+        {
+          label: `Starting at Age ${ageTakingOas} (Delayed)`,
+          data: generateChartDataDelayed(ageTakingOas),
+          borderColor: 'rgb(255, 99, 132)',
+          tension: 0.1,
+          fill: false
+        }
+      ]
+  }
+
+  // Now we generate the chart here in the calculate function so it will be
+  // updated every time user submits the form
+  const breakEvenAge = findBreakevenAge()
+  const options = {...}
+  const myChart = new Chart(ctx, {
+    type: 'line',
+    data: data,
+    options: options
+  });
+}
+```
+
+Now that the chart generation has moved inside the calculate function, when first landing on the page, it looks like this:
+
+![prototype oas input only](../images/prototype-oas-input-only.png "prototype oas input only")
+
+Let's try it out, selecting to delay just one year to age 66 - notice that the ChatGPT generated code also updated the chart label to show the user selected age:
+
+![prototype oas input plus chart](../images/prototype-oas-input-plus-chart.png "prototype oas input plus chart")
+
+This time we can see the lines are closer together, and they crossover earlier (at around age 80 rather than 84), than the previous example when delaying to age 70.
+
+## Bug No Breakeven
+
+However, ChatGPT introduced a bug - the breakeven chart annotation is no longer being displayed. The issue is that the `findBreakevenAge` function is still using the hard-coded age 70 to compare income streams, and so it will not find a match when the user provides a different age as in this example. After explaining the issue to ChatGPT it corrected the code by passing in the user selected age to the `findBreakevenAge` function.
+
+Here are the portions of the code it modified - notice it did not update the variable names such as `data70` or `benefitAt70`, but it did update the logic:
+
+```javascript
+
+// Modified `findBreakevenAge` to take the user selected age
+const findBreakevenAge = (ageTakingOas) => {
+  const data65 = generateChartData();
+
+  // Pass in user selected age to the delayed income stream calculation
+  const data70 = generateChartDataDelayed(ageTakingOas);
+
+  let breakevenAge = null;
+
+  // Start at user selected age because the second dataset only starts there
+  for (let age = ageTakingOas; age <= 95; age++) {
+    const benefitAt65 = data65.find(item => item.x === age)?.y || 0;
+    const benefitAt70 = data70.find(item => item.x === age)?.y || 0;
+
+    if (Math.abs(benefitAt70 - benefitAt65) <= 2000) {
+      breakevenAge = age;
+      break;
+    }
+  }
+
+  return breakevenAge;
+};
+
+function calculate(evt) {
+  // ...
+
+  // Pass the user selected age to the `breakEvenAge` function
+  const ageTakingOas = Number(document.getElementById('age-taking-oas').value);
+  const breakEvenAge = findBreakevenAge(ageTakingOas)
+
+  // ...
+}
+```
+
+With the break even logic updated to take into account user selected starting age, the breakeven annotation is displayed:
+
+![oas prototype breakeven bug](../images/prototype-oas-breakeven-bug.png "oas prototype breakeven bug")
+
+## Bug Breakeven Incorrect
+
+However, this reveals a new issue - its showing a breakeven age of 77 when the lines actually cross over at age 80. This is because the original heuristic of finding the first data point where the differences in income is $2000 or less isn't quite right for a smaller delay age, because in this case, the differences in income are smaller (as can be seen by the lines being closer together in slope).
+
+I explained the issue to ChatGPT and asked it to modify the break even logic to determine the absolute minimum difference between the two data streams rather than comparing to $2000. Here's the modified function:
+
+```javascript
+// Find the age at which the difference between the two income streams is the smallest
+const findBreakevenAge = (ageTakingOas) => {
+  const data65 = generateChartData();
+  const data70 = generateChartDataDelayed(ageTakingOas);
+
+  let minDifference = Infinity;
+  let breakevenAge = null;
+
+  // Start at ageTakingOas because the second dataset only starts there
+  for (let age = ageTakingOas; age <= 95; age++) {
+    const benefitAt65 = data65.find(item => item.x === age)?.y || 0;
+    const benefitAt70 = data70.find(item => item.x === age)?.y || 0;
+
+    const difference = Math.abs(benefitAt70 - benefitAt65);
+
+    if (difference < minDifference) {
+      minDifference = difference;
+      breakevenAge = age;
+    }
+  }
+
+  return breakevenAge;
+};
+```
+
+With that change in place, we can see the correct breakeven age of 80 displayed on the chart, when user selects age 66 to delay:
+
+![prototype oas breakeven corrected](../images/prototype-oas-breakeven-corrected.png "prototype oas breakeven corrected")
+
+## Bug Can't Change Age
+
+The logic next step would be for the user to try selecting different ages to see the effect on the income streams and break even age. However, this reveals another bug, which is that nothing seems to happen when selecting a different age, given that the chart is already rendered from the first selection.
+
+TODO Explain issue about re-using chart element...
+
+
+## Less than 40 years in Canada
+
+There's another complexity in that if someone has been in Canada for less than 40 years as an adult (i.e. after age 18) by the time they turn 65, then they're eligible for a fraction of the pension amount rather than the full amount. For example, if someone has lived for 35 years in Canada after age 18, and the full pension amount is $713.34
+
+## GIS Eligibility
+
+## Text Explanation
 
 ## TODO
 * WIP main content
-* WIP headings/subheadings
-* TODO: Form for input (eg: someone might want to do analysis for delay to 67)
+* Bug with re-using chart element
+* User Input section is too long, break up into subsections
+* Less than 40 years in Canada
+* GIS eligibility
 * conclusion para
 * description meta
 * edit
-* TODO: Combine "less than 40 years" with user input section or keep separate?
-* TODO: Ignoring annual inflation adjustments, comparing all values in today's dollars
-* TODO: Mention `npx http-server` for super quick, easy local static server in init or build prototype section
-* TODO: Ref stats can life expectancy
-* TODO: Obviously there's still a lot of work to do, such as extracting hard-coded numbers to meaningfully named constants, figuring out how to update the numbers from govt data, etc. But its important for a prototype, to STOP development once the idea is validated, otherwise you're creating more work for yourself in porting over more features to the "real thing", or you'll be tempted to make the prototype the real thing, which will burden you with unmaintainable code forever.
-* TODO: Aside: When generating JS functions, ChatGPT seems to recommend the `const findBreakevenAge = () => {...}` format but this results in creation of an anonymous function which makes for not very useful stacktraces. I prefer `function findBreakevenAge() {...}`
-* TODO: Screenshot somewhere showing how it looks on a phone? i.e. responsive by default
+* Aside domain + CNAME somewhere in prototype setup
+* Combine "less than 40 years" with user input section or keep separate?
+* Ignoring annual inflation adjustments, comparing all values in today's dollars
+* Mention `npx http-server` for super quick, easy local static server in init or build prototype section
+* Ref stats can life expectancy
+* Obviously there's still a lot of work to do, such as extracting hard-coded numbers to meaningfully named constants, figuring out how to update the numbers from govt data, etc. But its important for a prototype, to STOP development once the idea is validated, otherwise you're creating more work for yourself in porting over more features to the "real thing", or you'll be tempted to make the prototype the real thing, which will burden you with unmaintainable code forever.
+* Aside: When generating JS functions, ChatGPT seems to recommend the `const findBreakevenAge = () => {...}` format but this results in creation of an anonymous function which makes for not very useful stacktraces. I prefer `function findBreakevenAge() {...}`
+* Screenshot somewhere showing how it looks on a phone? i.e. responsive by default
