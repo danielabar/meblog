@@ -589,14 +589,87 @@ With that change in place, we can see the correct breakeven age of 80 displayed 
 
 ## Bug Can't Change Age
 
-The logic next step would be for the user to try selecting different ages to see the effect on the income streams and break even age. However, this reveals another bug, which is that nothing seems to happen when selecting a different age, given that the chart is already rendered from the first selection.
+The next thing the user might want to do is to select a different age for delaying OAS, to see the effect on the income streams and break even age. However, this reveals another bug, which is that nothing seems to happen when selecting a different age, given that the chart is already rendered from the first selection.
 
-TODO Explain issue about re-using chart element...
+For example, given that we just calculated for delay age of 66, then try to select age 67:
 
+![prototype oas age selector](../images/prototype-oas-age-selector.png "prototype oas age selector")
+
+The age 67 is shown in the dropdown, but after clicking the Calculate button, the chart doesn't change, it's still showing the results for age 66, not 67:
+
+![prototype oas chart not updated](../images/prototype-oas-chart-not-updated.png "prototype oas chart not updated")
+
+Opening the browser developer tools and inspecting the Console tab reveals an Uncaught JavaScript error:
+
+```
+chart.js@3.7.0:13 Uncaught
+Error: Canvas is already in use. Chart with ID '0' must be destroyed before the canvas can be reused.
+    at new dn (chart.js@3.7.0:13:90904)
+    at HTMLFormElement.calculate ((index):220:23)
+```
+
+Currently the context for the canvas on which Chart.js draws is defined as a constant outside of any functions. The chart is redefined each time as part of the `calculate` function, which is called every time the user submits the form. The error message about being unable to reuse the Canvas element is coming the `calculate` function where it tries to instantiate a new chart for the second time:
+
+```javascript
+const ctx = document.getElementById('myChart').getContext('2d');
+// ...
+
+function calculate(evt) {
+  // ...
+
+  // Error from this line:
+  // Canvas is already in use. Chart with ID '0' must be destroyed before the canvas can be reused.
+  const myChart = new Chart(ctx, {
+    type: 'line',
+    data: data,
+    options: options
+  });
+}
+```
+
+I gave ChatGPT the error message, and it corrected the code by defining a variable outside of the calculate function for the chart. Then it moved the context declaration inside the `calculate` function. It then modified the code to check if the `myChart` variable is already defined, and if so, it calls `destroy()` on it before attempting to re-use it for another chart:
+
+```javascript
+// Keep a reference to the chart because we need to check if its already populated
+// when attempting to re-render
+let myChart = null
+// ...
+
+function calculate(evt) {
+  // Canvas context needed for rendering the chart
+  const ctx = document.getElementById('myChart').getContext('2d');
+  // ...
+
+  // If a chart instance already exists, destroy it
+  if (myChart) {
+    myChart.destroy();
+  }
+
+  // Now we can safely generate another chart
+  myChart = new Chart(ctx, {
+    type: 'line',
+    data: data,
+    options: options
+  });
+```
+
+At this point, the code is functional, the user can keep selecting different delay ages, click the Calculate button, and see the chart rendered with two streams of income and the breakeven age updated.
 
 ## Less than 40 years in Canada
 
-There's another complexity in that if someone has been in Canada for less than 40 years as an adult (i.e. after age 18) by the time they turn 65, then they're eligible for a fraction of the pension amount rather than the full amount. For example, if someone has lived for 35 years in Canada after age 18, and the full pension amount is $713.34
+There's another complexity in that if someone has been in Canada for less than 40 years as an adult (i.e. after age 18) by the time they turn 65, then they're eligible for a fraction of the pension amount rather than the full amount. For example, if someone has lived for 35 years in Canada after age 18, and the full pension amount is $713.34, then they would be eligible for $713.34 * (35/40) = 624.17. i.e. the fraction they're eligible for is based on how many 40ths of years of residency they have.
+
+There's a common, but mistaken belief that delaying OAS in this case will have multiple benefits: Firstly the 0.6% per month of delay increase, *and* an increase of 1/40th the pension amount for every year of delay due to the residency increase. For example, someone who has 35 years in Canada at age 65, and delays OAS to age 68, may believe that this would qualify them for an extra 3/40ths of the full pension amount because they delayed for 3 years and now have 3 more qualifying residency years, and that they would get an extra 0.6% for each month of delay.
+
+However, the benefits of delaying do not "stack". What the government of Canada does is "fix" the pension amount to however many years the person has in Canada by age 65. Then if the person chooses to delay, the government calculates the 0.6% per month increase on the "fixed" pension amount calculated based on the 35 years in Canada.
+
+In our example of someone that has 35 years in Canada, if they were to start at age 65, they would qualify for $713.34 * (35/40) = $624.17 per month. Then if they were to delay for 3 years, i.e. 36 months, this would increase the monthly amount to $624.17 * (1 + (36 * 0.006)) = $758.99.
+
+<aside class="markdown-aside">
+Technically the person could write in a request to the government asking them to use their residency increase INSTEAD OF the monthly increase, however, the monthly 0.6% increase always results in a greater amount than the residency fraction increase so in practice, this is never done.
+</aside>
+
+WIP: Explain all this to ChatGPT and ask it to update the form with numeric integer input between 18 and 65, with help text, and update calculation to extract this value from form and use it...
 
 ## GIS Eligibility
 
@@ -619,3 +692,4 @@ There's another complexity in that if someone has been in Canada for less than 4
 * Obviously there's still a lot of work to do, such as extracting hard-coded numbers to meaningfully named constants, figuring out how to update the numbers from govt data, etc. But its important for a prototype, to STOP development once the idea is validated, otherwise you're creating more work for yourself in porting over more features to the "real thing", or you'll be tempted to make the prototype the real thing, which will burden you with unmaintainable code forever.
 * Aside: When generating JS functions, ChatGPT seems to recommend the `const findBreakevenAge = () => {...}` format but this results in creation of an anonymous function which makes for not very useful stacktraces. I prefer `function findBreakevenAge() {...}`
 * Screenshot somewhere showing how it looks on a phone? i.e. responsive by default
+* Lessons learned: No doubt faster development time. But it does introduce bugs when adding something new, it doesn't update what was written before. Inefficiencies - the same thing will get calculated over and over again, and its up to developer to refactor or point out the issue to ChatGPT.
