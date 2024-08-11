@@ -18,27 +18,24 @@ I had an opportunity to collaborate with [John Stapleton](https://openpolicyonta
 
 Before getting into the technical details of the prototype, let's start with the problem to be addressed:
 
-Low uptake of Old Age Security (OAS) among low-income Canadian seniors, especially immigrants without a full 40 years in Canada after the age of 18, is a significant issue. John Stapleton and I previously collaborated on a [Guaranteed Income Supplement RRSP calculator](https://rrspgiscalculator.site/), addressing the unintuitive aspects of financial planning for low-income Canadians wrt retirement savings plans. Our new challenge was similar: Create a tool to help seniors understand the benefits of OAS, and if low income, it's almost never a good idea to delay it.
+Low uptake of Old Age Security (OAS) among low-income Canadian seniors, especially immigrants without a full 40 years in Canada after the age of 18, is a significant issue. John Stapleton and I previously collaborated on a [Guaranteed Income Supplement RRSP calculator](https://rrspgiscalculator.site/), addressing the unintuitive aspects of financial planning for low-income Canadians with respect to retirement savings plans. Our new challenge was similar: Create a tool to help seniors understand the benefits of OAS, and if low income, it's almost never a good idea to delay it.
 
-In the Toronto Metropolitan area, where 71% of seniors are immigrants, many people turning 65 are not applying for OAS due to:
+In the Toronto Metropolitan area, where just over 70% of seniors are immigrants, many people turning 65 are not applying for OAS due to:
 
 1. Attempting to attain more qualifying years for OAS.
 2. Understanding that waiting until age 70 increases their monthly payments.
-3. Mainstream advice from private planners advocating for delaying OAS. This advice is sound if the money is not required and there is no eligibility for Guaranteed Income Supplement (GIS). However, for those eligible for significant GIS amounts, waiting might not be in their best interest.
+3. Mainstream advice from some financial planners advocating for delaying OAS. This advice is sound if the money is not required and there is no eligibility for Guaranteed Income Supplement (GIS). However, for those eligible for significant GIS amounts, waiting might not be in their best interest.
 
-The goal is to build a free online tool to illustrate these nuances effectively, and encourage people who would benefit to apply for OAS benefits as soon as possible rather than delaying.
+The goal is to build a free online tool to illustrate these nuances, and encourage people who would benefit to apply for their OAS pension as soon as possible rather than delaying.
 
 ## Business Rules
 
-Another thing to understand before getting into the technical details is the business rules around OAS. They are as follows:
+Here are some business rules for OAS that are needed to build the online tool:
 
 1. To receive the full monthly OAS pension amount, you must have 40 years of residency as an adult (after age 18) in Canada, at the time you turn 65.
 2. If you have less than 40 years residency, you qualify for 1/40th of the full amount for every year. For example, 35 years of residency would qualify for 35/40 fraction of the full amount.
 3. For every month after 65 that you delay taking OAS, the monthly amount you're entitled to when you do start increases by 0.6%, up to a maximum of 5 years, i.e. 60 months. So the most it could increase would be 0.6% * 60 = 36%.
 4. Canadians whose income is below the cutoff for GIS (Guaranteed Income Supplement), also qualify for an additional top up to their OAS, however they must claim OAS to also receive the GIS amount.
-
-TODO: Address a common misunderstanding:
-Note that delaying past age 65 does *not* increase the residency amount. For example, someone who has 35 years of residency by the time they turn 65 will not get an additional 5/40ths of the pension amount by delaying to age 70. They will however get the 36% delay bump, but that's 36% of the amount based on their 35 years of residency.
 
 TODO Aside: There's actually more nuance, but these additional details not required for the prototype, for those who would like to learn more see the govt canada website at https://www.canada.ca/en/services/benefits/publicpensions/cpp/old-age-security.html.
 
@@ -58,7 +55,7 @@ The simplest possible implementation would be a single `index.html` containing a
 * Push: `git push origin gh-pages`
 * Back in the GitHub web UI, go to your repo's Settings -> General, and make sure that `gh-pages` is the default branch.
 
-Now anytime you push new changes while on the `gh-pages` branch, they will get deployed via a "pages build an deployment" workflow and publicly reachable at `https://your-username.github.io/your-repo-name/`. No need to setup this workflow, GitHub does it for you automatically for any project that has a `gh-pages` branch.
+Now anytime you push new changes while on the `gh-pages` branch, they will get deployed via a "pages build and deployment" workflow and publicly reachable at `https://your-username.github.io/your-repo-name/`. No need to setup this workflow, GitHub does it for you automatically for any project that has a `gh-pages` branch.
 
 With the setup out of the way, it was time to start building.
 
@@ -102,7 +99,7 @@ Here are the results - I've highlighted age 84, explanation to follow:
 | 89  | 205,441.92      | 221,191.92      | 15,750.00      |
 | 90  | 214,002.00      | 232,833.60      | 18,831.60      |
 
-The amounts represent the *total* OAS accumulated. Even though starting at age 70 results in a higher monthly payment compared to starting at age 65, the *total* OAS accumulated is less up until age 84, when it starts to pull ahead. In other words, someone would have to live until at least age 84 to have a greater total amount. And even then, it's only a few hundred dollars. Given that according to Statistics Canada combined life expectancy for 2024 is ~83, you can start to see that it may not make sense for many people to delay OAS to age 70.
+The amounts represent the *total* OAS accumulated. Even though starting at age 70 results in a higher monthly payment compared to starting at age 65, the *total* OAS accumulated is less up until age 84, when it starts to pull ahead. In other words, someone would have to live until at least age 84 to have a greater total amount. And even then, it's only a few hundred dollars. Given that according to Statistics Canada combined life expectancy (for men and women that have reached age 65) for 2024 is ~83, you can start to see that it may not make sense for many people to delay OAS to age 70.
 
 ## Visualization
 
@@ -115,7 +112,7 @@ The two streams of income (Start at 65, Start at 70) could be visualized as two 
 
 This would require bringing in a charting library. I decided to go with [Chart.js](https://www.chartjs.org/) because it's relatively simple to use and results in pleasing looking charts with the default configuration, perfect for a prototype where there is no designer. It also has support for [responsive charts](https://www.chartjs.org/docs/latest/configuration/responsive.html).
 
-I asked ChatGPT to generate an `index.html` with a line chart using Chart.js, with two lines on the chart representing total accumulated OAS starting at age 65 and starting at age 70, using the business rules I had explained earlier. I also asked for a title "Should I Delay Old Age Security" and told it to use TailwindCSS for overall page styles and to make it a mobile first design.
+I asked ChatGPT to generate an `index.html` with a line chart using Chart.js, with two lines on the chart representing total accumulated OAS starting at age 65 and starting at age 70, using the business rules I had explained earlier. I also asked for a title "Should I Delay Old Age Security" and told it to use [TailwindCSS](https://tailwindcss.com/) for styling and to make it a mobile first design.
 
 It came up with the following:
 
@@ -267,9 +264,9 @@ Hovering over any point on a line, renders a tooltip with the age and total OAS 
 
 ## Highlight Break Even Point
 
-The first attempt is not too bad, saving a lot of developer time in setting up the initial scaffold for rendering a chart and writing functions to generate the data. However, it required additional effort from the user to hover over the intersection point to see the details of the break even point.
+The first attempt is not too bad. Using ChatGPT saved me a lot of time in setting up the initial scaffold for rendering a chart and writing functions to generate the data. However, the resulting chart requires effort from the user to hover over the intersection point to see the details of the break even point.
 
-I asked ChatGPT if there was a way to add a marker of sorts on the chart for the intersection point and to label it the breakeven age. It told me that Chart.js has an annotation plugin for this purpose. It proceeded to generate some code but it didn't work. My research revealed that the annotation plugin is not built into Chart.js, but rather, a separate library needs to be pulled in.
+I asked ChatGPT if there was a way to add a marker of sorts on the chart for the intersection point and to label it the breakeven age. It told me that Chart.js has an [annotation plugin](https://www.chartjs.org/chartjs-plugin-annotation/latest/) for this purpose. It proceeded to generate some code but it didn't work. My research revealed that the annotation plugin is not built into Chart.js, but rather, a separate library needs to be pulled in.
 
 After explaining this to ChatGPT it modified the prototype as follows:
 
@@ -343,7 +340,7 @@ However, it wasn't rendering an annotation on the chart. After debugging into th
 1. The datasets `data65` and `data70` aren't comparable by starting at the 0th index of data65 because the ages don't match. i.e. the 0th age of `data65` is `65` whereas 0th age of `data70` is `70`. To find the break even age we need to compare that datasets at the same ages.
 2. The `findBreakevenAge()` function generated by ChatGPT was trying to find an exact equality of OAS at two ages. However, recall from the initial math analysis (TODO: link), the incomes are never exactly equal. For example the breakeven age of 84 showed approximately a $300 difference.
 
-I explained the above to ChatGPT and told it to start comparing the datasets at age 70, and also to find the age at which the absolute difference between the two income streams is less than or equal to $2000.
+I explained the above to ChatGPT and told it to start comparing the datasets at age 70. I also to find the age at which the absolute difference between the two income streams is less than or equal to $2000, i.e. to use a heuristic rather than looking for exact equality which doesn't exist.
 
 Here's the modified code generated by ChatGPT:
 
@@ -360,6 +357,8 @@ const findBreakevenAge = () => {
     const benefitAt65 = data65.find(item => item.x === age)?.y || 0;
     const benefitAt70 = data70.find(item => item.x === age)?.y || 0;
 
+    // Use a heuristic to find "close enough" difference in income
+    // to be considered equal.
     if (Math.abs(benefitAt70 - benefitAt65) <= 2000) {
       breakevenAge = age;
       break;
@@ -376,13 +375,13 @@ And here is the visual result from these fixes:
 
 ![prototype oas breakeven annotation](../images/prototype-oas-breakeven-annotation.png "prototype oas breakeven annotation")
 
-Nice! 🎉
+Now the breakeven annotation is correctly rendered exactly where the two lines intersect. 🎉
 
 ## User Input Form
 
 At this point, I was satisfied with the visualization. The next step was to add in some flexibility with user input. For example, what if a user wants to delay to age 68 rather than 70, how would that impact the break even age? The code up to this point was hard-coded assuming a user would be delaying to age 70.
 
-Starting with the UI, I asked ChatGPT to generate a responsive form using TailwindCSS styles with a dropdown for which age to delay taking OAS, between 66 and 70, and a submit button. There's no benefit to delaying beyond age 70 because the 0.6% increase per month of delay maxes out at 60 months delay, i.e. 5 years from age 65 which is 70. I told it to make the field required, and default to 70.
+Starting with the UI, I asked ChatGPT to generate a responsive form using TailwindCSS styles with a dropdown for which age to delay taking OAS, between 66 and 70, and a submit button. Recall that there's no benefit to delaying beyond age 70 because the 0.6% increase per month of delay maxes out at 60 months delay, i.e. 5 years from age 65 which is 70. I told it to make the field required, and default to 70.
 
 It added the following form to the markup, just above the chart, contained in a panel with a subtle shadow:
 
@@ -426,8 +425,6 @@ Which looks like this:
 I then asked ChatGPT to add a form submit event listener. This listener should extract the age at which the user selected to take OAS, and use that instead of the hard-coded age 70 when calculating the delayed income stream. I explained that for each month of delay, there's a 0.6% increase in the payment amount.
 
 It modified the code as follows:
-
-It came up with this (I'm just showing the modified portions of the code):
 
 ```javascript
 // Form submit handler to intercept regular form submission
@@ -507,7 +504,7 @@ This time we can see the lines are closer together, and they crossover earlier (
 
 ## Bug No Breakeven
 
-However, ChatGPT introduced a bug - the breakeven chart annotation is no longer being displayed. The issue is that the `findBreakevenAge` function is still using the hard-coded age 70 to compare income streams, and so it will not find a match when the user provides a different age as in this example. After explaining the issue to ChatGPT it corrected the code by passing in the user selected age to the `findBreakevenAge` function.
+However, ChatGPT introduced a bug - the breakeven chart annotation is no longer being displayed. The issue is that the `findBreakevenAge` function is still using the hard-coded age 70 to compare income streams, and so it will not find a match when the user provides a different age. After explaining the issue to ChatGPT it corrected the code by passing in the user selected age to the `findBreakevenAge` function.
 
 Here are the portions of the code it modified - notice it did not update the variable names such as `data70` or `benefitAt70`, but it did update the logic:
 
@@ -587,6 +584,8 @@ With that change in place, we can see the correct breakeven age of 80 displayed 
 
 ![prototype oas breakeven corrected](../images/prototype-oas-breakeven-corrected.png "prototype oas breakeven corrected")
 
+This is proving to be interesting already, note that the breakeven age for just a one year delay is lower, age 80, compared to the 5 year delay which puts the breakeven age at 84.
+
 ## Bug Can't Change Age
 
 The next thing the user might want to do is to select a different age for delaying OAS, to see the effect on the income streams and break even age. However, this reveals another bug, which is that nothing seems to happen when selecting a different age, given that the chart is already rendered from the first selection.
@@ -599,7 +598,7 @@ The age 67 is shown in the dropdown, but after clicking the Calculate button, th
 
 ![prototype oas chart not updated](../images/prototype-oas-chart-not-updated.png "prototype oas chart not updated")
 
-Opening the browser developer tools and inspecting the Console tab reveals an Uncaught JavaScript error:
+Opening the browser developer tools and inspecting the Console tab reveals a JavaScript error:
 
 ```
 chart.js@3.7.0:13 Uncaught
@@ -655,41 +654,163 @@ function calculate(evt) {
 
 At this point, the code is functional, the user can keep selecting different delay ages, click the Calculate button, and see the chart rendered with two streams of income and the breakeven age updated.
 
+However, the results are only accurate for someone who is eligible for the full pension amount, which means they've lived for 40 years in Canada by the time they turn 65. Recall one of the goals of this calculator is to encourage immigrant seniors with less than 40 years to apply for OAS at age 65 rather than delaying. For this, the tool needs to take years of residency into account. Let's deal with this next.
+
 ## Less than 40 years in Canada
 
-There's another complexity in that if someone has been in Canada for less than 40 years as an adult (i.e. after age 18) by the time they turn 65, then they're eligible for a fraction of the pension amount rather than the full amount. For example, if someone has lived for 35 years in Canada after age 18, and the full pension amount is $713.34, then they would be eligible for $713.34 * (35/40) = 624.17. i.e. the fraction they're eligible for is based on how many 40ths of years of residency they have.
+There's another complexity in that if someone has been in Canada for less than 40 years as an adult (i.e. after age 18) by the time they turn 65, then they're eligible for a fraction of the pension amount rather than the full amount. For example, if someone has lived for 35 years in Canada after age 18, then they would be eligible for 35/40ths of the full pension amount: $713.34 * (35/40) = 624.17. i.e. the fraction they're eligible for is based on how many 40ths of years of residency they have.
 
-There's a common, but mistaken belief that delaying OAS in this case will have multiple benefits: Firstly the 0.6% per month of delay increase, *and* an increase of 1/40th the pension amount for every year of delay due to the residency increase. For example, someone who has 35 years in Canada at age 65, and delays OAS to age 68, may believe that this would qualify them for an extra 3/40ths of the full pension amount because they delayed for 3 years and now have 3 more qualifying residency years, and that they would get an extra 0.6% for each month of delay.
+There's a common, but mistaken belief that delaying OAS in this case will have multiple benefits: Firstly the 0.6% per month of delay increase, *and* an increase of 1/40th the pension amount for every year of delay due to the residency increase. For example, someone who has 35 years in Canada at age 65, and delays OAS to age 68, may believe that this would qualify them for an extra 3/40ths of the full pension amount because they delayed for 3 years and now have 3 more qualifying residency years, in addition to the 0.6% increase per month of delay.
 
-However, the benefits of delaying do not "stack". What the government of Canada does is "fix" the pension amount to however many years the person has in Canada by age 65. Then if the person chooses to delay, the government calculates the 0.6% per month increase on the "fixed" pension amount calculated based on the 35 years in Canada.
+However, the benefits of delaying do not "stack". What the government of Canada does is "fix" the pension amount to however many years the person has in Canada by age 65. Then if the person chooses to delay, the government calculates the 0.6% per month increase on the "fixed" pension amount, which was determined based on the 35 years in Canada.
 
-In our example of someone that has 35 years in Canada, if they were to start at age 65, they would qualify for $713.34 * (35/40) = $624.17 per month. Then if they were to delay for 3 years, i.e. 36 months, this would increase the monthly amount to $624.17 * (1 + (36 * 0.006)) = $758.99.
+In our example of someone that has 35 years in Canada, if they were to start at age 65, they would qualify for $713.34 * (35/40) = $624.17 per month. Then if they were to delay for 3 years, i.e. 36 months, this would increase the monthly amount to $624.17 * (1 + (36 * 0.006)) = $758.99. i.e. the 0.6% increase per month of delay is applying to the 35/40th fraction of the full pension amount.
 
 <aside class="markdown-aside">
-Technically the person could write in a request to the government asking them to use their residency increase INSTEAD OF the monthly increase, however, the monthly 0.6% increase always results in a greater amount than the residency fraction increase so in practice, this is never done.
+Technically the person could write in a request to the government asking to use the residency increase INSTEAD OF the monthly increase, however, the monthly 0.6% increase always results in a greater amount than the residency fraction increase, so in practice, this is never done.
 </aside>
 
-WIP: Explain all this to ChatGPT and ask it to update the form with numeric integer input between 18 and 65, with help text, and update calculation to extract this value from form and use it...
+I explained the above rules to ChatGPT and asked it to update the form with an input for years lived in Canada between ages 18 and 65, that could be an integer between 1 and 40 years, and update the calculation to extract this value from the form upon submission, and use it to determine the monthly OAS amount.
+
+Here's how it updated the input form, notice it maintained the existing look and feel, and added a subtle help text for the years in Canada field.
+
+```htm
+<form id="oas-form">
+  <!-- ... -->
+
+  <!-- NEW: Years Lived in Canada as an Adult -->
+  <div class="mb-4">
+    <label for="years-in-canada" class="block text-xl font-bold mb-2">Years Lived in Canada as an Adult</label>
+    <p class="text-gray-600 text-sm mb-2">(Between ages 18 and 65)</p>
+    <input type="number" id="years-in-canada" name="years_in_canada"
+      class="w-full p-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500" min="1"
+      max="40" required value="40">
+  </div>
+
+  <!-- ... -->
+</form>
+```
+
+![prototype oas years in canada](../images/prototype-oas-years-in-canada.png "prototype oas years in canada")
+
+Then it made a number of changes in the JavaScript code. Firstly, it recognized that the base pension amount of `713.34`was repeated in several places, and extracted it as a constant at the beginning of the script:
+
+```javascript
+const fullPensionAmount = 713.34;
+// ...
+```
+
+Then it introduced a new function for calculating the fractional base pension amount, based on how many years in Canada. For someone with a full 40 years in Canada, this would still return 713.34 because it would be multiplying 713.34 * 1:
+
+```javascript
+// Function to calculate the base monthly amount based on years in Canada
+const calculateBaseAmount = (yearsInCanada) => {
+  return fullPensionAmount * (yearsInCanada / 40);
+};
+```
+
+Then it modified both chart data functions to accept a new parameter `yearsInCanada`, and to call the new `calculateBaseAmount` rather than using the hard-coded `713.34`. Notice that in the delayed function, it *first* calculates the base amount using the number of years in Canada, and *then* calculates the percentage increase due to months of delaying upon this fractional base amount:
+
+```javascript
+// Function to generate data for starting at age 65
+const generateChartData = (yearsInCanada) => {
+  const initialAge = 65;
+  const finalAge = 95;
+
+  // NEW: Consider how many years in Canada
+  const baseAmount = calculateBaseAmount(yearsInCanada);
+
+  let dataPoints = [];
+  // ...
+};
+
+// Function to generate data for starting at a delayed age
+const generateChartDataDelayed = (ageTakingOas, yearsInCanada) => {
+  const recommendedAge = 65;
+  const finalAge = 95;
+
+  // NEW: Consider how many years in Canada
+  const baseAmount = calculateBaseAmount(yearsInCanada);
+
+  const delayedMonths = (ageTakingOas - recommendedAge) * 12;
+  const multiplier = 1 + (delayedMonths * 0.006); // 0.6% increase per month
+  const monthlyAmount = baseAmount * multiplier;
+
+  let dataPoints = [];
+  // ...
+};
+```
+
+It recognized that since the `findBreakevenAge` function calls the chart generation functions, it would also need a new parameter `yearsInCanada` to pass this through:
+
+```javascript
+// MODIFIED to accept `yearsInCanada` and pass to chart generation functions
+const findBreakevenAge = (ageTakingOas, yearsInCanada) => {
+  const data65 = generateChartData(yearsInCanada);
+  const data70 = generateChartDataDelayed(ageTakingOas, yearsInCanada);
+  // ...
+}
+```
+Finally, it modified the `calculate` function to extract the `yearsInCanada` value from the form, and pass it to the functions that generate the chart data:
+
+```javascript
+function calculate(evt) {
+  //...
+
+  // Extract user selected value for when they plan to start OAS
+  const ageTakingOas = Number(document.getElementById('age-taking-oas').value);
+
+  // NEW: Extract years in Canada
+  const yearsInCanada = Number(document.getElementById('years-in-canada').value);
+
+  // NEW: Pass in yearsInCanada to all functions that need it
+  const data = {
+    datasets: [
+      {
+        label: 'Starting at Age 65',
+        data: generateChartData(yearsInCanada),
+        // ...
+      },
+      {
+        label: `Starting at Age ${ageTakingOas} (Delayed)`,
+        data: generateChartDataDelayed(ageTakingOas, yearsInCanada),
+        // ...
+      }
+    ]
+  };
+
+  const breakEvenAge = findBreakevenAge(ageTakingOas, yearsInCanada);
+  // ...
+}
+```
+
+WIP: Show side-by-side results for someone with 35 years in Canada, delaying 3 years to age 68, compared to if they had 40 years in Canada. Breakeven age is pretty much the same!
 
 ## GIS Eligibility
 
-## Text Explanation
+## Results Explanation
 
 ## TODO
 * WIP main content
-* Bug with re-using chart element
-* User Input section is too long, break up into subsections
-* Less than 40 years in Canada
-* GIS eligibility
+* WIP Less than 40 years in Canada
+* Briefly define what OAS is and link to govt site
+* Maybe work in wording from OAS README.md case studies re: even if you do live past breakeven age, still missing out on all that income in your early "go go" retirement years. And for low income, critical missing out on the additional GIS.
+* GIS eligibility - consider as part 2 because it's already pretty long, or just very brief summary then point to final working prototype
+* Results explanation
 * conclusion para
 * description meta
 * edit
 * Aside domain + CNAME somewhere in prototype setup
-* Combine "less than 40 years" with user input section or keep separate?
 * Ignoring annual inflation adjustments, comparing all values in today's dollars
 * Mention `npx http-server` for super quick, easy local static server in init or build prototype section
 * Ref stats can life expectancy
 * Obviously there's still a lot of work to do, such as extracting hard-coded numbers to meaningfully named constants, figuring out how to update the numbers from govt data, etc. But its important for a prototype, to STOP development once the idea is validated, otherwise you're creating more work for yourself in porting over more features to the "real thing", or you'll be tempted to make the prototype the real thing, which will burden you with unmaintainable code forever.
-* Aside: When generating JS functions, ChatGPT seems to recommend the `const findBreakevenAge = () => {...}` format but this results in creation of an anonymous function which makes for not very useful stacktraces. I prefer `function findBreakevenAge() {...}`
 * Screenshot somewhere showing how it looks on a phone? i.e. responsive by default
-* Lessons learned: No doubt faster development time. But it does introduce bugs when adding something new, it doesn't update what was written before. Inefficiencies - the same thing will get calculated over and over again, and its up to developer to refactor or point out the issue to ChatGPT.
+* Lessons learned:
+  * No doubt faster development time.
+  * While generated UI wouldn't win any design awards, it is functional and looks neat enough (eg: alignment, spacing, accessible tab order and Enter submits the form)
+  * But it does introduce bugs when adding something new, it doesn't update what was written before.
+  * It did struggle with initial breakeven logic, even after explaining the issue several times, it wasn't able to come up with a working algorithm. Eventually I had to "solve" it first with heuristic, then with telling it to find minimum difference among the points. Once I explained exactly how the logic should function, it did write it correctly.
+  * Seems to prefer `const findBreakevenAge = () => {...}` format but this results in creation of an anonymous function which makes for not very useful stacktraces. I prefer `function findBreakevenAge() {...}`
+  * Inefficiencies - the same thing will get calculated over and over again, and its up to developer to refactor or point out the issue to ChatGPT.
+  * Still need an engineer, originally I gave it the problem statement exactly as worded from the SME and asked it to write a web app and it came up with something that didn't make any sense at all, and didn't change the numbers no matter what the user input.
