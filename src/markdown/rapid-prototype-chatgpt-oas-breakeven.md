@@ -41,7 +41,7 @@ TODO Aside: There's actually more nuance, but these additional details not requi
 
 ## Initializing the Prototype
 
-The idea was to get something that the subject matter expert and others could try out as quickly as possible. Our budget was exactly $0.00, so it had to be something that could be hosted for free. In this case, a static website hosted on [GitHub Pages](https://pages.github.com/) is the perfect solution. It doesn't even require purchasing a domain as GitHub will generate a publicly accessible url based on your GitHub username and repository name.
+The idea was to get something that the subject matter expert and others could try out as quickly as possible. Our budget was exactly $0.00, so it had to be something that could be hosted for free. In this case, a static website hosted on [GitHub Pages](https://pages.github.com/) is a great solution. It doesn't even require purchasing a domain as GitHub will generate a publicly accessible url based on your GitHub username and repository name.
 
 TODO: Aside domain + CNAME
 
@@ -268,7 +268,7 @@ The first attempt is not too bad. Using ChatGPT saved me a lot of time in settin
 
 I asked ChatGPT if there was a way to add a marker of sorts on the chart for the intersection point and to label it the breakeven age. It told me that Chart.js has an [annotation plugin](https://www.chartjs.org/chartjs-plugin-annotation/latest/) for this purpose. It proceeded to generate some code but it didn't work. My research revealed that the annotation plugin is not built into Chart.js, but rather, a separate library needs to be pulled in.
 
-After explaining this to ChatGPT it modified the prototype as follows:
+After explaining this to ChatGPT it modified the prototype to pull in the annotation plugin from a CDN, add an `annotations` section to the chart configuration, and a `findBreakevenAge` function, called when rendering the annotation:
 
 ```htm
 <head>
@@ -662,7 +662,7 @@ There's another complexity in that if someone has been in Canada for less than 4
 
 There's a common, but mistaken belief that delaying OAS in this case will have multiple benefits: Firstly the 0.6% per month of delay increase, *and* an increase of 1/40th the pension amount for every year of delay due to the residency increase. For example, someone who has 35 years in Canada at age 65, and delays OAS to age 68, may believe that this would qualify them for an extra 3/40ths of the full pension amount because they delayed for 3 years and now have 3 more qualifying residency years, in addition to the 0.6% increase per month of delay.
 
-However, the benefits of delaying do not "stack". What the government of Canada does is "fix" the pension amount to however many years the person has in Canada by age 65. Then if the person chooses to delay, the government calculates the 0.6% per month increase on the "fixed" pension amount, which was determined based on the 35 years in Canada.
+However, the benefits of delaying do not "stack". What the government of Canada does is "fix" the pension amount to however many years the person has in Canada by age 65. Then if the person chooses to delay, the government calculates the 0.6% per month increase on the "fixed" pension amount.
 
 In our example of someone that has 35 years in Canada, if they were to start at age 65, they would qualify for $713.34 * (35/40) = $624.17 per month. Then if they were to delay for 3 years, i.e. 36 months, this would increase the monthly amount to $624.17 * (1 + (36 * 0.006)) = $758.99. i.e. the 0.6% increase per month of delay is applying to the 35/40th fraction of the full pension amount.
 
@@ -784,15 +784,133 @@ function calculate(evt) {
 }
 ```
 
-WIP: Show side-by-side results for someone with 35 years in Canada, delaying 3 years to age 68, compared to if they had 40 years in Canada. Breakeven age is pretty much the same!
+With the code in place, we can now run the analysis for someone with 35 years in Canada who wants to see if its worth it to start OAS at 68 rather than 65. The results below show the break even age to be 82:
+
+![prototype oas 35 years residency take at age 68](../images/prototype-oas-35-years-residency-take-at-age-68.png "prototype oas 35 years residency take at age 68")
+
+What's interesting is that even for someone with a full 40 years of residency, delaying to age 68 puts the breakeven age at 82 as well. And notice that the slopes and distances between the two lines are the same even as with only 35 years in Canada (although the absolute amount of OAS will be different):
+
+![prototype oas 40 years residency take at age 68](../images/prototype-oas-40-years-residency-delay-to-68.png "prototype oas 40 years residency take at age 68")
+
+This shows that there's no extra benefit to delaying for people that don't have the full residency amount.
 
 ## GIS Eligibility
+
+A factor that can drastically influence the decision to delay OAS is eligibility for the [Guaranteed Income Supplement](https://www.canada.ca/en/services/benefits/publicpensions/cpp/old-age-security/guaranteed-income-supplement.html) (GIS). GIS is a non-taxable benefit provided to low-income seniors in Canada who are already receiving OAS. It's designed to top up their income, ensuring that even those with minimal financial resources can maintain a basic standard of living.
+
+It's important for the prototype calculator to take GIS into account because it can significantly increase the monthly payment amounts that a person could receive starting at age 65. And if this person were to delay taking OAS, they are necessarily also delaying GIS, because GIS is only available to those claiming OAS. This additional income can make a crucial difference to the standard of living for someone who is low income. And yet, many low income seniors are delaying OAS.
+
+Accurately determining the amount of GIS a person is eligible for depends on many [factors](https://www.canada.ca/en/services/benefits/publicpensions/cpp/old-age-security/guaranteed-income-supplement/eligibility.html). For the prototype, I simplified the approach by downloading the latest GIS lookup table (which was Apr. 2024 at the time of this writing) for a single person from [Open Government Canada](https://open.canada.ca/data/en/dataset/dfa4daf1-669e-4514-82cd-982f27707ed0). The GIS lookup table is a csv file that contains rows for income ranges and the monthly GIS amount for a person whose annual income falls in that range. It's sorted from the lowest to highest income that's eligible.
+
+Here are a few example rows from the GIS lookup csv file:
+
+```
+income_range_from,income_range_to,monthly_gis
+0,23.99,1065.47
+24,47.99,1064.47
+48,71.99,1063.47
+...
+8664,8671.99,566.47
+8672,8687.99,565.47
+8688,8711.99,564.47
+...
+21552,21575.99,2.43
+21576,21599.99,1.43
+21600,21623.99,0.43
+```
+
+At the lowest end, if someone is aged 65 or above and claiming OAS, and their annual income is between $0.00 and $23.99, then they are eligible for an additional $1,065.47 in GIS (in addition to their OAS amount). For an annual income between $8,664 and $8,671.99, monthly GIS is 566.47. As income goes up, the GIS amount is reduced. People with incomes above $21,623.99 are not eligible for GIS.
+
+The entire file is over 1000 lines long, and as far as I know, there is no publicly accessible HTTP based API to access this information. To make use of this data, I decided on another heuristic approach.
+
+I provided ChatGPT with the minimum and maximum income ranges from the CSV, then asked it to divide these into quartiles, and to create four radio button options for income ranges in the form, and an additional radio button for over the maximum range. Here is the markup it added to the form:
+
+```htm
+<!-- Annual Income -->
+<div class="mb-4">
+  <label for="income_range" class="block text-xl font-bold mb-2">Select Your Annual Income Range</label>
+  <p class="text-gray-600 text-sm mb-2">(required for GIS eligibility)</p>
+  <div class="flex flex-col space-y-2">
+    <label class="inline-flex items-center">
+      <input type="radio" name="income_range" id="income_range" value="0-4943" class="form-radio text-blue-500" required>
+      <span class="ml-2">0 - 4943</span>
+    </label>
+    <label class="inline-flex items-center">
+      <input type="radio" name="income_range" value="4944-9215" class="form-radio text-blue-500">
+      <span class="ml-2">4944 - 9215</span>
+    </label>
+    <label class="inline-flex items-center">
+      <input type="radio" name="income_range" value="9216-15239" class="form-radio text-blue-500">
+      <span class="ml-2">9216 - 15239</span>
+    </label>
+    <label class="inline-flex items-center">
+      <input type="radio" name="income_range" value="15240-21623" class="form-radio text-blue-500">
+      <span class="ml-2">15240 - 21623</span>
+    </label>
+    <label class="inline-flex items-center">
+      <input type="radio" name="income_range" value="Over 21624" class="form-radio text-blue-500">
+      <span class="ml-2">Over 21624 </span>
+    </label>
+  </div>
+</div>
+```
+
+Here is the updated form - notice how it kept the overall look and feel consistent:
+
+![prototype oas income selection](../images/prototype-oas-income-selection.png "prototype oas income selection")
+
+I then asked ChatGPT to modify the logic as follows:
+* When the form is submitted, extract the income range.
+* Wite a separate function to determine the GIS amount by finding the GIS amount for the min and max of the user selected range, and taking an average of these.
+* If the user selects the "Over" range, then the GIS amount is 0.
+* Pass in the GIS amount to the chart data generation functions and add it to the previously calculated amount.
+
+Here are the JavaScript changes ChatGPT generated:
+
+```javascript
+// NEW: Subset of lookup data from the csv file,
+// converted to JSON for easier wrangling in JavaScript
+const gisDataRows = [
+  { annualIncomeFrom: 0, annualIncomeTo: 23.99, totalMonthlyGIS: 1065.47 },
+  { annualIncomeFrom: 4928, annualIncomeTo: 4943.99, totalMonthlyGIS: 799.47 },
+  { annualIncomeFrom: 4944, annualIncomeTo: 4967.99, totalMonthlyGIS: 798.47 },
+  { annualIncomeFrom: 9200, annualIncomeTo: 9215.99, totalMonthlyGIS: 532.47 },
+  { annualIncomeFrom: 9216, annualIncomeTo: 9239.99, totalMonthlyGIS: 531.47 },
+  { annualIncomeFrom: 15216, annualIncomeTo: 15239.99, totalMonthlyGIS: 266.43 },
+  { annualIncomeFrom: 15240, annualIncomeTo: 15263.99, totalMonthlyGIS: 265.43 },
+  { annualIncomeFrom: 21600, annualIncomeTo: 21623.99, totalMonthlyGIS: 0.43 }
+];
+
+// NEW: Function to determine approximate GIS amount, given user selected income range
+function determineGisAmount(incomeRange) {
+  if (incomeRange.startsWith('Over')) {
+    return 0; // Not eligible for GIS
+  }
+
+  const [minIncome, maxIncome] = incomeRange.split('-').map(value => parseFloat(value.trim()));
+  const minRow = gisDataRows.find(row => minIncome >= row.annualIncomeFrom && minIncome <= row.annualIncomeTo);
+  const maxRow = gisDataRows.find(row => maxIncome >= row.annualIncomeFrom && maxIncome <= row.annualIncomeTo);
+
+  if (minRow && maxRow) {
+    const averageGIS = (minRow.totalMonthlyGIS + maxRow.totalMonthlyGIS) / 2
+    return averageGIS
+  } else {
+    console.error(`Could not find rows for income range ${incomeRange}`)
+    return 0
+  }
+}
+
+// MODIFIED: Chart data generation to add gisAmount (which could be 0)
+const generateChartData = (yearsInCanada, gisAmount) => {
+  const monthlyAmount = determineOasAmount(yearsInCanada, minAge) + gisAmount
+  // ...
+};
+```
 
 ## Results Explanation
 
 ## TODO
 * WIP main content
-* WIP Less than 40 years in Canada
 * Briefly define what OAS is and link to govt site
 * Maybe work in wording from OAS README.md case studies re: even if you do live past breakeven age, still missing out on all that income in your early "go go" retirement years. And for low income, critical missing out on the additional GIS.
 * GIS eligibility - consider as part 2 because it's already pretty long, or just very brief summary then point to final working prototype
