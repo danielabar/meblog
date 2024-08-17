@@ -910,12 +910,13 @@ const generateChartData = (yearsInCanada, gisAmount) => {
 ## Results Explanation
 
 ## TODO
-* WIP main content
+
+* WIP GIS
+* Results explanation
+* Consider split in two parts: Intro -> Visualization, then part 2 for User input -> Conclusion
 * Briefly define what OAS is and link to govt site
 * Maybe work in wording from OAS README.md case studies re: even if you do live past breakeven age, still missing out on all that income in your early "go go" retirement years. And for low income, critical missing out on the additional GIS.
-* GIS eligibility - consider as part 2 because it's already pretty long, or just very brief summary then point to final working prototype
-* Results explanation
-* conclusion para
+* conclusion para - maybe lessons learned is the conclusion?
 * description meta
 * edit
 * Aside domain + CNAME somewhere in prototype setup
