@@ -945,21 +945,229 @@ Now we can understand that if someone is eligible for GIS, it's *never* a good i
 
 ## Results Explanation
 
+At this point I was satisfied with the interaction and visuals of the tool. But it needed some explanatory text so the user could follow along with how their input was used for the calculations. I wanted to have the effect of someone getting personalized advice. In the case of the person with 35 years in Canada, eligible for GIS and considering delaying OAS to age 68, it would be nice to show them specific details like this:
+
+```
+With your 35 years in Canada after age 18,
+you're eligible for a monthly OAS benefit of 624.17,
+which is 0.875 of the full amount 713.34, starting at age 65.
+
+Delaying OAS to age 68 will increase your payment by 21.6% to 758.99.
+
+While delaying does result in a larger monthly payment,
+it also means forgoing 3 years of payments
+from age 65 to your delayed starting age of 68.
+
+Furthermore, your selected income range makes you eligible for an
+approximate monthly GIS benefit of 398.95
+which you can only get by claiming OAS.
+
+Those 3 years of missed payments represent an income loss of $36,832.41.
+
+In order to break even (have the same amount of money) from delaying OAS to 68,
+you would have to live until at least 91 years old. If you live beyond this,
+then you will end up with more OAS overall than if you had started at 65.
+
+The chart below shows how much total OAS you will have accumulated at each age
+whether you started at 65 or 68.
+Where the two lines cross over is the break even point.
+```
+
+This is where a templating solution from any of the JavaScript frameworks would come in handy, but since this was still a prototype, I didn't want to commit to a framework decision at this point.
+
+I explained to ChatGPT that I wanted:
+* A results panel with the above content, initially hidden, to be displayed after the form is submitted.
+* All the numbers had to be calculated or extracted from the form and placed into the panel.
+* Money values should be formatted using dollars and cents, and rounded to two decimal places.
+* Dynamic value should be rendered in a different style to make it stand out.
+* The GIS sentence should only be shown if the calculated `gisAmount` is > 0.
+* Since GIS is so crucial, use a yellow highlight style on this sentence if it is being rendered.
+* Add a new function to update the dynamic portions of the results panel, to be called after form is submitted.
+
+It updated the markup to add the results panel with the [hidden](https://developer.mozilla.org/en-US/docs/Web/HTML/Global_attributes/hidden) attribute. All the numeric values were represented as `<span>` elements with an id and TailwindCSS styles to render as medium blue and a little bolder than the regular text.
+
+```htm
+<div id="resultsPanel" hidden class="bg-white p-4 rounded shadow mb-6">
+  <div id="explanation">
+    <h2 class="text-2xl font-semibold mb-4">Your Results</h2>
+    <p class="mb-4 text-lg">
+      With your <span class="text-blue-500 font-semibold" id="resultsYearsInCanada"></span> years in Canada after
+      age 18, you're eligible for a monthly OAS benefit of
+      <span class="text-blue-500 font-semibold" id="resultsOasAt65"></span>, which is
+      <span class="text-blue-500 font-semibold" id="resultsCanadaMultiplier"></span>
+      of the full amount <span class="text-blue-500 font-semibold" id="resultsOasFullAmount"></span>,
+      starting at age <span class="text-blue-500 font-semibold" id="resultsDefaultAge"></span>.
+    </p>
+    <p class="mb-4 text-lg">
+      Delaying OAS to age <span class="text-blue-500 font-semibold" id="resultsDelayAge"></span> will increase
+      your payment by <span class="text-blue-500 font-semibold" id="resultsPercentageIncrease"></span>
+      to <span class="text-blue-500 font-semibold" id="resultsOasDelayed"></span>.
+    </p>
+    <p class="mb-4 text-lg">
+      While delaying does result in a larger monthly payment, it also means forgoing <span
+        class="text-blue-500 font-semibold" id="resultsYearsMissed"></span> years of payments
+      from age <span class="text-blue-500 font-semibold" id="resultsDefaultAge"></span> to your delayed starting
+      age of <span class="text-blue-500 font-semibold" id="resultsDelayAge"></span>.
+    </p>
+
+    <!-- This should only be shown if GIS eligible -->
+    <div id="gisPanel" hidden>
+      <p class="mb-4 text-lg">
+        <span class="bg-yellow-200 inline-block px-2 py-1 rounded-lg">
+          Furthermore, your selected income range makes you eligible for an approximate monthly GIS benefit of
+          <span class="text-blue-500 font-bold" id="resultsGisAmount"></span>
+          which you can only get by claiming OAS.
+        </span>
+      </p>
+    </div>
+
+    <p class="mb-4 text-lg">
+      Those <span class="text-blue-500 font-semibold" id="resultsYearsMissed"></span> years of missed payments
+      represent an income loss of <span class="text-blue-500 font-semibold" id="resultsOasDuringYearsMissed"></span>.
+    </p>
+
+    <p class="mb-4 text-lg">
+      In order to break even (have the same amount of money) from delaying OAS to <span
+        class="text-blue-500 font-semibold" id="resultsDelayAge"></span>, you would have to
+      live until at least <span class="text-blue-500 font-semibold" id="resultsBreakevenAge"></span> years old. If
+      you live beyond this, then you will end up with more OAS
+      overall than if you had started at <span class="text-blue-500 font-semibold" id="resultsDefaultAge"></span>.
+    </p>
+
+    <p class="mb-4 text-lg">
+      The chart below shows how much total OAS you will have accumulated at each age whether you started at
+      <span class="text-blue-500 font-semibold" id="resultsDefaultAge"></span> or <span
+        class="text-blue-500 font-semibold" id="resultsDelayAge"></span>.
+      Where the two lines cross over is the break even point.
+    </p>
+
+    <canvas id="myChart"></canvas>
+  </div>
+</div>
+```
+
+It then added a few functions to update the results panel with a `results` object, and constructed this results object in the `calculate` function:
+
+```javascript
+// NEW: Update all elements matching `selector` with `value`
+function updateContent(selector, value) {
+  const elements = document.querySelectorAll(`#${selector}`)
+  elements.forEach(element => {
+    element.textContent = value
+  });
+}
+
+// NEW: Update results panel with a `results` object and remove hidden attribute
+function updateResults(results) {
+  updateContent('resultsYearsInCanada', results.yearsInCanada);
+  updateContent('resultsOasAt65', `${results.oasAt65.toFixed(2)}`);
+  updateContent('resultsCanadaMultiplier', `${results.canadaMultiplier.toFixed(3)}`);
+  updateContent('resultsOasFullAmount', `${713.34.toFixed(2)}`);
+  updateContent('resultsDefaultAge', minAge);
+  updateContent('resultsDelayAge', results.delayAge);
+  updateContent('resultsPercentageIncrease', `${(results.percentageIncrease * 100).toFixed(1)}%`);
+  updateContent('resultsOasDelayed', `${results.oasDelayed.toFixed(2)}`);
+  updateContent('resultsYearsMissed', results.yearsMissed);
+  updateContent('resultsBreakevenAge', results.breakEvenAge);
+  updateContent('resultsOasDuringYearsMissed', results.oasDuringYearsMissed.toLocaleString('en-CA', { style: 'currency', currency: 'CAD' }));
+
+
+  document.getElementById('resultsPanel').removeAttribute('hidden');
+
+  if (results.gisAmount > 0) {
+    document.getElementById('gisPanel').removeAttribute('hidden');
+    updateContent('resultsGisAmount', `${results.gisAmount.toFixed(2)}`);
+  } else {
+    document.getElementById('gisPanel').setAttribute('hidden', true);
+  }
+}
+
+// MODIFIED: Added calculations and construction of results object
+function calculate(evt) {
+  // ...
+
+  // Calculate the required values
+  const oasAt65 = determineOasAmount(yearsInCanada, 65)
+  const oasDelayed = determineOasAmount(yearsInCanada, ageTakingOas)
+  const percentageIncrease = (oasDelayed - oasAt65) / oasAt65;
+  const yearsMissed = ageTakingOas - 65;
+  const oasDuringYearsMissed = yearsMissed * 12 * (oasAt65 + gisAmount)
+
+  // Construct results object
+  const results = {
+    yearsInCanada,
+    oasAt65,
+    canadaMultiplier: yearsInCanada / 40,
+    oasFullAmount: fullOasAmount,
+    defaultAge: minAge,
+    delayAge: ageTakingOas,
+    percentageIncrease,
+    oasDelayed,
+    yearsMissed,
+    breakEvenAge,
+    gisAmount,
+    oasDuringYearsMissed
+  };
+
+  // Update the UI with results
+  updateResults(results);
+  // ...
+}
+```
+
+Note that the first attempt at the above, had some repeated calculations for determining the OAS amount. There was another iteration where I told ChatGPT to extract a common function `determineOasAmount(yearsInCanada, ageTakingOas)` to reduce the duplication.
+
+Finally putting all this together, we now have a functioning input form, with the results containing both a visualization and a customized explanation of the results
+
+![prototype oas with explanation](../images/prototype-oas-with-explanation.png "prototype oas with explanation")
+
+## Bonus: Logo
+
+Before wrapping up prototype development, it would be nice to have a logo to show at the top and for the favicon. AI was useful for this as well, using Stable Diffusion with [Draw Things](https://drawthings.ai/). I started by asking ChatGPT for some prompt ideas for Stable Diffusion and it came up with:
+
+```
+vector illustration of an hourglass on a desk, gold coins scattered on the desk
+```
+
+My initial attempts simply pasting this into the Draw Things app prompt weren't returning anything useful. After help from this [post](https://openaijourney.com/stable-diffusion-illustration-prompts/), I downloaded the [flat_illustration](https://civitai.com/models/108841/niji-flatillustration) LoRA, and adjusted the prompt and inputs as follows:
+
+Model: Generic (Stable Diffusion v1.5)
+LoRA: flat_illustration (SD v1.x)
+Positive: (Masterpiece:1.2, high quality), vector illustration of an hourglass on a desk, gold coins scattered on the desk
+Negative: ((disfigured)), ((bad art)), ((deformed)), ((poorly drawn)), ((extra limbs)), ((close up)), ((b&w)), weird colors, blurry
+Image Size: 512 x 512
+Steps: 104
+Text Guidance: 15.0
+Sampler: DPM++ 2M Karras
+Shift: 1.00
+
+<aside class="markdown-aside">
+LoRA, short for "Low-Rank Adaptation," is a technique used in the context of AI image generation to fine tune large pre-trained models with a smaller dataset while significantly reducing the computational cost. This approach allows for quick and efficient fine-tuning on smaller datasets without the need to retrain the entire model from scratch. This makes it particularly useful for adapting pre-trained models to specific tasks, styles, or domains with limited data.
+</aside>
+
+Resulting in
+
+Upload png to https://realfavicongenerator.net/
+Follow instructions to generate favicon and all the other meta tags
+Download package
+Unzip to project root
+Add meta tags to head, but remove leading `/` due to being deployed on gh-pages
+
 ## TODO
 
-* WIP GIS
-* Results explanation
-* Consider split in two parts: Intro -> Visualization, then part 2 for User input -> Conclusion
+* WIP: Bonus exercise: logo with ChatGPT for prompt ideas and StableDiffusion for image generation
 * Briefly define what OAS is and link to govt site
+* Somewhere: You can try out the prototype at ...
 * Maybe work in wording from OAS README.md case studies re: even if you do live past breakeven age, still missing out on all that income in your early "go go" retirement years. And for low income, critical missing out on the additional GIS.
 * conclusion para - maybe lessons learned is the conclusion?
+* Consider split in two parts: Intro -> Visualization, then part 2 for User input -> Conclusion
 * description meta
 * edit
 * Aside domain + CNAME somewhere in prototype setup
 * Ignoring annual inflation adjustments, comparing all values in today's dollars
 * Mention `npx http-server` for super quick, easy local static server in init or build prototype section
 * Ref stats can life expectancy
-* Obviously there's still a lot of work to do, such as extracting hard-coded numbers to meaningfully named constants, figuring out how to update the numbers from govt data, choosing a JS framework, setting up linting/prettier etc. But its important for a prototype, to STOP development once the idea is validated, otherwise you're creating more work for yourself in porting over more features to the "real thing", or you'll be tempted to make the prototype the real thing, which will burden you with unmaintainable code forever.
+* Obviously there's still a lot of work to do, such as extracting hard-coded numbers to meaningfully named constants, figuring out how to update the numbers from govt data, choosing a JS framework, replacing imperative DOM manipulation with declarative templates as the code is getting unwieldy, setting up linting/prettier etc. But its important for a prototype, to STOP development once the idea is validated, otherwise you're creating more work for yourself in porting over more features to the "real thing", or you'll be tempted to make the prototype the real thing, which will burden you with unmaintainable code forever.
 * Screenshot somewhere showing how it looks on a phone? i.e. responsive by default
 * Lessons learned:
   * No doubt faster development time.
@@ -968,4 +1176,5 @@ Now we can understand that if someone is eligible for GIS, it's *never* a good i
   * It did struggle with initial breakeven logic, even after explaining the issue several times, it wasn't able to come up with a working algorithm. Eventually I had to "solve" it first with heuristic, then with telling it to find minimum difference among the points. Once I explained exactly how the logic should function, it did write it correctly.
   * Seems to prefer `const findBreakevenAge = () => {...}` format but this results in creation of an anonymous function which makes for not very useful stacktraces. I prefer `function findBreakevenAge() {...}`
   * Inefficiencies - the same thing will get calculated over and over again, and its up to developer to refactor or point out the issue to ChatGPT.
+  * Lots of hard-coded numbers eg: 65, 70, 713.34, has to be told to make these constants sometimes, otherwise they appear throughout like this
   * Still need an engineer, originally I gave it the problem statement exactly as worded from the SME and asked it to write a web app and it came up with something that didn't make any sense at all, and didn't change the numbers no matter what the user input.
