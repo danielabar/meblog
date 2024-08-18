@@ -796,7 +796,7 @@ This shows that there's no extra benefit to delaying for people that don't have 
 
 ## GIS Eligibility
 
-A factor that can drastically influence the decision to delay OAS is eligibility for the [Guaranteed Income Supplement](https://www.canada.ca/en/services/benefits/publicpensions/cpp/old-age-security/guaranteed-income-supplement.html) (GIS). GIS is a non-taxable benefit provided to low-income seniors in Canada who are already receiving OAS. It's designed to top up their income, ensuring that even those with minimal financial resources can maintain a basic standard of living.
+A factor that should influence the decision to delay OAS is eligibility for the [Guaranteed Income Supplement](https://www.canada.ca/en/services/benefits/publicpensions/cpp/old-age-security/guaranteed-income-supplement.html) (GIS). GIS is a non-taxable benefit provided to low-income seniors in Canada who are already receiving OAS. It's designed to top up their income, ensuring that even those with minimal financial resources can maintain a basic standard of living.
 
 It's important for the prototype calculator to take GIS into account because it can significantly increase the monthly payment amounts that a person could receive starting at age 65. And if this person were to delay taking OAS, they are necessarily also delaying GIS, because GIS is only available to those claiming OAS. This additional income can make a crucial difference to the standard of living for someone who is low income. And yet, many low income seniors are delaying OAS.
 
@@ -821,7 +821,7 @@ income_range_from,income_range_to,monthly_gis
 
 At the lowest end, if someone is aged 65 or above and claiming OAS, and their annual income is between $0.00 and $23.99, then they are eligible for an additional $1,065.47 in GIS (in addition to their OAS amount). For an annual income between $8,664 and $8,671.99, monthly GIS is 566.47. As income goes up, the GIS amount is reduced. People with incomes above $21,623.99 are not eligible for GIS.
 
-The entire file is over 1000 lines long, and as far as I know, there is no publicly accessible HTTP based API to access this information. To make use of this data, I decided on another heuristic approach.
+The entire file is over 1000 lines long, and as far as I know, there is no publicly accessible API to access this information. To make use of this data, I decided on another heuristic approach.
 
 I provided ChatGPT with the minimum and maximum income ranges from the CSV, then asked it to divide these into quartiles, and to create four radio button options for income ranges in the form, and an additional radio button for over the maximum range. Here is the markup it added to the form:
 
@@ -861,7 +861,7 @@ Here is the updated form - notice how it kept the overall look and feel consiste
 
 I then asked ChatGPT to modify the logic as follows:
 * When the form is submitted, extract the income range.
-* Wite a separate function to determine the GIS amount by finding the GIS amount for the min and max of the user selected range, and taking an average of these.
+* Wite a new function to determine the GIS amount by finding the GIS amount for the min and max of the user selected range, and taking an average of these.
 * If the user selects the "Over" range, then the GIS amount is 0.
 * Pass in the GIS amount to the chart data generation functions and add it to the previously calculated amount.
 
@@ -882,6 +882,7 @@ const gisDataRows = [
 ];
 
 // NEW: Function to determine approximate GIS amount, given user selected income range
+// I added a temporary console.log to see what it calculated
 function determineGisAmount(incomeRange) {
   if (incomeRange.startsWith('Over')) {
     return 0; // Not eligible for GIS
@@ -893,6 +894,7 @@ function determineGisAmount(incomeRange) {
 
   if (minRow && maxRow) {
     const averageGIS = (minRow.totalMonthlyGIS + maxRow.totalMonthlyGIS) / 2
+    console.log(`=== DETERMINED GIS: ${averageGIS}`)
     return averageGIS
   } else {
     console.error(`Could not find rows for income range ${incomeRange}`)
@@ -905,7 +907,41 @@ const generateChartData = (yearsInCanada, gisAmount) => {
   const monthlyAmount = determineOasAmount(yearsInCanada, minAge) + gisAmount
   // ...
 };
+const generateChartDataDelayed = (ageTakingOas, yearsInCanada, gisAmount) => {
+  // ...
+  const monthlyAmount = (baseAmount * multiplier) + gisAmount;
+  // ...
+}
+
+// MODIFIED: Calculate function to extract income range from form, determine GIS amount,
+// and pass it to chart generation.
+function calculate(evt) {
+  // ...
+  const gisRange = document.querySelector('input[name="income_range"]:checked').value;
+  const gisAmount = determineGisAmount(gisRange)
+  // ...
+  const data = {
+    // ...
+    data: generateChartData(yearsInCanada, gisAmount),
+    // ...
+    data: generateChartDataDelayed(ageTakingOas, yearsInCanada, gisAmount),
+  }
+  const breakEvenAge = findBreakevenAge(ageTakingOas, yearsInCanada, gisAmount);
+  // ...
+}
 ```
+
+With the GIS code changes in place, we can run the tool again for someone with 35 years in Canada and considering delaying taking OAS to age 68, but this time, select the income range of $9,216 - $15,239. Recall that before taking GIS into account, the breakeven age for this case was 82, at an accumulated OAS income of ~145K. Let's see what happens now:
+
+![prototype oas gis](../images/prototype-oas-gis.png "prototype oas gis")
+
+Whoa! The breakeven age has jumped up to 91, at an accumulated OAS + GIS income of ~319K. Given the Statistics Canada life expectancy of age 83 (for combined male/female having reached age 65), delaying looks more like a losing proposition in this case.
+
+You can also see that the two income streams (start at 65 vs start at 68) are closer together compared to the previous case with no GIS, showing that the delayed start has negligible benefit even beyond age 91.
+
+The reason for this dramatic result is GIS eligibility.  The console output is showing `=== DETERMINED GIS: 398.95`. This (approximate) amount is added to the monthly OAS amount. This greatly increases the amount of income missed during the first 3 years, and is greater in magnitude than the percentage increase in monthly payments due to the delayed start. This means it's going to take longer for the smaller monthly increase to make up for three years of missed regular OAS and the GIS combined.
+
+Now we can understand that if someone is eligible for GIS, it's *never* a good idea to delay OAS.
 
 ## Results Explanation
 
@@ -923,7 +959,7 @@ const generateChartData = (yearsInCanada, gisAmount) => {
 * Ignoring annual inflation adjustments, comparing all values in today's dollars
 * Mention `npx http-server` for super quick, easy local static server in init or build prototype section
 * Ref stats can life expectancy
-* Obviously there's still a lot of work to do, such as extracting hard-coded numbers to meaningfully named constants, figuring out how to update the numbers from govt data, etc. But its important for a prototype, to STOP development once the idea is validated, otherwise you're creating more work for yourself in porting over more features to the "real thing", or you'll be tempted to make the prototype the real thing, which will burden you with unmaintainable code forever.
+* Obviously there's still a lot of work to do, such as extracting hard-coded numbers to meaningfully named constants, figuring out how to update the numbers from govt data, choosing a JS framework, setting up linting/prettier etc. But its important for a prototype, to STOP development once the idea is validated, otherwise you're creating more work for yourself in porting over more features to the "real thing", or you'll be tempted to make the prototype the real thing, which will burden you with unmaintainable code forever.
 * Screenshot somewhere showing how it looks on a phone? i.e. responsive by default
 * Lessons learned:
   * No doubt faster development time.
