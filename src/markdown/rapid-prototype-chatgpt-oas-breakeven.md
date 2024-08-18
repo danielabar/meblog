@@ -943,7 +943,7 @@ The reason for this dramatic result is GIS eligibility.  The console output is s
 
 Now we can understand that if someone is eligible for GIS, it's *never* a good idea to delay OAS.
 
-## Results Explanation
+## Explanatory Text
 
 At this point I was satisfied with the interaction and visuals of the tool. But it needed some explanatory text so the user could follow along with how their input was used for the calculations. I wanted to have the effect of someone getting personalized advice. In the case of the person with 35 years in Canada, eligible for GIS and considering delaying OAS to age 68, it would be nice to show them specific details like this:
 
@@ -1121,31 +1121,52 @@ Finally putting all this together, we now have a functioning input form, with th
 
 ![prototype oas with explanation](../images/prototype-oas-with-explanation.png "prototype oas with explanation")
 
-## Bonus: Logo
+## Bonus: Logo Generation
 
-Before wrapping up prototype development, it would be nice to have a logo to show at the top and for the favicon. AI was useful for this as well, using Stable Diffusion with [Draw Things](https://drawthings.ai/). I started by asking ChatGPT for some prompt ideas for Stable Diffusion and it came up with:
+Before wrapping up prototype development, it would be nice to have a logo to show at the top and for the favicon, to avoid the generic grey globe in the browser tab:
+
+![prototype oas generic favicon](../images/prototype-oas-generic-favicon.png "prototype oas generic favicon")
+
+AI was useful for this as well, using Stable Diffusion with [Draw Things](https://drawthings.ai/). I started by asking ChatGPT for a prompt for Stable Diffusion and it came up with:
 
 ```
-vector illustration of an hourglass on a desk, gold coins scattered on the desk
+An elegant and modern logo design featuring a stylized hourglass
+with a dollar sign inside, symbolizing time and financial planning.
+
+The hourglass should have a smooth, clean look with a minimalistic approach.
+Incorporate shades of blue and green to represent trust and growth.
+
+The overall style should be flat and vector-like,
+suitable for use as both a logo and a favicon
 ```
 
-My initial attempts simply pasting this into the Draw Things app prompt weren't returning anything useful. After help from this [post](https://openaijourney.com/stable-diffusion-illustration-prompts/), I downloaded the [flat_illustration](https://civitai.com/models/108841/niji-flatillustration) LoRA, and adjusted the prompt and inputs as follows:
+My initial attempts simply pasting this into the Draw Things app prompt weren't returning anything useful. Here are some early attempts:
 
-Model: Generic (Stable Diffusion v1.5)
-LoRA: flat_illustration (SD v1.x)
-Positive: (Masterpiece:1.2, high quality), vector illustration of an hourglass on a desk, gold coins scattered on the desk
-Negative: ((disfigured)), ((bad art)), ((deformed)), ((poorly drawn)), ((extra limbs)), ((close up)), ((b&w)), weird colors, blurry
-Image Size: 512 x 512
-Steps: 104
-Text Guidance: 15.0
-Sampler: DPM++ 2M Karras
-Shift: 1.00
+![prototype oas logo generation early attempt](../images/prototype-oas-logo-gen-early-attempts.png "prototype oas logo generation early attempt")
+
+After help from this [post](https://openaijourney.com/stable-diffusion-illustration-prompts/), I downloaded a LoRA optimized for vector illustrations, and adjusted the prompt and other inputs as follows:
+
+| Parameter         | Value                                                                                                                     |
+| ----------------- | ------------------------------------------------------------------------------------------------------------------------- |
+| **Positive**      | (Masterpiece:1.2, high quality), vector illustration of an hourglass on a desk, gold coins scattered on the desk          |
+| **Negative**      | ((disfigured)), ((bad art)), ((deformed)), ((poorly drawn)), ((extra limbs)), ((close up)), ((b&w)), weird colors, blurry |
+| **Model**         | Generic (Stable Diffusion v1.5)                                                                                           |
+| **LoRA**          | [flat_illustration (SD v1.x)](https://civitai.com/models/108841/niji-flatillustration)                                    |
+| **Image Size**    | 512 x 512                                                                                                                 |
+| **Steps**         | 104                                                                                                                       |
+| **Text Guidance** | 15.0                                                                                                                      |
+| **Sampler**       | DPM++ 2M Karras                                                                                                           |
+| **Shift**         | 1.00                                                                                                                      |
 
 <aside class="markdown-aside">
-LoRA, short for "Low-Rank Adaptation," is a technique used in the context of AI image generation to fine tune large pre-trained models with a smaller dataset while significantly reducing the computational cost. This approach allows for quick and efficient fine-tuning on smaller datasets without the need to retrain the entire model from scratch. This makes it particularly useful for adapting pre-trained models to specific tasks, styles, or domains with limited data.
+LoRA (Low-Rank Adaptation), is a technique to fine tune large pre-trained models with a smaller dataset while significantly reducing the computational cost. This makes it particularly useful for adapting pre-trained models to specific tasks, styles, or domains with limited data.
 </aside>
 
-Resulting in
+After a few more iterations, eventually got this pleasing looking result:
+
+![prototype oas logo hourglass coins](../images/prototype-oas-hourglass-coins-logo.png "prototype oas logo hourglass coins")
+
+WIP...
 
 Upload png to https://realfavicongenerator.net/
 Follow instructions to generate favicon and all the other meta tags
