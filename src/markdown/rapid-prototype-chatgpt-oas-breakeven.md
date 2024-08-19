@@ -12,7 +12,7 @@ related:
 
 When building software, especially for complex financial scenarios, it's crucial to determine if you're on the right track before investing significant effort in selecting the language to build in, framework, architecture, automated testing, and setting up CI/CD pipelines. Rapid prototyping allows you to quickly reach valuable insights and validate your approach.
 
-I had an opportunity to collaborate with [John Stapleton](https://openpolicyontario.com/), a subject matter expert on social assistance policy and poverty reduction, on an Old Age Security (OAS) breakeven calculator, targeted at low income Canadians. This post will demonstrate how I used ChatGPT to quickly build a prototype and validate our ideas.
+I had an opportunity to collaborate with [John Stapleton](https://openpolicyontario.com/), a subject matter expert on social assistance policy and poverty reduction, on an Old Age Security (OAS) breakeven calculator, targeted at low income Canadian seniors. The [Old Age Security](https://www.canada.ca/en/services/benefits/publicpensions/cpp/old-age-security.html) pension is a monthly payment Canadians can get if they are 65 and older. This post will demonstrate how I used ChatGPT to quickly build a prototype and validate our ideas. The final prototype is available [here](https://danielabar.github.io/oas-delay-calculator-prototype/).
 
 ## Problem
 
@@ -1179,7 +1179,7 @@ I then used [Favicon Generator](https://realfavicongenerator.net/) to create the
 
 ![prototype oas logo header](../images/prototype-oas-logo-header.png "prototype oas logo header")
 
-## Next Steps and Caution
+## Prototype is Done
 
 That concludes the prototype development. You can try it out [here](https://danielabar.github.io/oas-delay-calculator-prototype/).
 
@@ -1203,13 +1203,15 @@ These lessons reaffirm that while AI can accelerate development and handle routi
 
 ## TODO
 
-* Briefly define what OAS is and link to govt site
-* Somewhere in intro: You can try out the prototype at ...
 * Maybe work in wording from OAS README.md case studies re: even if you do live past breakeven age, still missing out on all that income in your early "go go" retirement years. And for low income, critical missing out on the additional GIS.
+* Ref stats can life expectancy
+* Maybe add business insights (separate from tech insights):
+  * Even for someone with full residency requirements, it may not be worth it to delay because breakeven is around avg life expectancy, and missing out on additional income during the early retirement years, aka "go go" years. You can see from slope of lines that the additional income beyond break even is not that dramatic.
+  * For someone without full residency, delaying makes even less sense as it doesn't increase residency portion
+  * For low income Canadians, delaying never makes sense due to GIS eligibility.
 * Consider split in two parts: Intro -> Visualization, then part 2 for User input -> Conclusion
 * description meta
 * edit
 * Ignoring annual inflation adjustments, comparing all values in today's dollars
 * Mention `npx http-server` for super quick, easy local static server in init or build prototype section
-* Ref stats can life expectancy
 * Screenshot somewhere showing how it looks on a phone? i.e. responsive by default
