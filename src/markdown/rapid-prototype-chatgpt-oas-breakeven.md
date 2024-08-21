@@ -1,7 +1,7 @@
 ---
 title: "Rapid Prototyping with ChatGPT: OAS Pension Breakeven Calculator"
 featuredImage: "../images/rapid-prototype-oas-milad-fakurian-ePAL0f6jjr0-unsplash.jpg"
-description: "tbd"
+description: "Explore how ChatGPT was used to rapidly prototype an OAS pension breakeven calculator, providing valuable insights into the benefits of early OAS application for low-income Canadian seniors."
 date: "2024-12-01"
 category: "productivity"
 related:
@@ -37,13 +37,13 @@ Here are some business rules for OAS that are needed to build the online tool:
 3. For every month after 65 that you delay taking OAS, the monthly amount you're entitled to when you do start increases by 0.6%, up to a maximum of 5 years, i.e. 60 months. So the most it could increase would be 0.6% * 60 = 36%.
 4. Canadians whose income is below the cutoff for GIS (Guaranteed Income Supplement), also qualify for an additional top up to their OAS, however they must claim OAS to also receive the GIS amount.
 
-TODO Aside: There's actually more nuance, but these additional details not required for the prototype, for those who would like to learn more see the govt canada website at https://www.canada.ca/en/services/benefits/publicpensions/cpp/old-age-security.html.
+<aside class="markdown-aside">
+There's more nuance to these rules, but the details are not needed for the prototype. For further information, visit the Government of Canada's <a class="markdown-link" href="https://www.canada.ca/en/services/benefits/publicpensions/cpp/old-age-security.html">OAS page</a>.
+</aside>
 
 ## Initializing the Prototype
 
-The idea was to get something that the subject matter expert and others could try out as quickly as possible. Our budget was exactly $0.00, so it had to be something that could be hosted for free. In this case, a static website hosted on [GitHub Pages](https://pages.github.com/) is a great solution. It doesn't even require purchasing a domain as GitHub will generate a publicly accessible url based on your GitHub username and repository name.
-
-TODO: Aside domain + CNAME
+The idea was to get something that the subject matter expert and others could try out as quickly as possible. Our budget was exactly $0.00, so it had to be something that could be hosted for free. In this case, a static website hosted on [GitHub Pages](https://pages.github.com/) is a great solution. It doesn't require purchasing a domain as GitHub will generate a publicly accessible url based on your GitHub username and repository name.
 
 The simplest possible implementation would be a single `index.html` containing all the markup, and logic in a script tag `<script>...</script>`. I didn't want to spend time setting up a build system. I envisioned from pushing any changes, to immediately having the new code available. To support this, I setup a GitHub repository to only have a `gh-pages` branch. Then any changes pushed to the branch are automatically deployed to GitHub pages. Here are the steps to do this:
 
@@ -59,13 +59,17 @@ Now anytime you push new changes while on the `gh-pages` branch, they will get d
 
 With the setup out of the way, it was time to start building.
 
-## Figure out the Math
+## Start with the Math
 
-Recall the goal was to show that delaying OAS to a later age may not be worth it for many people as they would have to outlive the Statistics Canada life expectancy values to have more money overall by delaying.
+Recall the goal was to show that delaying OAS to a later age may not be worth it for many people as they would have to outlive the [Statistics Canada](https://www150.statcan.gc.ca/n1/en/catalogue/84-537-X) life expectancy values to have more money overall by delaying.
 
 I started with some manual calculations, assuming the simplest case: Someone who is eligible for a full OAS pension at 65, and not eligible for GIS. For 2024, they would receive a monthly OAS amount of $713.34 if starting at age 65. This means by the time they turn 66, they would have received a total of $713.34 * 12 = $8,560.08, i.e. 12 monthly payments. And by age 67, they would have a total of $713.34 * 12 * 2 = $17,120.16, i.e. 12 monthly payments per year at 2 years. By age 70, this person would have accumulated 5 years worth of payments which is 60 months for a total of $713.34 * 12 * 5 = $42,800.40. And so on, for each year the person is still alive and collecting OAS.
 
 On the other hand, waiting until age 70 would increase the monthly payment by 36%, i.e. 0.06% for each month delay, so 5 years of delay === 60 months, and 60 * 0.06% = 36%. So that 713.34 monthly payment would turn into: $713.34 * 1.36 = $970.14. By the time this person turns 71, they would have a total of $970.14 * 12 = $11,641.68. While this sounds like an impressive amount more than the $8,560.08 amount they would have had in one year if starting at 65, they're missing out on the $42,800.40 they could have had by starting at age 65.
+
+<aside class="markdown-aside">
+To keep things simple, I'm ignoring annual inflation adjustments and comparing everything in today's dollars.
+</aside>
 
 I explained the OAS rules above to ChatGPT and asked it to generate a table with columns for age, going from age 66 through 90, calculate the OAS amount someone would have accumulated by that age if they had started at 65, and another column for starting at 70, and then to calculate the difference between starting at 70 and 65.
 
@@ -99,7 +103,7 @@ Here are the results - I've highlighted age 84, explanation to follow:
 | 89  | 205,441.92      | 221,191.92      | 15,750.00      |
 | 90  | 214,002.00      | 232,833.60      | 18,831.60      |
 
-The amounts represent the *total* OAS accumulated. Even though starting at age 70 results in a higher monthly payment compared to starting at age 65, the *total* OAS accumulated is less up until age 84, when it starts to pull ahead. In other words, someone would have to live until at least age 84 to have a greater total amount. And even then, it's only a few hundred dollars. Given that according to Statistics Canada combined life expectancy (for men and women that have reached age 65) for 2024 is ~83, you can start to see that it may not make sense for many people to delay OAS to age 70.
+The amounts represent the *total* OAS accumulated. Even though starting at age 70 results in a higher monthly payment compared to starting at age 65, the *total* OAS accumulated is less up until age 84, when it starts to pull ahead. In other words, someone would have to live until at least age 84 to have a greater total amount. And even then, it's only a few hundred dollars. Given that according to Statistics Canada data [combined life expectancy](https://www150.statcan.gc.ca/t1/tbl1/en/tv.action?pid=1310011401&pickMembers%5B0%5D=1.1&pickMembers%5B1%5D=3.1&pickMembers%5B2%5D=4.8&cubeTimeFrame.startYear=2020+%2F+2022&cubeTimeFrame.endYear=2020+%2F+2022&referencePeriods=20200101%2C20200101) (for men and women that have reached age 65) for 2022 is ~85, you can start to see that it may not make sense for many people to delay OAS to age 70.
 
 ## Visualization
 
@@ -1183,13 +1187,20 @@ I then used [Favicon Generator](https://realfavicongenerator.net/) to create the
 
 That concludes the prototype development. You can try it out [here](https://danielabar.github.io/oas-delay-calculator-prototype/).
 
-While the prototype has successfully visualized and explained the impact of delaying OAS under different circumstances, there's still significant work required to transform it into a fully-fledged product. This includes selecting a suitable JavaScript framework to replace the increasingly complex imperative DOM manipulation, implementing automated unit and system tests, and extracting hard-coded numbers into meaningfully named constants. Additionally, a strategy will be required for updating figures based on government data, which is published quarterly or annually for inflation adjustments, and to set up a CI/CD pipeline along with automated tooling for code style and formatting.
+The prototype has successfully visualized and explained the impact of delaying OAS under different circumstances, showing:
 
-However, it's crucial to pause development at this stage. Continuing to build features beyond the prototype phase can lead to unnecessary work when porting to the final product, or worse, tempt you to use the prototype as the foundation for the real application, which would result in a codebase that's difficult to maintain in the long run.
+* For someone with the full residency requirement, delaying by a few years results in a break even age is very close to average life expectancy.
+* For someone with less than the full residency requirement, delaying doesn't provide additional benefit over and above what someone with full residency would get from delaying.
+* For someone who is entitled to GIS, delaying is definitely sub-optimal.
+* In all cases, delaying results in missing out on significant pension income that could have been useful in the early retirement years.
+
+There's still significant work required to transform it into a fully-fledged product. For example it could be more illustrative to have the Statistics Canada life expectancy layered on the chart. There's also the work of selecting a suitable JavaScript framework to replace the increasingly complex imperative DOM manipulation, implementing automated unit and system tests, and extracting hard-coded numbers into meaningfully named constants. Additionally, a strategy will be required for updating figures based on government data, which is published quarterly or annually for inflation adjustments, and to set up a CI/CD pipeline along with automated tooling for code style and formatting.
+
+However, it's crucial to pause development at this stage. Continuing to build beyond the prototype phase can lead to unnecessary work when porting to the final product, or worse, tempt you to use the prototype as the foundation for the real application, which would result in a codebase that's difficult to maintain in the long run.
 
 ## Lessons Learned
 
-Throughout this rapid prototyping journey, a few key insights emerged:
+Throughout this rapid prototyping journey with ChatGPT, a few key insights emerged:
 
 - **Speed**: The development process was notably faster, especially during the initial setup of Chart.js, and form building.
 - **Functional UI**: Although the generated UI may not win design awards, it’s functional, with neat alignment, accessible tab order, and overall consistent design elements.
@@ -1199,19 +1210,11 @@ Throughout this rapid prototyping journey, a few key insights emerged:
 - **Efficiency Concerns**: Redundant calculations and hard-coded values required manual optimization, highlighting the need for developer oversight.
 - **Engineer’s Role**: Generative AI is not (yet?) at the point where a functioning product can be produced without any engineering. When I gave it the problem statement exactly as worded by the SME, the initial output didn’t make sense and failed to respond to user input.
 
-These lessons reaffirm that while AI can accelerate development and handle routine tasks, the nuanced decision-making and problem-solving abilities of a skilled engineer working together with a product manager are still needed.
+These lessons reaffirm that while AI can accelerate development and handle routine tasks, the nuanced decision-making and problem-solving abilities of a skilled engineer working together with a product manager and/or subject matter expert are still needed.
 
 ## TODO
 
-* Maybe work in wording from OAS README.md case studies re: even if you do live past breakeven age, still missing out on all that income in your early "go go" retirement years. And for low income, critical missing out on the additional GIS.
-* Ref stats can life expectancy
-* Maybe add business insights (separate from tech insights):
-  * Even for someone with full residency requirements, it may not be worth it to delay because breakeven is around avg life expectancy, and missing out on additional income during the early retirement years, aka "go go" years. You can see from slope of lines that the additional income beyond break even is not that dramatic.
-  * For someone without full residency, delaying makes even less sense as it doesn't increase residency portion
-  * For low income Canadians, delaying never makes sense due to GIS eligibility.
 * Consider split in two parts: Intro -> Visualization, then part 2 for User input -> Conclusion
-* description meta
 * edit
-* Ignoring annual inflation adjustments, comparing all values in today's dollars
 * Mention `npx http-server` for super quick, easy local static server in init or build prototype section
 * Screenshot somewhere showing how it looks on a phone? i.e. responsive by default
