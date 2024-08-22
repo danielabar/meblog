@@ -1216,5 +1216,3 @@ These lessons reaffirm that while AI can accelerate development and handle routi
 
 * Consider split in two parts: Intro -> Visualization, then part 2 for User input -> Conclusion
 * edit
-* Mention `npx http-server` for super quick, easy local static server in init or build prototype section
-* Screenshot somewhere showing how it looks on a phone? i.e. responsive by default
