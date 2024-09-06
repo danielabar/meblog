@@ -10,17 +10,21 @@ related:
   - "You Can Have Your Browser Tabs and Use Them Too"
 ---
 
-In the [first part](../rapid-prototype-chatgpt-oas-breakeven-part1) of this series on rapid prototyping with ChatGPT, we covered the initial steps in building the OAS breakeven calculator, including defining the problem, establishing business rules, and creating the initial visualizations. With the core calculations in place, the next step was to allow users to interact with the tool by inputting their own data, such as the age they wish to delay OAS to, their years of residency in Canada, and their income range if they are eligible for the Guaranteed Income Supplement (GIS).
+This is the second of a two-part series on rapid prototyping with ChatGPT. If you missed it, the [first part](../rapid-prototype-chatgpt-oas-breakeven-part1) covered the foundational steps in building an Old Age Security (OAS) breakeven calculator - a tool designed to help low-income Canadian seniors decide whether to delay their OAS pension. The OAS pension is a monthly payment for Canadians aged 65 and older, and the decision to delay it can have a significant impacts, especially for those eligible for the Guaranteed Income Supplement (GIS).
 
-In this part, I'll take you through the process of building the user input form, handling user interactions, and refining the prototype to respond accurately to different scenarios.
+In part one, I introduced the problem, defined the business rules, and built an initial visualization for comparing different retirement scenarios. Now, with the core calculations in place, we’ll dive into the next phase: allowing users to interact with the tool by inputting their own data, such as the age they plan to start receiving OAS, their years of residency, and income range for GIS eligibility. The final prototype is available [here](https://danielabar.github.io/oas-delay-calculator-prototype/).
 
 **Disclaimer:** The content in this post is for informational purposes only and should not be considered financial advice. The OAS pension breakeven calculator prototype is a tool designed to illustrate potential outcomes based on specific scenarios. Individual financial situations vary, and it’s important to consult with a qualified financial advisor or professional before making any decisions regarding Old Age Security (OAS) or other financial matters.
 
 ## User Input Form
 
-At this point, I was satisfied with the visualization. The next step was to add in some flexibility with user input. For example, what if a user wants to delay to age 68 rather than 70, how would that impact the break even age? The code up to this point was hard-coded assuming a user would be delaying to age 70.
+Where we left off in Part 1, there was a functional visualization comparing the effects of taking OAS at age 65 (the default age), versus delaying it to age 70:
 
-Starting with the UI, I asked ChatGPT to generate a responsive form using TailwindCSS styles with a dropdown for which age to delay taking OAS, between 66 and 70, and a submit button. Recall that there's no benefit to delaying beyond age 70 because the 0.6% increase per month of delay maxes out at 60 months delay, i.e. 5 years from age 65 which is 70. I told it to make the field required, and default to 70.
+![prototype oas breakeven annotation](../images/prototype-oas-breakeven-annotation.png "prototype oas breakeven annotation")
+
+The next step was to add in some flexibility with user input. For example, what if a user wants to delay to age 68 rather than 70, how would that impact the break even age? The code up to this point was hard-coded assuming a user would be delaying to age 70.
+
+Starting with the UI, I asked ChatGPT to generate a responsive form using TailwindCSS styles with a dropdown for which age to delay taking OAS, between 66 and 70, and a submit button. There's no benefit to delaying beyond age 70 because the 0.6% increase per month of delay maxes out at 60 months delay, i.e. 5 years from age 65 which is 70. I told it to make the field required, and default to 70.
 
 It added the following form to the markup, just above the chart, contained in a panel with a subtle shadow:
 
@@ -139,7 +143,7 @@ Let's try it out, selecting to delay just one year to age 66 - notice that the C
 
 ![prototype oas input plus chart](../images/prototype-oas-input-plus-chart.png "prototype oas input plus chart")
 
-This time we can see the lines are closer together, and they crossover earlier (at around age 80 rather than 84), than the previous example when delaying to age 70.
+This time we can see the lines are closer together, and they crossover earlier (at around age 80 rather than 84), than the previous example when delaying to age 70. It makes sense that the lines are closer together (compared to delaying to age 70) because delaying by only one year results in an increased monthly payment of just 0.6% * 12 = 7.2%.
 
 ## Bug No Breakeven
 
@@ -297,7 +301,7 @@ However, the results are only accurate for someone who is eligible for the full 
 
 ## Less than 40 years in Canada
 
-There's another complexity in that if someone has been in Canada for less than 40 years as an adult (i.e. after age 18) by the time they turn 65, then they're eligible for a fraction of the pension amount rather than the full amount. For example, if someone has lived for 35 years in Canada after age 18, then they would be eligible for 35/40ths of the full pension amount: $713.34 * (35/40) = 624.17. i.e. the fraction they're eligible for is based on how many 40ths of years of residency they have.
+If someone has lived in Canada for less than 40 years as an adult (i.e. after age 18) by the time they turn 65, then they're eligible for a fraction of the pension amount rather than the full amount. For example, if someone has lived for 35 years in Canada after age 18, then they would be eligible for 35/40ths of the full pension amount: $713.34 * (35/40) = 624.17. i.e. the fraction they're eligible for is based on how many 40ths of years of residency they have.
 
 There's a common, but mistaken belief that delaying OAS in this case will have multiple benefits: Firstly the 0.6% per month of delay increase, *and* an increase of 1/40th the pension amount for every year of delay due to the residency increase. For example, someone who has 35 years in Canada at age 65, and delays OAS to age 68, may believe that this would qualify them for an extra 3/40ths of the full pension amount because they delayed for 3 years and now have 3 more qualifying residency years, in addition to the 0.6% increase per month of delay.
 
@@ -460,6 +464,10 @@ income_range_from,income_range_to,monthly_gis
 
 At the lowest end, if someone is aged 65 or above and claiming OAS, and their annual income is between $0.00 and $23.99, then they are eligible for an additional $1,065.47 in GIS (in addition to their OAS amount). For an annual income between $8,664 and $8,671.99, monthly GIS is 566.47. As income goes up, the GIS amount is reduced. People with incomes above $21,623.99 are not eligible for GIS.
 
+<aside class="markdown-aside">
+The OAS amount does not count as income when determining GIS. However, other sources such as (but not limited to) CPP (Canada Pension Plan), private pension plans, withdrawals from registered retirement accounts, and employment income does.
+</aside>
+
 The entire file is over 1000 lines long, and as far as I know, there is no publicly accessible API to access this information. To make use of this data, I decided on another heuristic approach.
 
 I provided ChatGPT with the minimum and maximum income ranges from the CSV, then asked it to divide these into quartiles, and to create four radio button options for income ranges in the form, and an additional radio button for over the maximum range. Here is the markup it added to the form:
@@ -500,6 +508,7 @@ Here is the updated form - notice how it kept the overall look and feel consiste
 
 I then asked ChatGPT to modify the logic as follows:
 * When the form is submitted, extract the income range.
+* Create a subset of the csv rows around the quartile income ranges to determine the GIS amount without requiring all 1000+ lines.
 * Wite a new function to determine the GIS amount by finding the GIS amount for the min and max of the user selected range, and taking an average of these.
 * If the user selects the "Over" range, then the GIS amount is 0.
 * Pass in the GIS amount to the chart data generation functions and add it to the previously calculated amount.
@@ -580,7 +589,7 @@ You can also see that the two income streams (start at 65 vs start at 68) are cl
 
 The reason for this dramatic result is GIS eligibility.  The console output is showing `=== DETERMINED GIS: 398.95`. This (approximate) amount is added to the monthly OAS amount. This greatly increases the amount of income missed during the first 3 years, and is greater in magnitude than the percentage increase in monthly payments due to the delayed start. This means it's going to take longer for the smaller monthly increase to make up for three years of missed regular OAS and the GIS combined.
 
-Now we can understand that if someone is eligible for GIS, it's *never* a good idea to delay OAS.
+Now we can understand that if someone is eligible for GIS, it's almost always sub-optimal to delay OAS.
 
 ## Explanatory Text
 
@@ -826,10 +835,12 @@ The prototype has successfully visualized and explained the impact of delaying O
 
 * For someone with the full residency requirement, delaying by a few years results in a break even age is very close to average life expectancy.
 * For someone with less than the full residency requirement, delaying doesn't provide additional benefit over and above what someone with full residency would get from delaying.
-* For someone who is entitled to GIS, delaying is definitely sub-optimal.
+* For someone who is entitled to GIS, delaying is likely to be sub-optimal.
 * In all cases, delaying results in missing out on significant pension income that could have been useful in the early retirement years.
 
-There's still significant work required to transform it into a fully-fledged product. For example it could be more illustrative to have the Statistics Canada life expectancy layered on the chart. There's also the work of selecting a suitable JavaScript framework to replace the increasingly complex imperative DOM manipulation, implementing automated unit and system tests, and extracting hard-coded numbers into meaningfully named constants. Additionally, a strategy will be required for updating figures based on government data, which is published quarterly or annually for inflation adjustments, and to set up a CI/CD pipeline along with automated tooling for code style and formatting.
+There's still significant work required to transform it into a fully-fledged product. For example it could be more illustrative to have the Statistics Canada life expectancy layered on the chart. The lines should also "bend" at age 75 to account for an [increased amount](https://www.canada.ca/en/services/benefits/publicpensions/cpp/old-age-security/benefit-amount.html#h2.2) as per government policy since 2022.
+
+There's also the work of selecting a suitable JavaScript framework to replace the increasingly complex imperative DOM manipulation, implementing automated unit and system tests, and extracting hard-coded numbers into meaningfully named constants. Additionally, a strategy will be required for updating figures based on government data, which is published quarterly or annually for inflation adjustments, and to set up a CI/CD pipeline along with automated tooling for code style and formatting.
 
 However, it's crucial to pause development at this stage. Continuing to build beyond the prototype phase can lead to unnecessary work when porting to the final product, or worse, tempt you to use the prototype as the foundation for the real application, which would result in a codebase that's difficult to maintain in the long run.
 
@@ -846,7 +857,3 @@ Throughout this rapid prototyping journey with ChatGPT, a few key insights emerg
 - **Engineer’s Role**: Generative AI is not (yet?) at the point where a functioning product can be produced without any engineering. When I gave it the problem statement exactly as worded by the SME, the initial output didn’t make sense and failed to respond to user input.
 
 These lessons reaffirm that while AI can accelerate development and handle routine tasks, the nuanced decision-making and problem-solving abilities of a skilled engineer working together with a product manager and/or subject matter expert are still needed.
-
-## TODO
-
-* edit

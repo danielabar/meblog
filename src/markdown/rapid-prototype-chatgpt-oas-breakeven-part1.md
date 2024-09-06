@@ -10,11 +10,11 @@ related:
   - "Build and Publish a Presentation with RevealJS and Github"
 ---
 
-When building software, especially for complex financial scenarios, it's crucial to determine if you're on the right track before investing significant effort in selecting the language to build in, framework, architecture, automated testing, and setting up CI/CD pipelines. Rapid prototyping allows you to quickly reach valuable insights and validate your approach.
+When building software, it's crucial to determine if you're on the right track before investing significant effort in selecting the language to build in, framework, architecture, automated testing, and setting up CI/CD pipelines. Rapid prototyping allows you to quickly reach valuable insights and validate your approach.
 
 I had an opportunity to collaborate with [John Stapleton](https://openpolicyontario.com/), a subject matter expert on social assistance policy and poverty reduction, on an Old Age Security (OAS) breakeven calculator, targeted at low income Canadian seniors. The [Old Age Security](https://www.canada.ca/en/services/benefits/publicpensions/cpp/old-age-security.html) pension is a monthly payment Canadians can get if they are 65 and older. This post will demonstrate how I used ChatGPT to quickly build a prototype and validate our ideas. The final prototype is available [here](https://danielabar.github.io/oas-delay-calculator-prototype/).
 
-In this first part, I'll walk you through the problem we aimed to address and the initial steps in building the prototype, including setting up the necessary calculations and visualization.
+This is the first part of a two-part series. In this first part, I'll walk you through the problem we aimed to address and the initial steps in building the prototype, including setting up the necessary calculations and visualization. In [Part 2](../rapid-prototype-chatgpt-oas-breakeven-part2), we’ll dive deeper into building the user interface, handling inputs, and refining the prototype.
 
 **Disclaimer:** The content in this post is for informational purposes only and should not be considered financial advice. The OAS pension breakeven calculator prototype is a tool designed to illustrate potential outcomes based on specific scenarios. Individual financial situations vary, and it’s important to consult with a qualified financial advisor or professional before making any decisions regarding Old Age Security (OAS) or other financial matters.
 
@@ -42,7 +42,7 @@ Before building any software, we must first understand the rules around OAS pens
 4. Canadians whose income is below the cutoff for GIS (Guaranteed Income Supplement), also qualify for an additional top up to their OAS, however they must claim OAS to also receive the GIS amount.
 
 <aside class="markdown-aside">
-There's more nuance to these rules, but the details are not needed for the prototype. For further information, visit the Government of Canada's <a class="markdown-link" href="https://www.canada.ca/en/services/benefits/publicpensions/cpp/old-age-security.html">OAS page</a>.
+There's more nuance to these rules, but the details are not needed for the prototype. For further information, visit the Government of Canada's <a class="markdown-link" href="https://www.canada.ca/en/services/benefits/publicpensions/cpp/old-age-security/eligibility.html">OAS eligibility page</a>.
 </aside>
 
 ## Initializing the Prototype
@@ -52,7 +52,7 @@ The idea was to get something that the subject matter expert and others could tr
 The simplest possible implementation would be a single `index.html` containing all the markup, and logic in a script tag `<script>...</script>`. I didn't want to spend time setting up a build system. I envisioned from pushing any changes, to immediately having the new code available. To support this, I setup a GitHub repository to only have a `gh-pages` branch. Then any changes pushed to the branch are automatically deployed to GitHub pages. Here are the steps to do this:
 
 * While logged in to your GitHub account, create a new public GitHub repo, name it `whatever_prototype`, do not initialize repo with any files.
-* Clone the repository to your laptop: `git clone..`
+* Clone the repository to your laptop: `git clone ...`
 * `cd` into the repository you just cloned
 * Create an empty branch: `git checkout --orphan gh-pages`
 * Create an empty commit: `git commit --allow-empty -m "Initialize gh-pages branch"`
@@ -69,7 +69,7 @@ The goal was to show that delaying OAS to a later age may not be worth it for ma
 
 I started with some manual calculations, assuming the simplest case: Someone who is eligible for a full OAS pension at 65, and not eligible for GIS. For 2024, they would receive a monthly OAS amount of $713.34 if starting at age 65. This means by the time they turn 66, they would have received a total of $713.34 * 12 = $8,560.08, i.e. 12 monthly payments. And by age 67, they would have a total of $713.34 * 12 * 2 = $17,120.16, i.e. 12 monthly payments per year at 2 years. By age 70, this person would have accumulated 5 years worth of payments which is 60 months for a total of $713.34 * 12 * 5 = $42,800.40. And so on, for each year the person is still alive and collecting OAS.
 
-On the other hand, waiting until age 70 would increase the monthly payment by 36%, i.e. 0.06% for each month delay, so 5 years of delay === 60 months, and 60 * 0.06% = 36%. So that 713.34 monthly payment would turn into: $713.34 * 1.36 = $970.14. By the time this person turns 71, they would have a total of $970.14 * 12 = $11,641.68. While this sounds like an impressive amount more than the $8,560.08 amount they would have had in one year if starting at 65, they're missing out on the $42,800.40 they could have had by starting at age 65.
+On the other hand, waiting until age 70 would increase the monthly payment by 36%, i.e. 0.06% for each month delay, so 5 years of delay === 60 months, and 60 * 0.6% = 36%. So that 713.34 monthly payment would turn into: $713.34 * 1.36 = $970.14. By the time this person turns 71, they would have a total of $970.14 * 12 = $11,641.68. While this sounds like an impressive amount more than the $8,560.08 amount they would have had in one year if starting at 65, they're missing out on the $42,800.40 they could have had by starting at age 65.
 
 <aside class="markdown-aside">
 To keep things simple, I'm ignoring annual inflation adjustments and comparing everything in today's dollars.
@@ -276,7 +276,7 @@ Hovering over any point on a line, renders a tooltip with the age and total OAS 
 
 The first attempt is not too bad. Using ChatGPT saved me a lot of time in setting up the initial scaffold for rendering a chart and writing functions to generate the data. However, the resulting chart requires effort from the user to hover over the intersection point to see the details of the break even point.
 
-I asked ChatGPT if there was a way to add a marker of sorts on the chart for the intersection point and to label it the breakeven age. It told me that Chart.js has an [annotation plugin](https://www.chartjs.org/chartjs-plugin-annotation/latest/) for this purpose. It proceeded to generate some code but it didn't work. My research revealed that the annotation plugin is not built into Chart.js, but rather, a separate library needs to be pulled in.
+I asked ChatGPT if there was a way to add a marker on the chart for the intersection point and to label it the breakeven age. It told me that Chart.js has an [annotation plugin](https://www.chartjs.org/chartjs-plugin-annotation/latest/) for this purpose. It proceeded to generate some code but it didn't work. My research revealed that the annotation plugin is not built into Chart.js, but rather, a separate library needs to be pulled in.
 
 After explaining this to ChatGPT it modified the prototype to pull in the annotation plugin from a CDN, add an `annotations` section to the chart configuration, and a `findBreakevenAge` function, called when rendering the annotation:
 
@@ -379,7 +379,7 @@ const findBreakevenAge = () => {
 };
 ```
 
-There's a third issue with respect to efficiency in that the `findBreakevenAge()` function is calling the data generation functions again, even though they've already been called to render the lines. That's easily fixable by extracting these to constants and re-using them for both chart and annotation generation. I wasn't worried about that at this time as I just wanted to get something working.
+There's a third issue with respect to efficiency in that the `findBreakevenAge()` function is calling the data generation functions again, even though they've already been called to render the lines. That's easily fixable by extracting these to constants and re-using them for both chart and annotation generation. I wasn't worried about optimizing at this time as I just wanted to get something working.
 
 And here is the visual result from these fixes:
 
@@ -390,7 +390,3 @@ Now the breakeven annotation is correctly rendered exactly where the two lines i
 ## Conclusion
 
 With the basic calculations and visualizations in place, we had a foundational prototype that could illustrate the impact of delaying OAS. However, to make the tool truly useful, it needed to allow users to input their own data, such as their age, years of residency in Canada, and income range, to see personalized results. In the [next part](../rapid-prototype-chatgpt-oas-breakeven-part2), we'll dive into adding a user input form, and refine the prototype to respond to user input effectively and display personalized results.
-
-## TODO
-
-* edit
