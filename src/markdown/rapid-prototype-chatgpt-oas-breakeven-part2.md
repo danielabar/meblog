@@ -7,7 +7,7 @@ category: "productivity"
 related:
   - "Hack Your RRSP Tax Refund"
   - "When the Password Field Says No to Paste"
-  - "You Can Have Your Browser Tabs and Use Them Too"
+  - "A Tale of Rails, ChatGPT, and Scopes"
 ---
 
 This is the second of a two-part series on rapid prototyping with ChatGPT. If you missed it, the [first part](../rapid-prototype-chatgpt-oas-breakeven-part1) covered the foundational steps in building an Old Age Security (OAS) breakeven calculator - a tool designed to help low-income Canadian seniors decide whether to delay their OAS pension. The OAS pension is a monthly payment for Canadians aged 65 and older, and the decision to delay it can have a significant impacts, especially for those eligible for the Guaranteed Income Supplement (GIS).
@@ -22,11 +22,15 @@ Where we left off in Part 1, there was a functional visualization comparing the 
 
 ![prototype oas breakeven annotation](../images/prototype-oas-breakeven-annotation.png "prototype oas breakeven annotation")
 
-The next step was to add in some flexibility with user input. For example, what if a user wants to delay to age 68 rather than 70, how would that impact the break even age? The code up to this point was hard-coded assuming a user would be delaying to age 70.
+The next step is to add user input. For example, what if a user wants to delay to age 68 rather than 70, how would that impact the break even age? The code up to this point was hard-coded assuming a user would be delaying to age 70.
 
-Starting with the UI, I asked ChatGPT to generate a responsive form using TailwindCSS styles with a dropdown for which age to delay taking OAS, between 66 and 70, and a submit button. There's no benefit to delaying beyond age 70 because the 0.6% increase per month of delay maxes out at 60 months delay, i.e. 5 years from age 65 which is 70. I told it to make the field required, and default to 70.
+Starting with the UI, I asked ChatGPT to generate a responsive form using TailwindCSS styles with a dropdown for which age to delay taking OAS. The dropdown should have values between 66 and 70, and a submit button.  I told it to make the field required, and default to 70.
 
-It added the following form to the markup, just above the chart, contained in a panel with a subtle shadow:
+<aside class="markdown-aside">
+Why not delay past age 70? There's no benefit to delaying beyond age 70 because the 0.6% increase per month of delay maxes out at 60 months delay, i.e. 5 years from age 65 which is 70. See the "Applying to delay your first payment" section of the <a class="markdown-link" href="https://www.canada.ca/en/services/benefits/publicpensions/cpp/old-age-security/benefit-amount.html">OAS Benefit Amount</a> for more details.
+</aside>
+
+ChatGPT added the following form to the markup, just above the chart, contained in a panel with a subtle shadow:
 
 ```htm
 <!-- Added a panel for the form -->
@@ -439,9 +443,9 @@ This shows that there's no extra benefit to delaying for people that don't have 
 
 ## GIS Eligibility
 
-A factor that should influence the decision to delay OAS is eligibility for the [Guaranteed Income Supplement](https://www.canada.ca/en/services/benefits/publicpensions/cpp/old-age-security/guaranteed-income-supplement.html) (GIS). GIS is a non-taxable benefit provided to low-income seniors in Canada who are already receiving OAS. It's designed to top up their income, ensuring that even those with minimal financial resources can maintain a basic standard of living.
+A factor that should influence the decision to delay OAS is eligibility for the [Guaranteed Income Supplement](https://www.canada.ca/en/services/benefits/publicpensions/cpp/old-age-security/guaranteed-income-supplement.html) (GIS). GIS is a non-taxable benefit provided to low-income seniors in Canada who are already receiving OAS. It's designed to top up their income, ensuring that people with minimal financial resources can maintain a basic standard of living.
 
-It's important for the prototype calculator to take GIS into account because it can significantly increase the monthly payment amounts that a person could receive starting at age 65. And if this person were to delay taking OAS, they are necessarily also delaying GIS, because GIS is only available to those claiming OAS. This additional income can make a crucial difference to the standard of living for someone who is low income. And yet, many low income seniors are delaying OAS.
+It's important for the prototype calculator to take GIS into account because it can significantly increase the monthly payment amounts that a person could receive starting at age 65. If this person were to delay taking OAS, they are necessarily also delaying GIS, because GIS is only available to those claiming OAS. This additional income can make a crucial difference to the standard of living for someone who is low income. And yet, many low income seniors are delaying OAS.
 
 Accurately determining the amount of GIS a person is eligible for depends on many [factors](https://www.canada.ca/en/services/benefits/publicpensions/cpp/old-age-security/guaranteed-income-supplement/eligibility.html). For the prototype, I simplified the approach by downloading the latest GIS lookup table (which was Apr. 2024 at the time of this writing) for a single person from [Open Government Canada](https://open.canada.ca/data/en/dataset/dfa4daf1-669e-4514-82cd-982f27707ed0). The GIS lookup table is a csv file that contains rows for income ranges and the monthly GIS amount for a person whose annual income falls in that range. It's sorted from the lowest to highest income that's eligible.
 
@@ -468,9 +472,9 @@ At the lowest end, if someone is aged 65 or above and claiming OAS, and their an
 The OAS amount does not count as income when determining GIS. However, other sources such as (but not limited to) CPP (Canada Pension Plan), private pension plans, withdrawals from registered retirement accounts, and employment income does.
 </aside>
 
-The entire file is over 1000 lines long, and as far as I know, there is no publicly accessible API to access this information. To make use of this data, I decided on another heuristic approach.
+The entire file is over 1000 lines long, and as far as I know, there is no publicly accessible API to access this information. To make use of this data, I decided on a heuristic.
 
-I provided ChatGPT with the minimum and maximum income ranges from the CSV, then asked it to divide these into quartiles, and to create four radio button options for income ranges in the form, and an additional radio button for over the maximum range. Here is the markup it added to the form:
+I provided ChatGPT with the minimum and maximum income ranges from the CSV as well as a sampling from roughly around the first quarter, middle, and last quarter. I asked ChatGPT to divide these into quartiles, and to create four radio button options for income ranges in the form, and an additional radio button for over the maximum range. Here is the markup it added to the form:
 
 ```htm
 <!-- Annual Income -->
@@ -848,12 +852,12 @@ However, it's crucial to pause development at this stage. Continuing to build be
 
 Throughout this rapid prototyping journey with ChatGPT, a few key insights emerged:
 
-- **Speed**: The development process was notably faster, especially during the initial setup of Chart.js, and form building.
-- **Functional UI**: Although the generated UI may not win design awards, it’s functional, with neat alignment, accessible tab order, and overall consistent design elements.
+- **Speed**: The development process was notably faster, especially during the initial setup of Chart.js, form building, and what would have been a tedious task of building the customized results explanation.
+- **Functional UI**: Although the generated UI may not win design awards, it’s functional, with neat alignment, accessible tab order, and overall consistency.
 - **Bugs and Limitations**: Introducing new features sometimes led to bugs, as updates didn’t always integrate seamlessly with existing code.
 - **Complex Logic**: ChatGPT struggled with the breakeven logic, requiring manual intervention to refine the algorithm before it could generate correct code.
-- **Code Style**: It often suggested creating anonymous functions like `const findBreakevenAge = () => {...}`, which resulted in confusing stack traces. I prefer traditional function declarations like `function findBreakevenAge() {...}` for clearer debugging.
+- **Code Style**: It often suggested creating anonymous functions like `const findBreakevenAge = () => {...}`, which result in confusing stack traces. I prefer traditional function declarations like `function findBreakevenAge() {...}` for clearer debugging.
 - **Efficiency Concerns**: Redundant calculations and hard-coded values required manual optimization, highlighting the need for developer oversight.
-- **Engineer’s Role**: Generative AI is not (yet?) at the point where a functioning product can be produced without any engineering. When I gave it the problem statement exactly as worded by the SME, the initial output didn’t make sense and failed to respond to user input.
+- **Engineer’s Role**: Generative AI is not (yet?) at the point where a functioning product can be produced without any engineering. When I gave it the problem statement exactly as worded by the SME, the initial output was confusing and failed to respond to user input.
 
-These lessons reaffirm that while AI can accelerate development and handle routine tasks, the nuanced decision-making and problem-solving abilities of a skilled engineer working together with a product manager and/or subject matter expert are still needed.
+These lessons show that while AI can accelerate development and handle routine tasks, the nuanced decision-making and problem-solving abilities of a skilled engineer working together with a product manager or subject matter expert are still needed.

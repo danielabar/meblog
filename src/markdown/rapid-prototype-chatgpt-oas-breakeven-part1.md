@@ -63,11 +63,23 @@ Now anytime you push new changes while on the `gh-pages` branch, they will get d
 
 With the setup out of the way, it was time to start building.
 
-## Start with the Math
+## Initial Attempt
+
+My first attempt was to pretend to be a non technical business user. I gave ChatGPT the problem statement exactly as worded from the John, the subject matter expert, along with the OAS rules from the government website, and asked it to build "something" to solve the problem. It came up with the following:
+
+![prototype oas first attempt form](../images/prototype-oas-first-attempt-form.png "prototype oas first attempt form")
+
+![prototype oas first attempt results](../images/prototype-oas-first-attempt-results.png "prototype oas first attempt results")
+
+The problem was no matter what inputs I entered in the form, it produced the exact same output. Also the bar chart didn't seem helpful in a decision making process. But despite explaining to ChatGPT these issues, it continued to produce the same output.
+
+It was at this point I realized I would have to take more technical control over the process, starting with an analysis of income streams.
+
+## The Math
 
 The goal was to show that delaying OAS to a later age may not be worth it for many people as they would have to outlive the [Statistics Canada](https://www150.statcan.gc.ca/n1/en/catalogue/84-537-X) life expectancy values to have more money overall by delaying.
 
-I started with some manual calculations, assuming the simplest case: Someone who is eligible for a full OAS pension at 65, and not eligible for GIS. For 2024, they would receive a monthly OAS amount of $713.34 if starting at age 65. This means by the time they turn 66, they would have received a total of $713.34 * 12 = $8,560.08, i.e. 12 monthly payments. And by age 67, they would have a total of $713.34 * 12 * 2 = $17,120.16, i.e. 12 monthly payments per year at 2 years. By age 70, this person would have accumulated 5 years worth of payments which is 60 months for a total of $713.34 * 12 * 5 = $42,800.40. And so on, for each year the person is still alive and collecting OAS.
+I ran some manual calculations, assuming the simplest case: Someone who is eligible for a full OAS pension at 65, and not eligible for GIS. For 2024, they would receive a monthly OAS amount of $713.34 if starting at age 65. This means by the time they turn 66, they would have received a total of $713.34 * 12 = $8,560.08, i.e. 12 monthly payments. And by age 67, they would have a total of $713.34 * 12 * 2 = $17,120.16, i.e. 12 monthly payments per year at 2 years. By age 70, this person would have accumulated 5 years worth of payments which is 60 months for a total of $713.34 * 12 * 5 = $42,800.40. And so on, for each year the person is still alive and collecting OAS.
 
 On the other hand, waiting until age 70 would increase the monthly payment by 36%, i.e. 0.06% for each month delay, so 5 years of delay === 60 months, and 60 * 0.6% = 36%. So that 713.34 monthly payment would turn into: $713.34 * 1.36 = $970.14. By the time this person turns 71, they would have a total of $970.14 * 12 = $11,641.68. While this sounds like an impressive amount more than the $8,560.08 amount they would have had in one year if starting at 65, they're missing out on the $42,800.40 they could have had by starting at age 65.
 
