@@ -30,7 +30,11 @@ In the Toronto Metropolitan area, where just over 70% of seniors are immigrants,
 2. Understanding that waiting until age 70 increases their monthly payments.
 3. Mainstream advice from some financial planners advocating for delaying OAS. This advice is sound if the money is not required and there is no eligibility for Guaranteed Income Supplement (GIS). However, for those eligible for significant GIS amounts, waiting might not be in their best interest.
 
-The goal is to build a free online tool to illustrate these nuances, and encourage people who would benefit to apply for their OAS pension as soon as possible rather than delaying.
+<aside class="markdown-aside">
+While the data mentioned above is not published, it is based on custom Statistics Canada data that has been privately obtained. If you're interested in accessing this information, you can <a class="markdown-link" href="https://openpolicyontario.com/contact/">contact John Stapleton</a> for further details or to request the data directly.
+</aside>
+
+The goal is to build a free online tool to illustrate these nuances, and encourage people who would benefit from applying earlier or when first eligible at 65.
 
 ## OAS Rules
 
