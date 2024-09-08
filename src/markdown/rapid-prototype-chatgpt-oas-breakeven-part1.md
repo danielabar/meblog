@@ -81,8 +81,6 @@ It was at this point I realized I would have to take more technical control over
 
 ## The Math
 
-The goal was to show that delaying OAS to a later age may not be worth it for many people as they would have to outlive the [Statistics Canada](https://www150.statcan.gc.ca/n1/en/catalogue/84-537-X) life expectancy values to have more money overall by delaying.
-
 I ran some manual calculations, assuming the simplest case: Someone who is eligible for a full OAS pension at 65, and not eligible for GIS. For 2024, they would receive a monthly OAS amount of $713.34 if starting at age 65. This means by the time they turn 66, they would have received a total of $713.34 * 12 = $8,560.08, i.e. 12 monthly payments. And by age 67, they would have a total of $713.34 * 12 * 2 = $17,120.16, i.e. 12 monthly payments per year at 2 years. By age 70, this person would have accumulated 5 years worth of payments which is 60 months for a total of $713.34 * 12 * 5 = $42,800.40. And so on, for each year the person is still alive and collecting OAS.
 
 On the other hand, waiting until age 70 would increase the monthly payment by 36%, i.e. 0.06% for each month delay, so 5 years of delay === 60 months, and 60 * 0.6% = 36%. So that 713.34 monthly payment would turn into: $713.34 * 1.36 = $970.14. By the time this person turns 71, they would have a total of $970.14 * 12 = $11,641.68. While this sounds like an impressive amount more than the $8,560.08 amount they would have had in one year if starting at 65, they're missing out on the $42,800.40 they could have had by starting at age 65.
@@ -91,7 +89,7 @@ On the other hand, waiting until age 70 would increase the monthly payment by 36
 To keep things simple, I'm ignoring annual inflation adjustments and comparing everything in today's dollars.
 </aside>
 
-I explained the OAS rules above to ChatGPT and asked it to generate a table with columns for age, going from age 66 through 90, calculate the OAS amount someone would have accumulated by that age if they had started at 65, and another column for starting at 70, and then to calculate the difference between starting at 70 and 65.
+I explained the OAS rules above to ChatGPT and asked it to generate a table with columns for age, going from age 66 through 90, calculate the total OAS amount someone would have accumulated by that age if they had started at 65, and another column for starting at 70, and then to calculate the difference between starting at 70 and 65.
 
 Here are the results - I've highlighted age 84, explanation to follow:
 
@@ -125,7 +123,7 @@ Here are the results - I've highlighted age 84, explanation to follow:
 
 The amounts represent the *total* OAS accumulated. Even though starting at age 70 results in a higher monthly payment compared to starting at age 65, the table above shows that the *total* OAS accumulated is less up until age 84, when it starts to pull ahead. In other words, someone would have to live until at least age 84 to have a greater total amount. And even then, it's only a few hundred dollars.
 
-Given that according to Statistics Canada data [combined life expectancy](https://www150.statcan.gc.ca/t1/tbl1/en/tv.action?pid=1310011401&pickMembers%5B0%5D=1.1&pickMembers%5B1%5D=3.1&pickMembers%5B2%5D=4.8&cubeTimeFrame.startYear=2020+%2F+2022&cubeTimeFrame.endYear=2020+%2F+2022&referencePeriods=20200101%2C20200101) (for men and women that have reached age 65) for 2022 is ~85, you can start to see that it may not make sense for many people to delay OAS to age 70.
+Given that according to Statistics Canada data [combined life expectancy](https://www150.statcan.gc.ca/t1/tbl1/en/tv.action?pid=1310011401&pickMembers%5B0%5D=1.1&pickMembers%5B1%5D=3.1&pickMembers%5B2%5D=4.8&cubeTimeFrame.startYear=2020+%2F+2022&cubeTimeFrame.endYear=2020+%2F+2022&referencePeriods=20200101%2C20200101) (for men and women that have reached age 65) for 2022 is ~85, you can start to see that it may not make sense for some people to delay OAS to age 70.
 
 ## Visualization
 
@@ -134,9 +132,9 @@ While the table of numbers is useful, some people's eyes glaze over when present
 * The horizontal `x` axis is for age (i.e. time moving forward)
 * The vertical `y` axis is for total accumulated OAS
 
-The two streams of income (Start at 65, Start at 70) could be visualized as two lines on this chart, showing the total OAS income over time for starting payments at age 65 versus age 70. Each point on a line would represent the total OAS accumulated at that age. The line that starts at age 70 would have a greater slope because each payment is greater, but it would also start "pushed out to the right" because the payments from age 65 - 70 would be 0. The line that starts at age 65 would have a lower slope due to lower monthly payments. This mean the two lines would have to intersect, and the age at which they intersect would be the break even age.
+The two streams of income (Start at 65, Start at 70) could be visualized as two lines on this chart, showing the total OAS income over time for starting payments at age 65 versus age 70. Each point on a line would represent the total OAS accumulated at that age. The line that starts at age 70 would have a steeper slope because each payment is greater, but it would also start "pushed out to the right" because the payments from age 65 - 70 would be 0. The line that starts at age 65 would have a flatter slope due to lower monthly payments, and start at the origin (age 65). This mean the two lines would have to intersect, and the age at which they intersect would be the break even age.
 
-This would require bringing in a charting library. I decided to go with [Chart.js](https://www.chartjs.org/) because it's relatively simple to use and results in pleasing looking charts with the default configuration, perfect for a prototype where there is no designer. It also has support for [responsive charts](https://www.chartjs.org/docs/latest/configuration/responsive.html).
+This would require bringing in a charting library. I decided to go with [Chart.js](https://www.chartjs.org/) because it's relatively simple to use and results in pleasing looking charts with the default configuration. This is ideal for a prototype where there is no designer. It also has support for [responsive charts](https://www.chartjs.org/docs/latest/configuration/responsive.html).
 
 I asked ChatGPT to generate an `index.html` with a line chart using Chart.js, with two lines on the chart representing total accumulated OAS starting at age 65 and starting at age 70, using the business rules I had explained earlier. I also asked for a title "Should I Delay Old Age Security" and told it to use [TailwindCSS](https://tailwindcss.com/) for styling and to make it a mobile first design.
 
@@ -364,7 +362,7 @@ After explaining this to ChatGPT it modified the prototype to pull in the annota
 However, it wasn't rendering an annotation on the chart. After debugging into the code, I discovered two issue:
 
 1. The datasets `data65` and `data70` aren't comparable by starting at the 0th index of data65 because the ages don't match. i.e. the 0th age of `data65` is `65` whereas 0th age of `data70` is `70`. To find the break even age we need to compare that datasets at the same ages.
-2. The `findBreakevenAge()` function generated by ChatGPT was trying to find an exact equality of OAS at two ages. However, recall from the initial [math analysis](../rapid-prototype-chatgpt-oas-brakeven-part1#start-with-the-math), the incomes are never exactly equal. For example the breakeven age of 84 showed approximately a $300 difference.
+2. The `findBreakevenAge()` function generated by ChatGPT was trying to find an exact equality of OAS at two ages. However, recall when the [income streams were compared](../rapid-prototype-chatgpt-oas-breakeven-part1#the-math), the incomes are never exactly equal. For example the breakeven age of 84 showed approximately a $300 difference.
 
 I explained the above to ChatGPT and told it to start comparing the datasets at age 70. I also to find the age at which the absolute difference between the two income streams is less than or equal to $2000, i.e. to use a heuristic rather than looking for exact equality which doesn't exist.
 
@@ -405,4 +403,4 @@ Now the breakeven annotation is correctly rendered exactly where the two lines i
 
 ## Conclusion
 
-With the basic calculations and visualizations in place, we had a foundational prototype that could illustrate the impact of delaying OAS. However, to make the tool truly useful, it needed to allow users to input their own data, such as their age, years of residency in Canada, and income range, to see personalized results. In the [next part](../rapid-prototype-chatgpt-oas-breakeven-part2), we'll dive into adding a user input form, and refine the prototype to respond to user input effectively and display personalized results.
+With the basic calculations and visualizations in place, we had a solid prototype to illustrate the impact of delaying OAS. To make the tool useful however, it needed to accommodate user input, such as age to delay (for example, how does it look if delaying to age 68 rather than 70), years of residency in Canada, and income range, for personalized results. In the [next part](../rapid-prototype-chatgpt-oas-breakeven-part2), we'll focus on adding a user input form and refining the prototype to effectively respond to and display personalized data.

@@ -314,7 +314,7 @@ However, the benefits of delaying do not "stack". What the government of Canada 
 In our example of someone that has 35 years in Canada, if they were to start at age 65, they would qualify for $713.34 * (35/40) = $624.17 per month. Then if they were to delay for 3 years, i.e. 36 months, this would increase the monthly amount to $624.17 * (1 + (36 * 0.006)) = $758.99. i.e. the 0.6% increase per month of delay is applying to the 35/40th fraction of the full pension amount.
 
 <aside class="markdown-aside">
-Technically the person could write in a request to the government asking to use the residency increase INSTEAD OF the monthly increase, however, the monthly 0.6% increase always results in a greater amount than the residency fraction increase, so in practice, this is never done.
+Technically the person could write in a request to the government asking to use the residency increase INSTEAD OF the monthly increase. However, the monthly 0.6% increase (aka actuarially adjusted amount) always results in a greater amount than the residency fraction increase, so in practice, this is never done.
 </aside>
 
 I explained the above rules to ChatGPT and asked it to update the form with an input for years lived in Canada between ages 18 and 65, that could be an integer between 1 and 40 years, and update the calculation to extract this value from the form upon submission, and use it to determine the monthly OAS amount.
@@ -435,7 +435,7 @@ With the code in place, we can now run the analysis for someone with 35 years in
 
 ![prototype oas 35 years residency take at age 68](../images/prototype-oas-35-years-residency-take-at-age-68.png "prototype oas 35 years residency take at age 68")
 
-What's interesting is that even for someone with a full 40 years of residency, delaying to age 68 puts the breakeven age at 82 as well. And notice that the slopes and distances between the two lines are the same even as with only 35 years in Canada (although the absolute amount of OAS will be different):
+What's interesting is that even for someone with a full 40 years of residency, delaying to age 68 puts the breakeven age at 82 as well. And notice that the slopes and distances between the two lines are similar as with only 35 years in Canada (although the absolute amount of OAS will be different):
 
 ![prototype oas 40 years residency take at age 68](../images/prototype-oas-40-years-residency-delay-to-68.png "prototype oas 40 years residency take at age 68")
 
@@ -775,11 +775,11 @@ Finally putting all this together, we now have a functioning input form, with th
 
 ## Bonus: Logo Generation
 
-To add a final touch to the prototype, I wanted a custom logo for the header and favicon, avoiding the default grey globe in the browser tab:
+To add a final touch to the prototype, I wanted a custom logo for the header and favicon, rather than the default grey globe in the browser tab:
 
 ![prototype oas generic favicon](../images/prototype-oas-generic-favicon.png "prototype oas generic favicon")
 
-Generative AI proved useful here as well. Using Stable Diffusion with the [Draw Things](https://drawthings.ai/) app, I began by asking ChatGPT for a logo prompt. Here’s what it suggested:
+Generative AI proved useful here as well. Using [Stable Diffusion](https://en.wikipedia.org/wiki/Stable_Diffusion) with the [Draw Things](https://drawthings.ai/) app, I began by asking ChatGPT for a logo prompt. Here’s what it suggested:
 
 ```
 An elegant and modern logo design featuring a stylized hourglass
@@ -852,7 +852,7 @@ However, it's crucial to pause development at this stage. Continuing to build be
 
 Throughout this rapid prototyping journey with ChatGPT, a few key insights emerged:
 
-- **Speed**: The development process was notably faster, especially during the initial setup of Chart.js, form building, and what would have been a tedious task of building the customized results explanation.
+- **Speed**: The development process was notably faster, especially during the initial setup of Chart.js, form building, and what would have been a tedious task of building the customized results template.
 - **Functional UI**: Although the generated UI may not win design awards, it’s functional, with neat alignment, accessible tab order, and overall consistency.
 - **Bugs and Limitations**: Introducing new features sometimes led to bugs, as updates didn’t always integrate seamlessly with existing code.
 - **Complex Logic**: ChatGPT struggled with the breakeven logic, requiring manual intervention to refine the algorithm before it could generate correct code.
