@@ -587,13 +587,13 @@ With the GIS code changes in place, we can run the tool again for someone with 3
 
 ![prototype oas gis](../images/prototype-oas-gis.png "prototype oas gis")
 
-Whoa! The breakeven age has jumped up to 91, at an accumulated OAS + GIS income of ~319K. Given the Statistics Canada life expectancy of age 83 (for combined male/female having reached age 65), delaying looks more like a losing proposition in this case.
+Whoa! The breakeven age has jumped up to 91, at an accumulated OAS + GIS income of ~319K. Given the Statistics Canada life expectancy of age 85 (for combined male/female having reached age 65), delaying looks more like a losing proposition in this case.
 
 You can also see that the two income streams (start at 65 vs start at 68) are closer together compared to the previous case with no GIS, showing that the delayed start has negligible benefit even beyond age 91.
 
 The reason for this dramatic result is GIS eligibility.  The console output is showing `=== DETERMINED GIS: 398.95`. This (approximate) amount is added to the monthly OAS amount. This greatly increases the amount of income missed during the first 3 years, and is greater in magnitude than the percentage increase in monthly payments due to the delayed start. This means it's going to take longer for the smaller monthly increase to make up for three years of missed regular OAS and the GIS combined.
 
-Now we can understand that if someone is eligible for GIS, it's almost always sub-optimal to delay OAS.
+This demonstrates that delaying OAS is probably not a good idea for someone eligible for GIS.
 
 ## Explanatory Text
 
@@ -842,7 +842,7 @@ The prototype has successfully visualized and explained the impact of delaying O
 * For someone who is entitled to GIS, delaying is likely to be sub-optimal.
 * In all cases, delaying results in missing out on significant pension income that could have been useful in the early retirement years.
 
-There's still significant work required to transform it into a fully-fledged product. For example it could be more illustrative to have the Statistics Canada life expectancy layered on the chart. The lines should also "bend" at age 75 to account for an [increased amount](https://www.canada.ca/en/services/benefits/publicpensions/cpp/old-age-security/benefit-amount.html#h2.2) as per government policy since 2022.
+There's still significant work required to transform it into a fully-fledged product. For example it could be more illustrative to have the Statistics Canada life expectancy layered on the chart. The lines should also "bend" at age 75 to account for an [increased amount](https://www.canada.ca/en/services/benefits/publicpensions/cpp/old-age-security/benefit-amount.html#h2.2) as per government policy since 2022. It might also be better to round all the numbers to the nearest 100 and clarify that all numbers are approximations.
 
 There's also the work of selecting a suitable JavaScript framework to replace the increasingly complex imperative DOM manipulation, implementing automated unit and system tests, and extracting hard-coded numbers into meaningfully named constants. Additionally, a strategy will be required for updating figures based on government data, which is published quarterly or annually for inflation adjustments, and to set up a CI/CD pipeline along with automated tooling for code style and formatting.
 
@@ -858,6 +858,6 @@ Throughout this rapid prototyping journey with ChatGPT, a few key insights emerg
 - **Complex Logic**: ChatGPT struggled with the breakeven logic, requiring manual intervention to refine the algorithm before it could generate correct code.
 - **Code Style**: It often suggested creating anonymous functions like `const findBreakevenAge = () => {...}`, which result in confusing stack traces. I prefer traditional function declarations like `function findBreakevenAge() {...}` for clearer debugging.
 - **Efficiency Concerns**: Redundant calculations and hard-coded values required manual optimization, highlighting the need for developer oversight.
-- **Engineer’s Role**: Generative AI is not (yet?) at the point where a functioning product can be produced without any engineering. When I gave it the problem statement exactly as worded by the SME, the initial output was confusing and failed to respond to user input.
+- **Engineer’s Role**: Generative AI is not (yet?) at the point where a functioning product can be produced without any engineering effort. When I gave it the problem statement exactly as worded by the SME, the initial output was confusing and failed to respond to user input.
 
 These lessons show that while AI can accelerate development and handle routine tasks, the nuanced decision-making and problem-solving abilities of a skilled engineer working together with a product manager or subject matter expert are still needed.
