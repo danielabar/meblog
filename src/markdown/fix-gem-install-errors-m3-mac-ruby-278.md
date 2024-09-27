@@ -1,8 +1,8 @@
 ---
-title: "Fixing Gem Install Errors on M3 Mac with Ruby 2.7.8"
+title: "Fixing Gem Install Errors on M3 Mac with Ruby 2.7"
 featuredImage: "../images/fix-gem-install-issues-julien-pier-belanger-SoFNVdiJQgc-unsplash.jpg"
 description: "A guide to resolving common gem installation errors such as `pg`, `nokogiri`, and `msgpack` when setting up a Rails project on an M3 Mac with Ruby 2.7.8, including solutions and troubleshooting steps."
-date: "2024-10-01"
+date: "2025-02-01"
 category: "rails"
 related:
   - "Homebrew Postgresql Service not Starting Resolved"
@@ -10,7 +10,9 @@ related:
   - "Old Ruby and New Mac"
 ---
 
-When setting up a Rails 6.1 project on an M3 Mac using Ruby 2.7.8, I encountered various issues during `bundle install` for several gems like `pg`, `nokogiri`, and `msgpack`. This can happen due to the native extensions certain gems rely on, which aren't always fully compatible with newer Mac ARM architecture. Below, I’ll walk through each issue, including the error message you might see, an explanation of the issue, and the solution to fix it.
+When setting up a legacy Rails 6.1 project on an M3 Mac using Ruby 2.7.x, I encountered errors during `bundle install` for several gems like `pg`, `nokogiri`, and `msgpack`. This can happen due to the native extensions certain gems rely on, which aren't always fully compatible with newer Mac ARM architecture. While [Ruby 2.7.x is no longer officially supported](https://endoflife.date/ruby), it's still common to work with legacy systems that require older versions during maintenance or upgrades.
+
+In this post, I’ll walk through each issue, including the error message you might see, an explanation of the issue, and the solution to fix it.
 
 ##  Nokogiri
 
@@ -18,8 +20,6 @@ Here are snippets of the error I encountered during `bundle install` for the [no
 
 ```
 Gem::Ext::BuildError: ERROR: Failed to build gem native extension.
-
-current directory: /path/to/gems/nokogiri-1.15.6/ext/nokogiri
 
 Building nokogiri using packaged libraries.
 checking for iconv... yes
@@ -45,7 +45,7 @@ extconf failed, exit code 1
 An error occurred while installing nokogiri (1.15.6), and Bundler cannot continue.
 ```
 
-This error usually occurs when `nokogiri` fails to compile due to missing libraries or misconfigured compilation flags. On macOS, it often involves issues with `libxml2` or `iconv`, which `nokogiri` depends on.
+This error usually occurs when `nokogiri` fails to compile due to missing libraries or misconfigured compilation flags. On a Mac, it often involves issues with `libxml2` or `iconv`, which `nokogiri` depends on.
 
 Inspecting the `nokogiri-1.15.6/mkmf.log` file mentioned in the error message revealed a compilation error with `iconv`:
 
@@ -89,9 +89,9 @@ bundle config build.nokogiri --use-system-libraries
 
 This tells `nokogiri` to use the pre-installed libraries on your system.
 
-After running this, try running `bundle install` again, and the `pg` gem should compile successfully.
+After running this, try running `bundle install` again, and the `nokogiri` gem should compile successfully.
 
-For more discussion on this topic, see [Why does installing Nokogiri on Mac OS fail with libiconv is missing?](https://stackoverflow.com/questions/5528839/why-does-installing-nokogiri-on-mac-os-fail-with-libiconv-is-missing). This question [_libiconv or _iconv undefined symbol on Mac OSX](https://stackoverflow.com/questions/57734434/libiconv-or-iconv-undefined-symbol-on-mac-osx) provides further context.
+For more discussion on this topic, see [Why does installing Nokogiri on Mac OS fail with libiconv is missing?](https://stackoverflow.com/questions/5528839/why-does-installing-nokogiri-on-mac-os-fail-with-libiconv-is-missing). Also this question [_libiconv or _iconv undefined symbol on Mac OSX](https://stackoverflow.com/questions/57734434/libiconv-or-iconv-undefined-symbol-on-mac-osx) provides further context.
 
 ## PostgreSQL pg
 
@@ -140,8 +140,8 @@ Here are snippets of the error I encountered during `bundle install` for the [ms
 ```
 Gem::Ext::BuildError: ERROR: Failed to build gem native extension.
 
-    current directory: /Users/daniela.baron/.rbenv/versions/2.7.8/lib/ruby/gems/2.7.0/gems/msgpack-1.3.1/ext/msgpack
-/Users/daniela.baron/.rbenv/versions/2.7.8/bin/ruby -I /Users/daniela.baron/.rbenv/versions/2.7.8/lib/ruby/2.7.0 -r ./siteconf20240802-87419-1amtg6u.rb extconf.rb
+    current directory: /Users/myuser/.rbenv/versions/2.7.8/lib/ruby/gems/2.7.0/gems/msgpack-1.3.1/ext/msgpack
+/Users/myuser/.rbenv/versions/2.7.8/bin/ruby -I /Users/myuser/.rbenv/versions/2.7.8/lib/ruby/2.7.0 -r ./siteconf20240802-87419-1amtg6u.rb extconf.rb
 checking for ruby/st.h... yes
 checking for st.h... yes
 checking for rb_str_replace() in ruby.h... yes
@@ -153,10 +153,10 @@ checking for rb_hash_dup() in ruby.h... yes
 checking for rb_hash_clear() in ruby.h... yes
 creating Makefile
 
-current directory: /Users/daniela.baron/.rbenv/versions/2.7.8/lib/ruby/gems/2.7.0/gems/msgpack-1.3.1/ext/msgpack
+current directory: /Users/myuser/.rbenv/versions/2.7.8/lib/ruby/gems/2.7.0/gems/msgpack-1.3.1/ext/msgpack
 make "DESTDIR=" clean
 
-current directory: /Users/daniela.baron/.rbenv/versions/2.7.8/lib/ruby/gems/2.7.0/gems/msgpack-1.3.1/ext/msgpack
+current directory: /Users/myuser/.rbenv/versions/2.7.8/lib/ruby/gems/2.7.0/gems/msgpack-1.3.1/ext/msgpack
 make "DESTDIR="
 compiling buffer.c
 compiling buffer_class.c
@@ -181,9 +181,11 @@ In Gemfile:
     msgpack
 ```
 
-This error shows up when compiling the `msgpack` gem and sometimes the `bootsnap` gem. It's caused by stricter function pointer checks in the C extensions on the ARM architecture of the M3 Mac.
+<aside class="markdown-aside">
+The msgpack gem is a dependency of <a class="markdown-link" href="https://github.com/shopify/bootsnap">bootsnap</a>, which is often included in Rails applications to improve boot times by optimizing the loading of code.
+</aside>
 
-The ARM architecture is more sensitive to function pointer types, leading to compilation errors for gems that use native C extensions like `msgpack` and `bootsnap`.
+This error is caused by stricter function pointer checks when building C extensions on the ARM architecture of the M3 Mac.
 
 **Solution:**
 
@@ -196,17 +198,8 @@ bundle config set --global build.bootsnap "--with-cflags=-Wno-error=incompatible
 
 This will suppress the function pointer type warnings and allow the gems to install correctly.
 
-TODO: Ref: https://github.com/grpc/grpc/issues/35148
+This discussion on a different GitHub project has more information on the [incompatible function pointer type error on an M3 Mac](https://github.com/grpc/grpc/issues/35148).
 
 ## Conclusion
 
-When encountering gem installation errors on an M3 Mac using Ruby 2.7.8, it’s essential to inspect the console output and installation log files to understand the root cause. Whether it’s missing libraries, incorrect configuration, or ARM-specific compilation issues, using the correct flags and ensuring your environment is properly set up can help resolve the errors.
-
-## TODO
-
-* explain this particular Rails project depends on bootsnap, which in turn depends on msgpack
-* verify explanation for msgpack
-* order: pg, msgpack, nokogiri
-* figure out publish date
-* WIP main content
-* edit
+When encountering gem installation errors on an M3 Mac using Ruby 2.7.x, it’s essential to inspect the console output and installation log files to understand the root cause. Whether it’s missing libraries, incorrect configuration, or ARM-specific compilation issues, using the correct flags and ensuring your environment is properly set up can help resolve the errors.
