@@ -2,7 +2,7 @@
 title: "Rapid Prototyping with ChatGPT: OAS Pension Calculator Part 1"
 featuredImage: "../images/rapid-prototype-oas-part1-milad-fakurian-ePAL0f6jjr0-unsplash.jpg"
 description: "Discover the initial steps of using ChatGPT to rapidly prototype an OAS pension breakeven calculator. This first part covers the problem definition, business rules, and the creation of core calculations and visualizations, offering insights into the impact of delaying OAS for low-income Canadian seniors."
-date: "2024-12-01"
+date: "2024-10-01"
 category: "productivity"
 related:
   - "Promotional interest rates and the fine print"

@@ -2,7 +2,7 @@
 title: "Rapid Prototyping with ChatGPT: OAS Pension Calculator Part 2"
 featuredImage: "../images/rapid-prototype-oas-part2-kenny-eliason-KYxXMTpTzek-unsplash.jpg"
 description: "Continue exploring the development of the OAS pension breakeven calculator prototype in this second part. Learn how user input was integrated into the tool, enhancing its functionality and personalization. See how edge cases were handled, bugs were resolved, and how the prototype was refined to provide valuable insights for low-income Canadian seniors."
-date: "2024-12-02"
+date: "2024-10-02"
 category: "productivity"
 related:
   - "Hack Your RRSP Tax Refund"
