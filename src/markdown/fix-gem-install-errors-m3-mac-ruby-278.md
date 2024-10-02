@@ -77,7 +77,7 @@ checked program was:
 /* end */
 ```
 
-The error occurs when trying to link against the `iconv` library. The linker is failing because it cannot find the `iconv` symbols (`_iconv` and `_iconv_open`) for the architecture arm64.
+The error occurs when trying to link against the `iconv` library. The linker is failing because it cannot find the `iconv` symbols (`_iconv` and `_iconv_open`) for the arm64 architecture.
 
 **Solution:**
 
