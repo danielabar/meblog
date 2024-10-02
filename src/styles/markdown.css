@@ -152,6 +152,10 @@
   background-color: #ddd;
 }
 
+.markdown-table tr:has(td > .markdown-table-highlight) {
+  background-color: #FFD700;
+}
+
 .markdown-strikethrough {
   color: var(--post-strikethrough-font-color);
   font-family: sans-serif;

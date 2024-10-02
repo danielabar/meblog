@@ -17,6 +17,9 @@ jobs:
           node-version: "18"
           cache: "npm"
 
+      # - name: Set Node options
+      #   run: echo "NODE_OPTIONS=--max_old_space_size=2048" >> $GITHUB_ENV
+
       - name: install
         run: make install
 
