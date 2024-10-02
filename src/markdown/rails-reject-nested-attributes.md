@@ -2,7 +2,7 @@
 title: "Reject Nested Attributes in Rails"
 featuredImage: "../images/reject-nested-attributespawel-czerwinski-rfkXGUbYnS8-unsplash.jpg"
 description: "Learn how to use Rails accepts_nested_attributes_for and reject_if options to create flexible forms that handle nested models with optional associations."
-date: "2024-11-01"
+date: "2024-12-01"
 category: "rails"
 related:
   - "They Don't All Have To Be ActiveRecord Models"
@@ -194,7 +194,7 @@ class User < ApplicationRecord
 end
 ```
 
-The [accepts_nested_attribute_for](https://api.rubyonrails.org/classes/ActiveRecord/NestedAttributes/ClassMethods.html#method-i-accepts_nested_attributes_for) method defines an attribute writer for the specified association. This enabled a parent model to accept and update attributes for its associated child model. In the example above, we're declaring that from the `User` model, it can populate attributes for the `Address` model.
+The [accepts_nested_attribute_for](https://api.rubyonrails.org/classes/ActiveRecord/NestedAttributes/ClassMethods.html#method-i-accepts_nested_attributes_for) method defines an attribute writer for the specified association. This enables a parent model to accept and update attributes for its associated child model. In the example above, we're declaring that from the `User` model, it can populate attributes for the `Address` model.
 
 Next the `new` method in the `UsersController` is modified to build a potential address for the user using the `build_address` method:
 
