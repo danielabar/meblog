@@ -10,9 +10,9 @@ related:
   - "A Tale of Rails, ChatGPT, and Scopes"
 ---
 
-I was inspired to write this after encountering a LinkedIn discussion on the topic of cover letters. The debate centered on whether it still makes sense to submit a cover letter with your application in 2024 and beyond? Many on the thread thought it was no longer necessary, and that your resume and/or LinkedIn profile should be sufficient to show why you're a good fit for the job. While I didn't save the link to that specific discussion, a search for "cover letter waste" on LinkedIn yields many discussions and opinions.
+I was inspired to write this after encountering a LinkedIn discussion on the topic of cover letters. The debate centered on whether it still makes sense to submit a cover letter with your application in 2025 and beyond? Many on the thread thought it was no longer necessary, and that your resume and/or LinkedIn profile should be sufficient to show why you're a good fit for the job. While I didn't save the link to that specific discussion, a search for "cover letter waste" on LinkedIn yields many discussions and opinions.
 
-This post will cover why I think cover letters remain valuable and offer a technique to make writing them easier and more effective, especially for techies that use markdown.
+This post will cover why I think cover letters remain valuable and offer a technique to make writing them easier and more effective, especially for techies that use markdown. Writing a custom cover letter can feel daunting, as writing isn’t often a core focus in technical education. However, strong communication is essential in many tech roles, and a well-written cover letter can make a meaningful impact.
 
 Before getting into it, let's briefly define what a cover letter is: A document sent with your resume to provide additional information about your skills and experience. It typically highlights specific achievements and experiences that make you a suitable candidate for the job.
 
@@ -36,7 +36,7 @@ This is of course, anecdotal based on my experience. I don't have any hard data 
 
 ## The Nerd Way
 
-So how do we, as techies, tackle the often daunting task of writing cover letters? I’ve developed a process using Markdown that makes it a bit more enjoyable and, more importantly, more effective.
+I’ve developed a process using Markdown that makes it a bit more enjoyable and, more importantly, more effective.
 
 ### Gather Your Tools
 
@@ -46,7 +46,7 @@ Start by creating a simple Markdown document. I prefer to work in VSCode because
 
 Go through the job description with a fine-tooth comb. Your goal is to find key phrases or requirements that you can address directly. These might be specific technical skills, methodologies, or other skills like communication or teamwork. For each key responsibility or qualification, copy the text into your Markdown file like this:
 
-```
+```markdown
 > Design, develop, and ship major features using Ruby on Rails
 ```
 
@@ -56,10 +56,14 @@ By quoting the job description, you’re explicitly showing the recruiter that y
 
 Under each quoted sentence from the job description, write a paragraph explaining how you’ve applied that skill or experience in your career. This could be from work experience, a side project, or even coursework. For example:
 
-```
+```markdown
 > Design, develop, and ship major features using Ruby on Rails
 
-In my last role at XYZ Corp, I led the development of several major features using Rails. One of the highlights was integrating third-party APIs to enhance the platform’s capabilities, resulting in a 20% increase in user engagement. Additionally, I’ve written several blog posts sharing tips and tricks for Rails development, including [this post on caching strategies](https://example.com).
+In my last role at XYZ Corp, I led the development of several major features using Rails.
+One of the highlights was integrating third-party APIs to enhance the platform’s
+capabilities, resulting in a 20% increase in user engagement.
+Additionally, I’ve written several blog posts sharing tips and tricks
+for Rails development, including [this post on caching strategies](https://example.com).
 ```
 
 Notice how the response is specific to the requirement. It also provides concrete examples, which are far more compelling than general statements like, "I’m a strong developer." Whenever possible, link to relevant blog posts, side projects, or public code repositories that showcase your work.
@@ -68,27 +72,65 @@ Notice how the response is specific to the requirement. It also provides concret
 
 If you don’t have work experience that matches a requirement, don’t worry. Side projects, open-source contributions, volunteer work, or even personal study is also valuable. For example:
 
-```
+```markdown
 > Familiarity with Hotwire and Turbo
 
-While I haven’t used Hotwire in a professional setting yet, I’ve been working on a side project that integrates Turbo with Rails to create a real-time chat application. You can check it out on GitHub [here](https://github.com/username/chat-app).
+While I haven’t used Hotwire in a professional setting yet,
+I’ve been working on a side project that integrates Turbo with Rails
+to create a real-time chat application.
+You can check it out on GitHub [here](https://github.com/username/chat-app).
 ```
 
 You could also reference coursework or certifications. Mentioning a public-facing project, even a small one, shows initiative and your ability to learn new technologies.
 
 For example, if the job description mentions that Tailwind is a requirement or a nice to have:
 
-```
+```markdown
 > Experience with TailwindCSS
 
-I recently completed a Pluralsight course on TailwindCSS that covered utility-first principles and responsive design. As part of the course, I built a personal portfolio site using Tailwind, which you can view here: [My Tailwind Portfolio](https://example.com). I also wrote detailed course notes, documenting my learning process and challenges faced while implementing Tailwind in real-world scenarios: [TailwindCSS Course Notes](https://example.com/course-notes).
+I recently completed a Pluralsight course on TailwindCSS that covered
+utility-first principles and responsive design.
+As part of the course, I built a personal portfolio site using Tailwind,
+which you can view here: [My Tailwind Portfolio](https://example.com).
+I also wrote detailed course notes, documenting my learning process and
+challenges faced while implementing Tailwind in real-world scenarios:
+[TailwindCSS Course Notes](https://example.com/course-notes).
 ```
 
 This example shows how you can emphasize not only your experience but also your willingness to share your learning journey, which can make a strong impression on recruiters or hiring managers.
 
 ### Keep It Focused and Specific
 
-The goal is not to address every single point in the job description. Focus on 3-4 key responsibilities or qualifications that you can speak to the most. This ensures that your cover letter is concise and easy to read, making it more likely to get noticed.
+It's not necessary to address every single point in the job description. Focus on 3 - 4 key responsibilities or qualifications that you can speak to the most. This ensures that your cover letter is concise and easy to read, making it more likely to get noticed.
+
+### Wrap it Up
+
+Finish up the cover letter by adding a brief introduction and end with your profile links. The text below is just an example, customize it to suit your communication style and the company/role:
+
+```markdown
+Dear hiring team at [Company],
+
+I'm writing to apply for the [Role] position posted on [JobPostingSite].
+With a solid background in full-stack development and extensive experience
+in Ruby on Rails, I think this could be a good fit.
+Below, I highlight how my experience aligns with
+some responsibilities from the job description:
+
+> Phrase from JD
+
+My examples...
+
+> Phrase from JD
+
+My examples...
+
+Thank you for considering my application.
+
+Best regards,
+
+[Your Name]
+[Website](https://your.website/) • [LinkedIn](https://www.linkedin.com/in/user/) • [GitHub](https://github.com/user) • [LinkTree](https://linktr.ee/user)
+```
 
 ### Export to PDF
 
@@ -98,11 +140,11 @@ To use it in VSCode, follow these simple steps:
 
 1. Install the Markdown PDF extension.
 2. Configure the settings to define the export format and output directory (see below for an example configuration).
-3. Open your Markdown cover letter, then hit `Cmd + Shift + P` (on Mac) or `Ctrl + Shift + P` (on Windows/Linux) to open the command palette.
+3. Open your Markdown cover letter, then hit <kbd class="markdown-kbd">Cmd</kbd> + <kbd class="markdown-kbd">Shift</kbd> + <kbd class="markdown-kbd">P</kbd> (on Mac) or <kbd class="markdown-kbd">Ctrl</kbd> + <kbd class="markdown-kbd">Shift</kbd> + <kbd class="markdown-kbd">P</kbd> (on Windows) to open the command palette.
 4. Select `Markdown PDF: Export (pdf)`.
 5. Wait a few seconds, and your PDF will be generated!
 
-Here’s an example of my settings in `settings.json`:
+Here’s an example of my settings in `~/Library/Application Support/Code/User/settings.json`. The extension is supposed to download Chromium if an `executablePath` isn't provided but that didn't work for me so I had to specify the path to Chrome:
 
 ```json
 {
@@ -119,6 +161,24 @@ Here’s an example of my settings in `settings.json`:
 
 This means if you're working on a document named `cover-letter-acme-corp.md`, the pdf will be generated in `~/tmp/cover-letter-acme-corp.pdf`. Then it's ready for upload to your job application portal.
 
+Here's an example of what the pdf will look like:
+
+![cover letter example](../images/cover-letter-example.png "cover letter example")
+
+By default, the Markdown PDF extension generates a header with the file name and date in ISO format, and a footer with the page number. You can disable header or footer generation by adding this to your VSCode `settings.json`:
+
+```json
+{
+  // turn off header
+  "markdown-pdf.headerTemplate": "",
+
+  // turn off footer
+  "markdown-pdf.footerTemplate": "",
+}
+```
+
+You can also customize the contents of the header and footer using `markdown-pdf.headerTemplate` and `markdown-pdf.footerTemplate`. Read the [extension documentation](https://marketplace.visualstudio.com/items?itemName=yzane.markdown-pdf#pdf-options) for further details.
+
 ## Conclusion
 
 Writing a custom cover letter doesn’t have to be overwhelming. By using Markdown and focusing on specific, actionable examples from your experience, you can craft a letter that helps your application stand out. While it takes a bit more effort than sending a generic one, it’s often the extra touch needed to get noticed in a competitive job market.
@@ -126,8 +186,3 @@ Writing a custom cover letter doesn’t have to be overwhelming. By using Markdo
 Even if your cover letter ends up being ignored by a recruiter or filtered out by an ATS, the exercise itself is still worth it. Writing the letter forces you to clarify in your own mind why you're a great fit for the role. And if you do land that initial call, you'll be better prepared to answer the inevitable "why are you a good fit for this role?" question, with several specific examples ready to go.
 
 Keep in mind that the goal of a cover letter is simply to increase your chances of getting that first call. It won’t get you the job on its own, but it’s a powerful tool in your job application toolkit. And for techies, using markdown can make the process just a little bit more enjoyable.
-
-## TODO
-* WIP examples of specifying: work experience, side project, course, blog post, podcast interview, youtube channel
-* edit
-* Ref: writing can be difficult for engineers, its not often taught as part of tech education and not valued as much as "hard skills"
