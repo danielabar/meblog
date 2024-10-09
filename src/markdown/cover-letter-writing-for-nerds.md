@@ -7,16 +7,20 @@ category: "career"
 related:
   - "About Those Docs"
   - "Solving a Python Interview Question in Ruby"
-  - "A Tale of Rails, ChatGPT, and Scopes"
+  - "Re-imagining Technical Interviews: Valuing Experience Over Exam Skills"
 ---
 
 I was inspired to write this after encountering a LinkedIn discussion on the topic of cover letters. The debate centered on whether it still makes sense to submit a cover letter with your application in 2025 and beyond? Many on the thread thought it was no longer necessary, and that your resume and/or LinkedIn profile should be sufficient to show why you're a good fit for the job. While I didn't save the link to that specific discussion, a search for "cover letter waste" on LinkedIn yields many discussions and opinions.
 
 This post will cover why I think cover letters remain valuable and offer a technique to make writing them easier and more effective, especially for techies that use markdown. Writing a custom cover letter can feel daunting, as writing isn’t often a core focus in technical education. However, strong communication is essential in many tech roles, and a well-written cover letter can make a meaningful impact.
 
+<aside class="markdown-aside">
+This is of course, anecdotal based on my experience. I don't have any hard data or industry-wide metrics to prove the usefulness of cover letters one way or the other.
+</aside>
+
 Before getting into it, let's briefly define what a cover letter is: A document sent with your resume to provide additional information about your skills and experience. It typically highlights specific achievements and experiences that make you a suitable candidate for the job.
 
-Here's an example from an ATS (Applicant Tracking System) asking to upload both a resume and cover letter in pdf format. In this particular case, the cover letter is required, although other application forms may mark it as optional:
+Here's an example from an ATS (Applicant Tracking System) asking to upload both a resume and cover letter in pdf format. In this particular case, the cover letter is required, although other systems may mark it as optional:
 
 ![cover letter upload](../images/cover-letter-upload.png "cover letter upload")
 
@@ -26,13 +30,9 @@ I believe it's definitely still worth spending the time to craft a *custom* cove
 
 > I am writing to express my interest in the Software Engineer position at [Company Name], as advertised on [Job Board/Company Website]...I have attached my resume for your review and would welcome the opportunity to discuss how my background, skills, and experiences will be beneficial to [Company Name]. Thank you for considering my application.
 
-... will not be beneficial. Might as well just send your resume and be done with it.
+... will not have much impact. Might as well just send your resume and be done with it.
 
-A well crafted cover letter is an opportunity to personalize and tailor your content to the specific role. Think of it as: How to make life easier for HR/recruiters that may be scanning a large number of applications? I do this by highlighting specific phrases or sentences from the job description (JD), then showing how I've developed or used that skill.
-
-<aside class="markdown-aside">
-This is of course, anecdotal based on my experience. I don't have any hard data or industry-wide metrics to prove the usefulness of cover letters one way or the other.
-</aside>
+A well crafted cover letter is an opportunity to personalize and tailor your content to the specific role. Think of it as: How to make life easier for hiring managers or recruiters that may be scanning a large number of applications? I do this by highlighting specific phrases or sentences from the job description (JD), then showing how I've developed or used that skill.
 
 ## The Nerd Way
 
@@ -40,7 +40,7 @@ I’ve developed a process using Markdown that makes it a bit more enjoyable and
 
 ### Gather Your Tools
 
-Start by creating a simple Markdown document. I prefer to work in VSCode because it allows me to write my cover letter in Markdown and then easily convert it to a PDF. There’s even a handy extension, [Markdown PDF](https://marketplace.visualstudio.com/items?itemName=yzane.markdown-pdf), which I’ll explain in more detail later.
+Start by creating a simple Markdown document. I prefer to work in VSCode because it allows me to write my cover letter in Markdown and then easily convert it to a PDF using an extension, [Markdown PDF](https://marketplace.visualstudio.com/items?itemName=yzane.markdown-pdf), which I’ll explain in more detail later.
 
 ### Analyze the Job Description
 
@@ -81,9 +81,7 @@ to create a real-time chat application.
 You can check it out on GitHub [here](https://github.com/username/chat-app).
 ```
 
-You could also reference coursework or certifications. Mentioning a public-facing project, even a small one, shows initiative and your ability to learn new technologies.
-
-For example, if the job description mentions that Tailwind is a requirement or a nice to have:
+You could also reference coursework or certifications. Mentioning a public-facing project, even a small one, shows initiative and your ability to learn new technologies. For example, if the job description mentions that Tailwind is a requirement or a nice to have:
 
 ```markdown
 > Experience with TailwindCSS
@@ -124,25 +122,29 @@ My examples...
 
 My examples...
 
+...
+
 Thank you for considering my application.
 
 Best regards,
 
 [Your Name]
-[Website](https://your.website/) • [LinkedIn](https://www.linkedin.com/in/user/) • [GitHub](https://github.com/user) • [LinkTree](https://linktr.ee/user)
+[Website](https://your.website/) •
+[LinkedIn](https://www.linkedin.com/in/user/) •
+[GitHub](https://github.com/user) •
+[LinkTree](https://linktr.ee/user)
 ```
 
 ### Export to PDF
 
-Once you’ve written your cover letter in Markdown, it’s time to export it to PDF. This is where the [Markdown PDF](https://marketplace.visualstudio.com/items?itemName=yzane.markdown-pdf) extension comes in handy.
-
-To use it in VSCode, follow these simple steps:
+Once you’ve written your cover letter in Markdown, it’s time to export it to PDF. This is where the [Markdown PDF](https://marketplace.visualstudio.com/items?itemName=yzane.markdown-pdf) extension comes in handy. To use it in VSCode, follow these steps:
 
 1. Install the Markdown PDF extension.
-2. Configure the settings to define the export format and output directory (see below for an example configuration).
-3. Open your Markdown cover letter, then hit <kbd class="markdown-kbd">Cmd</kbd> + <kbd class="markdown-kbd">Shift</kbd> + <kbd class="markdown-kbd">P</kbd> (on Mac) or <kbd class="markdown-kbd">Ctrl</kbd> + <kbd class="markdown-kbd">Shift</kbd> + <kbd class="markdown-kbd">P</kbd> (on Windows) to open the command palette.
-4. Select `Markdown PDF: Export (pdf)`.
-5. Wait a few seconds, and your PDF will be generated!
+2. Configure the extension settings to define the export format and output directory (see below for an example configuration).
+3. Start a new markdown document in any directory (eg: `jsmith-cover-letter-acme-corp.md`) and fill in the content as described earlier.
+4. With your Markdown cover letter open, hit <kbd class="markdown-kbd">Cmd</kbd> + <kbd class="markdown-kbd">Shift</kbd> + <kbd class="markdown-kbd">P</kbd> (on Mac) or <kbd class="markdown-kbd">Ctrl</kbd> + <kbd class="markdown-kbd">Shift</kbd> + <kbd class="markdown-kbd">P</kbd> (on Windows) to open the command palette.
+5. Select `Markdown PDF: Export (pdf)`.
+6. Wait a few seconds, and your PDF will be generated in your configured output directory.
 
 Here’s an example of my settings in `~/Library/Application Support/Code/User/settings.json`. The extension is supposed to download Chromium if an `executablePath` isn't provided but that didn't work for me so I had to specify the path to Chrome:
 
@@ -159,9 +161,9 @@ Here’s an example of my settings in `~/Library/Application Support/Code/User/s
 }
 ```
 
-This means if you're working on a document named `cover-letter-acme-corp.md`, the pdf will be generated in `~/tmp/cover-letter-acme-corp.pdf`. Then it's ready for upload to your job application portal.
+This means if you're working on a document named `jsmith-cover-letter-acme-corp.md`, the pdf will be generated in `~/tmp/jsmith-cover-letter-acme-corp.pdf`. Then it's ready for upload to your job application portal.
 
-Here's an example of what the pdf will look like:
+Here's an example of what the pdf will look like - any links in the content will be clickable.
 
 ![cover letter example](../images/cover-letter-example.png "cover letter example")
 
@@ -181,8 +183,8 @@ You can also customize the contents of the header and footer using `markdown-pdf
 
 ## Conclusion
 
-Writing a custom cover letter doesn’t have to be overwhelming. By using Markdown and focusing on specific, actionable examples from your experience, you can craft a letter that helps your application stand out. While it takes a bit more effort than sending a generic one, it’s often the extra touch needed to get noticed in a competitive job market.
+Writing a custom cover letter doesn’t have to be overwhelming. By using Markdown and focusing on specific examples from your experience, you can craft a letter that helps your application stand out. While it takes a bit more effort than sending a generic one, it’s often the extra touch needed to get noticed in a competitive job market.
 
-Even if your cover letter ends up being ignored by a recruiter or filtered out by an ATS, the exercise itself is still worth it. Writing the letter forces you to clarify in your own mind why you're a great fit for the role. And if you do land that initial call, you'll be better prepared to answer the inevitable "why are you a good fit for this role?" question, with several specific examples ready to go.
+Even if your cover letter ends up being ignored by a recruiter or filtered out by an ATS, this exercise is still worth doing. Writing the letter forces helps to clarify in your own mind why you're a great fit for the role. And if you do land that initial call, you'll be better prepared to answer the inevitable "Why are you a good fit for this role?" or "Can you describe a situation where..." type questions, with specific examples ready to go.
 
-Keep in mind that the goal of a cover letter is simply to increase your chances of getting that first call. It won’t get you the job on its own, but it’s a powerful tool in your job application toolkit. And for techies, using markdown can make the process just a little bit more enjoyable.
+Keep in mind that the goal of a cover letter is simply to increase your chances of getting that first call. It won’t get you the job on its own, but it can be a powerful tool. And for techies, using markdown can make the process just a little bit more enjoyable.
