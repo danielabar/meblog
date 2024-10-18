@@ -1,7 +1,7 @@
 ---
 title: "Cover Letter Writing for Nerds"
 featuredImage: "../images/cover-letter-matthew-henry-n5vuEc86Zg8-unsplash.jpg"
-description: "Learn how to write effective, customized cover letters for tech job applications using Markdown and a Markdown to PDF converter for VSCode."
+description: "Learn how to write effective, customized cover letters for tech job applications using markdown and a markdown to PDF converter for VSCode."
 date: "2025-03-01"
 category: "career"
 related:
@@ -38,21 +38,21 @@ A well crafted cover letter is an opportunity to personalize and tailor your con
 
 ## The Nerd Way
 
-Now that we’ve established why cover letters are still worth the effort, let’s dive into the mechanics of crafting one. I’ve developed a process using Markdown that makes it a bit more enjoyable as well as effective.
+Now that we’ve established why cover letters are still worth the effort, let’s dive into the mechanics of crafting one. I’ve developed a process using markdown that makes it a bit more enjoyable as well as effective.
 
 ### Gather Your Tools
 
-Start by creating a simple Markdown document. I prefer to work in VSCode because it allows me to write my cover letter in Markdown and then easily convert it to a PDF using an extension, [Markdown PDF](https://marketplace.visualstudio.com/items?itemName=yzane.markdown-pdf), which I’ll explain in more detail later.
+Start by creating a new markdown document, for example `cover-letter-company-name.md`. I prefer to work in VSCode because it allows me to write my cover letter in markdown and then easily convert it to a PDF using an extension, [Markdown PDF](https://marketplace.visualstudio.com/items?itemName=yzane.markdown-pdf), which I’ll explain in more detail later.
 
 ### Analyze the Job Description
 
-Go through the job description with a fine-tooth comb. Your goal is to find key phrases or requirements that you can address directly. These might be specific technical skills, methodologies, or other skills like communication or teamwork. For each key responsibility or qualification, copy the text into your Markdown file like this:
+Go through the job description with a fine-tooth comb. Your goal is to find key phrases or requirements that you can address directly. These might be specific technical skills, methodologies, or other skills like communication or teamwork. For each responsibility or qualification, copy the text into your markdown file like this:
 
 ```markdown
 > Design, develop, and ship major features using Ruby on Rails
 ```
 
-By quoting the job description, you’re demonstrating that you’ve read it thoroughly. This small detail makes it clear that you’re taking the time to craft a personalized response, not just recycling the same generic letter.
+By quoting the job description, you’re demonstrating that you’ve read it thoroughly. This small detail makes it clear that you’re taking the time to craft a personalized response, rather than recycling the same generic letter.
 
 ### Tailor Your Response
 
@@ -97,11 +97,11 @@ challenges faced while implementing Tailwind in real-world scenarios:
 [TailwindCSS Course Notes](https://example.com/course-notes).
 ```
 
-This example shows how you can emphasize not only your experience but also your willingness to share your learning journey.
+This example shows how you can emphasize your experience and willingness to share your learning journey.
 
 ### Keep It Focused and Specific
 
-It's not necessary to address every single point in the job description. Focus on 3 - 4 key responsibilities or qualifications that you can speak to the most. This ensures that your cover letter is concise and easy to read.
+It's not necessary to address every single point in the job description. Focus on a handful of responsibilities or qualifications that you can speak to the most. This ensures that the cover letter is concise and easy to read.
 
 ### Wrap it Up
 
@@ -138,14 +138,13 @@ Best regards,
 
 ### Export to PDF
 
-Once you’ve written your cover letter in Markdown, it’s time to export it to PDF. This is where the [Markdown PDF](https://marketplace.visualstudio.com/items?itemName=yzane.markdown-pdf) extension comes in handy. To use it in VSCode, follow these steps:
+Once you’ve written your cover letter in markdown, it’s time to export it to PDF, following these steps:
 
-1. Install the Markdown PDF extension.
+1. Install the [Markdown PDF](https://marketplace.visualstudio.com/items?itemName=yzane.markdown-pdf) extension for VSCode.
 2. Configure the extension settings to define the export format and output directory (see below for an example configuration).
-3. Start a new markdown document in any directory (eg: `jsmith-cover-letter-acme-corp.md`) and fill in the content as described earlier.
-4. With your Markdown cover letter open, hit <kbd class="markdown-kbd">Cmd</kbd> + <kbd class="markdown-kbd">Shift</kbd> + <kbd class="markdown-kbd">P</kbd> (on Mac) or <kbd class="markdown-kbd">Ctrl</kbd> + <kbd class="markdown-kbd">Shift</kbd> + <kbd class="markdown-kbd">P</kbd> (on Windows) to open the command palette.
-5. Select `Markdown PDF: Export (pdf)`.
-6. Wait a few seconds, and your PDF will be generated in your configured output directory.
+3. With your markdown cover letter open, hit <kbd class="markdown-kbd">Cmd</kbd> + <kbd class="markdown-kbd">Shift</kbd> + <kbd class="markdown-kbd">P</kbd> (on Mac) or <kbd class="markdown-kbd">Ctrl</kbd> + <kbd class="markdown-kbd">Shift</kbd> + <kbd class="markdown-kbd">P</kbd> (on Windows) to open the command palette.
+4. Select `Markdown PDF: Export (pdf)`.
+5. Wait a few seconds, and your PDF will be generated in your configured output directory.
 
 Here’s an example of my settings in `~/Library/Application Support/Code/User/settings.json`. The extension is supposed to download Chromium if an `executablePath` isn't provided but that didn't work for me so I had to specify the path to Chrome:
 
@@ -162,9 +161,9 @@ Here’s an example of my settings in `~/Library/Application Support/Code/User/s
 }
 ```
 
-This means if you're working on a document named `jsmith-cover-letter-acme-corp.md`, the pdf will be generated in `~/tmp/jsmith-cover-letter-acme-corp.pdf`. Then it's ready for upload to your job application portal.
+This means if you're working on a document named `jsmith-cover-letter-acme-corp.md`, the pdf will be generated in `~/tmp/jsmith-cover-letter-acme-corp.pdf`. Then it's ready for upload to any job application portal.
 
-Here's an example of what the pdf will look like - any links in the content will be clickable.
+Here's an example of what the pdf will look like, any links in the content will be clickable.
 
 ![cover letter example](../images/cover-letter-example.png "cover letter example")
 
@@ -184,7 +183,7 @@ You can also customize the contents of the header and footer using `markdown-pdf
 
 ## Conclusion
 
-Writing a custom cover letter doesn’t have to be overwhelming. By using Markdown and focusing on specific examples from your experience, you can craft a letter that helps your application stand out. While it takes a bit more effort than sending a generic one, it’s often the extra touch needed to get noticed in a competitive job market.
+Writing a custom cover letter doesn’t have to be overwhelming. By using markdown and focusing on specific examples from your experience, you can craft a letter that helps your application stand out. While it takes a bit more effort than sending a generic one, it’s often the extra touch needed to get noticed in a competitive job market.
 
 Even if your cover letter ends up being ignored by a recruiter or filtered out by an ATS, this exercise is still worth doing. Writing the letter helps to clarify in your own mind why you're a great fit for the role. And if you do land that initial call, you'll be better prepared to answer the inevitable "Why are you a good fit for this role?" or "Can you describe a situation where..." type questions, with specific examples ready to go.
 
