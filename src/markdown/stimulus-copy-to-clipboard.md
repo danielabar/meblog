@@ -2,7 +2,7 @@
 title: "Copy to Clipboard with Stimulus & Rails"
 featuredImage: "../images/stimulus-copy-clipboard-meg-boulden-7daz5hPdd1c-unsplash.jpg"
 description: "Learn how to build a configurable copy to clipboard feature with the Stimulus JavaScript library as part of a Rails application"
-date: "2024-10-01"
+date: "2024-11-02"
 category: "javascript"
 related:
   - "When the Password Field Says No to Paste"
