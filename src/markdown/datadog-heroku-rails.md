@@ -226,13 +226,36 @@ fi
 
 ## Deploy
 
-At this point, you would merge all the changes you made to the Rails app to the main branch. As a reminder, here's what's changed:
+Once you've merged all the changes to the main branch, you can deploy with `git push heroku main`. Here’s a quick recap of the changes:
 
-* `Gemfile` and `Gemfile.lock` to install the `datadog` gem.
-* `config/initializers/datadog.rb` to configure Datadog from the Rails side.
-* `.datadog/prerun.sh` to configure Datadog for tagging host metrics consistently with the app.
+* Updated `Gemfile` and `Gemfile.lock` to include the `datadog` gem.
+* Created `config/initializers/datadog.rb` for Datadog configuration within Rails.
+* Added `.datadog/prerun.sh` to consistently tag host metrics with the app's environment, service, and version information.
 
-And deploy with `git push heroku main`. Within a few minutes, you should start seeing metrics and telemetry data flowing into your Datadog dashboard. Open APM -> Services in Datadog to start analyzing your data.
+After deployment, give it a few minutes, then open Datadog’s Infrastructure section in the web UI. Use filters like `env:...`, `service:...`, or `version:...` (as configured in `prerun.sh`) to verify your host metrics and confirm they are tagged correctly.
+
+Next, go to APM -> Service Catalog -> Resource Page, where you’ll see the same host metrics, now correlated with specific resource executions. This setup ensures you can track performance and resource usage comprehensively across both Infrastructure and APM sections. You should also see telemetry data for the Rails app, with each `Controller#action` instrumented by Datadog appearing as a Resource.
+
+## Memory Usage
+
+Since the Datadog agent is another process that will always be running on your dyno's, be aware that it does consume additional memory. Our staging environment was using the Basic dyno type, which only has 512MB of memory, and it started crashing frequently after adding the Datadog agent. To resolve this we had to upgrade to the Standard dyno type. To be fair, it was the Rails app was consuming most of this memory, and adding the Datadog agent just pushed it over the edge.
+
+<aside class="markdown-aside">
+The Heroku docs have the complete list of <a class="markdown-link" href="https://www.heroku.com/dynos">Dyno Types</a>. Notice the steep price increase from Basic to Standard. This is the cost of the convenience of a PaaS. Although with consistent improvements in deployment tooling such as <a class="markdown-link" href="https://kamal-deploy.org/">Kamal</a>, it may be possible to get this convenience at a lower price. Perhaps a blog post for another day.
+</aside>
+
+Although the Heroku web dashboard shows memory consumption, it doesn't break this down by process. To view memory consumption for both the Datadog agent, and the Rails app on either the web or worker dyno's, you can shell in as we did before to check the agent status, then run the `ps` command, which displays information about active processes:
+
+```bash
+heroku ps:exec --dyno=web.1 -a your-app-name
+ps auxww --sort=-%mem
+```
+
+- `a`: Show processes for all users, not just the current user.
+- `u`: Display the output in a user-oriented format, showing user-related columns like `USER`, `%CPU`, and `%MEM`.
+- `x`: Show processes not attached to a terminal.
+- `ww`: Provides unlimited width for the command output, ensuring the full command line (`COMMAND`) for each process is shown without truncation.
+- `--sort=-%mem`: Sorts the processes by memory usage (`%MEM`) in descending order. The `-` sign indicates descending order, so processes using the most memory appear at the top.
 
 ## Summary and References
 
@@ -244,22 +267,78 @@ In this guide, we walked through integrating Datadog APM with a Rails app deploy
 - [Heroku Dyno Metadata](https://devcenter.heroku.com/articles/dyno-metadata)
 - [Datadog Tracing Ruby Applications](https://docs.datadoghq.com/tracing/trace_collection/automatic_instrumentation/dd_libraries/ruby/)
 
+## Bonus: Terminal Tab Visual Cues
+
+A few times during this post, we had to shell into Heroku. To [avoid disasters](https://news.ycombinator.com/item?id=14476421), I like to colorize my terminal tabs differently to make it obvious that I'm no longer in my own laptop's shell. You can change the terminal tab colors by adding a function to your shell profile (`~/.bash_profile` or `~/.zshrc`), which will adjust the red, green, and blue values of the tab background.
+
+Add the following to your profile:
+
+```bash
+# Define a function to set the tab color in your terminal
+tab-color() {
+  echo -ne "\033]6;1;bg;red;brightness;$1\a"
+  echo -ne "\033]6;1;bg;green;brightness;$2\a"
+  echo -ne "\033]6;1;bg;blue;brightness;$3\a"
+}
+
+# Functions to quickly set a specific color.
+# Adjust as per your preference.
+tab-green() { tab-color 0 255 0; }   # For staging
+tab-red() { tab-color 255 0 0; }     # For production
+
+# Function to reset the color back to the default
+tab-reset() { echo -ne "\033]6;1;bg;*;default\a"; }
+```
+
+To demonstrate, here is what my regular terminal tabs look like:
+
+![iterm tab regular](../images/iterm-tab-regular.png "iterm tab regular")
+
+After running the `tab-green` function:
+
+![iterm tab green](../images/iterm-tab-green.png "iterm tab green")
+
+After running `tab-red`:
+
+![iterm tab red](../images/iterm-tab-red.png "iterm tab red")
+
+And resetting:
+
+![iterm tab reset](../images/iterm-tab-reset.png "iterm tab reset")
+
+Next, define aliases for shelling into your Heroku environments (for example: staging and production) that will use the tab color functions. My aliases are as follows:
+
+```bash
+# SSH into Heroku staging dyno and turn tab green
+alias hss='tab-green && heroku ps:exec --dyno=web.1 -a your-staging-app'
+
+# SSH into Heroku production dyno and turn tab red
+alias hsp='tab-red && heroku ps:exec --dyno=web.1 -a your-production-app'
+```
+
+Customize the aliases for whatever you'll remember. For me I think of "heroku shell staging" or "heroku shell production" and take the first characters of each. Now whenever you shell into either staging or production, you'll have a strong visual cue that you're in a deployed environment.
+
+Note that I use iTerm with zsh, via oh-my-zsh and the above technique has only been tested on this particular setup.
+TODO: Link to my terminal setup post.
+
 ## TODO
 * WIP main content from `blog-research/datadog-rails-heroku-draft-from-notes.md` AND `blog-research/datadog-rails-heroku.md`
-* WIP explain unified host metrics as a separate section, so that metrics such as mem, cpu can be shown alongside resources/spans/traces (where resource === Controller#action)
 * Should the "Rails Instrumentation" be split up into two sub-sections for gem installation and config initializer?
 * Assumptions: familiarity with running a Rails app on Heroku, and heroku cli installed and authenticated
 * Define what is a buildpack and link to Heroku docs: https://docs.datadoghq.com/agent/basic_agent_usage/heroku/
 * Command to list buildpacks after agent is installed, to confirm it's there - get command and example output from work laptop
 * Note: all the heroku commands shown here include the `-a` flag to specify the app name, this is necessary if you host multiple apps on heroku, or even if its logically one app, if you have a separate app for staging (eg: my-app-staging) vs production (eg: my-app). If you only have a single app on heroku, the `-a` flag can be left out.
 * Explain about `/app` for DD prerun path is Heroku level `/app` folder, NOT the Rails `/app` folder!
+  * Get `tree` output of top level from work laptop
 * Nice to have: a visual showing how the components fit together: Heroku dynos, DD agent installed on dyno and sending host metrics, datadog gem installed as part of Rails app and sending instrumentation data to DD agent, DD site receiving metrics from DD agent.
 * After dyno metadata enabled, maybe show expectation that now a bunch of `HEROKU_...` env vars should be populated? (get example from work laptop, make generic if necessary)
+* Aside: telemetry data will show the database queries executed by the Rails app, but PostgreSQL monitoring is an additional service that has to be paid for if you want it, and involves another whole set of steps to setup. And some challenges given that the PG add-on for Heroku is a managed service, i.e. you can't just ssh in there and modify the conf file. My team isn't using this at the moment, so perhaps a topic for a future blog post.
+* Explain a little more about what auto instrument does, try to find it in the dd-trace-rb repo on GitHub
 * Is it really necessary to specify `c.tracing.instrument...` or does auto_instrument already capture all of those? I couldn't find it in the dd docs, spend some time searching through the source and issues: https://github.com/search?q=repo%3ADataDog%2Fdd-trace-rb%20auto_instrument&type=code and https://github.com/DataDog/dd-trace-rb/issues/2343#issuecomment-1299009009
 * Add references (get more links from work laptop?) such as
   * https://docs.datadoghq.com/agent/basic_agent_usage/heroku/
   * terminology: https://docs.datadoghq.com/tracing/glossary/
   * tracing ruby apps: https://docs.datadoghq.com/tracing/trace_collection/automatic_instrumentation/dd_libraries/ruby/
   * troubleshooting: https://docs.datadoghq.com/agent/basic_agent_usage/heroku/#troubleshooting
-* conclusion para
+* potentially different feature image -> dogs!
 * edit
