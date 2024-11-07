@@ -16,15 +16,33 @@ Heroku makes it easy to add some APMs such as NewRelic or Scout APM with a one-c
 
 This post will walk through setting up Datadog APM on a Heroku-hosted Rails application.
 
+**Assumptions:** This guide assumes familiarity with deploying and managing a Rails app on Heroku, along with Heroku CLI installed and authenticated.
+
 ## Install Buildpack
 
 Since Heroku doesn't offer a one-click Datadog integration, we need to use the [Datadog Heroku Buildpack](https://docs.datadoghq.com/agent/basic_agent_usage/heroku/). To install it, run the following:
 
 ```bash
-heroku buildpacks:add --index 1 https://github.com/DataDog/heroku-buildpack-datadog.git
+heroku buildpacks:add \
+  --index 1 https://github.com/DataDog/heroku-buildpack-datadog.git \
+  -a your-app-name
 ```
 
 **Buildpack order matters:** If you're running a Rails application, you likely already have the `heroku/ruby` buildpack. The Datadog buildpack needs to be listed *before* the Ruby buildpack. Setting `--index 1` will make it first in the list. The `--index` flag is 1-based, not 0-based.
+
+You can confirm the buildpack is installed by running the following, your output may look a little different depending on what other buildpacks are already installed:
+
+```bash
+heroku buildpacks -a my-app
+
+# === my-app Buildpack URLs
+# 1. https://github.com/DataDog/heroku-buildpack-datadog.git
+# 2. heroku/ruby
+```
+
+<aside class="markdown-aside">
+Even if you've never explicitly added a buildpack to your Heroku app, you'll still have at least one. This is because when you push code to Heroku and it starts building, it will automatically look for an appropriate buildpack for the project's language (Ruby, Python, PHP, etc.) and add it. Read more about working with Heroku buildpacks <a class="markdown-link" href="https://devcenter.heroku.com/articles/buildpacks">here</a>.
+</aside>
 
 ## Enable Dyno Metadata
 
@@ -190,7 +208,7 @@ At this point, we're nearly done with the APM setup. There's just one last step 
 
 ## Unified Service Tagging
 
-When the Datadog agent runs on the web and worker dyno's, in addition to sending instrumentation data from the Rails application and background jobs to Datadog, it also sends metrics about the web and worker dynos such as memory and CPU utilization. We need to ensure that these are correctly tagged with the service, environment, and release versions so that the host metrics can be filtered on, and correlated to the APM data. For example, when investigating a particular Rails controller action, it would be interesting to see if there's a memory spike every time it runs.
+When the Datadog agent runs on the web and worker dyno's, in addition to sending instrumentation data from the Rails application and background jobs to Datadog, it also sends metrics about the web and worker dynos such as memory and CPU utilization. We need to ensure this information is correctly tagged with the service, environment, and release versions so that the host metrics can be filtered on, and correlated to the APM data. For example, when investigating a particular Rails controller action, it would be interesting to see if there's a memory spike every time it runs.
 
 Datadog can display this information all in a single view, but it requires setting up [Unified Service Tagging](https://docs.datadoghq.com/getting_started/tagging/unified_service_tagging/). The documentation mentions several different ways to set this up, but on Heroku, our team found this easiest to accomplish with a [Prerun script](https://docs.datadoghq.com/agent/basic_agent_usage/heroku/#prerun-script).
 
@@ -200,7 +218,7 @@ A Prerun script runs after all of the standard configuration, but immediately be
 heroku config:set DD_HEROKU_CONF_FOLDER="/app/.datadog" -a your-app-name
 ```
 
-In this case, Datadog will expect to find a folder named `.datadog` in your project root, with an executable file named `prerun.sh`. In this script, the `env`, `service`, and `version` tags are populated. For example:
+In this case, Datadog will expect to find a folder named `.datadog` in your project root (not in the Rails `app` dir, this will be explained shortly), with an executable file named `prerun.sh`. In this script, the `env`, `service`, and `version` tags are populated. For example:
 
 ```bash
 # .datadog/prerun.sh
@@ -224,6 +242,45 @@ if [ -n "$DD_ENV" ] && [ -n "$DD_VERSION" ] && [ -n "$DD_SERVICE" ]; then
 fi
 ```
 
+**Why We Place the `.datadog` Directory in the Project Root**
+
+On Heroku, your app is deployed within a top-level `/app` directory, so your project's root directory in the Heroku environment is actually `/app`. This means that when we specify `DD_HEROKU_CONF_FOLDER="/app/.datadog"`, the `.datadog` directory should be created in the root of your project repository, not inside the `app` directory where Rails controllers, models, and views are located.
+
+In other words, your project structure on your laptop will look like this:
+
+```
+.
+├── .datadog
+│   └── prerun.sh
+├── Gemfile
+├── Gemfile.lock
+├── Procfile
+├── ...
+└── app
+    ├── controllers
+    ├── models
+    ├── views
+    └── ...
+```
+
+But when it runs on Heroku, it looks like this:
+
+```
+.
+└── app                   === HEROKU LEVEL APP DIR ===
+    ├── .datadog
+    │   └── prerun.sh
+    ├── Gemfile
+    ├── Gemfile.lock
+    ├── Procfile
+    ├── ...
+    └── app               === YOUR RAILS APP DIR ===
+        ├── controllers
+        ├── models
+        ├── views
+        └── ...
+```
+
 ## Deploy
 
 Once you've merged all the changes to the main branch, you can deploy with `git push heroku main`. Here’s a quick recap of the changes:
@@ -234,15 +291,11 @@ Once you've merged all the changes to the main branch, you can deploy with `git 
 
 After deployment, give it a few minutes, then open Datadog’s Infrastructure section in the web UI. Use filters like `env:...`, `service:...`, or `version:...` (as configured in `prerun.sh`) to verify your host metrics and confirm they are tagged correctly.
 
-Next, go to APM -> Service Catalog -> Resource Page, where you’ll see the same host metrics, now correlated with specific resource executions. This setup ensures you can track performance and resource usage comprehensively across both Infrastructure and APM sections. You should also see telemetry data for the Rails app, with each `Controller#action` instrumented by Datadog appearing as a Resource.
+Next, go to APM -> Service Catalog -> Select your service, then from the list of resources, select any Resource Page. This should also display the host metrics, now correlated with specific resource executions. This setup ensures you can track performance and resource usage comprehensively across both Infrastructure and APM sections. You should also see telemetry data for the Rails app, with each `Controller#action` instrumented by Datadog appearing as a Resource.
 
 ## Memory Usage
 
 Since the Datadog agent is another process that will always be running on your dyno's, be aware that it does consume additional memory. Our staging environment was using the Basic dyno type, which only has 512MB of memory, and it started crashing frequently after adding the Datadog agent. To resolve this we had to upgrade to the Standard dyno type. To be fair, it was the Rails app was consuming most of this memory, and adding the Datadog agent just pushed it over the edge.
-
-<aside class="markdown-aside">
-The Heroku docs have the complete list of <a class="markdown-link" href="https://www.heroku.com/dynos">Dyno Types</a>. Notice the steep price increase from Basic to Standard. This is the cost of the convenience of a PaaS. Although with consistent improvements in deployment tooling such as <a class="markdown-link" href="https://kamal-deploy.org/">Kamal</a>, it may be possible to get this convenience at a lower price. Perhaps a blog post for another day.
-</aside>
 
 Although the Heroku web dashboard shows memory consumption, it doesn't break this down by process. To view memory consumption for both the Datadog agent, and the Rails app on either the web or worker dyno's, you can shell in as we did before to check the agent status, then run the `ps` command, which displays information about active processes:
 
@@ -257,6 +310,10 @@ ps auxww --sort=-%mem
 - `ww`: Provides unlimited width for the command output, ensuring the full command line (`COMMAND`) for each process is shown without truncation.
 - `--sort=-%mem`: Sorts the processes by memory usage (`%MEM`) in descending order. The `-` sign indicates descending order, so processes using the most memory appear at the top.
 
+<aside class="markdown-aside">
+The Heroku docs have the complete list of <a class="markdown-link" href="https://www.heroku.com/dynos">Dyno Types</a>. Notice the steep price increase from Basic to Standard. This is the cost of the convenience of a PaaS. Although with consistent improvements in deployment tooling such as <a class="markdown-link" href="https://kamal-deploy.org/">Kamal</a>, it may be possible to get this convenience at a lower price. Perhaps a blog post for another day.
+</aside>
+
 ## Summary References
 
 In this guide, we walked through integrating Datadog APM with a Rails app deployed on Heroku. Key steps included adding the Datadog buildpack, enabling Heroku dyno metadata, configuring environment variables for the Datadog agent, and setting up unified service tagging for consistent metrics and traces. We also installed and configured the `datadog` gem in the Rails application.
@@ -269,7 +326,7 @@ In this guide, we walked through integrating Datadog APM with a Rails app deploy
 
 ## Bonus: Terminal Tab Visual Cues
 
-A few times during this post, we had to shell into Heroku. To [avoid disasters](https://news.ycombinator.com/item?id=14476421), I like to colorize my terminal tabs differently to make it obvious that I'm no longer in my own laptop's shell. You can change the terminal tab colors by adding a function to your shell profile (`~/.bash_profile` or `~/.zshrc`), which will adjust the red, green, and blue values of the tab background.
+A few times during this post, we had to shell into Heroku to check on things. To [avoid disasters](https://np.reddit.com/r/cscareerquestions/comments/6ez8ag/accidentally_destroyed_production_database_on/), I like to colorize my terminal tabs differently to make it obvious that I'm no longer in my own laptop's shell. You can change the terminal tab colors by adding a function to your shell profile (`~/.bash_profile` or `~/.zshrc`), which will adjust the red, green, and blue values of the tab background.
 
 Add the following to your profile:
 
@@ -321,20 +378,11 @@ Customize the aliases for whatever you'll remember. For me I think of "Heroku Sh
 Note that I use [iTerm with zsh and oh-my-zsh](../how-i-setup-my-terminal) and the above technique has only been tested on this particular setup.
 
 ## TODO
-* WIP main content from `blog-research/datadog-rails-heroku-draft-from-notes.md` AND `blog-research/datadog-rails-heroku.md`
-* Should the "Rails Instrumentation" be split up into two sub-sections for gem installation and config initializer?
-* Assumptions: familiarity with running a Rails app on Heroku, and heroku cli installed and authenticated
-* Define what is a buildpack and link to Heroku docs: https://docs.datadoghq.com/agent/basic_agent_usage/heroku/
-* Command to list buildpacks after agent is installed, to confirm it's there - get command and example output from work laptop
-* Note: all the heroku commands shown here include the `-a` flag to specify the app name, this is necessary if you host multiple apps on heroku, or even if its logically one app, if you have a separate app for staging (eg: my-app-staging) vs production (eg: my-app). If you only have a single app on heroku, the `-a` flag can be left out.
-* Explain about `/app` for DD prerun path is Heroku level `/app` folder, NOT the Rails `/app` folder!
-  * Get `tree` output of top level from work laptop
 * Nice to have: a visual showing how the components fit together: Heroku dynos, DD agent installed on dyno and sending host metrics, datadog gem installed as part of Rails app and sending instrumentation data to DD agent, DD site receiving metrics from DD agent.
   * See WIP `tech/blog-research/rails-heroku-datadog/mermaid4.html`
 * After dyno metadata enabled, maybe show expectation that now a bunch of `HEROKU_...` env vars should be populated? (get example from work laptop, make generic if necessary)
 * Aside: telemetry data will show the database queries executed by the Rails app, but PostgreSQL monitoring is an additional service that has to be paid for if you want it, and involves another whole set of steps to setup. And some challenges given that the PG add-on for Heroku is a managed service, i.e. you can't just ssh in there and modify the conf file. My team isn't using this at the moment, so perhaps a topic for a future blog post.
-* Explain a little more about what auto instrument does, try to find it in the dd-trace-rb repo on GitHub
-* Is it really necessary to specify `c.tracing.instrument...` or does auto_instrument already capture all of those? I couldn't find it in the dd docs, spend some time searching through the source and issues: https://github.com/search?q=repo%3ADataDog%2Fdd-trace-rb%20auto_instrument&type=code and https://github.com/DataDog/dd-trace-rb/issues/2343#issuecomment-1299009009
+* Explain a little more about what auto instrument does, try to find it in the dd-trace-rb repo on GitHub: https://github.com/search?q=repo%3ADataDog%2Fdd-trace-rb%20auto_instrument&type=code and https://github.com/DataDog/dd-trace-rb/issues/2343#issuecomment-1299009009
 * Add references (get more links from work laptop?) such as
   * https://docs.datadoghq.com/agent/basic_agent_usage/heroku/
   * terminology: https://docs.datadoghq.com/tracing/glossary/
@@ -356,27 +404,42 @@ When you’re using the `datadog` gem in a Rails app on Heroku, the trace data f
 <!doctype html>
 <html lang="en">
 
+<head>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+</head>
+
 <body>
   <pre class="mermaid">
   architecture-beta
     group heroku(cloud)[Heroku Server]
+
     group web_dyno(server)[Web Dyno] in heroku
     group rails_app(skill-icons:rails)[Rails App] in web_dyno
 
-    service datadog_gem(vscode-icons:file-type-datadog)[Datadog Gem] in rails_app
-    service datadog_agent(server)[Datadog Agent] in web_dyno
-    service datadog_backend(cloud)[Datadog Backend]
+    group dd_cloud(internet)[Datadog Backend]
+    service dd_backend(vscode-icons:folder-type-datadog-opened) in dd_cloud
+
+    group worker_dyno(server)[Worker Dyno] in heroku
+    group rails_app_j(skill-icons:rails)[Rails App] in worker_dyno
+    service datadog_gem_j(logos:rubygems)[Datadog Gem] in rails_app_j
+    service datadog_agent_j(vscode-icons:file-type-datadog)[Datadog Agent] in worker_dyno
+
+    service datadog_gem(logos:rubygems)[Datadog Gem] in rails_app
+    service datadog_agent(vscode-icons:file-type-datadog)[Datadog Agent] in web_dyno
 
     datadog_gem:R --> L:datadog_agent
-    datadog_agent:R --> L:datadog_backend
+    datadog_gem_j:R --> L:datadog_agent_j
+    datadog_agent:R --> L:dd_backend
+    datadog_agent_j:R --> B:dd_backend
   </pre>
+
+  <button id="downloadBtn">Download Diagram as PNG</button>
 
   <script type="module">
     import mermaid from 'https://cdn.jsdelivr.net/npm/mermaid@11/dist/mermaid.esm.min.mjs';
+    // import html2canvas from 'https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js';
 
     // Register the icon pack for Iconify
-    // https://icones.js.org/collection/all?s=datadog
-    // https://icon-sets.iconify.design/
     mermaid.registerIconPacks([
       {
         name: 'skill-icons', // Specify the name used in Mermaid syntax (e.g., skill-icons:rails)
@@ -388,7 +451,33 @@ When you’re using the `datadog` gem in a Rails app on Heroku, the trace data f
         loader: () =>
           fetch('https://unpkg.com/@iconify-json/vscode-icons@1/icons.json').then(res => res.json())
       },
+      {
+        name: 'logos', // For logos like 'logos:rubygems'
+        loader: () =>
+          fetch('https://unpkg.com/@iconify-json/logos@1/icons.json').then(res => res.json())
+      },
     ]);
+
+    // Initialize Mermaid with the configuration
+    // mermaid.initialize({ startOnLoad: true });
+
+    // Download button functionality
+    document.getElementById('downloadBtn').addEventListener('click', () => {
+      const svgElement = document.querySelector('.mermaid svg');
+
+      if (svgElement) {
+        // Convert SVG to PNG using html2canvas
+        html2canvas(svgElement).then(canvas => {
+          // Create a link to download the image
+          const link = document.createElement('a');
+          link.download = 'mermaid_diagram.png';
+          link.href = canvas.toDataURL('image/png');
+          link.click();
+        });
+      } else {
+        alert('Diagram not rendered yet!');
+      }
+    });
   </script>
 </body>
 
