@@ -18,9 +18,23 @@ This post will walk through setting up Datadog APM on a Heroku-hosted Rails appl
 
 **Assumptions:** This guide assumes familiarity with deploying and managing a Rails app on Heroku, along with Heroku CLI installed and authenticated.
 
+## High Level
+
+Before getting into the step-by-step installation details, let's take a look at the overall picture:
+
+![datadog heroku rails architecture diagram](../images/datadog-heroku-rails-architecture-diagram.png "datadog heroku rails architecture diagram")
+
+Heroku runs both web and worker dynos, where your Rails app is hosted. For Datadog APM to capture data effectively, you’ll need both the datadog gem (integrated directly into the Rails app) and the Datadog Agent, which must run as a separate process on each dyno. The trace data flow is:
+
+1. The Rails app, instrumented by the `datadog` gem, generates trace data as it processes requests web and background job requests.
+2. The `datadog` gem sends this trace data to the Datadog Agent running on your Heroku dynos.
+3. The Datadog Agent then aggregates and forwards the traces it receives from the gem to Datadog’s backend.
+
 ## Install Buildpack
 
-Since Heroku doesn't offer a one-click Datadog integration, we need to use the [Datadog Heroku Buildpack](https://docs.datadoghq.com/agent/basic_agent_usage/heroku/). To install it, run the following:
+Since Heroku doesn't offer a one-click Datadog integration, we need to use the [Datadog Heroku Buildpack](https://docs.datadoghq.com/agent/basic_agent_usage/heroku/). Heroku dynos are ephemeral, meaning they don’t retain installed services or agents after a restart. The Datadog buildpack ensures that the Datadog Agent is installed and automatically started each time a dyno is restarted for scaling, deployment, or routine cycling.
+
+To install it, run the following:
 
 ```bash
 heroku buildpacks:add \
@@ -52,10 +66,21 @@ Heroku dyno names are ephemeral, meaning their identifiers can change frequently
 heroku labs:enable runtime-dyno-metadata -a your-app-name
 ```
 
-This allows the Heroku app name, dyno type, and dyno number to be used in Datadog for better tracking of performance metrics.
+This allows information about the dyno to be used in Datadog for better tracking of metrics and traces. You can verify this feature is now enabled by checking your Heroku environment variables, there should now be several new ones starting with `HEROKU...`, for example:
+
+```bash
+heroku config -a my-app | grep "^HEROKU"
+
+# HEROKU_APP_ID:                   abc123...
+# HEROKU_APP_NAME:                 my-app
+# HEROKU_RELEASE_CREATED_AT:       2025-03-25-07T19:55:21Z
+# HEROKU_RELEASE_VERSION:          v1234
+# HEROKU_SLUG_COMMIT:              5c8d2...
+# HEROKU_SLUG_DESCRIPTION:         Deploy 5c8...
+```
 
 <aside class="markdown-aside">
-The Heroku docs for dyno metadata have a warning: "Features added through Heroku Labs are experimental and subject to change.". It's concerning that something so critical as APM is depending on an experimental feature. However, when I reached out to Heroku support for help with setting up Datadog, their reply was "Just use NewRelic" ¯\_(ツ)_/¯
+The Heroku docs for dyno metadata have a warning: "Features added through Heroku Labs are experimental and subject to change.". It's concerning that something so critical as APM is depending on an experimental feature. However, when I reached out to Heroku support for help with setting up Datadog, their reply was "<em class="markdown-emphasis">Just use NewRelic</em>" ¯\_(ツ)_/¯
 </aside>
 
 ## Configure Agent
@@ -293,6 +318,10 @@ After deployment, give it a few minutes, then open Datadog’s Infrastructure se
 
 Next, go to APM -> Service Catalog -> Select your service, then from the list of resources, select any Resource Page. This should also display the host metrics, now correlated with specific resource executions. This setup ensures you can track performance and resource usage comprehensively across both Infrastructure and APM sections. You should also see telemetry data for the Rails app, with each `Controller#action` instrumented by Datadog appearing as a Resource.
 
+<aside class="markdown-aside">
+Telemetry data from Datadog will show the database queries executed by your Rails app, but if you want deeper insights into PostgreSQL performance, you’ll need to set up Datadog’s PostgreSQL monitoring service, which comes at an additional cost. For more details on configuring PostgreSQL monitoring with Datadog, check out their <a class="markdown-link" href="https://www.datadoghq.com/monitoring/postgresql-monitoring/">PostgreSQL Monitoring guide</a>. My team isn't using this feature currently, but it could be a topic for a future post.
+</aside>
+
 ## Memory Usage
 
 Since the Datadog agent is another process that will always be running on your dyno's, be aware that it does consume additional memory. Our staging environment was using the Basic dyno type, which only has 512MB of memory, and it started crashing frequently after adding the Datadog agent. To resolve this we had to upgrade to the Standard dyno type. To be fair, it was the Rails app was consuming most of this memory, and adding the Datadog agent just pushed it over the edge.
@@ -314,7 +343,7 @@ ps auxww --sort=-%mem
 The Heroku docs have the complete list of <a class="markdown-link" href="https://www.heroku.com/dynos">Dyno Types</a>. Notice the steep price increase from Basic to Standard. This is the cost of the convenience of a PaaS. Although with consistent improvements in deployment tooling such as <a class="markdown-link" href="https://kamal-deploy.org/">Kamal</a>, it may be possible to get this convenience at a lower price. Perhaps a blog post for another day.
 </aside>
 
-## Summary References
+## Summary
 
 In this guide, we walked through integrating Datadog APM with a Rails app deployed on Heroku. Key steps included adding the Datadog buildpack, enabling Heroku dyno metadata, configuring environment variables for the Datadog agent, and setting up unified service tagging for consistent metrics and traces. We also installed and configured the `datadog` gem in the Rails application.
 
@@ -324,7 +353,7 @@ In this guide, we walked through integrating Datadog APM with a Rails app deploy
 - [Heroku Dyno Metadata](https://devcenter.heroku.com/articles/dyno-metadata)
 - [Datadog Tracing Ruby Applications](https://docs.datadoghq.com/tracing/trace_collection/automatic_instrumentation/dd_libraries/ruby/)
 
-## Bonus: Terminal Tab Visual Cues
+## Bonus: Terminal Visual Cues
 
 A few times during this post, we had to shell into Heroku to check on things. To [avoid disasters](https://np.reddit.com/r/cscareerquestions/comments/6ez8ag/accidentally_destroyed_production_database_on/), I like to colorize my terminal tabs differently to make it obvious that I'm no longer in my own laptop's shell. You can change the terminal tab colors by adding a function to your shell profile (`~/.bash_profile` or `~/.zshrc`), which will adjust the red, green, and blue values of the tab background.
 
@@ -378,10 +407,6 @@ Customize the aliases for whatever you'll remember. For me I think of "Heroku Sh
 Note that I use [iTerm with zsh and oh-my-zsh](../how-i-setup-my-terminal) and the above technique has only been tested on this particular setup.
 
 ## TODO
-* Nice to have: a visual showing how the components fit together: Heroku dynos, DD agent installed on dyno and sending host metrics, datadog gem installed as part of Rails app and sending instrumentation data to DD agent, DD site receiving metrics from DD agent.
-  * See WIP `tech/blog-research/rails-heroku-datadog/mermaid4.html`
-* After dyno metadata enabled, maybe show expectation that now a bunch of `HEROKU_...` env vars should be populated? (get example from work laptop, make generic if necessary)
-* Aside: telemetry data will show the database queries executed by the Rails app, but PostgreSQL monitoring is an additional service that has to be paid for if you want it, and involves another whole set of steps to setup. And some challenges given that the PG add-on for Heroku is a managed service, i.e. you can't just ssh in there and modify the conf file. My team isn't using this at the moment, so perhaps a topic for a future blog post.
 * Explain a little more about what auto instrument does, try to find it in the dd-trace-rb repo on GitHub: https://github.com/search?q=repo%3ADataDog%2Fdd-trace-rb%20auto_instrument&type=code and https://github.com/DataDog/dd-trace-rb/issues/2343#issuecomment-1299009009
 * Add references (get more links from work laptop?) such as
   * https://docs.datadoghq.com/agent/basic_agent_usage/heroku/
@@ -390,96 +415,3 @@ Note that I use [iTerm with zsh and oh-my-zsh](../how-i-setup-my-terminal) and t
   * troubleshooting: https://docs.datadoghq.com/agent/basic_agent_usage/heroku/#troubleshooting
 * potentially different feature image -> dogs!
 * edit
-
-### Somewhere explain the visual + diagram
-
-When you’re using the `datadog` gem in a Rails app on Heroku, the trace data flow typically follows this path:
-
-1. **Your Rails app**, instrumented by the `datadog` gem, generates trace data as it processes requests.
-2. The `datadog` gem sends this trace data **to the Datadog Agent** running on your Heroku dynos (usually listening on port `8126`).
-3. **The Datadog Agent** then aggregates and forwards the traces it receives from the gem **to Datadog’s backend**, specifically to `DD_SITE="datadoghq.com"`.
-
-```htm
-<!-- https://mermaid.js.org/config/usage.html#cdn -->
-<!doctype html>
-<html lang="en">
-
-<head>
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
-</head>
-
-<body>
-  <pre class="mermaid">
-  architecture-beta
-    group heroku(cloud)[Heroku Server]
-
-    group web_dyno(server)[Web Dyno] in heroku
-    group rails_app(skill-icons:rails)[Rails App] in web_dyno
-
-    group dd_cloud(internet)[Datadog Backend]
-    service dd_backend(vscode-icons:folder-type-datadog-opened) in dd_cloud
-
-    group worker_dyno(server)[Worker Dyno] in heroku
-    group rails_app_j(skill-icons:rails)[Rails App] in worker_dyno
-    service datadog_gem_j(logos:rubygems)[Datadog Gem] in rails_app_j
-    service datadog_agent_j(vscode-icons:file-type-datadog)[Datadog Agent] in worker_dyno
-
-    service datadog_gem(logos:rubygems)[Datadog Gem] in rails_app
-    service datadog_agent(vscode-icons:file-type-datadog)[Datadog Agent] in web_dyno
-
-    datadog_gem:R --> L:datadog_agent
-    datadog_gem_j:R --> L:datadog_agent_j
-    datadog_agent:R --> L:dd_backend
-    datadog_agent_j:R --> B:dd_backend
-  </pre>
-
-  <button id="downloadBtn">Download Diagram as PNG</button>
-
-  <script type="module">
-    import mermaid from 'https://cdn.jsdelivr.net/npm/mermaid@11/dist/mermaid.esm.min.mjs';
-    // import html2canvas from 'https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js';
-
-    // Register the icon pack for Iconify
-    mermaid.registerIconPacks([
-      {
-        name: 'skill-icons', // Specify the name used in Mermaid syntax (e.g., skill-icons:rails)
-        loader: () =>
-          fetch('https://unpkg.com/@iconify-json/skill-icons@1/icons.json').then(res => res.json())
-      },
-      {
-        name: 'vscode-icons', // For using icons like vscode-icons:file-type-datadog
-        loader: () =>
-          fetch('https://unpkg.com/@iconify-json/vscode-icons@1/icons.json').then(res => res.json())
-      },
-      {
-        name: 'logos', // For logos like 'logos:rubygems'
-        loader: () =>
-          fetch('https://unpkg.com/@iconify-json/logos@1/icons.json').then(res => res.json())
-      },
-    ]);
-
-    // Initialize Mermaid with the configuration
-    // mermaid.initialize({ startOnLoad: true });
-
-    // Download button functionality
-    document.getElementById('downloadBtn').addEventListener('click', () => {
-      const svgElement = document.querySelector('.mermaid svg');
-
-      if (svgElement) {
-        // Convert SVG to PNG using html2canvas
-        html2canvas(svgElement).then(canvas => {
-          // Create a link to download the image
-          const link = document.createElement('a');
-          link.download = 'mermaid_diagram.png';
-          link.href = canvas.toDataURL('image/png');
-          link.click();
-        });
-      } else {
-        alert('Diagram not rendered yet!');
-      }
-    });
-  </script>
-</body>
-
-</html>
-```
