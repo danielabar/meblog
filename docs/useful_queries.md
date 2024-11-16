@@ -224,3 +224,27 @@ Example output:
   "extensions": {}
 }
 ```
+
+## Content for Sharing
+
+```graphql
+{
+  allMarkdownRemark(
+    filter: {
+      fileAbsolutePath: { regex: "/src/markdown/" }
+    }
+    sort: {frontmatter: {date: DESC}}
+  ) {
+    edges {
+      node {
+        frontmatter {
+          title
+          description
+          category
+          date(formatString: "YYYY-MM-DD")
+        }
+      }
+    }
+  }
+}
+```
