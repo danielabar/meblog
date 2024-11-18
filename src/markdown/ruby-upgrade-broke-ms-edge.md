@@ -1,6 +1,6 @@
 ---
 title: "How a Ruby Upgrade Broke MS Edge Support in Our Rails App"
-featuredImage: "../images/tbd.jpg"
+featuredImage: "../images/ruby-upgrade-broke-ms-edge-support-rails-howard-chin-dgajs9bJYek-unsplash.jpg"
 description: "Discover how upgrading Ruby unexpectedly caused compatibility issues with Microsoft Edge in our Rails app, and learn the debugging steps we took to resolve it."
 date: "2025-05-01"
 category: "rails"
