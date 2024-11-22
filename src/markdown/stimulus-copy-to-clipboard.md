@@ -508,6 +508,209 @@ export default class extends Controller {
 }
 ```
 
+## Internationalization
+
+After publishing the original version of this post, a Reddit user raised a great question: *How would you make this work with internationalization?* That question brought up an issue I hadn’t considered - the word "Copy" is hard-coded in the JavaScript, making it difficult to support multiple languages:
+
+```javascript
+this.buttonTarget.textContent = "Copy";
+```
+
+While internationalization (i18n) in Rails is a broad topic, here's how this specific problem can be solved:
+
+**Step 1: Configure i18n**
+
+Add the locales that are supported and specify a default. This can go either in `config/application.rb` as shown below or in `config/initializers/locale.rb`:
+
+```ruby
+module StimulusDemo
+  class Application < Rails::Application
+    # Support English and Spanish
+    config.i18n.available_locales = %i[en es]
+
+    # Default to English
+    config.i18n.default_locale = :en
+
+    # ...
+  end
+end
+```
+
+**Step 2: Controller Locale Switching**
+
+In the main application controller, add a `before_action` to set the locale from `params` or the default if not specified:
+
+```ruby
+class ApplicationController < ActionController::Base
+  before_action :set_locale
+
+  private
+
+  def set_locale
+    I18n.locale = params[:locale] || I18n.default_locale
+  end
+
+  # ensures locale is included in all generated URLs
+  def default_url_options
+    { locale: I18n.locale }
+  end
+end
+```
+
+**Step 3: Modify Routes to Include Locale**
+
+Wrap routes that need to work with translations with an optional path scope. This allows routes that don't specify a locale to be considered valid and use the default locale:
+
+```ruby
+# config/routes.rb
+Rails.application.routes.draw do
+  scope "(:locale)", locale: /en|es/ do
+    root "welcome#index"
+    get "welcome/index"
+  end
+  # ...
+end
+```
+
+**Step 4: Create Translation Files**
+
+Take all the currently hard-coded English content out of controllers, and views and move it to the translation files:
+
+```yml
+# config/locales/en.yml
+en:
+  clipboard:
+    copy: "Copy"
+    done: "Done"
+  welcome:
+    index:
+      very_important_content: >
+        The sun gently peeked through the dense foliage, casting dappled shadows on the forest floor.
+        With a steady hand, the artist meticulously applied strokes of vibrant color to the canvas, bringing the landscape to life.
+        ...
+```
+
+```yml
+# config/locales/es.yml
+es:
+  clipboard:
+    copy: "Copiar"
+    done: "Hecho"
+  welcome:
+    index:
+      very_important_content: >
+        El sol se asomó suavemente a través del denso follaje, proyectando sombras moteadas en el suelo del bosque.
+        ...
+```
+
+<aside class="markdown-aside">
+Since I don't speak Spanish, I used Google Translate to generate the above es.yml file. However, please note that literal translations may not always capture the exact idioms or nuances of the language.
+</aside>
+
+**Step 5: Add Language Switcher**
+
+Update the application layout with links to switch to English or Spanish:
+
+```erb
+<%# app/views/layouts/application.html.erb %>
+<!DOCTYPE html>
+<html lang="<%= I18n.locale %>">
+  <head>...</head>
+
+  <body>
+    <%# === NEW: ADD LINKS FOR LANGUAGE SWITCHING === %>
+    <header>
+      <div >
+        <%= link_to "English", url_for(locale: :en) %>
+        <%= link_to "Español", url_for(locale: :es) %>
+      </div>
+    </header>
+
+    <main>
+      <%= yield %>
+    <main>
+  </body>
+</html>
+```
+
+**Step 6: Update Welcome Controller**
+
+Set translated content rather than hard-coded:
+
+```ruby
+# app/controllers/welcome_controller.rb
+class WelcomeController < ApplicationController
+  def index
+    # @very_important_content = "The sun gently peeked through..."
+    @very_important_content = I18n.t("welcome.index.very_important_content")
+  end
+end
+```
+
+**Step 7: Update Stimulus Controller**
+
+Replace the hard-coded English word "Copy" with a new input value `copyText`:
+
+```javascript
+// app/javascript/controllers/clipboard_controller.js
+export default class extends Controller {
+  // === NEW: copyText ADDED HERE ===
+  // === OPTIONALLY REMOVE DEFAULTS SO THESE MUST ALWAYS BE PROVIDED ===
+  static values = {
+    confirm: { type: String, default: 'Done' },
+    delayMs: { type: Number, default: 2000 },
+    copyText: { type: String, default: 'Copy' }
+  }
+
+  copy() {
+    const text = this.contentTarget.innerText
+    navigator.clipboard.writeText(text)
+      .then(() => {
+        this.buttonTarget.textContent = this.confirmValue;
+        setTimeout(() => {
+          // === NEW: USE copyTextValue INSTEAD OF HARD-CODED ENGLISH WORD ===
+          // this.buttonTarget.textContent = "Copy";
+          this.buttonTarget.textContent = this.copyTextValue;
+        }, this.delayMsValue);
+      })
+      // ...
+  }
+}
+```
+
+**Step 8: Update Welcome View**
+
+Finally, update the welcome index view to pass in the translation values rather than hard-coded English words into the Stimulus controller via the data attributes:
+
+```erb
+<%# app/views/welcome/index.html.erb %>
+<div
+  data-controller="clipboard"
+  data-clipboard-confirm-value="<%= t('clipboard.done') %>"
+  data-clipboard-delay-ms-value="3000"
+  data-clipboard-copy-text-value="<%= t('clipboard.copy') %>">
+
+  <div data-clipboard-target="content" id="content">
+    <%= @very_important_content %>
+  </div>
+
+  <button
+    data-action="clipboard#copy"
+    data-clipboard-target="button">
+      <%= t('clipboard.copy') %>
+  </button>
+</div>
+```
+
+Now when you click on `Español`, all the content switches to Spanish, including content referenced by the Stimulus controller.
+
+TODO: link!
+<aside class="markdown-aside">
+This is just one of many ways to implement i18n in Rails. The topic of internationalization is quite extensive. For more in-depth coverage, check out the official Rails i18n guide.
+</aside>
+
+
+
 ## Debugging
 
 Stimulus controllers can be debugged using the browser developer tools just like any other JavaScript. For example using Chrome, from the developer tools, click on the "Sources" tab:
