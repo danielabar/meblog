@@ -135,6 +135,10 @@
   content: "json";
 }
 
+.content pre[data-language="javascript"]::before {
+  content: "javascript";
+}
+
 .content pre[data-language="html"]::before {
   content: "html";
 }

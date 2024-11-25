@@ -510,7 +510,7 @@ export default class extends Controller {
 
 ## Internationalization
 
-After publishing the original version of this post, a Reddit user raised a great question: *How would you make this work with internationalization?* That question brought up an issue I hadn’t considered - the word "Copy" is hard-coded in the JavaScript, making it difficult to support multiple languages:
+After publishing the original version of this post, a Reddit user raised a great question: *How would you make this work with internationalization?* That question brought up an issue I hadn’t considered - there are many hard-coded English words throughout the solution, including in the Stimulus controller:
 
 ```javascript
 this.buttonTarget.textContent = "Copy";
@@ -604,7 +604,7 @@ es:
 ```
 
 <aside class="markdown-aside">
-Since I don't speak Spanish, I used Google Translate to generate the above es.yml file. However, please note that literal translations may not always capture the exact idioms or nuances of the language.
+Since I don't speak Spanish, I used Google Translate to generate the above es.yml file. However, please note that literal translations may not capture idioms or nuances of the language.
 </aside>
 
 **Step 5: Add Language Switcher**
@@ -702,14 +702,23 @@ Finally, update the welcome index view to pass in the translation values rather 
 </div>
 ```
 
-Now when you click on `Español`, all the content switches to Spanish, including content referenced by the Stimulus controller.
+Now it defaults to English (added some TailwindCSS styles):
 
-TODO: link!
+![stimulus demo language english](../images/stimulus-demo-language-english.png "stimulus demo language english")
+
+Clicking Spanish changes the url and content:
+
+![stimulus demo language spanish](../images/stimulus-demo-language-spanish.png "stimulus demo language spanish")
+
+Clicking the Copy button while on the `/es` url, shows that it's functioning in Spanish (and after a few seconds returns to "Copiar"):
+
+![stimulus demo language spanish done](../images/stimulus-demo-language-spanish-done.png "stimulus demo language spanish done")
+
+The complete changeset to add multi-language support can be viewed [here](https://github.com/danielabar/stimulus_demo/commit/63c2d0cd7166a7bd4f45589f3a61b8a4c56fa000).
+
 <aside class="markdown-aside">
-This is just one of many ways to implement i18n in Rails. The topic of internationalization is quite extensive. For more in-depth coverage, check out the official Rails i18n guide.
+This is just one of many ways to implement i18n in Rails. The topic of internationalization is quite extensive. For more in-depth coverage, check out the <a class="markdown-link" href="https://guides.rubyonrails.org/i18n.html">Rails i18n guide</a>.
 </aside>
-
-
 
 ## Debugging
 
