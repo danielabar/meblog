@@ -2,7 +2,7 @@
 title: "Fixing Gem Install Errors on M3 Mac with Ruby 2.7"
 featuredImage: "../images/fix-gem-install-issues-julien-pier-belanger-SoFNVdiJQgc-unsplash.jpg"
 description: "A guide to resolving common gem installation errors such as `pg`, `nokogiri`, and `msgpack` when setting up a Rails project on an M3 Mac with Ruby 2.7.8, including solutions and troubleshooting steps."
-date: "2025-02-01"
+date: "2024-12-01"
 category: "rails"
 related:
   - "Homebrew Postgresql Service not Starting Resolved"
