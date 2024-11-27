@@ -162,7 +162,7 @@ end
 ```
 At first glance, it appeared that Microsoft Edge was intentionally marked as unsupported. However, this configuration was introduced eight years ago, back when Edge was more like Internet Explorer. At the time, this rule made sense for this particular app.
 
-TODO: Explain about Backbone/Marionette front end for legacy app and known issues with older browsers such as IE8. Note that better browser support was added in 2019 but this app is over 8 years old, and at that time support for older browsers was not the case: https://github.com/marionettejs/backbone.marionette/blob/master/test/rollup.config.js#L24-L30
+TODO: Explain about Backbone/Marionette front end for legacy app and known issues with older browsers such as IE8. Note that better browser support was added in 2019 but this app is over 8 years old, and at that time support for older browsers was not the case: https://github.com/marionettejs/backbone.marionette/issues/3658 and https://github.com/marionettejs/backbone.marionette/blob/master/test/rollup.config.js#L24-L30
 
 But in January 2020, Microsoft modified their Edge browser to be Chromium based, which would have also modified the User Agent string that browser was sending. However, this app had remained on the older version of the `browser` gem (v2.2.0) during this transition.
 
