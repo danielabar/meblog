@@ -31,7 +31,7 @@ The results above indicated that the `/unsupported_browser` url is handled by th
 
 This app uses Datadog APM for observability, with the datadog gem and auto instrumentation enabled. This makes any `Controller#action` available as a Resource in the Services section.
 
-The top of every resource page in Datadog shows some summary charts, including the number of requests to this resource over a period of time. The resource page for `PagesController#unsupported_browser` in Datadog showed a sharp increase in the number of requests over the past few days:
+The top of every resource page in Datadog shows some summary graphs, including the number of requests to this resource over a period of time. The resource page for `PagesController#unsupported_browser` in Datadog showed a sharp increase in the number of requests over the past few days:
 
 ![datadog-unsupported-browser-requests-spike](../images/datadog-unsupported-browser-requests-spike.png "datadog-unsupported-browser-requests-spike")
 
@@ -74,8 +74,6 @@ npx ua-parser-js "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (
 
 ## Reproducing the Issue
 
-WIP...
-
 The next step was to see if I could reproduce the issue. From the user agent string analysis, it appeared to only be affecting Microsoft Edge users on Windows 10. While it is possible to install the Microsoft Edge browser on a Mac, I was concerned that the user agent string wouldn't be exactly the same from a Mac vs Windows.
 
 Fortunately, it's possible using Chrome (my default browser on Mac) to send any User Agent string. With the Developer Tools open, select the Network tab, then click on the three vertical dots at the top right, and select More Tools, then Network Conditions as shown in the screenshot below:
@@ -90,22 +88,70 @@ What this does is for any subsequent network requests, while devtools is open, i
 
 With this in place, when I refreshed the app, I was redirected to `/unsupported_browser`, just like some of our users were experiencing. This was good news - it's much easier to troubleshoot a reproducible issue.
 
-TODO: Where does this fit in?
+## When did it Start?
+
+With the issue now reproducible, the next logical question was: Why were users only encountering this problem recently?
+
+To answer that, I took a closer look at the Datadog requests over time graph, and noticed that there was a very distinct date when these requests started, as highlighted below:
+
 ![datadog-unsupported-browser-requests-spike](../images/datadog-unsupported-browser-requests-spike-highlight-date.png "datadog-unsupported-browser-requests-spike")
 
-This just happened to be the same date we had deployed a Ruby 3.x upgrade.
+This just happened to be the exact same date we had released a major Ruby upgrade from 2.x to 3.x!
 
 ![ruby-upgrade-msedge-coincidence-i-think-not](../images/ruby-upgrade-msedge-coincidence-i-think-not.jpg "ruby-upgrade-msedge-coincidence-i-think-not")
 
+Armed with steps to reproduce, and an idea of the most recent change that might have broken things, I could start digging into the code to find the root cause.
+
 ## Digging Into the Code
 
-Our app uses the `browsernizer` gem (which depends on the `browser` gem) to detect browsers and redirect unsupported ones. Reviewing the `Gemfile.lock` changes from the Ruby upgrade revealed that while `browsernizer` hadn’t changed, its dependency, `browser`, was updated from version 2.2.0 to 2.7.1.
-
-TODO: Image of git diff
-
-In our `browsernizer` configuration:
+I started by looking into the code that renders the `/unsupported_browser` path, including the router, controller, and view:
 
 ```ruby
+# config/routes.rb
+Rails.application.routes.draw do
+  get "/unsupported_browser", to: "pages#unsupported_browser"
+end
+```
+
+```ruby
+# app/controllers/pages_controller.rb
+class PagesController < ApplicationController
+  def unsupported_browser
+  end
+end
+```
+
+```erb
+<%# app/views/pages/unsupported_browser.html.erb %>
+<div>
+  Content to display please use one of the browsers below...
+</div>
+```
+
+But there was nothing remarkable in any of the above code: No recent changes as a result of the Ruby upgrade, and not even any logic, just static display. I also checked the base `ApplicationController` but nothing relevant there either.
+
+So the next question was, what was directing some requests to the `/unsupported_browser` path? In absence of any obvious logic in the application code, the answer could be in middleware, which can modify http requests and responses. Rails already comes with a middleware stack, but an app can add more via custom code or gems.
+
+To view the list of middleware currently in a Rails app, you can run `bin/rails middleware`. I ran this looking for anything that wasn't out-of-the-box Rails like `ActionDispatch::...` or `Rack::...`, and possibly related to browser detection. And I found:
+
+```bash
+bin/rails middleware
+# usual Rails things...
+# use Browsernizer::Router
+```
+
+The `Browsernizer::Router` middleware comes from the [browsernizer](https://github.com/assembler/browsernizer) gem (which depends on the [browser](https://github.com/fnando/browser) gem). This gem detect browsers and redirects unsupported ones. Looking at the `Gemfile`, I discovered our app does indeed use this gem.
+
+And reviewing the `Gemfile.lock` changes from the Ruby upgrade revealed that while `browsernizer` hadn’t changed, its dependency, `browser`, was updated from version 2.2.0 to 2.7.1. This can be viewed in the snippet of the git diff below:
+
+![ruby upgrade gem diffs](../images/ruby-upgrade-gem-diffs.png "ruby upgrade gem diffs")
+
+Definitely getting closer...
+
+The browsernizer middleware is configured in an initializer as follows:
+
+```ruby
+# config/initializers/browsernizer.rb
 Rails.application.config.middleware.use Browsernizer::Router do |config|
   config.supported "Internet Explorer", false
   config.supported "Microsoft Edge", false
@@ -114,11 +160,15 @@ Rails.application.config.middleware.use Browsernizer::Router do |config|
   config.exclude   %r{^/assets}
 end
 ```
-At first glance, it appeared that Edge was intentionally marked as unsupported. However, this configuration was introduced eight years ago, back when Edge was more like Internet Explorer. At the time, this rule made sense.
+At first glance, it appeared that Microsoft Edge was intentionally marked as unsupported. However, this configuration was introduced eight years ago, back when Edge was more like Internet Explorer. At the time, this rule made sense for this particular app.
 
-TODO: Explain about Backbone/Marionette front end for legacy app and known issues with older browsers such as IE8.
+TODO: Explain about Backbone/Marionette front end for legacy app and known issues with older browsers such as IE8. Note that better browser support was added in 2019 but this app is over 8 years old, and at that time support for older browsers was not the case: https://github.com/marionettejs/backbone.marionette/blob/master/test/rollup.config.js#L24-L30
 
-With the older `browser` gem (v2.2.0), Chromium-based Edge wasn’t recognized as "Microsoft Edge" due to differences in User-Agent parsing. This unintentional gap allowed Chromium-based Edge users to bypass the block. After the Ruby upgrade, the newer `browser` gem (v2.7.1) correctly identified all Edge browsers—Chromium-based or not—triggering the block for all versions of Edge.
+But in January 2020, Microsoft modified their Edge browser to be Chromium based, which would have also modified the User Agent string that browser was sending. However, this app had remained on the older version of the `browser` gem (v2.2.0) during this transition.
+
+## Identify Root Cause
+
+With the older `browser` gem (v2.2.0), Chromium-based Edge wasn’t recognized as "Microsoft Edge" due to differences in User-Agent parsing. This unintentional gap allowed Chromium-based Edge users to bypass the block. After the Ruby upgrade, the newer `browser` gem (v2.7.1) correctly identified all Edge browsers—Chromium-based or not, therefore triggering the block for all versions of Edge, which was not intended.
 
 TODO: Better explanation of above? Maybe dig into 2.2.0 code...
 
@@ -226,12 +276,15 @@ These tests ensure that future updates won’t reintroduce the bug.
 
 ## TODO
 * WIP integrate notes from `~/Documents/tech/blog-research/blog-ideas.md`
-* Consistency in browser naming re: Edge, MS Edge, Microsoft Edge.
+* WIP Digging into code re: browser gem during time of MS Edge transition from non-Chromium to Chromium-based
 * Explain what browsernizer and browser gems do
-* Aside: Datadog/APM terminology - link to a good learning resource for those unfamiliar
 * Dig into code differences on browser 2.2.0 v 2.7.1 wrt Microsoft Edge
+* Better sub-section heading for "Investigating the Cause"
+* Annotate `chrome-devtools-custom-user-agent-string.png` with arrow pointing to what to uncheck and where to custom fill in
+* Aside: Datadog/APM terminology - link to a good learning resource for those unfamiliar
 * Aside: Mention browsernizer hasn't been updated in 8 years, careful with bringing in gems that don't get regularly updated, we may in the future want to remove this dependency and use browser gem directly for browser detection.
 * Aside: Browserstack is useful for testing on a variety of real browsers, our team might invest in a few licenses for the future.
 * Conclusion or maybe call it Lessons Learned - careful with bringing in gems that may no longer be maintained, especially if all they do is provide a lightweight wrapper around a well-maintained/popular gem. Do maintain the system tests as much as possible, because relying on manual testing will slow you down tremendously as app size grows. Anything else?
+* Consistency in browser naming re: Edge, MS Edge, Microsoft Edge.
 * edit
 * Updated related to include Datadog Heroku post, should be published by then
