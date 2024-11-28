@@ -35,7 +35,7 @@ The top of every resource page in Datadog shows some summary graphs, including t
 
 ![datadog-unsupported-browser-requests-spike](../images/datadog-unsupported-browser-requests-spike.png "datadog-unsupported-browser-requests-spike")
 
-The resource page in Datadog also includes a list of traces it captured for this request. Since it's a rack request, Datadog also captures the User Agent string. Here are a few examples of user agent strings I found for the `/unsupported_browser` request:
+The resource page in Datadog also includes a list of traces it captured for this request. Since it's a rack request, Datadog also captures the User Agent string. Here are a few examples of User Agent strings I found for the `/unsupported_browser` request:
 
 ```
 Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/129.0.0.0 Safari/537.36 Edg/129.0.0.0
@@ -74,9 +74,9 @@ npx ua-parser-js "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (
 
 ## Reproducing the Issue
 
-The next step was to see if I could reproduce the issue. From the user agent string analysis, it appeared to only be affecting Microsoft Edge users on Windows 10. While it is possible to install the Microsoft Edge browser on a Mac, I was concerned that the user agent string wouldn't be exactly the same from a Mac vs Windows.
+The next step was to see if I could reproduce the issue. From the user agent string analysis, it appeared to only be affecting Microsoft Edge users on Windows 10. While it is possible to install the Microsoft Edge browser on a Mac, I was concerned that the User Agent string wouldn't be exactly the same from a Mac vs Windows.
 
-Fortunately, it's possible using Chrome (my default browser on Mac) to send any User Agent string. With the Developer Tools open, select the Network tab, then click on the three vertical dots at the top right, and select More Tools, then Network Conditions as shown in the screenshot below:
+Fortunately, it's possible using Chrome (my default browser on Mac) to send an alternate User Agent string. With the Developer Tools open, select the Network tab, then click on the three vertical dots at the top right, and select More Tools, then Network Conditions as shown in the screenshot below:
 
 ![chrome-devtools-network-more-tools-network-conditions](../images/chrome-devtools-network-more-tools-network-conditions.png "chrome-devtools-network-more-tools-network-conditions")
 
@@ -84,7 +84,7 @@ This opens up the Network Conditions sub-panel. Here you can uncheck the "Use br
 
 ![chrome-devtools-custom-user-agent-string](../images/chrome-devtools-custom-user-agent-string.png "chrome-devtools-custom-user-agent-string")
 
-What this does is for any subsequent network requests, while devtools is open, it will send your custom user agent string to the server instead of your actual browser/device user agent string.
+What this does is for any subsequent network requests, while devtools is open, it will send your custom User Agent string to the server instead of your actual browser/device User Agent string.
 
 With this in place, when I refreshed the app, I was redirected to `/unsupported_browser`, just like some of our users were experiencing. This was good news - it's much easier to troubleshoot a reproducible issue.
 
@@ -130,9 +130,11 @@ end
 
 But there was nothing remarkable in any of the above code: No recent changes as a result of the Ruby upgrade, and not even any logic, just static display. I also checked the base `ApplicationController` but nothing relevant there either.
 
-So the next question was, what was directing some requests to the `/unsupported_browser` path? In absence of any obvious logic in the application code, the answer could be in middleware, which can modify http requests and responses. Rails already comes with a middleware stack, but an app can add more via custom code or gems.
+So the next question was, what was directing some requests to the `/unsupported_browser` path? In absence of any obvious logic in the application code, the answer could be in [rack middleware](https://stackoverflow.com/questions/2256569/what-is-rack-middleware), which can filter and modify http requests and responses.
 
-To view the list of middleware currently in a Rails app, you can run `bin/rails middleware`. I ran this looking for anything that wasn't out-of-the-box Rails like `ActionDispatch::...` or `Rack::...`, and possibly related to browser detection. And I found:
+To view the list of middleware currently configured for a Rails app, you can run `bin/rails middleware`. I ran this looking for anything that wasn't out-of-the-box Rails like `ActionDispatch::...` or `Rack::...`, and possibly related to browser detection.
+
+I found this:
 
 ```bash
 bin/rails middleware
@@ -140,7 +142,7 @@ bin/rails middleware
 # use Browsernizer::Router
 ```
 
-The `Browsernizer::Router` middleware comes from the [browsernizer](https://github.com/assembler/browsernizer) gem (which depends on the [browser](https://github.com/fnando/browser) gem). This gem detect browsers and redirects unsupported ones. Looking at the `Gemfile`, I discovered our app does indeed use this gem.
+The `Browsernizer::Router` middleware comes from the [browsernizer](https://github.com/assembler/browsernizer) gem (which depends on the [browser](https://github.com/fnando/browser) gem). These two gems are used to detect browsers and redirect unsupported ones. Looking at the `Gemfile`, I discovered our app does indeed use this gem.
 
 And reviewing the `Gemfile.lock` changes from the Ruby upgrade revealed that while `browsernizer` hadn’t changed, its dependency, `browser`, was updated from version 2.2.0 to 2.7.1. This can be viewed in the snippet of the git diff below:
 
@@ -160,31 +162,97 @@ Rails.application.config.middleware.use Browsernizer::Router do |config|
   config.exclude   %r{^/assets}
 end
 ```
-At first glance, it appeared that Microsoft Edge was intentionally marked as unsupported. However, this configuration was introduced eight years ago, back when Edge was more like Internet Explorer. At the time, this rule made sense for this particular app.
+At first glance, it appeared that Microsoft Edge was intentionally marked as unsupported. However, this configuration was introduced eight years ago, back when Edge was more like Internet Explorer. At the time, this rule made sense for this particular app. And the `browser` gem v2.2.0 was also released 8 years ago.
 
-TODO: Explain about Backbone/Marionette front end for legacy app and known issues with older browsers such as IE8. Note that better browser support was added in 2019 but this app is over 8 years old, and at that time support for older browsers was not the case: https://github.com/marionettejs/backbone.marionette/issues/3658 and https://github.com/marionettejs/backbone.marionette/blob/master/test/rollup.config.js#L24-L30
+<aside class="markdown-aside">
+This app's front end is built with Backbone and Marionette, which historically had compatibility issues with older browsers like IE8, prompting the decision to block both Internet Explorer and Edge in the initial configuration. Browser support was improved in Marionette around 2019, but this app is over 8 years old, and at that time support for older browsers was not the case. This <a class="markdown-link" href="https://github.com/marionettejs/backbone.marionette/issues/3658">GitHub issue</a> and <a class="markdown-link" href="https://github.com/marionettejs/backbone.marionette/blob/master/test/rollup.config.js#L24-L30">test configuration</a> have more details.
+</aside>
 
 But in January 2020, Microsoft modified their Edge browser to be Chromium based, which would have also modified the User Agent string that browser was sending. However, this app had remained on the older version of the `browser` gem (v2.2.0) during this transition.
 
 ## Identify Root Cause
 
-With the older `browser` gem (v2.2.0), Chromium-based Edge wasn’t recognized as "Microsoft Edge" due to differences in User-Agent parsing. This unintentional gap allowed Chromium-based Edge users to bypass the block. After the Ruby upgrade, the newer `browser` gem (v2.7.1) correctly identified all Edge browsers—Chromium-based or not, therefore triggering the block for all versions of Edge, which was not intended.
+With the older `browser` gem (v2.2.0), Chromium-based Edge wasn’t recognized as "Microsoft Edge" due to differences in User-Agent parsing. This version of the gem was released 8 years ago, prior to the existence of Chromium-based Edge, so it couldn't have been detected as such.
 
-TODO: Better explanation of above? Maybe dig into 2.2.0 code...
+This unintentional gap allowed Chromium-based Edge users to bypass the block because the v2.2.0 version of `browser` incorrectly identified Chromium-based Edge as "Chrome". After the Ruby upgrade, the newer `browser` gem (v2.7.1) correctly identified *all* Edge browsers - Chromium-based or not, therefore triggering the block for all versions of Edge, which was not intended.
+
+To verify this, I setup a Ruby project with the older 2.2.0 version of the `browser` gem as follows:
+
+```ruby
+# Gemfile
+source "https://rubygems.org"
+gem "browser", "2.2.0"
+```
+
+```ruby
+# main.rb
+require "browser"
+
+# Modern (i.e. Chromium-based) MS Edge
+user_agent = "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/129.0.0.0 Safari/537.36 Edg/130.0.0.0"
+
+# Let's see what the older browser gem makes of Chromium-based Edge:
+browser = Browser.new(user_agent, accept_language: "en-us")
+
+puts "Browser name: #{browser.name}"
+# Browser name: Chrome
+
+puts "Is this Edge? #{browser.edge?}"
+# Is this Edge? (no further output so must be nil)
+
+puts "Is this Chrome? #{browser.chrome?}"
+# Is this Chrome? true
+```
+
+As shown from the above output, v2.2.0 of `browser` gem was identifying Chromium-based Edge as Chrome, and so this browser was bypassing the blocks setup in `config/initializers/browsernizer.rb`.
+
+Then I setup another Ruby project, this time with the 2.7.1 version of the browser gem that the project had been updated to as part of the upgrade project:
+
+```ruby
+# Gemfile
+source "https://rubygems.org"
+gem "browser", "2.7.1"
+```
+
+```ruby
+# main.rb
+require "browser"
+
+# Modern (i.e. Chromium-based) MS Edge
+user_agent = "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/129.0.0.0 Safari/537.36 Edg/130.0.0.0"
+
+# Let's see what the newer browser gem makes of Chromium-based Edge:
+browser = Browser.new(user_agent, accept_language: "en-us")
+
+puts "Browser name: #{browser.name}"
+# Browser name: Microsoft Edge
+
+puts "Is this Edge? #{browser.edge?}"
+# Is this Edge? true
+
+puts "Is this Chrome? #{browser.chrome?}"
+# Is this Chrome? false
+```
+
+As shown from the above output, v2.7.1 of the `browser` gem was now identifying Chromium-based Edge as Microsoft Edge, which was then getting blocked by `config/initializers/browsernizer.rb`.
 
 ## Implementing the Fix
 
 The real requirement was to:
+
 1. Block Internet Explorer.
 2. Block non-Chromium-based Edge.
 3. Allow all Chromium-based browsers, including modern Edge.
 
-Unfortunately, the `browsernizer` gem hasn’t been updated to support the latest `browser` gem versions, where a convenient `chromium_based?` method exists. To work around this, I implemented a custom check for Chromium-based Edge in our browsernizer configuration:
+Unfortunately, the `browsernizer` gem hasn’t been updated to support the latest `browser` gem versions, where a convenient `chromium_based?` method exists. To work around this, I implemented a custom check for Chromium-based Edge in our browsernizer configuration, based on the most recent version of `browser` gem:
 
 ```ruby
+# config/initializers/browsernizer.rb
 Rails.application.config.middleware.use Browsernizer::Router do |config|
+  # Block IE
   config.supported "Internet Explorer", false
 
+  # Dynamic check for all other browsers
   config.supported do |browser|
     if browser.edge?
       browser.ua.match?(/\bEdg\b/) # Allow Chromium-based Edge
@@ -198,15 +266,17 @@ Rails.application.config.middleware.use Browsernizer::Router do |config|
 end
 ```
 
+With this fix in place, I repeated the manual testing I had been doing with Chrome dev tools and sending the Chromium-based Edge User Agent string, and this time I was allowed to get into the app.
+
 ## Ensuring the Bug Stays Fixed
 
-But it's not enough to just deliver a code fix. The question had to be asked: Why didn't any test fail back when the Ruby upgrade was being performed?
+But it's not enough to only deliver a code fix. We also need some tests to ensure this stays fixed.
 
-This project does have decent system/feature test coverage with Capybara and Cuprite (TODO: Link, JS driver for Capybara, pure Ruby, no Selenium webdriver/chromedriver etc. simpler to setup). But Cuprite JS driver is Chrome only, so at first glance, it seems like it wouldn't be possible to have an automated test to verify chromium-based MS Edge is allowed.
+This project does have decent system/feature test coverage with [Capybara](https://github.com/teamcapybara/capybara) and [Cuprite](https://github.com/rubycdp/cuprite), which is a pure Ruby driver for Capybara. But Cuprite is Chrome only, so at first glance, it seems like it wouldn't be possible to have an automated test to verify other browsers.
 
-However, remembering my earlier experiment with Chrome dev tools to simulate the error condition, I had an idea that maybe the same thing could be done with a feature test, if there was a way to modify the user agent string sent in request header.
+However, remembering my earlier experiment with Chrome dev tools to simulate the error condition by sending a different User Agent string, I had an idea that maybe the same thing could be done with a feature test, if there was a way to modify the User Agent string sent in request header.
 
-It turns out, Cuprite does indeed support modifying request headers! https://github.com/rubycdp/cuprite?tab=readme-ov-file#request-headers. The code sample they provide helpfully includes an example for changing the user agent string, which is exactly what I wanted to do:
+It turns out, Cuprite does indeed support [modifying request headers](https://github.com/rubycdp/cuprite?tab=readme-ov-file#request-headers). The code sample they provide helpfully includes an example for changing the user agent string, which is exactly what I wanted to do:
 
 ```ruby
 page.driver.headers # => {}
@@ -215,7 +285,7 @@ page.driver.add_headers("Referer" => "https://example.com")
 page.driver.headers # => { "User-Agent" => "Cuprite", "Referer" => "https://example.com" }
 ```
 
-This allowed me to write a test to simulate a user visiting the root path "/" from any number of different browsers, differentiated only by the user agent string. If a browser is supported, then the test expects that the user should be redirected to "/login", otherwise, "/unsupported_browser". And here is the test - this ensures that this particular bug should never happen again, even if there are future updates to browsernizer and/or the browser gems:
+This allowed me to write a test to simulate a user visiting the root path "/" from any number of different browsers, differentiated only by the User Agent string. If a browser is supported, then the test expects that the user should be redirected to "/login", otherwise, "/unsupported_browser":
 
 ```ruby
 # spec/features/user_agent_spec.rb
@@ -269,6 +339,8 @@ These tests ensure that future updates won’t reintroduce the bug.
 
 ## Lessons Learned
 
+TODO: This section needs work
+
 1. **Legacy Configurations Need Periodic Reviews**: The `browsernizer` configuration was a time bomb waiting for the right conditions to trigger issues.
 2. **Test Browser Compatibility**: Incorporating tests with simulated User-Agent strings is invaluable for avoiding browser-specific regressions.
 3. **Keep Dependencies Up-to-Date**: Stagnant gems like `browsernizer` can lead to tech debt and compatibility issues.
@@ -276,9 +348,7 @@ These tests ensure that future updates won’t reintroduce the bug.
 
 ## TODO
 * WIP integrate notes from `~/Documents/tech/blog-research/blog-ideas.md`
-* WIP Digging into code re: browser gem during time of MS Edge transition from non-Chromium to Chromium-based
 * Explain what browsernizer and browser gems do
-* Dig into code differences on browser 2.2.0 v 2.7.1 wrt Microsoft Edge
 * Better sub-section heading for "Investigating the Cause"
 * Annotate `chrome-devtools-custom-user-agent-string.png` with arrow pointing to what to uncheck and where to custom fill in
 * Aside: Datadog/APM terminology - link to a good learning resource for those unfamiliar
