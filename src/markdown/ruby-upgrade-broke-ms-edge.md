@@ -25,11 +25,13 @@ bin/rails routes -g "unsupported_browser"
 # unsupported_browser GET  /unsupported_browser(.:format) pages#unsupported_browser
 ```
 
-The results above indicated that the `/unsupported_browser` url is handled by the `unsupported_browser` method in the `PagesController` From there, I turned to Datadog APM to investigate traffic patterns.
+The results above indicated that the `/unsupported_browser` url is handled by the `unsupported_browser` method in the `PagesController`.
 
-## Investigating the Cause
+I was curious to determine if this was an isolated issue affecting only one user, or if other users were experiencing the same problem, so I turned my attention to our observability tool to investigate traffic patterns.
 
-This app uses Datadog APM for observability, with the datadog gem and auto instrumentation enabled. This makes any `Controller#action` available as a Resource in the Services section.
+## One User or Many?
+
+ This app uses Datadog APM for observability, with the datadog gem and auto instrumentation enabled. This makes any `Controller#action` available as a Resource in the Services section.
 
 The top of every resource page in Datadog shows some summary graphs, including the number of requests to this resource over a period of time. The resource page for `PagesController#unsupported_browser` in Datadog showed a sharp increase in the number of requests over the past few days:
 
@@ -347,9 +349,6 @@ TODO: This section needs work
 4. **Debugging Tools Are Your Friend**: Chrome DevTools’ ability to simulate User-Agent strings was critical to reproducing the issue.
 
 ## TODO
-* WIP integrate notes from `~/Documents/tech/blog-research/blog-ideas.md`
-* Explain what browsernizer and browser gems do
-* Better sub-section heading for "Investigating the Cause"
 * Annotate `chrome-devtools-custom-user-agent-string.png` with arrow pointing to what to uncheck and where to custom fill in
 * Aside: Datadog/APM terminology - link to a good learning resource for those unfamiliar
 * Aside: Mention browsernizer hasn't been updated in 8 years, careful with bringing in gems that don't get regularly updated, we may in the future want to remove this dependency and use browser gem directly for browser detection.
