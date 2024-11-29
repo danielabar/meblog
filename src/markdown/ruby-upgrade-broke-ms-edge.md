@@ -2,7 +2,7 @@
 title: "How a Ruby Upgrade Broke MS Edge Support in Our Rails App"
 featuredImage: "../images/ruby-upgrade-broke-ms-edge-support-rails-david-vives-plzP_gAmSog-unsplash.jpg"
 description: "Discover how upgrading Ruby unexpectedly caused compatibility issues with Microsoft Edge in our Rails app, and learn the debugging steps we took to resolve it."
-date: "2025-05-01"
+date: "2025-02-01"
 category: "rails"
 related:
   - "Capybara Webdriver Element not Clickable Resolved"
@@ -355,5 +355,5 @@ These tests ensure that future updates won’t reintroduce the bug.
 5. A good APM tool is your friend in diagnosing production issues.
 
 ## TODO
-* edit
+* WIP edit
 * Updated related to include Datadog Heroku post, should be published by then
