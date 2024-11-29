@@ -31,9 +31,9 @@ I was curious to determine if this was an isolated issue affecting only one user
 
 ## One User or Many?
 
- This app uses [Datadog APM](https://docs.datadoghq.com/tracing/) for observability, with the [datadog gem](https://github.com/DataDog/dd-trace-rb) and auto instrumentation enabled. This makes any `Controller#action` available as a Resource in the Services section.
+ This app uses [Datadog APM](https://docs.datadoghq.com/tracing/) for observability, with the [datadog gem](https://github.com/DataDog/dd-trace-rb) and auto instrumentation enabled. This makes any Rails `Controller#action` available as a Resource in the Services section.
 
-The top of every resource page in Datadog shows some summary graphs, including the number of requests to this resource over a period of time. The resource page for `PagesController#unsupported_browser` in Datadog showed a sharp increase in the number of requests over the past few days:
+The top of every resource page in Datadog shows some summary graphs, including the number of requests to this resource over a period of time. The resource page for `PagesController#unsupported_browser` in Datadog showed a sharp increase in the number of requests over the past week:
 
 ![datadog-unsupported-browser-requests-spike](../images/datadog-unsupported-browser-requests-spike.png "datadog-unsupported-browser-requests-spike")
 
@@ -86,11 +86,11 @@ This opens up the Network Conditions sub-panel. Here you can uncheck the "Use br
 
 ![chrome-devtools-custom-user-agent-string](../images/chrome-devtools-custom-user-agent-string.png "chrome-devtools-custom-user-agent-string")
 
-What this does is for any subsequent network requests, while devtools is open, it will send your custom User Agent string to the server instead of your actual browser/device User Agent string.
+What this does is for any subsequent network requests, while developer tools is open, it will send your custom User Agent string to the server instead of your actual browser/device User Agent string.
 
 With this in place, when I refreshed the app, I was redirected to `/unsupported_browser`, just like some of our users were experiencing. This was good news - it's much easier to troubleshoot a reproducible issue.
 
-## When did it Start?
+## When Did it Start?
 
 With the issue now reproducible, the next logical question was: Why were users only encountering this problem recently?
 
@@ -151,6 +151,8 @@ And reviewing the `Gemfile.lock` changes from the Ruby upgrade revealed that whi
 ![ruby upgrade gem diffs](../images/ruby-upgrade-gem-diffs.png "ruby upgrade gem diffs")
 
 Definitely getting closer...
+
+![ruby-upgrade-msedge-issue-getting-closer](../images/ruby-upgrade-msedge-issue-getting-closer.png "ruby-upgrade-msedge-issue-getting-closer")
 
 The browsernizer middleware is configured in an initializer as follows:
 
