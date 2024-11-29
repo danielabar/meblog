@@ -2,7 +2,7 @@
 title: "Datadog APM for Rails on Heroku"
 featuredImage: "../images/datadog-heroku-rails-chewy-EV9_vVMZTcg-unsplash.jpg"
 description: "Learn how to set up Datadog APM for a Rails application on Heroku, including installation, configuration, and tips for optimizing performance monitoring."
-date: "2025-04-01"
+date: "2025-01-01"
 category: "devops"
 related:
   - "Using Heroku's pg:pull with Docker"
