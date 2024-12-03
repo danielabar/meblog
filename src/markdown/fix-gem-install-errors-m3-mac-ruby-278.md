@@ -13,7 +13,7 @@ related:
 Starting a new role always comes with exciting challenges, and one of my first tasks in a recent new role was setting up a 10-year-old legacy Rails project on an M3 MacBook. The project was running Rails 6.1 and Ruby 2.7.8, with several older versions of gems that errored on `bundle install`. In this post I'll share what caused the errors, and the steps to resolve them, so you can save time and headaches when faced with similar issues.
 
 <aside class="markdown-aside">
-While <a class="markdown-link" href="https://endoflife.date/ruby">Ruby 2.7.x is no longer officially supported</a>, it's still common to work with legacy systems that require older versions during maintenance or upgrades. I'm in the process of upgrading all the things but the first step is still to get the older version working and tests running.
+While <a class="markdown-link" href="https://endoflife.date/ruby">Ruby 2.7.x is no longer officially supported</a>, it's still common to work with legacy systems that require older versions during maintenance or upgrades. I'm in the process of upgrading all the things but the first step is to get the older version working and tests running.
 </aside>
 
 ##  Nokogiri
@@ -183,10 +183,6 @@ In Gemfile:
     msgpack
 ```
 
-<aside class="markdown-aside">
-The msgpack gem is a dependency of <a class="markdown-link" href="https://github.com/shopify/bootsnap">bootsnap</a>, which is included in some Rails applications to improve boot times by optimizing the loading of code.
-</aside>
-
 This error is caused by stricter function pointer checks when building C extensions on the ARM architecture of the M3 Mac.
 
 **Solution:**
@@ -198,15 +194,16 @@ bundle config set --global build.msgpack "--with-cflags=-Wno-error=incompatible-
 bundle config set --global build.bootsnap "--with-cflags=-Wno-error=incompatible-function-pointer-types"
 ```
 
-This will suppress the function pointer type warnings and allow the gems to install correctly.
+This will suppress the function pointer type warnings and allow the gems to install correctly. This discussion on a different GitHub project has more information on the [incompatible function pointer type error on an M3 Mac](https://github.com/grpc/grpc/issues/35148).
 
-This discussion on a different GitHub project has more information on the [incompatible function pointer type error on an M3 Mac](https://github.com/grpc/grpc/issues/35148).
+<aside class="markdown-aside"> The <a class="markdown-link" href="https://github.com/shopify/bootsnap">bootsnap</a> gem, often used in Rails applications, speeds up boot times by caching and optimizing how code is loaded.
+</aside>
 
 ## Alternative
 
 For teams encountering repeated issues with native installations, an alternative approach is to create a Docker image for development, or a [Dev Container for VS Code](https://code.visualstudio.com/docs/devcontainers/create-dev-container). These solutions can simplify setup by standardizing the environment across team members and isolating dependencies.
 
-However, these approaches have tradeoffs. A Dockerized development environment may introduce performance overhead and make debugging more complex. Since not all of our team members use VS Code and we anticipated upgrading to newer Ruby and Rails versions soon, we opted to stick with native installation for this project.
+However, a Dockerized development environment may introduce performance overhead and make debugging more complex. As for VS Code dev containers, not all of our team members are using VS Code, and we anticipated upgrading to newer Ruby and Rails versions soon, so we opted to stick with native installation for this project.
 
 ## Conclusion
 
