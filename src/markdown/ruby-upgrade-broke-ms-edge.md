@@ -1,5 +1,5 @@
 ---
-title: "How a Ruby Upgrade Broke MS Edge Support in Our Rails App"
+title: "How a Ruby Upgrade Broke MS Edge Support in a Rails App"
 featuredImage: "../images/ruby-upgrade-broke-ms-edge-support-rails-david-vives-plzP_gAmSog-unsplash.jpg"
 description: "Discover how upgrading Ruby unexpectedly caused compatibility issues with Microsoft Edge in our Rails app, and learn the debugging steps we took to resolve it."
 date: "2025-02-01"
@@ -10,11 +10,11 @@ related:
   - "Rails Feature Test Solved by Regex"
 ---
 
-Recently, I encountered a perplexing issue: customers using Microsoft Edge could no longer access a legacy Rails app I maintain. Instead, they were redirected to our `/unsupported_browser` page, which advises users to switch to Chrome, Firefox, or Safari. This wasn’t just an inconvenience, it was a major blocker for some users who relied exclusively on Edge. This post will walk through the debugging steps and resolution.
+Recently, I encountered a strange issue on a legacy Rails application I maintain: Customers using Microsoft Edge could no longer access the site. Instead, they were redirected to the `/unsupported_browser` page, which advises users to switch to Chrome, Firefox, or Safari. This wasn’t just an inconvenience, it was a major blocker for some users who relied exclusively on Edge. This post will walk through the debugging steps and resolution.
 
 ## The Issue
 
-A user reported that they were being redirected to the `/unsupported_browser` page on Edge, despite having used the app for years without issues. This behavior was unexpected because Microsoft Edge, being  [Chromium-based since January 2020](https://support.microsoft.com/en-us/microsoft-edge/download-the-new-microsoft-edge-based-on-chromium-0f4a3dd7-55df-60f5-739f-00010dba52cf), is a modern browser and fully compatible with our app.
+A user reported that they were being redirected to the `/unsupported_browser` page on Edge, despite having used the app for years without issues. This behavior was unexpected because Microsoft Edge, being  [Chromium-based since January 2020](https://support.microsoft.com/en-us/microsoft-edge/download-the-new-microsoft-edge-based-on-chromium-0f4a3dd7-55df-60f5-739f-00010dba52cf), is a modern browser and fully compatible with this application.
 
 To understand why Edge users were being blocked, I started by identifying where the `/unsupported_browser` page was being rendered in the Rails app. The `bin/rails routes` command lists all routes defined in the application, and the `-g` (grep) flag filters the results to only those matching the given string or regular expression:
 
@@ -37,7 +37,7 @@ The top of every resource page in Datadog shows some summary graphs, including t
 
 ![datadog-unsupported-browser-requests-spike](../images/datadog-unsupported-browser-requests-spike.png "datadog-unsupported-browser-requests-spike")
 
-The resource page in Datadog also includes a list of traces it captured for this request. Since it's a rack request, Datadog also captures the User Agent string. Here are a few examples of User Agent strings I found for the `/unsupported_browser` request:
+The resource page in Datadog also includes a list of traces it captured for this request. Since it's a [rack](https://www.writesoftwarewell.com/definitive-guide-to-rack/) request, Datadog also captures the User Agent string. Here are a few examples of User Agent strings I found for the `/unsupported_browser` request:
 
 ```
 Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/129.0.0.0 Safari/537.36 Edg/129.0.0.0
@@ -86,13 +86,13 @@ This opens up the Network Conditions sub-panel. Here you can uncheck the "Use br
 
 ![chrome-devtools-custom-user-agent-string](../images/chrome-devtools-custom-user-agent-string.png "chrome-devtools-custom-user-agent-string")
 
-What this does is for any subsequent network requests, while developer tools is open, it will send your custom User Agent string to the server instead of your actual browser/device User Agent string.
+For any network requests made while Developer Tools is open, the browser will now send your custom User Agent string to the server instead of the one normally associated with your browser or device.
 
-With this in place, when I refreshed the app, I was redirected to `/unsupported_browser`, just like some of our users were experiencing. This was good news - it's much easier to troubleshoot a reproducible issue.
+With this setup, refreshing the browser with the url at the application home page, redirected me to `/unsupported_browser`, confirming that I had successfully reproduced the issue our users were encountering. This was great news because having a reproducible issue makes troubleshooting significantly easier.
 
 ## When Did it Start?
 
-With the issue now reproducible, the next logical question was: Why were users only encountering this problem recently?
+With the issue now reproducible, the next logical question was: Why were users only encountering this problem recently? i.e. this application has been running in production for years, why was this problem starting now?
 
 To answer that, I took a closer look at the Datadog requests over time graph, and noticed that there was a very distinct date when these requests started, as highlighted below:
 
@@ -118,6 +118,7 @@ end
 ```ruby
 # app/controllers/pages_controller.rb
 class PagesController < ApplicationController
+  # no logic here means this will render: app/views/pages/unsupported_browser.html.erb
   def unsupported_browser
   end
 end
@@ -144,7 +145,7 @@ bin/rails middleware
 # use Browsernizer::Router
 ```
 
-The `Browsernizer::Router` middleware comes from the [browsernizer](https://github.com/assembler/browsernizer) gem (which depends on the [browser](https://github.com/fnando/browser) gem). These two gems are used to detect browsers and redirect unsupported ones. Looking at the `Gemfile`, I discovered our app does indeed use this gem.
+The `Browsernizer::Router` middleware comes from the [browsernizer](https://github.com/assembler/browsernizer) gem (which depends on the [browser](https://github.com/fnando/browser) gem). This gem is used to detect browsers and redirect unsupported ones. Looking at the `Gemfile`, I discovered our app does indeed use this gem.
 
 And reviewing the `Gemfile.lock` changes from the Ruby upgrade revealed that while `browsernizer` hadn’t changed, its dependency, `browser`, was updated from version 2.2.0 to 2.7.1. This can be viewed in the snippet of the git diff below:
 
@@ -166,7 +167,7 @@ Rails.application.config.middleware.use Browsernizer::Router do |config|
   config.exclude   %r{^/assets}
 end
 ```
-At first glance, it appeared that Microsoft Edge was intentionally marked as unsupported. However, this configuration was introduced eight years ago, back when Edge was more like Internet Explorer. At the time, this rule made sense for this particular app.
+At first glance, it appeared that Microsoft Edge was intentionally marked as unsupported. However, this configuration was introduced eight years ago, back when Microsoft Edge was more like Internet Explorer. At the time, this rule made sense for this particular app.
 
 <aside class="markdown-aside">
 This app's front end is built with Backbone and Marionette, which historically had compatibility issues with older browsers like IE8, prompting the decision to block both Internet Explorer and Edge in the initial configuration. Browser support was improved in Marionette around 2019, but this app is over 8 years old, and at that time support for older browsers was not the case. This <a class="markdown-link" href="https://github.com/marionettejs/backbone.marionette/issues/3658">GitHub issue</a> and <a class="markdown-link" href="https://github.com/marionettejs/backbone.marionette/blob/master/test/rollup.config.js#L24-L30">test configuration</a> have more details.
@@ -242,7 +243,7 @@ As shown from the above output, v2.7.1 of the `browser` gem was now identifying 
 
 ## Implementing the Fix
 
-The real requirement was to:
+The intention of the browser detection middleware was to:
 
 1. Block Internet Explorer.
 2. Block non-Chromium-based Edge.
@@ -280,11 +281,11 @@ Longer term we may consider replacing the `browsernizer` gem with a custom solut
 
 But it's not enough to only deliver a code fix. We also need some tests to ensure this stays fixed.
 
-This project does have decent system/feature test coverage with [Capybara](https://github.com/teamcapybara/capybara) and [Cuprite](https://github.com/rubycdp/cuprite), which is a pure Ruby driver for Capybara. But Cuprite is Chrome only, so at first glance, it seems like it wouldn't be possible to have an automated test to verify other browsers.
+This project has system test coverage with [Capybara](https://github.com/teamcapybara/capybara) and [Cuprite](https://github.com/rubycdp/cuprite), which is a pure Ruby driver for Capybara. But Cuprite is Chrome only, so at first glance, it seems like it wouldn't be possible to have an automated test to verify other browsers.
 
-However, remembering my earlier experiment with Chrome dev tools to simulate the error condition by sending a different User Agent string, I had an idea that maybe the same thing could be done with a feature test, if there was a way to modify the User Agent string sent in the request headers.
+However, remembering my earlier [experiment with Chrome developer tools](../ruby-upgrade-broke-ms-edge#reproducing-the-issue) to simulate the error condition by sending a different User Agent string, I had an idea that maybe the same thing could be done with a feature test.
 
-It turns out, Cuprite does indeed support [modifying request headers](https://github.com/rubycdp/cuprite?tab=readme-ov-file#request-headers). The documentation includes an example for changing the User Agent string, which is exactly what I wanted to do:
+It turns out, Cuprite supports [modifying request headers](https://github.com/rubycdp/cuprite?tab=readme-ov-file#request-headers). The documentation includes an example for changing the User Agent string, which is exactly what I wanted to do:
 
 ```ruby
 # From Cuprite README.md -> Request headers
@@ -294,7 +295,7 @@ page.driver.add_headers("Referer" => "https://example.com")
 page.driver.headers # => { "User-Agent" => "Cuprite", "Referer" => "https://example.com" }
 ```
 
-This allowed me to write a test to simulate a user visiting the root path `"/"` from any number of different browsers, differentiated only by the User Agent string. If a browser is supported, then the test expects that the user should be redirected to `"/login"`, otherwise, `"/unsupported_browser"`:
+This allowed me to write a system test to simulate a user visiting the root path `"/"` from any number of different browsers, differentiated only by the User Agent string. If a browser is supported, then the test expects that the user should be redirected to `"/login"`, otherwise, `"/unsupported_browser"`:
 
 ```ruby
 # spec/features/user_agent_spec.rb
@@ -355,5 +356,4 @@ These tests ensure that future updates won’t reintroduce the bug.
 5. A good APM tool is your friend in diagnosing production issues.
 
 ## TODO
-* WIP edit
 * Updated related to include Datadog Heroku post, should be published by then
