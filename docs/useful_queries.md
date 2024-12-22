@@ -310,3 +310,38 @@ For example, to exclude certain categories
   }
 }
 ```
+
+## Short Posts
+
+For example, less than 5 minutes reading time
+
+```graphql
+{
+  allMarkdownRemark(
+    filter: {
+      fileAbsolutePath: { regex: "/src/markdown/" }
+      frontmatter: { category: { nin: ["personal finance", "podcasts", "just for fun"] } }
+      timeToRead: { lte: 4 }
+    }
+    sort: [
+      { timeToRead: ASC },
+      { frontmatter: { date: DESC } }
+    ]
+  ) {
+    totalCount
+    edges {
+      node {
+        timeToRead
+        frontmatter {
+          title
+          category
+          date(formatString: "YYYY-MM-DD")
+        }
+        fields {
+          slug
+        }
+      }
+    }
+  }
+}
+```
