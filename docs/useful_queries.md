@@ -277,3 +277,36 @@ Eg: Short posts, most recently published.
   }
 }
 ```
+
+## Where Not In
+
+For example, to exclude certain categories
+
+```graphql
+{
+  allMarkdownRemark(
+    filter: {
+      fileAbsolutePath: { regex: "/src/markdown/" }
+      frontmatter: { category: { nin: ["personal finance", "podcasts"] } }
+    }
+    sort: [
+      { timeToRead: ASC },
+      { frontmatter: { date: DESC } }
+    ]
+  ) {
+    edges {
+      node {
+        timeToRead
+        frontmatter {
+          title
+          category
+          date(formatString: "YYYY-MM-DD")
+        }
+        fields {
+          slug
+        }
+      }
+    }
+  }
+}
+```
