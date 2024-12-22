@@ -248,3 +248,32 @@ Example output:
   }
 }
 ```
+
+## Sort By Multiple Fields
+
+Eg: Short posts, most recently published.
+
+```graphql
+{
+  allMarkdownRemark(
+    filter: {
+      fileAbsolutePath: { regex: "/src/markdown/" }
+    }
+    sort: [
+      { timeToRead: ASC },
+      { frontmatter: { date: DESC } }
+    ]
+  ) {
+    edges {
+      node {
+        frontmatter {
+          title
+          category
+          date(formatString: "YYYY-MM-DD")
+        }
+        timeToRead
+      }
+    }
+  }
+}
+```
