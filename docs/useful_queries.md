@@ -248,3 +248,100 @@ Example output:
   }
 }
 ```
+
+## Sort By Multiple Fields
+
+Eg: Short posts, most recently published.
+
+```graphql
+{
+  allMarkdownRemark(
+    filter: {
+      fileAbsolutePath: { regex: "/src/markdown/" }
+    }
+    sort: [
+      { timeToRead: ASC },
+      { frontmatter: { date: DESC } }
+    ]
+  ) {
+    edges {
+      node {
+        frontmatter {
+          title
+          category
+          date(formatString: "YYYY-MM-DD")
+        }
+        timeToRead
+      }
+    }
+  }
+}
+```
+
+## Where Not In
+
+For example, to exclude certain categories
+
+```graphql
+{
+  allMarkdownRemark(
+    filter: {
+      fileAbsolutePath: { regex: "/src/markdown/" }
+      frontmatter: { category: { nin: ["personal finance", "podcasts"] } }
+    }
+    sort: [
+      { timeToRead: ASC },
+      { frontmatter: { date: DESC } }
+    ]
+  ) {
+    edges {
+      node {
+        timeToRead
+        frontmatter {
+          title
+          category
+          date(formatString: "YYYY-MM-DD")
+        }
+        fields {
+          slug
+        }
+      }
+    }
+  }
+}
+```
+
+## Short Posts
+
+For example, less than 5 minutes reading time
+
+```graphql
+{
+  allMarkdownRemark(
+    filter: {
+      fileAbsolutePath: { regex: "/src/markdown/" }
+      frontmatter: { category: { nin: ["personal finance", "podcasts", "just for fun"] } }
+      timeToRead: { lte: 4 }
+    }
+    sort: [
+      { timeToRead: ASC },
+      { frontmatter: { date: DESC } }
+    ]
+  ) {
+    totalCount
+    edges {
+      node {
+        timeToRead
+        frontmatter {
+          title
+          category
+          date(formatString: "YYYY-MM-DD")
+        }
+        fields {
+          slug
+        }
+      }
+    }
+  }
+}
+```
