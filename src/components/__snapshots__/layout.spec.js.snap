@@ -74,7 +74,7 @@ exports[`Layout renders correctly 1`] = `
         >
           <hr />
           <p>
-            All materials © Daniela Baron 2024
+            All materials © Daniela Baron 2025
           </p>
           <div>
             <a
@@ -220,7 +220,7 @@ exports[`Layout renders correctly 1`] = `
       >
         <hr />
         <p>
-          All materials © Daniela Baron 2024
+          All materials © Daniela Baron 2025
         </p>
         <div>
           <a

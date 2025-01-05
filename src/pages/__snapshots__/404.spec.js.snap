@@ -91,7 +91,7 @@ exports[`404 Page renders with layout and all-link 1`] = `
         >
           <hr />
           <p>
-            All materials © Daniela Baron 2024
+            All materials © Daniela Baron 2025
           </p>
           <div>
             <a
@@ -254,7 +254,7 @@ exports[`404 Page renders with layout and all-link 1`] = `
       >
         <hr />
         <p>
-          All materials © Daniela Baron 2024
+          All materials © Daniela Baron 2025
         </p>
         <div>
           <a

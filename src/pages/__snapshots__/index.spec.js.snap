@@ -147,7 +147,7 @@ exports[`Home Page renders with layout, article list, and all-link 1`] = `
         >
           <hr />
           <p>
-            All materials © Daniela Baron 2024
+            All materials © Daniela Baron 2025
           </p>
           <div>
             <a
@@ -366,7 +366,7 @@ exports[`Home Page renders with layout, article list, and all-link 1`] = `
       >
         <hr />
         <p>
-          All materials © Daniela Baron 2024
+          All materials © Daniela Baron 2025
         </p>
         <div>
           <a
