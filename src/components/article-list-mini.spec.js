@@ -23,7 +23,9 @@ describe("ArticleListMini", () => {
   ]
 
   it("renders correctly", () => {
-    const container = render(<ArticleListMini articles={articles} title="Recent Posts" />)
+    const container = render(
+      <ArticleListMini articles={articles} title="Recent Posts" />
+    )
     expect(container).toMatchSnapshot()
 
     expect(screen.getByText("Recent Posts")).toBeInTheDocument()

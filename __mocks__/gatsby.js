@@ -22,12 +22,11 @@ module.exports = {
         href: to,
       })
   ),
-  Slice: jest.fn().mockImplementation(
-    ({ alias, ...rest }) =>
-      React.createElement("div", {
-        ...rest,
-        "data-test-slice-alias": alias
-      })
+  Slice: jest.fn().mockImplementation(({ alias, ...rest }) =>
+    React.createElement("div", {
+      ...rest,
+      "data-test-slice-alias": alias,
+    })
   ),
   // TODO: Remove, no longer using StaticQuery component
   StaticQuery: jest.fn().mockImplementation(() => {

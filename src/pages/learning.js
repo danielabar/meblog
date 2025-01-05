@@ -44,30 +44,32 @@ const Learning = props => {
 
 export default Learning
 
-export const query = graphql`{
-  allMarkdownRemark(
-    filter: { fileAbsolutePath: { regex: "/src/learning/" } }
-    sort: {frontmatter: {completed_date: DESC}}
-  ) {
-    totalCount
-    edges {
-      node {
-        id
-        frontmatter {
-          title
-          instructor
-          platform
-          description
-          completed_date(formatString: "YYYY-MM-DD")
-          category
-          notes
-          featuredImage {
-            childImageSharp {
-              gatsbyImageData(width: 250, aspectRatio: 1.78)
+export const query = graphql`
+  {
+    allMarkdownRemark(
+      filter: { fileAbsolutePath: { regex: "/src/learning/" } }
+      sort: { frontmatter: { completed_date: DESC } }
+    ) {
+      totalCount
+      edges {
+        node {
+          id
+          frontmatter {
+            title
+            instructor
+            platform
+            description
+            completed_date(formatString: "YYYY-MM-DD")
+            category
+            notes
+            featuredImage {
+              childImageSharp {
+                gatsbyImageData(width: 250, aspectRatio: 1.78)
+              }
             }
           }
         }
       }
     }
   }
-}`
+`

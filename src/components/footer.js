@@ -1,12 +1,13 @@
 import React from "react"
 import * as styles from "./footer.module.css"
-import { FaTwitter, FaGithub, FaCodepen, FaLinkedinIn } from "react-icons/fa"
+import { FaTwitter, FaGithub, FaLinkedinIn } from "react-icons/fa"
+import { SiLinktree } from "react-icons/si"
 
 const Footer = () => {
   return (
     <footer className={styles.container} data-testid="footer">
       <hr className={styles.sep} />
-      <p className={styles.copy}>All materials © Daniela Baron 2024</p>
+      <p className={styles.copy}>All materials © Daniela Baron 2025</p>
       <div className={styles.social}>
         <a
           href="https://twitter.com/DanielaMBaron"
@@ -17,8 +18,8 @@ const Footer = () => {
         <a href="https://github.com/danielabar" className={styles.footerIcon}>
           <FaGithub />
         </a>
-        <a href="https://codepen.io/danielabar" className={styles.footerIcon}>
-          <FaCodepen />
+        <a href="https://linktr.ee/danielabaron" className={styles.footerIcon}>
+          <SiLinktree />
         </a>
         <a
           href="https://www.linkedin.com/in/danielabaron/"

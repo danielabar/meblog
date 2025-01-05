@@ -18,7 +18,7 @@ describe("SearchInput", () => {
 
     const inputEl = screen.getByTestId("search-input")
     user.clear(inputEl)
-    await user.keyboard('Rails{enter}')
+    await user.keyboard("Rails{enter}")
 
     expect(navigate).toHaveBeenCalledWith("/search-results/?q=Rails")
   })
@@ -29,7 +29,7 @@ describe("SearchInput", () => {
 
     const inputEl = screen.getByTestId("search-input")
     user.clear(inputEl)
-    await user.keyboard('docker{enter}')
+    await user.keyboard("docker{enter}")
 
     expect(navigate).toHaveBeenCalledWith("/search-results/?q=docker")
   })
