@@ -2,7 +2,7 @@
 title: "Datadog APM for Rails on Heroku"
 featuredImage: "../images/datadog-heroku-rails-chewy-EV9_vVMZTcg-unsplash.jpg"
 description: "Learn how to set up Datadog APM for a Rails application on Heroku, including installation, configuration, and tips for optimizing performance monitoring."
-date: "2025-01-01"
+date: "2025-01-05"
 category: "devops"
 related:
   - "Using Heroku's pg:pull with Docker"
@@ -10,9 +10,9 @@ related:
   - "Automate Tabs & Commands in iTerm2"
 ---
 
-Application performance monitoring (APM) is essential for understanding how a web application behaves in production. While Heroku provides basic metrics such as memory usage and CPU load, this is not enough for in-depth analysis of what's happening inside a Rails controller or background job. Such as what database queries are running, Redis access, how much time is spent waiting for external services, etc. This is where an APM is needed.
+Application performance monitoring (APM) is critical for understanding how a web application behaves in production. While Heroku provides basic metrics such as memory usage and CPU load, this is not enough for in-depth analysis of what's happening inside a Rails controller or background job. Such as what database queries are running, Redis access, how much time is spent waiting for external services, etc. This is why an APM tool is needed.
 
-Heroku makes it easy to add some APMs such as NewRelic or Scout APM with a one-click add-on, but sometimes, your company may already be using Datadog across different projects. Integrating everything into the same observability tool keeps things consistent, simplifies cross-project monitoring, and leverages existing Datadog dashboards.
+Heroku makes it easy to add some APMs such as NewRelic or Scout APM with a one-click add-on, but sometimes, your company may already be using Datadog on other projects or teams. Integrating everything into the same observability tool keeps things consistent, simplifies cross-project monitoring, and leverages existing Datadog dashboards.
 
 This post will walk through setting up Datadog APM on a Heroku-hosted Rails application. From my experience in going through this setup, I found Datadog's documentation occasionally lacking visibility on specific options. However, their customer support team was very helpful in answering my questions, usually within the same day or the next.
 
@@ -55,7 +55,7 @@ heroku buildpacks -a my-app
 ```
 
 <aside class="markdown-aside">
-Even if you've never explicitly added a buildpack to your Heroku app, you'll still have at least one. This is because when you push code to Heroku and it starts building, it will automatically look for an appropriate buildpack for the project's language (Ruby, Python, PHP, etc.) and add it. Read more about working with <a class="markdown-link" href="https://devcenter.heroku.com/articles/buildpacks">Heroku buildpacks</a>.
+Even if you've never explicitly added a buildpack to your Heroku app, you'll still have at least one. This is because when you push code to Heroku and it starts building, it will automatically look for an appropriate buildpack for the project's language (Ruby, Python, PHP, etc.) and add it. Read more about working with <a class="markdown-link" href="https://devcenter.heroku.com/articles/buildpacks">buildpacks</a>.
 </aside>
 
 ## Enable Dyno Metadata
@@ -129,6 +129,16 @@ The above mentioned environment variables are a minimum to get started. Datadog 
 
 
 ## Apply Buildpack
+
+**UPDATE:** At the time of writing this guide, the `heroku ps:exec` command was functioning correctly and allowed me to verify the Datadog agent status as described below. However, sometime between then and publishing, this feature became broken in the latest Heroku CLI v10.0.0. Attempting to connect to a running dyno now results in the following error:
+
+```
+Establishing credentials... error
+ ▸    Could not connect to dyno!
+ ▸    Check if the dyno is running with `heroku ps`
+```
+
+This issue is being tracked in [this GitHub issue](https://github.com/heroku/cli/issues/3147). Until it’s resolved, you won’t be able to shell into your dynos for verification.
 
 At this point, the agent isn't running yet. This is because it requires the Heroku [slug](https://devcenter.heroku.com/articles/slug-compiler) to be re-built. To do this, add an empty commit and push to your `heroku` remote:
 
@@ -224,7 +234,7 @@ end
 * **Rails Environment Check:** By wrapping the initializer in a `Rails.env.staging? || Rails.env.production?` check, we ensure Datadog configuration only runs in environments where the Datadog agent is running.
 * **Log Level:** Even though earlier we ran `heroku config:set DD_LOG_LEVEL="error"`, I found it necessary to also set the log level in the initializer to fully quiet all the Datadog logs noise.
 * **Environment Tagging:** Datadog uses the `env` tag to segment and filter application data by environment, like "staging" or "production". Setting `c.env` to `prod-my-app-name` or `staging-my-app-name` ensures that traces, are grouped by environment.
-* **Version Tagging:** The `version` tag tracks specific app versions, which is handy for tracing changes across deployments. Here, we pull `HEROKU_RELEASE_VERSION` directly from the environment. This allows us to see how a particular deployment performs, compare releases, and track down any regressions or improvements made in recent updates.
+* **Version Tagging:** The `version` tag tracks specific app versions, which is useful for tracing changes across deployments. Here, we pull `HEROKU_RELEASE_VERSION` directly from the environment. This allows us to see how a particular deployment performs, compare releases, and track down any regressions or improvements made in recent updates.
 * **Sidekiq:** Although Sidekiq instrumentation is enabled by default as a result of specifying `auto_instrument` in the `Gemfile`, the arguments passed to the `perform` method will show up in Datadog spans as `?`. If you want to see the actual values the job is being called with, use the `quantize` option.
 
 <aside class="markdown-aside">
