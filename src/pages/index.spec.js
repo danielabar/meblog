@@ -51,19 +51,19 @@ const homeData = {
           id: "ccc333",
           title: "Very Popular Title",
           published_at: "January 2, 2022",
-          slug: "/blog/very-popular/"
-        }
+          slug: "/blog/very-popular/",
+        },
       },
       {
         node: {
           id: "ddd444",
           title: "Also Popular Title",
           published_at: "February 3, 2022",
-          slug: "/blog/also-popular/"
-        }
-      }
-    ]
-  }
+          slug: "/blog/also-popular/",
+        },
+      },
+    ],
+  },
 }
 
 describe("Home Page", () => {
@@ -73,8 +73,8 @@ describe("Home Page", () => {
 
     expect(screen.getByTestId("header")).toBeInTheDocument()
 
-    const articleLists = screen.queryAllByTestId("article-list-mini");
-    expect(articleLists.length).toBe(2);
+    const articleLists = screen.queryAllByTestId("article-list-mini")
+    expect(articleLists.length).toBe(2)
     expect(screen.getByTestId("footer")).toBeInTheDocument()
 
     expect(screen.getByText("Recent Posts")).toBeInTheDocument()

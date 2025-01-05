@@ -17,7 +17,9 @@ import simplifyMarkdownEdges from "../../lib/node-edges-helper"
 import * as styles from "./index.module.css"
 
 const Index = props => {
-  const flattenedMarkdownEdges = simplifyMarkdownEdges(props.data.allMarkdownRemark.edges)
+  const flattenedMarkdownEdges = simplifyMarkdownEdges(
+    props.data.allMarkdownRemark.edges
+  )
 
   return (
     <Layout>
@@ -41,35 +43,37 @@ const Index = props => {
 
 export default Index
 
-export const query = graphql`{
-  allMarkdownRemark(
-    limit: 3,
-    filter: { fileAbsolutePath: { regex: "/src/markdown/" } }
-    sort: {frontmatter: {date: DESC}}
-  ) {
-    totalCount
-    edges {
-      node {
-        id
-        frontmatter {
-          title
-          date(formatString: "MMMM D, YYYY")
-          category
+export const query = graphql`
+  {
+    allMarkdownRemark(
+      limit: 3
+      filter: { fileAbsolutePath: { regex: "/src/markdown/" } }
+      sort: { frontmatter: { date: DESC } }
+    ) {
+      totalCount
+      edges {
+        node {
+          id
+          frontmatter {
+            title
+            date(formatString: "MMMM D, YYYY")
+            category
+          }
+          fields {
+            slug
+          }
         }
-        fields {
+      }
+    }
+    popular: allPopularCsv {
+      edges {
+        node {
+          id
+          title
+          published_at
           slug
         }
       }
     }
   }
-  popular: allPopularCsv {
-    edges {
-      node {
-        id
-        title
-        published_at
-        slug
-      }
-    }
-  }
-}`
+`

@@ -6,9 +6,12 @@ import * as styles from "./course.module.css"
 const Course = props => {
   return (
     <div className={styles.container}>
-
       <div className={styles.imgwrapper}>
-        <GatsbyImage className={styles.image} image={props.featuredImage.childImageSharp.gatsbyImageData} alt={props.title} />
+        <GatsbyImage
+          className={styles.image}
+          image={props.featuredImage.childImageSharp.gatsbyImageData}
+          alt={props.title}
+        />
       </div>
 
       <div className={`${styles.categoryWrapper} ${props.category}`}>
@@ -26,7 +29,15 @@ const Course = props => {
         </div>
         <div className={styles.iconWithText}>
           <FaExternalLinkAlt className={styles.icon} />
-          <a className={styles.iconLink} href={props.notes} data-testid="course-notes-link" target="_blank" rel="noopener noreferrer">View Notes</a>
+          <a
+            className={styles.iconLink}
+            href={props.notes}
+            data-testid="course-notes-link"
+            target="_blank"
+            rel="noopener noreferrer"
+          >
+            View Notes
+          </a>
         </div>
       </div>
     </div>

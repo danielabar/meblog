@@ -37,7 +37,9 @@ const Post = props => {
         <div className={styles.wrapper}>
           <main className={styles.main}>
             <h1 className={styles.title}>{title}</h1>
-            <div className={styles.published}>Published {publishedDate} &middot; {timeToRead} min read</div>
+            <div className={styles.published}>
+              Published {publishedDate} &middot; {timeToRead} min read
+            </div>
             <GatsbyImage
               image={featuredImgFluid}
               className={styles.featureImage}
@@ -49,7 +51,9 @@ const Post = props => {
             />
           </main>
           <div className={styles.toc}>
-            <div className={styles.toclist} dangerouslySetInnerHTML={{ __html: toc }}
+            <div
+              className={styles.toclist}
+              dangerouslySetInnerHTML={{ __html: toc }}
             />
           </div>
         </div>

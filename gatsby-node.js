@@ -22,30 +22,32 @@ exports.createPages = ({ graphql, actions }) => {
   const { createPage } = actions
 
   return new Promise(resolve => {
-    graphql(`{
-  allMarkdownRemark(
-    filter: { fileAbsolutePath: { regex: "/src/markdown/" } }
-    sort: {frontmatter: {date: DESC}}
-  ) {
-    edges {
-      node {
-        frontmatter {
-          title
-          category
-          date(formatString: "YYYY-MM-DD")
-          description
-          related
+    graphql(`
+      {
+        allMarkdownRemark(
+          filter: { fileAbsolutePath: { regex: "/src/markdown/" } }
+          sort: { frontmatter: { date: DESC } }
+        ) {
+          edges {
+            node {
+              frontmatter {
+                title
+                category
+                date(formatString: "YYYY-MM-DD")
+                description
+                related
+              }
+              fields {
+                slug
+              }
+              excerpt
+              html
+              rawMarkdownBody
+            }
+          }
         }
-        fields {
-          slug
-        }
-        excerpt
-        html
-        rawMarkdownBody
       }
-    }
-  }
-}`).then(result => {
+    `).then(result => {
       // wipe out old search file
       if (fs.existsSync("search.sql")) {
         fs.unlinkSync("search.sql")
@@ -85,5 +87,5 @@ exports.createPages = ({ graphql, actions }) => {
       })
       resolve()
     })
-  });
+  })
 }

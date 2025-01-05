@@ -1,8 +1,8 @@
-import React from 'react'
+import React from "react"
 import { render } from "@testing-library/react"
 import "@testing-library/jest-dom"
 
-import RelatedPosts from './related-posts'
+import RelatedPosts from "./related-posts"
 
 describe("RelatedPosts", () => {
   it("Renders a card for each post", () => {
@@ -84,9 +84,9 @@ describe("RelatedPosts", () => {
             },
           },
         },
-      ]
+      ],
     }
     const container = render(<RelatedPosts related={related} />)
     expect(container).toMatchSnapshot()
-  });
+  })
 })

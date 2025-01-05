@@ -8,7 +8,11 @@ const RelatedPosts = props => (
     <h2 className={styles.header}>You may also like...</h2>
     <div className={styles.postsContainer}>
       {props.related.edges.map(post => (
-        <Link key={post.node.id} to={post.node.fields.slug} className={styles.postLink}>
+        <Link
+          key={post.node.id}
+          to={post.node.fields.slug}
+          className={styles.postLink}
+        >
           <div>
             <GatsbyImage
               image={

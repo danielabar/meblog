@@ -1,6 +1,7 @@
 import React from "react"
 import * as styles from "./footer.module.css"
-import { FaTwitter, FaGithub, FaCodepen, FaLinkedinIn } from "react-icons/fa"
+import { FaTwitter, FaGithub, FaLinkedinIn } from "react-icons/fa"
+import { SiLinktree } from "react-icons/si"
 
 const Footer = () => {
   return (
@@ -17,8 +18,8 @@ const Footer = () => {
         <a href="https://github.com/danielabar" className={styles.footerIcon}>
           <FaGithub />
         </a>
-        <a href="https://codepen.io/danielabar" className={styles.footerIcon}>
-          <FaCodepen />
+        <a href="https://linktr.ee/danielabaron" className={styles.footerIcon}>
+          <SiLinktree />
         </a>
         <a
           href="https://www.linkedin.com/in/danielabaron/"
