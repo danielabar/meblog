@@ -209,7 +209,9 @@ TODO: Benefits - Consistency: There's only one way to manage all secrets, across
 
 ### Solution 2 - Convert Secrets to Credentials Per Environment
 
+Use this if you don't have a secrets manager (although will still need to manage rails master key!) AND you have all/multiple secrets you've been managing in `config/secrets.yml`, and have numerous references in your code to `Rails.application.secrets.stripe_api_key`, etc.
 
+TODO: include step for modifying all `Rails.application.secrets.foo` to `Rails.application.credentials[:foo]`. (get exact syntax!)
 
 ## TODO
 * WIP main content
