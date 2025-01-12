@@ -130,16 +130,6 @@ The above mentioned environment variables are a minimum to get started. Datadog 
 
 ## Apply Buildpack
 
-**UPDATE:** At the time of writing this guide, the `heroku ps:exec` command was functioning correctly and allowed me to verify the Datadog agent status as described below. However, sometime between then and publishing, this feature became broken in the latest Heroku CLI v10.0.0. Attempting to connect to a running dyno now results in the following error:
-
-```
-Establishing credentials... error
- ▸    Could not connect to dyno!
- ▸    Check if the dyno is running with `heroku ps`
-```
-
-This issue is being tracked in [this GitHub issue](https://github.com/heroku/cli/issues/3147). Until it’s resolved, you won’t be able to shell into your dynos for verification.
-
 At this point, the agent isn't running yet. This is because it requires the Heroku [slug](https://devcenter.heroku.com/articles/slug-compiler) to be re-built. To do this, add an empty commit and push to your `heroku` remote:
 
 ```bash
@@ -155,6 +145,10 @@ You can verify the agent was started successfully by shelling into a Heroku web 
 heroku ps:exec --dyno=web.1 -a your-app-name
 agent-wrapper status
 ```
+
+<aside class="markdown-aside">
+If you get an error from `heroku ps:exec` like "Establishing credentials... error", you might have an older heroku cli version and require an update. Check this <a class="markdown-link" href="https://github.com/heroku/cli/issues/3147">GitHub issue</a> for details.
+</aside>
 
 Ignore the warnings about `DD_API_KEY` not being set. Heroku doesn't set configuration variables for the SSH session, but the Datadog Agent process is able to access them.
 
