@@ -76,7 +76,7 @@ This means `secret_key_base` needs to be:
 1. **A closely guarded secret:** It's critical for the security of the application because it's used to generate encryption and signing keys for sensitive operations, including cookies and other secure data.
 2. **Consistent across Rails upgrades and deployments:** Changing the `secret_key_base` would invalidate all existing cookies and encrypted data (e.g., session cookies), effectively signing out all users and potentially causing issues with any other data encrypted or signed with it.
 
-I then pulled up the `config/secrets.yml` on the project I was upgrading and found this:
+I then opened the `config/secrets.yml` on the project I was upgrading and found this:
 
 ```yml
 # Be sure to restart your server when you modify this file.
@@ -108,24 +108,24 @@ production:
 
 This file is used to persist environment-specific values of `secret_key_base`. It also supports erb interpolation, so you can commit either the plain text secret, or reference an environment variable via `ENV`. The `secret_key_base` can then be accessed by Rails and application code as `Rails.application.secrets.secret_key_base`.
 
-But it's not just the `secret_key_base`, this file supports potentially persisting all of an application's secrets. For example:
+This file also supports storage of *all* the application's secrets. For example:
 
 ```yml
 development:
   secret_key_base: d9d6241...
-  stripe_api_key: devstripe...
+  stripe_secret_key: devstripe...
   another_secret: ...
   ...
 
 test:
   secret_key_base: 638095d...
-  stripe_api_key: testtripe...
+  stripe_secret_key: testtripe...
   another_secret: ...
   ...
 
 staging:
   secret_key_base: <%= ENV["SECRET_KEY_BASE"] %>
-  stripe_api_key: <%= ENV["STRIPE_API_KEY"] %>
+  stripe_secret_key: <%= ENV["STRIPE_SECRET_KEY"] %>
   another_secret: ...
   ...
 
@@ -133,18 +133,16 @@ staging:
 # instead read values from the environment.
 production:
   secret_key_base: <%= ENV["SECRET_KEY_BASE"] %>
-  stripe_api_key: <%= ENV["STRIPE_API_KEY"] %>
+  stripe_secret_key: <%= ENV["STRIPE_SECRET_KEY"] %>
   another_secret: ...
   ...
 ```
 
-The other secrets could then be accessed in application code, for example: `Rails.application.secrets.stripe_api_key`.
+The other secrets could then be accessed in application code, for example: `Rails.application.secrets.stripe_secret_key`.
 
 **Potential security issues:**
 
 Although the comments in this file warn to use environment variables for production, there is nothing to enforce it. So if a team didn't have a way to easily manage environment variables, it's possible that some teams may have started committing their plain text secrets in this file. This may explain why this feature had to change.
-
-It also sets an example that the development and test secrets can be committed to source control as plain text. TODO: security like fence, only as strong as weakest link analogy...
 
 ## History
 
@@ -220,17 +218,14 @@ Rails.application.secrets
 
 [Release Notes](https://guides.rubyonrails.org/7_2_release_notes.html)
 
-Now that we've covered the history from secrets and secret key base, to credentials and master key, we're finally ready to resolve the deprecation.
+Now that we've covered the history from secrets and secret key base, to credentials and master key, we're finally ready to resolve the deprecation. There's a few different ways to solve this. The next sections will provide some guidance to help you choose what's most appropriate for your project.
 
-## Solutions
 
-There's a few different ways to solve this. Read below to choose what's most appropriate for your project.
-
-### 1. Remove Secrets/Credentials and use Environment Variables
+## Solution A: Replace Secrets with Environment Variable
 
 On our team, we found the easiest way to resolve this was to remove the secrets file, and not introduce the replacement credentials file, in favour of an environment variable `SECRET_KEY_BASE`.
 
-Consider this solution if:
+**Consider this solution if:**
 
 * The only secret in `config/secrets.yml` is the `secret_key_base`.
 * The project has access to a tool for converting secrets to environment variables in deployed environments (eg: AWS Parameter Store, Hashicorp Vault, Heroku Config, etc.)
@@ -249,11 +244,15 @@ TODO: ASIDE: Continuity of the secret_key_base value doesn't matter for developm
 
 Rails first searches for the `secret_key_base` value in `ENV["SECRET_KEY_BASE"]`. If this environment variable is not found, then Rails will search for it in the new encrypted credentials yaml file. If your old `config/secrets.yml` already contained `<%= ENV["SECRET_KEY_BASE"] %>`, then effectively it was already reading an environment variable, and the yaml file was just serving as a pass-through.
 
-TODO: Benefits - Consistency: There's only one way to manage all secrets, across all environments. Avoids future confusion as developers come and go. If there's more than one way to do things, then as developers come and go, people will discover all of them and some will be done one way, and some the other. Eventually no one will remember or understand why there's multiple ways to accomplish the same task. Creates maintenance overhead as each time this task is needed (eg: integrating a new 3rd party service), developer needs to spend time thinking about which way the new secrets should be managed.
+**Benefits**
 
-### 2. Convert Secrets to Credentials Per Environment
+TODO: Consistency: There's only one way to manage all secrets, across all environments. Avoids future confusion as developers come and go. If there's more than one way to do things, then as developers come and go, people will discover all of them and some will be done one way, and some the other. Eventually no one will remember or understand why there's multiple ways to accomplish the same task. Creates maintenance overhead as each time this task is needed (eg: integrating a new 3rd party service), developer needs to spend time thinking about which way the new secrets should be managed.
 
-Consider this solution if:
+## Solution B: Convert Secrets to Credentials
+
+In this solution, you'll convert all the secrets in `config/secrets.yml` to the new encrypted credentials format. We'll use the environment-specific support introduced as of Rails 6.0 to isolate both the secrets and the master key needed to decrypt/encrypt them on a per-environment basis.
+
+**Consider this solution if:**
 
 * There are multiple secrets stored in `config/secrets.yml` in addition to `secret_key_base`. i.e. the application code has references to `Rails.application.secrets.some_secret`, `Rails.application.secrets.another_secret`, etc.
 * Your project is not configured with a tool to convert secrets to environment variables. Keep in mind you'll still need to manage one new secret `RAILS_MASTER_KEY`.
@@ -267,30 +266,32 @@ The actual secret values would be long random alpha-numeric strings such as `b9e
 
 development:
   secret_key_base: dev-secret-key-base
-  stripe_api_key: dev-stripe-api-key
+  stripe_secret_key: dev-stripe-secret-key
   another_secret: ...
   ...
 
 test:
   secret_key_base: test-secret-key-base
-  stripe_api_key: test-stripe-api-key
+  stripe_secret_key: test-stripe-secret-key
   another_secret: ...
   ...
 
 staging:
   secret_key_base: staging-secret-key-base
-  stripe_api_key: staging-stripe-api-key
+  stripe_secret_key: staging-stripe-secret-key
   another_secret: ...
   ...
 
 production:
   secret_key_base: production-secret-key-base
-  stripe_api_key: production-stripe-api-key
+  stripe_secret_key: production-stripe-secret-key
   another_secret: ...
   ...
 ```
 
-Let's start with converting the development secrets to credentials. Run the following in a terminal at the project root:
+### Step 1: Convert Development Secrets to Credentials
+
+Run the following in a terminal at the project root:
 
 ```bash
 bin/rails credentials:edit --environment development
@@ -318,9 +319,9 @@ Editing config/credentials/development.yml.enc...
 **Explanation:**
 
 1. A new encrypted file was generated to persist the development secrets: `config/credentials/development.yml.enc`
-2. A new key was generated to encrypt and decrypt the development secrets: `a44c8fd8b05cd46af35b34f778b56f37`
-3. The value of the development key is saved in a new file: `config/credentials/development.key`
-4. The file containing the development key is gitignored. You can verify this by checking the `.gitignore` file, it has a new entry: `/config/credentials/development.key`
+2. A new master key was generated to encrypt and decrypt the development secrets: `a44c8fd8b05cd46af35b34f778b56f37`
+3. The value of the development master key is saved in a new file: `config/credentials/development.key`
+4. The file containing the development master key is gitignored. You can verify this by checking the `.gitignore` file - it has a new entry: `/config/credentials/development.key`
 
 At this point, your editor will be open with a temporary file that displays the decrypted contents of newly generated `config/credentials/development.yml.enc`. Rails generates some example content like this:
 
@@ -330,34 +331,16 @@ At this point, your editor will be open with a temporary file that displays the 
 #   secret_access_key: 345
 ```
 
-Edit the file, porting over the values that were previously in `config/secrets.yml` development section as follows:
+Somewhat confusingly, the sample content doesn't show how to set `secret_key_base`. Edit the file, porting over the values that were previously in `config/secrets.yml` development section as follows:
 
 ```yml
 secret_key_base: dev-secret-key-base
-stripe_api_key: dev-stripe-api-key
+stripe_secret_key: dev-stripe-secret-key
 ```
 
 Save the file, and then close it. When closed, Rails will encrypt the contents, saving the results to `config/credentials/development.yml.enc`.
 
-Verify the contents are available in application code by launching a Rails console `bin/rails c` and check the following:
-
-```ruby
-Rails.application.secret_key_base
-=> "dev-secret-key-base"
-
-# Can also access via `credentials`Rails.application.credentials.secret_key_base
-Rails.application.credentials.secret_key_base
-=> "dev-secret-key-base"
-
-Rails.application.credentials.stripe_api_key
-=> "dev-stripe-api-key"
-
-# Can also access as symbol
-Rails.application.credentials[:stripe_api_key]
-=> "dev-stripe-api-key"
-```
-
-Opening the encrypted file `config/credentials/development.yml.enc` directly in an editor will only show the encrypted contents and not be human legible, for example:
+Opening the encrypted file `config/credentials/development.yml.enc` directly in an editor will only show the encrypted contents and not be human readable. For example:
 
 ```
 akdhz8ZaV6MpFpavkrPtQkHUOkFJprED4Sr2y6Zihpww75KA7mPoGQnthu/SPBeQPPKMFNwji8bSjy7gaY+nfllG+q1QMEKM1ntJyn/o+l3hr/AnKdjOa0QEqog+zGLpC8mf66dCEllnAdx84K7WA6pt+2awrdFkZpossOkg27p1j3MFXJSzZ1PXEPces4/5rxTaOCAobwPEeJhizmDAmPOcvnlNfq3POMl/hb4ydqgMpnxweultayA/--sepv1Y5SB+QFU/cp--DuDkAeCIggKo0nj5N8xTxQ==
@@ -365,18 +348,99 @@ akdhz8ZaV6MpFpavkrPtQkHUOkFJprED4Sr2y6Zihpww75KA7mPoGQnthu/SPBeQPPKMFNwji8bSjy7g
 
 If you need to view the contents of this file or open it for editing, you would again run `bin/rails credentials:edit --environment development`. This time, rather than generating a new development key, Rails will use the existing key saved at `config/credentials/development.key` to decrypt the file and display the plain text contents in a temporary file in your editor.
 
-TODO: include step for modifying all `Rails.application.secrets.foo` to `Rails.application.credentials.foo` or `Rails.application.credentials[:foo]`
+Launch a Rails console `bin/rails c` and verify the credentials are accessible from application code:
+
+```ruby
+Rails.application.credentials.secret_key_base
+=> "dev-secret-key-base"
+
+# Also available directly on Rails.application
+Rails.application.secret_key_base
+=> "dev-secret-key-base"
+
+Rails.application.credentials.stripe_secret_key
+=> "dev-stripe-secret-key"
+```
+
+Rails uses the `development.key` to decrypt the contents of `development.yml.enc` so you have access to all the secrets defined in the file at run-time.
+
+The credentials yaml file also supports nesting for the application secrets. For example, the Stripe secrets could be organized as follows:
+
+```yml
+secret_key_base: dev-secret-key-base
+
+stripe:
+  secret_key: dev-stripe-secret-key
+  publishable_key: dev-stripe-publishable-key
+  webhook_secret: dev-stripe-webhook-secret
+```
+
+In this case, the stripe secrets are accessible in application code like this:
+
+```ruby
+Rails.application.credentials.stripe
+=> {
+      :secret_key=>"dev-stripe-secret-key",
+      :publishable_key=>"dev-stripe-publishable-key",
+      :webhook_secret=>"dev-stripe-webhook-secret"
+   }
+
+Rails.application.credentials.stripe.secret_key
+=> "dev-stripe-secret-key"
+
+Rails.application.credentials.stripe.publishable_key
+=> "dev-stripe-publishable-key"
+```
+
+### Step 2: Convert All Other Environment Secrets
+
+Repeat the above procedure, for every other environment your application supports. For example:
+
+```
+bin/rails credentials:edit --environment test
+bin/rails credentials:edit --environment staging
+bin/rails credentials:edit --environment production
+```
+
+### Step 3: Update Application Code
+
+Find all references to `Rails.application.secret.something` in your application code and change it to `Rails.application.credentials.something`.
+
+At this point, you should be able to run your Rails server locally `bin/rails s` without any deprecation warnings. Exercise all the workflows that depend on secrets to ensure your development secrets are being read.
+
+Also run your test suite locally and ensure it passes, and no deprecation warnings are displayed.
+
+### Step 4: Commit Changes to Source Control
+
+TODO: Show screenshot of changes, notice all the key files are gitignored. The encrypted yaml files can and should be committed.
+
+### Step 5: Update Continuous Integration
+
+TODO: Value contained `config/credentials/test.key` needs to be made available to CI. Most CI systems have a way to populate a secret in their web dashboards, populate this as `RAILS_MASTER_KEY`. Details of how to do this will be CI-specific.
+
+TODO: Provide example if using GitHub Actions.
+
+### Step 6: Update Deployed Environments
+
+TODO: Value contained in `config/credentials/staging.key\production.key` needs to be made available to deployed environment. Specific to VPS, eg: DigitalOcean, Linode, Hetzner etc.
+
+### Step 7: Share Master Key Values Securely
+
+Recall all the key files are gitignored.
+
+If working with a team, they'll also need access to the key files, especially dev and test so they can run their servers and tests locally.
+
+TODO: include step for saving all key files somewhere safe and that you can share with the rest of the development team such as 1Password, Bitwarden, Dashlane, etc.
 
 ## TODO
 * WIP main content
-* analogy of security <-> fence wrt committing dev/test secrets
 * 5.2 History - show example of how it was meant to be used on a new project?
 * 6.0 History - show example of env-specific how it was meant to be used on a new project?
 * For easier solution, reference dotenv-rails gem for last optional step
 * Solution 1: Add Rails console commands to verify `Rails.application.secret_key_base` is correctly returning value from `SECRET_KEY_BASE` env var (after deleting `config/secrets.yml` from repo)
 * WIP Solution 2
 * ASIDE: profile env var needed so that `credentials:edit` will open in your editor of choice, for example, to use VSCode: `export EDITOR="code --wait"`. If not specified, will open default system editor, which could be `vi` or `vim`.
-* NOTE: Using erb interpolation in encrypted creds (eg: to reference an env var) doesn't work.
+* NOTE: Using erb interpolation in encrypted creds (eg: to reference an env var) doesn't work. Put this in Solution B sub-section "all other environments"
 * Reference: https://guides.rubyonrails.org/security.html#custom-credentials
 * Possibly aside about if plain text prod secret was committed, consider rotating (find reference how to do this?)
 * Tip: Improve visibility of deprecations in development mode, otherwise they hide out in `log/development.log` by default:
@@ -391,9 +455,11 @@ TODO: include step for modifying all `Rails.application.secrets.foo` to `Rails.a
     config.active_support.deprecation = :stderr
     # temp to investigate secrets deprecated warning
     # config.active_support.deprecation = :raise
-```
+  ```
 * From intro - jump to solution link, otherwise, history lesson follows
 * conclusion para
+  * My opinion: Preference is to use environment variables for all secrets, and have consistent approach for each environment.
+  * ...
 * maybe somewhere a summary of definitions:
   * secret_key_base: ...
   * secrets: old technique for maintaining secret_key_base and optionally other application secrets
