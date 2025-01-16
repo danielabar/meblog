@@ -291,7 +291,14 @@ production:
 
 ### Step 1: Convert Development Secrets to Credentials
 
-Run the following in a terminal at the project root:
+I'm assuming git version control is being used on the project. Start by creating a branch off the latest main for this work:
+
+```bash
+# Follow your project's branch naming conventions
+git checkout -b chore-migrate-secrets-to-credentials
+```
+
+Next, run the following in a terminal at the project root:
 
 ```bash
 bin/rails credentials:edit --environment development
@@ -318,10 +325,11 @@ Editing config/credentials/development.yml.enc...
 
 **Explanation:**
 
-1. A new encrypted file was generated to persist the development secrets: `config/credentials/development.yml.enc`
-2. A new master key was generated to encrypt and decrypt the development secrets: `a44c8fd8b05cd46af35b34f778b56f37`
-3. The value of the development master key is saved in a new file: `config/credentials/development.key`
-4. The file containing the development master key is gitignored. You can verify this by checking the `.gitignore` file - it has a new entry: `/config/credentials/development.key`
+1. A new directory `credentials` was created in the existing `config` directory.
+2. A new encrypted file was generated to persist the development secrets: `config/credentials/development.yml.enc`
+3. A new master key was generated to encrypt and decrypt the development secrets: `a44c8fd8b05cd46af35b34f778b56f37`
+4. The value of the development master key is saved in a new file: `config/credentials/development.key`
+5. The file containing the development master key is gitignored. You can verify this by checking the `.gitignore` file - it has a new entry: `/config/credentials/development.key`
 
 At this point, your editor will be open with a temporary file that displays the decrypted contents of newly generated `config/credentials/development.yml.enc`. Rails generates some example content like this:
 
@@ -404,19 +412,64 @@ bin/rails credentials:edit --environment production
 
 ### Step 3: Update Application Code
 
-Find all references to `Rails.application.secret.something` in your application code and change it to `Rails.application.credentials.something`.
+Find all references to `Rails.application.secrets.something` in your application code and change it to `Rails.application.credentials.something`.
 
-At this point, you should be able to run your Rails server locally `bin/rails s` without any deprecation warnings. Exercise all the workflows that depend on secrets to ensure your development secrets are being read.
+At this point, you should be able to run your Rails server locally `bin/rails s` without seeing the secrets/credentials deprecation warning. Exercise all the workflows that depend on secrets to ensure your development secrets are being read correctly from the new encrypted credentials yaml file.
 
-Also run your test suite locally and ensure it passes, and no deprecation warnings are displayed.
+Also run your test suite locally. It should pass and should not output any secrets/credentials deprecation warning. This assumes that there is test coverage for the areas of the app that use the secrets!
 
 ### Step 4: Commit Changes to Source Control
 
-TODO: Show screenshot of changes, notice all the key files are gitignored. The encrypted yaml files can and should be committed.
+At this point, the `config/credentials` directory should contain the following:
+
+```
+config
+├── credentials
+│   ├── development.key
+│   ├── development.yml.enc
+│   ├── production.key
+│   ├── production.yml.enc
+│   ├── staging.key
+│   ├── staging.yml.enc
+│   ├── test.key
+│   └── test.yml.enc
+```
+
+The `.gitignore` file will have the following new entries added to ignore the `*.key` files:
+```
+/config/credentials/development.key
+/config/credentials/test.key
+/config/credentials/staging.key
+/config/credentials/production.key
+```
+
+The `*.yml.enc` files are encrypted and contain all the secrets ported over from `config/secrets.yml`. These should be committed into source control.
+
+The `*.key` files contain the master key(s) to encrypt/decrypt the corresponding yaml files. These are git ignored and should NOT be committed into source control.
+
+Go ahead and commit the changes to the branch, for example:
+
+TODO: Step for removing `config/secrets.yml`?
+
+```bash
+git add .gitignore
+
+git add config/credentials/development.yml.enc
+# add rest of the encrypted yaml files
+
+git commit -m "convert deprecated secrets to encrypted credentials"
+git push
+```
+
+At this point, since the key files only exist on your laptop, yours is the only machine capable of decrypting the credentials yaml file. The next steps are about ensuring others can as well.
 
 ### Step 5: Update Continuous Integration
 
-TODO: Value contained `config/credentials/test.key` needs to be made available to CI. Most CI systems have a way to populate a secret in their web dashboards, populate this as `RAILS_MASTER_KEY`. Details of how to do this will be CI-specific.
+If you have a continuous integration system that runs tests, such as GitHub Actions, CircleCI, TravisCI, etc. That system will need access to the test master key to decrypt the test credentials file. Recall that currently the test credentials file `config/credentials/test.yml.enc` has been committed, but the key to decrypt it is at `/config/credentials/test.key` only exists on your laptop. This means if the CI system were to run on the branch where you just committed, it will fail because it won't have access to the secrets.
+
+TODO/WIP:
+
+Most CI systems have a way to populate a secret in their web dashboards, populate this as `RAILS_MASTER_KEY`. Details of how to do this will be CI-specific.
 
 TODO: Provide example if using GitHub Actions.
 
