@@ -30,7 +30,7 @@ This was surprising to me because:
 
 It turns out, what used to be called "secrets", now referred to as "credentials" is a non-obvious aspect of Rails with a long history. Unless you've been the first developer to setup and deploy a Rails project, you may never have encountered this feature. This post will explain what secrets and credentials are, and cover a few options for resolving this deprecation warning.
 
-TODO: For those in a hurry, jump to solution. Otherwise read on for investigation and some Rails history on this topic...
+In a hurry? Jump straight to the [solutions](../migrating-from-rails-secrets-to-credentials#solution-a-replace-secrets-with-environment-variable). Otherwise read on to learn the Rails history on this topic.
 
 ## Investigation
 
@@ -170,7 +170,7 @@ The idea was you would move all the plain text secrets previously in `config/sec
 
 **5.2 Encrypted Credentials**
 
-This release refined the encryption concept, renaming it "credentials" rather than "secrets". Another new file was introduced `config/credentials.yml.enc`, along with a `config/master.key` containing the key to encrypt and decrypt the credentials file.
+This release refined the encryption concept, referring to it as [custom credentials](https://guides.rubyonrails.org/v5.2/security.html#custom-credentials) rather than "secrets". Another new file was introduced `config/credentials.yml.enc`, along with a `config/master.key` containing the key to encrypt and decrypt the credentials file.
 
 If you had previously migrated from `config/secrets.yml` to `config/secrets.yml.enc`, you would now migrate again to `config/credentials.yml.enc`.
 
@@ -180,12 +180,9 @@ At this time, the previous plain text secrets were still supported. The 5.1 rele
 
 > This will eventually replace Rails.application.secrets and the encrypted secrets introduced in Rails 5.1
 
-Here is where it would have been useful to start having deprecation warnings, but I never noticed any while maintaining this project, until upgrading to 7.1.
+Here is where it would have been useful to start having deprecation warnings.
 
 [Release Notes](https://guides.rubyonrails.org/5_2_release_notes.html#credentials)
-
-TODO: why is this here? link it in explanation if relevant
-[Securing Rails Application Guide](https://guides.rubyonrails.org/v5.2/security.html#custom-credentials)
 
 **6.0 Multi Environment Credentials**
 
@@ -238,7 +235,9 @@ On our team, we found the easiest way to resolve this was to remove the secrets 
 4. Optionally, if you want development and test environments to be consistent with the technique used in deployed environments, the `SECRET_KEY_BASE` environment variable can be added to `.env.development` and `.env.test`, with the value being whatever it was in the old `config/secrets.yml`, development and test sections. Then Rails will read from the environment variable rather than generating a `tmp/local_secret.txt`.
 5. Delete `config/secrets.yml` from source control.
 
-TODO: ASIDE: Continuity of the secret_key_base value doesn't matter for development and test so it should be fine to let Rails generate a new one in those environments. These environments are normally reset frequently and there's no need to ensure a dev/test user that was logged in on your localhost needs to remain so after a Rails upgrade.
+<aside class="markdown-aside">
+Continuity of the secret_key_base value doesn't matter for development and test so it should be fine to let Rails generate a new one in those environments. These environments are normally reset frequently and there's no need to ensure a dev/test user that was logged in on your localhost needs to remain so after a Rails upgrade.
+</aside>
 
 **Why this works:**
 
@@ -246,11 +245,11 @@ Rails first searches for the `secret_key_base` value in `ENV["SECRET_KEY_BASE"]`
 
 **Benefits**
 
-TODO: Consistency: There's only one way to manage all secrets, across all environments. Avoids future confusion as developers come and go. If there's more than one way to do things, then as developers come and go, people will discover all of them and some will be done one way, and some the other. Eventually no one will remember or understand why there's multiple ways to accomplish the same task. Creates maintenance overhead as each time this task is needed (eg: integrating a new 3rd party service), developer needs to spend time thinking about which way the new secrets should be managed.
+Switching to an environment variable for managing `SECRET_KEY_BASE` simplifies and standardizes secret management across all environments. This consistency ensures future developers don’t waste time deciphering why some secrets are managed in a yaml file and some with environment variables. This also aligns with standard practices for managing environment variables securely in deployment pipelines.
 
 ## Solution B: Convert Secrets to Credentials
 
-In this solution, you'll convert all the secrets in `config/secrets.yml` to the new encrypted credentials format. We'll use the environment-specific support introduced as of Rails 6.0 to isolate both the secrets and the master key needed to decrypt/encrypt them on a per-environment basis.
+In this solution, all the secrets in `config/secrets.yml` will be converted to the new encrypted credentials format. We'll use the environment-specific support introduced as of Rails 6.0 to isolate both the secrets and the master key needed to decrypt/encrypt them on a per-environment basis.
 
 **Consider this solution if:**
 
@@ -298,6 +297,8 @@ I'm assuming git version control is being used on the project. Start by creating
 git checkout -b chore-migrate-secrets-to-credentials
 ```
 
+Make a backup of `config/secrets.yml` to somewhere secure and remove it from the project. This is to ensure that if the application is still trying to access it, it won't work correctly.
+
 Next, run the following in a terminal at the project root:
 
 ```bash
@@ -327,7 +328,7 @@ Editing config/credentials/development.yml.enc...
 
 1. A new directory `credentials` was created in the existing `config` directory.
 2. A new encrypted file was generated to persist the development secrets: `config/credentials/development.yml.enc`
-3. A new master key was generated to encrypt and decrypt the development secrets: `a44c8fd8b05cd46af35b34f778b56f37`
+3. A new master key was generated to encrypt and decrypt the development secrets: `a44c8f...`
 4. The value of the development master key is saved in a new file: `config/credentials/development.key`
 5. The file containing the development master key is gitignored. You can verify this by checking the `.gitignore` file - it has a new entry: `/config/credentials/development.key`
 
@@ -339,7 +340,7 @@ At this point, your editor will be open with a temporary file that displays the 
 #   secret_access_key: 345
 ```
 
-Somewhat confusingly, the sample content doesn't show how to set `secret_key_base`. Edit the file, porting over the values that were previously in `config/secrets.yml` development section as follows:
+Edit the file, porting over the values that were previously in `config/secrets.yml` development section as follows:
 
 ```yml
 secret_key_base: dev-secret-key-base
@@ -449,8 +450,6 @@ The `*.key` files contain the master key(s) to encrypt/decrypt the corresponding
 
 Go ahead and commit the changes to the branch, for example:
 
-TODO: Step for removing `config/secrets.yml`?
-
 ```bash
 git add .gitignore
 
@@ -461,29 +460,29 @@ git commit -m "convert deprecated secrets to encrypted credentials"
 git push
 ```
 
+The `config/secrets.yml` removal you did earlier in Step 1 should also be included in this commit.
+
 At this point, since the key files only exist on your laptop, yours is the only machine capable of decrypting the credentials yaml file. The next steps are about ensuring others can as well.
+
+The key to understanding this is if Rails can't find a key file at `config/credentials/{env}.key`, it will read it from `RAILS_MASTER_KEY` environment variable. Since the key files are not committed, the solution in all other environments is to ensure the `RAILS_MASTER_KEY` environment variable is populated.
 
 ### Step 5: Update Continuous Integration
 
-If you have a continuous integration system that runs tests, such as GitHub Actions, CircleCI, TravisCI, etc. That system will need access to the test master key to decrypt the test credentials file. Recall that currently the test credentials file `config/credentials/test.yml.enc` has been committed, but the key to decrypt it is at `/config/credentials/test.key` only exists on your laptop. This means if the CI system were to run on the branch where you just committed, it will fail because it won't have access to the secrets.
+If you have a continuous integration system that runs tests, such as GitHub Actions, Circle CI, Travis CI, etc. That system will need access to the test master key to decrypt the test credentials file. Recall that currently the test credentials file `config/credentials/test.yml.enc` has been committed, but the key to decrypt it is at `/config/credentials/test.key`, which only exists on your laptop. This means if the CI system were to run on the branch where you just committed, it will fail because it won't have access to the secrets.
 
-TODO/WIP:
+Most CI systems have a way to populate a secret via their web dashboards, and make it available to the workflow as an environment variable. Go ahead and do this, creating a new secret/environment variable `RAILS_MASTER_KEY`, and populate it with the value from the file on your laptop: `/config/credentials/test.key`
 
-Most CI systems have a way to populate a secret in their web dashboards, populate this as `RAILS_MASTER_KEY`. Details of how to do this will be CI-specific.
-
-TODO: Provide example if using GitHub Actions.
+Details of how to do this will be CI-specific, for example here's how to [use secrets in GitHub actions](https://docs.github.com/en/actions/security-for-github-actions/security-guides/using-secrets-in-github-actions).
 
 ### Step 6: Update Deployed Environments
 
-TODO: Value contained in `config/credentials/staging.key\production.key` needs to be made available to deployed environment. Specific to VPS, eg: DigitalOcean, Linode, Hetzner etc.
+To ensure the application deployed in production (or other environments like staging) can decrypt the credentials, the corresponding master key needs to be available in the deployment environment. Currently it's at  `config/credentials/staging.key` and `config/credentials/production.key` on your laptop.
+
+This step will vary depending on how you deploy your Rails application. In general, this requires a new environment variable `RAILS_MASTER_KEY` to be set and populated. Refer to your hosting provider’s documentation (eg: Hetzner, Linode, DigitalOcean, etc.) for the exact steps.
 
 ### Step 7: Share Master Key Values Securely
 
-Recall all the key files are gitignored.
-
-If working with a team, they'll also need access to the key files, especially dev and test so they can run their servers and tests locally.
-
-TODO: include step for saving all key files somewhere safe and that you can share with the rest of the development team such as 1Password, Bitwarden, Dashlane, etc.
+Recall all the key files are gitignored. If working with a team, they'll also need access to the key files, especially dev and test so they can run their servers and tests locally. The team should also have access to the deployment master keys (staging, production) in case someone needs to setup a new server. Save these somewhere secure that the rest of the team can access. For example a password manager that supports team sharing such as 1Password, Bitwarden, etc.
 
 ## TODO
 * WIP main content
@@ -491,7 +490,6 @@ TODO: include step for saving all key files somewhere safe and that you can shar
 * 6.0 History - show example of env-specific how it was meant to be used on a new project?
 * For easier solution, reference dotenv-rails gem for last optional step
 * Solution 1: Add Rails console commands to verify `Rails.application.secret_key_base` is correctly returning value from `SECRET_KEY_BASE` env var (after deleting `config/secrets.yml` from repo)
-* WIP Solution 2
 * ASIDE: profile env var needed so that `credentials:edit` will open in your editor of choice, for example, to use VSCode: `export EDITOR="code --wait"`. If not specified, will open default system editor, which could be `vi` or `vim`.
 * NOTE: Using erb interpolation in encrypted creds (eg: to reference an env var) doesn't work. Put this in Solution B sub-section "all other environments"
 * Reference: https://guides.rubyonrails.org/security.html#custom-credentials
@@ -509,7 +507,6 @@ TODO: include step for saving all key files somewhere safe and that you can shar
     # temp to investigate secrets deprecated warning
     # config.active_support.deprecation = :raise
   ```
-* From intro - jump to solution link, otherwise, history lesson follows
 * conclusion para
   * My opinion: Preference is to use environment variables for all secrets, and have consistent approach for each environment.
   * ...
