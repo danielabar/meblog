@@ -349,6 +349,8 @@ These tests ensure that future updates won’t reintroduce the bug.
 
 ## Lessons Learned
 
+Technically, it wasn't the Ruby upgrade itself that introduced the bug, but rather, one of the accompanying gem updates.
+
 1. If an app is using browser detection, periodically revisit the configuration as new browsers become available to ensure it still works as intended.
 2. If using a gem for browser detection, keep this dependency up to date.
 3. If a gem is no longer receiving updates, consider replacing it with something that is maintained, or if the logic is relatively simple, with a custom solution.
