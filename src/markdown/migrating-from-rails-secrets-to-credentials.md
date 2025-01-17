@@ -106,7 +106,7 @@ production:
   secret_key_base: <%= ENV["SECRET_KEY_BASE"] %>
 ```
 
-This file is used to persist environment-specific values of `secret_key_base`. It also supports erb interpolation, so you can commit either the plain text secret, or reference an environment variable via `ENV`. The `secret_key_base` can then be accessed by Rails and application code as `Rails.application.secrets.secret_key_base`.
+This file is used to persist environment-specific values of `secret_key_base`. It also supports erb interpolation, so you can commit plain text values, or reference an environment variable via `ENV`. The `secret_key_base` can then be accessed by Rails and application code as `Rails.application.secrets.secret_key_base`.
 
 This file also supports storage of *all* the application's secrets. For example:
 
@@ -146,7 +146,7 @@ Although the comments in this file warn to use environment variables for product
 
 ## History
 
-I dug through the history of release notes from 4.1 to 7.2 to understand how this feature has changed over time, and what it was supposed to look like on Rails 7.x:
+I dug through the history of release notes from 4.1 to 7.2 to understand how this feature has changed over time:
 
 **4.1 Plain Text Secrets**
 
@@ -230,20 +230,39 @@ On our team, we found the easiest way to resolve this was to remove the secrets 
 **Steps:**
 
 1. Make sure `SECRET_KEY_BASE` is defined in the secrets tool in every deployed environment (eg: staging, production).
-2. Make a backup of the original `config/secrets.yml` outside of source control in case you need to refer to it if something goes wrong.
+2. Make a backup of the original `config/secrets.yml` outside of source control and remove it from the project.
 3. In development and test environments, do nothing, Rails will automatically generate a git ignored file `tmp/local_secret.txt` containing a randomly generated value of `secret_key_base`, if it can't find a `SECRET_KEY_BASE` environment variable and there is no encrypted credentials yaml.
-4. Optionally, if you want development and test environments to be consistent with the technique used in deployed environments, the `SECRET_KEY_BASE` environment variable can be added to `.env.development` and `.env.test`, with the value being whatever it was in the old `config/secrets.yml`, development and test sections. Then Rails will read from the environment variable rather than generating a `tmp/local_secret.txt`.
-5. Delete `config/secrets.yml` from source control.
+4. Commit the changes to source control (which is just the removal of `config/secrets.yml`).
 
 <aside class="markdown-aside">
 Continuity of the secret_key_base value doesn't matter for development and test so it should be fine to let Rails generate a new one in those environments. These environments are normally reset frequently and there's no need to ensure a dev/test user that was logged in on your localhost needs to remain so after a Rails upgrade.
 </aside>
 
+Optionally, if you want development and test environments to be consistent with the technique used in deployed environments, the `SECRET_KEY_BASE` environment variable can be added to `.env.development` and `.env.test`, with the value being whatever it was in the old `config/secrets.yml`, development and test sections. Then Rails will read from the environment variable rather than generating a `tmp/local_secret.txt`. This will work given that the project is using the [dotenv-rails](https://rubygems.org/gems/dotenv-rails) gem.
+
+**Verify:**
+
+Run a Rails console on your laptop (i.e. development mode) to check the value of the secret key base:
+
+```ruby
+Rails.application.secret_key_base
+#=> should be value from `tmp/local_secret.txt`
+# OR
+# .env.development SECRET_KEY_BASE
+```
+
+After deploying the changes to production (or staging first if you have another deployed environment), connect to a Rails console on the deployed environment and check the value of the secret key base:
+
+```ruby
+Rails.application.secret_key_base
+#=> should be value from SECRET_KEY_BASE env var defined in deployed environment
+```
+
 **Why this works:**
 
 Rails first searches for the `secret_key_base` value in `ENV["SECRET_KEY_BASE"]`. If this environment variable is not found, then Rails will search for it in the new encrypted credentials yaml file. If your old `config/secrets.yml` already contained `<%= ENV["SECRET_KEY_BASE"] %>`, then effectively it was already reading an environment variable, and the yaml file was just serving as a pass-through.
 
-**Benefits**
+**Benefits:**
 
 Switching to an environment variable for managing `SECRET_KEY_BASE` simplifies and standardizes secret management across all environments. This consistency ensures future developers don’t waste time deciphering why some secrets are managed in a yaml file and some with environment variables. This also aligns with standard practices for managing environment variables securely in deployment pipelines.
 
@@ -486,12 +505,8 @@ Recall all the key files are gitignored. If working with a team, they'll also ne
 
 ## TODO
 * WIP main content
-* 5.2 History - show example of how it was meant to be used on a new project?
-* 6.0 History - show example of env-specific how it was meant to be used on a new project?
-* For easier solution, reference dotenv-rails gem for last optional step
-* Solution 1: Add Rails console commands to verify `Rails.application.secret_key_base` is correctly returning value from `SECRET_KEY_BASE` env var (after deleting `config/secrets.yml` from repo)
-* ASIDE: profile env var needed so that `credentials:edit` will open in your editor of choice, for example, to use VSCode: `export EDITOR="code --wait"`. If not specified, will open default system editor, which could be `vi` or `vim`.
-* NOTE: Using erb interpolation in encrypted creds (eg: to reference an env var) doesn't work. Put this in Solution B sub-section "all other environments"
+* Solution B - ASIDE: profile env var needed so that `credentials:edit` will open in your editor of choice, for example, to use VSCode: `export EDITOR="code --wait"`. If not specified, will open default system editor, which could be `vi` or `vim`.
+* Solution B: Add at end of Step 1 NOTE: Using erb interpolation in encrypted creds (eg: to reference an env var) doesn't work.
 * Reference: https://guides.rubyonrails.org/security.html#custom-credentials
 * Possibly aside about if plain text prod secret was committed, consider rotating (find reference how to do this?)
 * Tip: Improve visibility of deprecations in development mode, otherwise they hide out in `log/development.log` by default:
