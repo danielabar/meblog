@@ -5,9 +5,9 @@ description: "Discover how upgrading Ruby unexpectedly caused compatibility issu
 date: "2025-02-01"
 category: "rails"
 related:
-  - "Capybara Webdriver Element not Clickable Resolved"
+  - "Fixing Gem Install Errors on M3 Mac with Ruby 2.7"
   - "Old Ruby and New Mac"
-  - "Rails Feature Test Solved by Regex"
+  - "Datadog APM for Rails on Heroku"
 ---
 
 Recently, I encountered a strange issue on a legacy Rails application I maintain: Customers using Microsoft Edge could no longer access the site. Instead, they were redirected to the `/unsupported_browser` page, which advises users to switch to Chrome, Firefox, or Safari. This wasn’t just an inconvenience, it was a major blocker for some users who relied exclusively on Edge. This post will walk through the debugging steps and resolution.
@@ -354,6 +354,3 @@ These tests ensure that future updates won’t reintroduce the bug.
 3. If a gem is no longer receiving updates, consider replacing it with something that is maintained, or if the logic is relatively simple, with a custom solution.
 4. Include automated tests for browser detection.
 5. A good APM tool is your friend in diagnosing production issues.
-
-## TODO
-* Updated related to include Datadog Heroku post, should be published by then
