@@ -23,7 +23,7 @@ and will be removed in Rails 7.2.
 (called from <main> at my-app/config/environment.rb:5)
 ```
 
-This was surprising to me because:
+This was surprising because:
 
 1. There hadn't been any mention of this in the upgrade guide from 7.0 to 7.1.
 2. This project uses environment variables (provided via Heroku Config) for secrets, so why would there be any secrets in the code?
@@ -229,13 +229,13 @@ On our team, we found the easiest way to resolve this was to remove the secrets 
 
 **Steps:**
 
-1. Make sure `SECRET_KEY_BASE` is defined in the secrets tool in every deployed environment (eg: staging, production).
+1. Make sure `SECRET_KEY_BASE` is defined in every deployed environments' configuration (eg: staging, production).
 2. Make a backup of the original `config/secrets.yml` outside of source control and remove it from the project.
 3. In development and test environments, do nothing, Rails will automatically generate a git ignored file `tmp/local_secret.txt` containing a randomly generated value of `secret_key_base`, if it can't find a `SECRET_KEY_BASE` environment variable and there is no encrypted credentials yaml.
 4. Commit the changes to source control (which is just the removal of `config/secrets.yml`).
 
 <aside class="markdown-aside">
-Continuity of the secret_key_base value doesn't matter for development and test so it should be fine to let Rails generate a new one in those environments. These environments are normally reset frequently and there's no need to ensure a dev/test user that was logged in on your localhost needs to remain so after a Rails upgrade.
+Continuity of the `secret_key_base` value doesn't matter for development and test so it should be fine to let Rails generate a new one in those environments. These environments are normally reset frequently and there's no need to ensure a dev/test user that was logged in on your localhost needs to remain so after a Rails upgrade.
 </aside>
 
 Optionally, if you want development and test environments to be consistent with the technique used in deployed environments, the `SECRET_KEY_BASE` environment variable can be added to `.env.development` and `.env.test`, with the value being whatever it was in the old `config/secrets.yml`, development and test sections. Then Rails will read from the environment variable rather than generating a `tmp/local_secret.txt`. This will work given that the project is using the [dotenv-rails](https://rubygems.org/gems/dotenv-rails) gem.
@@ -374,6 +374,10 @@ Opening the encrypted file `config/credentials/development.yml.enc` directly in 
 akdhz8ZaV6MpFpavkrPtQkHUOkFJprED4Sr2y6Zihpww75KA7mPoGQnthu/SPBeQPPKMFNwji8bSjy7gaY+nfllG+q1QMEKM1ntJyn/o+l3hr/AnKdjOa0QEqog+zGLpC8mf66dCEllnAdx84K7WA6pt+2awrdFkZpossOkg27p1j3MFXJSzZ1PXEPces4/5rxTaOCAobwPEeJhizmDAmPOcvnlNfq3POMl/hb4ydqgMpnxweultayA/--sepv1Y5SB+QFU/cp--DuDkAeCIggKo0nj5N8xTxQ==
 ```
 
+<aside class="markdown-aside">
+To use the `credentials:edit` command, Rails needs to know which editor to open. By default, it uses the system's default editor, which is often vim. If you prefer another editor, you can set the `EDITOR` environment variable. For example, to use VS Code: `export EDITOR="code --wait"`.
+</aside>
+
 If you need to view the contents of this file or open it for editing, you would again run `bin/rails credentials:edit --environment development`. This time, rather than generating a new development key, Rails will use the existing key saved at `config/credentials/development.key` to decrypt the file and display the plain text contents in a temporary file in your editor.
 
 Launch a Rails console `bin/rails c` and verify the credentials are accessible from application code:
@@ -420,6 +424,21 @@ Rails.application.credentials.stripe.publishable_key
 => "dev-stripe-publishable-key"
 ```
 
+**ERB Interpolation Not Supported**
+
+When using encrypted credentials, you must enter the plain text values when editing the decrypted file. Unlike the old `config/secrets.yml`, erb interpolation does not work. For example, if you were to enter in the temporary editor window:
+
+```yml
+secret_key_base: <%= ENV["SECRET_KEY_BASE"] %>
+```
+
+Then attempt to access the `secret_key_base` in a Rails console, the value will be a literal string of the above, even if `SECRET_KEY_BASE` is set:
+
+```ruby
+Rails.application.secret_key_base
+=> "<%= ENV[\"SECRET_KEY_BASE\"] %>"
+```
+
 ### Step 2: Convert All Other Environment Secrets
 
 Repeat the above procedure, for every other environment your application supports. For example:
@@ -429,6 +448,7 @@ bin/rails credentials:edit --environment test
 bin/rails credentials:edit --environment staging
 bin/rails credentials:edit --environment production
 ```
+
 
 ### Step 3: Update Application Code
 
@@ -503,12 +523,21 @@ This step will vary depending on how you deploy your Rails application. In gener
 
 Recall all the key files are gitignored. If working with a team, they'll also need access to the key files, especially dev and test so they can run their servers and tests locally. The team should also have access to the deployment master keys (staging, production) in case someone needs to setup a new server. Save these somewhere secure that the rest of the team can access. For example a password manager that supports team sharing such as 1Password, Bitwarden, etc.
 
+Also update your project's `README.md` setup instructions, informing developers of where to find the keys, and to create files `config/credentials/development.key` and `config/credentials/test.key` in their local project directories containing the key values.
+
+## Summary
+
+Before wrapping up, here's a summary of the key terms covered in this post:
+
+* **secret_key_base:** A secret key used to sign cookies, session data, and other sensitive information.
+* **Secrets:** The old technique for managing `secret_key_base` and other sensitive application data.
+* **Credentials:** The new technique for storing secrets, in an encrypted file, protected by a master key.
+* **Master Key:** The key used to encrypt and decrypt credentials. By default, Rails looks for this key in `config/master.key`, but it can also be set per environment (eg: `config/credentials/production.key`) or via the `RAILS_MASTER_KEY` environment variable.
+
+If you’ve found the process of migrating Rails secrets to credentials confusing, you’re not alone. This area has a long, evolving history, and a clear migration path is difficult to find. Personally, I prefer managing secrets through environment variables, as it’s a widely adopted and straightforward approach. Whatever path you choose, the key is to prioritize security and a workflow that fits your team's needs.
+
 ## TODO
-* WIP main content
-* Solution B - ASIDE: profile env var needed so that `credentials:edit` will open in your editor of choice, for example, to use VSCode: `export EDITOR="code --wait"`. If not specified, will open default system editor, which could be `vi` or `vim`.
-* Solution B: Add at end of Step 1 NOTE: Using erb interpolation in encrypted creds (eg: to reference an env var) doesn't work.
 * Reference: https://guides.rubyonrails.org/security.html#custom-credentials
-* Possibly aside about if plain text prod secret was committed, consider rotating (find reference how to do this?)
 * Tip: Improve visibility of deprecations in development mode, otherwise they hide out in `log/development.log` by default:
   ```ruby
   # config/environments/development.rb
@@ -522,13 +551,5 @@ Recall all the key files are gitignored. If working with a team, they'll also ne
     # temp to investigate secrets deprecated warning
     # config.active_support.deprecation = :raise
   ```
-* conclusion para
-  * My opinion: Preference is to use environment variables for all secrets, and have consistent approach for each environment.
-  * ...
-* maybe somewhere a summary of definitions:
-  * secret_key_base: ...
-  * secrets: old technique for maintaining secret_key_base and optionally other application secrets
-  * credentials: new technique for maintaining secret_key_base and optionally other application secrets
-  * master_key: ...
 * reschedule publish date to mid month for https://github.com/danielabar/meblog/pull/185
 * edit
