@@ -26,11 +26,11 @@ and will be removed in Rails 7.2.
 This was surprising because:
 
 1. There hadn't been any mention of this in the upgrade guide from 7.0 to 7.1.
-2. This project uses environment variables (provided via Heroku Config) for secrets, so why would there be any secrets in the code?
+2. This project uses environment variables (provided via Heroku Config) for secrets, so as far as I knew, there weren't any secrets in the code.
 
 It turns out, what used to be called "secrets", now referred to as "credentials" is a non-obvious aspect of Rails with a long history. Unless you've been the first developer to setup and deploy a Rails project, you may never have encountered this feature. This post will explain what secrets and credentials are, and cover a few options for resolving this deprecation warning.
 
-In a hurry? Jump straight to the [solutions](../migrating-from-rails-secrets-to-credentials#solution-a-replace-secrets-with-environment-variable). Otherwise read on to learn the Rails history on this topic.
+In a hurry? Jump straight to the [solutions](../migrating-from-rails-secrets-to-credentials#solution-a-replace-secrets-with-environment-variable). Otherwise read on for the investigation and history on this topic.
 
 ## Investigation
 
@@ -88,7 +88,7 @@ From the Rails API docs on [secret_key_base](https://api.rubyonrails.org/classes
 
 This means `secret_key_base` needs to be:
 
-1. **A closely guarded secret:** It's critical for the security of the application because it's used to generate encryption and signing keys for sensitive operations, including cookies and other secure data.
+1. **A closely guarded secret:** It's critical for the security of the application because it's used to generate encryption and signing keys for sensitive operations.
 2. **Consistent across Rails upgrades and deployments:** Changing the `secret_key_base` would invalidate all existing cookies and encrypted data (e.g., session cookies), effectively signing out all users and potentially causing issues with any other data encrypted or signed with it.
 
 I then opened the `config/secrets.yml` on the project I was upgrading and found this:
@@ -177,7 +177,7 @@ No changes to the secrets feature.
 
 **5.1 Encrypted Secrets**
 
-This release was a first attempt at encrypting the secrets. A rake task was introduced which would generate a new file `config/secrets.yml.enc`, along with a *master key* that could be used to encrypt and decrypt the file. The master key however had to be maintained outside of the source. Rails could read it either from a git ignored file `config/secrets.yml.key` or from a new environment variable `RAILS_MASTER_KEY`.
+This release was a first attempt at encrypting the secrets. A rake task was introduced which would generate a new file `config/secrets.yml.enc`, along with a master key that could be used to encrypt and decrypt the file. The master key had to be maintained outside of the source. Rails could read it either from a git ignored file `config/secrets.yml.key` or from a new environment variable `RAILS_MASTER_KEY`.
 
 The idea was you would move all the plain text secrets previously in `config/secrets.yml` to the new encrypted `config/secrets.yml.enc`. Note that there's no instructions on exactly how to do this - for example, can you copy the entire contents of the plain text `config/secrets.yml`, including nesting for each environment and erb interpolation, and dump that into the new encrypted file?
 
@@ -187,9 +187,9 @@ The idea was you would move all the plain text secrets previously in `config/sec
 
 This release refined the encryption concept, referring to it as [custom credentials](https://guides.rubyonrails.org/v5.2/security.html#custom-credentials) rather than "secrets". Another new file was introduced `config/credentials.yml.enc`, along with a `config/master.key` containing the key to encrypt and decrypt the credentials file.
 
-If you had previously migrated from `config/secrets.yml` to `config/secrets.yml.enc`, you would now migrate again to `config/credentials.yml.enc`.
+If you had previously migrated from `config/secrets.yml` to `config/secrets.yml.enc`, you would now migrate to `config/credentials.yml.enc`. However, there are no instructions on how to take the previous environment-specific plain text or erb interpolated values from the old file to the new encrypted file.
 
-Once again, there are no instructions on how to take the previous environment-specific plain text or erb interpolated values from the old file to the new encrypted file. It also seems like there's a single `config/master.key` that would be used across all environments. For example, you might have multiple deployed environments like staging and production, and having a shared master key across both of them is not ideal.
+There's a single `config/master.key` intended to be used across all environments. For example, you might have multiple deployed environments like staging and production, and having a shared master key across both of them is not ideal.
 
 At this time, the previous plain text secrets were still supported. The 5.1 release notes have an important message:
 
@@ -201,7 +201,7 @@ Here is where it would have been useful to start having deprecation warnings.
 
 **6.0 Multi Environment Credentials**
 
-This release maintained the previous encrypted credentials, but added support for multi-environment credentials. This is only mentioned as a bullet point in the release notes under "Notable changes". The associated [PR]((https://github.com/rails/rails/pull/33521)) has some lively discussion. But once again, there's no final instructions for how to convert from old plain text secrets to environment-specific encrypted credentials.
+This release maintained the previous encrypted credentials, but added support for multi-environment credentials. This is only mentioned as a bullet point in the release notes under "Notable changes". The associated [PR](https://github.com/rails/rails/pull/33521) has some lively discussion. But once again, there's no instructions for how to convert from old plain text secrets to environment-specific encrypted credentials.
 
 The [securing rails application guide for 6.0](https://guides.rubyonrails.org/v6.0/security.html#environmental-security) has the same explanation as the previous 5.2 guide for how to use encrypted credentials, but it doesn't mention the new environment-specific options introduced in the PR.
 
@@ -253,7 +253,7 @@ On our team, we found the easiest way to resolve this was to remove the secrets 
 Continuity of the `secret_key_base` value doesn't matter for development and test so it should be fine to let Rails generate a new one in those environments. These environments are normally reset frequently and there's no need to ensure a dev/test user that was logged in on your localhost needs to remain so after a Rails upgrade.
 </aside>
 
-Optionally, if you want development and test environments to be consistent with the technique used in deployed environments, the `SECRET_KEY_BASE` environment variable can be added to `.env.development` and `.env.test`, with the value being whatever it was in the old `config/secrets.yml`, development and test sections. Then Rails will read from the environment variable rather than generating a `tmp/local_secret.txt`. This will work given that the project is using the [dotenv-rails](https://rubygems.org/gems/dotenv-rails) gem.
+***Optionally***, if you want development and test environments to be consistent with the technique used in deployed environments, the `SECRET_KEY_BASE` environment variable can be added to `.env.development` and `.env.test`, with the value being whatever it was in the old `config/secrets.yml`, development and test sections. Then Rails will read from the environment variable rather than generating a `tmp/local_secret.txt`. This will work given that the project is using the [dotenv-rails](https://rubygems.org/gems/dotenv-rails) gem.
 
 **Verify:**
 
