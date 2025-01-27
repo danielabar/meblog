@@ -2,7 +2,7 @@
 title: "Cover Letter Writing for Nerds"
 featuredImage: "../images/cover-letter-matthew-henry-n5vuEc86Zg8-unsplash.jpg"
 description: "Learn how to write effective, customized cover letters for tech job applications using markdown and a markdown to PDF converter for VSCode."
-date: "2025-03-01"
+date: "2025-03-15"
 category: "career"
 related:
   - "About Those Docs"
@@ -15,14 +15,14 @@ I was inspired to write this after encountering a LinkedIn discussion on the top
 This post will cover why I think cover letters remain valuable and offer a technique to make writing them easier and more effective, especially for techies that use markdown. Writing a custom cover letter can feel daunting, as writing isn’t often a core focus in technical education. However, strong communication is essential in many tech roles, and a well-written cover letter can make a meaningful impact.
 
 <aside class="markdown-aside">
-This is of course, anecdotal based on my experience. I don't have any hard data or industry-wide metrics to prove the usefulness of cover letters one way or the other.
+This is of course, anecdotal based on my experience. I don't have any hard data or industry-wide metrics to prove the usefulness of cover letters one way or the other, so your mileage may vary.
 </aside>
 
 ## What is a Cover Letter?
 
 Before getting into it, let's briefly define what a cover letter is. It's a document sent with your resume to provide additional information about your skills and experience. It typically highlights specific achievements and experiences that make you suitable for the *particular* job you're applying to.
 
-The screenshot below is from an ATS (Applicant Tracking System) asking to upload both a resume and cover letter in pdf format. In this particular case, the cover letter is required, although other systems may mark it as optional:
+The screenshot below is from an ATS (Applicant Tracking System) asking to upload both a resume and cover letter in pdf format. In this case, a cover letter is required, although other systems may mark it as optional:
 
 ![cover letter upload](../images/cover-letter-upload.png "cover letter upload")
 
@@ -34,7 +34,7 @@ I believe it's definitely still worth spending the time to craft a *custom* cove
 
 ... will not have much impact. Might as well just send your resume and be done with it.
 
-A well crafted cover letter is an opportunity to personalize and tailor your content to the specific role. Think of it as: How to make life easier for hiring managers or recruiters that may be scanning a large number of applications? I do this by highlighting specific phrases or sentences from the job description (JD), then showing how I've developed or used that skill.
+A well crafted cover letter is an opportunity to personalize and tailor your content to the specific role. Think of it as: How to make life easier for hiring managers or recruiters that may be scanning a large number of applications? I do this by highlighting specific phrases or sentences from the job description, then showing how I've developed or used that skill.
 
 ## The Nerd Way
 
@@ -68,7 +68,7 @@ Additionally, I’ve written several blog posts sharing tips and tricks
 for Rails development, including [this post on caching strategies](https://example.com).
 ```
 
-Notice how the response is specific to the requirement. It also provides concrete examples, which are far more compelling than general statements like, "I’m a strong developer." Whenever possible, link to relevant blog posts, side projects, or public code repositories that showcase your work.
+Notice how the response is specific to the requirement. It also provides concrete examples, which are far more compelling than general statements like, "I have a lot of experience with {framework}."
 
 ### Use Side Projects, Courses, or Volunteer Work
 
@@ -80,7 +80,8 @@ If you don’t have work experience that matches a requirement, don’t worry. S
 While I haven’t used Hotwire in a professional setting yet,
 I’ve been working on a side project that integrates Turbo with Rails
 to create a real-time chat application.
-You can check it out on GitHub [here](https://github.com/username/chat-app).
+You can try out the [deployed app](https://your-app.com)
+and view the source on [GitHub](https://github.com/username/chat-app).
 ```
 
 You could also reference coursework or certifications. Mentioning a public-facing project, even a small one, shows initiative and your ability to learn new technologies. For example, if the job description mentions that Tailwind is a requirement or a nice to have:
@@ -161,7 +162,13 @@ Here’s an example of my settings in `~/Library/Application Support/Code/User/s
 }
 ```
 
-This means if you're working on a document named `jsmith-cover-letter-acme-corp.md`, the pdf will be generated in `~/tmp/jsmith-cover-letter-acme-corp.pdf`. Then it's ready for upload to any job application portal.
+This means if you're working on a document named `jsmith-cover-letter-acme-corp.md`, the pdf will be generated in `~/tmp/jsmith-cover-letter-acme-corp.pdf`. Then it's ready for upload to any job application portal. If you want the pdf to be generated in the same directory as the markdown, then configure the output directory to an empty string:
+
+```json
+{
+  "markdown-pdf.outputDirectory": "",
+}
+```
 
 Here's an example of what the pdf will look like, any links in the content will be clickable.
 
@@ -185,6 +192,6 @@ You can also customize the contents of the header and footer using `markdown-pdf
 
 Writing a custom cover letter doesn’t have to be overwhelming. By using markdown and focusing on specific examples from your experience, you can craft a letter that helps your application stand out. While it takes a bit more effort than sending a generic one, it’s often the extra touch needed to get noticed in a competitive job market.
 
-Even if your cover letter ends up being ignored by a recruiter or filtered out by an ATS, this exercise is still worth doing. Writing the letter helps to clarify in your own mind why you're a great fit for the role. And if you do land that initial call, you'll be better prepared to answer the inevitable "Why are you a good fit for this role?" or "Can you describe a situation where..." type questions, with specific examples ready to go.
+Even if your cover letter ends up being ignored by a recruiter or filtered out by an ATS (Applicant Tracking System), this exercise is still worth doing. Writing the letter helps to clarify in your own mind why you're a great fit for the role. And if you do land that initial call, you'll be better prepared to answer the inevitable "Why are you a good fit for this role?" or "Can you describe a situation where..." type questions, with specific examples ready to go.
 
 Keep in mind that the goal of a cover letter is simply to increase your chances of getting that first call. It won’t get you the job on its own, but it can be a powerful tool. And for techies, using markdown can make the process just a little bit more enjoyable.
