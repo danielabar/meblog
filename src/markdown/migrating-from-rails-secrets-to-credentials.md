@@ -541,6 +541,8 @@ Recall all the key files are gitignored. If working with a team, they'll also ne
 
 Also update your project's `README.md` setup instructions, informing developers of where to find the keys, and to create files `config/credentials/development.key` and `config/credentials/test.key` in their local project directories containing the key values.
 
+<aside class="markdown-aside">Keeping your development setup instructions up to date is essential for helping new developers get started quickly and ensuring the whole team stays on the same page, especially for changes like this that aren't immediately obvious from the code. This is a great example of why clear, detailed engineering documentation matters. For more tips on writing effective docs, check out my blog post <a class="markdown-link" href="https://danielabaron.me/blog/about-those-docs/">About Those Docs</a>.</aside>
+
 ## Summary
 
 Here are the key terms covered in this post:
