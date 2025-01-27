@@ -46,9 +46,9 @@ Rails.application.initialize! # === DEPRECATION WARNING FROM THIS LINE ===
 
 A search through the entire project for `Rails.application.secrets` didn't yield any matches. This must have been something in library code or deeper in Rails internals.
 
-Up until this point, I had been following the specific guide for upgrading from 7.0 to 7.1. Aside from a section about the development and test [secret key base file having been renamed](https://guides.rubyonrails.org/upgrading_ruby_on_rails.html#development-and-test-environments-secret-key-base-file-changed), I couldn't find anything related to a migration from secrets to credentials.
+Up until this point, I had been following the guide for upgrading from 7.0 to 7.1. Aside from a section about the development and test [secret key base file having been renamed](https://guides.rubyonrails.org/upgrading_ruby_on_rails.html#development-and-test-environments-secret-key-base-file-changed), I couldn't find anything related to a migration from secrets to credentials.
 
-I then wondered if I had missed a step in the previous upgrade related to secrets and credentials, or if the previous maintainer had missed a step in earlier upgrades? I went back through all the upgrade guides back to the first version of this project, which was 4.1:
+I then wondered if I had missed a step in the previous upgrade related to secrets and credentials, or if the previous maintainer had missed a step in earlier upgrades? To answer this question I went through all the upgrade guides back to the first version of this project, which was 4.1, and couldn't find anything about migrating secrets to credentials:
 
 * [7.0 to 7.1](https://guides.rubyonrails.org/upgrading_ruby_on_rails.html#upgrading-from-rails-7-0-to-rails-7-1)
 * [6.1 to 7.0](https://guides.rubyonrails.org/upgrading_ruby_on_rails.html#upgrading-from-rails-6-1-to-rails-7-0)
@@ -59,7 +59,7 @@ I then wondered if I had missed a step in the previous upgrade related to secret
 * [4.2 to 5.0](https://guides.rubyonrails.org/upgrading_ruby_on_rails.html#upgrading-from-rails-4-2-to-rails-5-0)
 * [4.1 to 4.2](https://guides.rubyonrails.org/upgrading_ruby_on_rails.html#upgrading-from-rails-4-1-to-rails-4-2)
 
-None of the above mentioned upgrade guides had instructions on migrating from secrets to credentials. In order to resolve the deprecation warning, I would first have to understand what is this "secrets" feature?
+In order to resolve the deprecation warning, I would first have to understand what is this "secrets" feature?
 
 **Quick Tip**
 
@@ -121,7 +121,7 @@ production:
   secret_key_base: <%= ENV["SECRET_KEY_BASE"] %>
 ```
 
-This file is used to persist environment-specific values of `secret_key_base`. It also supports erb interpolation, so you can commit plain text values, or reference an environment variable via `ENV`. The `secret_key_base` can then be accessed by Rails and application code as `Rails.application.secrets.secret_key_base`.
+This file is used to persist environment-specific values of `secret_key_base`. It also supports erb interpolation, so you can commit plain text values, or reference an environment variable via `ENV`. The `secret_key_base` can then be accessed by Rails and application code as `Rails.application.secret_key_base`.
 
 This file also supports storage of *all* the application's secrets. For example:
 
@@ -290,7 +290,7 @@ In this solution, all the secrets in `config/secrets.yml` will be converted to t
 * There are multiple secrets stored in `config/secrets.yml` in addition to `secret_key_base`. i.e. the application code has references to `Rails.application.secrets.some_secret`, `Rails.application.secrets.another_secret`, etc.
 * Your project is not configured with a tool to convert secrets to environment variables. Keep in mind you'll still need to manage one new secret `RAILS_MASTER_KEY`.
 
-For example, suppose the `config/secrets.yml` contains plain-text values from all environments (assuming it was a private source repository and if the team didn't have a secrets manager, then this would have been the easiest option, albeit not that secure in case of a breach of the source code hosting).
+For example, suppose the `config/secrets.yml` contains plain-text values from all environments (assuming it was a private source repository and if the team didn't have a secrets manager, then this would have been the easiest option, albeit not that secure should the source code get leaked).
 
 The actual secret values would be long random alpha-numeric strings such as `b9efa92ff...`, but I'm putting in simple legible values for demonstration purposes:
 
@@ -405,6 +405,7 @@ Rails.application.credentials.secret_key_base
 Rails.application.secret_key_base
 => "dev-secret-key-base"
 
+# Should be able to access all other secrets via `credentials`
 Rails.application.credentials.stripe_secret_key
 => "dev-stripe-secret-key"
 ```
@@ -441,7 +442,7 @@ Rails.application.credentials.stripe.publishable_key
 
 **ERB Interpolation Not Supported**
 
-When using encrypted credentials, you must enter the plain text values when editing the decrypted file. Unlike the old `config/secrets.yml`, erb interpolation does not work. For example, if you were to enter in the temporary editor window:
+When using encrypted credentials, you must enter the plain text values when editing the decrypted file. Unlike the old `config/secrets.yml`, erb interpolation does not work. For example, if you were to run `bin/rails credentials:edit --environment development` and save the following:
 
 ```yml
 secret_key_base: <%= ENV["SECRET_KEY_BASE"] %>
@@ -518,13 +519,13 @@ The `config/secrets.yml` removal you did earlier in [Step 1](../migrating-from-r
 
 At this point, since the key files only exist on your laptop, yours is the only machine capable of decrypting the credentials yaml file. The next steps are about ensuring others can as well.
 
-The key to understanding this is if Rails can't find a key file at `config/credentials/{env}.key`, it will read it from `RAILS_MASTER_KEY` environment variable. Since the key files are not committed, the solution in all other environments is to ensure the `RAILS_MASTER_KEY` environment variable is populated.
+If Rails can't find a key file at `config/credentials/{env}.key`, it will read it from `RAILS_MASTER_KEY` environment variable. Since the key files are not committed, the solution in all other environments is to ensure the `RAILS_MASTER_KEY` environment variable is populated.
 
 ### Step 5: Update Continuous Integration
 
-If you have a continuous integration system that runs tests, such as GitHub Actions, Circle CI, Travis CI, etc. That system will need access to the test master key to decrypt the test credentials file. Recall that currently the test credentials file `config/credentials/test.yml.enc` has been committed, but the key to decrypt it is at `/config/credentials/test.key`, which only exists on your laptop. This means if the CI system were to run on the branch where you just committed, it will fail because it won't have access to the secrets.
+If you have a continuous integration system that runs tests, such as GitHub Actions, Circle CI, Travis CI, etc. That system will need access to the test master key to decrypt the test credentials file. Recall that currently the test credentials file `config/credentials/test.yml.enc` has been committed, but the key to decrypt it is at `config/credentials/test.key`, which only exists on your laptop. This means if the CI system were to run on the branch where you just committed, it will fail because it won't have access to the secrets.
 
-Most CI systems have a way to populate a secret via their web dashboards, and make it available to the workflow as an environment variable. Go ahead and do this, creating a new secret/environment variable `RAILS_MASTER_KEY`, and populate it with the value from the file on your laptop: `/config/credentials/test.key`
+Most CI systems have a way to populate a secret via their web dashboards, and make it available to the workflow as an environment variable. Go ahead and do this, creating a new secret/environment variable `RAILS_MASTER_KEY`, and populate it with the value from the file on your laptop: `config/credentials/test.key`
 
 Details of how to do this are CI-specific, for example here's how to [use secrets in GitHub actions](https://docs.github.com/en/actions/security-for-github-actions/security-guides/using-secrets-in-github-actions).
 
