@@ -45,6 +45,14 @@ jobs:
           github_token: ${{ secrets.GITHUB_TOKEN }}
           publish_dir: ./public
 
+      # https://devcenter.heroku.com/articles/heroku-cli#install-with-ubuntu-debian-apt-get
+      - name: Install Heroku CLI
+        run: |
+          curl https://cli-assets.heroku.com/install-ubuntu.sh | sh
+
+      - name: Verify Heroku CLI Installation
+        run: heroku --version
+
       - name: Ingest search docs
         env:
           HEROKU_APP_NAME: ${{ secrets.HEROKU_APP_NAME }}
