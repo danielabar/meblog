@@ -2,7 +2,7 @@
 title: "Migrating From Rails Secrets to Credentials"
 featuredImage: "../images/migrating-rails-secrets-to-credentials-silas-kohler-C1P4wHhQbjM-unsplash.jpg"
 description: "Exploring the evolution of Rails secrets to credentials, this post investigates the deprecation of Rails.application.secrets, explains its history, and provides step-by-step solutions to address the change in legacy Rails applications."
-date: "2025-03-01"
+date: "2025-03-04"
 category: "rails"
 related:
   - "Dependabot PRs Need Their Secrets"
