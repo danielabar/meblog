@@ -10,6 +10,8 @@ related:
   - "Build and Publish a Presentation with RevealJS and Github"
 ---
 
+**Update (March 2025):** Added a section on how to [upload files](../postman-alternative-vscode#file-uploads) using the VSCode REST Client, expanding its capabilities as a Postman alternative. This is especially useful for APIs that require file-based input, such as Azure OpenAI Batch processing.
+
 If you've been doing web development for any length of time, you've probably built or worked on an HTTP REST style API and needed a REST Client to test it. [Postman](https://www.postman.com/product/rest-client/) is a very popular choice and I used to reach for this all the time. However, I'd like to share another tool, a VS Code extension that is working better for me, as an alternative to Postman.
 
 But first, why not just stick with Postman? Below I've outlined a few pain points that have caused me to seek out an alternative.
@@ -139,6 +141,71 @@ Myapp-Tenant-Api-Key: {{apikey}}
       "status": "active",
       "customer-id": "some-customer",
       "plan-id": "some-plan"
+    }
+  }
+}
+```
+
+### File Uploads
+
+You can also submit requests that include a file. For example, the Azure OpenAI Batch API requires uploading a `.jsonl` type file via a POST request to `openai.azure.com`. The [Azure OpenAI documentation](https://learn.microsoft.com/en-us/azure/ai-services/openai/how-to/batch?tabs=global-batch%2Cstandard-input%2Cpython-secure&pivots=rest-api#upload-batch-file) shows the following curl request:
+
+```bash
+curl -X POST https://YOUR_RESOURCE_NAME.openai.azure.com/openai/files?api-version=2024-10-21 \
+  -H "Content-Type: multipart/form-data" \
+  -H "api-key: $AZURE_OPENAI_API_KEY" \
+  -F "purpose=batch" \
+  -F "file=@C:\\batch\\test.jsonl;type=application/json"
+```
+
+In this request:
+- `-F "purpose=batch"` sets a standard form field with the value `"batch"`.
+- `-F "file=@C:\\batch\\test.jsonl;type=application/json"` attaches a file, specifying its MIME type as JSON.
+
+The VSCode REST Client extension supports multipart form-data using the `Content-Disposition` header to define file uploads. Here’s how you can replicate the `curl` request:
+
+```http
+# Upload a file
+POST {{host}}/openai/files?api-version={{api_version}}
+api-key: {{api_key}}
+Content-Type: multipart/form-data; boundary=----WebKitFormBoundary7MA4YWxkTrZu0gX
+
+------WebKitFormBoundary7MA4YWxkTrZu0gX
+Content-Disposition: form-data; name="purpose"
+
+batch
+------WebKitFormBoundary7MA4YWxkTrZu0gX
+Content-Disposition: form-data; name="file"; filename="{{file_name}}"
+Content-Type: application/json
+
+< {{file_path}}
+------WebKitFormBoundary7MA4YWxkTrZu0gX--
+```
+
+**Explanation:**
+
+- `Content-Disposition: form-data; name="file"; filename="{{file_name}}"` tells the server the field name and file name.
+- `< {{file_path}}` instructs VSCode REST Client to load the file’s content from the specified path.
+- The boundary `----WebKitFormBoundary7MA4YWxkTrZu0gX` is a random string to separate different parts of the form. This is required for multipart uploads. You could make this any value as long as its unique (doesn't appear in the request data) and consistent (same value used in each section).
+
+The variables `api_version`, `api_key`, `file_name`, and `file_path` are defined in `.vscode/settings.json`. The `file_path` can be absolute or relative to the project:
+
+```json
+{
+  "rest-client.environmentVariables": {
+    "$shared": {
+      "file_name": "batch_input.jsonl",
+      "file_path": "./tmp/azure/batch_input.jsonl",
+    },
+    "staging": {
+      "api_version": "STAGING API VERSION",
+      "host": "https://staging-resource-name.openai.azure.com",
+      "auth_token": "YOUR STAGING TOKEN"
+    },
+    "production": {
+      "api_version": "PRODUCTION API VERSION",
+      "host": "https://production-resource-name.openai.azure.com",
+      "auth_token": "YOUR PRODUCTION TOKEN"
     }
   }
 }
