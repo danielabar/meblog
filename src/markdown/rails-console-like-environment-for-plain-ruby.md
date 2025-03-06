@@ -187,6 +187,7 @@ TODO: show it in my main.rb and spec helper (assuming using rspec for testing).
 
 ## TODO
 * alternative is to load project-specific source files in `.irbrc` in project directory, then could just run irb, but if you're used to the convenience of bin scripts, this might feel more natural.
+* Verify: if already have irbrc customizations in home dir `~/.irbrc`, adding project level will override but not replace other settings
 * reference: [irb](https://ruby.github.io/irb/)
 * intro para
 * main content
