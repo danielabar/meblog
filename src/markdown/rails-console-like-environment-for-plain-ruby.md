@@ -105,9 +105,7 @@ Edit `config/environment.rb` to load all project dependencies from the Gemfile, 
 # Load all dependencies from Gemfile or standard Ruby library
 require "descriptive_statistics"
 require "tty-progressbar"
-require "tty-table"
-require "unicode_plot"
-require "yaml"
+# ...
 
 # Load all project source files from lib dir and its subdirectories
 Dir.glob(File.expand_path("../lib/**/*.rb", __dir__)) { |file| require file }
@@ -123,7 +121,9 @@ That one line `Dir.glob(File.expand_path("../lib/**/*.rb", __dir__)).each { |fil
 
 The `Dir.glob` method expands it's first argument, which in our case is a pattern string `/path/to/project/lib/**/*.rb`. It returns an array of all matching file names, which in this case will be all Ruby files contained in the `lib` directory and all of its subdirectories.
 
-Finally, when given a block `Dir.glob`, will execute that block for each file matching the pattern. In our case, we pass in a block to `require` the file. This is what makes all classes in the project available in the irb session.
+Finally, when given a block `Dir.glob`, will execute that block for each file matching the pattern. In our case, we pass in a block to `require` the file. When this code runs, all ruby files in the project will be available in memory.
+
+TODO: Aside doesn't have to be in config or named environment, this is just a suggestion for code organization. You can name this file and place it wherever you like.
 
 ## Create Project Specific `.irbrc`
 
@@ -150,8 +150,6 @@ IRB.conf[:PROMPT_MODE] = :APP # Set custom prompt
 ```
 
 TODO: ASIDE explain about default config in home dir, but it can be overridden on a project level because irb will look in the current directory. Reference [Configuration File Path Resolution](https://ruby.github.io/irb/Configurations_md.html#label-Configuration+File+Path+Resolution).
-
-## Launch custom irb
 
 Now when you run `irb` at the terminal, it will first run all the code in `.irbrc` in the project root. If you chose to customize the prompt, it will display the project name instead of the default `irb(main)>` prompt:
 
@@ -197,17 +195,48 @@ bin/console
 
 It will behave the same as having run `irb`.
 
+## Alternative Without Custom .irbrc
+
+If for whatever reason you don't want to commit a custom `.irbrc` file into the project root - maybe it conflicts with other custom settings in `~/.irbrc` or each team member prefers to maintain their own version, an alternative approach is to load the `config/environment.rb` in `bin/console` like this:
+
+```ruby
+#!/usr/bin/env ruby
+# frozen_string_literal: true
+
+require "irb"
+require_relative "../config/environment"
+
+IRB.start
+```
+
+Now when running `bin/console`, it will load all the project source files.
+
 ## Bonus: Use `config/environment.rb` for Tests and Main Entry Point
 
-Instead of manually requiring files in multiple places, you can include `config/environment.rb` in your main script (`main.rb`) and spec helper to keep things DRY.
+A benefit of having taken the time to construct `config/environment.rb` is that it can be used in the project entrypoint and in a test helper. This avoids manually requiring files in multiple places throughout the project. For example, `main.rb`:
 
-TODO: show it in my main.rb and spec helper (assuming using rspec for testing).
+```ruby
+require_relative "config/environment"
 
+Run::AppRunner.new("inputs.yml", ARGV[0]).run
+```
+
+If using RSpec, then `spec/spec_helper.rb`:
+
+```ruby
+require "rspec"
+require_relative "../config/environment"
+
+RSpec.configure do |config|
+  # ...
+end
+```
+## Summary
+
+TODO...
 This approach provides a lightweight, Rails-like console experience for any Ruby project, making interactive debugging and exploration just as easy as when using Rails.
 
 ## TODO
-* WIP "muscle memory" of bin scripts - introduce bin/console that starts irb
-* alternative: if don't want to customize .irbrc (eg: on a team and everyone has different opinions of how they want to customize it even at project level), could instead require config/environment from bin/console for similar effect, then leave everyone to put whatever they want in projrect level .irbrc and gitignore it.
 * Verify: if already have irbrc customizations in home dir `~/.irbrc`, adding project level will override but not replace other settings
 * Show updated project structure with `config` dir and optional `bin` dir (which can be useful for other bin scripts such as rspec, rubocop, etc.)
 * Reference other irb configuration options (just barely scratched the surface here): https://ruby.github.io/irb/Configurations_md.html
