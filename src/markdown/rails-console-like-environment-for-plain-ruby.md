@@ -240,6 +240,7 @@ This approach provides a lightweight, Rails-like console experience for any Ruby
 * Verify: if already have irbrc customizations in home dir `~/.irbrc`, adding project level will override but not replace other settings
 * Show updated project structure with `config` dir and optional `bin` dir (which can be useful for other bin scripts such as rspec, rubocop, etc.)
 * Reference other irb configuration options (just barely scratched the surface here): https://ruby.github.io/irb/Configurations_md.html
+* Reference useful Ruby doc methods for Dir and File (point to matching Ruby version!)
 * WIP main content
 * organize headings/sub-headings
 * conclusion para
