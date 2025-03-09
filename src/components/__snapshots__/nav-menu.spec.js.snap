@@ -39,6 +39,15 @@ exports[`NavMenu renders search input when SEARCH_ENABLED env var is true 1`] = 
           <li
             class="undefined undefined"
           >
+            <a
+              href="https://danielabaron.me/rss.xml"
+            >
+              RSS
+            </a>
+          </li>
+          <li
+            class="undefined undefined"
+          >
             <div>
               <svg
                 fill="currentColor"
@@ -99,6 +108,15 @@ exports[`NavMenu renders search input when SEARCH_ENABLED env var is true 1`] = 
             href="/about"
           >
             About
+          </a>
+        </li>
+        <li
+          class="undefined undefined"
+        >
+          <a
+            href="https://danielabaron.me/rss.xml"
+          >
+            RSS
           </a>
         </li>
         <li

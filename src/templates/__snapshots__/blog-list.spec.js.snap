@@ -58,6 +58,15 @@ exports[`Blog List Renders in layout with pagination set to second page 1`] = `
                     About
                   </a>
                 </li>
+                <li
+                  class="undefined undefined"
+                >
+                  <a
+                    href="https://danielabaron.me/rss.xml"
+                  >
+                    RSS
+                  </a>
+                </li>
               </ul>
             </nav>
           </div>
@@ -276,6 +285,15 @@ exports[`Blog List Renders in layout with pagination set to second page 1`] = `
                   href="/about"
                 >
                   About
+                </a>
+              </li>
+              <li
+                class="undefined undefined"
+              >
+                <a
+                  href="https://danielabaron.me/rss.xml"
+                >
+                  RSS
                 </a>
               </li>
             </ul>
@@ -555,6 +573,15 @@ exports[`Blog List Renders in layout with pagination set to third page 1`] = `
                     About
                   </a>
                 </li>
+                <li
+                  class="undefined undefined"
+                >
+                  <a
+                    href="https://danielabaron.me/rss.xml"
+                  >
+                    RSS
+                  </a>
+                </li>
               </ul>
             </nav>
           </div>
@@ -773,6 +800,15 @@ exports[`Blog List Renders in layout with pagination set to third page 1`] = `
                   href="/about"
                 >
                   About
+                </a>
+              </li>
+              <li
+                class="undefined undefined"
+              >
+                <a
+                  href="https://danielabaron.me/rss.xml"
+                >
+                  RSS
                 </a>
               </li>
             </ul>
