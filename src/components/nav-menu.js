@@ -31,6 +31,10 @@ const NavMenu = () => {
             About
           </Link>
         </li>
+        {/* RSS feed is only generated for production site */}
+        <li className={`${styles.headerItem} ${styles.navItem}`}>
+          <a href="https://danielabaron.me/rss.xml">RSS</a>
+        </li>
         {renderSearchInput()}
       </ul>
     </nav>
