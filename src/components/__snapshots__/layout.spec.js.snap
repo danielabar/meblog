@@ -58,6 +58,15 @@ exports[`Layout renders correctly 1`] = `
                     About
                   </a>
                 </li>
+                <li
+                  class="undefined undefined"
+                >
+                  <a
+                    href="https://danielabaron.me/rss.xml"
+                  >
+                    RSS
+                  </a>
+                </li>
               </ul>
             </nav>
           </div>
@@ -204,6 +213,15 @@ exports[`Layout renders correctly 1`] = `
                   href="/about"
                 >
                   About
+                </a>
+              </li>
+              <li
+                class="undefined undefined"
+              >
+                <a
+                  href="https://danielabaron.me/rss.xml"
+                >
+                  RSS
                 </a>
               </li>
             </ul>

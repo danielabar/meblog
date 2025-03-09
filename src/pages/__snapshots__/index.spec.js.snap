@@ -58,6 +58,15 @@ exports[`Home Page renders with layout, article list, and all-link 1`] = `
                     About
                   </a>
                 </li>
+                <li
+                  class="undefined undefined"
+                >
+                  <a
+                    href="https://danielabaron.me/rss.xml"
+                  >
+                    RSS
+                  </a>
+                </li>
               </ul>
             </nav>
           </div>
@@ -277,6 +286,15 @@ exports[`Home Page renders with layout, article list, and all-link 1`] = `
                   href="/about"
                 >
                   About
+                </a>
+              </li>
+              <li
+                class="undefined undefined"
+              >
+                <a
+                  href="https://danielabaron.me/rss.xml"
+                >
+                  RSS
                 </a>
               </li>
             </ul>
