@@ -72,9 +72,7 @@ irb(main):004> tx = Tax::IncomeTaxCalculator.new
 # 	from <internal:kernel>:187:in `loop'
 ```
 
-This could be resolved by running `require_relative ...` in the irb session, for one specific file. Helpfully, irb has [autocompletion](https://ruby.github.io/irb/?search=autocomplete#label-Automatic+Completion) so when you start typing a path for the `require_relative` method, it suggests files from the contents of the current directory:
-
-![rails console for ruby irb autocomplete require relative path](../images/rails-console-for-ruby-irb-autocomplete-require-relative-path.png "rails console for ruby irb autocomplete require relative path")
+This could be resolved by running `require_relative ...` in the irb session, for one specific file.:
 
 ```ruby
 irb(main):002> require_relative "lib/tax/income_tax_calculator"
@@ -88,7 +86,7 @@ irb(main):002> require_relative "lib/tax/income_tax_calculator"
 
 But this is tedious to have to do every time you want to experiment with some of your project code. It would be nice if all the project code was always available, any time you ran `irb` form your project root. The next sections will walk through how to set this up.
 
-## Define `config/environment.rb`
+## Define config/environment.rb
 
 The first step is to create a `config` directory, and an `environment.rb` file in that directory:
 
@@ -115,17 +113,17 @@ That one line `Dir.glob(File.expand_path("../lib/**/*.rb", __dir__)).each { |fil
 
 **Explanation:**
 
-`__dir__` is a built-in method provided by the [Kernel module](https://docs.ruby-lang.org/en/3.2/Kernel.html#method-i-__dir__) that returns the absolute path of the directory containing the current file. Since it's being called in the `config/environment.rb` file, it's value will be ` /path/to/project/config`.
+[__dir__](https://docs.ruby-lang.org/en/3.3/Kernel.html#method-i-__dir__) is a built-in method provided by the Kernel module. It returns the absolute path of the directory containing the current file. Since it's being called in the `config/environment.rb` file, it's value will be ` /path/to/project/config`.
 
-`File.expand_path` converts a pathname to an absolute pathname. When given an optional `dir_string` argument, which we're doing here by passing in `__dir__`, it uses the `dir_string` as a starting point. But the first argument we're passing in says to go up one directory. So this will return `/path/to/project/lib/**/*.rb`.
+[File.expand_path](https://docs.ruby-lang.org/en/3.3/File.html#method-c-expand_path) converts a pathname to an absolute pathname. When given an optional `dir_string` argument, which we're doing here by passing in `__dir__`, it uses the `dir_string` as a starting point. But the first argument we're passing in says to go up one directory. So this will return `/path/to/project/lib/**/*.rb`.
 
-The `Dir.glob` method expands it's first argument, which in our case is a pattern string `/path/to/project/lib/**/*.rb`. It returns an array of all matching file names, which in this case will be all Ruby files contained in the `lib` directory and all of its subdirectories.
+[Dir.glob](https://docs.ruby-lang.org/en/3.3/Dir.html#method-c-glob) expands it's first argument, which in our case is a pattern string `/path/to/project/lib/**/*.rb`. It returns an array of all matching file names, which in this case will be all Ruby files contained in the `lib` directory and all of its subdirectories.
 
-Finally, when given a block `Dir.glob`, will execute that block for each file matching the pattern. In our case, we pass in a block to `require` the file. When this code runs, all ruby files in the project will be available in memory.
+Finally, when given a block `Dir.glob`, will execute that block for each file matching the pattern. In our case, we pass in a block to `require` the file. When this code runs, all Ruby files in the project's `lib` directory will be available in memory.
 
-TODO: Aside doesn't have to be in config or named environment, this is just a suggestion for code organization. You can name this file and place it wherever you like.
+You don’t have to place this file in `config` or name it `environment.rb` - this is just a suggestion for organizing code. Feel free to name it and place it wherever makes sense for your project.
 
-## Create Project Specific `.irbrc`
+## Create Project Specific .irbrc
 
 Now that we have the potential to load all project dependencies from a single file, the next step is to ensure this file is always run when starting an irb session. To achieve this, create a `.irbrc` file in the project directory. This provides an opportunity to customize the behaviour of [irb](https://ruby.github.io/irb/) when started from the project root.
 
@@ -148,23 +146,37 @@ IRB.conf[:PROMPT][:APP] = {
 
 IRB.conf[:PROMPT_MODE] = :APP # Set custom prompt
 ```
+<aside class="markdown-aside">
+IRB first loads the `.irbrc` file in your home directory (if it exists) and then looks for one in the current directory, applying both. This allows you to define project-specific settings without losing your global customizations, though some configurations may override or interact with each other. For more details, see <a class="markdown-link" href="https://ruby.github.io/irb/Configurations_md.html#label-Configuration+File+Path+Resolution">Configuration File Path Resolution</a>.
+</aside>
 
-TODO: ASIDE explain about default config in home dir, but it can be overridden on a project level because irb will look in the current directory. Reference [Configuration File Path Resolution](https://ruby.github.io/irb/Configurations_md.html#label-Configuration+File+Path+Resolution).
+Now when you run `irb` at the terminal, it will run all the code in `.irbrc` in the project root. If you chose to customize the prompt, it will display the project name instead of the default `irb(main)>` prompt.
 
-Now when you run `irb` at the terminal, it will first run all the code in `.irbrc` in the project root. If you chose to customize the prompt, it will display the project name instead of the default `irb(main)>` prompt:
-
-```
-Loaded application
-drawdown_simulator>
-```
-
-All project classes will be loaded, so you can now interact with them, without having to explicitly load them. And just like before when we saw autocompletion in effect for the one class we manually loaded, it's now available for all of them. For example:
+All project classes will be loaded, so you can now interact with them, without having to explicitly load them. Additionally, irb's built-in [autocomplete](https://ruby.github.io/irb/#label-Automatic+Completion) will help you quickly explore your project's classes and methods. For example:
 
 ![rails console for ruby irb autocomplete tax namespace](../images/rails-console-for-ruby-irb-autocomplete-tax-namespace.png "rails console for ruby irb autocomplete tax namespace")
 
 ![rails console for ruby irb autocomplete return-sequences namespace](../images/rails-console-for-ruby-irb-autocomplete-return-sequences-namespace.png "rails console for ruby irb autocomplete return-sequences namespace")
 
-## Optionally Create `bin/console`
+Optionally, you can add a `reload!` method to the `.irbrc` file. If you're used to this behavior from Rails, it's not part of IRB:
+
+```ruby
+# .irbrc
+
+# other code...
+
+def reload!
+  exec "irb"
+end
+```
+
+Now if you make any changes to application code, rather than being forced to exit and run `irb` again, running `reload!` will refresh the code loaded in memory.
+
+<aside class="markdown-aside">
+This is just the beginning of what can be done with `.irbrc`. It supports defining custom commands, setting up debugging tools, tweaking history behavior, and much more. While it's beyond the scope of this post to cover everything, you can explore further in the <a class="markdown-link" href="https://ruby.github.io/irb/#label-Configure+IRB">IRB documentation</a>.
+</aside>
+
+## Optional Bin Script
 
 If rather than running `irb`, you're used to the "muscle memory" of running a `bin` script, as has become standard on Rails projects, you can layer that on with the irb customization as follows:
 
@@ -195,9 +207,9 @@ bin/console
 
 It will behave the same as having run `irb`.
 
-## Alternative Without Custom .irbrc
+## Alternative
 
-If for whatever reason you don't want to commit a custom `.irbrc` file into the project root - maybe it conflicts with other custom settings in `~/.irbrc` or each team member prefers to maintain their own version, an alternative approach is to load the `config/environment.rb` in `bin/console` like this:
+If for whatever reason you don't want to commit a custom `.irbrc` file into the project root - maybe it conflicts with other custom settings in your home `~/.irbrc` or each team member prefers to maintain their own version, an alternative approach is to load the `config/environment.rb` in `bin/console` like this:
 
 ```ruby
 #!/usr/bin/env ruby
@@ -211,17 +223,18 @@ IRB.start
 
 Now when running `bin/console`, it will load all the project source files.
 
-## Bonus: Use `config/environment.rb` for Tests and Main Entry Point
+## Other Uses For config/environment.rb
 
-A benefit of having taken the time to construct `config/environment.rb` is that it can be used in the project entrypoint and in a test helper. This avoids manually requiring files in multiple places throughout the project. For example, `main.rb`:
+A benefit of having taken the time to construct `config/environment.rb` is that it can be used in the project entrypoint and in a test helper. This avoids manually requiring lists of files in multiple places throughout the project. For example, `main.rb`:
 
 ```ruby
 require_relative "config/environment"
 
+# Whatever code starts your project...
 Run::AppRunner.new("inputs.yml", ARGV[0]).run
 ```
 
-If using RSpec, then `spec/spec_helper.rb`:
+If using RSpec, then `spec/spec_helper.rb` can require the config right after loading `rspec`:
 
 ```ruby
 require "rspec"
@@ -231,17 +244,7 @@ RSpec.configure do |config|
   # ...
 end
 ```
+
 ## Summary
 
-TODO...
-This approach provides a lightweight, Rails-like console experience for any Ruby project, making interactive debugging and exploration just as easy as when using Rails.
-
-## TODO
-* Verify: if already have irbrc customizations in home dir `~/.irbrc`, adding project level will override but not replace other settings
-* Show updated project structure with `config` dir and optional `bin` dir (which can be useful for other bin scripts such as rspec, rubocop, etc.)
-* Reference other irb configuration options (just barely scratched the surface here): https://ruby.github.io/irb/Configurations_md.html
-* Reference useful Ruby doc methods for Dir and File (point to matching Ruby version!)
-* WIP main content
-* organize headings/sub-headings
-* conclusion para
-* edit
+This post has covered several approaches for providing a Rails-like console experience for any Ruby project, making interactive debugging and exploration just as easy as when using Rails. We started by defining `config/environment.rb` to load all project dependencies in one place. Then covered options for a project-specific `.irbrc` file and/or a `bin` script. If you’re working on a CLI tool or any non-Rails Ruby project, consider adding a console to your workflow.
