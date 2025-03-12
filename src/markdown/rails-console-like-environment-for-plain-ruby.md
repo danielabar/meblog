@@ -57,7 +57,7 @@ Here is my project structure (ignoring documentation and test folders). Aside fr
 └── main.rb
 ```
 
-Before getting into the automated solution, let's cover how you could load and run any individual class from a project manually.
+Before getting into the automated solution, let's cover how you could load and run an individual class from a project manually.
 
 On any Ruby project (and also Rails projects), you can always run [irb](https://ruby.github.io/irb/#label-Overview) at the terminal, to get into an interactive Ruby session. `irb` is a default gem of Ruby so no need to install it, if you've installed Ruby, then you already have `irb`. However, by default, it doesn't know about any code in the project, even when it's run from the root of the project. For example:
 
@@ -103,6 +103,7 @@ Edit `config/environment.rb` to load all project dependencies from the Gemfile, 
 # Load all dependencies from Gemfile or standard Ruby library
 require "descriptive_statistics"
 require "tty-progressbar"
+require "yaml"
 # ...
 
 # Load all project source files from lib dir and its subdirectories
@@ -113,13 +114,13 @@ That one line `Dir.glob(File.expand_path("../lib/**/*.rb", __dir__)).each { |fil
 
 **Explanation:**
 
-[__dir__](https://docs.ruby-lang.org/en/3.3/Kernel.html#method-i-__dir__) is a built-in method provided by the Kernel module. It returns the absolute path of the directory containing the current file. Since it's being called in the `config/environment.rb` file, it's value will be ` /path/to/project/config`.
+[\_\_dir__](https://docs.ruby-lang.org/en/3.3/Kernel.html#method-i-__dir__) is a built-in method provided by the Kernel module. It returns the absolute path of the directory containing the current file. Since it's being called in the `config/environment.rb` file, it's value will be ` /path/to/project/config`.
 
 [File.expand_path](https://docs.ruby-lang.org/en/3.3/File.html#method-c-expand_path) converts a pathname to an absolute pathname. When given an optional `dir_string` argument, which we're doing here by passing in `__dir__`, it uses the `dir_string` as a starting point. But the first argument we're passing in says to go up one directory. So this will return `/path/to/project/lib/**/*.rb`.
 
 [Dir.glob](https://docs.ruby-lang.org/en/3.3/Dir.html#method-c-glob) expands it's first argument, which in our case is a pattern string `/path/to/project/lib/**/*.rb`. It returns an array of all matching file names, which in this case will be all Ruby files contained in the `lib` directory and all of its subdirectories.
 
-Finally, when given a block `Dir.glob`, will execute that block for each file matching the pattern. In our case, we pass in a block to `require` the file. When this code runs, all Ruby files in the project's `lib` directory will be available in memory.
+Finally, when given a block, `Dir.glob` will execute that block for each file matching the pattern. In our case, we pass in a block to `require` the file. When this code runs, all Ruby files in the project's `lib` directory will be available in memory.
 
 You don’t have to place this file in `config` or name it `environment.rb` - this is just a suggestion for organizing code. Feel free to name it and place it wherever makes sense for your project.
 
