@@ -12,7 +12,7 @@ related:
 
 I was inspired to write this after encountering a LinkedIn discussion on the topic of cover letters. The debate centered on whether it still makes sense to submit a cover letter with your application in 2025 and beyond? Many on the thread thought it was no longer necessary, and that your resume and LinkedIn profile should be sufficient to show why you're a good fit for the job. While I didn't save the link to that specific discussion, a search for "cover letter waste" on LinkedIn yields many discussions and opinions.
 
-This post will cover why I think cover letters remain valuable and offer a technique to make writing them easier and more effective, especially for techies that use markdown. Writing a custom cover letter can feel daunting, as writing isn’t often a core focus in technical education. However, strong communication is essential in many tech roles, and a well-written cover letter can make a meaningful impact.
+In this post, I'll discuss why cover letters are still valuable and share a technique to simplify and improve the writing process, particularly for techies that use markdown. Writing a custom cover letter can feel daunting, as writing isn’t often a core focus in technical education. However, strong communication is essential in many tech roles, and a well-written cover letter can make a meaningful impact.
 
 <aside class="markdown-aside">
 This is of course, anecdotal based on my experience. I don't have any hard data or industry-wide metrics to prove the usefulness of cover letters one way or the other, so your mileage may vary.
@@ -20,7 +20,7 @@ This is of course, anecdotal based on my experience. I don't have any hard data 
 
 ## What is a Cover Letter?
 
-Before getting into it, let's briefly define what a cover letter is. It's a document sent with your resume to provide additional information about your skills and experience. It typically highlights specific achievements and experiences that make you suitable for the *particular* job you're applying to.
+Before getting into it, let's briefly define what a cover letter is. It's a document sent, along with your resume to provide additional information about your skills and experience. It typically highlights specific achievements and experiences that make you suitable for the *particular* job you're applying to.
 
 The screenshot below is from an ATS (Applicant Tracking System) asking to upload both a resume and cover letter in pdf format. In this case, a cover letter is required, although other systems may mark it as optional:
 
