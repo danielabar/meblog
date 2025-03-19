@@ -2,7 +2,7 @@
 title: "Cover Letter Writing for Nerds"
 featuredImage: "../images/cover-letter-matthew-henry-n5vuEc86Zg8-unsplash.jpg"
 description: "Learn how to write effective, customized cover letters for tech job applications using markdown and a markdown to PDF converter for VSCode."
-date: "2025-03-15"
+date: "2025-03-19"
 category: "career"
 related:
   - "About Those Docs"
@@ -147,7 +147,7 @@ Once you’ve written your cover letter in markdown, it’s time to export it to
 4. Select `Markdown PDF: Export (pdf)`.
 5. Wait a few seconds, and your PDF will be generated in your configured output directory.
 
-Here’s an example of my settings in `~/Library/Application Support/Code/User/settings.json`. The extension is supposed to download Chromium if an `executablePath` isn't provided but that didn't work for me so I had to specify the path to Chrome:
+Here are my settings. The extension is supposed to download Chromium if an `executablePath` isn't provided but that didn't work for me so I had to specify the path to Chrome:
 
 ```json
 {
@@ -170,7 +170,7 @@ This means if you're working on a document named `jsmith-cover-letter-acme-corp.
 }
 ```
 
-Here's an example of what the pdf will look like, any links in the content will be clickable.
+Here's an example of what the pdf will look like, any links in the content will be clickable. Notice the block quotes from the job description are styled:
 
 ![cover letter example](../images/cover-letter-example.png "cover letter example")
 
