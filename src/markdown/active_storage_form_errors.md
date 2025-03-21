@@ -133,6 +133,8 @@ Here's the form filled in with valid values and an attachment selected for the r
 
 ![active storage new expense report filled](../images/active-storage-new-expense-report-filled.png "active storage new expense report filled")
 
+TODO: Explain that's the native file picker as a result of `file_field` form helper, clicking "Choose File" launches a file selection dialog on the user's computer.
+
 Submitting the form will pause on the `debugger` breakpoint in the `ExpenseReportsController#create` method, just after the model has been successfully saved. You should see something like the following in the terminal where the Rails server was started:
 
 ![active storage debug create success](../images/active-storage-debug-create-success.png "active storage debug create success")
@@ -167,7 +169,7 @@ TODO: Also explain attached? and persisted?
 continue
 ```
 
-Since the `@expense_report` model was saved successfully, the controller redirects to the show view for this expense report. The show view has a link to edit, which navigates to http://localhost:3000/expense_reports/1/edit. This renders the shared form partial `app/views/expense_reports/_form.html.erb`, which now renders a download link for the receipt we just attached:
+Since the `@expense_report` model was saved successfully, the controller redirects to the show view for this expense report. The show view has a link to edit, which navigates to `http://localhost:3000/expense_reports/1/edit`. This renders the shared form partial `app/views/expense_reports/_form.html.erb`, which now renders a download link for the receipt we just attached:
 
 ![active storage edit expense report](../images/active-storage-edit-expense-report.png "active storage edit expense report")
 
@@ -184,7 +186,7 @@ Recall we modified the form partial earlier to show the download link if one is 
 ```
 
 If you right-click on the download link and select "Copy Link Address", it looks like this - notice the part just before the file name is the same value as what was returned from the `signed_id` method earlier in our debug session:
-http://localhost:3000/rails/active_storage/blobs/redirect/eyJfcmFpbHMiOnsiZGF0YSI6MSwicHVyIjoiYmxvYl9pZCJ9fQ==--42eb19d188a21278e0c6add2449a511283e28afe/receipt-1.pdf
+`http://localhost:3000/rails/active_storage/blobs/redirect/eyJfcmFpbHMiOnsiZGF0YSI6MSwicHVyIjoiYmxvYl9pZCJ9fQ==--42eb19d188a21278e0c6add2449a511283e28afe/receipt-1.pdf`
 
 Now let's start a database session with `bin/rails db` and see what got saved in the active storage database tables:
 
