@@ -391,6 +391,7 @@ Then get into solution parts...
 * aside when debugging: use `bin/rails s` rather than `bin/dev` - reason?
 * better definition of `blob`
 * explanation of `signed_id` when showing right-click -> copy link address on file download link
+* aside in direct uploads section for purging unattached blobs which could happen if user abandons the form after validation error: https://guides.rubyonrails.org/v7.2/active_storage_overview.html#purging-unattached-uploads
 * replace `UI` with user interface or form or view or something like that
 * bonus section about sqlite and pretty format, default query output is hard to read, solution:
 ```bash
