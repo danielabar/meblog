@@ -362,9 +362,9 @@ Caused by: ArgumentError (Cannot get a signed_id for a new record)
 
 Information for: ActionView::Template::Error (Cannot get a signed_id for a new record):
     40:     <% if expense_report.receipt.attached? %>
-    41:       <div class="mt-2">
-    42:         <strong class="block font-medium mb-1">Current Receipt:</strong>
-    43:         <%= link_to expense_report.receipt.filename, expense_report.receipt, class: "text-gray-700 underline hover:no-underline" %>
+    41:       <div>
+    42:         <strong>Current Receipt:</strong>
+    43:         <%= link_to expense_report.receipt.filename, expense_report.receipt %>
     44:       </div>
     45:     <% end %>
     46:   </div>
@@ -372,9 +372,64 @@ Information for: ActionView::Template::Error (Cannot get a signed_id for a new r
 app/views/expense_reports/_form.html.erb:43
 ```
 
-Next up: Explain this is due to additional code in form partial that attempts to show user their attachment if it exists. But as shown earlier in debug session `expense_report.receipt.attached?` returns true, even if file not persisted. And the `link_to` helper invokes the `signed_id` method on the blob, as we saw earlier in debug session, this raises an error when invoked on a new (i.e. unpersisted) blob.
+We saw in the debug session that `expense_report.receipt.attached?` is truthy, even though the attachment didn't actually get associated to the model. This means the view code will attempt to generate a download link `<%= link_to expense_report.receipt.filename, expense_report.receipt %>`. But in order to do this, it needs a `signed_id` for the file, which isn't available because the file isn't actually uploaded or associated with the model.
 
-Then get into solution parts...
+The next sections will walk through how to solve this.
+
+## 1. Check Persisted
+
+The most immediate problem to be solved is to not render the 500 Server Error page, so at the very least, the user can continue to interact with the form. From our earlier debug session, we saw that while `expense_report.receipt.attached?` returned true when an attachment had been attempted but the form had not been saved, `expense_report.receipt.persisted?` returned false.
+
+Let's switch the portion of the form partial that attempts to render a download link to the receipt to check for `persisted?` rather than `attached?`:
+
+```erb
+<%= form_with(model: expense_report, class: "contents") do |form| %>
+  <!-- form fields... -->
+
+  <!-- Receipt Attachment -->
+  <div>
+    <%= form.label :receipt %>
+    <%= form.file_field :receipt %>
+
+    <%# Display to user their current attachment if there is one %>
+    <%# === CHANGE CHECK TO PERSISTED HERE === %>
+    <% if expense_report.receipt.persisted? %>
+      <div>
+        <strong>Current Receipt:</strong>
+        <%= link_to expense_report.receipt.filename, expense_report.receipt %>
+      </div>
+    <% end %>
+  </div>
+
+  <!-- submit -->
+<% end %>
+```
+
+Now we can again try to create a new expense report, with a receipt, and blank description. This time when the form is submitted, it will render in an error state, showing that the Description must be provided, i.e. classic Rails CRUD behavior. And it will not attempt to render a download link to the receipt because there isn't one:
+
+![active storage new expense report upload lost](../images/active-storage-new-expense-report-upload-lost.png "active storage new expense report upload lost")
+
+But this exposes a new problem - the user's upload has been lost. This is unlike the other form fields that Rails was able to remember what user previously filled in (amount and incurred_on date). In order to proceed, the user needs to fill in the Description field *and* select the receipt from their file system again. It would be nice if we could remember the file they were trying to upload, just like all the other form fields that were remembered.
+
+## 2. Direct Upload
+
+This leads us to the next part of the solution. By default when using Active Storage, all the activity, including uploading the file to the storage service, and writing the corresponding records in the active storage tables is initiated in a single request from user submitting the form.
+
+However, there is an alternative approach which is to enable [Direct Uploads](https://guides.rubyonrails.org/active_storage_overview.html#direct-uploads). In this case, when a form with an attachment is submitted, client side JavaScript will be used to upload the file to the storage service. It will also write the corresponding record in the `active_storage_blobs` table for this file.
+
+TODO: Confusing wording
+TODO: Add something about 2 of the 3 things that need to be in place are done by Direct Upload, even if form validation has failed.
+
+This means that even if the model doesn't get saved due to a validation error, the file upload will have completed successfully. Although it won't be associated with the model (i.e. there won't be any new record in `active_storage_attachments`), this means the `signed_id` is available. This means it can be submitted as a hidden field in the form, and the next time the user submits the form successfully (i.e. fixes their validation errors), then Rails will be able to associate the attachment with the model, without the user having to select it from their file system again.
+
+Next up:
+* Explain since direct upload is a javascript feature, enabling it depends on what build system/asset pipeline etc you're using. Link to two doc sources (details in `expense_tracker/docs/notes.md`)
+* Show how I did it on Rails 8.0.2 with propshaft and importmaps
+* Demo submitting form with upload and validation error
+  * this time debug session try ot call signed_id - it works!
+  * also notice new file in storage and `active_storage_blobs`
+* Now we're in a good position because we have the signed_id
+* Lead to part 3 of solution to submit hidden field signed_id when attached but not persisted (which means user attempted an upload but it didn't get associated to the model because model save had validation errors)
 
 ## TODO
 * WIP main content
@@ -391,6 +446,7 @@ Then get into solution parts...
 * aside when debugging: use `bin/rails s` rather than `bin/dev` - reason?
 * better definition of `blob`
 * explanation of `signed_id` when showing right-click -> copy link address on file download link
+* aside in direct uploads section - good practice in any case to avoid slow clients typing up a puma thread
 * aside in direct uploads section for purging unattached blobs which could happen if user abandons the form after validation error: https://guides.rubyonrails.org/v7.2/active_storage_overview.html#purging-unattached-uploads
 * replace `UI` with user interface or form or view or something like that
 * bonus section about sqlite and pretty format, default query output is hard to read, solution:
