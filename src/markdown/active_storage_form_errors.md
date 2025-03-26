@@ -180,7 +180,7 @@ Recall we modified the form partial earlier to show the download link if one is 
 <% if expense_report.receipt.attached? %>
   <div class="mt-2">
     <strong class="block font-medium mb-1">Current Receipt:</strong>
-    <%= link_to expense_report.receipt.filename, expense_report.receipt, class: "text-gray-700 underline hover:no-underline" %>
+    <%= link_to expense_report.receipt.filename, expense_report.receipt %>
   </div>
 <% end %>
 ```
@@ -383,7 +383,7 @@ The most immediate problem to be solved is to not render the 500 Server Error pa
 Let's switch the portion of the form partial that attempts to render a download link to the receipt to check for `persisted?` rather than `attached?`:
 
 ```erb
-<%= form_with(model: expense_report, class: "contents") do |form| %>
+<%= form_with(model: expense_report) do |form| %>
   <!-- form fields... -->
 
   <!-- Receipt Attachment -->
@@ -435,7 +435,7 @@ Instructions for other setups can be found in the [Rails Guide on Active Storage
 With that in place, we can specify `direct_upload: true` when using the `file_field` helper in the form partial:
 
 ```erb
-<%= form_with(model: expense_report, class: "contents") do |form| %>
+<%= form_with(model: expense_report) do |form| %>
   <!-- form fields... -->
 
   <!-- Receipt Attachment -->
@@ -551,7 +551,7 @@ However, we only want to submit this hidden field in the case where `attached?` 
 To implement this logic, add the following to the form partial:
 
 ```erb
-<%= form_with(model: expense_report, class: "contents") do |form| %>
+<%= form_with(model: expense_report) do |form| %>
   <!-- other fields... -->
 
   <%= form.label :receipt %>
@@ -585,13 +585,119 @@ As far as the user is concerned, the file upload still looks "lost" because the 
 
 We'll address the user display in the next step. But for now, if we update the description field with some value and submit the form again, it will be saved successfully, including associating to the file the user previously uploaded:
 
-Next up:
-* Reset system so there's only the one original expense report, then show success on second report after fixing validation error.
-* Show how things look in db
-* Show how things look in file storage
-* Lead into UX issue and next part to improve that
+![active storage expense report saved with attachment after fix validation error](../images/active-storage-expense-report-saved-with-attachment-after-fix-validation-error.png "active storage expense report saved with attachment after fix validation error")
+
+Checking in the database shows that the second expense report was saved (because we fixed the validation error), and it used the hidden `signed_id` field to associate the expense report with the `receipt-2.pdf` attachment user previously uploaded:
+
+```
+select * from active_storage_attachments;
+id  name     record_type    record_id  blob_id  created_at
+--  -------  -------------  ---------  -------  --------------------------
+1   receipt  ExpenseReport  1          1        2025-03-21 12:46:13.604834
+2   receipt  ExpenseReport  2          2        2025-03-21 12:50:14.151515
+
+-- Earlier we saw that active_storage_blob with id of 2 is for receipt-2.pdf
+```
+
+At this point, we have the ability to hold on to a user's previously uploaded file and ensure it gets saved on the next successful form submission. But there's a UX issue - the native file picker displays as if no file is selected. This would confuse the user into thinking they need to select it again. The next section will cover how to solve this.
 
 ## 4. Custom File Input
+
+The problem we need to solve now is that the form shows "No file chosen" beside the "Choose File" button, even when we do actually have the user's previous upload saved.
+
+![active storage native file input no file chosen](../images/active-storage-native-file-input-no-file-chosen.png "active storage native file input no file chosen")
+
+Earlier in a debug session, we saw that we do have access to the filename via the `@expense_report` model, even if it the model itself wasn't saved due to the validation error:
+
+```ruby
+# === FILE NAME IS POPULATED ===
+@expense_report.receipt.blob
+#<ActiveStorage::Blob:0x000000016341c800
+#  id: 2,
+#  key: "8gxcs3hkovtiapbmrjx0f32ejqhy",
+#  filename: "receipt-2.pdf",
+#  content_type: "application/pdf",
+# ...
+```
+
+It would be nice if we could programmatically set the file selector's value in the form, since it's available via `@expense_report.receipt.blob.filename`. However, this won't work, because this is the native file picker.
+
+Earlier when using the scaffold generator, we passed `receipt:attachment` as one of the model fields. Since we told Rails that receipt is an attachment, it used the [file_field](https://api.rubyonrails.org/classes/ActionView/Helpers/FormBuilder.html#method-i-file_field) helper method inside of the [form_with](https://api.rubyonrails.org/classes/ActionView/Helpers/FormHelper.html#method-i-form_with) block in the form partial to generate an input for choosing a file:
+
+```erb
+<%= form_with(model: expense_report) do |form| %>
+  <!-- other fields... -->
+
+  <%= form.label :receipt %>
+  <%= form.file_field :receipt, direct_upload: true %>
+
+  <!-- submit -->
+<% end %>
+```
+
+This renders markup as follows:
+
+```htm
+<form enctype="multipart/form-data" action="/expense_reports" method="post">
+  <!-- other fields... -->
+
+  <label for="expense_report_receipt">Receipt</label>
+  <input type="file" name="expense_report[receipt]" id="expense_report_receipt">
+
+  <!-- submit -->
+</form>
+```
+
+`<input type="file"...>` is the browser native file picker. The MDN docs: https://developer.mozilla.org/en-US/docs/Web/HTML/Element/input/file have details on how it works. For our purposes, the important points to understand are:
+
+* The file input type has a `value` attribute which defaults to an empty string.
+* When `value` is empty, then "No file chosen" is displayed in the browser.
+* After user has selected a file, the `value` attribute of the input is populated with the file name, and then the input updates to display the file name in the browser.
+* The file information is also available in a `files` attribute which is a `FileList`.
+* The `value` cannot be set programmatically to anything other than an empty string. It also has no effect when populated in the markup.
+
+For example, trying to do something like this in JavaScript throws an exception:
+
+```javascript
+const input = document.querySelector("input[type=file]");
+input.value = "receipt-2.pdf"
+
+// Uncaught InvalidStateError:
+//  Failed to set the 'value' property on 'HTMLInputElement':
+//    This input element accepts a filename, which may only be
+//    programmatically set to the empty string.
+```
+
+If user clicks the Choose File button and selects a file from their file system, then the input is populated as follows:
+
+```javascript
+// Use the UI to select a file, then run in Console tab of browser dev tools:
+const input = document.querySelector("input[type=file]");
+
+// Value always preceded with `fakepath` rather than actual file system path for security
+input.value
+//  'C:\\fakepath\\receipt-2.pdf'
+
+// FileList is array-like object with a single entry for file user just selected
+input.files
+// FileList {0: File, length: 1}
+
+// That FileList expanded looks something like this:
+{
+  0: File {
+    name: "receipt-2.pdf",
+    type: "application/pdf",
+  },
+  length: 1
+}
+```
+
+This means that we'll have to hide the native file input (although keep it functional), and instead display a custom button and label to control the file name display. The button click will delegate to the native file input to perform the file selection. Then the display requirements are as follows:
+
+1. If user clicks the custom "Choose file" button and selects a file from their file system, then display the selected file name (i.e. same as native behaviour).
+2. If the form renders with an attached, but not persisted receipt, then display the filename from the model: `expense_report.receipt.blob.filename`.
+
+Next up: Explain we need JavaScript for this, will use Stimulus (ref to official docs and my previous post). Explain solution from demo project re: `app/javascript/controllers/file_upload_controller.js` and changes required to `app/views/expense_reports/_form.html.erb` to setup `targets` and populate `values`.
 
 ## TODO
 * WIP main content
