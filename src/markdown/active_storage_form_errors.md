@@ -251,7 +251,7 @@ Going through this happy path has demonstrated that in order for an Active Stora
 2. New record inserted in database table `active_storage_blobs` with the `key` matching the file name uploaded to storage.
 3. New record inserted in database table `active_storage_attachments` that associated the model (which also got saved in the database) to the blob, which represents the file.
 
-## Model Validation Errors
+## Validation Errors
 
 Now that we understand what Active Storage does in the success case, it's time to look at what happens when things go wrong. Specifically, what happens when the form is submitted with an attachment, but with one or more validation errors in the other form fields?
 
@@ -692,12 +692,86 @@ input.files
 }
 ```
 
-This means that we'll have to hide the native file input (although keep it functional), and instead display a custom button and label to control the file name display. The button click will delegate to the native file input to perform the file selection. Then the display requirements are as follows:
+This means that we'll have to hide the native file input (although keep it functional), and instead display a custom button and label to control the file name display. The button click will delegate to the native file input to perform the file selection. The display requirements are as follows:
 
-1. If user clicks the custom "Choose file" button and selects a file from their file system, then display the selected file name (i.e. same as native behaviour).
-2. If the form renders with an attached, but not persisted receipt, then display the filename from the model: `expense_report.receipt.blob.filename`.
+1. If user has not selected a file, then display "No file chosen".
+2. If user clicks the custom "Choose file" button and selects a file from their file system, then display the selected file name (i.e. same as native behaviour).
+3. If the form renders with an attached, but not persisted receipt, then display the filename from the model: `expense_report.receipt.blob.filename`.
 
-Next up: Explain we need JavaScript for this, will use Stimulus (ref to official docs and my previous post). Explain solution from demo project re: `app/javascript/controllers/file_upload_controller.js` and changes required to `app/views/expense_reports/_form.html.erb` to setup `targets` and populate `values`.
+Let's modify the form partial for the additional markup needed:
+
+```erb
+<%= form_with(model: expense_report, class: "contents") do |form| %>
+  <!-- other fields... -->
+
+  <!-- receipt attachment-->
+  <%= form.label :receipt %>
+
+  <!-- logic we added earlier to preserve file if necessary -->
+  <% if expense_report.receipt.attached? && !expense_report.receipt.persisted? %>
+    <%= form.hidden_field :receipt, value: expense_report.receipt.signed_id %>
+  <% end %>
+
+  <!-- wrapper div for native file input and custom controls -->
+  <div class="relative w-full">
+
+    <!-- hide the native file input from display with css -->
+    <!-- make it take up full width of container so it receives clicks -->
+    <%= form.file_field :receipt,
+          direct_upload: true,
+          class: "opacity-0 absolute w-full" %>
+
+    <!-- add a placeholder div to display "No file chosen" or selected file -->
+    <div>
+      <!-- will be filled in by JavaScript -->
+    </div>
+
+    <!-- button to display instead of hidden file input -->
+    <button type="button">Choose File</button>
+  </div>
+
+  <!-- submit -->
+<% end %>
+```
+
+**Explanation:**
+
+* The native file picker is still present in the DOM but hidden from display with css
+* A placeholder div has been added to display the file picker selection (which can "No file chosen" or filename user has selected or has saved from previous form submission with validation errors). This isn't functional at the moment, we'll get there soon.
+* A button has been added with text "Choose File" to mimic the native file picker.
+* A wrapper div is introduced with some css to allow the native file input to take up the full width of the container - this means even though it's hidden, it will receive the click event when the custom button is clicked.
+
+At this point, the form looks like this:
+
+![active storage markup for custom file input](../images/active-storage-markup-for-custom-file-input.png "active storage markup for custom file input")
+
+Clicking the custom "Choose File" button launches the system file selector because it's rendered on top of the hidden native file input. However, the custom div to display either "No file chosen" or the selected filename isn't functional yet. That's where we'll need some JavaScript.
+
+As of Rails 7 and beyond, the recommended way to work with JavaScript is with [Stimulus](https://stimulus.hotwired.dev/handbook/introduction). Stimulus is a minimal JavaScript framework for enhancing server-rendered pages with client-side interactivity.
+
+To get started, run the following command to generate a new Stimulus controller. We'll name it "file_upload" since that's the functionality needed:
+
+```bash
+bin/rails generate stimulus file_upload
+```
+
+This generates the following JavaScript file:
+
+```javascript
+// app/javascript/controllers/file_upload_controller.js
+import { Controller } from "@hotwired/stimulus"
+
+// Connects to data-controller="file-upload"
+export default class extends Controller {
+  connect() {
+  }
+}
+```
+
+The client-side interactivity we need to implement is:
+
+Next up: How to break down the code in stimulus controller step by step or show it all?
+
 
 ## TODO
 * WIP main content
@@ -711,13 +785,14 @@ Next up: Explain we need JavaScript for this, will use Stimulus (ref to official
 * link to scaffold generator for those unfamiliar - very useful to quickly get end to end functionality for a given model, try to find official rails guides/docs on this.
 * aside: using tailwindcss but have removed classes from erb snippets to focus on attachment issue
 * aside: debug gem included by default in Rails projects (or you can add it if don't already have it), reference: https://guides.rubyonrails.org/debugging_rails_applications.html#debugging-with-the-debug-gem
-* aside when debugging: use `bin/rails s` rather than `bin/dev` - reason?
+* aside when debugging: use `bin/rails s` rather than `bin/dev` - reason? Procfile, debug port?
 * better definition of `blob`
 * explanation of `signed_id` when showing right-click -> copy link address on file download link
 * better definition of what direct upload does?
 * maybe show the ajax requests when direct upload is enabled and form is submitted
 * aside in direct uploads section - good practice in any case to avoid slow clients typing up a puma thread
 * aside in direct uploads section for purging unattached blobs which could happen if user abandons the form after validation error: https://guides.rubyonrails.org/v7.2/active_storage_overview.html#purging-unattached-uploads
+* aside: beyond scope of this post to go in depth on stimulus, if not familiar, see my previous post on stimulus - link...
 * replace `UI` with user interface or form or view or something like that
 * fix erb comments - consistency
 * bonus section about sqlite and pretty format, default query output is hard to read, solution:
