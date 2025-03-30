@@ -745,11 +745,9 @@ At this point, the form looks like this:
 
 ![active storage markup for custom file input](../images/active-storage-markup-for-custom-file-input.png "active storage markup for custom file input")
 
-Clicking the custom "Choose File" button launches the system file selector because it's rendered on top of the hidden native file input. However, the custom div to display either "No file chosen" or the selected filename isn't functional yet. That's where we'll need some JavaScript.
+Clicking the custom "Choose File" button launches the system file selector because it's rendered on top of the hidden native file input. However, the custom div to display either "No file chosen" or the selected filename isn't functional yet. And if the form is submitted with a validation error, that custom div isn't showing the file name user previously selected.
 
-As of Rails 7 and beyond, the recommended way to work with JavaScript is with [Stimulus](https://stimulus.hotwired.dev/handbook/introduction). Stimulus is a minimal JavaScript framework for enhancing server-rendered pages with client-side interactivity.
-
-To get started, run the following command to generate a new Stimulus controller. We'll name it "file_upload" since that's the functionality needed:
+To make the custom file input functional, we'll need to add some JavaScript. [Stimulus](https://stimulus.hotwired.dev/handbook/introduction) is a minimal JavaScript framework integrated into Rails that helps enhance server-rendered pages. To get started, run the following command to generate a new Stimulus controller:
 
 ```bash
 bin/rails generate stimulus file_upload
@@ -768,10 +766,95 @@ export default class extends Controller {
 }
 ```
 
-The client-side interactivity we need to implement is:
+Then update it to add the following code, explanation to follow:
 
-Next up: How to break down the code in stimulus controller step by step or show it all?
+```javascript
+import { Controller } from "@hotwired/stimulus";
 
+// Connects to: data-controller="file-upload"
+export default class extends Controller {
+  static targets = ["input", "fileNameContainer"];
+
+  static values = {
+    fileSelectionText: { type: String, default: "No file chosen" },
+  };
+
+  connect() {
+    this.updateFileName();
+  }
+
+  updateFileName() {
+    this.fileNameContainerTarget.textContent = this.fileSelectionTextValue;
+  }
+
+  // When user selects a new file, update the display based on the native file input selection
+  handleNewFileSelection() {
+    if (this.inputTarget.files.length > 0) {
+      this.fileNameContainerTarget.textContent = this.inputTarget.files[0].name;
+    } else {
+      this.updateFileName(); // Reset display if no file selected
+    }
+  }
+}
+```
+
+Here are the corresponding changes to the form partial, adding in data-dash attributes to connect it to the Stimulus controller:
+
+```erb
+<%= form_with(model: expense_report, class: "contents") do |form| %>
+  <!-- other fields... -->
+
+  <%# If a file is attached but not persisted, it means user submitted the form with a selected file but also had validation error(s) %>
+  <%# If that's the case, we update the custom file input label with the file name from the model so user realizes we still have their file %>
+  <div class="my-5"
+      data-controller="file-upload"
+      data-file-upload-file-selection-text-value="<%= expense_report.receipt.attached? && !expense_report.receipt.persisted? ? expense_report.receipt.blob.filename : "No file chosen" %>">
+    <%= form.label :receipt %>
+
+    <%# If the receipt is attached but not persisted it means user previously attempted to upload but encountered form validation errors %>
+    <%# Let's hang on to that id for them in a hidden field so file will be persisted on next successful form submission %>
+    <%# This works to reference signed_id because of enabling Active Storage Direct Uploads, the blob is there in the database and in the file system %>
+    <% if expense_report.receipt.attached? && !expense_report.receipt.persisted? %>
+      <%= form.hidden_field :receipt, value: expense_report.receipt.signed_id %>
+    <% end %>
+
+    <div >
+      <%# Native file input (hidden but still functional) %>
+      <%= form.file_field :receipt, direct_upload: true,
+            data: { file_upload_target: "input", action: "change->file-upload#handleNewFileSelection" },
+            class: "absolute w-full opacity-0" %>
+
+      <%# Custom file input selector that will render on top of the hidden native file input %>
+      <%# This allows us to target it with JavaScript to pre-populate a file name if user previously selected one %>
+      <%# and then submitted the form with validation errors %>
+      <div data-file-upload-target="fileNameContainer">
+        <%# Label population is handled by JavaScript: app/javascript/controllers/file_upload_controller.js  %>
+      </div>
+      <button type="button" data-file-upload-target="button">
+        Choose File
+      </button>
+    </div>
+
+    <%# Display to user their current attachment if there is one %>
+    <% if expense_report.receipt.persisted? %>
+      <div>
+        <strong>Current Receipt:</strong>
+        <%= link_to expense_report.receipt.filename, expense_report.receipt %>
+      </div>
+    <% end %>
+  </div>
+
+  <!-- submit -->
+<% end %>
+```
+
+**Explanation:**
+
+1. **File Name Display:** When the form is first rendered, we show "No file chosen" if no file is selected, or the name of the file that was previously selected.
+2. **User Selection:** When the user selects a file using the hidden file input (triggered by clicking the custom "Choose File" button), the controller will update the display to show the selected file’s name.
+3. **Handling Validation Errors:** If the form is re-rendered due to validation errors (e.g., the form failed to save), the controller will display the previously uploaded file’s name (from the model), or "No file chosen" if there was no file selected.
+
+We accomplish this by using **Stimulus targets** to reference the parts of the page that need to be updated and **Stimulus values** to store the default text for the file name ("No file chosen"). When the user selects a file, we update the displayed file name accordingly.
 
 ## TODO
 * WIP main content
