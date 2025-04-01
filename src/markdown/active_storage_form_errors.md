@@ -678,7 +678,8 @@ const input = document.querySelector("input[type=file]");
 input.value
 //  'C:\\fakepath\\receipt-2.pdf'
 
-// FileList is array-like object with a single entry for file user just selected
+// FileList is array-like object with a single entry
+// containing the file user just selected
 input.files
 // FileList {0: File, length: 1}
 
@@ -737,7 +738,7 @@ Let's modify the form partial for the additional markup needed:
 **Explanation:**
 
 * The native file picker is still present in the DOM but hidden from display with css
-* A placeholder div has been added to display the file picker selection (which can "No file chosen" or filename user has selected or has saved from previous form submission with validation errors). This isn't functional at the moment, we'll get there soon.
+* A placeholder div has been added to display the file picker selection ("No file chosen" or filename user has selected or has saved from previous form submission with validation errors). This isn't functional at the moment, we'll get there soon.
 * A button has been added with text "Choose File" to mimic the native file picker.
 * A wrapper div is introduced with some css to allow the native file input to take up the full width of the container - this means even though it's hidden, it will receive the click event when the custom button is clicked.
 
@@ -747,7 +748,7 @@ At this point, the form looks like this:
 
 Clicking the custom "Choose File" button launches the system file selector because it's rendered on top of the hidden native file input. However, the custom div to display either "No file chosen" or the selected filename isn't functional yet. And if the form is submitted with a validation error, that custom div isn't showing the file name user previously selected.
 
-To make the custom file input functional, we'll need to add some JavaScript. [Stimulus](https://stimulus.hotwired.dev/handbook/introduction) is a minimal JavaScript framework integrated into Rails that helps enhance server-rendered pages. To get started, run the following command to generate a new Stimulus controller:
+To make the custom file input functional, we'll need to add some JavaScript. [Stimulus](https://stimulus.hotwired.dev/handbook/introduction) is a minimal JavaScript framework that works with Rails that to enhance server-rendered pages. To get started, run the following command to generate a new Stimulus controller:
 
 ```bash
 bin/rails generate stimulus file_upload
@@ -766,15 +767,21 @@ export default class extends Controller {
 }
 ```
 
-Then update it to add the following code, explanation to follow:
+Then update it as follows:
 
 ```javascript
 import { Controller } from "@hotwired/stimulus";
 
 // Connects to: data-controller="file-upload"
 export default class extends Controller {
+  // Targets are the DOM elements that this controller will interact with
+  // `input` is the native file input so we can inspect it's `files` property
+  // `fileNameContainer` is the custom div to display a previously selected file name
   static targets = ["input", "fileNameContainer"];
 
+  // Values are inputs the DOM can provide to the controller.
+  // `fileSelectionText` will have the file name of a previously selected file
+  // or if it's not provided, we'll use a default of "No file chosen".
   static values = {
     fileSelectionText: { type: String, default: "No file chosen" },
   };
@@ -783,6 +790,7 @@ export default class extends Controller {
     this.updateFileName();
   }
 
+  // Updates the custom div with a file name or "No file chosen"
   updateFileName() {
     this.fileNameContainerTarget.textContent = this.fileSelectionTextValue;
   }
@@ -798,7 +806,7 @@ export default class extends Controller {
 }
 ```
 
-Here are the corresponding changes to the form partial, adding in data-dash attributes to connect it to the Stimulus controller:
+To make use of the Stimulus controller, the form partial is enhanced with data-dash attributes to connect the targets and values:
 
 ```erb
 <%= form_with(model: expense_report, class: "contents") do |form| %>
@@ -820,6 +828,7 @@ Here are the corresponding changes to the form partial, adding in data-dash attr
 
     <div >
       <%# Native file input (hidden but still functional) %>
+      <%# Register a click handler so the custom display can function the same as the native %>
       <%= form.file_field :receipt, direct_upload: true,
             data: { file_upload_target: "input", action: "change->file-upload#handleNewFileSelection" },
             class: "absolute w-full opacity-0" %>
@@ -848,13 +857,13 @@ Here are the corresponding changes to the form partial, adding in data-dash attr
 <% end %>
 ```
 
-**Explanation:**
+Now if we try to submit a new expense report with an attachment and form validation errors, the form will re-render with the validation errors *and* the file name is preserved!
 
-1. **File Name Display:** When the form is first rendered, we show "No file chosen" if no file is selected, or the name of the file that was previously selected.
-2. **User Selection:** When the user selects a file using the hidden file input (triggered by clicking the custom "Choose File" button), the controller will update the display to show the selected file’s name.
-3. **Handling Validation Errors:** If the form is re-rendered due to validation errors (e.g., the form failed to save), the controller will display the previously uploaded file’s name (from the model), or "No file chosen" if there was no file selected.
+![active storage new expense report validation error and remembers filename](../images/active-storage-new-expense-report-validation-error-and-remembers-filename.png "active storage new expense report validation error and remembers filename")
 
-We accomplish this by using **Stimulus targets** to reference the parts of the page that need to be updated and **Stimulus values** to store the default text for the file name ("No file chosen"). When the user selects a file, we update the displayed file name accordingly.
+## 5. Reusable File Field Partial
+
+Next up: problem is solved, but had to add a lot of code in the form partial, and what happens if we have another attachment in the same or other models in the project. Will get messy to keep adding all that code, plus duplication. Let's refactor to extract a file field partial for re-usability. Walk through refactor, then add another document such as `approval` to expense report.
 
 ## TODO
 * WIP main content
