@@ -863,10 +863,119 @@ Now if we try to submit a new expense report with an attachment and form validat
 
 ## 5. Reusable File Field Partial
 
-Next up: problem is solved, but had to add a lot of code in the form partial, and what happens if we have another attachment in the same or other models in the project. Will get messy to keep adding all that code, plus duplication. Let's refactor to extract a file field partial for re-usability. Walk through refactor, then add another document such as `approval` to expense report.
+Now that our file attachment persists through validation errors, the problem is technically solved, but at the cost of a lot of extra code in the form partial. If we need to support additional attachments, whether in the same model or elsewhere in the project, this approach quickly becomes repetitive and hard to maintain. Instead of duplicating the same logic across multiple forms, let’s refactor by extracting a reusable file field partial. This will clean up our form, make our code more maintainable, and simplify adding new attachments.
+
+For example, suppose submitting an expense report also requires attaching an approval document to prove that the user was previously approved for this kind of expense. The model is updated:
+
+```ruby
+class ExpenseReport < ApplicationRecord
+  has_one_attached :receipt
+
+  # === ADD ANOTHER ATTACHMENT HERE ===
+  has_one_attached :approval_document
+
+  # ...
+end
+```
+
+The server side controller is updated to permit this additional parameter:
+
+```ruby
+class ExpenseReportsController < ApplicationController
+  # ...
+
+  private
+
+  def expense_report_params
+    params.expect(expense_report: [
+      :amount,
+      :description,
+      :incurred_on,
+      :receipt,
+      # === ADD APPROVAL DOCUMENT TO LIST OF ALLOWED PARAMS ===
+      :approval_document
+    ])
+  end
+end
+```
+
+Now we introduce a new partial `app/views/shared/_file_field.html.erb` to handle the display of any attachment, including displaying the file name from the previous selection if necessary. It uses [strict locals](https://api.rubyonrails.org/classes/ActionView/Template.html#method-i-strict_locals-21) to ensure it's provided with a form builder, a model instance, and an attachment attribute. It still makes use of the Stimulus controller via the data-dash attribute `data-controller="file-upload"`:
+
+```erb
+<%# locals: (form:, object:, attribute:) %>
+
+<%#
+  Render a file input field with enhanced behavior using Stimulus.
+  Ensure that selected files persist across form validation errors,
+  preventing users from having to reselect them.
+
+  Locals:
+  - form: The form builder object, used to generate form fields.
+  - object: The model instance being edited, providing access to attached files.
+  - attribute: The attribute representing the file attachment (e.g., :receipt, :approval_document).
+%>
+
+<div data-controller="file-upload"
+    data-file-upload-file-selection-text-value="<%= object.send(attribute).attached? && !object.send(attribute).persisted? ? object.send(attribute).blob.filename : "No file chosen" %>">
+
+  <%= form.label attribute %>
+
+  <% if object.send(attribute).attached? && !object.send(attribute).persisted? %>
+    <%= form.hidden_field attribute, value: object.send(attribute).signed_id %>
+  <% end %>
+
+  <div>
+    <%# Hidden (but still functional) native file input %>
+    <%= form.file_field attribute, direct_upload: true,
+          data: { file_upload_target: "input", action: "change->file-upload#handleNewFileSelection" },
+          class: "absolute inset-0 w-full opacity-0 cursor-pointer" %>
+
+    <%# Custom file name display - populated by Stimulus controller %>
+    <div data-file-upload-target="fileNameContainer"></div>
+
+    <%# Custom button to select a file %>
+    <button type="button" data-file-upload-target="button" >
+      Choose File
+    </button>
+  </div>
+
+  <%# Only display download link if file is actually associated with the model %>
+  <% if object.send(attribute).persisted? %>
+    <div>
+      <strong>Current <%= attribute.to_s.humanize %>:</strong>
+      <%= link_to object.send(attribute).filename, object.send(attribute) %>
+    </div>
+  <% end %>
+</div>
+```
+
+Finally, we can add the new approval attachment in the form `app/views/expense_reports/_form.html.erb`, and replace the existing receipt attachment, using the new file field partial:
+
+```erb
+<%= form_with(model: expense_report, class: "contents") do |form| %>
+  <%# Other fields... %>
+
+  <%# Use file_field partial for attachment fields %>
+  <%= render "shared/file_field", form: form, object: expense_report, attribute: :receipt %>
+  <%= render "shared/file_field", form: form, object: expense_report, attribute: :approval_document %>
+
+  <%# Submit %>
+<% end %>
+```
+
+Now the form looks like this with the two attachments, suppose user has selected both their receipt and approval document, but again forgets to fill in the description:
+
+![active storage new expense report with approval doc](../images/active-storage-new-expense-report-with-approval-doc.png "active storage new expense report with approval doc")
+
+With no additional effort on our part, both attachment names are preserved when the form is submitted, and rendered with validation errors:
+
+![active storage file field partial](../images/active-storage-file-field-partial.png "active storage file field partial")
+
+## Summary
+
+In this post, we've learned how to provide a nicer user experience when using Active Storage fields within a new or edit form. We've covered...
 
 ## TODO
-* WIP main content
 * conclusion para
 * edit
 * verify all links
