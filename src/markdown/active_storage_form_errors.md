@@ -12,9 +12,11 @@ related:
 
 Rails' Active Storage is a powerful, built-in solution for handling file uploads, providing integration with cloud storage and automatic attachment management. It works out of the box, making it easy to associate files with models. However, when a form includes an attachment and validation errors occur, the uploaded file is lost when the form re-renders to display the validation errors, forcing users to select their file again.
 
-This happens because Active Storage only associates a file with a model after a successful save. If the model fails validation, the attachment is not persisted, and the file selection is lost.
+This happens because [Active Storage](https://guides.rubyonrails.org/active_storage_overview.html) only associates a file with a model after a successful save. If the model fails validation, the attachment is not persisted, and the file selection is lost.
 
-This post will provide a step-by-step solution using direct uploads, hidden signed IDs, and a better file input with Stimulus. By the end, you'll have a robust way to ensure users never lose their file uploads due to form validation errors.
+This post will provide a step-by-step solution using direct uploads, hidden signed IDs, and a better file input with Stimulus. By the end, you'll have a robust way to ensure users don't lose their file uploads due to form validation errors. The complete working solution is also available on [GitHub](https://github.com/danielabar/expense_tracker).
+
+This post assumes familiarity with Rails concepts like models, views, controllers, and database migrations.
 
 ## Demo Project Setup
 
@@ -34,9 +36,11 @@ bin/rails active_storage:install
 bin/rails db:migrate
 ```
 
-The Active Storage installation generates a database migration to create two tables: `active_storage_blobs` to store information about the uploaded file, and `active_storage_attachments`, which associates the blob to a model.
+The Active Storage installation generates a database migration to create two tables: `active_storage_blobs` to store information about the uploaded file, and `active_storage_attachments`, which associates the blob to a model. This can be any model in your application, which is accomplished via [polymorphic association](https://guides.rubyonrails.org/association_basics.html#polymorphic-associations) under the hood.
 
-TODO ASIDE: This can be any model in your application, which is accomplished via polymorphic association. Reference.
+<aside class="markdown-aside">
+By default, in development mode, Active Storage uses the local file system, storing files in the `storage` directory in the project root. In production, you'll need to configure a cloud storage service like AWS S3, Azure, Cloudflare R2, etc. The <a class="markdown-link" href="https://guides.rubyonrails.org/active_storage_overview.html#setup">Active Storage Setup</a> guide has details on how to do this.
+</aside>
 
 Now we can use the `scaffold` generator to generate a migration, model, controller, views, and route definitions for the `ExpenseReport` model, which has a dollar amount, description, date on which the expense was incurred, and a receipt, which is an attachment:
 
@@ -120,6 +124,10 @@ class ExpenseReportsController < ApplicationController
   # ...
 end
 ```
+
+<aside class="markdown-aside">
+In a real-world application, authentication and authorization would be necessary to ensure users can only view and modify their own expense reports. However, this post focuses solely on Active Storage and file persistence, so auth concerns are omitted for simplicity.
+</aside>
 
 ## Happy Path
 
@@ -979,10 +987,6 @@ In this post, we've learned how to provide a nicer user experience when using Ac
 * conclusion para
 * edit
 * verify all links
-* aside/assumption: reader knows what active storage is, link to guides, also reader is familiar with rails concepts such as database migrations, models, views, and controllers
-* link to demo repo on GitHub
-* active storage config: by default, development uses the local file system which will be at `storage` dir in project root (contents are gitignored), for production and other deployed environments, would configure a service such as AWS S3 or Cloudflare R2
-* aside: a real application would have user authentication to ensure each user only has access to their own expense reports
 * link to scaffold generator for those unfamiliar - very useful to quickly get end to end functionality for a given model, try to find official rails guides/docs on this.
 * aside: using tailwindcss but have removed classes from erb snippets to focus on attachment issue
 * aside: debug gem included by default in Rails projects (or you can add it if don't already have it), reference: https://guides.rubyonrails.org/debugging_rails_applications.html#debugging-with-the-debug-gem
