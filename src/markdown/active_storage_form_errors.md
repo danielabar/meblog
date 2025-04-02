@@ -10,9 +10,7 @@ related:
   - "Some Elegance with Rails Caching"
 ---
 
-Rails' Active Storage is a powerful, built-in solution for handling file uploads, providing integration with cloud storage and automatic attachment management. It works out of the box, making it easy to associate files with models. However, when a form includes an attachment and validation errors occur, the uploaded file is lost when the form re-renders to display the validation errors, forcing users to select their file again.
-
-This happens because [Active Storage](https://guides.rubyonrails.org/active_storage_overview.html) only associates a file with a model after a successful save. If the model fails validation, the attachment is not persisted, and the file selection is lost.
+Rails' Active Storage is a powerful, built-in solution for handling file uploads, providing integration with cloud storage and automatic attachment management. It works out of the box, making it easy to associate files with models. However, when a form includes an attachment and validation errors occur, the uploaded file is lost when the form re-renders to display the validation errors, forcing users to select their file again. This happens because [Active Storage](https://guides.rubyonrails.org/active_storage_overview.html) only associates a file with a model after a successful save. If the model fails validation, the attachment is not persisted, and the file selection is lost.
 
 This post will provide a step-by-step solution using direct uploads, hidden signed IDs, and a better file input with Stimulus. By the end, you'll have a robust way to ensure users don't lose their file uploads due to form validation errors. The complete working solution is also available on [GitHub](https://github.com/danielabar/expense_tracker).
 
@@ -253,7 +251,7 @@ storage
 
 That leaf entry `6081val5vwpz691v8ukv8tc4zma0` is the actual pdf file. Notice that the file name matches the `key` stored in `active_storage_blobs` table. It's also the `key` value we saw when inspecting `@expense_report.receipt.blob` earlier in the debug session.
 
-Going through this happy path has demonstrated that in order for an Active Storage attachment to be saved successfully, the following three things must be true:
+Going through this happy path has demonstrated that in order for an Active Storage attachment to be saved and associated to a model, the following must be true:
 
 1. File uploaded to storage service (locally, this is the `storage` directory in the project root).
 2. New record inserted in database table `active_storage_blobs` with the `key` matching the file name uploaded to storage.
@@ -263,7 +261,7 @@ Going through this happy path has demonstrated that in order for an Active Stora
 
 Now that we understand what Active Storage does in the success case, it's time to look at what happens when things go wrong. Specifically, what happens when the form is submitted with an attachment, but with one or more validation errors in the other form fields?
 
-For this demo, the `debugger` statement is moved to the `else` clause in the `ExpenseController#create` method, so we can inspect what the receipt blob looks like when the model failed validation:
+For this demo, the `debugger` statement is moved to the `else` clause in the `ExpenseController#create` method, so we can inspect what the receipt blob looks like when the model fails to be saved:
 
 ```ruby
 class ExpenseReportsController < ApplicationController
@@ -380,7 +378,7 @@ Information for: ActionView::Template::Error (Cannot get a signed_id for a new r
 app/views/expense_reports/_form.html.erb:43
 ```
 
-We saw in the debug session that `expense_report.receipt.attached?` is truthy, even though the attachment didn't actually get associated to the model. This means the view code will attempt to generate a download link `<%= link_to expense_report.receipt.filename, expense_report.receipt %>`. But in order to do this, it needs a `signed_id` for the file, which isn't available because the file isn't actually uploaded or associated with the model.
+We saw in the debug session that `expense_report.receipt.attached?` is truthy, even though the attachment didn't actually get associated to the model. This means the view code will attempt to generate a download link `<%= link_to expense_report.receipt.filename, expense_report.receipt %>`. But in order to do this, it needs a `signed_id` for the file, which isn't available because the file hasn't been uploaded to storage and is not associated to the model.
 
 The next sections will walk through how to solve this.
 
@@ -425,7 +423,7 @@ This leads us to the next part of the solution. By default when using Active Sto
 
 However, an alternative approach is to enable [Direct Uploads](https://guides.rubyonrails.org/active_storage_overview.html#direct-uploads). In this case, when a form with an attachment is submitted, client side JavaScript will be used to upload the file to the storage service. It will also write the corresponding record in the `active_storage_blobs` table for this file.
 
-Since Direct Uploads is a JavaScript feature, the steps to enable it depend on what build system your project is using. The demo project is using Rails 8 with Propshaft and Importmaps so the steps are to add an entry to the import maps and initialize Active Storage in the application's JavaScript:
+Since Direct Uploads is a JavaScript feature, the steps to enable it depend on what front-end build system your project is using. The demo project is using Rails 8 with Propshaft and Importmaps so the steps are to add an entry to the import maps and initialize Active Storage in the application's JavaScript:
 
 ```ruby
 # config/importmap.rb
@@ -546,9 +544,9 @@ Recall earlier when walking through the Happy Path, we learned that three things
 2. New record inserted in database table `active_storage_blobs` with the `key` matching the file name uploaded to storage.
 3. New record inserted in database table `active_storage_attachments` that associated the model (which also got saved in the database) to the blob, which represents the file.
 
-By enabling Direct Uploads, the first two of these have completed, even when the model couldn't be saved due to validation errors, this is progress!
+By enabling Direct Uploads, the first two of these have completed, even when the model couldn't be saved due to validation errors. This is progress 🎉
 
-Back in the UI, it still displays the same error message as before wrt missing Description, and the user still needs to select their file again, but now we're in a good position to resolve this. This is described in the next step.
+Back in the UI, it still displays the same validation error message as before about missing Description, and the user still needs to select their file again, but now we're in a good position to resolve this. This is described in the next step.
 
 ## 3. Hidden Signed ID
 
@@ -814,7 +812,9 @@ export default class extends Controller {
 }
 ```
 
-To make use of the Stimulus controller, the form partial is enhanced with data-dash attributes to connect the targets and values:
+To make use of the Stimulus controller, add the following data-dash attributes to connect the markup to the Stimulus targets and values:
+
+TODO: Comments/highlight what was modified
 
 ```erb
 <%= form_with(model: expense_report, class: "contents") do |form| %>
