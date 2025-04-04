@@ -139,15 +139,13 @@ Here's the form filled in with valid values and an attachment selected for the r
 
 ![active storage new expense report filled](../images/active-storage-new-expense-report-filled.png "active storage new expense report filled")
 
-TODO: Explain that's the native file picker as a result of `file_field` form helper, clicking "Choose File" launches a file selection dialog on the user's computer.
-
 Submitting the form will pause on the `debugger` breakpoint in the `ExpenseReportsController#create` method, just after the model has been successfully saved. You should see something like the following in the terminal where the Rails server was started:
 
 ![active storage debug create success](../images/active-storage-debug-create-success.png "active storage debug create success")
 
 In the debug session, we can inspect the `blob` which is the file details associated with the expense report `receipt` attachment. Notice it has `id`, `key`, and `filename` attributes. Also notice we can invoke the `signed_id` method on it (you'll see why this is important shortly):
 
-TODO: Also explain attached? and persisted?
+We can also check whether the `receipt`, which is an instance of [ActiveStorage::Attached::One](https://api.rubyonrails.org/classes/ActiveStorage/Attached/One.html), is `attached?` and `persisted?`. That latter method comes from [ActiveRecord::Persistence](https://api.rubyonrails.org/classes/ActiveRecord/Persistence.html):
 
 ```ruby
 @expense_report.receipt.blob
@@ -169,7 +167,7 @@ TODO: Also explain attached? and persisted?
 # true
 
 @expense_report.receipt.persisted?
-# false
+# true
 
 # let the request continue to get out of debug session
 continue
@@ -191,7 +189,7 @@ Recall we modified the form partial earlier to show the download link if one is 
 <% end %>
 ```
 
-If you right-click on the download link and select "Copy Link Address", it looks like this - notice the part just before the file name is the same value as what was returned from the `signed_id` method earlier in our debug session:
+If you right-click on the download link and select "Copy Link Address", it looks like this - notice the part just before the file name `eyJFcm...`, is the same value that was returned from the `signed_id` method earlier in our debug session:
 `http://localhost:3000/rails/active_storage/blobs/redirect/eyJfcmFpbHMiOnsiZGF0YSI6MSwicHVyIjoiYmxvYl9pZCJ9fQ==--42eb19d188a21278e0c6add2449a511283e28afe/receipt-1.pdf`
 
 Now let's start a database session with `bin/rails db` and see what got saved in the active storage database tables:
@@ -289,9 +287,7 @@ Since the `ExpenseReport` model requires the description field to be filled in, 
 
 Once again submitting the form will launch us into a debug session, but this time, `@expense_report.save` returned `false` due to a validation error (because `description` is required, but was not provided).
 
-TODO: Move this to **Observations:** section just after the debug output (and do the same with previous debug session)
-
-This time we can see that there is a blob with a `key` in memory, and it has a reference to the `filename` the user uploaded. However it's not persisted - notice the `id` and `created_at` attributes are `nil`. Also notice if we try to invoke the `signed_id` method on the blob, an error is raised that it's not possible to have a signed_id on a new record. We'll see why this is important shortly when observing what happens in the UI.
+Now the debug session shows that there is a blob with a `key` in memory, and it has a reference to the `filename` the user uploaded. However it's not persisted - notice the `id` and `created_at` attributes are `nil`. Also notice if we try to invoke the `signed_id` method on the blob, an error is raised that it's not possible to have a signed_id on a new record. We'll see why this is important shortly when observing what happens in the UI.
 
 Another interesting observation is that `@expense_report.receipt.attached?` returns `true` even though the blob isn't actually persisted. So this just means that the user is attempting to attach a file.
 
@@ -345,7 +341,7 @@ id  name     record_type    record_id  blob_id  created_at
 1   receipt  ExpenseReport  1          1        2025-03-21 12:46:13.604834
 ```
 
-We can also check the `storage` directory in the project root and observe that there are no new files uploaded, even though the user did attempt to upload a new file `receipt-2.pdf`:
+We can also check the `storage` directory in the project root and observe that there are no new files uploaded, even though the user did attempt to upload a new file `receipt-2.pdf`. The only file is listed is from the previous happy path, which was `receipt-1.pdf`:
 
 ```
 tree storage -I "*.sqlite3*|*sqlite3*|*/.*" --prune
@@ -378,7 +374,7 @@ Information for: ActionView::Template::Error (Cannot get a signed_id for a new r
 app/views/expense_reports/_form.html.erb:43
 ```
 
-We saw in the debug session that `expense_report.receipt.attached?` is truthy, even though the attachment didn't actually get associated to the model. This means the view code will attempt to generate a download link `<%= link_to expense_report.receipt.filename, expense_report.receipt %>`. But in order to do this, it needs a `signed_id` for the file, which isn't available because the file hasn't been uploaded to storage and is not associated to the model.
+We saw in the debug session that `expense_report.receipt.attached?` returns `true`, even though the attachment didn't actually get associated to the model. This means the view code will attempt to generate a download link `<%= link_to expense_report.receipt.filename, expense_report.receipt %>`. But in order to do this, it needs a `signed_id` for the file, which isn't available because the file hasn't been uploaded to storage and is not associated to the model.
 
 The next sections will walk through how to solve this.
 
@@ -459,7 +455,7 @@ With that in place, we can specify `direct_upload: true` when using the `file_fi
 <% end %>
 ```
 
-After restarting the Rails server, we can once again attempt to submit an expense with `receipt2.pdf` attachment, but description field left blank:
+After restarting the Rails server, we can once again attempt to submit an expense with `receipt-2.pdf` attachment, but description field left blank:
 
 ![active storage new expense report description empty](../images/active-storage-new-expense-report-description-empty.png "active storage new expense report description empty")
 
@@ -485,7 +481,7 @@ class ExpenseReportsController < ApplicationController
 end
 ```
 
-Here we are in the debug session after submitting the form. This time when inspecting the receipt blob, there's a significant difference from before direct upload was enabled: The blob has an `id` and we can invoke the `signed_id` method on it successfully!
+Here we are in the debug session after submitting the form. This time when inspecting the receipt blob, there's a significant difference: The blob has an `id` and we can invoke the `signed_id` method on it successfully!
 
 ```ruby
 # === HAS AN ID! ===
@@ -544,7 +540,7 @@ Recall earlier when walking through the Happy Path, we learned that three things
 2. New record inserted in database table `active_storage_blobs` with the `key` matching the file name uploaded to storage.
 3. New record inserted in database table `active_storage_attachments` that associated the model (which also got saved in the database) to the blob, which represents the file.
 
-By enabling Direct Uploads, the first two of these have completed, even when the model couldn't be saved due to validation errors. This is progress 🎉
+By enabling Direct Uploads, the first two of these have completed, even when the model couldn't be saved due to validation errors. This is progress 🙏
 
 Back in the UI, it still displays the same validation error message as before about missing Description, and the user still needs to select their file again, but now we're in a good position to resolve this. This is described in the next step.
 
@@ -563,9 +559,11 @@ To implement this logic, add the following to the form partial:
   <%= form.label :receipt %>
   <%= form.file_field :receipt, direct_upload: true %>
 
-  <%# If the receipt is attached but not persisted it means user previously attempted to upload but encountered form validation errors %>
-  <%# Let's hang on to that id for them in a hidden field so file will be persisted on next successful form submission %>
-  <%# This works to reference signed_id because of enabling Active Storage Direct Uploads, the blob is there in the database and in the file system %>
+  <%# If the receipt is attached but not persisted it means user %>
+  <%# previously attempted to upload but encountered form validation errors %>
+  <%# Let's hang on to that id for them in a hidden field so file %>
+  <%# will be persisted on next successful form submission %>
+  <%# We can reference signed_id due to enabling Active Storage Direct Uploads %>
   <% if expense_report.receipt.attached? && !expense_report.receipt.persisted?%>
     <%= form.hidden_field :receipt, value: expense_report.receipt.signed_id %>
   <% end %>
@@ -814,45 +812,37 @@ export default class extends Controller {
 
 To make use of the Stimulus controller, add the following data-dash attributes to connect the markup to the Stimulus targets and values:
 
-TODO: Comments/highlight what was modified
-
 ```erb
 <%= form_with(model: expense_report, class: "contents") do |form| %>
   <!-- other fields... -->
 
-  <%# If a file is attached but not persisted, it means user submitted the form with a selected file but also had validation error(s) %>
-  <%# If that's the case, we update the custom file input label with the file name from the model so user realizes we still have their file %>
+  <%# === data-controller ON WRAPPER DIV CONNECTS TO STIMULUS CONTROLLER === %>
+  <%# === data-file-upload-file-selection-text-value PROVIDES FILE NAME DISPLAY VALUE === %>
   <div class="my-5"
       data-controller="file-upload"
       data-file-upload-file-selection-text-value="<%= expense_report.receipt.attached? && !expense_report.receipt.persisted? ? expense_report.receipt.blob.filename : "No file chosen" %>">
     <%= form.label :receipt %>
 
-    <%# If the receipt is attached but not persisted it means user previously attempted to upload but encountered form validation errors %>
-    <%# Let's hang on to that id for them in a hidden field so file will be persisted on next successful form submission %>
-    <%# This works to reference signed_id because of enabling Active Storage Direct Uploads, the blob is there in the database and in the file system %>
     <% if expense_report.receipt.attached? && !expense_report.receipt.persisted? %>
       <%= form.hidden_field :receipt, value: expense_report.receipt.signed_id %>
     <% end %>
 
     <div >
-      <%# Native file input (hidden but still functional) %>
-      <%# Register a click handler so the custom display can function the same as the native %>
+
+      <%# === data-file-upload-target PROVIDES REFERENCE TO NATIVE FILE INPUT TO STIMULUS CONTROLLER === %>
       <%= form.file_field :receipt, direct_upload: true,
             data: { file_upload_target: "input", action: "change->file-upload#handleNewFileSelection" },
             class: "absolute w-full opacity-0" %>
 
-      <%# Custom file input selector that will render on top of the hidden native file input %>
-      <%# This allows us to target it with JavaScript to pre-populate a file name if user previously selected one %>
-      <%# and then submitted the form with validation errors %>
+      <%# === data-file-upload-target PROVIDES REFERENCE TO CUSTOM LABEL TO STIMULUS CONTROLLER === %>
       <div data-file-upload-target="fileNameContainer">
-        <%# Label population is handled by JavaScript: app/javascript/controllers/file_upload_controller.js  %>
       </div>
-      <button type="button" data-file-upload-target="button">
+
+      <button type="button">
         Choose File
       </button>
     </div>
 
-    <%# Display to user their current attachment if there is one %>
     <% if expense_report.receipt.persisted? %>
       <div>
         <strong>Current Receipt:</strong>
@@ -928,6 +918,8 @@ Now we introduce a new partial `app/views/shared/_file_field.html.erb` to handle
 
   <%= form.label attribute %>
 
+  <%# Preserve previously uploaded file if it was %>
+  <%# submitted along with form validation errors %>
   <% if object.send(attribute).attached? && !object.send(attribute).persisted? %>
     <%= form.hidden_field attribute, value: object.send(attribute).signed_id %>
   <% end %>
@@ -941,7 +933,7 @@ Now we introduce a new partial `app/views/shared/_file_field.html.erb` to handle
     <%# Custom file name display - populated by Stimulus controller %>
     <div data-file-upload-target="fileNameContainer"></div>
 
-    <%# Custom button to select a file %>
+    <%# Custom button to select a file - renders on top of hidden file input %>
     <button type="button" data-file-upload-target="button" >
       Choose File
     </button>
@@ -985,8 +977,6 @@ In this post, we've learned how to provide a nicer user experience when using Ac
 
 ## TODO
 * conclusion para
-* edit
-* verify all links
 * link to scaffold generator for those unfamiliar - very useful to quickly get end to end functionality for a given model, try to find official rails guides/docs on this.
 * aside: using tailwindcss but have removed classes from erb snippets to focus on attachment issue
 * aside: debug gem included by default in Rails projects (or you can add it if don't already have it), reference: https://guides.rubyonrails.org/debugging_rails_applications.html#debugging-with-the-debug-gem
@@ -1000,6 +990,8 @@ In this post, we've learned how to provide a nicer user experience when using Ac
 * aside: beyond scope of this post to go in depth on stimulus, if not familiar, see my previous post on stimulus - link...
 * replace `UI` with user interface or form or view or something like that
 * fix erb comments - consistency
+* edit
+* verify all links
 * bonus section about sqlite and pretty format, default query output is hard to read, solution:
 ```bash
 # create sqlite config file in home directory
@@ -1012,4 +1004,32 @@ Enter the following:
 ```
 .headers on
 .mode column
+```
+
+### Brainstorming
+
+```ruby
+@expense_report.receipt.class
+ActiveStorage::Attached::One
+
+(@expense_report.receipt.methods - Object.methods).sort
+[:attach, :attached?, :attachment, :detach, :method_missing, :purge, :purge_later, :record]
+
+ls @expense_report.receipt    # outline command
+ActiveStorage::Attached#methods: name  record
+ActiveStorage::Attached::One#methods: attach  attached?  attachment  blank?  detach  method_missing  purge  purge_later
+instance variables: @name  @record
+locals: format
+
+@expense_report.receipt.attachment.class
+ActiveStorage::Attachment(id: integer, name: string, record_type: string, record_id: integer, blob_id: integer, created_at: datetime)
+
+(@expense_report.receipt.attachment.methods - Object.methods).sort
+# massive list, including `:persisted?`
+
+ls @expense_report.receipt.attachment
+# massive output, but `:persisted?` comes from:
+ActiveRecord::Persistence#methods:
+  becomes            becomes!       decrement       decrement!  delete  destroy!  destroyed?  increment  new_record?  persisted?  previously_new_record?  previously_persisted?  toggle  toggle!  update  update!  update_attribute
+  update_attribute!  update_column  update_columns
 ```
