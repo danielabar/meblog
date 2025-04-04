@@ -2,7 +2,7 @@
 title: "Reject Nested Attributes in Rails"
 featuredImage: "../images/reject-nested-attributespawel-czerwinski-rfkXGUbYnS8-unsplash.jpg"
 description: "Learn how to use Rails accepts_nested_attributes_for and reject_if options to create flexible forms that handle nested models with optional associations."
-date: "2025-04-01"
+date: "2025-04-04"
 category: "rails"
 related:
   - "They Don't All Have To Be ActiveRecord Models"
