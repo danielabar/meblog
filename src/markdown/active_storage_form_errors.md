@@ -101,6 +101,11 @@ Finally, the generated form partial `app/views/expense_reports/_form.html.erb` (
 <% end %>
 ```
 
+<aside class="markdown-aside">
+The demo code uses Tailwind CSS for styling, but most classes have been removed from the ERB snippets to keep the focus on file attachments and Active Storage behavior.
+</aside>
+
+
 When the form is submitted for a new expense report, the `create` action in the controller will run. The only change I've made to the code is to add a `debugger` breakpoint just after a successful save. This will allow us to inspect the `@expense_report` model when the model and attachment have been successfully saved so we can understand what it looks like when all goes well:
 
 ```ruby
@@ -123,6 +128,8 @@ class ExpenseReportsController < ApplicationController
 end
 ```
 
+The `debug` gem is included by default in modern Rails projects. If you’re using an older version or don’t have it installed, you can add it to your Gemfile. For more, see the [Rails Debugging Guide](https://guides.rubyonrails.org/debugging_rails_applications.html#debugging-with-the-debug-gem).
+
 <aside class="markdown-aside">
 In a real-world application, authentication and authorization would be necessary to ensure users can only view and modify their own expense reports. However, this post focuses solely on Active Storage and file persistence, so auth concerns are omitted for simplicity.
 </aside>
@@ -143,9 +150,7 @@ Submitting the form will pause on the `debugger` breakpoint in the `ExpenseRepor
 
 ![active storage debug create success](../images/active-storage-debug-create-success.png "active storage debug create success")
 
-In the debug session, we can inspect the `blob` which is the file details associated with the expense report `receipt` attachment. Notice it has `id`, `key`, and `filename` attributes. Also notice we can invoke the `signed_id` method on it (you'll see why this is important shortly):
-
-We can also check whether the `receipt`, which is an instance of [ActiveStorage::Attached::One](https://api.rubyonrails.org/classes/ActiveStorage/Attached/One.html), is `attached?` and `persisted?`. That latter method comes from [ActiveRecord::Persistence](https://api.rubyonrails.org/classes/ActiveRecord/Persistence.html):
+In the debug session, we can inspect the `blob` which is the file details associated with the expense report `receipt` attachment. Notice it has `id`, `key`, and `filename` attributes:
 
 ```ruby
 @expense_report.receipt.blob
@@ -159,10 +164,18 @@ We can also check whether the `receipt`, which is an instance of [ActiveStorage:
 #  byte_size: 7171,
 #  checksum: "PnVMB8Sc/us7Jy4wxuy07w==",
 #  created_at: "2025-03-21 12:46:13.604118000 +0000">
+```
 
+We can invoke the `signed_id` method on it. The `signed_id` is a secure identifier for a blob that can be safely passed to the client (e.g., in a form or a URL). It encodes the blob’s ID along with a cryptographic signature to prevent manipulation. This is how Active Storage allows clients to reference uploaded files:
+
+```ruby
 @expense_report.receipt.blob.signed_id
 # "eyJfcmFpbHMiOnsiZGF0YSI6MSwicHVyIjoiYmxvYl9pZCJ9fQ==--42eb19d188a21278e0c6add2449a511283e28afe"
+```
 
+We can also check whether the `receipt`, which is an instance of [ActiveStorage::Attached::One](https://api.rubyonrails.org/classes/ActiveStorage/Attached/One.html), is `attached?` and `persisted?`. That latter method comes from [ActiveRecord::Persistence](https://api.rubyonrails.org/classes/ActiveRecord/Persistence.html):
+
+```ruby
 @expense_report.receipt.attached?
 # true
 
@@ -189,8 +202,11 @@ Recall we modified the form partial earlier to show the download link if one is 
 <% end %>
 ```
 
-If you right-click on the download link and select "Copy Link Address", it looks like this - notice the part just before the file name `eyJFcm...`, is the same value that was returned from the `signed_id` method earlier in our debug session:
-`http://localhost:3000/rails/active_storage/blobs/redirect/eyJfcmFpbHMiOnsiZGF0YSI6MSwicHVyIjoiYmxvYl9pZCJ9fQ==--42eb19d188a21278e0c6add2449a511283e28afe/receipt-1.pdf`
+If you right-click on the download link and choose "Copy Link Address", you'll see a long token in the URL, starting with `eyJFcm...`. This is the `signed_id` we saw earlier in the debug session. This confirms that Active Storage uses this signed identifier to link to the correct file:
+
+```
+http://localhost:3000/rails/active_storage/blobs/redirect/eyJfcmFpbHMiOnsiZGF0YSI6MSwicHVyIjoiYmxvYl9pZCJ9fQ==--42eb19d188a21278e0c6add2449a511283e28afe/receipt-1.pdf
+```
 
 Now let's start a database session with `bin/rails db` and see what got saved in the active storage database tables:
 
@@ -415,11 +431,11 @@ But this exposes a new problem - the user's upload has been lost. This is unlike
 
 ## 2. Direct Upload
 
-This leads us to the next part of the solution. By default when using Active Storage, all the activity, including uploading the file to the storage service, and writing the corresponding records in the active storage tables is initiated in a single request from user submitting the form.
+This leads us to the next part of the solution. By default, when using Active Storage, file uploads and database record creation happen in a single request when the user submits the form. The server handles both tasks: uploading the file to the storage service (local file system for development, S3, Google Cloud, etc. for production) and creating the corresponding database record for the file in the `active_storage_blobs` table (which won't happen when the model isn't saved successfully).
 
-However, an alternative approach is to enable [Direct Uploads](https://guides.rubyonrails.org/active_storage_overview.html#direct-uploads). In this case, when a form with an attachment is submitted, client side JavaScript will be used to upload the file to the storage service. It will also write the corresponding record in the `active_storage_blobs` table for this file.
+However, an alternative approach is to enable [Direct Uploads](https://guides.rubyonrails.org/active_storage_overview.html#direct-uploads). With direct uploads, client-side JavaScript will first make a request to upload the file to the storage service, and once the upload is complete, it will send a request to the Rails server to create the corresponding record in the `active_storage_blobs` table. This happens separately from submitting the form to create the expense report. Having separate requests for file upload vs form submission provides flexibility to save the file, *regardless* of the expense report being saved successfully or not.
 
-Since Direct Uploads is a JavaScript feature, the steps to enable it depend on what front-end build system your project is using. The demo project is using Rails 8 with Propshaft and Importmaps so the steps are to add an entry to the import maps and initialize Active Storage in the application's JavaScript:
+Since Direct Uploads is a JavaScript feature, the steps to enable it depend on what front-end build system your project is using. The demo project is using Rails 8 with Propshaft and import maps so the steps are to add an entry to the import maps and initialize Active Storage in the application's JavaScript:
 
 ```ruby
 # config/importmap.rb
@@ -533,10 +549,17 @@ storage
         └── 8gxcs3hkovtiapbmrjx0f32ejqhy
 ```
 
+If you want to see even more details of how this happened, keep the Network tab of your browser Developer Tools open while submitting the form. There will be three requests as follows:
+
+![active storage direct upload network requests](../images/active-storage-direct-upload-network-requests.png "active storage direct upload network requests")
+
+* **Direct Upload Request:** The first request (`/rails/active_storage/direct_uploads`) is made from the client-side JavaScript to the Rails server to initiate the upload. This request contains metadata about the file (like its name, content type, checksum, etc.). The Rails server then responds with an upload URL (e.g., for a storage service like S3 or local storage) and a `signed_id` to track the file.
+*  **File Upload to Storage:** The second request (`/rails/active_storage/disk/...`) is a PUT request that uploads the file (e.g., `receipt-1.pdf`) to the storage service, using the URL provided in the first request. The client sends the file's binary data in the body of this request.
+* **Form Submission:** The third request is a regular form submission to create the `ExpenseReport` (e.g., `POST /expense_reports`).
 
 Recall earlier when walking through the Happy Path, we learned that three things need to be true for an attachment to be successfully saved:
 
-1. File uploaded to storage service (locally, this is the `storage` directory in the project root).
+1. File uploaded to storage service.
 2. New record inserted in database table `active_storage_blobs` with the `key` matching the file name uploaded to storage.
 3. New record inserted in database table `active_storage_attachments` that associated the model (which also got saved in the database) to the blob, which represents the file.
 
@@ -986,14 +1009,6 @@ In this post, we explored how Rails' Active Storage handles file attachments, an
 With these techniques, you now have a robust, user-friendly way to preserve file uploads through validation cycles, bringing Active Storage in line with the rest of Rails' form behavior.
 
 ## TODO
-* link to scaffold generator for those unfamiliar - very useful to quickly get end to end functionality for a given model, try to find official rails guides/docs on this.
-* aside: using tailwindcss but have removed classes from erb snippets to focus on attachment issue
-* aside: debug gem included by default in Rails projects (or you can add it if don't already have it), reference: https://guides.rubyonrails.org/debugging_rails_applications.html#debugging-with-the-debug-gem
-* aside when debugging: use `bin/rails s` rather than `bin/dev` - reason? Procfile, debug port?
-* better definition of `blob`
-* explanation of `signed_id` when showing right-click -> copy link address on file download link
-* better definition of what direct upload does?
-* maybe show the ajax requests when direct upload is enabled and form is submitted
 * aside in direct uploads section - good practice in any case to avoid slow clients typing up a puma thread
 * aside in direct uploads section for purging unattached blobs which could happen if user abandons the form after validation error: https://guides.rubyonrails.org/v7.2/active_storage_overview.html#purging-unattached-uploads
 * aside: beyond scope of this post to go in depth on stimulus, if not familiar, see my previous post on stimulus - link...
