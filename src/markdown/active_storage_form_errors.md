@@ -897,7 +897,7 @@ class ExpenseReportsController < ApplicationController
 end
 ```
 
-Now we introduce a new partial `app/views/shared/_file_field.html.erb` to handle the display of any attachment, including displaying the file name from the previous selection if necessary. It uses [strict locals](https://api.rubyonrails.org/classes/ActionView/Template.html#method-i-strict_locals-21) to ensure it's provided with a form builder, a model instance, and an attachment attribute. It still makes use of the Stimulus controller via the data-dash attribute `data-controller="file-upload"`:
+Now we introduce a new partial `app/views/shared/_file_field.html.erb` to handle the display of any attachment, including displaying the file name from the previous selection if necessary. It uses [strict locals](https://api.rubyonrails.org/classes/ActionView/Template.html#method-i-strict_locals-21) to ensure it's provided with a form builder, a model instance, and an attachment attribute. It still makes use of the Stimulus controller via the data-dash attributes:
 
 ```erb
 <%# locals: (form:, object:, attribute:) %>
@@ -973,10 +973,19 @@ With no additional effort on our part, both attachment names are preserved when 
 
 ## Summary
 
-In this post, we've learned how to provide a nicer user experience when using Active Storage fields within a new or edit form. We've covered...
+In this post, we explored how Rails' Active Storage handles file attachments, and what goes wrong when a form submission fails validation. Along the way, we:
+
+- **Learned that Active Storage only attaches files after a successful save**, which means uploaded files can be lost when validations fail.
+- **Walked through the "happy path"**, demonstrating how attachments are persisted when everything goes smoothly.
+- **Used the debugger to inspect attachment state in memory**, distinguishing between `attached?` and `persisted?`.
+- **Enabled Direct Uploads**, allowing files to be uploaded and blob records via client-side JavaScript, in parallel as the form is submitted, making it possible to preserve uploads through validation errors.
+- **Used the signed ID of the blob** to reattach the uploaded file via a hidden field on subsequent submissions.
+- **Built a custom file input using Stimulus**, giving users visual feedback about their selected file, even when the native file picker resets.
+- **Created a reusable partial for file inputs** that combines the hidden field and Stimulus enhancements, making it easy to apply this pattern across an application.
+
+With these techniques, you now have a robust, user-friendly way to preserve file uploads through validation cycles, bringing Active Storage in line with the rest of Rails' form behavior.
 
 ## TODO
-* conclusion para
 * link to scaffold generator for those unfamiliar - very useful to quickly get end to end functionality for a given model, try to find official rails guides/docs on this.
 * aside: using tailwindcss but have removed classes from erb snippets to focus on attachment issue
 * aside: debug gem included by default in Rails projects (or you can add it if don't already have it), reference: https://guides.rubyonrails.org/debugging_rails_applications.html#debugging-with-the-debug-gem
