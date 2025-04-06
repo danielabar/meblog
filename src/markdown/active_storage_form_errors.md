@@ -252,10 +252,10 @@ local:
 # other cloud storage providers...
 ```
 
-Since we're running locally, the uploaded files can be found in the `storage` directory in the project root. When using sqlite3, Rails also happens to store the development and test databases in this directory. To view only the active storage contents, we can use [tree](https://formulae.brew.sh/formula/tree#default) and filter out the database files:
+Since we're running locally, the uploaded files can be found in the `storage` directory in the project root:
 
 ```
-tree storage -I "*.sqlite3*|*sqlite3*|*/.*" --prune
+tree storag
 
 storage
 └── 60
@@ -303,7 +303,7 @@ Since the `ExpenseReport` model requires the description field to be filled in, 
 
 Once again submitting the form will launch us into a debug session, but this time, `@expense_report.save` returned `false` due to a validation error (because `description` is required, but was not provided).
 
-Now the debug session shows that there is a blob with a `key` in memory, and it has a reference to the `filename` the user uploaded. However it's not persisted - notice the `id` and `created_at` attributes are `nil`. Also notice if we try to invoke the `signed_id` method on the blob, an error is raised that it's not possible to have a signed_id on a new record. We'll see why this is important shortly when observing what happens in the UI.
+Now the debug session shows that there is a blob with a `key` in memory, and it has a reference to the `filename` the user uploaded. However it's not persisted - notice the `id` and `created_at` attributes are `nil`. Also notice if we try to invoke the `signed_id` method on the blob, an error is raised that it's not possible to have a signed_id on a new record. We'll see why this is important shortly when observing what happens on the page.
 
 Another interesting observation is that `@expense_report.receipt.attached?` returns `true` even though the blob isn't actually persisted. So this just means that the user is attempting to attach a file.
 
@@ -334,7 +334,7 @@ Another interesting observation is that `@expense_report.receipt.attached?` retu
 continue
 ```
 
-Before turning our attention to what happens in the UI, let's launch another database session `bin/rails db` and observe that there are no new entries in the active storage tables:
+Before turning our attention to what happens on the page, let's launch another database session `bin/rails db` and observe that there are no new entries in the active storage tables:
 
 ```
 # No new blobs - this is the previous happy path
@@ -357,10 +357,7 @@ id  name     record_type    record_id  blob_id  created_at
 1   receipt  ExpenseReport  1          1        2025-03-21 12:46:13.604834
 ```
 
-We can also check the `storage` directory in the project root and observe that there are no new files uploaded, even though the user did attempt to upload a new file `receipt-2.pdf`. The only file is listed is from the previous happy path, which was `receipt-1.pdf`:
-
-```
-tree storage -I "*.sqlite3*|*sqlite3*|*/.*" --prune
+We can also check the `storage` directory in the project root and observe that there are no new files uploaded, even though the user did attempt to upload a new file `receipt-2.pdf`. The only file is listed is from the previous happy path, which was `receip
 
 storage
 └── 60
@@ -539,7 +536,7 @@ id  key                           filename       content_type
 The `storage` directory, shows a new file with the `receipt-2.pdf` key of `8gxcs3hkovtiapbmrjx0f32ejqhy` was uploaded:
 
 ```
-tree storage -I "*.sqlite3*|*sqlite3*|*/.*" --prune
+tree storage
 storage
 ├── 60
 │   └── 81
@@ -553,11 +550,11 @@ If you want to see even more details of how this happened, keep the Network tab 
 
 ![active storage direct upload network requests](../images/active-storage-direct-upload-network-requests.png "active storage direct upload network requests")
 
-* **Direct Upload Request:** The first request (`/rails/active_storage/direct_uploads`) is made from the client-side JavaScript to the Rails server to initiate the upload. This request contains metadata about the file (like its name, content type, checksum, etc.). The Rails server then responds with an upload URL (e.g., for a storage service like S3 or local storage) and a `signed_id` to track the file.
+* **Direct Upload Request:** The first request (`/rails/active_storage/direct_uploads`) is made from the client-side JavaScript to the Rails server to initiate the upload. This request contains metadata about the file (like its name, content type, checksum, etc.). The Rails server then responds with an upload URL and a `signed_id` to track the file.
 *  **File Upload to Storage:** The second request (`/rails/active_storage/disk/...`) is a PUT request that uploads the file (e.g., `receipt-1.pdf`) to the storage service, using the URL provided in the first request. The client sends the file's binary data in the body of this request.
 * **Form Submission:** The third request is a regular form submission to create the `ExpenseReport` (e.g., `POST /expense_reports`).
 
-Recall earlier when walking through the Happy Path, we learned that three things need to be true for an attachment to be successfully saved:
+Recall earlier when walking through the [Happy Path](../active_storage_form_errors#happy-path), we learned that three things need to be true for an attachment to be successfully saved:
 
 1. File uploaded to storage service.
 2. New record inserted in database table `active_storage_blobs` with the `key` matching the file name uploaded to storage.
@@ -565,11 +562,16 @@ Recall earlier when walking through the Happy Path, we learned that three things
 
 By enabling Direct Uploads, the first two of these have completed, even when the model couldn't be saved due to validation errors. This is progress 🙏
 
-Back in the UI, it still displays the same validation error message as before about missing Description, and the user still needs to select their file again, but now we're in a good position to resolve this. This is described in the next step.
+***Quick notes on Direct Uploads:***
+
+- It's worth implementing even if you don't encounter the validation issue, since it prevent slow clients from tying up application server threads during uploads.
+- Be sure to schedule a job to [purge unattached uploads](https://guides.rubyonrails.org/active_storage_overview.html#purging-unattached-uploads), which can accumulate if users abandon the form after a validation error.
+
+Back on the page, it still displays the same validation error message as before about missing Description, and the user still needs to select their file again. Now we're in a good position to resolve this. This is described in the next step.
 
 ## 3. Hidden Signed ID
 
-After enabling Direct Uploads, we learned that the attachment blob was created and we had access to it's `signed_id`. This means that the form can be modified to submit this `signed_id` as a hidden field, and if present, Rails will associate the previously uploaded file to the ExpenseReport model upon the next successful form submission. This means the user only needs to correct their validation error (missing Description in our case), but they don't need to select the file from their file system again.
+After enabling Direct Uploads, we learned that the attachment blob was created and we had access to it's `signed_id`. This means that the form can be modified to submit this `signed_id` as a hidden field, and if present, Rails will associate the previously uploaded file to the `ExpenseReport` model upon the next successful form submission. This means the user only needs to correct their validation error (missing Description in our case), but they don't need to select the file from their file system again.
 
 However, we only want to submit this hidden field in the case where `attached?` is true (meaning there was an attempt to attach a file), but `persisted?` is false, meaning the attachment wasn't associated to the model.
 
@@ -598,12 +600,23 @@ To implement this logic, add the following to the form partial:
 Once again let's try the test case of submitting the form with an attachment, but description left blank. It will render with validation errors as expected, but this time, inspecting the DOM will show a hidden field is rendered containing the `signed_id` of the receipt upload:
 
 ```htm
-<input
-  value="eyJfcmFpbHMiOnsiZGF0YSI6MiwicHVyIjoiYmxvYl9pZCJ9fQ==--cb69cfd5043d24d8af9c289739183e40974271c6"
-  autocomplete="off"
-  type="hidden"
-  name="expense_report[receipt]"
-  id="expense_report_receipt">
+<form action="/expense_reports" method="post">
+  <!-- other fields... -->
+
+  <!-- what the user sees -->
+  <label for="expense_report_receipt">Receipt</label>
+  <input type="file" name="expense_report[receipt]" id="expense_report_receipt">
+
+  <!-- === NEW: HIDDEN FIELD WITH ATTACHMENT SIGNED_ID -->
+  <input
+    value="eyJfcmFp..."
+    autocomplete="off"
+    type="hidden"
+    name="expense_report[receipt]"
+    id="expense_report_receipt">
+
+  <!-- submit -->
+</form>
 ```
 
 As far as the user is concerned, the file upload still looks "lost" because the native file picker still displays "No file chosen". But things are different this time because we actually have a reference to the file upload via the hidden `signed_id` field:
@@ -698,7 +711,7 @@ input.value = "receipt-2.pdf"
 If user clicks the Choose File button and selects a file from their file system, then the input is populated as follows:
 
 ```javascript
-// Use the UI to select a file, then run in Console tab of browser dev tools:
+// From the browser page, select a file, then run in Console tab of browser dev tools:
 const input = document.querySelector("input[type=file]");
 
 // Value always preceded with `fakepath` rather than actual file system path for security
@@ -832,6 +845,10 @@ export default class extends Controller {
   }
 }
 ```
+
+<aside class="markdown-aside">
+It's beyond the scope of this post to go in depth on Stimulus. If you're not familiar with it, or want a refresher on concepts like targets and values, check out my earlier step-by-step guide <a class="markdown-link" href="https://danielabaron.me/blog/stimulus-copy-to-clipboard/">on building a Stimulus controller</a>.
+</aside>
 
 To make use of the Stimulus controller, add the following data-dash attributes to connect the markup to the Stimulus targets and values:
 
@@ -1009,11 +1026,6 @@ In this post, we explored how Rails' Active Storage handles file attachments, an
 With these techniques, you now have a robust, user-friendly way to preserve file uploads through validation cycles, bringing Active Storage in line with the rest of Rails' form behavior.
 
 ## TODO
-* aside in direct uploads section - good practice in any case to avoid slow clients typing up a puma thread
-* aside in direct uploads section for purging unattached blobs which could happen if user abandons the form after validation error: https://guides.rubyonrails.org/v7.2/active_storage_overview.html#purging-unattached-uploads
-* aside: beyond scope of this post to go in depth on stimulus, if not familiar, see my previous post on stimulus - link...
-* replace `UI` with user interface or form or view or something like that
-* fix erb comments - consistency
 * edit
 * verify all links
 * bonus section about sqlite and pretty format, default query output is hard to read, solution:
