@@ -255,7 +255,7 @@ local:
 Since we're running locally, the uploaded files can be found in the `storage` directory in the project root:
 
 ```
-tree storag
+tree storage
 
 storage
 └── 60
@@ -445,7 +445,7 @@ import * as ActiveStorage from "@rails/activestorage";
 ActiveStorage.start();
 ```
 
-Instructions for other setups can be found in the [Rails Guide on Active Storage](https://guides.rubyonrails.org/active_storage_overview.html#direct-uploads) and the [API Documentation](https://api.rubyonrails.org/files/activestorage/README_md.html).
+Instructions for other setups can be found in the [Rails Guide on Active Storage](https://guides.rubyonrails.org/active_storage_overview.html#direct-uploads) and [Direct upload installation](https://api.rubyonrails.org/files/activestorage/README_md.html).
 
 With that in place, we can specify `direct_upload: true` when using the `file_field` helper in the form partial:
 
@@ -1018,7 +1018,7 @@ In this post, we explored how Rails' Active Storage handles file attachments, an
 - **Learned that Active Storage only attaches files after a successful save**, which means uploaded files can be lost when validations fail.
 - **Walked through the "happy path"**, demonstrating how attachments are persisted when everything goes smoothly.
 - **Used the debugger to inspect attachment state in memory**, distinguishing between `attached?` and `persisted?`.
-- **Enabled Direct Uploads**, allowing files to be uploaded and blob records via client-side JavaScript, in parallel as the form is submitted, making it possible to preserve uploads through validation errors.
+- **Enabled Direct Uploads**, allowing files to be uploaded and blob records created via client-side JavaScript, in parallel as the form is submitted, making it possible to preserve uploads through validation errors.
 - **Used the signed ID of the blob** to reattach the uploaded file via a hidden field on subsequent submissions.
 - **Built a custom file input using Stimulus**, giving users visual feedback about their selected file, even when the native file picker resets.
 - **Created a reusable partial for file inputs** that combines the hidden field and Stimulus enhancements, making it easy to apply this pattern across an application.
@@ -1027,45 +1027,3 @@ With these techniques, you now have a robust, user-friendly way to preserve file
 
 ## TODO
 * edit
-* verify all links
-* bonus section about sqlite and pretty format, default query output is hard to read, solution:
-```bash
-# create sqlite config file in home directory
-touch ~/.sqliterc
-
-# edit it with your editor of choice, I'm using VSCode
-c ~/.sqliterc
-```
-Enter the following:
-```
-.headers on
-.mode column
-```
-
-### Brainstorming
-
-```ruby
-@expense_report.receipt.class
-ActiveStorage::Attached::One
-
-(@expense_report.receipt.methods - Object.methods).sort
-[:attach, :attached?, :attachment, :detach, :method_missing, :purge, :purge_later, :record]
-
-ls @expense_report.receipt    # outline command
-ActiveStorage::Attached#methods: name  record
-ActiveStorage::Attached::One#methods: attach  attached?  attachment  blank?  detach  method_missing  purge  purge_later
-instance variables: @name  @record
-locals: format
-
-@expense_report.receipt.attachment.class
-ActiveStorage::Attachment(id: integer, name: string, record_type: string, record_id: integer, blob_id: integer, created_at: datetime)
-
-(@expense_report.receipt.attachment.methods - Object.methods).sort
-# massive list, including `:persisted?`
-
-ls @expense_report.receipt.attachment
-# massive output, but `:persisted?` comes from:
-ActiveRecord::Persistence#methods:
-  becomes            becomes!       decrement       decrement!  delete  destroy!  destroyed?  increment  new_record?  persisted?  previously_new_record?  previously_persisted?  toggle  toggle!  update  update!  update_attribute
-  update_attribute!  update_column  update_columns
-```
