@@ -571,11 +571,13 @@ Back on the page, it still displays the same validation error message as before 
 
 ## 3. Hidden Signed ID
 
-After enabling Direct Uploads, we learned that the attachment blob was created and we had access to it's `signed_id`. This means that the form can be modified to submit this `signed_id` as a hidden field, and if present, Rails will associate the previously uploaded file to the `ExpenseReport` model upon the next successful form submission. This means the user only needs to correct their validation error (missing Description in our case), but they don't need to select the file from their file system again.
+When using Direct Uploads, the file is uploaded and a blob is created immediately, even before the form is successfully submitted. This gives us access to the blob’s `signed_id`, which we can use to re-attach the file later.
 
-However, we only want to submit this hidden field in the case where `attached?` is true (meaning there was an attempt to attach a file), but `persisted?` is false, meaning the attachment wasn't associated to the model.
+To avoid forcing the user to re-select their file after a validation error (like a missing description), we can store the `signed_id` in a hidden field. On the next successful form submission, Rails will associate the already-uploaded file with the model using this ID.
 
-To implement this logic, add the following to the form partial:
+However, we only want to render the hidden field if the file was uploaded (`attached?`) but not yet saved with the record (`persisted?`). That’s how we know the user attached something, but the form failed validation.
+
+Here’s how to implement that in the form partial:
 
 ```erb
 <%= form_with(model: expense_report) do |form| %>
@@ -584,11 +586,7 @@ To implement this logic, add the following to the form partial:
   <%= form.label :receipt %>
   <%= form.file_field :receipt, direct_upload: true %>
 
-  <%# If the receipt is attached but not persisted it means user %>
-  <%# previously attempted to upload but encountered form validation errors %>
-  <%# Let's hang on to that id for them in a hidden field so file %>
-  <%# will be persisted on next successful form submission %>
-  <%# We can reference signed_id due to enabling Active Storage Direct Uploads %>
+  <%# === ADD HIDDEN SIGNED_ID HERE === %>
   <% if expense_report.receipt.attached? && !expense_report.receipt.persisted?%>
     <%= form.hidden_field :receipt, value: expense_report.receipt.signed_id %>
   <% end %>
