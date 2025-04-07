@@ -12,13 +12,11 @@ related:
 
 Rails' Active Storage is a powerful, built-in solution for handling file uploads, providing integration with cloud storage and automatic attachment management. It works out of the box, making it easy to associate files with models. However, when a form includes an attachment and validation errors occur, the uploaded file is lost when the form re-renders to display the validation errors, forcing users to select their file again. This happens because [Active Storage](https://guides.rubyonrails.org/active_storage_overview.html) only associates a file with a model after a successful save. If the model fails validation, the attachment is not persisted, and the file selection is lost.
 
-This post will provide a step-by-step solution using direct uploads, hidden signed IDs, and a better file input with Stimulus. By the end, you'll have a robust way to ensure users don't lose their file uploads due to form validation errors. The complete working solution is also available on [GitHub](https://github.com/danielabar/expense_tracker).
-
-This post assumes familiarity with Rails concepts like models, views, controllers, and database migrations.
+This post will walk through a solution using direct uploads, hidden signed IDs, and a custom file input with Stimulus. By the end, you'll have a robust way to ensure users don't lose their file uploads due to form validation errors. The complete working solution is also available on [GitHub](https://github.com/danielabar/expense_tracker).
 
 ## Demo Project Setup
 
-To demonstrate the issue, we'll setup a new Rails project (as of this writing, I'm on Rails 8.0.2) for a simple expense tracker application. It will have one model `ExpenseReport` that users are required to fill out to get reimbursed for their expenses. The `ExpenseReport` model will have a single file attachment named `receipt` to allow user's to upload a scanned pdf or image of their expense.
+To demonstrate the issue, we'll setup a new Rails project (as of this writing, I'm on Rails 8.0.2) for a simple expense tracker application. It will have one model `ExpenseReport` that users fill out to get reimbursed for their expenses. The `ExpenseReport` model will have a single file attachment named `receipt` for users to upload evidence of their expense.
 
 The commands to get started are as follows:
 
@@ -35,10 +33,6 @@ bin/rails db:migrate
 ```
 
 The Active Storage installation generates a database migration to create two tables: `active_storage_blobs` to store information about the uploaded file, and `active_storage_attachments`, which associates the blob to a model. This can be any model in your application, which is accomplished via [polymorphic association](https://guides.rubyonrails.org/association_basics.html#polymorphic-associations) under the hood.
-
-<aside class="markdown-aside">
-By default, in development mode, Active Storage uses the local file system, storing files in the `storage` directory in the project root. In production, you'll need to configure a cloud storage service like AWS S3, Azure, Cloudflare R2, etc. The <a class="markdown-link" href="https://guides.rubyonrails.org/active_storage_overview.html#setup">Active Storage Setup</a> guide has details on how to do this.
-</aside>
 
 Now we can use the `scaffold` generator to generate a migration, model, controller, views, and route definitions for the `ExpenseReport` model, which has a dollar amount, description, date on which the expense was incurred, and a receipt, which is an attachment:
 
@@ -106,7 +100,7 @@ The demo code uses Tailwind CSS for styling, but most classes have been removed 
 </aside>
 
 
-When the form is submitted for a new expense report, the `create` action in the controller will run. The only change I've made to the code is to add a `debugger` breakpoint just after a successful save. This will allow us to inspect the `@expense_report` model when the model and attachment have been successfully saved so we can understand what it looks like when all goes well:
+When the form is submitted for a new expense report, the `create` action in the controller will run. The only change I've made to the generated code is to add a `debugger` breakpoint after a successful save. This will allow us to inspect the `@expense_report` model when the model and attachment have been successfully saved:
 
 ```ruby
 class ExpenseReportsController < ApplicationController
@@ -166,7 +160,7 @@ In the debug session, we can inspect the `blob` which is the file details associ
 #  created_at: "2025-03-21 12:46:13.604118000 +0000">
 ```
 
-We can invoke the `signed_id` method on it. The `signed_id` is a secure identifier for a blob that can be safely passed to the client (e.g., in a form or a URL). It encodes the blob’s ID along with a cryptographic signature to prevent manipulation. This is how Active Storage allows clients to reference uploaded files:
+The `signed_id` method can be called on the blob. This method returns a secure identifier that can be passed to the client. It encodes the blob’s ID along with a cryptographic signature to prevent manipulation. This is how Active Storage allows clients to reference uploaded files:
 
 ```ruby
 @expense_report.receipt.blob.signed_id
@@ -195,14 +189,14 @@ Recall we modified the form partial earlier to show the download link if one is 
 ```erb
 <!-- app/views/expense_reports/_form.html.erb -->
 <% if expense_report.receipt.attached? %>
-  <div class="mt-2">
-    <strong class="block font-medium mb-1">Current Receipt:</strong>
+  <div>
+    <strong>Current Receipt:</strong>
     <%= link_to expense_report.receipt.filename, expense_report.receipt %>
   </div>
 <% end %>
 ```
 
-If you right-click on the download link and choose "Copy Link Address", you'll see a long token in the URL, starting with `eyJFcm...`. This is the `signed_id` we saw earlier in the debug session. This confirms that Active Storage uses this signed identifier to link to the correct file:
+If you right-click on the download link and choose "Copy Link Address", you'll see a long token in the URL, starting with `eyJFcm...`. This is the `signed_id` we saw earlier in the debug session. This confirms that Active Storage uses this signed identifier to link to the file:
 
 ```
 http://localhost:3000/rails/active_storage/blobs/redirect/eyJfcmFpbHMiOnsiZGF0YSI6MSwicHVyIjoiYmxvYl9pZCJ9fQ==--42eb19d188a21278e0c6add2449a511283e28afe/receipt-1.pdf
@@ -231,7 +225,7 @@ That `id`, `key`, and `filename` in the `active_storage_blobs` table matches wha
 
 The `active_storage_attachments` associates that blob to the expense report record with id of `1`, which we can see is the expense report we just created.
 
-But where is the actual file? The answer to this can be found in `config/storage.yml`. This file automatically got created earlier when running `rails new...`:
+Where is the actual file? The answer can be found in `config/storage.yml`. This file automatically got created earlier when running `rails new...`:
 
 ```yml
 test:
@@ -251,6 +245,8 @@ local:
 
 # other cloud storage providers...
 ```
+
+In development mode, Active Storage uses the local file system, storing files in the `storage` directory in the project root. In production, you'll need to configure a cloud storage service like AWS S3, Azure, Cloudflare R2, etc. The <a class="markdown-link" href="https://guides.rubyonrails.org/active_storage_overview.html#setup">Active Storage Setup</a> guide has details on how to do this.
 
 Since we're running locally, the uploaded files can be found in the `storage` directory in the project root:
 
@@ -301,11 +297,9 @@ Since the `ExpenseReport` model requires the description field to be filled in, 
 
 ![active storage new expense report description empty](../images/active-storage-new-expense-report-description-empty.png "active storage new expense report description empty")
 
-Once again submitting the form will launch us into a debug session, but this time, `@expense_report.save` returned `false` due to a validation error (because `description` is required, but was not provided).
+Once again submitting the form will launch us into a debug session. This time, `@expense_report.save` returned `false` due to a validation error (because `description` is required, but was not provided).
 
-Now the debug session shows that there is a blob with a `key` in memory, and it has a reference to the `filename` the user uploaded. However it's not persisted - notice the `id` and `created_at` attributes are `nil`. Also notice if we try to invoke the `signed_id` method on the blob, an error is raised that it's not possible to have a signed_id on a new record. We'll see why this is important shortly when observing what happens on the page.
-
-Another interesting observation is that `@expense_report.receipt.attached?` returns `true` even though the blob isn't actually persisted. So this just means that the user is attempting to attach a file.
+The debug session shows that there is a blob with a `key` in memory, and it has a reference to the `filename` the user uploaded. However it's not persisted - notice the `id` and `created_at` attributes are `nil`:
 
 ```ruby
 @expense_report.receipt.blob
@@ -319,19 +313,24 @@ Another interesting observation is that `@expense_report.receipt.attached?` retu
  byte_size: 42223,
  checksum: "IO+1GEvBwGHnvuy0kYIpzw==",
  created_at: nil>
+```
 
+Also notice if we try to invoke the `signed_id` method on the blob, an error is raised that it's not possible to have a signed_id on a new record. We'll see why this is important shortly when observing what happens on the page.
+
+```ruby
 @expense_report.receipt.blob.signed_id
 # eval error: Cannot get a signed_id for a new record
 # nil
+```
 
+Another interesting observation is that `@expense_report.receipt.attached?` returns `true` even though the blob isn't actually persisted. So this just means that the user is attempting to attach a file. `persisted?` however returns `false`:
+
+```ruby
 @expense_report.receipt.attached?
 # true
 
 @expense_report.receipt.persisted?
 # false
-
-# let the request continue to get out of debug session
-continue
 ```
 
 Before turning our attention to what happens on the page, let's launch another database session `bin/rails db` and observe that there are no new entries in the active storage tables:
@@ -357,15 +356,18 @@ id  name     record_type    record_id  blob_id  created_at
 1   receipt  ExpenseReport  1          1        2025-03-21 12:46:13.604834
 ```
 
-We can also check the `storage` directory in the project root and observe that there are no new files uploaded, even though the user did attempt to upload a new file `receipt-2.pdf`. The only file is listed is from the previous happy path, which was `receip
+We can also check the `storage` directory in the project root and observe that there are no new files uploaded, even though the user did attempt to upload a new file `receipt-2.pdf`. The only file is listed is from the previous happy path, which was `receipt-1.pdf`
 
+```
 storage
 └── 60
     └── 81
         └── 6081val5vwpz691v8ukv8tc4zma0
 ```
 
-Normally when there is a model validation error on create, the expected result is that the new view renders the form again, displaying the validation errors. Any data the user had entered into the form fields is preserved. However, in this case, an error page is displayed:
+Now let's look at what happens on the page in the browser. Normally when there is a model validation error on `create`, the expected result is that the new view renders the form again, displaying the validation errors. Any data the user had entered into the form fields is preserved.
+
+However, in this case, an error page is displayed with error message: "Cannot get a signed_id for a new record":
 
 ![active storage new expense report error](../images/active-storage-new-expense-report-error.png "active storage new expense report error")
 
@@ -428,9 +430,9 @@ But this exposes a new problem - the user's upload has been lost. This is unlike
 
 ## 2. Direct Upload
 
-This leads us to the next part of the solution. By default, when using Active Storage, file uploads and database record creation happen in a single request when the user submits the form. The server handles both tasks: uploading the file to the storage service (local file system for development, S3, Google Cloud, etc. for production) and creating the corresponding database record for the file in the `active_storage_blobs` table (which won't happen when the model isn't saved successfully).
+This leads us to the next part of the solution. By default, when using Active Storage, file uploads and database record creation happen in a single request when the user submits the form. The server handles both tasks: uploading the file to the storage service, and creating the corresponding database record for the file in the `active_storage_blobs` table.
 
-However, an alternative approach is to enable [Direct Uploads](https://guides.rubyonrails.org/active_storage_overview.html#direct-uploads). With direct uploads, client-side JavaScript will first make a request to upload the file to the storage service, and once the upload is complete, it will send a request to the Rails server to create the corresponding record in the `active_storage_blobs` table. This happens separately from submitting the form to create the expense report. Having separate requests for file upload vs form submission provides flexibility to save the file, *regardless* of the expense report being saved successfully or not.
+An alternative approach is to enable [Direct Uploads](https://guides.rubyonrails.org/active_storage_overview.html#direct-uploads). With direct uploads, client-side JavaScript will first make a request to upload the file to the storage service, and once the upload is complete, it will send a request to the Rails server to create the corresponding record in the `active_storage_blobs` table. This happens separately from submitting the form to create the expense report. Having separate requests for file upload vs form submission provides flexibility to save the file, *regardless* of the expense report being saved successfully or not.
 
 Since Direct Uploads is a JavaScript feature, the steps to enable it depend on what front-end build system your project is using. The demo project is using Rails 8 with Propshaft and import maps so the steps are to add an entry to the import maps and initialize Active Storage in the application's JavaScript:
 
@@ -447,28 +449,24 @@ ActiveStorage.start();
 
 Instructions for other setups can be found in the [Rails Guide on Active Storage](https://guides.rubyonrails.org/active_storage_overview.html#direct-uploads) and [Direct upload installation](https://api.rubyonrails.org/files/activestorage/README_md.html).
 
-With that in place, we can specify `direct_upload: true` when using the `file_field` helper in the form partial:
+With Direct Upload enabled, we can add the `direct_upload: true` option for the `file_field` helper in the form partial:
 
 ```erb
 <%= form_with(model: expense_report) do |form| %>
-  <!-- form fields... -->
+  <!-- other fields... -->
 
-  <!-- Receipt Attachment -->
-  <div>
-    <%= form.label :receipt %>
+  <%= form.label :receipt %>
 
-    <!-- === USE DIRECT UPLOAD HERE === -->
-    <%= form.file_field :receipt, direct_upload: true %>
+  <!-- === USE DIRECT UPLOAD HERE === -->
+  <%= form.file_field :receipt, direct_upload: true %>
 
-    <%# Display to user their current attachment if there is one %>
-    ...
-  </div>
+  ...
 
   <!-- submit -->
 <% end %>
 ```
 
-After restarting the Rails server, we can once again attempt to submit an expense with `receipt-2.pdf` attachment, but description field left blank:
+After restarting the Rails server, we can once again attempt to submit an expense with `receipt-2.pdf` attachment and description field left blank:
 
 ![active storage new expense report description empty](../images/active-storage-new-expense-report-description-empty.png "active storage new expense report description empty")
 
@@ -553,6 +551,8 @@ If you want to see even more details of how this happened, keep the Network tab 
 * **Direct Upload Request:** The first request (`/rails/active_storage/direct_uploads`) is made from the client-side JavaScript to the Rails server to initiate the upload. This request contains metadata about the file (like its name, content type, checksum, etc.). The Rails server then responds with an upload URL and a `signed_id` to track the file.
 *  **File Upload to Storage:** The second request (`/rails/active_storage/disk/...`) is a PUT request that uploads the file (e.g., `receipt-1.pdf`) to the storage service, using the URL provided in the first request. The client sends the file's binary data in the body of this request.
 * **Form Submission:** The third request is a regular form submission to create the `ExpenseReport` (e.g., `POST /expense_reports`).
+
+Even though the form submission failed with a status of 422 due to the validation error, the file upload requests were able to proceed independently of the form submission.
 
 Recall earlier when walking through the [Happy Path](../active_storage_form_errors#happy-path), we learned that three things need to be true for an attachment to be successfully saved:
 
@@ -688,7 +688,7 @@ This renders markup as follows:
 </form>
 ```
 
-`<input type="file"...>` is the browser native file picker. The MDN docs: https://developer.mozilla.org/en-US/docs/Web/HTML/Element/input/file have details on how it works. For our purposes, the important points to understand are:
+`<input type="file"...>` is the browser native file picker. The MDN docs have [details on how it works](https://developer.mozilla.org/en-US/docs/Web/HTML/Element/input/file). For our purposes, the important points to understand are:
 
 * The file input type has a `value` attribute which defaults to an empty string.
 * When `value` is empty, then "No file chosen" is displayed in the browser.
@@ -847,10 +847,10 @@ export default class extends Controller {
 ```
 
 <aside class="markdown-aside">
-It's beyond the scope of this post to go in depth on Stimulus. If you're not familiar with it, or want a refresher on concepts like targets and values, check out my earlier step-by-step guide <a class="markdown-link" href="https://danielabaron.me/blog/stimulus-copy-to-clipboard/">on building a Stimulus controller</a>.
+It's beyond the scope of this post to go in depth on Stimulus. If you're not familiar with it, or want a refresher on concepts like targets and values, check out my earlier guide <a class="markdown-link" href="https://danielabaron.me/blog/stimulus-copy-to-clipboard/">on building a Stimulus controller</a>.
 </aside>
 
-To make use of the Stimulus controller, add the following data-dash attributes to connect the markup to the Stimulus targets and values:
+To make use of the Stimulus controller, we add some data-dash attributes to the form partial. These connect the markup to the Stimulus targets and values:
 
 ```erb
 <%= form_with(model: expense_report, class: "contents") do |form| %>
@@ -858,7 +858,7 @@ To make use of the Stimulus controller, add the following data-dash attributes t
 
   <%# === data-controller ON WRAPPER DIV CONNECTS TO STIMULUS CONTROLLER === %>
   <%# === data-file-upload-file-selection-text-value PROVIDES FILE NAME DISPLAY VALUE === %>
-  <div class="my-5"
+  <div
       data-controller="file-upload"
       data-file-upload-file-selection-text-value="<%= expense_report.receipt.attached? && !expense_report.receipt.persisted? ? expense_report.receipt.blob.filename : "No file chosen" %>">
     <%= form.label :receipt %>
@@ -899,9 +899,11 @@ Now if we try to submit a new expense report with an attachment and form validat
 
 ![active storage new expense report validation error and remembers filename](../images/active-storage-new-expense-report-validation-error-and-remembers-filename.png "active storage new expense report validation error and remembers filename")
 
+Now all the user has to do is correct the validation error(s) and submit the form again. And they can see that the file name they previously selected is still there.
+
 ## 5. Reusable File Field Partial
 
-Now that our file attachment persists through validation errors, the problem is technically solved, but at the cost of a lot of extra code in the form partial. If we need to support additional attachments, whether in the same model or elsewhere in the project, this approach quickly becomes repetitive and hard to maintain. Instead of duplicating the same logic across multiple forms, let’s refactor by extracting a reusable file field partial. This will clean up our form, make our code more maintainable, and simplify adding new attachments.
+While our file attachment now persists through validation errors, the solution adds a lot of boilerplate to the form. If we need to support more attachments, whether on the same model or others, this code will become hard to maintain. To avoid duplication and keep our forms clean, let’s extract a reusable file field partial.
 
 For example, suppose submitting an expense report also requires attaching an approval document to prove that the user was previously approved for this kind of expense. The model is updated:
 
@@ -1023,7 +1025,4 @@ In this post, we explored how Rails' Active Storage handles file attachments, an
 - **Built a custom file input using Stimulus**, giving users visual feedback about their selected file, even when the native file picker resets.
 - **Created a reusable partial for file inputs** that combines the hidden field and Stimulus enhancements, making it easy to apply this pattern across an application.
 
-With these techniques, you now have a robust, user-friendly way to preserve file uploads through validation cycles, bringing Active Storage in line with the rest of Rails' form behavior.
-
-## TODO
-* edit
+With these techniques, you now have a robust, user-friendly way to preserve file uploads through validation cycles.
