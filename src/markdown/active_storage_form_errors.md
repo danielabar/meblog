@@ -18,7 +18,7 @@ This post will walk through a solution using direct uploads, hidden signed IDs, 
 
 To demonstrate the issue, we'll setup a new Rails project (as of this writing, I'm on Rails 8.0.2) for a simple expense tracker application. It will have one model `ExpenseReport` that users fill out to get reimbursed for their expenses. The `ExpenseReport` model will have a single file attachment named `receipt` for users to upload evidence of their expense.
 
-The commands to get started are as follows:
+The commands to get started:
 
 ```bash
 # Create new rails application (defaults to sqlite database)
@@ -544,13 +544,17 @@ storage
         └── 8gxcs3hkovtiapbmrjx0f32ejqhy
 ```
 
-If you want to see even more details of how this happened, keep the Network tab of your browser Developer Tools open while submitting the form. There will be three requests as follows:
+If you want to see even more details of how this happened, keep the Network tab of your browser Developer Tools open while submitting the form. There will be three requests:
 
 ![active storage direct upload network requests](../images/active-storage-direct-upload-network-requests.png "active storage direct upload network requests")
 
 * **Direct Upload Request:** The first request (`/rails/active_storage/direct_uploads`) is made from the client-side JavaScript to the Rails server to initiate the upload. This request contains metadata about the file (like its name, content type, checksum, etc.). The Rails server then responds with an upload URL and a `signed_id` to track the file.
 *  **File Upload to Storage:** The second request (`/rails/active_storage/disk/...`) is a PUT request that uploads the file (e.g., `receipt-1.pdf`) to the storage service, using the URL provided in the first request. The client sends the file's binary data in the body of this request.
 * **Form Submission:** The third request is a regular form submission to create the `ExpenseReport` (e.g., `POST /expense_reports`).
+
+<aside class="markdown-aside">
+The form submission is of type `fetch` rather than `document` because <a class="markdown-link" href="https://turbo.hotwired.dev/handbook/drive">Turbo Drive</a> is enabled. This intercepts all link clicks and form submissions and turns them into background requests, which allows the page to update without a full reload.
+</aside>
 
 Even though the form submission failed with a status of 422 due to the validation error, the file upload requests were able to proceed independently of the form submission.
 
@@ -591,7 +595,7 @@ Here’s how to implement that in the form partial:
     <%= form.hidden_field :receipt, value: expense_report.receipt.signed_id %>
   <% end %>
 
-  <!-- submit. -->
+  <!-- submit -->
 <% end %>
 ```
 
@@ -673,7 +677,7 @@ Earlier when using the scaffold generator, we passed `receipt:attachment` as one
 <% end %>
 ```
 
-This renders markup as follows:
+This renders markup:
 
 ```htm
 <form enctype="multipart/form-data" action="/expense_reports" method="post">
@@ -706,7 +710,7 @@ input.value = "receipt-2.pdf"
 //    programmatically set to the empty string.
 ```
 
-If user clicks the Choose File button and selects a file from their file system, then the input is populated as follows:
+If user clicks the Choose File button and selects a file from their file system, then the input is populated:
 
 ```javascript
 // From the browser page, select a file, then run in Console tab of browser dev tools:
@@ -731,7 +735,7 @@ input.files
 }
 ```
 
-This means that we'll have to hide the native file input (although keep it functional), and instead display a custom button and label to control the file name display. The button click will delegate to the native file input to perform the file selection. The display requirements are as follows:
+This means that we'll have to hide the native file input (although keep it functional), and instead display a custom button and label to control the file name display. The button click will delegate to the native file input to perform the file selection. The display requirements are:
 
 1. If user has not selected a file, then display "No file chosen".
 2. If user clicks the custom "Choose file" button and selects a file from their file system, then display the selected file name (i.e. same as native behaviour).
@@ -805,7 +809,7 @@ export default class extends Controller {
 }
 ```
 
-Then update it as follows:
+Then update it:
 
 ```javascript
 import { Controller } from "@hotwired/stimulus";
@@ -1023,4 +1027,4 @@ In this post, we explored how Rails' Active Storage handles file attachments, an
 - **Built a custom file input using Stimulus**, giving users visual feedback about their selected file, even when the native file picker resets.
 - **Created a reusable partial for file inputs** that combines the hidden field and Stimulus enhancements, making it easy to apply this pattern across an application.
 
-With these techniques, you now have a robust, user-friendly way to preserve file uploads through validation cycles.
+With these techniques, you now have a robust, user-friendly way to preserve file uploads through validation cycles. With all that said, this took more effort than the usual "it just works" Rails experience. Maybe a future version will handle file inputs like it does other fields on validation errors. Until then, it was a good excuse to peek under the hood of Active Storage and learn how attachments are handled.
