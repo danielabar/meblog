@@ -2,7 +2,7 @@
 title: "Active Storage & Form Errors: Preventing Lost File Uploads in Rails"
 featuredImage: "../images/rails-active-storage-form-validation-errorssteve-johnson-Kr8Tc8Rugdk-unsplash.jpg"
 description: "Rails' Active Storage makes file uploads easy, but validation errors can cause attachments to be lost when forms re-render. This guide explains why and walks through a step-by-step solution using direct uploads, signed IDs, and Stimulus for an improved user experience."
-date: "2025-07-01"
+date: "2025-05-01"
 category: "rails"
 related:
   - "Understanding ActiveRecord Dependent Options"
