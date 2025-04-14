@@ -1,11 +1,11 @@
 ---
 title: "Pretty SQLite Output Persistently"
-featuredImage: "../images/pretty-sqlite-output-nipun-haldar-X1V6aogS9XY-unsplash.jpg"
+featuredImage: "../images/pretty-sqlite-output-maryn-brayfield-MaDKBVyaVOY-unsplash.jpg"
 description: "Learn how to improve SQLite's default query output for better readability in Rails 8, where SQLite is now a serious option for production apps thanks to Solid Queue, Solid Cable, and Solid Cache."
 date: "2025-06-01"
 category: "sqlite"
 related:
-  - "ActiveRecord JSON Column with MySQL and MariaDB"
+  - "SQLite Varchar Surprise"
   - "Rails Enums with MySQL or Postgres"
   - "Efficient Database Queries in Rails: A Practical Approach"
 ---
@@ -17,6 +17,10 @@ With Rails 8, SQLite has quietly grown into a serious option for production use.
 
 As developers begin using SQLite more regularly, there's a small but annoying detail: the default query output is difficult to read. This post will cover a quick solution to this problem.
 
+## Accessing the SQLite Session
+
+Before getting into improving SQLite’s query output, let’s quickly cover how to access a SQLite session. You can either use the command `sqlite3 storage/development.sqlite3` to open it directly or take advantage of the shortcut `bin/rails db`, which launches the database shell for the database configured in your `config/database.yml`. The `bin/rails db` command is especially useful for working with Rails apps, as it automatically points to the correct database file based on the yaml config file in the project.
+
 ## The Problem
 
 Here’s what a query looks like in SQLite's default mode:
@@ -24,21 +28,20 @@ Here’s what a query looks like in SQLite's default mode:
 ```
 sqlite> select id, key, filename, content_type from active_storage_blobs;
 1|6081val5vwpz691v8ukv8tc4zma0|receipt-1.pdf|application/pdf
+2|yepiy78vt33lrxw2olnzvllpw36w|receipt-2.pdf|application/pdf
+3|bkbzp8qgom9h6lpbp582fuzn8u7u|approval.pdf|application/pdf
 ```
 
-All the values are crammed together with pipes (`|`), no headers, and no alignment. Compare that to PostgreSQL’s default output, which is far more readable out of the box:
-
-TODO: Get actual example from psql
+All the values are crammed together with pipes (`|`), no headers, and no alignment. Compare that to PostgreSQL’s default output, which is more legible out of the box:
 
 ```
-myapp_development=# select id, key, filename, content_type from active_storage_blobs;
- id |             key              |    filename    |   content_type
-----+------------------------------+----------------+------------------
+ id |             key              |   filename     |  content_type
+----+------------------------------+----------------+-----------------
   1 | 6081val5vwpz691v8ukv8tc4zma0 | receipt-1.pdf  | application/pdf
-(1 row)
+  2 | yepiy78vt33lrxw2olnzvllpw36w | receipt-2.pdf  | application/pdf
+  3 | bkbzp8qgom9h6lpbp582fuzn8u7u | approval.pdf   | application/pdf
+(3 rows)
 ```
-
-For quick debugging or manual inspection, the SQLite format can be a headache.
 
 ## Temporary Fix
 
@@ -51,9 +54,15 @@ You can improve the output by typing a couple commands into the SQLite prompt:
 
 This turns on column headers and switches to a padded, readable column layout:
 
-TODO: Show improved output
+```
+id  key                           filename       content_type
+--  ----------------------------  -------------  ---------------
+1   6081val5vwpz691v8ukv8tc4zma0  receipt-1.pdf  application/pdf
+2   yepiy78vt33lrxw2olnzvllpw36w  receipt-2.pdf  application/pdf
+3   bkbzp8qgom9h6lpbp582fuzn8u7u  approval.pdf   application/pdf
+```
 
-Much better! But the moment you quit and start a new session (e.g., with `bin/rails db`), those settings are lost.
+Much better! But the moment you quit and start a new session, those settings are lost.
 
 ## Permanent Fix
 
@@ -74,21 +83,37 @@ Add the following lines:
 .mode column
 ```
 
-Now every time you open a SQLite session, including `bin/rails db`, you’ll get readable output by default:
+Now every time you open a SQLite session, the output will be formatted by default. A message is also displayed on startup confirming the custom settings file has been loaded:
 
 ```
--- Loading resources from /Users/dbaron/.sqliterc
+-- Loading resources from /Users/youruser/.sqliterc
 sqlite> select id, key, filename, content_type from active_storage_blobs;
 id  key                           filename       content_type
 --  ----------------------------  -------------  ---------------
 1   6081val5vwpz691v8ukv8tc4zma0  receipt-1.pdf  application/pdf
+2   yepiy78vt33lrxw2olnzvllpw36w  receipt-2.pdf  application/pdf
+3   bkbzp8qgom9h6lpbp582fuzn8u7u  approval.pdf   application/pdf
+```
+
+Alternatively, specifying `.mode box` (instead of `column`) will draw a box around the results, which some might find even easier to read:
+
+```
+.mode box
+select id, key, filename, content_type from active_storage_blobs;
+┌────┬──────────────────────────────┬───────────────┬─────────────────┐
+│ id │             key              │   filename    │  content_type   │
+├────┼──────────────────────────────┼───────────────┼─────────────────┤
+│ 1  │ 6081val5vwpz691v8ukv8tc4zma0 │ receipt-1.pdf │ application/pdf │
+│ 2  │ yepiy78vt33lrxw2olnzvllpw36w │ receipt-2.pdf │ application/pdf │
+│ 3  │ bkbzp8qgom9h6lpbp582fuzn8u7u │ approval.pdf  │ application/pdf │
+└────┴──────────────────────────────┴───────────────┴─────────────────┘
 ```
 
 A tiny change, but a big boost to developer ergonomics.
 
 ## Other Options
 
-According to the [SQLite CLI documentation](https://sqlite.org/cli.html), `.sqliterc` can include any valid SQLite shell command (those starting with a dot, like `.mode`, `.headers`, etc.). Here are a few other useful options you might consider:
+Here are a few other useful options you might consider:
 
 **.nullvalue**
 
@@ -98,20 +123,12 @@ Set how NULLs are displayed in results (default is empty string):
 .nullvalue NULL
 ```
 
-**.width**
+**.changes**
 
-Manually set column widths (useful if `.mode column` wraps weirdly):
-
-```
-.width 5 35 20 25
-```
-
-**.prompt**
-
-Customize the shell prompt (might help distinguish from `psql` if you use both):
+Show how many rows were affected by inserts, updates, deletes. Otherwise by default sqlite is silent about this:
 
 ```
-.prompt 'sqlite> '
+.changes on
 ```
 
 **.echo**
@@ -122,9 +139,12 @@ Echo each command before execution (handy for debugging):
 .echo on
 ```
 
-SQLite may be lightweight, but its CLI is surprisingly customizable. With just a couple of lines in a dotfile, you can make it way more comfortable to work with, especially now that it’s increasingly at home in production Rails apps.
+**.timer**
 
-## TODO
-* verify bonus options
-* explain `bin/rails db` as shortcut to get into a database shell for whatever is configured in `config/database.yml`
-* edit
+Show timing information after executing queries:
+
+```
+.timer on
+```
+
+Check out the [SQLite CLI documentation](https://sqlite.org/cli.html) for even more options. SQLite may be lightweight, but the CLI is fairly customizable. With just a couple of lines in a dotfile, you can make it more comfortable to work with, especially now that it’s increasingly at home in Rails apps.
