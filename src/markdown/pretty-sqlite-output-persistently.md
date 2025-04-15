@@ -10,7 +10,7 @@ related:
   - "Efficient Database Queries in Rails: A Practical Approach"
 ---
 
-With Rails 8, SQLite has quietly grown into a serious option for production use. A big part of this shift is Rails' move toward reducing external dependencies: no need for PostgreSQL, MySQL, or Redis just to get full-featured apps running. Thanks to the new **Solid Queue**, **Solid Cable**, and **Solid Cache** adapters, SQLite can now power jobs, caching, and WebSockets in a production-capable setup.
+With Rails 8, SQLite has quietly grown into a serious option for production use. A big part of this shift is Rails' move toward reducing external dependencies: no need for PostgreSQL, MySQL, or Redis just to get full-featured apps running. Thanks to the new Solid Queue, Solid Cable, and Solid Cache adapters, SQLite can now power jobs, caching, and WebSockets in a production-capable setup.
 
 > “Now all of it can be done with SQLite…”
 > — [Rails 8 Beta 1 Announcement](https://rubyonrails.org/2024/9/27/rails-8-beta1-no-paas-required)
@@ -19,7 +19,7 @@ As developers begin using SQLite more regularly, there's a small but annoying de
 
 ## Accessing the SQLite Session
 
-Before getting into improving SQLite’s query output, let’s quickly cover how to access a SQLite session. You can either use the command `sqlite3 storage/development.sqlite3` to open it directly or take advantage of the shortcut `bin/rails db`, which launches the database shell for the database configured in your `config/database.yml`. The `bin/rails db` command is especially useful for working with Rails apps, as it automatically points to the correct database file based on the yaml config file in the project.
+Before getting into improving SQLite’s query output, let’s quickly cover how to access a SQLite session. You can either use the command `sqlite3 storage/development.sqlite3` to open it directly, specifying the path to the database file. Or take advantage of the shortcut `bin/rails db`, which launches the database shell for the database configured in your `config/database.yml`. The `bin/rails db` command is especially useful for working with Rails apps, as it automatically points to the correct database file based on the yaml config file in the project.
 
 ## The Problem
 
@@ -45,9 +45,9 @@ All the values are crammed together with pipes (`|`), no headers, and no alignme
 
 ## Temporary Fix
 
-You can improve the output by typing a couple commands into the SQLite prompt:
+You can improve the output by typing the following commands in the SQLite shell:
 
-```sql
+```
 .headers on
 .mode column
 ```
@@ -76,14 +76,14 @@ touch ~/.sqliterc
 code ~/.sqliterc  # or use vim, nano, etc.
 ```
 
-Add the following lines:
+Add the following lines and save the file:
 
 ```
 .headers on
 .mode column
 ```
 
-Now every time you open a SQLite session, the output will be formatted by default. A message is also displayed on startup confirming the custom settings file has been loaded:
+Now every time you open a SQLite session, the output will be formatted as per the settings in the config file. A message is also displayed on startup indicating the custom settings file has been loaded:
 
 ```
 -- Loading resources from /Users/youruser/.sqliterc
@@ -113,7 +113,7 @@ A tiny change, but a big boost to developer ergonomics.
 
 ## Other Options
 
-Here are a few other useful options you might consider:
+Here are some other options that can be added to the `~/.sqliterc` file:
 
 **.nullvalue**
 
@@ -133,7 +133,7 @@ Show how many rows were affected by inserts, updates, deletes. Otherwise by defa
 
 **.echo**
 
-Echo each command before execution (handy for debugging):
+Echo each command before execution:
 
 ```
 .echo on
@@ -147,4 +147,4 @@ Show timing information after executing queries:
 .timer on
 ```
 
-Check out the [SQLite CLI documentation](https://sqlite.org/cli.html) for even more options. SQLite may be lightweight, but the CLI is fairly customizable. With just a couple of lines in a dotfile, you can make it more comfortable to work with, especially now that it’s increasingly at home in Rails apps.
+Check out the [SQLite CLI documentation](https://sqlite.org/cli.html) for even more options. SQLite may be lightweight, but the CLI is fairly customizable. With a few lines in a dotfile, you can make it more comfortable to work with, especially now that it’s increasingly at home in Rails apps.
