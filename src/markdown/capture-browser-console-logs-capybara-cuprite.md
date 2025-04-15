@@ -2,7 +2,7 @@
 title: "Capture Browser Console Logs in Rails System Tests with Capybara and Cuprite"
 featuredImage: "../images/capture-browser-console-logs-elena-mozhvilo-AI17tJHgIJ8-unsplash.jpg"
 description: "Learn how to capture browser console logs in Rails system tests using Capybara and Cuprite, and debug JavaScript issues without slowing down test execution."
-date: "2025-05-01"
+date: "2025-07-01"
 category: "rails"
 related:
   - "Debug Github Actions"
