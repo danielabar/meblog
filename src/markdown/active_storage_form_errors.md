@@ -32,9 +32,12 @@ bin/rails active_storage:install
 bin/rails db:migrate
 ```
 
-The Active Storage installation generates a database migration to create two tables: `active_storage_blobs` to store information about the uploaded file, and `active_storage_attachments`, which associates the blob to a model. This can be any model in your application, which is accomplished via [polymorphic association](https://guides.rubyonrails.org/association_basics.html#polymorphic-associations) under the hood.
+The Active Storage installation generates a database migration to create two tables:
 
-Now we can use the `scaffold` generator to generate a migration, model, controller, views, and route definitions for the `ExpenseReport` model, which has a dollar amount, description, date on which the expense was incurred, and a receipt, which is an attachment:
+1. `active_storage_blobs` to store information about the uploaded file.
+2. `active_storage_attachments`, which associates the blob to a model. This can be any model in your application, which is accomplished via [polymorphic association](https://guides.rubyonrails.org/association_basics.html#polymorphic-associations) under the hood.
+
+Now we can use the `scaffold` generator to generate a migration, model, controller, views, and route definitions for the `ExpenseReport` model. This model will have a dollar amount, description, date on which the expense was incurred, and a receipt, which is an attachment:
 
 ```bash
 bin/rails g scaffold ExpenseReport \
@@ -122,7 +125,7 @@ class ExpenseReportsController < ApplicationController
 end
 ```
 
-The `debug` gem is included by default in modern Rails projects. If you’re using an older version or don’t have it installed, you can add it to your Gemfile. For more, see the [Rails Debugging Guide](https://guides.rubyonrails.org/debugging_rails_applications.html#debugging-with-the-debug-gem).
+The `debug` gem is included by default in modern Rails projects. If you’re using an older version or don’t have it installed, you can add it to your Gemfile. See the [Rails Debugging Guide](https://guides.rubyonrails.org/debugging_rails_applications.html#debugging-with-the-debug-gem) for more information.
 
 <aside class="markdown-aside">
 In a real-world application, authentication and authorization would be necessary to ensure users can only view and modify their own expense reports. However, this post focuses solely on Active Storage and file persistence, so auth concerns are omitted for simplicity.
@@ -315,7 +318,7 @@ The debug session shows that there is a blob with a `key` in memory, and it has 
  created_at: nil>
 ```
 
-Also notice if we try to invoke the `signed_id` method on the blob, an error is raised that it's not possible to have a signed_id on a new record. We'll see why this is important shortly when observing what happens on the page.
+Also notice if we try to invoke the `signed_id` method on the blob, an error is raised that it's not possible to have a signed_id on a new record. We'll see why this is important shortly when observing what happens on the page:
 
 ```ruby
 @expense_report.receipt.blob.signed_id
@@ -356,7 +359,7 @@ id  name     record_type    record_id  blob_id  created_at
 1   receipt  ExpenseReport  1          1        2025-03-21 12:46:13.604834
 ```
 
-We can also check the `storage` directory in the project root and observe that there are no new files uploaded, even though the user did attempt to upload a new file `receipt-2.pdf`. The only file is listed is from the previous happy path, which was `receipt-1.pdf`
+We can also check the `storage` directory in the project root and observe that there are no new files uploaded, even though the user did attempt to upload a new file `receipt-2.pdf`. The only file is listed is from the previous happy path, which was `receipt-1.pdf` with a key of `6081val5vwpz691v8ukv8tc4zma0`:
 
 ```
 storage
@@ -408,7 +411,7 @@ Let's switch the portion of the form partial that attempts to render a download 
     <%= form.label :receipt %>
     <%= form.file_field :receipt %>
 
-    <%# Display to user their current attachment if there is one %>
+    <%# Display current attachment if there is one %>
     <%# === CHANGE CHECK TO PERSISTED HERE === %>
     <% if expense_report.receipt.persisted? %>
       <div>
@@ -470,7 +473,7 @@ After restarting the Rails server, we can once again attempt to submit an expens
 
 ![active storage new expense report description empty](../images/active-storage-new-expense-report-description-empty.png "active storage new expense report description empty")
 
-Recall we still have a breakpoint in the failure case - which it will stop on because the model is invalid:
+The controller still has the `debugger` breakpoint in the failure case - which it will stop on because the model is invalid:
 
 ```ruby
 class ExpenseReportsController < ApplicationController
@@ -519,7 +522,7 @@ Here we are in the debug session after submitting the form. This time when inspe
 # false
 ```
 
-In a database session `bin/rails db` - this time, `receipt-2.pdf` has been added to `active_storage_blobs` with `id` of `2`, which matches what was shown in the debug session for `@expense_report.receipt.blob`. There are no new records in `active_storage_attachments` or `expense_reports` because the model wasn't saved, but at least, the receipt blob did get saved:
+Another significant difference can be observed in the database: `receipt-2.pdf` has been added to `active_storage_blobs` with `id` of `2`, which matches what was shown in the debug session for `@expense_report.receipt.blob`. There are no new records in `active_storage_attachments` or `expense_reports` because the model wasn't saved, but at least, the receipt blob did get saved:
 
 ```
 === NEW BLOB GOT SAVED ===
@@ -531,7 +534,7 @@ id  key                           filename       content_type
 2   8gxcs3hkovtiapbmrjx0f32ejqhy  receipt-2.pdf  application/pdf
 ```
 
-The `storage` directory, shows a new file with the `receipt-2.pdf` key of `8gxcs3hkovtiapbmrjx0f32ejqhy` was uploaded:
+Another important difference is in the `storage` directory, which shows a new file with the `receipt-2.pdf` key of `8gxcs3hkovtiapbmrjx0f32ejqhy` was uploaded:
 
 ```
 tree storage
@@ -577,7 +580,7 @@ Back on the page, it still displays the same validation error message as before 
 
 When using Direct Uploads, the file is uploaded and a blob is created immediately, even before the form is successfully submitted. This gives us access to the blob’s `signed_id`, which we can use to re-attach the file later.
 
-To avoid forcing the user to re-select their file after a validation error (like a missing description), we can store the `signed_id` in a hidden field. On the next successful form submission, Rails will associate the already-uploaded file with the model using this ID.
+To avoid forcing the user to re-select their file after a validation error, we can store the `signed_id` in a hidden field. On the next successful form submission, Rails will associate the already-uploaded file with the model using this ID.
 
 However, we only want to render the hidden field if the file was uploaded (`attached?`) but not yet saved with the record (`persisted?`). That’s how we know the user attached something, but the form failed validation.
 
@@ -611,7 +614,7 @@ Once again let's try the test case of submitting the form with an attachment, bu
 
   <!-- === NEW: HIDDEN FIELD WITH ATTACHMENT SIGNED_ID -->
   <input
-    value="eyJfcmFp..."
+    value="8gxcs3h..."
     autocomplete="off"
     type="hidden"
     name="expense_report[receipt]"
@@ -664,7 +667,7 @@ Earlier in a debug session, we saw that we do have access to the filename via th
 
 It would be nice if we could programmatically set the file selector's value in the form, since it's available via `@expense_report.receipt.blob.filename`. However, this won't work, because this is the native file picker.
 
-Earlier when using the scaffold generator, we passed `receipt:attachment` as one of the model fields. Since we told Rails that receipt is an attachment, it used the [file_field](https://api.rubyonrails.org/classes/ActionView/Helpers/FormBuilder.html#method-i-file_field) helper method inside of the [form_with](https://api.rubyonrails.org/classes/ActionView/Helpers/FormHelper.html#method-i-form_with) block in the form partial to generate an input for choosing a file:
+Earlier, when we generated the scaffold and included `receipt:attachment` as a model field, Rails recognized `receipt` as an attachment. As a result, it used the [file_field](https://api.rubyonrails.org/classes/ActionView/Helpers/FormBuilder.html#method-i-file_field) helper inside the [form_with](https://api.rubyonrails.org/classes/ActionView/Helpers/FormHelper.html#method-i-form_with) block to create a file input in the form partial:
 
 ```erb
 <%= form_with(model: expense_report) do |form| %>
@@ -735,11 +738,13 @@ input.files
 }
 ```
 
-This means that we'll have to hide the native file input (although keep it functional), and instead display a custom button and label to control the file name display. The button click will delegate to the native file input to perform the file selection. The display requirements are:
+Because the browser prevents us from programmatically setting the file input’s value, we can’t use the filename from `@expense_report.receipt.blob.filename` to populate the input or trigger the browser to display the file name. This means that even if a file is already attached, the input will still display "No file chosen" on page load. To provide a better user experience, and accurately reflect the file's presence, we'll need to hide the native file input (while keeping it functional) and replace it with a custom button and label. The custom UI will let us display the actual file name when available, and mimic the native behavior in other scenarios.
 
-1. If user has not selected a file, then display "No file chosen".
-2. If user clicks the custom "Choose file" button and selects a file from their file system, then display the selected file name (i.e. same as native behaviour).
-3. If the form renders with an attached, but not persisted receipt, then display the filename from the model: `expense_report.receipt.blob.filename`.
+The custom label should display:
+
+1. "No file chosen" if the user has not selected a file.
+2. The selected file name if the user clicks the custom "Choose file" button and picks a file from their file system (mimicking native behavior).
+3. The filename from the model (`expense_report.receipt.blob.filename`) if the form renders with an attached, but not yet persisted, receipt.
 
 Let's modify the form partial for the additional markup needed:
 
@@ -788,9 +793,7 @@ At this point, the form looks like this:
 
 ![active storage markup for custom file input](../images/active-storage-markup-for-custom-file-input.png "active storage markup for custom file input")
 
-Clicking the custom "Choose File" button launches the system file selector because it's rendered on top of the hidden native file input. However, the custom div to display either "No file chosen" or the selected filename isn't functional yet. And if the form is submitted with a validation error, that custom div isn't showing the file name user previously selected.
-
-To make the custom file input functional, we'll need to add some JavaScript. [Stimulus](https://stimulus.hotwired.dev/handbook/introduction) is a minimal JavaScript framework that works with Rails that to enhance server-rendered pages. To get started, run the following command to generate a new Stimulus controller:
+Clicking the custom "Choose File" button launches the system file selector because it's rendered on top of the hidden native file input. To make the custom file name display functional, we'll need to add some JavaScript. [Stimulus](https://stimulus.hotwired.dev/handbook/introduction) is a minimal JavaScript framework that works with Rails that to enhance server-rendered pages. To get started, run the following command to generate a new Stimulus controller:
 
 ```bash
 bin/rails generate stimulus file_upload
