@@ -10,13 +10,13 @@ related:
   - "Some Elegance with Rails Caching"
 ---
 
-Rails' Active Storage is a powerful, built-in solution for handling file uploads, providing integration with cloud storage and automatic attachment management. It works out of the box, making it easy to associate files with models. However, when a form includes an attachment and validation errors occur, the uploaded file is lost when the form re-renders to display the validation errors, forcing users to select their file again. This happens because [Active Storage](https://guides.rubyonrails.org/active_storage_overview.html) only associates a file with a model after a successful save. If the model fails validation, the attachment is not persisted, and the file selection is lost.
+Rails' Active Storage is a powerful, built-in solution for handling file uploads, providing integration with cloud storage and automatic attachment management. It works out of the box, making it easy to associate files with models. However, when a form includes an attachment and a validation errors occur, the uploaded file is lost when the form re-renders to display the validation errors, forcing users to select their file again. This happens because [Active Storage](https://guides.rubyonrails.org/active_storage_overview.html) only associates a file with a model after a successful save. If the model fails validation, the attachment is not persisted, and the file selection is lost.
 
 This post will walk through a solution using direct uploads, hidden signed IDs, and a custom file input with Stimulus. By the end, you'll have a robust way to ensure users don't lose their file uploads due to form validation errors. The complete working solution is also available on [GitHub](https://github.com/danielabar/expense_tracker).
 
 ## Demo Project Setup
 
-To demonstrate the issue, we'll setup a new Rails project (as of this writing, I'm on Rails 8.0.2) for a simple expense tracker application. It will have one model `ExpenseReport` that users fill out to get reimbursed for their expenses. The `ExpenseReport` model will have a single file attachment named `receipt` for users to upload evidence of their expense.
+To demonstrate the issue, we'll setup a new Rails project (as of this writing, I'm on Rails 8.0.2) for a simple expense tracker application. It will have one model, `ExpenseReport`, which represents an expense submission. This model will have a single file attachment named `receipt` for users to upload evidence of their expense.
 
 The commands to get started:
 
@@ -37,7 +37,7 @@ The Active Storage installation generates a database migration to create two tab
 1. `active_storage_blobs` to store information about the uploaded file.
 2. `active_storage_attachments`, which associates the blob to a model. This can be any model in your application, which is accomplished via [polymorphic association](https://guides.rubyonrails.org/association_basics.html#polymorphic-associations) under the hood.
 
-Now we can use the `scaffold` generator to generate a migration, model, controller, views, and route definitions for the `ExpenseReport` model. This model will have a dollar amount, description, date on which the expense was incurred, and a receipt, which is an attachment:
+Next, the `scaffold` generator is used to generate a migration, model, controller, views, and routes for the `ExpenseReport` model. This model will have a dollar amount, description, date on which the expense was incurred, and a receipt, which is an attachment:
 
 ```bash
 bin/rails g scaffold ExpenseReport \
@@ -47,7 +47,7 @@ bin/rails g scaffold ExpenseReport \
   receipt:attachment
 ```
 
-Let's modify the generated migration to add some constraints to ensure amount, description, and incurred_on are always provided:
+The generated migration is modified to ensure amount, description, and incurred_on are always provided:
 
 ```ruby
 class CreateExpenseReports < ActiveRecord::Migration[8.0]
@@ -147,7 +147,7 @@ Submitting the form will pause on the `debugger` breakpoint in the `ExpenseRepor
 
 ![active storage debug create success](../images/active-storage-debug-create-success.png "active storage debug create success")
 
-In the debug session, we can inspect the `blob` which is the file details associated with the expense report `receipt` attachment. Notice it has `id`, `key`, and `filename` attributes:
+In the debug session, we can inspect the `blob`, which contains the metadata and storage details for the file attached to the expense report's `receipt`. This includes attributes like `id`, `key`, and `filename`:
 
 ```ruby
 @expense_report.receipt.blob
@@ -199,7 +199,7 @@ Recall we modified the form partial earlier to show the download link if one is 
 <% end %>
 ```
 
-If you right-click on the download link and choose "Copy Link Address", you'll see a long token in the URL, starting with `eyJFcm...`. This is the `signed_id` we saw earlier in the debug session. This confirms that Active Storage uses this signed identifier to link to the file:
+Right-clicking the download link and selecting "Copy Link Address" reveals a long tokenized URL that begins with `eyJFcm...`. This is the same `signed_id` we saw earlier in the debug session, confirming that Active Storage uses this signed identifier to securely reference the file:
 
 ```
 http://localhost:3000/rails/active_storage/blobs/redirect/eyJfcmFpbHMiOnsiZGF0YSI6MSwicHVyIjoiYmxvYl9pZCJ9fQ==--42eb19d188a21278e0c6add2449a511283e28afe/receipt-1.pdf
@@ -264,7 +264,7 @@ storage
 
 That leaf entry `6081val5vwpz691v8ukv8tc4zma0` is the actual pdf file. Notice that the file name matches the `key` stored in `active_storage_blobs` table. It's also the `key` value we saw when inspecting `@expense_report.receipt.blob` earlier in the debug session.
 
-Going through this happy path has demonstrated that in order for an Active Storage attachment to be saved and associated to a model, the following must be true:
+Going through this happy path has demonstrated that in order for an Active Storage attachment to be saved and associated to a model, the following must occur:
 
 1. File uploaded to storage service (locally, this is the `storage` directory in the project root).
 2. New record inserted in database table `active_storage_blobs` with the `key` matching the file name uploaded to storage.
@@ -339,20 +339,22 @@ Another interesting observation is that `@expense_report.receipt.attached?` retu
 Before turning our attention to what happens on the page, let's launch another database session `bin/rails db` and observe that there are no new entries in the active storage tables:
 
 ```
-# No new blobs - this is the previous happy path
+# NO NEW BLOBS - THIS IS THE PREVIOUS HAPPY PATH
 sqlite> select id, key, filename, content_type from active_storage_blobs;
 id  key                           filename       content_type
 --  ----------------------------  -------------  ---------------
 1   6081val5vwpz691v8ukv8tc4zma0  receipt-1.pdf  application/pdf
 
-# No new expense reports - this is the previous happy path
+
+# NO NEW EXPENSE REPORTS - THIS IS THE PREVIOUS HAPPY PATH
 sqlite> select id, amount, description, incurred_on from expense_reports;
 id  amount  description                incurred_on
 --  ------  -------------------------  -----------
 1   123.45  Uber trip to the airport.  2025-03-21
 
-# No new attachments - since there's no new blob or expense report to associate
-# This record is from the previous happy path
+
+# NO NEW ATTACHMENTS - SINCE THERE'S NO NEW BLOB OR EXPENSE REPORT TO ASSOCIATE
+# THIS RECORD IS FROM THE PREVIOUS HAPPY PATH
 sqlite> select * from active_storage_attachments;
 id  name     record_type    record_id  blob_id  created_at
 --  -------  -------------  ---------  -------  --------------------------
@@ -394,7 +396,7 @@ app/views/expense_reports/_form.html.erb:43
 
 We saw in the debug session that `expense_report.receipt.attached?` returns `true`, even though the attachment didn't actually get associated to the model. This means the view code will attempt to generate a download link `<%= link_to expense_report.receipt.filename, expense_report.receipt %>`. But in order to do this, it needs a `signed_id` for the file, which isn't available because the file hasn't been uploaded to storage and is not associated to the model.
 
-The next sections will walk through how to solve this.
+The next section will walk through how to solve this.
 
 ## 1. Check Persisted
 
@@ -574,7 +576,7 @@ By enabling Direct Uploads, the first two of these have completed, even when the
 - It's worth implementing even if you don't encounter the validation issue, since it prevent slow clients from tying up application server threads during uploads.
 - Be sure to schedule a job to [purge unattached uploads](https://guides.rubyonrails.org/active_storage_overview.html#purging-unattached-uploads), which can accumulate if users abandon the form after a validation error.
 
-Back on the page, it still displays the same validation error message as before about missing Description, and the user still needs to select their file again. Now we're in a good position to resolve this. This is described in the next step.
+Back on the page, it still displays the same validation error message as before about missing Description, and the user still needs to select their file again. Now we're in a good position to improve the user experience.
 
 ## 3. Hidden Signed ID
 
@@ -624,7 +626,7 @@ Once again let's try the test case of submitting the form with an attachment, bu
 </form>
 ```
 
-As far as the user is concerned, the file upload still looks "lost" because the native file picker still displays "No file chosen". But things are different this time because we actually have a reference to the file upload via the hidden `signed_id` field:
+As far as the user is concerned, the file upload still looks "lost" because the native file picker still displays "No file chosen". But things are different this time because we have a reference to the file upload via the hidden `signed_id` field:
 
 ![active storage new expense report upload hidden id](../images/active-storage-new-expense-report-upload-hidden-id.png "active storage new expense report upload hidden id")
 
@@ -693,15 +695,15 @@ This renders markup:
 </form>
 ```
 
-`<input type="file"...>` is the browser native file picker. The MDN docs have [details on how it works](https://developer.mozilla.org/en-US/docs/Web/HTML/Element/input/file). For our purposes, the important points to understand are:
+`<input type="file" ...>` is the browser's native file picker. The [Mozilla Developer Network (MDN)](https://developer.mozilla.org/en-US/docs/Web/HTML/Element/input/file) has a reference on how file inputs behave. With regards to populating the selected file name, here are the key things to understand:
 
-* The file input type has a `value` attribute which defaults to an empty string.
-* When `value` is empty, then "No file chosen" is displayed in the browser.
-* After user has selected a file, the `value` attribute of the input is populated with the file name, and then the input updates to display the file name in the browser.
-* The file information is also available in a `files` attribute which is a `FileList`.
-* The `value` cannot be set programmatically to anything other than an empty string. It also has no effect when populated in the markup.
+* The file input’s `value` attribute defaults to an empty string.
+* When `value` is empty, the browser displays “No file chosen.”
+* After a user selects a file, the browser updates the file input to display the file name.
+* The actual file data is stored in the `files` attribute, which is a `FileList` object.
+* The `value` cannot be set programmatically to anything other than an empty string. Setting it in HTML or JavaScript has no effect and can throw an error.
 
-For example, trying to do something like this in JavaScript throws an exception:
+For example, trying to programmatically populate the file input's value won't work:
 
 ```javascript
 const input = document.querySelector("input[type=file]");
@@ -738,7 +740,7 @@ input.files
 }
 ```
 
-Because the browser prevents us from programmatically setting the file input’s value, we can’t use the filename from `@expense_report.receipt.blob.filename` to populate the input or trigger the browser to display the file name. This means that even if a file is already attached, the input will still display "No file chosen" on page load. To provide a better user experience, and accurately reflect the file's presence, we'll need to hide the native file input (while keeping it functional) and replace it with a custom button and label. The custom UI will let us display the actual file name when available, and mimic the native behavior in other scenarios.
+Since the browser does not allow programmatically setting the file input’s value, we can’t use the filename from `@expense_report.receipt.blob.filename` to populate the input. This means that even if a file is already attached, the input will still display "No file chosen" on page load. To provide a better user experience, and accurately reflect the file's presence, we'll need to hide the native file input (while keeping it functional) and replace it with a custom button and label. These custom controls will let us display the actual file name when available, and mimic the native behavior in other scenarios.
 
 The custom label should display:
 
