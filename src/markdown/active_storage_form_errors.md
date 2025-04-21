@@ -571,9 +571,10 @@ Recall earlier when walking through the [Happy Path](../active_storage_form_erro
 
 By enabling Direct Uploads, the first two of these have completed, even when the model couldn't be saved due to validation errors. This is progress 🙏
 
-***Quick notes on Direct Uploads:***
+***Quick notes on direct uploads:***
 
 - It's worth implementing even if you don't encounter the validation issue, since it prevent slow clients from tying up application server threads during uploads.
+- If you're uploading directly to a third-party storage service like S3 , make sure you've configured [CORS](https://guides.rubyonrails.org/active_storage_overview.html#cross-origin-resource-sharing-cors-configuration) to allow direct uploads from your app.
 - Be sure to schedule a job to [purge unattached uploads](https://guides.rubyonrails.org/active_storage_overview.html#purging-unattached-uploads), which can accumulate if users abandon the form after a validation error.
 
 Back on the page, it still displays the same validation error message as before about missing Description, and the user still needs to select their file again. Now we're in a good position to improve the user experience.
