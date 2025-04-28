@@ -228,7 +228,7 @@ That `id`, `key`, and `filename` in the `active_storage_blobs` table matches wha
 
 The `active_storage_attachments` associates that blob to the expense report record with id of `1`, which we can see is the expense report we just created.
 
-Where is the actual file? The answer can be found in `config/storage.yml`. This file automatically got created earlier when running `rails new...`:
+Where is the actual file? The answer can be found in `config/storage.yml`. This file automatically got created earlier when running `rails new...` and defines storage services the app could use:
 
 ```yml
 test:
@@ -249,9 +249,16 @@ local:
 # other cloud storage providers...
 ```
 
-In development mode, Active Storage uses the local file system, storing files in the `storage` directory in the project root. In production, you'll need to configure a cloud storage service like AWS S3, Azure, Cloudflare R2, etc. The <a class="markdown-link" href="https://guides.rubyonrails.org/active_storage_overview.html#setup">Active Storage Setup</a> guide has details on how to do this.
+Then the `config/environments/development.rb` file got generated with:
 
-Since we're running locally, the uploaded files can be found in the `storage` directory in the project root:
+```ruby
+# Store uploaded files on the local file system (see config/storage.yml for options).
+config.active_storage.service = :local
+```
+
+This means that in development mode, Active Storage uses the local file system, storing files in the `storage` directory in the project root. In production, you'll need to configure a cloud storage service like AWS S3, Azure, Cloudflare R2, etc. The <a class="markdown-link" href="https://guides.rubyonrails.org/active_storage_overview.html#setup">Active Storage Setup</a> guide has details on how to do this.
+
+Here are the contents of that `storage` directory:
 
 ```
 tree storage
