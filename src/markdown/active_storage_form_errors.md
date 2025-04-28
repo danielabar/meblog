@@ -99,7 +99,7 @@ Finally, the generated form partial `app/views/expense_reports/_form.html.erb` (
 ```
 
 <aside class="markdown-aside">
-The demo code uses Tailwind CSS for styling, but most classes have been removed from the ERB snippets to keep the focus on file attachments and Active Storage behavior.
+The demo code uses <a class="markdown-link" href="https://github.com/rails/tailwindcss-rails">TailwindCSS</a> for styling, but most classes have been removed from the ERB snippets to keep the focus on file attachments and Active Storage behavior.
 </aside>
 
 
@@ -226,9 +226,9 @@ id  amount  description                incurred_on
 
 That `id`, `key`, and `filename` in the `active_storage_blobs` table matches what we saw in the debug session when inspecting `@expense_report.receipt.blob`.
 
-The `active_storage_attachments` associates that blob to the expense report record with id of `1`, which we can see is the expense report we just created.
+The record in `active_storage_attachments` associates that blob to the expense report record with id of `1`, which we can see is the expense report we just created.
 
-Where is the actual file? The answer can be found in `config/storage.yml`. This file automatically got created earlier when running `rails new...` and defines storage services the app could use:
+Where is the actual file? The answer can be found in `config/storage.yml`. This file automatically got created earlier when running `rails new...` and defines storage services the app can use:
 
 ```yml
 test:
@@ -249,16 +249,14 @@ local:
 # other cloud storage providers...
 ```
 
-Then the `config/environments/development.rb` file got generated with:
+Then the `config/environments/development.rb` file got generated telling Rails to use the `local` service for development:
 
 ```ruby
 # Store uploaded files on the local file system (see config/storage.yml for options).
 config.active_storage.service = :local
 ```
 
-This means that in development mode, Active Storage uses the local file system, storing files in the `storage` directory in the project root. In production, you'll need to configure a cloud storage service like AWS S3, Azure, Cloudflare R2, etc. The <a class="markdown-link" href="https://guides.rubyonrails.org/active_storage_overview.html#setup">Active Storage Setup</a> guide has details on how to do this.
-
-Here are the contents of that `storage` directory:
+Here are the contents of the `storage` directory in the project root:
 
 ```
 tree storage
@@ -269,13 +267,13 @@ storage
         └── 6081val5vwpz691v8ukv8tc4zma0
 ```
 
-That leaf entry `6081val5vwpz691v8ukv8tc4zma0` is the actual pdf file. Notice that the file name matches the `key` stored in `active_storage_blobs` table. It's also the `key` value we saw when inspecting `@expense_report.receipt.blob` earlier in the debug session.
+The leaf entry `6081val5vwpz691v8ukv8tc4zma0` is the actual pdf file. Notice that the file name matches the `key` stored in `active_storage_blobs` table. It's also the `key` value we saw when inspecting `@expense_report.receipt.blob` earlier in the debug session.
 
 Going through this happy path has demonstrated that in order for an Active Storage attachment to be saved and associated to a model, the following must occur:
 
-1. File uploaded to storage service (locally, this is the `storage` directory in the project root).
+1. File uploaded to storage service.
 2. New record inserted in database table `active_storage_blobs` with the `key` matching the file name uploaded to storage.
-3. New record inserted in database table `active_storage_attachments` that associated the model (which also got saved in the database) to the blob, which represents the file.
+3. New record inserted in database table `active_storage_attachments` that associates the model to the blob.
 
 ## Validation Errors
 
@@ -547,6 +545,7 @@ Another important difference is in the `storage` directory, which shows a new fi
 
 ```
 tree storage
+
 storage
 ├── 60
 │   └── 81
@@ -574,7 +573,7 @@ Recall earlier when walking through the [Happy Path](../active_storage_form_erro
 
 1. File uploaded to storage service.
 2. New record inserted in database table `active_storage_blobs` with the `key` matching the file name uploaded to storage.
-3. New record inserted in database table `active_storage_attachments` that associated the model (which also got saved in the database) to the blob, which represents the file.
+3. New record inserted in database table `active_storage_attachments` to associate the model to the blob.
 
 By enabling Direct Uploads, the first two of these have completed, even when the model couldn't be saved due to validation errors. This is progress 🙏
 
@@ -748,7 +747,9 @@ input.files
 }
 ```
 
-Since the browser does not allow programmatically setting the file input’s value, we can’t use the filename from `@expense_report.receipt.blob.filename` to populate the input. This means that even if a file is already attached, the input will still display "No file chosen" on page load. To provide a better user experience, and accurately reflect the file's presence, we'll need to hide the native file input (while keeping it functional) and replace it with a custom button and label. These custom controls will let us display the actual file name when available, and mimic the native behavior in other scenarios.
+Since the browser does not allow programmatically setting the file input’s value, we can’t use the filename from `@expense_report.receipt.blob.filename` to populate the input. This means that even if a file is already uploaded to storage, the input will still display "No file chosen" on page load.
+
+To provide a better user experience, and accurately reflect the file's presence, we'll need to hide the native file input (while keeping it functional) and replace it with a custom button and label. These custom controls will let us display the actual file name when available, and mimic the native behavior in other scenarios.
 
 The custom label should display:
 
@@ -822,7 +823,7 @@ export default class extends Controller {
 }
 ```
 
-Then update it:
+Then update it to display the correct filename (either from the saved upload value or new user selection), by setting up Stimulus targets for the hidden file input and display div, and wiring up a `handleNewFileSelection` method to react to user changes:
 
 ```javascript
 import { Controller } from "@hotwired/stimulus";
@@ -909,6 +910,8 @@ To make use of the Stimulus controller, we add some data-dash attributes to the 
   <!-- submit -->
 <% end %>
 ```
+
+The key to this solution is that we're able to tell the Stimulus controller to display the previously selected filename from memory: `expense_report.receipt.blob.filename`, by passing it in as a `value`.
 
 Now if we try to submit a new expense report with an attachment and form validation errors, the form will re-render with the validation errors *and* the file name is preserved!
 
