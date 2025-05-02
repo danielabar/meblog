@@ -178,3 +178,4 @@ If you're doing advanced PostgreSQL work—custom triggers, views, full-text sea
 * heading/subheadings need work
 * conclusion para
 * edit
+* aside: hair_trigger gem but concern about long term keeping up with Rails/AR (had that experience with annotate gem that stopped working as of Rails 8)
