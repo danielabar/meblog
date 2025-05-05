@@ -10,20 +10,22 @@ related:
   - "Rails Feature Test Solved by Regex"
 ---
 
-When writing Rails system (aka feature) tests, you'll likely use [Capybara](https://teamcapybara.github.io/capybara/) to simulate user interactions. If the front end is a JavaScript-heavy Single Page Application, this also requires installing and configuring a JavaScript driver for Capybara, such as [Cuprite](https://github.com/rubycdp/cuprite), to test JavaScript execution in the browser. But what happens when JavaScript behaves unexpectedly during testing? How do you capture `console.log` output while running Rails system tests?
+When writing Rails system tests, a common practice is to use [Capybara](https://teamcapybara.github.io/capybara/) to simulate user interactions. If the front end is a JavaScript-heavy Single Page Application (SPA), this also requires installing and configuring a JavaScript driver for Capybara, such as [Cuprite](https://github.com/rubycdp/cuprite), to test JavaScript execution in the browser.
+
+When testing a SPAs, it can be challenging to understand how different pieces of code are interacting or when certain code is executing. In cases where unexpected behavior arises during test execution, such as event handling issues or timing problems, adding `console.log` statements at strategic points in the front-end code can help. But how do you capture and view those logs while running Rails system tests?
 
 Unfortunately, the Cuprite and [Ferrum](https://github.com/rubycdp/ferrum) (the underlying driver for Cuprite) documentation doesn’t make this immediately clear. So in this post, I’ll walk you through why capturing browser console logs is useful and how to configure your tests to capture those logs.
 
 ## Why Capture Browser Console Logs?
 
-Imagine a scenario where one of your system tests fails intermittently. The failure might be caused by some JavaScript code running too slowly or not executing at all. You’ve added some `console.log(...)` statements in your app to debug the issue. However, in headless mode, it’s not obvious how to access these logs. For example, somewhere in the front end JavaScript:
+Imagine a scenario where one of your system tests fails intermittently and you're pretty sure the issue is in some unexpected JavaScript execution. You’ve added some `console.log(...)` statements in your app to debug the issue. However, in headless mode, it’s not obvious how to access these logs. For example, somewhere in the front end JavaScript:
 
 ```javascript
 // app/javascript/some_code.js
 console.log("==== ROUTER NAVIGATE FINISHED")
 ```
 
-You might consider running the test with a non-headless browser (like Chrome) and use debugging tools (such as `binding.pry` in the system test) to inspect the console. But there’s a major problem with this approach: debugging mode often slows down the browser, giving your JavaScript more time to execute. In this case, the timing-related issue may not occur, and the test passes – masking the real problem.
+You might consider running the test with a non-headless browser (like Chrome) and use debugging tools (such as `binding.pry` in the system test) to inspect the console. But there’s a problem with this approach: debugging mode often slows down the browser, giving your JavaScript more time to execute. In this case, the timing-related issue may not occur, and the test passes – masking the real problem.
 
 To truly replicate the failure, you need to capture the browser’s console logs while running the test at full speed. This requires a method to redirect `console.log` output from the browser to your test environment.
 
@@ -37,7 +39,7 @@ Here’s how you can configure the Cuprite driver to capture the browser console
 
 ### Step 1: Modify the Capybara Driver
 
-To capture the logs, you need to define a logger using [StringIO](https://docs.ruby-lang.org/en/3.2/StringIO.html) when registering the Cuprite driver. This is done by modifying the Capybara configuration in `spec/support/capybara.rb`.
+To capture the logs, define a logger using [StringIO](https://docs.ruby-lang.org/en/3.2/StringIO.html) when registering the Cuprite driver. This is done by modifying the Capybara configuration in `spec/support/capybara.rb`:
 
 ```ruby
 # spec/support/capybara.rb
@@ -60,7 +62,7 @@ In this configuration, the `StringIO` logger will capture all browser console ou
 
 ### Step 2: Use the Logger in Your Test
 
-Now that the Cuprite driver is set up to capture the logs, you can access the log output during your tests. Here’s an example test where you capture and print the logs:
+Now that the Cuprite driver is set up to capture the logs, these can be accessed from tests. Here’s an example:
 
 ```ruby
 # spec/features/some_spec.rb
@@ -68,7 +70,7 @@ it "Does something" do
   # Visit the relevant page or trigger the action
   visit some_path
 
-  # Perform any interactions or assertions before capturing logs
+  # Perform some interaction that causes JavaScript to execute
   click_button "Some Action"
 
   # Capture browser console logs
@@ -93,10 +95,46 @@ bin/rspec spec/features/some_spec.rb | pbcopy
 Once the output is in your clipboard or saved in a file, you can search for the specific logs you’re interested in. Look for occurrences of `Runtime.consoleAPICalled`:
 
 ```json
-{"method":"Runtime.consoleAPICalled","params":{"type":"log","args":[{"type":"string","value":"==== ROUTER NAVIGATE FINISHED:"}]
+{
+  "method": "Runtime.consoleAPICalled",
+  "params": {
+    "type": "log",
+    "args": [
+      {
+        "type": "string",
+        "value": "==== ROUTER NAVIGATE FINISHED:"
+      }
+    ]
+  }
+}
 ```
 
 This is an example of a `console.log` statement captured during the test. You can now inspect these logs for clues as to what went wrong, such as whether your expected JavaScript code is actually running.
+
+Another option is to filter the log lines you're interested in directly in the test, for example:
+
+```ruby
+# spec/features/some_spec.rb
+it "Does something" do
+  # Visit the relevant page or trigger the action
+  visit some_path
+
+  # Perform any interactions or assertions before capturing logs
+  click_button "Some Action"
+
+  # Get full log output
+  logs = page.driver.browser.options.logger.string
+
+  # Filter only the relevant lines
+  matching_logs = logs.lines.select { |line| line.include?("=== ROUTER") }
+
+  puts "FILTERED BROWSER LOGS:"
+  puts matching_logs
+
+  # Some test expectation
+  expect(URI.parse(page.current_url).request_uri).to eql("/account")
+end
+```
 
 ## Exploring Cuprite Source
 
@@ -127,6 +165,6 @@ Lesson learned: If you're ever in doubt, remember that reading through the sourc
 
 ## Conclusion
 
-Capturing browser console logs in Rails system tests with Capybara and Cuprite is a powerful way to debug JavaScript timing issues without slowing down your tests. By modifying the driver configuration to include a `StringIO` logger, you can access all `console.log` output during test execution. Just be mindful that the captured output can be quite large, so piping or redirecting it to a file for inspection is recommended.
+Capturing browser console logs in Rails system tests with Capybara and Cuprite is a useful way to debug JavaScript timing issues without slowing down your tests. By modifying the driver configuration to include a `StringIO` logger, you can access all `console.log` output during test execution. Just be mindful that the captured output can be quite large, so redirecting it to a file or filtering within the test is recommended.
 
 This approach allows you to debug in real-world conditions, ensuring that the JS in your app behaves as expected under full-speed test runs.
