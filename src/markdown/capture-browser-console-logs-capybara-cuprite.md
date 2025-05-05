@@ -86,13 +86,13 @@ In this test, after visiting the page and triggering any JavaScript behavior, yo
 
 ### Step 3: Manage the Log Output
 
-The captured output is often massive, as it includes not only the `console.log` statements you added but also a lot of internal browser output. To manage this, you can pipe the output into your clipboard or redirect it to a text file for easier inspection. Here’s how to do that on a Mac:
+The captured output is massive, as it includes not only the `console.log` statements you added but also a lot of internal browser output. To manage this, you can pipe the output into your clipboard or redirect it to a text file for easier inspection. Here’s how to do that on a Mac:
 
 ```bash
 bin/rspec spec/features/some_spec.rb | pbcopy
 ```
 
-Once the output is in your clipboard or saved in a file, you can search for the specific logs you’re interested in. Look for occurrences of `Runtime.consoleAPICalled`:
+Once the output is in your clipboard or saved in a file, you can search for the specific logs you’re interested in. Look for occurrences of `Runtime.consoleAPICalled`. The captured log lines are json formatted like this:
 
 ```json
 {
@@ -135,6 +135,18 @@ it "Does something" do
   expect(URI.parse(page.current_url).request_uri).to eql("/account")
 end
 ```
+
+**IMPORTANT**
+
+When making changes to JavaScript files (or any front end assets), such as adding a `console.log(...)` for debugging, remember to run:
+
+```bash
+bin/rails assets:precompile
+```
+
+*before* running the system tests.
+
+Otherwise, you may scratch your head wondering why the new log statements aren’t showing up when the tests run, even if logs are shown in development. This happens because in test mode, Rails uses the precompiled asset bundle. If you forget to recompile, it will continue to serve stale JavaScript from the previous build.
 
 ## Exploring Cuprite Source
 
