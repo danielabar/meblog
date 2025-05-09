@@ -12,6 +12,8 @@ related:
 
 **Update (September 2023):** Rails projects using fixtures will need one additional permission for the Postgres role. See [initialization](../rails-postgres-docker#initialization) section for more details.
 
+**Update (May 2025):** Added instructions for customizing the PostgreSQL configuration file `postgresql.conf` used by the Docker container. See [modify config file](../rails-postgres-docker#modify-config-file) section for more details.
+
 When scaffolding a new Rails project, the database flag can be used to specify a database other than the default SQLite, such as Postgres. However, the generated configuration will assume that the database is running on localhost, i.e. installed directly on your laptop or development machine. If instead you'd like the database running in a Docker container, a few more steps are necessary. This post will walk you through how to setup a new Rails project with a Postgres database running in a Docker container rather than the default SQLite running on localhost. It will be demonstrated using the [Rails Getting Started Guide](https://guides.rubyonrails.org/getting_started.html) which builds an example blog application. All the code explained in this post can be found in this [blogpg project](https://github.com/danielabar/blogpg) on Github.
 
 <aside class="markdown-aside">
@@ -367,6 +369,120 @@ Congratulations! You now have a running Rails application that is using a Docker
 <aside class="markdown-aside">
 Since the test database is also running in a Docker container, this will require Docker-specific setup to work on whatever CI (continuous integration) system your project is using. If using <a class="markdown-link" href="https://github.com/features/actions">Github Actions</a>, the host mount to the project source for initializing the database role doesn't work due to the order of how services and source checkout works. See my post on <a class="markdown-link" href="https://danielabaron.me/blog/debug-github-action/">Debugging Github Actions</a> for more details.
 </aside>
+
+## Modify Config File
+
+Optionally, you may want to tweak the default PostgreSQL configuration. Common reasons for doing this include:
+
+* Enabling extensions like `pg_stat_statements` for query performance analysis.
+* Adjusting logging settings for better visibility of slow queries or autovacuum operations.
+* Customizing memory or connection settings to better suit your local development environment.
+
+By default, the `postgresql.conf` file lives inside the Docker container as part of the official PostgreSQL image. Any changes made directly in the container will be lost if the container is removed. To make persistent changes, you need to:
+
+1. Locate and copy the config file out of the container.
+2. Make your desired changes locally.
+3. Bind mount the updated file back into the container.
+
+Here's how to do that step by step:
+
+**Step 1: Locate and Copy Config File**
+
+Connect to your running database using a superuser account:
+
+```bash
+# If your custom role has SUPERUSER privileges:
+bin/rails db
+
+# Or using the default postgres superuser:
+psql -h 127.0.0.1 -p 5434 -U postgres
+```
+
+From the psql prompt, check where the config file is located:
+
+```sql
+SHOW config_file;
+```
+
+The output should look something like this:
+
+```
+               config_file
+------------------------------------------
+ /var/lib/postgresql/data/postgresql.conf
+```
+
+Since the file is inside the container, extract a copy for local modification:
+
+```bash
+# Create a directory in your project root to hold PostgreSQL configuration files
+mkdir postgres_conf
+
+# Pull the sample config file from the official PostgreSQL image
+docker run -i --rm postgres:16 cat /usr/share/postgresql/postgresql.conf.sample > postgres_conf/postgresql.conf
+```
+
+**Step 2: Modify Config File**
+
+Now you have a local copy at `postgres_conf/postgresql.conf`. Open the file using your editor of choice and modify the settings as needed. For example:
+
+```
+# Enable pg_stat_statements for analyzing query performance
+# and auto_explain for slow query logging
+# https://www.postgresql.org/docs/current/auto-explain.html
+shared_preload_libraries = 'pg_stat_statements,auto_explain'
+
+# Collect query performance data
+pg_stat_statements.max = 10000
+pg_stat_statements.track = all
+
+# Log queries with execution duration >= 1ms
+auto_explain.log_min_duration = '1ms'
+auto_explain.log_analyze = on
+auto_explain.log_format = json
+
+# General logging tweaks
+log_min_duration_statement = 1    # log queries taking longer than 1ms
+log_duration = on                # always log duration of each completed statement
+
+# Log all autovacuum operations
+log_autovacuum_min_duration = 0
+
+# Enable CSV logging for easier analysis
+log_destination = 'stderr,csvlog'
+logging_collector = on
+```
+
+**Step 3: Update docker-compose.yml to use the custom config**
+
+To ensure your container uses the modified configuration file, update your `docker-compose.yml` with a [bind mount](https://docs.docker.com/engine/storage/bind-mounts/) in the `volumes` section:
+
+```yml
+version: "3.8"
+services:
+  database:
+    image: postgres:16
+    volumes:
+      - db_pg_data:/var/lib/postgresql/data
+      # === ADD THIS LINE HERE ===
+      - ./postgres_conf/postgresql.conf:/var/lib/postgresql/data/postgresql.conf
+    ports:
+      - "5434:5432"
+    environment:
+      POSTGRES_PASSWORD: shhhhItsASecret
+
+volumes:
+  db_pg_data:
+```
+
+Then recreate the container for changes to take effect:
+
+```bash
+docker-compose down
+docker-compose up
+```
+
+PostgreSQL running in the container will now use your customized configuration.
 
 ## Conclusion
 
