@@ -380,13 +380,13 @@ Optionally, you may want to tweak the default PostgreSQL configuration. Common r
 
 By default, the `postgresql.conf` file lives inside the Docker container as part of the official PostgreSQL image. Any changes made directly in the container will be lost if the container is removed. To make persistent changes, you need to:
 
-* Locate and copy the config file out of the container.
-* Make your desired changes locally.
-* Bind mount the updated file back into the container.
+1. Locate and copy the config file out of the container.
+2. Make your desired changes locally.
+3. Bind mount the updated file back into the container.
 
-Here's how to do this:
+Here's how to do that step by step:
 
-**Step 1: Locate the Config File**
+**Step 1: Locate and Copy Config File**
 
 Connect to your running database using a superuser account:
 
@@ -412,8 +412,6 @@ The output should look something like this:
  /var/lib/postgresql/data/postgresql.conf
 ```
 
-**Step 2: Copy the Config File Locally**
-
 Since the file is inside the container, extract a copy for local modification:
 
 ```bash
@@ -424,11 +422,9 @@ mkdir postgres_conf
 docker run -i --rm postgres:16 cat /usr/share/postgresql/postgresql.conf.sample > postgres_conf/postgresql.conf
 ```
 
-Now you have a local copy at `postgres_conf/postgresql.conf` that you can modify using your preferred editor.
+**Step 2: Modify Config File**
 
-**Step 3: Customize the Config File**
-
-Open `postgres_conf/postgresql.conf` and add or modify the settings you need. For example:
+Now you have a local copy at `postgres_conf/postgresql.conf`. Open the file using your editor of choice and modify the settings as needed. For example:
 
 ```
 # Enable pg_stat_statements for analyzing query performance
@@ -457,9 +453,9 @@ log_destination = 'stderr,csvlog'
 logging_collector = on
 ```
 
-**Step 4: Update docker-compose.yml to use the custom config**
+**Step 3: Update docker-compose.yml to use the custom config**
 
-To ensure your container uses the modified configuration file, update your `docker-compose.yml` with a bind mount in the `volumes` section:
+To ensure your container uses the modified configuration file, update your `docker-compose.yml` with a [bind mount](https://docs.docker.com/engine/storage/bind-mounts/) in the `volumes` section:
 
 ```yml
 version: "3.8"
@@ -486,7 +482,7 @@ docker-compose down
 docker-compose up
 ```
 
-PostgreSQL will now use your customized configuration.
+PostgreSQL running in the container will now use your customized configuration.
 
 ## Conclusion
 
