@@ -10,7 +10,7 @@ related:
   - "Understanding ActiveRecord Dependent Options"
 ---
 
-Rails maintains a file called `schema.rb` to represent your database schema. This file is automatically updated every time you run a migration. It reflects the current structure of your database using Ruby syntax, based on the [Rails migration DSL](https://api.rubyonrails.org/v8.0.2/classes/ActiveRecord/ConnectionAdapters/SchemaStatements.html). It's used to recreate the database schema quickly when running tasks like `db:setup`, `db:prepare`, or `db:reset`, without replaying the entire migration history (which may not be possible in any case on older projects).
+Rails maintains a file called `schema.rb` to represent the projects' database schema. This file is automatically updated every time a database migration is run. It reflects the current structure of the database using Ruby syntax, based on the [Rails migration DSL](https://api.rubyonrails.org/v8.0.2/classes/ActiveRecord/ConnectionAdapters/SchemaStatements.html). It's used to recreate the database schema quickly when running tasks like `db:setup`, `db:prepare`, or `db:reset`, without replaying the entire migration history (which may not be possible in any case on older projects).
 
 But sometimes you hit a limitation - like needing to use raw SQL to define database triggers, custom indexes, or other advanced database features that can't be expressed with the Rails migration DSL. That’s where SQL schema dumps come in. When using the sql schema format, instead of a `schema.rb` file being generated when migrations are run, you'll have a `structure.sql` file.
 
