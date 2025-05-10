@@ -10,9 +10,9 @@ related:
   - "Use UUID for primary key with Rails and Postgres"
 ---
 
-**Update (September 2023):** Rails projects using fixtures will need one additional permission for the Postgres role. See [initialization](../rails-postgres-docker#initialization) section for more details.
-
 **Update (May 2025):** Added instructions for customizing the PostgreSQL configuration file `postgresql.conf` used by the Docker container. See [modify config file](../rails-postgres-docker#modify-config-file) section for more details.
+
+**Update (September 2023):** Rails projects using fixtures will need one additional permission for the Postgres role. See [initialization](../rails-postgres-docker#initialization) section for more details.
 
 When scaffolding a new Rails project, the database flag can be used to specify a database other than the default SQLite, such as Postgres. However, the generated configuration will assume that the database is running on localhost, i.e. installed directly on your laptop or development machine. If instead you'd like the database running in a Docker container, a few more steps are necessary. This post will walk you through how to setup a new Rails project with a Postgres database running in a Docker container rather than the default SQLite running on localhost. It will be demonstrated using the [Rails Getting Started Guide](https://guides.rubyonrails.org/getting_started.html) which builds an example blog application. All the code explained in this post can be found in this [blogpg project](https://github.com/danielabar/blogpg) on Github.
 
