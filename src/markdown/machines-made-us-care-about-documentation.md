@@ -2,7 +2,7 @@
 title: "The Machines Finally Made Us Care About Documentation"
 featuredImage: "../images/machines-care-documentation-maxim-berg-pEb1rA-fElU-unsplash.jpg"
 description: "AI coding assistants like GitHub Copilot are making engineers care about documentation again — not for their teammates, but to train the machines."
-date: "2025-06-15"
+date: "2025-06-07"
 category: "productivity"
 related:
   - "About Those Docs"
@@ -10,7 +10,7 @@ related:
   - "Rapid Prototyping with ChatGPT: OAS Pension Calculator Part 1"
 ---
 
-I’ve been talking about the benefits of engineering documentation, and trying to encourage my fellow developers to write these, for many years. Beyond a basic *README.md*, architecture decisions, coding conventions, best practices, naming systems, third party integrations, “why we do it this way” files. The kind of internal documentation that helps new team members onboard faster, helps future-you remember how something works, and helps everyone avoid reinventing the wheel on every new feature.
+I’ve been talking for years about the value of engineering documentation—and trying to convince fellow developers to write more of it. Not just the basics like a README.md, but deeper internal docs: architecture decisions, coding conventions, naming systems, third-party integrations, and those invaluable “why we do it this way” explanations. This kind of documentation accelerates onboarding, helps future-you decode past-you’s decisions, and keeps teams from reinventing the wheel every time they build something new.
 
 But to be honest, it's been an uphill climb. For the longest time, it felt like I was shouting into the void. Engineers love writing code. But writing about code? Forget it. "Nobody reads the docs" they’d say, or "We’ll catch up with the docs later when we have time". Spoiler: there's never time and it rarely happens.
 
@@ -90,21 +90,16 @@ With these markdown-based engineering docs, the AI assistant can offer more rele
 
 ## A New Reason to Care About Docs
 
-This isn’t just a guide for your teammates anymore — it’s a training manual for your AI pair programmer.
+This isn’t just a guide for your teammates anymore - it’s a training manual for your AI pair programmer. The AI has become the best reader of your internal docs, and that’s shifting how we think about writing them.
 
-The AI has become the best reader of your internal docs — and suddenly, documentation is cool again.
-
-For folks like me who’ve been advocating for strong written communication in engineering teams, there's a certain irony here. Engineers that couldn't be persuaded to write docs for their fellow engineers, are jumping at the chance to write docs for their AI coding tools.
+For folks like me who’ve been advocating for strong written communication in engineering teams, there's a certain irony here. Engineers that couldn't be persuaded to write docs for their fellow engineers, are now eager to write docs for their AI coding tools.
 
 Documentation isn’t a burden. It’s leverage. It always has been. The difference is that now, you can *see* that leverage immediately in the form of smarter suggestions, cleaner diffs, and more aligned code across your team.
 
-## Write to be Read — by Humans *and* Machines
+## Write to be Read by Humans and Machines
 
-These AI-specific context files double as great human documentation. They’re short, focused, and actionable. And unlike Confluence or Notion wiki pages, they actually live alongside your code, which is another aspect of documentation I've always advocated for.
+These AI-specific context files double as great human documentation. They’re short, focused, and actionable. And unlike Confluence or Notion wiki pages, they live alongside your code, which is another aspect of documentation I've always advocated for.
 
 If you’ve ever thought “I don’t have time to write this down,” think of it this way: every line of context you write today means fewer irrelevant AI assistant suggestions, fewer PR comments about convention mismatches, and fewer hours debugging misunderstood business logic.
 
 Writing is coding now. Especially when machines are reading it.
-
-## TODO
-* edit
