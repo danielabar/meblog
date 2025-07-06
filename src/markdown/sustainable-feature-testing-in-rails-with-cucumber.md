@@ -691,27 +691,18 @@ end
 
 See the Cucumber documentation on [Anti Patterns](https://cucumber.io/docs/guides/anti-patterns) for more information about organizing step files and what to avoid.
 
-## Optimizing Test Speed and Developer Experience
+## Debugging
 
-* Why you don’t want to go through the login UI every time
-* Warden test helpers explained
-* Using a visible browser vs headless mode
-* VSCode Cucumber extension: autocomplete + step linking
+* Using a visible browser vs headless mode to see what's going on
+* `debugger` or `binding.pry` to stop the test, together with visible mode
 * Screenshot-on-failure setup (optional but helpful), see: https://cucumber.io/docs/guides/browser-automation#screenshot-on-failure
 
-## What Good Cucumber Coverage Looks Like
+## Developer Tooling
 
-* Coverage philosophy: entire workflows, not isolated actions
-* Walkthrough: One full workflow from the Book Review Demo
-* Show CLI output of full run—how readable it is
-* Benefits for QA and PMs in understanding what's covered
-
-## Tips, Tradeoffs, and Edge Cases
-
-* When not to use Cucumber (e.g. low-level logic)
-* How to avoid writing fragile steps
-* Testing authorization, edge flows, error states
-* Debugging failing scenarios (visible mode, screenshots, `save_and_open_page`)
+* VSCode Cucumber extension:
+  * syntax highlighting
+  * autocomplete? + click step in feature link to corresponding step definition file
+  * other editors/IDEs?
 
 ## Running Tests in CI
 
