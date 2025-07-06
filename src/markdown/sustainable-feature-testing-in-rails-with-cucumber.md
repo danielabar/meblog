@@ -637,19 +637,61 @@ end
 
 Alternatively the original scenario "User adds a review" could be renamed to "User manages their reviews", then more steps added showing how a user can at first create a review, edit it, then even delete it.
 
-## Test Organization
+## Steps Organization
 
-* By feature? By concern? How to think about it
-* Tradeoffs between generic steps and tightly scoped ones
-* Examples of reusable steps (like checking content, logging in)
-* Managing brittleness in selectors: where to use `within`, `data-testid` (this applies to browser testing in general, not Cucumber specific so the same best practices apply when using Cucumber)
+You may have noticed from the examples so far, that there were multiple step definition files in the book review demo app:
+
+```
+features
+├── authentication.feature
+├── book_reviews.feature
+├── other feature files...
+├── step_definitions
+│   ├── authentication_steps.rb
+│   ├── common_steps.rb
+│   ├── review.rb
+│   └── other step files...
+└── support
+    ├── env.rb
+    └── other support files...
+```
+
+How you organize your Cucumber step definitions can make a big difference as your test suite grows. While it’s technically possible to keep all your steps in a single file, this quickly becomes unwieldy. A more sustainable approach is to group step definitions by domain concept, such as authentication, books, or reviews, mirroring the main features of your app. For example, in the Book Review Demo, you might have `authentication_steps.rb` for login-related steps, `book_steps.rb` for book setup, and `review_steps.rb` for anything review-related.
+
+As you add more features, you’ll notice some steps are used across multiple domains—like clicking buttons or verifying flash messages. When this happens, extract these into a shared file, such as `common_steps.rb`. For instance, a generic step like:
+
+```ruby
+When("I click {string}") do |button|
+  click_button button
+end
+```
+
+is applicable to many scenarios.
+
+There’s a tradeoff between writing very generic steps (like checking for text anywhere on the page) and tightly scoped ones (like checking for a message within a specific DOM selector or data test id). Generic steps are easier to reuse but can lead to false positives, while tightly scoped steps are more robust but may break when the markup changes. For example, instead of:
+
+```ruby
+Then("I should see {string}") do |text|
+  expect(page).to have_content(text)
+end
+```
+
+you might prefer:
+
+```ruby
+Then("I should see {string} in the alert") do |text|
+  within(".alert") { expect(page).to have_content(text) }
+end
+```
+
+See the Cucumber documentation on [Anti Patterns](https://cucumber.io/docs/guides/anti-patterns) for more information about organizing step files and what to avoid.
 
 ## Optimizing Test Speed and Developer Experience
 
 * Why you don’t want to go through the login UI every time
 * Warden test helpers explained
 * Using a visible browser vs headless mode
-* VSCodium / VSCode Cucumber extension: autocomplete + step linking
+* VSCode Cucumber extension: autocomplete + step linking
 * Screenshot-on-failure setup (optional but helpful), see: https://cucumber.io/docs/guides/browser-automation#screenshot-on-failure
 
 ## What Good Cucumber Coverage Looks Like
@@ -696,7 +738,7 @@ Alternatively the original scenario "User adds a review" could be renamed to "Us
 * assuming project is using Devise for user authentication, which uses Warden under the hood
   * what to do if not using this? for example rails 8 comes with simple user auth out of the box - does that also come with system test helpers?
 * somewhere explain that When/Then/And can be mixed/matched between feature and steps (i.e. a Then in feature can match And in steps)
-* re-org common steps out of authentication_steps.rb into common_steps.rb - organization advice: start with specific 1-1 steps file per feature file, as you develop more tests and discover common steps, extract to something like common_steps.rb
+* WIP re-org common steps out of authentication_steps.rb into common_steps.rb - organization advice: start with specific 1-1 steps file per feature file, as you develop more tests and discover common steps, extract to something like common_steps.rb
 * slightly more explanation about "publishing" - some built-in hosted feature cucumber provides but we're not using it
 * debugging and non headless mode to see what's going on
 * cucumber is not just for Ruby/Rails projects, has drivers for other languages including Java, ... find ref link: https://cucumber.io/docs/installation/
@@ -705,9 +747,9 @@ Alternatively the original scenario "User adds a review" could be renamed to "Us
 * somewhere link cucumber for ruby gem: https://github.com/cucumber/cucumber-ruby/tree/main
 * Is this already linked somewhere? https://cucumber.io/docs/
 * The diagram in https://cucumber.io/docs/#what-are-step-definitions could be useful?
-* Hmmm organization by domain concept: https://cucumber.io/docs/guides/anti-patterns#how-to-decouple-steps--step-definitions
+* WIP Hmmm organization by domain concept: https://cucumber.io/docs/guides/anti-patterns#how-to-decouple-steps--step-definitions
   * But I like to start with one steps file per feature test, then extract to common steps as shared steps "reveal" themselves
 * target audience/assumptions: familiar with rails and system/feature testing in general (at least had some experience), but new to Cucumber.
-* Wording on aside for real app content moderation
+* Wording on aside for real app content moderation and email display
 * Explain `Background` - if need the same setup for every scenario - analogous to `before` in RSpec: https://www.jakubsobolewski.com/cucumber/articles/reference-gherkin.html#background
 * Nice to have: `.feature` file syntax
