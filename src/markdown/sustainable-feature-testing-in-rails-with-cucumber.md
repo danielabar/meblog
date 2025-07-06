@@ -396,10 +396,15 @@ Feature: Book reviews
 Let's focus our attention on the background steps:
 
 ```
-Given the following books exist:
-  | Title      | Author   | Published Year |
-  | Book One   | Author A | 2001           |
-  | Book Two   | Author B | 2002           |
+# features/book_reviews.feature
+Feature: Book reviews
+
+  Background:
+    Given the following books exist:
+      | Title      | Author   | Published Year |
+      | Book One   | Author A | 2001           |
+      | Book Two   | Author B | 2002           |
+    # ...
 ```
 
 The step definition looks like this:
@@ -499,7 +504,7 @@ When("I visit the book show page for {string}") do |book_title|
 end
 ```
 
-For filling in the review form the step accepts a string and integer rating, then uses Capybara `fill_in` and `select` methods to fill in a text area and select dropdown respectively:
+The step to fill in the review form accepts a string and integer rating, then uses Capybara `fill_in` and `select` methods to fill in a text area and select dropdown respectively:
 
 ```ruby
 # features/step_definitions/review_steps.rb
@@ -509,7 +514,7 @@ When("I enter a review with body {string} and rating {int}") do |body, rating|
 end
 ```
 
-Clicking the "Submit Review" button can re-use the same step definition we saw earlier for clicking the "Log in" button so this step can be extracted to a common file (more on [test organization](../sustainable-feature-testing-in-rails-with-cucumber#test-organization) later):
+Clicking the "Submit Review" button can re-use the same step definition we saw earlier for clicking the "Log in" button, so this step can be extracted to a common file (more on [steps organization](../sustainable-feature-testing-in-rails-with-cucumber#steps-organization) later):
 
 ```ruby
 # features/step_definitions/common_steps.rb
@@ -658,7 +663,7 @@ features
 
 How you organize your Cucumber step definitions can make a big difference as your test suite grows. While it’s technically possible to keep all your steps in a single file, this quickly becomes unwieldy. A more sustainable approach is to group step definitions by domain concept, such as authentication, books, or reviews, mirroring the main features of your app. For example, in the Book Review Demo, you might have `authentication_steps.rb` for login-related steps, `book_steps.rb` for book setup, and `review_steps.rb` for anything review-related.
 
-As you add more features, you’ll notice some steps are used across multiple domains—like clicking buttons or verifying flash messages. When this happens, extract these into a shared file, such as `common_steps.rb`. For instance, a generic step like:
+As you add more features, you’ll notice some steps are used across multiple domains, such as clicking buttons or verifying flash messages. When this happens, extract these into a shared file, such as `common_steps.rb`. For instance, a generic step like:
 
 ```ruby
 When("I click {string}") do |button|
