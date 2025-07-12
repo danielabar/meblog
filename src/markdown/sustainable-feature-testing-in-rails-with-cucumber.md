@@ -48,13 +48,13 @@ Feature: Book reviews
 
 We’ll unpack how this all works shortly, but for now, just notice how readable it is, even without knowing any Ruby or testing library syntax.
 
-These phrases aren't comments or placeholders, they make up an executable test. Behind the scenes, each plain language step is connected to Ruby code that uses Capybara (or any other driver) to interact with the web application under test. This provides the best of both worlds: readable intent at the top, and full control at the bottom.
+These phrases aren't comments or placeholders, they make up an executable test. Behind the scenes, each plain language step is connected to Ruby code that can use Capybara (or any other browser automation tool) to interact with the web application under test. This provides the best of both worlds: readable intent at the top, and full control at the bottom.
 
 Cucumber is especially valuable in projects where collaboration matters. Product managers, QA engineers, designers, and even stakeholders can follow along with what’s being tested without needing to parse through RSpec matchers or complex DOM selectors. And for developers, that same clarity makes tests easier to write, refactor, and maintain over the long haul.
 
 ## Why Not Just RSpec + Capybara?
 
-It’s worth asking: If system testing can already be accomplished with RSpec and Capybara, why add another layer? Let’s take a look at how the same scenario we saw earlier ("User sees book details and reviews") might look using RSpec system tests (assume FactoryBot is available and factories have been defined for all models):
+It’s worth asking: If system testing can already be accomplished with RSpec and Capybara, why add another layer? Let’s take a look at how the same scenario we saw earlier might look using RSpec system tests (assume FactoryBot is available and factories have been defined for all models):
 
 ```ruby
 require "rails_helper"
@@ -689,17 +689,154 @@ Then("I should see {string} in the alert") do |text|
 end
 ```
 
-See the Cucumber documentation on [Anti Patterns](https://cucumber.io/docs/guides/anti-patterns) for more information about organizing step files and what to avoid.
+See the Cucumber documentation on [Anti Patterns](https://cucumber.io/docs/guides/anti-patterns) for more information.
 
 ## Debugging
 
-* Using a visible browser vs headless mode to see what's going on
-* `debugger` or `binding.pry` to stop the test, together with visible mode
-* Screenshot-on-failure setup (optional but helpful), see: https://cucumber.io/docs/guides/browser-automation#screenshot-on-failure
+Browser tests are great when everything is passing, but when something goes wrong, debugging can be a challenge. Unlike unit or integration tests, these tests involve a real browser and a visual UI. This means sometimes it's often not enough to just read the error message; you need to actually see what’s happening on the page.
+
+By default, Capybara runs the tests in headless mode, meaning the browser operates invisibly in the background without displaying any windows. This is fast and convenient for automated runs, but it makes troubleshooting UI issues harder. Fortunately, with a simple environment variable, you can launch the browser in visible mode and watch your tests run just like a real user.
+
+Recall earlier when configuring Cucumber, we added `features/support/cuprite.rb` with the following:
+
+```ruby
+Capybara.register_driver(:cuprite) do |app|
+  Capybara::Cuprite::Driver.new(
+    app,
+    window_size: [1920, 1080],
+    js_errors: true,
+    headless: !ENV["VISIBLE_BROWSER"],
+    timeout: 10,
+    browser_options: {
+      "no-sandbox" => nil # Required if running in Docker
+    }
+  )
+end
+```
+
+This means you can set the `VISIBLE_BROWSER` environment variable when running the cucumber command (to any non empty value). When set, Capybara will launch the browser in visible (non-headless) mode, so you can watch the test as it runs. However, if a failure happens quickly, you might still miss it. The solution is to also add a `debugger` statement to pause the test right before the failure.
+
+For example, suppose the edit scenario is failing in not finding the expected validation messages. The output would look something like this:
+
+```
+ Scenario: User edits their review                                                                     # features/book_reviews.feature:42
+    ...
+    And I click "Update Review"                                                                         # features/step_definitions/common_steps.rb:1
+    Then I should see the following form validation messages:                                           # features/step_definitions/common_steps.rb:26
+      | There were some problems with your submission: |
+      | Body can't be blank                            |
+      Unable to find css "[data-testid=\"form-validation-error\"]" (Capybara::ElementNotFound)
+      ./features/step_definitions/common_steps.rb:27:in 'block in <main>'
+      features/book_reviews.feature:48:in `I should see the following form validation messages:'
+
+Failing Scenarios:
+cucumber features/book_reviews.feature:42 # Scenario: User edits their review
+```
+
+In this case, we can add a `debugger` statement at the beginning of the failing step definition:
+
+```ruby
+# features/step_definitions/common_steps.rb
+
+Then("I should see the following form validation messages:") do |table|
+  # === ADD DEBUGGER TO MAKE TEST PAUSE HERE ===
+  debugger
+
+  within('[data-testid="form-validation-error"]') do
+    table.raw.flatten.each do |msg|
+      expect(page).to have_content(msg)
+    end
+  end
+end
+```
+
+And then run only the failing test, setting the `VISIBLE_BROWSER` environment variable as follows:
+
+```bash
+VISIBLE_BROWSER=true bundle exec cucumber features/book_reviews.feature:42
+```
+
+When the test runs, you'll see it pause at the `debugger` line, just like any regular Ruby program:
+
+```
+    When I visit the book show page for "Book One"                                                      # features/step_definitions/review_steps.rb:21
+    Then I should see 3 stars for my review                                                             # features/step_definitions/review_steps.rb:49
+    And I enter a review with body "" and rating 3                                                      # features/step_definitions/review_steps.rb:26
+    And I click "Update Review"                                                                         # features/step_definitions/common_steps.rb:1
+[22, 31] in ~/projects/book_review_demo/features/step_definitions/common_steps.rb
+    26| Then("I should see the following form validation messages:") do |table|
+=>  27|   debugger
+    28|   within('[data-testid="form-validation-error"]') do
+    29|     table.raw.flatten.each do |msg|
+    30|       expect(page).to have_content(msg)
+    31|     end
+=>#0	block {|table=#<Cucumber::MultilineArgument::DataTable:...|} in <main> at ~/projects/book_review_demo/features/step_definitions/common_steps.rb:27
+```
+
+Also, a new browser will open and you can see exactly what the UI looks like at the point of failure. In this case, we can see that the error is displayed as expected:
+
+![cucumber book review demo app test browser](../images/cucumber-book-review-demo-app-test-browser.png "cucumber book review demo app test browser")
+
+So perhaps the problem lies in the css selector. This is a regular browser so you can open dev tools and inspect elements. And here we see the issue is that the `data-testid` in the markup is `form-validation-errors`:
+
+![cucumber book review demo app test browser dev tools](../images/cucumber-book-review-demo-app-test-browser-dev-tools.png "cucumber book review demo app test browser dev tools")
+
+But the step definition is incorrectly looking for a `data-testid` of "form-validation-error" (singular):
+
+```ruby
+Then("I should see the following form validation messages:") do |table|
+  debugger
+  # === FOUND THE BUG HERE! ===
+  within('[data-testid="form-validation-error"]') do
+    # ...
+  end
+end
+```
+
+So we can fix the selector in the test and run again to confirm it passes.
+
+## Screenshot on Failure
+
+Anytime a test fails, you will almost certainly want to see what the browser looked like at the point of failure. While the debugging steps covered in the previous section can get you there, a more efficient way is to automatically capture a [screenshot on failure](https://cucumber.io/docs/guides/browser-automation/#screenshot-on-failure). The Cucumber docs suggest the following code in an `After` hook:
+
+```ruby
+# features/support/hooks.rb
+After do |scenario|
+  if scenario.failed?
+    path = "html-report/#{scenario.__id__}.png"
+    page.save_screenshot(path)
+    attach(path, 'image/png')
+  end
+end
+```
+
+The generated files will be saved at `tmp/capybara/html-report/`, which should be git ignored. For example `tmp/capybara/html-report/12192.png`. A problem with this is if you're running an entire suite and multiple tests fail, it will be difficult to associate which screenshot is from which test failure because it's not obvious from the scenario ID.
+
+Fortunately Cucumber exposes some more details on the `scenario` object yielded by the `After` block. We can use these attributes to construct a more meaningful file name for the screenshot:
+
+```ruby
+# features/support/hooks.rb
+After do |scenario|
+  if scenario.failed?
+    file, line = scenario.location.to_s.split(":")
+    feature = File.basename(file, ".feature")
+    scenario_name = scenario.name.gsub(/\W+/, "_")
+    path = "html-report/#{feature}_#{scenario_name}_line_#{line}.png"
+    page.save_screenshot(path)
+    attach(path, "image/png")
+  end
+end
+```
+
+Now that failing test for a user editing their review would have its screenshot saved as `tmp/capybara/html-report/book_reviews_User_edits_their_review_line_42.png`, which is much more useful than something like `12192.png`.
+
+<aside class="markdown-aside">
+The <code>scenario</code> object yielded by the Cucumber <code>After</code> hook is an instance of <a class="markdown-link" href="https://github.com/cucumber/cucumber-ruby/blob/main/lib/cucumber/running_test_case.rb">Cucumber::RunningTestCase::TestCase</a>, which is defined in the <a class="markdown-link" href="https://github.com/cucumber/cucumber-ruby/tree/main">cucumber-ruby</a> gem. The docs for <code>RunningTestCase</code> state that it wraps <a class="markdown-link" href="https://github.com/cucumber/cucumber-ruby-core/blob/main/lib/cucumber/core/test/case.rb">Cucumber::Core::Test::Case</a>, which is defined in the <a class="markdown-link" href="https://github.com/cucumber/cucumber-ruby-core">cucumber-ruby-core</a> gem. Feel free to peruse the cucumber-ruby and cucumber-ruby-core gems to learn what methods are available for scenarios and other parts of Cucumber.
+</aside>
 
 ## Developer Tooling
 
-* VSCode Cucumber extension:
+* VSCode Cucumber extension: https://marketplace.visualstudio.com/items?itemName=CucumberOpen.cucumber-official
   * syntax highlighting
   * autocomplete? + click step in feature link to corresponding step definition file
   * other editors/IDEs?
@@ -739,7 +876,6 @@ See the Cucumber documentation on [Anti Patterns](https://cucumber.io/docs/guide
 * debugging and non headless mode to see what's going on
 * cucumber is not just for Ruby/Rails projects, has drivers for other languages including Java, ... find ref link: https://cucumber.io/docs/installation/
 * conclusion para
-* edit
 * somewhere link cucumber for ruby gem: https://github.com/cucumber/cucumber-ruby/tree/main
 * Is this already linked somewhere? https://cucumber.io/docs/
 * The diagram in https://cucumber.io/docs/#what-are-step-definitions could be useful?
@@ -748,4 +884,5 @@ See the Cucumber documentation on [Anti Patterns](https://cucumber.io/docs/guide
 * target audience/assumptions: familiar with rails and system/feature testing in general (at least had some experience), but new to Cucumber.
 * Wording on aside for real app content moderation and email display
 * Explain `Background` - if need the same setup for every scenario - analogous to `before` in RSpec: https://www.jakubsobolewski.com/cucumber/articles/reference-gherkin.html#background
-* Nice to have: `.feature` file syntax
+* Nice to have: `.feature` file syntax highlighting - can we get it from here? https://github.com/cucumber/vscode
+* edit
