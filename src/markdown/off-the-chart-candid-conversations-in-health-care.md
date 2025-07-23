@@ -18,7 +18,7 @@ As a technologist, I'm used to learning systems inside and out. I like to make i
 
 ## The Fog of Medical Communication
 
-At almost every step of the process, I've found myself asking questions that don't get clear answers. Not because the clinicians are rude or dismissive (although sometimes this happens), many have been kind and well-intentioned. But the *way* they communicate is often deeply unsatisfying and frustrating.
+At almost every step of the process, I've found myself asking questions that don't get clear answers. Not because the clinicians are rude or dismissive (although sometimes this happens), many have been kind and well-intentioned. But the *way* they communicate is often deeply unsatisfying and leaves me feeling no further informed as before the conversation began.
 
 For example, we were once weighing whether to pursue a less invasive diagnostic test before agreeing to a more invasive and risky surgical procedure. I asked about this less invasive option, and the clinician acknowledged that it existed - but said it was hard to get, involved a lot of paperwork, and wasn't commonly done. I was attempting to get at something like: Are you not recommending it because it's not useful as a diagnostic tool? Or because it's a bureaucratic hassle to get approval? If the test were as easy to order as an ultrasound, would you view it as worthwhile? But I wasn't able to get a straight answer.
 
