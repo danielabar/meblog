@@ -2,7 +2,7 @@
 title: "Pretty SQLite Output Persistently"
 featuredImage: "../images/pretty-sqlite-output-maryn-brayfield-MaDKBVyaVOY-unsplash.jpg"
 description: "Learn how to improve SQLite's default query output for better readability in Rails 8, where SQLite is now a serious option for production apps thanks to Solid Queue, Solid Cable, and Solid Cache."
-date: "2025-10-01"
+date: "2025-11-01"
 category: "sqlite"
 related:
   - "SQLite Varchar Surprise"
