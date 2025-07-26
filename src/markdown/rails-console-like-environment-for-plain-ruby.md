@@ -2,7 +2,7 @@
 title: "Rails Console-like Environment for a Plain Ruby Project"
 featuredImage: "../images/rails-console-plain-ruby-chad-greiter-qvksnJCsjyw-unsplash.jpg"
 description: "If you're working on a plain Ruby project and need an interactive console for debugging and exploration, this post covers how to set one up. A console allows quick experimentation with project classes, making it easier to test calculations, inspect data, and validate logic without writing temporary scripts. The setup is simple and provides a Rails-like experience for loading and interacting with the code."
-date: "2025-08-01"
+date: "2025-09-01"
 category: "ruby"
 related:
   - "Use Ruby to Parse Command Line Output"
