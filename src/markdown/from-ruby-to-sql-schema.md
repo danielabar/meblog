@@ -2,7 +2,7 @@
 title: "Switching From Ruby to SQL Schema in Rails"
 featuredImage: "../images/from-ruby-to-sql-schema-marek-studzinski--RDBDQuGF9k-unsplash.jpg"
 description: "How to switch from Rails default schema.rb to a SQL-based structure.sql schema dump mid-project without breaking your existing setup."
-date: "2025-09-01"
+date: "2025-10-01"
 category: "rails"
 related:
   - "Setup a Rails Project with Postgres and Docker"
