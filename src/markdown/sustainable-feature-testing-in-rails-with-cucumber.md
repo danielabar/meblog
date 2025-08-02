@@ -846,11 +846,100 @@ It also warns you if there is no corresponding step definition from a feature fi
 
 If you’re using a different editor, Cucumber’s [editor support page](https://cucumber.io/docs/tools/editors/) lists options for Atom, TextMate, Nova, and popular IDEs.
 
-## Running Tests in CI
+## Continuous Integration
 
-* Suggested setup (GitHub Actions example?)
-* Headless mode considerations
-* Storing screenshots as artifacts (optional)
+To make sure your Cucumber feature tests run consistently across machines, and catch regressions automatically, it's a good idea to integrate them into Continuous Integration (CI). Since my project is already hosted on GitHub, I use [GitHub Actions](https://docs.github.com/en/actions) to run tests automatically whenever I push code.
+
+To get started, add a workflow YAML file in your project root under `.github/workflows/` as follows:
+
+```yml
+# .github/workflows/feature_tests.yml
+name: Feature Tests
+
+on:
+  push:
+    branches: ["*"]
+
+jobs:
+  cucumber:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Set up Ruby
+        uses: ruby/setup-ruby@v1
+        with:
+          ruby-version: .ruby-version
+          bundler-cache: true
+
+      - name: Install system dependencies
+        run: sudo apt-get update && sudo apt-get install --no-install-recommends -y build-essential git pkg-config google-chrome-stable
+
+      - name: Prepare test database
+        run: bin/rails db:test:prepare
+
+      - name: Precompile assets
+        run: bin/rails assets:precompile
+
+      - name: Run Cucumber features
+        env:
+          RAILS_ENV: test
+        run: bundle exec cucumber
+
+      - name: Upload screenshots from failed tests
+        uses: actions/upload-artifact@v4
+        if: failure()
+        with:
+          name: screenshots
+          path: tmp/capybara/html-report
+          if-no-files-found: ignore
+```
+
+Let’s break down a few key parts:
+
+* **Checkout & setup:** Pulls down your code and installs the Ruby version from `.ruby-version`.
+* **System dependencies:** Installs packages like Chrome for running headless feature tests.
+* **Test setup:**
+  * `bin/rails db:test:prepare` sets up the test database.
+  * `bin/rails assets:precompile` is important for any JavaScript or CSS your app uses—without this, the feature tests may load broken pages or fail entirely. Precompiling ensures the test browser sees a fully styled, functional site, and any screenshots captured on failure will actually reflect the expected layout and design.
+* **Test execution:** Runs your Cucumber features in test mode.
+* **Artifacts on failure:** If any test fails, screenshots and HTML reports from Capybara are saved and uploaded as artifacts. You can download them from the GitHub UI to debug what went wrong.
+
+Here’s what a successful run looks like:
+
+![cucumber github workflow runner success](../images/cucumber-github-workflow-runner-success.png "cucumber github workflow runner success")
+
+And here’s a deliberately failing test, which triggers a red CI run and stores screenshots in the artifacts section. This can be downloaded which will download a zip file containing screenshots of the browser at the point that test(s) failed:
+
+```gherkin
+Feature: Book reviews
+
+  Background:
+    Given the following books exist:
+      | Title      | Author   | Published Year |
+      | Book One   | Author A | 2001           |
+      | Book Two   | Author B | 2002           |
+    And users exist:
+      | Email             | Password  |
+      | user1@example.com | password1 |
+      | user2@example.com | password2 |
+    And the following reviews exist:
+      | Book     | User Email        | Rating | Body       |
+      | Book One | user2@example.com | 4      | Good read. |
+    And I am signed in as "user1@example.com"
+
+  Scenario: User sees book details and reviews
+    When I visit the book show page for "Book One"
+    Then I should see the book title, author, and published year for "Book One DOES NOT EXIST"
+    And I should see the review for "user2@example.com" with body "Good read." and 4 stars
+    And I should see a submit review button
+```
+
+![cucumber github workflow runner failure](../images/cucumber-github-workflow-runner-failure.png "cucumber github workflow runner failure")
+
+For more options and customizations, check out the [GitHub Actions documentation](https://docs.github.com/en/actions).
 
 ## Cucumber + AI (Bonus Section)
 
@@ -889,5 +978,5 @@ If you’re using a different editor, Cucumber’s [editor support page](https:/
 * target audience/assumptions: familiar with rails and system/feature testing in general (at least had some experience), but new to Cucumber.
 * Wording on aside for real app content moderation and email display
 * Explain `Background` - if need the same setup for every scenario - analogous to `before` in RSpec: https://www.jakubsobolewski.com/cucumber/articles/reference-gherkin.html#background
-* Nice to have: `.feature` file syntax highlighting - can we get it from here? https://github.com/cucumber/vscode
+* Nice to have: `.feature` file syntax highlighting - can we get it from here? https://github.com/cucumber/vscode `gherkin`
 * edit
