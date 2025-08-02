@@ -693,7 +693,7 @@ See the Cucumber documentation on [Anti Patterns](https://cucumber.io/docs/guide
 
 ## Debugging
 
-Browser tests are great when everything is passing, but when something goes wrong, debugging can be a challenge. Unlike unit or integration tests, these tests involve a real browser and a visual UI. This means sometimes it's often not enough to just read the error message; you need to actually see what’s happening on the page.
+Browser tests are great when everything is passing, but when something goes wrong, debugging can be a challenge. Unlike unit or integration tests, these tests involve a real browser and a visual UI. This means it's not enough to read the error message; you need to also inspect what’s happening on the page.
 
 By default, Capybara runs the tests in headless mode, meaning the browser operates invisibly in the background without displaying any windows. This is fast and convenient for automated runs, but it makes troubleshooting UI issues harder. Fortunately, with a simple environment variable, you can launch the browser in visible mode and watch your tests run just like a real user.
 
@@ -836,10 +836,15 @@ The <code>scenario</code> object yielded by the Cucumber <code>After</code> hook
 
 ## Developer Tooling
 
-* VSCode Cucumber extension: https://marketplace.visualstudio.com/items?itemName=CucumberOpen.cucumber-official
-  * syntax highlighting
-  * autocomplete? + click step in feature link to corresponding step definition file
-  * other editors/IDEs?
+To make working with Cucumber more pleasant, I recommend the [Cucumber extension for VSCode](https://marketplace.visualstudio.com/items?itemName=CucumberOpen.cucumber-official). It adds syntax highlighting, step definition navigation (click a step in a feature file to jump to the corresponding step definition), and helpful autocomplete when writing feature files. The screenshot below shows autocomplete in action from the demo project:
+
+![cucumber vscode extension autocomplete](../images/cucumber-vscode-extension-autocomplete.png "cucumber vscode extension autocomplete")
+
+It also warns you if there is no corresponding step definition from a feature file, for example:
+
+![cucumber vscode extension no step definition warning](../images/cucumber-vscode-extension-no-step-definition-warning.png "cucumber vscode extension no step definition warning")
+
+If you’re using a different editor, Cucumber’s [editor support page](https://cucumber.io/docs/tools/editors/) lists options for Atom, TextMate, Nova, and popular IDEs.
 
 ## Running Tests in CI
 
