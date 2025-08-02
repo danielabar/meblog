@@ -941,21 +941,11 @@ Feature: Book reviews
 
 For more options and customizations, check out the [GitHub Actions documentation](https://docs.github.com/en/actions).
 
-## Cucumber + AI (Bonus Section)
-
-* How AI can help (and hurt) when generating tests
-* Example of a helpful AI prompt
-* When to take over manually
-
 ## Conclusion
 
-* Summary of benefits: clarity, communication, maintainability
-* Final take: if you're writing system tests, Cucumber makes them *readable and enduring*
-* Link to demo project
-* Invite to share thoughts, fork project, or try it out
+Cucumber isn’t magic, but it does bring structure and sanity to testing complex user flows. It helps you describe what matters in plain language and keeps your test code focused on behavior, not plumbing. When paired with Capybara and a CI runner, it becomes a powerful tool for catching regressions before your users do.
 
 ## TODO
-* WIP main content
 * ref link to page object pattern in aside
 * show example step definition earlier in What is Cucumber section?
 * in section where introducing cuprite, state why cuprite instead of selenium-webdriver (mention you could use selenium if you wish, Cucumber is agnostic to choice of browser driver) - could be an aside its not the main topic
@@ -969,7 +959,6 @@ For more options and customizations, check out the [GitHub Actions documentation
 * slightly more explanation about "publishing" - some built-in hosted feature cucumber provides but we're not using it
 * debugging and non headless mode to see what's going on
 * cucumber is not just for Ruby/Rails projects, has drivers for other languages including Java, ... find ref link: https://cucumber.io/docs/installation/
-* conclusion para
 * somewhere link cucumber for ruby gem: https://github.com/cucumber/cucumber-ruby/tree/main
 * Is this already linked somewhere? https://cucumber.io/docs/
 * The diagram in https://cucumber.io/docs/#what-are-step-definitions could be useful?
