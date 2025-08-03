@@ -46,11 +46,15 @@ Feature: Book reviews
     And I should see a submit review button
 ```
 
-We’ll unpack how this all works shortly, but for now, just notice how readable it is, even without knowing any Ruby or testing library syntax.
+We’ll look at how those plain language steps connect to Ruby code in just a bit, but for now, notice how readable it is, even without knowing any Ruby or testing library syntax.
 
 These phrases aren't comments or placeholders, they make up an executable test. Behind the scenes, each plain language step is connected to Ruby code that can use Capybara (or any other browser automation tool) to interact with the web application under test. This provides the best of both worlds: readable intent at the top, and full control at the bottom.
 
 Cucumber is especially valuable in projects where collaboration matters. Product managers, QA engineers, designers, and even stakeholders can follow along with what’s being tested without needing to parse through RSpec matchers or complex DOM selectors. And for developers, that same clarity makes tests easier to write, refactor, and maintain over the long haul.
+
+<aside class="markdown-aside">
+While this post uses a Ruby on Rails example, it's worth noting that Cucumber isn't Ruby-specific. Cucumber supports multiple languages including Java, JavaScript, and Python. See <a class="markdown-link" href="https://cucumber.io/docs/installation/">installation options</a> for the full list.
+</aside>
 
 ## Why Not Just RSpec + Capybara?
 
@@ -99,7 +103,7 @@ While the same concepts are being tested, it takes effort to understand what’s
 This is where Cucumber shines. Instead of encoding all the implementation detail in the test body, Cucumber pushes that detail down into step definitions. The result is a high-level test that reads like documentation, which is ideal for stakeholders, QA, and even your future self.
 
 <aside class="markdown-aside">
-It is possible to make RSpec system tests more readable using custom matchers, page objects, or helper methods. But these strategies can also add complexity or hide detail in other files. Cucumber, on the other hand, embraces the separation between intent and implementation from the start.
+It is possible to make RSpec system tests more readable using custom matchers, [page objects](https://martinfowler.com/bliki/PageObject.html), or helper methods. But these strategies can also add complexity or hide detail in other files. Cucumber, on the other hand, embraces the separation between intent and implementation from the start.
 </aside>
 
 And the best part? You don’t have to throw out your existing Capybara setup to adopt it. Cucumber doesn’t replace Capybara, it wraps around it. The same drivers, selectors, and test helpers still apply. You're just giving your tests a better top layer.
@@ -140,13 +144,15 @@ features/
     └── custom configuration (see below)
 ```
 
+All files in `features/support/*.rb` will be automatically loaded when tests run. The following sections explain each file we'll be adding and why it's needed.
+
 ### Configure Browser Driver
 
 Cucumber itself is agnostic about how your tests interact with the browser - it just runs your scenarios and delegates the actual browser automation to whatever tool you choose. In Rails projects, a popular choice is [Capybara](https://github.com/teamcapybara/capybara), which provides a unified API for driving different browser engines.
 
-Here, we configure Capybara to use [Cuprite](https://github.com/rubycdp/cuprite), a fast, modern driver for Chrome/Chromium. Cuprite is often more reliable and faster for JavaScript-heavy Rails apps than the default Selenium driver, but you could use Selenium or another driver if you prefer—Cucumber doesn't care which one you pick.
+Here, we configure Capybara to use [Cuprite](https://github.com/rubycdp/cuprite), a fast, modern driver for Chrome/Chromium. Cuprite is easy to setup, but you could use Selenium or another driver if you prefer. Cucumber is not opinionated in this matter.
 
-The configuration below sets Cuprite as the default driver for both regular and JavaScript-enabled tests. It enables headless mode by default (unless you set `VISIBLE_BROWSER`), sets a large window size for consistent screenshots, and includes a Docker-friendly option.
+The configuration below sets Cuprite as the default driver for both regular and JavaScript-enabled tests. It enables headless mode by default, sets a large window size for consistent screenshots, and includes a Docker-friendly option.
 
 Add `features/support/cuprite.rb`:
 
@@ -186,7 +192,7 @@ This ensures a clean database state between scenarios.
 
 ### FactoryBot Integration
 
-FactoryBot makes it easy to set up test data, and it works beautifully with Cucumber once configured.
+[FactoryBot](https://github.com/thoughtbot/factory_bot) makes it easy to set up test data, and it works beautifully with Cucumber once configured. (Assumes you’ve already added `factory_bot_rails` to your Gemfile in the `:test` group.)
 
 Add `features/support/factory_bot.rb`:
 
@@ -198,7 +204,7 @@ This makes methods like `create(:user)` available directly in your step definiti
 
 ### Devise and Warden for Fast Login
 
-Devise handles authentication in many Rails apps, and it uses Warden under the hood. Instead of clicking through login forms in every test, we can sign in programmatically.
+If your project uses [Devise](https://github.com/heartcombo/devise) for authentication (as many Rails apps do), you can speed up login in tests by using test helpers from it's dependent library, [Warden](https://github.com/wardencommunity/warden/wiki). Instead of clicking through login forms in every test, we can sign in programmatically.
 
 Add `features/support/warden.rb`:
 
@@ -943,27 +949,24 @@ For more options and customizations, check out the [GitHub Actions documentation
 
 ## Conclusion
 
-Cucumber isn’t magic, but it does bring structure and sanity to testing complex user flows. It helps you describe what matters in plain language and keeps your test code focused on behavior, not plumbing. When paired with Capybara and a CI runner, it becomes a powerful tool for catching regressions before your users do.
+Cucumber isn’t magic, but it does bring structure and sanity to testing complex user flows. It helps you describe what matters in plain language and keeps test code focused on behavior, not plumbing. When paired with Capybara and a CI runner, it becomes a powerful tool for catching regressions before your users do.
+
+For further reading, here are some of the resources mentioned in this post:
+
+* [Cucumber](https://cucumber.io/)
+* [Gherkin Reference](https://cucumber.io/docs/gherkin/reference)
+* [Installation Options](https://cucumber.io/docs/installation/)
+* [Data Tables](https://cucumber.io/docs/cucumber/data-tables/)
+* [Cucumber Expressions – Parameter Types](https://github.com/cucumber/cucumber-expressions#parameter-types)
+* [Cucumber Expressions – Custom Parameter Types](https://github.com/cucumber/cucumber-expressions#custom-parameter-types)
+* [Cucumber Anti-Patterns](https://cucumber.io/docs/guides/anti-patterns)
+* [Cucumber::DataTable API Docs](https://www.rubydoc.info/gems/cucumber/Cucumber/MultilineArgument/DataTable)
+* [`hashes` Method for Data Tables](https://www.rubydoc.info/gems/cucumber/Cucumber/MultilineArgument/DataTable#hashes-instance_method)
+* [`World` Method Source Code](https://github.com/cucumber/cucumber-ruby/blob/2cf3a61802cc36cbca6bf3eed666b3a4a90f77a3/lib/cucumber/glue/dsl.rb#L58)
 
 ## TODO
-* ref link to page object pattern in aside
-* show example step definition earlier in What is Cucumber section?
-* in section where introducing cuprite, state why cuprite instead of selenium-webdriver (mention you could use selenium if you wish, Cucumber is agnostic to choice of browser driver) - could be an aside its not the main topic
-* in "Configuring the Test Stack", explain that all files in support dir will be loaded, don't touch auto-generated `support/env.rb` because that may get modified on upgrades, instead, add all your own config in support/something.rb
-* maybe some config sections need more explanations (see comments at top of each support file in demo project)
-* link to factorybot docs for those not familiar
-* assuming project is using Devise for user authentication, which uses Warden under the hood
-  * what to do if not using this? for example rails 8 comes with simple user auth out of the box - does that also come with system test helpers?
-* somewhere explain that When/Then/And can be mixed/matched between feature and steps (i.e. a Then in feature can match And in steps)
-* WIP re-org common steps out of authentication_steps.rb into common_steps.rb - organization advice: start with specific 1-1 steps file per feature file, as you develop more tests and discover common steps, extract to something like common_steps.rb
 * slightly more explanation about "publishing" - some built-in hosted feature cucumber provides but we're not using it
-* debugging and non headless mode to see what's going on
-* cucumber is not just for Ruby/Rails projects, has drivers for other languages including Java, ... find ref link: https://cucumber.io/docs/installation/
-* somewhere link cucumber for ruby gem: https://github.com/cucumber/cucumber-ruby/tree/main
-* Is this already linked somewhere? https://cucumber.io/docs/
 * The diagram in https://cucumber.io/docs/#what-are-step-definitions could be useful?
-* WIP Hmmm organization by domain concept: https://cucumber.io/docs/guides/anti-patterns#how-to-decouple-steps--step-definitions
-  * But I like to start with one steps file per feature test, then extract to common steps as shared steps "reveal" themselves
 * target audience/assumptions: familiar with rails and system/feature testing in general (at least had some experience), but new to Cucumber.
 * Wording on aside for real app content moderation and email display
 * Explain `Background` - if need the same setup for every scenario - analogous to `before` in RSpec: https://www.jakubsobolewski.com/cucumber/articles/reference-gherkin.html#background
