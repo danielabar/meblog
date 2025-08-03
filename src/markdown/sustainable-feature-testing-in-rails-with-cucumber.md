@@ -969,7 +969,3 @@ For further reading, here are some of the resources mentioned in this post:
 * [Cucumber::DataTable API Docs](https://www.rubydoc.info/gems/cucumber/Cucumber/MultilineArgument/DataTable)
 * [`hashes` Method for Data Tables](https://www.rubydoc.info/gems/cucumber/Cucumber/MultilineArgument/DataTable#hashes-instance_method)
 * [`World` Method Source Code](https://github.com/cucumber/cucumber-ruby/blob/2cf3a61802cc36cbca6bf3eed666b3a4a90f77a3/lib/cucumber/glue/dsl.rb#L58)
-
-## TODO
-* Nice to have: `.feature` file syntax highlighting - can we get it from here? https://github.com/cucumber/vscode `gherkin`
-* edit
