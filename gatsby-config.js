@@ -89,6 +89,7 @@ module.exports = {
                 "applescript",
                 "vscode-graphql-syntax",
                 "vscode-ruby-syntax",
+                "vscode-gherkin",
               ],
               wrapperClassName: "gatsby-highlight",
               inlineCode: {
