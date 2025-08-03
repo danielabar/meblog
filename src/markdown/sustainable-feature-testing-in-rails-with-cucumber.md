@@ -14,6 +14,8 @@ Long-lived web applications need end-to-end tests, also known as system or brows
 
 That’s where [Cucumber](https://cucumber.io/) comes in. By separating high-level intent from low-level implementation, Cucumber lets you write tests in plain language that developers, product managers, and future-you can all understand at a glance. In this post, I’ll walk through examples from a Rails app I built, the [Book Review Demo](https://github.com/danielabar/book_review_demo), to show how Cucumber can make your test suite more readable, maintainable, and enduring.
 
+This post assumes you are familiar with Ruby on Rails and have some experience writing system or feature tests, such as with RSpec and Capybara or similar tools.
+
 ## What Is Cucumber
 
 Cucumber is a testing tool that lets you describe application behavior in plain language. Unlike tools such as Capybara or Selenium, which control the browser directly, Cucumber sits *above* your browser automation stack. Its job isn’t to drive the browser, but to express what you want to test in a way that anyone on your team, technical or non technical, can read and understand.
@@ -219,7 +221,9 @@ Now you can use `login_as(user)` in your steps to simulate a logged-in session. 
 
 ### Tidying Up Output
 
-When you run your first Cucumber test, you might see a message about "publishing your results". If that’s not useful to you, you can silence it by editing `config/cucumber.yml`, which got generated during the instal step earlier:
+When running Cucumber tests for the first time, it may display a message about *publishing results*. This refers to Cucumber’s optional service that lets you upload your test run data to an online dashboard. It can be useful for teams who want to share test reports in a web interface, but it’s not required.
+
+If you don’t need this feature, it can be silenced by editing `config/cucumber.yml`, which was generated during setup:
 
 ```yml
 std_opts = "--format #{ENV['CUCUMBER_FORMAT'] || 'pretty'} --strict --tags 'not @wip' --publish-quiet"
@@ -229,6 +233,8 @@ This also sets a few sensible defaults:
 
 * `--strict` will fail the build on undefined or pending steps.
 * `--tags 'not @wip'` skips work-in-progress scenarios unless explicitly tagged.
+
+To learn more about publishing and sharing your Cucumber test reports online, check out the [Cucumber Reports service](https://reports.cucumber.io/).
 
 ## Writing Your First Feature Test
 
@@ -258,7 +264,7 @@ Feature: User authentication
 
 A feature file starts with a `Feature` block, which describes a high-level capability or area of your application (for example, “User authentication” or “Book reviews”). Each feature file can contain multiple `Scenario` blocks, each representing a specific user story or test case within that feature.
 
-Each line in the `Scenario` maps to a Ruby method called a "step definition". These live in files under `features/step_definitions/`.
+Each line in the `Scenario` maps to a Ruby method called a [step definition](https://cucumber.io/docs/cucumber/step-definitions), which connects steps in the feature file to programming code. These live in files under `features/step_definitions/`.
 
 The `Given` keyword is used to set up the initial state for your scenario. This might mean creating test data, configuring the environment, or ensuring the application is in a known state before the user takes any actions.
 
@@ -357,7 +363,7 @@ After correcting the error by providing some review text, they can then submit t
 ![cucumber book review demo app review submit success](../images/cucumer-book-review-demo-app-review-submitted-success.png "cucumber book review demo app review submit success")
 
 <aside class="markdown-aside">
-TBD wording: A real app would not instantly publish the review but would go through some content moderation process. A real app would also allow user's to specify a username rather than displaying email addresses publicly. Not needed for this simple demo app.
+In a real app, reviews would typically undergo content moderation before publishing, and users would be able to select a display name instead of showing their email publicly. These details are omitted here to keep the demo relatively simple.
 </aside>
 
 To test this, we'll need a few books, users, and reviews setup in the test database. Recall in our first test we saw how we can create data for the test as follows:
@@ -965,10 +971,5 @@ For further reading, here are some of the resources mentioned in this post:
 * [`World` Method Source Code](https://github.com/cucumber/cucumber-ruby/blob/2cf3a61802cc36cbca6bf3eed666b3a4a90f77a3/lib/cucumber/glue/dsl.rb#L58)
 
 ## TODO
-* slightly more explanation about "publishing" - some built-in hosted feature cucumber provides but we're not using it
-* The diagram in https://cucumber.io/docs/#what-are-step-definitions could be useful?
-* target audience/assumptions: familiar with rails and system/feature testing in general (at least had some experience), but new to Cucumber.
-* Wording on aside for real app content moderation and email display
-* Explain `Background` - if need the same setup for every scenario - analogous to `before` in RSpec: https://www.jakubsobolewski.com/cucumber/articles/reference-gherkin.html#background
 * Nice to have: `.feature` file syntax highlighting - can we get it from here? https://github.com/cucumber/vscode `gherkin`
 * edit
