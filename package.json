@@ -49,7 +49,8 @@
     "react-icons": "4.8.0",
     "rest-client": "github:Huachao/vscode-restclient",
     "vscode-graphql-syntax": "github:danielabar/vscode-graphql-syntax",
-    "vscode-ruby-syntax": "github:smridge/vscode-ruby-syntax"
+    "vscode-ruby-syntax": "github:smridge/vscode-ruby-syntax",
+    "vscode-gherkin": "file:vendor/vscode-gherkin"
   },
   "devDependencies": {
     "@testing-library/jest-dom": "5.16.5",

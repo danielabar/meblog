@@ -24,7 +24,7 @@ Cucumber scenarios are written in a structured format called [Gherkin](https://c
 
 For example:
 
-```
+```gherkin
 Feature: Book reviews
 
   Background:
@@ -248,7 +248,7 @@ A user enters their credentials and clicks “Log in.” If the login is success
 
 Let’s see how we can express this workflow as a Cucumber feature test. The goal is to describe the scenario in plain language, just as a product manager or QA might:
 
-```
+```gherkin
 # features/authentication.feature
 Feature: User authentication
 
@@ -368,7 +368,7 @@ In a real app, reviews would typically undergo content moderation before publish
 
 To test this, we'll need a few books, users, and reviews setup in the test database. Recall in our first test we saw how we can create data for the test as follows:
 
-```
+```gherkin
 # features/authentication.feature
 Feature: User authentication
 
@@ -379,7 +379,7 @@ Feature: User authentication
 
 While we could write multiples lines like this, Cucumber has a more convenient feature [Data Tables](https://www.jakubsobolewski.com/cucumber/articles/reference-gherkin.html#data-tables), which allow you to pass a list of values to a step definition. For example:
 
-```
+```gherkin
 # features/book_reviews.feature
 Feature: Book reviews
 
@@ -407,7 +407,7 @@ Feature: Book reviews
 
 Let's focus our attention on the background steps:
 
-```
+```gherkin
 # features/book_reviews.feature
 Feature: Book reviews
 
@@ -462,7 +462,7 @@ end
 
 The last background step is to ensure a user is signed in that doesn't have a review on the book, so we can test the new review feature:
 
-```
+```gherkin
 # features/book_reviews.feature
 Feature: Book reviews
 
@@ -483,7 +483,7 @@ end
 
 Now we can write the step definitions for the scenario:
 
-```
+```gherkin
 # features/book_reviews.feature
 Feature: Book reviews
 
@@ -537,7 +537,7 @@ end
 
 The remainder of the scenario steps:
 
-```
+```gherkin
 Then I should see "Review was successfully created."
 And I should see "You" at the top of the reviews list
 And I should see "Amazing!" in my review
@@ -620,7 +620,7 @@ Another scenario we would want to test is a user visiting a book details page wh
 
 That scenario could be written like this:
 
-```
+```gherkin
 Feature: Book reviews
 
   Background:
