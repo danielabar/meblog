@@ -20,7 +20,7 @@ This post assumes you are familiar with Ruby on Rails and have some experience w
 
 Cucumber is a testing tool that lets you describe application behavior in plain language. Unlike tools such as Capybara or Selenium, which control the browser directly, Cucumber sits *above* your browser automation stack. Its job isn't to drive the browser, but to express what you want to test in a way that anyone on your team, technical or non technical, can read and understand.
 
-Cucumber scenarios are written in a structured format called [Gherkin](https://cucumber.io/docs/gherkin/reference), which uses keywords like `Feature`, `Background`, `Scenario`, `Given`, `When`, and `Then` to describe user-facing behavior. Each line beginning with `Given`, `When`, `Then` or `And` is called a *step*, which is a plain-language instruction that maps to Ruby code performing the actual test logic.
+Cucumber scenarios are written in a structured format called [Gherkin](https://cucumber.io/docs/gherkin/reference), which uses keywords like `Feature`, `Background`, `Scenario`, `Given`, `When`, and `Then` to describe user-facing behavior. Each line beginning with `Given`, `When`, `Then` or `And` is called a [step](https://cucumber.io/docs/cucumber/api#steps), which is a plain-language instruction that maps to Ruby code performing the actual test logic.
 
 For example:
 
@@ -60,7 +60,7 @@ While this post uses a Ruby on Rails example, it's worth noting that Cucumber is
 
 ## Why Not Just RSpec + Capybara?
 
-It's worth asking: If system testing can already be accomplished with RSpec and Capybara, why add another layer? Let's take a look at how the same scenario we saw earlier might look using RSpec system tests (assume [factory_bot](https://github.com/thoughtbot/factory_bot) is available and factories have been defined for all models):
+It's worth asking: If system testing can already be accomplished with RSpec and Capybara, why add another layer? Let's take a look at how the same scenario we saw earlier might look using RSpec system tests (assume [factory_bot](https://github.com/thoughtbot/factory_bot) is installed and factories have been defined for all models):
 
 ```ruby
 require "rails_helper"
@@ -100,7 +100,7 @@ RSpec.describe "Book show page", type: :system do
 end
 ```
 
-While the same concepts are being tested, it takes effort to understand what's actually being tested. It's not *terrible*, especially for developers familiar with Capybara, but it's clearly written for the machine, not the human. You have to *parse* the `let`, `within`, `all`, and `find` blocks to reconstruct what's going on. The intent: "show book details and reviews", is buried inside DOM selectors and test helpers.
+While the same concepts are being tested, it takes effort to understand what's actually being tested. It's not *terrible*, especially for developers familiar with Capybara, but it's clearly written for the machine, not the human. You have to *parse* the `let`, `within`, `all`, and `find` blocks to reconstruct what's going on. The intent: "show book details and reviews", is buried inside DOM selectors and and Capybara DSL calls.
 
 This is where Cucumber shines. Instead of encoding all the implementation detail in the test body, Cucumber pushes that detail down into step definitions. The result is a high-level test that reads like documentation.
 
@@ -152,9 +152,7 @@ All files in `features/support/*.rb` will be automatically loaded when tests run
 
 Cucumber itself is agnostic about how your tests interact with the browser - it just runs your scenarios and delegates the actual browser automation to whatever tool you choose. In Rails projects, a popular choice is [Capybara](https://github.com/teamcapybara/capybara), which provides a unified API for driving different browser engines.
 
-Here, we configure Capybara to use [Cuprite](https://github.com/rubycdp/cuprite), a fast, modern driver for Chrome/Chromium. Cuprite is easy to setup, but you could use Selenium or another driver if you prefer. Cucumber is not opinionated in this matter.
-
-The configuration below sets Cuprite as the default driver for both regular and JavaScript-enabled tests. It enables headless mode by default, sets a large window size for consistent screenshots, and includes a Docker-friendly option.
+Here, we configure Capybara to use [Cuprite](https://github.com/rubycdp/cuprite), a pure Ruby driver for Capybara. The configuration below sets Cuprite as the default driver for both regular and JavaScript-enabled tests. It enables headless mode by default, sets a large window size for consistent screenshots, and includes a Docker-friendly option.
 
 Add `features/support/cuprite.rb`:
 
@@ -185,7 +183,7 @@ Capybara.default_max_wait_time = 5
 
 ### Configure DatabaseCleaner
 
-By default, Rails uses transactions to clean test data, but that doesn't work when your app and test code run in separate processes (like with JavaScript drivers). So we need to configure truncation instead.
+With JavaScript drivers, Capybara runs the app server in a separate thread from your tests, so transactions aren’t shared. Simply rolling back a transaction at the end of a test won't clean up data seen by both threads. This means we need to configure truncation to ensure a clean state between tests.
 
 Create `features/support/database_cleaner.rb`:
 
@@ -193,11 +191,9 @@ Create `features/support/database_cleaner.rb`:
 DatabaseCleaner.strategy = :truncation
 ```
 
-This ensures a clean database state between scenarios.
-
 ### FactoryBot Integration
 
-[FactoryBot](https://github.com/thoughtbot/factory_bot) makes it easy to set up test data, and it works beautifully with Cucumber once configured. (Assumes you've already added `factory_bot_rails` to your Gemfile in the `:test` group.)
+[FactoryBot](https://github.com/thoughtbot/factory_bot) makes it easy to set up test data, and it works well with Cucumber once configured. (Assumes you've already added `factory_bot_rails` to your Gemfile in the `:test` group.)
 
 Add `features/support/factory_bot.rb`:
 
@@ -222,9 +218,9 @@ After { Warden.test_reset! }
 
 Now you can use `login_as(user)` in your steps to simulate a logged-in session. This technique is much faster than logging in through the UI for each test (although you should have at least one test that does this to ensure the login form is working).
 
-### Tidying Up Output
+### Suppressing Publish Message
 
-When running Cucumber tests for the first time, it may display a message about *publishing results*. This refers to Cucumber's optional service that lets you upload your test run data to an online dashboard. It can be useful for teams who want to share test reports in a web interface, but it's not required.
+When running Cucumber tests for the first time, it may display a message about publishing results. This refers to Cucumber's optional [reports service](https://reports.cucumber.io/) that lets you upload your test run data to an online dashboard. It can be useful for teams who want to share test reports in a web interface, but it's not required.
 
 If you don't need this feature, it can be silenced by editing `config/cucumber.yml`, which was generated during setup:
 
@@ -236,8 +232,6 @@ This also sets a few sensible defaults:
 
 * `--strict` will fail the build on undefined or pending steps.
 * `--tags 'not @wip'` skips work-in-progress scenarios unless explicitly tagged.
-
-To learn more about publishing and sharing your Cucumber test reports online, check out the [Cucumber Reports service](https://reports.cucumber.io/).
 
 ## Writing Your First Feature Test
 
