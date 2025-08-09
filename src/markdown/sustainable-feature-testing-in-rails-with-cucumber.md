@@ -10,13 +10,13 @@ related:
   - "Capybara Webdriver Element not Clickable Resolved"
 ---
 
-Long-lived web applications need end-to-end tests, also known as system or browser-based tests. These tests need to ensure *correct* behaviour, but also be *communicative*. System tests simulate real user behavior, verifying full-stack workflows through the UI. But as a project grows, traditional system tests can become hard to read and harder to maintain, especially when the test code obscures *what* is being tested behind *how* it's implemented.
+When your web app has been around for years, you need more than unit tests, you need proof the whole thing still works from the user's perspective. That's where end-to-end tests (a.k.a. system or browser-based tests) come in, simulating real clicks, form fills, and page loads to verify entire workflows through the UI. They shouldn't just verify correct behaviour; they should tell a clear story about what's being tested. But as your project grows, those same tests can morph into dense, brittle scripts that hide the ""what" behind the "how", making them painful to read and maintain.
 
 That's where [Cucumber](https://cucumber.io/) comes in. By separating high-level intent from low-level implementation, Cucumber lets you write tests in plain language that developers, product managers, and future-you can all understand at a glance. In this post, I'll walk through examples from a Rails app I built, the [Book Review Demo](https://github.com/danielabar/book_review_demo), to show how Cucumber can make your test suite more readable and maintainable.
 
 This post assumes you are familiar with Ruby on Rails and have some experience writing system or feature tests, such as with RSpec and Capybara or similar tools.
 
-## What Is Cucumber
+## What Is Cucumber?
 
 Cucumber is a testing tool that lets you describe application behavior in plain language. Unlike tools such as Capybara or Selenium, which control the browser directly, Cucumber sits *above* your browser automation stack. Its job isn't to drive the browser, but to express what you want to test in a way that anyone on your team, technical or non technical, can read and understand.
 
