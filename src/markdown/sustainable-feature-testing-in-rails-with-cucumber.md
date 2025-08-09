@@ -243,7 +243,7 @@ A user enters their credentials and clicks “Log in.” If the login is success
 
 ![cucumber book review demo app signed in](../images/cucumber-book-review-demo-app-signed-in.png "cucumber book review demo app signed in")
 
-Let's see how we can express this workflow as a Cucumber feature test. The goal is to describe the scenario in plain language, just as a product manager or QA might:
+Let's see how we can express this workflow as a Cucumber feature test:
 
 ```gherkin
 # features/authentication.feature
@@ -360,7 +360,7 @@ After correcting the error by providing some review text, they can then submit t
 ![cucumber book review demo app review submit success](../images/cucumer-book-review-demo-app-review-submitted-success.png "cucumber book review demo app review submit success")
 
 <aside class="markdown-aside">
-In a real app, reviews would typically undergo content moderation before publishing, and users would be able to select a display name instead of showing their email publicly. These details are omitted here to keep the demo relatively simple.
+In a real app, reviews would typically undergo content moderation before publishing, and users would be able to choose a display name instead of showing their email publicly. These details are omitted here to keep the demo relatively simple.
 </aside>
 
 To test this, we'll need a few books, users, and reviews setup in the test database. Recall in our first test we saw how we can create data for the test as follows:
@@ -762,7 +762,7 @@ end
 And then run only the failing test, setting the `VISIBLE_BROWSER` environment variable as follows:
 
 ```bash
-VISIBLE_BROWSER=true bundle exec cucumber features/book_reviews.feature:42
+VISIBLE_BROWSER=true bundle exec cucumber features/book_reviews.feature
 ```
 
 When the test runs, you'll see it pause at the `debugger` line, just like any regular Ruby program:
@@ -853,11 +853,11 @@ It also warns you if there is no corresponding step definition from a feature fi
 
 ![cucumber vscode extension no step definition warning](../images/cucumber-vscode-extension-no-step-definition-warning.png "cucumber vscode extension no step definition warning")
 
-If you're using a different editor, Cucumber's [editor support page](https://cucumber.io/docs/tools/editors/) lists options for Atom, TextMate, Nova, and popular IDEs.
+If you're using a different editor, check Cucumber's [editor support page](https://cucumber.io/docs/tools/#editors) for available plugins.
 
 ## Continuous Integration
 
-To make sure your Cucumber feature tests run consistently across machines, and catch regressions automatically, it's a good idea to integrate them into Continuous Integration (CI). Since my project is already hosted on GitHub, I use [GitHub Actions](https://docs.github.com/en/actions) to run tests automatically whenever I push code.
+To ensure your Cucumber feature tests run consistently across different environments and automatically catch regressions, it's a good practice to include them in your Continuous Integration (CI) pipeline. Since my project is hosted on GitHub, I use [GitHub Actions](https://docs.github.com/en/actions) to run tests automatically on every push.
 
 To get started, add a workflow YAML file in your project root under `.github/workflows/` as follows:
 
@@ -912,7 +912,7 @@ Let's break down a few key parts:
 * **System dependencies:** Installs packages like Chrome for running headless feature tests.
 * **Test setup:**
   * `bin/rails db:test:prepare` sets up the test database.
-  * `bin/rails assets:precompile` is important for any JavaScript or CSS your app uses—without this, the feature tests may load broken pages or fail entirely. Precompiling ensures the test browser sees a fully styled, functional site, and any screenshots captured on failure will actually reflect the expected layout and design.
+  * `bin/rails assets:precompile` precompiling assets ensures the test browser sees a fully styled, functional site, and any screenshots captured on failure will actually reflect the expected layout and design.
 * **Test execution:** Runs your Cucumber features in test mode.
 * **Artifacts on failure:** If any test fails, screenshots and HTML reports from Capybara are saved and uploaded as artifacts. You can download them from the GitHub UI to debug what went wrong.
 
