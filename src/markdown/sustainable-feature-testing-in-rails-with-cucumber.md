@@ -10,17 +10,17 @@ related:
   - "Capybara Webdriver Element not Clickable Resolved"
 ---
 
-Long-lived web applications need end-to-end tests, also known as system or browser-based tests. These tests need to ensure *correct* behaviour, but also be *communicative*. System tests simulate real user behavior, verifying full-stack workflows through the UI. But as a project grows, traditional system tests can become hard to read and harder to maintain, especially when the test code obscures *what* is being tested behind *how* it’s implemented.
+Long-lived web applications need end-to-end tests, also known as system or browser-based tests. These tests need to ensure *correct* behaviour, but also be *communicative*. System tests simulate real user behavior, verifying full-stack workflows through the UI. But as a project grows, traditional system tests can become hard to read and harder to maintain, especially when the test code obscures *what* is being tested behind *how* it's implemented.
 
-That’s where [Cucumber](https://cucumber.io/) comes in. By separating high-level intent from low-level implementation, Cucumber lets you write tests in plain language that developers, product managers, and future-you can all understand at a glance. In this post, I’ll walk through examples from a Rails app I built, the [Book Review Demo](https://github.com/danielabar/book_review_demo), to show how Cucumber can make your test suite more readable, maintainable, and enduring.
+That's where [Cucumber](https://cucumber.io/) comes in. By separating high-level intent from low-level implementation, Cucumber lets you write tests in plain language that developers, product managers, and future-you can all understand at a glance. In this post, I'll walk through examples from a Rails app I built, the [Book Review Demo](https://github.com/danielabar/book_review_demo), to show how Cucumber can make your test suite more readable and maintainable.
 
 This post assumes you are familiar with Ruby on Rails and have some experience writing system or feature tests, such as with RSpec and Capybara or similar tools.
 
 ## What Is Cucumber
 
-Cucumber is a testing tool that lets you describe application behavior in plain language. Unlike tools such as Capybara or Selenium, which control the browser directly, Cucumber sits *above* your browser automation stack. Its job isn’t to drive the browser, but to express what you want to test in a way that anyone on your team, technical or non technical, can read and understand.
+Cucumber is a testing tool that lets you describe application behavior in plain language. Unlike tools such as Capybara or Selenium, which control the browser directly, Cucumber sits *above* your browser automation stack. Its job isn't to drive the browser, but to express what you want to test in a way that anyone on your team, technical or non technical, can read and understand.
 
-Cucumber scenarios are written in a structured format called [Gherkin](https://cucumber.io/docs/gherkin/reference), which uses keywords like `Feature`, `Background`, `Scenario`, `Given`, `When`, and `Then` to describe user-facing behavior.
+Cucumber scenarios are written in a structured format called [Gherkin](https://cucumber.io/docs/gherkin/reference), which uses keywords like `Feature`, `Background`, `Scenario`, `Given`, `When`, and `Then` to describe user-facing behavior. Each line beginning with `Given`, `When`, `Then` or `And` is called a *step*, which is a plain-language instruction that maps to Ruby code performing the actual test logic.
 
 For example:
 
@@ -48,19 +48,19 @@ Feature: Book reviews
     And I should see a submit review button
 ```
 
-We’ll look at how those plain language steps connect to Ruby code in just a bit, but for now, notice how readable it is, even without knowing any Ruby or testing library syntax.
+We'll look at how those plain language steps connect to Ruby code in just a bit, but for now, notice how readable it is, even without knowing any Ruby or testing library syntax.
 
 These phrases aren't comments or placeholders, they make up an executable test. Behind the scenes, each plain language step is connected to Ruby code that can use Capybara (or any other browser automation tool) to interact with the web application under test. This provides the best of both worlds: readable intent at the top, and full control at the bottom.
 
-Cucumber is especially valuable in projects where collaboration matters. Product managers, QA engineers, designers, and even stakeholders can follow along with what’s being tested without needing to parse through RSpec matchers or complex DOM selectors. And for developers, that same clarity makes tests easier to write, refactor, and maintain over the long haul.
+Cucumber is especially valuable in projects where collaboration matters. Product managers, QA engineers, designers, and even stakeholders can follow along with what's being tested without needing to parse through RSpec matchers or complex DOM selectors. And for developers, that same clarity makes tests easier to write, refactor, and maintain over the long haul.
 
 <aside class="markdown-aside">
-While this post uses a Ruby on Rails example, it's worth noting that Cucumber isn't Ruby-specific. Cucumber supports multiple languages including Java, JavaScript, and Python. See <a class="markdown-link" href="https://cucumber.io/docs/installation/">installation options</a> for the full list.
+While this post uses a Ruby on Rails example, it's worth noting that Cucumber isn't Ruby-specific. Cucumber supports multiple languages including Java, JavaScript, Python, and many others. See <a class="markdown-link" href="https://cucumber.io/docs/installation/">installation options</a> for the full list.
 </aside>
 
 ## Why Not Just RSpec + Capybara?
 
-It’s worth asking: If system testing can already be accomplished with RSpec and Capybara, why add another layer? Let’s take a look at how the same scenario we saw earlier might look using RSpec system tests (assume FactoryBot is available and factories have been defined for all models):
+It's worth asking: If system testing can already be accomplished with RSpec and Capybara, why add another layer? Let's take a look at how the same scenario we saw earlier might look using RSpec system tests (assume [factory_bot](https://github.com/thoughtbot/factory_bot) is available and factories have been defined for all models):
 
 ```ruby
 require "rails_helper"
@@ -100,23 +100,23 @@ RSpec.describe "Book show page", type: :system do
 end
 ```
 
-While the same concepts are being tested, it takes effort to understand what’s actually being tested. It’s not *terrible*, especially for developers familiar with Capybara, but it’s clearly written for the machine, not the human. You have to *parse* the `let`, `within`, `all`, and `find` blocks to reconstruct what’s going on. The intent: "show book details and reviews", is buried inside DOM selectors and test helpers.
+While the same concepts are being tested, it takes effort to understand what's actually being tested. It's not *terrible*, especially for developers familiar with Capybara, but it's clearly written for the machine, not the human. You have to *parse* the `let`, `within`, `all`, and `find` blocks to reconstruct what's going on. The intent: "show book details and reviews", is buried inside DOM selectors and test helpers.
 
-This is where Cucumber shines. Instead of encoding all the implementation detail in the test body, Cucumber pushes that detail down into step definitions. The result is a high-level test that reads like documentation, which is ideal for stakeholders, QA, and even your future self.
+This is where Cucumber shines. Instead of encoding all the implementation detail in the test body, Cucumber pushes that detail down into step definitions. The result is a high-level test that reads like documentation.
 
 <aside class="markdown-aside">
-It is possible to make RSpec system tests more readable using custom matchers, [page objects](https://martinfowler.com/bliki/PageObject.html), or helper methods. But these strategies can also add complexity or hide detail in other files. Cucumber, on the other hand, embraces the separation between intent and implementation from the start.
+It is possible to make RSpec system tests more readable using custom matchers, <a class="markdown-link" href="https://martinfowler.com/bliki/PageObject.html">page objects</a>, or helper methods. But these strategies can also add complexity or hide detail in other files. Cucumber, on the other hand, embraces the separation between intent and implementation from the start.
 </aside>
 
-And the best part? You don’t have to throw out your existing Capybara setup to adopt it. Cucumber doesn’t replace Capybara, it wraps around it. The same drivers, selectors, and test helpers still apply. You're just giving your tests a better top layer.
+And the best part? You don't have to throw out your existing Capybara setup to adopt it. Cucumber doesn't replace Capybara, it wraps around it. The same drivers, selectors, and test helpers still apply. You're just giving your tests a better top layer.
 
 ## Setting Up Cucumber
 
-In this section, we’ll walk through setting up Cucumber in an existing Rails project. We'll configure Cucumber to work with Capybara, Cuprite (for headless JavaScript testing), FactoryBot, Devise, and DatabaseCleaner.
+In this section, we'll walk through setting up Cucumber in an existing Rails project. We'll configure Cucumber to work with Capybara, Cuprite (for headless JavaScript testing), FactoryBot, Devise, and DatabaseCleaner.
 
 ### Installation
 
-Start by updating the project's `Gemfile` under the `:test` group. Note that we’re opting for `cuprite` instead of the default `selenium-webdriver`:
+Start by updating the project's `Gemfile` under the `:test` group. Note that we're opting for `cuprite` instead of the default `selenium-webdriver`:
 
 ```ruby
 group :test do
@@ -170,13 +170,16 @@ Capybara.register_driver(:cuprite) do |app|
     window_size: [1920, 1080],
     js_errors: true,
     headless: !ENV["VISIBLE_BROWSER"],
+    # Max time (in seconds) to wait for browser commands to complete
     timeout: 10,
     browser_options: {
-      "no-sandbox" => nil # Required if running in Docker
+      # Required if running in Docker
+      "no-sandbox" => nil
     }
   )
 end
 
+# Max time (in seconds) to wait for elements to appear/disappear
 Capybara.default_max_wait_time = 5
 ```
 
@@ -194,7 +197,7 @@ This ensures a clean database state between scenarios.
 
 ### FactoryBot Integration
 
-[FactoryBot](https://github.com/thoughtbot/factory_bot) makes it easy to set up test data, and it works beautifully with Cucumber once configured. (Assumes you’ve already added `factory_bot_rails` to your Gemfile in the `:test` group.)
+[FactoryBot](https://github.com/thoughtbot/factory_bot) makes it easy to set up test data, and it works beautifully with Cucumber once configured. (Assumes you've already added `factory_bot_rails` to your Gemfile in the `:test` group.)
 
 Add `features/support/factory_bot.rb`:
 
@@ -221,9 +224,9 @@ Now you can use `login_as(user)` in your steps to simulate a logged-in session. 
 
 ### Tidying Up Output
 
-When running Cucumber tests for the first time, it may display a message about *publishing results*. This refers to Cucumber’s optional service that lets you upload your test run data to an online dashboard. It can be useful for teams who want to share test reports in a web interface, but it’s not required.
+When running Cucumber tests for the first time, it may display a message about *publishing results*. This refers to Cucumber's optional service that lets you upload your test run data to an online dashboard. It can be useful for teams who want to share test reports in a web interface, but it's not required.
 
-If you don’t need this feature, it can be silenced by editing `config/cucumber.yml`, which was generated during setup:
+If you don't need this feature, it can be silenced by editing `config/cucumber.yml`, which was generated during setup:
 
 ```yml
 std_opts = "--format #{ENV['CUCUMBER_FORMAT'] || 'pretty'} --strict --tags 'not @wip' --publish-quiet"
@@ -238,15 +241,15 @@ To learn more about publishing and sharing your Cucumber test reports online, ch
 
 ## Writing Your First Feature Test
 
-Suppose we want to test the login flow in our Book Review Demo app. Let’s start by looking at what the user sees:
+Suppose we want to test the login flow in our Book Review Demo app. Let's start by looking at what the user sees:
 
 ![cucumber book review demo app login](../images/cucumber-book-review-demo-app-login.png "cucumber book review demo app login")
 
-A user enters their credentials and clicks “Log in.” If the login is successful, they’re redirected to the landing page, and the navigation bar updates to show their email address:
+A user enters their credentials and clicks “Log in.” If the login is successful, they're redirected to the landing page, and the navigation bar updates to show their email address:
 
 ![cucumber book review demo app signed in](../images/cucumber-book-review-demo-app-signed-in.png "cucumber book review demo app signed in")
 
-Let’s see how we can express this workflow as a Cucumber feature test. The goal is to describe the scenario in plain language, just as a product manager or QA might:
+Let's see how we can express this workflow as a Cucumber feature test. The goal is to describe the scenario in plain language, just as a product manager or QA might:
 
 ```gherkin
 # features/authentication.feature
@@ -268,7 +271,7 @@ Each line in the `Scenario` maps to a Ruby method called a [step definition](htt
 
 The `Given` keyword is used to set up the initial state for your scenario. This might mean creating test data, configuring the environment, or ensuring the application is in a known state before the user takes any actions.
 
-Here’s what the step definitions for the above scenario might look like:
+Here's what the step definitions for the above scenario might look like:
 
 ```ruby
 # features/step_definitions/authentication_steps.rb
@@ -314,7 +317,7 @@ bundle exec cucumber features/authentication.feature
 bundle exec cucumber
 ```
 
-Cucumber will print each step as it runs, showing which Ruby file and line number implements it. If all steps pass, you’ll see a summary at the end. For example:
+Cucumber will print each step as it runs, showing which Ruby file and line number implements it. If all steps pass, you'll see a summary at the end. For example:
 
 ```
 Capybara starting Puma...
@@ -430,13 +433,13 @@ Given("the following books exist:") do |table|
 end
 ```
 
-Rather than passing a single value like a `{string}` or `{int}` into the step, we are making use of Cucumber’s [data tables](https://cucumber.io/docs/cucumber/data-tables/), which let you pass structured lists or records directly from your `.feature` files into your step definitions. When you write a step with a table, Cucumber automatically parses it and passes it as a [Cucumber::MultilineArgument::DataTable](https://www.rubydoc.info/gems/cucumber/Cucumber/MultilineArgument/DataTable) object to your Ruby block. You can then use methods like [hashes](https://www.rubydoc.info/gems/cucumber/Cucumber/MultilineArgument/DataTable#hashes-instance_method) to iterate over each row as a hash, making it easy to create multiple records or set up complex test data in a single, readable step.
+Rather than passing a single value like a `{string}` or `{int}` into the step, we are making use of Cucumber's [data tables](https://cucumber.io/docs/cucumber/data-tables/), which let you pass structured lists or records directly from your `.feature` files into your step definitions. When you write a step with a table, Cucumber automatically parses it and passes it as a [Cucumber::MultilineArgument::DataTable](https://www.rubydoc.info/gems/cucumber/Cucumber/MultilineArgument/DataTable) object to your Ruby block. You can then use methods like [hashes](https://www.rubydoc.info/gems/cucumber/Cucumber/MultilineArgument/DataTable#hashes-instance_method) to iterate over each row as a hash, making it easy to create multiple records or set up complex test data in a single, readable step.
 
 **Why use data tables?**
 
 - **Clarity:** Test data is visible right in the scenario, not hidden in Ruby code.
 - **Maintainability:** Adding or changing test cases is as simple as editing the table.
-- **Reusability:** Step definitions can handle any number of rows, so you don’t need to write repetitive steps.
+- **Reusability:** Step definitions can handle any number of rows, so you don't need to write repetitive steps.
 
 The `users exist` step follows the same pattern:
 
@@ -673,9 +676,9 @@ features
     └── other support files...
 ```
 
-How you organize your Cucumber step definitions can make a big difference as your test suite grows. While it’s technically possible to keep all your steps in a single file, this quickly becomes unwieldy. A more sustainable approach is to group step definitions by domain concept, such as authentication, books, or reviews, mirroring the main features of your app. For example, in the Book Review Demo, you might have `authentication_steps.rb` for login-related steps, `book_steps.rb` for book setup, and `review_steps.rb` for anything review-related.
+How you organize your Cucumber step definitions can make a big difference as your test suite grows. While it's technically possible to keep all your steps in a single file, this quickly becomes unwieldy. A more sustainable approach is to group step definitions by domain concept, such as authentication, books, or reviews, mirroring the main features of your app. For example, in the Book Review Demo, you might have `authentication_steps.rb` for login-related steps, `book_steps.rb` for book setup, and `review_steps.rb` for anything review-related.
 
-As you add more features, you’ll notice some steps are used across multiple domains, such as clicking buttons or verifying flash messages. When this happens, extract these into a shared file, such as `common_steps.rb`. For instance, a generic step like:
+As you add more features, you'll notice some steps are used across multiple domains, such as clicking buttons or verifying flash messages. When this happens, extract these into a shared file, such as `common_steps.rb`. For instance, a generic step like:
 
 ```ruby
 When("I click {string}") do |button|
@@ -685,7 +688,7 @@ end
 
 is applicable to many scenarios.
 
-There’s a tradeoff between writing very generic steps (like checking for text anywhere on the page) and tightly scoped ones (like checking for a message within a specific DOM selector or data test id). Generic steps are easier to reuse but can lead to false positives, while tightly scoped steps are more robust but may break when the markup changes. For example, instead of:
+There's a tradeoff between writing very generic steps (like checking for text anywhere on the page) and tightly scoped ones (like checking for a message within a specific DOM selector or data test id). Generic steps are easier to reuse but can lead to false positives, while tightly scoped steps are more robust but may break when the markup changes. For example, instead of:
 
 ```ruby
 Then("I should see {string}") do |text|
@@ -705,7 +708,7 @@ See the Cucumber documentation on [Anti Patterns](https://cucumber.io/docs/guide
 
 ## Debugging
 
-Browser tests are great when everything is passing, but when something goes wrong, debugging can be a challenge. Unlike unit or integration tests, these tests involve a real browser and a visual UI. This means it's not enough to read the error message; you need to also inspect what’s happening on the page.
+Browser tests are great when everything is passing, but when something goes wrong, debugging can be a challenge. Unlike unit or integration tests, these tests involve a real browser and a visual UI. This means it's not enough to read the error message; you need to also inspect what's happening on the page.
 
 By default, Capybara runs the tests in headless mode, meaning the browser operates invisibly in the background without displaying any windows. This is fast and convenient for automated runs, but it makes troubleshooting UI issues harder. Fortunately, with a simple environment variable, you can launch the browser in visible mode and watch your tests run just like a real user.
 
@@ -856,7 +859,7 @@ It also warns you if there is no corresponding step definition from a feature fi
 
 ![cucumber vscode extension no step definition warning](../images/cucumber-vscode-extension-no-step-definition-warning.png "cucumber vscode extension no step definition warning")
 
-If you’re using a different editor, Cucumber’s [editor support page](https://cucumber.io/docs/tools/editors/) lists options for Atom, TextMate, Nova, and popular IDEs.
+If you're using a different editor, Cucumber's [editor support page](https://cucumber.io/docs/tools/editors/) lists options for Atom, TextMate, Nova, and popular IDEs.
 
 ## Continuous Integration
 
@@ -909,7 +912,7 @@ jobs:
           if-no-files-found: ignore
 ```
 
-Let’s break down a few key parts:
+Let's break down a few key parts:
 
 * **Checkout & setup:** Pulls down your code and installs the Ruby version from `.ruby-version`.
 * **System dependencies:** Installs packages like Chrome for running headless feature tests.
@@ -919,11 +922,11 @@ Let’s break down a few key parts:
 * **Test execution:** Runs your Cucumber features in test mode.
 * **Artifacts on failure:** If any test fails, screenshots and HTML reports from Capybara are saved and uploaded as artifacts. You can download them from the GitHub UI to debug what went wrong.
 
-Here’s what a successful run looks like:
+Here's what a successful run looks like:
 
 ![cucumber github workflow runner success](../images/cucumber-github-workflow-runner-success.png "cucumber github workflow runner success")
 
-And here’s a deliberately failing test, which triggers a red CI run and stores screenshots in the artifacts section. This can be downloaded which will download a zip file containing screenshots of the browser at the point that test(s) failed:
+And here's a deliberately failing test, which triggers a red CI run and stores screenshots in the artifacts section. This can be downloaded which will download a zip file containing screenshots of the browser at the point that test(s) failed:
 
 ```gherkin
 Feature: Book reviews
@@ -955,7 +958,7 @@ For more options and customizations, check out the [GitHub Actions documentation
 
 ## Conclusion
 
-Cucumber isn’t magic, but it does bring structure and sanity to testing complex user flows. It helps you describe what matters in plain language and keeps test code focused on behavior, not plumbing. When paired with Capybara and a CI runner, it becomes a powerful tool for catching regressions before your users do.
+Cucumber isn't magic, but it does bring structure and sanity to testing complex user flows. It helps you describe what matters in plain language and keeps test code focused on behavior, not plumbing. When paired with Capybara and a CI runner, it becomes a powerful tool for catching regressions before your users do.
 
 For further reading, here are some of the resources mentioned in this post:
 
