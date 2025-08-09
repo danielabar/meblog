@@ -948,8 +948,6 @@ Feature: Book reviews
 
 ![cucumber github workflow runner failure](../images/cucumber-github-workflow-runner-failure.png "cucumber github workflow runner failure")
 
-For more options and customizations, check out the [GitHub Actions documentation](https://docs.github.com/en/actions).
-
 ## Conclusion
 
 Cucumber isn't magic, but it does bring structure and sanity to testing complex user flows. It helps you describe what matters in plain language and keeps test code focused on behavior, not plumbing. When paired with Capybara and a CI runner, it becomes a powerful tool for catching regressions before your users do.
