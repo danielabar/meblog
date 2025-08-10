@@ -818,7 +818,7 @@ So we can fix the selector in the test and run again to confirm it passes.
 
 ## Screenshot on Failure
 
-Anytime a test fails, you will almost certainly want to see what the browser looked like at the point of failure. While the debugging steps covered in the previous section can get you there, a more efficient way is to automatically capture a [screenshot on failure](https://cucumber.io/docs/guides/browser-automation/#screenshot-on-failure). The Cucumber docs suggest the following code in an `After` hook:
+Anytime a test fails, you will almost certainly want to see what the browser looked like at the point of failure. While the debugging steps covered in the previous section can get you there, a more efficient way is to automatically capture a [screenshot on failure](https://cucumber.io/docs/guides/browser-automation/#screenshot-on-failure). The Cucumber documentation suggests adding the following code in an `After` hook, which is placed in a support file:
 
 ```ruby
 # features/support/hooks.rb
@@ -833,7 +833,7 @@ end
 
 The generated files will be saved at `tmp/capybara/html-report/`, which should be git ignored. For example `tmp/capybara/html-report/12192.png`. A problem with this is if you're running an entire suite and multiple tests fail, it will be difficult to associate which screenshot is from which test failure because it's not obvious from the scenario ID.
 
-Fortunately Cucumber exposes some more details on the `scenario` object yielded by the `After` block. We can use these attributes to construct a more meaningful file name for the screenshot:
+Fortunately Cucumber exposes some details on the `scenario` object yielded by the `After` block. We can use these attributes to construct a more meaningful file name for the screenshot:
 
 ```ruby
 # features/support/hooks.rb
@@ -849,10 +849,10 @@ After do |scenario|
 end
 ```
 
-Now that failing test for a user editing their review would have its screenshot saved as `tmp/capybara/html-report/book_reviews_User_edits_their_review_line_42.png`, which is much more useful than something like `12192.png`.
+Now that failing test for a user editing their review would have its screenshot saved as `tmp/capybara/html-report/book_reviews_User_edits_their_review_line_42.png`.
 
 <aside class="markdown-aside">
-The <code>scenario</code> object yielded by the Cucumber <code>After</code> hook is an instance of <a class="markdown-link" href="https://github.com/cucumber/cucumber-ruby/blob/main/lib/cucumber/running_test_case.rb">Cucumber::RunningTestCase::TestCase</a>, which is defined in the <a class="markdown-link" href="https://github.com/cucumber/cucumber-ruby/tree/main">cucumber-ruby</a> gem. The docs for <code>RunningTestCase</code> state that it wraps <a class="markdown-link" href="https://github.com/cucumber/cucumber-ruby-core/blob/main/lib/cucumber/core/test/case.rb">Cucumber::Core::Test::Case</a>, which is defined in the <a class="markdown-link" href="https://github.com/cucumber/cucumber-ruby-core">cucumber-ruby-core</a> gem. Feel free to peruse the cucumber-ruby and cucumber-ruby-core gems to learn what methods are available for scenarios and other parts of Cucumber.
+The <code>scenario</code> object yielded by the Cucumber <code>After</code> hook is an instance of <a class="markdown-link" href="https://github.com/cucumber/cucumber-ruby/blob/main/lib/cucumber/running_test_case.rb">Cucumber::RunningTestCase::TestCase</a>, which is defined in the <a class="markdown-link" href="https://github.com/cucumber/cucumber-ruby/tree/main">cucumber-ruby</a> gem. The documentation for <code>RunningTestCase</code> state that it wraps <a class="markdown-link" href="https://github.com/cucumber/cucumber-ruby-core/blob/main/lib/cucumber/core/test/case.rb">Cucumber::Core::Test::Case</a>, which is defined in the <a class="markdown-link" href="https://github.com/cucumber/cucumber-ruby-core">cucumber-ruby-core</a> gem. Feel free to peruse the cucumber-ruby and cucumber-ruby-core gems to learn what methods are available for scenarios and other parts of Cucumber.
 </aside>
 
 ## Developer Tooling
