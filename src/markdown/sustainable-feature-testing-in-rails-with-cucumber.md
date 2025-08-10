@@ -716,7 +716,7 @@ See the Cucumber documentation on [Anti Patterns](https://cucumber.io/docs/guide
 
 Browser tests are great when everything is passing, but when something goes wrong, debugging can be a challenge. Unlike unit or integration tests, these tests involve a real browser and a visual UI. This means it's not enough to read the error message; you need to also inspect what's happening on the page.
 
-By default, Capybara runs the tests in headless mode, meaning the browser operates invisibly in the background without displaying any windows. This is fast and convenient for automated runs, but it makes troubleshooting UI issues harder. Fortunately, with a simple environment variable, you can launch the browser in visible mode and watch your tests run just like a real user.
+By default, Capybara runs the tests in headless mode, meaning the browser operates invisibly in the background without displaying any windows. This is fast and convenient for automated runs, but it makes troubleshooting UI issues harder. Fortunately, with a simple environment variable, you can launch the browser in visible mode and watch your tests run.
 
 Recall earlier when configuring Cucumber, we added `features/support/cuprite.rb` with the following:
 
@@ -735,9 +735,9 @@ Capybara.register_driver(:cuprite) do |app|
 end
 ```
 
-This means you can set the `VISIBLE_BROWSER` environment variable when running the cucumber command (to any non empty value). When set, Capybara will launch the browser in visible (non-headless) mode, so you can watch the test as it runs. However, if a failure happens quickly, you might still miss it. The solution is to also add a `debugger` statement to pause the test right before the failure.
+This means you can set the `VISIBLE_BROWSER` environment variable when running the `cucumber` command. When set, Capybara will launch the browser in visible (non-headless) mode, so you can watch the test as it runs. However, if a failure happens quickly, you might still miss it. The solution is to also add a `debugger` statement to pause the test right before the failure.
 
-For example, suppose the edit scenario is failing in not finding the expected validation messages. The output would look something like this:
+For example, suppose the edit scenario is failing in not finding the expected validation messages. The output might look something like this:
 
 ```
  Scenario: User edits their review                                                                     # features/book_reviews.feature:42
@@ -754,7 +754,7 @@ Failing Scenarios:
 cucumber features/book_reviews.feature:42 # Scenario: User edits their review
 ```
 
-In this case, we can add a `debugger` statement at the beginning of the failing step definition:
+To troubleshoot the failing test, we add a `debugger` statement at the beginning of the failing step definition:
 
 ```ruby
 # features/step_definitions/common_steps.rb
@@ -798,7 +798,7 @@ Also, a new browser will open and you can see exactly what the UI looks like at 
 
 ![cucumber book review demo app test browser](../images/cucumber-book-review-demo-app-test-browser.png "cucumber book review demo app test browser")
 
-So perhaps the problem lies in the css selector. This is a regular browser so you can open dev tools and inspect elements. And here we see the issue is that the `data-testid` in the markup is `form-validation-errors`:
+So perhaps the problem lies in the css selector. This is a regular browser so you can open the developer tools and inspect elements. And here we see the issue is that the `data-testid` in the markup is `form-validation-errors`:
 
 ![cucumber book review demo app test browser dev tools](../images/cucumber-book-review-demo-app-test-browser-dev-tools.png "cucumber book review demo app test browser dev tools")
 
