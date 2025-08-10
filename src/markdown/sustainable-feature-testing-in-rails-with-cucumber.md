@@ -224,7 +224,7 @@ Now you can call `login_as(user)` in your step definitions to simulate a logged-
 
 ### Reports Service
 
-When running Cucumber tests for the first time, it may display a message about publishing results. This refers to Cucumber's optional [reports service](https://reports.cucumber.io/) that lets you upload your test run data to an online dashboard. It can be useful for teams who want to share test reports in a web interface, but it's not required.
+When running Cucumber tests for the first time, it may display a message about publishing results. This refers to Cucumber's optional [reports service](https://reports.cucumber.io/) for uploading test run data to an online dashboard. It can be useful for teams who want to share test reports in a web interface, but it's not required.
 
 If you don't need this feature, it can be silenced by editing `config/cucumber.yml`, which was generated during setup:
 
@@ -243,7 +243,7 @@ Suppose we want to test the login flow in our Book Review Demo app. Let's start 
 
 ![cucumber book review demo app login](../images/cucumber-book-review-demo-app-login.png "cucumber book review demo app login")
 
-A user enters their credentials and clicks “Log in.” If the login is successful, they're redirected to the landing page, and the navigation bar updates to show their email address:
+A user enters their credentials and clicks “Log in.” If the login is successful, they're redirected to the landing page, and the navigation bar updates to indicate they're logged in:
 
 ![cucumber book review demo app signed in](../images/cucumber-book-review-demo-app-signed-in.png "cucumber book review demo app signed in")
 
@@ -263,9 +263,9 @@ Feature: User authentication
     And I should see a "Logout" button
 ```
 
-A feature file starts with a `Feature` block, which describes a high-level capability or area of your application (for example, “User authentication” or “Book reviews”). Each feature file can contain multiple `Scenario` blocks, each representing a specific user story or test case within that feature.
+A feature file starts with a `Feature` block, which describes a high-level capability or area of your application (for example, "User authentication" or "Book reviews"). Feature files can contain multiple `Scenario` blocks, representing user stories or test cases within that feature.
 
-Each line in the `Scenario` maps to a Ruby method called a [step definition](https://cucumber.io/docs/cucumber/step-definitions), which connects steps in the feature file to programming code. These live in files under `features/step_definitions/`.
+Each line in the `Scenario` maps to a Ruby method called a [step definition](https://cucumber.io/docs/cucumber/step-definitions), which connects steps in the feature file to code. These Ruby files are located at `features/step_definitions/`.
 
 The `Given` keyword is used to set up the initial state for your scenario. This might mean creating test data, configuring the environment, or ensuring the application is in a known state before the user takes any actions.
 
@@ -298,10 +298,21 @@ Then("I should see a {string} button") do |text|
 end
 ```
 
-**Notes:**
+Each `{string}`, `{int}`, or other placeholder in the step's text corresponds to a parameter passed into the Ruby step definition block. For example, in:
+
+```ruby
+Given("a user exists with email {string} and password {string}") do |email, password|
+  # ...
+end
+```
+
+the two `{string}` placeholders in the feature step are extracted and provided as the `email` and `password` variables inside the block.
+
+**Additional Notes:**
 
 - You can use any Ruby code, including Capybara matchers and Rails helpers inside the step definitions.
 - The `{string}` placeholders let you reuse steps for different values.
+- You can mix and match `Given`, `When`, `Then`, and `And` in both your feature files and step definitions - Cucumber matches them by the text rather than the Gherkin keyword.
 - In addition to `{string}`, step definitions can match on several other [types](https://github.com/cucumber/cucumber-expressions?tab=readme-ov-file#parameter-types)
 - If the built-in types aren't enough for your use case, you can write a [custom type](https://github.com/cucumber/cucumber-expressions?tab=readme-ov-file#custom-parameter-types)
 
@@ -338,12 +349,7 @@ Feature: User authentication
 7 steps (7 passed)
 ```
 
-**What's happening under the hood?**
-
-- Just like with RSpec system tests, Capybara automatically starts a real Rails server (usually Puma) for each test run, so your scenarios interact with a live application.
-- **Feature files** describe *what* should happen, not *how*.
-- **Step definitions** translate those plain-language steps into Ruby code that interacts with your app (using Capybara, FactoryBot, etc.).
-- You can mix and match `Given`, `When`, `Then`, and `And` in both your feature files and step definitions - Cucumber matches them by the text, not the keyword.
+Just like with RSpec system tests, Capybara starts a Rails server for each test run, so the scenarios interact with a running application.
 
 ## More Complex Feature
 
