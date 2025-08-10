@@ -10,9 +10,9 @@ related:
   - "Capybara Webdriver Element not Clickable Resolved"
 ---
 
-When your web app has been around for years, you need more than unit tests, you need proof the whole thing still works from the user's perspective. That's where end-to-end tests (a.k.a. system or browser-based tests) come in, simulating real clicks, form fills, and page loads to verify entire workflows through the UI. They shouldn't just verify correct behaviour; they should tell a clear story about what's being tested. But as your project grows, those same tests can morph into dense, brittle scripts that hide the ""what" behind the "how", making them painful to read and maintain.
+When your web app has been around for years, you need more than unit tests, you need proof the whole thing still works from the user's perspective. That's where end-to-end tests (a.k.a. system or browser-based tests) come in, simulating clicks, form fills, and page loads to verify entire workflows through the UI. These tests shouldn't just verify correct behaviour; they should tell a clear story about what's being tested. But as your project grows, those same tests can morph into dense, brittle scripts that hide the "what" behind the "how", making them painful to read and maintain.
 
-That's where [Cucumber](https://cucumber.io/) comes in. By separating high-level intent from low-level implementation, Cucumber lets you write tests in plain language that developers, product managers, and future-you can all understand at a glance. In this post, I'll walk through examples from a Rails app I built, the [Book Review Demo](https://github.com/danielabar/book_review_demo), to show how Cucumber can make your test suite more readable and maintainable.
+That's where [Cucumber](https://cucumber.io/) comes in. By separating high-level intent from low-level implementation, Cucumber lets you write tests in plain language that developers, product managers, and future-you can all understand at a glance. In this post, I'll walk through examples from a demo Rails app: [Book Review Demo](https://github.com/danielabar/book_review_demo), to show how Cucumber can make your test suite more readable and maintainable.
 
 This post assumes you are familiar with Ruby on Rails and have some experience writing system or feature tests, such as with RSpec and Capybara or similar tools.
 
@@ -148,7 +148,7 @@ features/
 
 All files in `features/support/*.rb` will be automatically loaded when tests run. The following sections explain each file we'll be adding and why it's needed.
 
-### Configure Browser Driver
+### Browser Driver
 
 Cucumber itself is agnostic about how your tests interact with the browser - it just runs your scenarios and delegates the actual browser automation to whatever tool you choose. In Rails projects, a popular choice is [Capybara](https://github.com/teamcapybara/capybara), which provides a unified API for driving different browser engines.
 
@@ -181,7 +181,7 @@ end
 Capybara.default_max_wait_time = 5
 ```
 
-### Configure DatabaseCleaner
+### DatabaseCleaner
 
 With JavaScript drivers, Capybara runs the app server in a separate thread from your tests, so transactions aren’t shared. Simply rolling back a transaction at the end of a test won't clean up data seen by both threads. This means we need to configure truncation to ensure a clean state between tests.
 
@@ -191,7 +191,7 @@ Create `features/support/database_cleaner.rb`:
 DatabaseCleaner.strategy = :truncation
 ```
 
-### FactoryBot Integration
+### FactoryBot
 
 [FactoryBot](https://github.com/thoughtbot/factory_bot) makes it easy to set up test data, and it works well with Cucumber once configured. (Assumes you've already added `factory_bot_rails` to your Gemfile in the `:test` group.)
 
@@ -203,7 +203,7 @@ World(FactoryBot::Syntax::Methods)
 
 This makes methods like `create(:user)` available directly in your step definitions, no need to prefix with `FactoryBot.`
 
-### Devise and Warden for Fast Login
+### Fast Login
 
 If your project uses [Devise](https://github.com/heartcombo/devise) for authentication (as many Rails apps do), you can speed up login in tests by using test helpers from it's dependent library, [Warden](https://github.com/wardencommunity/warden/wiki). Instead of clicking through login forms in every test, we can sign in programmatically.
 
@@ -218,7 +218,7 @@ After { Warden.test_reset! }
 
 Now you can use `login_as(user)` in your steps to simulate a logged-in session. This technique is much faster than logging in through the UI for each test (although you should have at least one test that does this to ensure the login form is working).
 
-### Suppressing Publish Message
+### Reports Service
 
 When running Cucumber tests for the first time, it may display a message about publishing results. This refers to Cucumber's optional [reports service](https://reports.cucumber.io/) that lets you upload your test run data to an online dashboard. It can be useful for teams who want to share test reports in a web interface, but it's not required.
 
