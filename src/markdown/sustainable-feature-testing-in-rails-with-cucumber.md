@@ -871,7 +871,7 @@ If you're using a different editor, check Cucumber's [editor support page](https
 
 To ensure your Cucumber feature tests run consistently across different environments and automatically catch regressions, it's a good practice to include them in your Continuous Integration (CI) pipeline. Since my project is hosted on GitHub, I use [GitHub Actions](https://docs.github.com/en/actions) to run tests automatically on every push.
 
-To get started, add a workflow YAML file in your project root under `.github/workflows/` as follows:
+To get started, add a workflow YAML file in your project's `.github/workflows` directory:
 
 ```yml
 # .github/workflows/feature_tests.yml
@@ -924,7 +924,7 @@ Let's break down a few key parts:
 * **System dependencies:** Installs packages like Chrome for running headless feature tests.
 * **Test setup:**
   * `bin/rails db:test:prepare` sets up the test database.
-  * `bin/rails assets:precompile` precompiling assets ensures the test browser sees a fully styled, functional site, and any screenshots captured on failure will actually reflect the expected layout and design.
+  * `bin/rails assets:precompile` precompiling assets ensures the test browser sees a fully styled, functional site.
 * **Test execution:** Runs your Cucumber features in test mode.
 * **Artifacts on failure:** If any test fails, screenshots and HTML reports from Capybara are saved and uploaded as artifacts. You can download them from the GitHub UI to debug what went wrong.
 
@@ -932,7 +932,7 @@ Here's what a successful run looks like:
 
 ![cucumber github workflow runner success](../images/cucumber-github-workflow-runner-success.png "cucumber github workflow runner success")
 
-And here's a deliberately failing test, which triggers a red CI run and stores screenshots in the artifacts section. This can be downloaded which will download a zip file containing screenshots of the browser at the point that test(s) failed:
+And here's a deliberately failing test, which triggers a failing CI run and stores screenshots in the artifacts section. This can be downloaded which will download a zip file containing screenshots of the browser at the point that test(s) failed:
 
 ```gherkin
 Feature: Book reviews
