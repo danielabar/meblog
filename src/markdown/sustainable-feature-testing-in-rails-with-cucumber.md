@@ -865,7 +865,7 @@ It also warns you if there is no corresponding step definition from a feature fi
 
 ![cucumber vscode extension no step definition warning](../images/cucumber-vscode-extension-no-step-definition-warning.png "cucumber vscode extension no step definition warning")
 
-If you're using a different editor, check Cucumber's [editor support page](https://cucumber.io/docs/tools/#editors) for available plugins.
+If you're using a different editor, check Cucumber's [editor support page](https://cucumber.io/docs/tools/#editors).
 
 ## Continuous Integration
 
