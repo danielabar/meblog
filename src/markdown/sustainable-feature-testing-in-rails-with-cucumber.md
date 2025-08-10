@@ -370,10 +370,10 @@ After correcting the error by providing some review text, they can then submit t
 ![cucumber book review demo app review submit success](../images/cucumer-book-review-demo-app-review-submitted-success.png "cucumber book review demo app review submit success")
 
 <aside class="markdown-aside">
-In a real app, reviews would typically undergo content moderation before publishing, and users would be able to choose a display name instead of showing their email publicly. These details are omitted here to keep the demo relatively simple.
+In a real app, reviews would undergo content moderation before publishing, and users would be able to choose a display name instead of showing their email publicly. These details are omitted here to keep the demo simple.
 </aside>
 
-To test this, we'll need a few books, users, and reviews setup in the test database. Recall in our first test we saw how we can create data for the test as follows:
+To test this, we'll need a few books, users, and reviews setup in the test database. Recall in our first test, some data was created like this:
 
 ```gherkin
 # features/authentication.feature
@@ -384,7 +384,7 @@ Feature: User authentication
     ...
 ```
 
-While we could write multiples lines like this, Cucumber has a more convenient feature [Data Tables](https://www.jakubsobolewski.com/cucumber/articles/reference-gherkin.html#data-tables), which allow you to pass a list of values to a step definition. For example:
+While we could write many individual steps like this, Cucumber offers a more powerful feature called [Data Tables](https://www.jakubsobolewski.com/cucumber/articles/reference-gherkin.html#data-tables) to pass lists of values to a single step. For example:
 
 ```gherkin
 # features/book_reviews.feature
@@ -412,7 +412,7 @@ Feature: Book reviews
     ...
 ```
 
-Let's focus our attention on the background steps:
+Focusing on the first `Background` step:
 
 ```gherkin
 # features/book_reviews.feature
@@ -426,7 +426,7 @@ Feature: Book reviews
     # ...
 ```
 
-The step definition looks like this:
+The corresponding step definition is as follows:
 
 ```ruby
 # features/step_definitions/book_steps.rb
@@ -587,7 +587,7 @@ Then("I should see {int} stars for my review") do |count|
 end
 ```
 
-Notice that the last two step definitions both need to find the current user's review. Optionally to avoid this duplication, the Capybara gem provides a [World](https://github.com/cucumber/cucumber-ruby/blob/2cf3a61802cc36cbca6bf3eed666b3a4a90f77a3/lib/cucumber/glue/dsl.rb#L58) method. This can be used to register a module and it becomes available in the global namespace. We used this earlier when configuring FactoryBot and Warden helper methods.
+Notice that the last two step definitions both need to find the current user's review. To avoid this duplication, the Capybara gem provides a [World](https://github.com/cucumber/cucumber-ruby/blob/2cf3a61802cc36cbca6bf3eed666b3a4a90f77a3/lib/cucumber/glue/dsl.rb#L58) method. This can be used to register a module, which then becomes available in the global namespace. We used this earlier when configuring FactoryBot and Warden helper methods.
 
 To add our own helper method:
 
@@ -604,17 +604,19 @@ end
 World(ReviewHelpers)
 ```
 
-Then those two step definitions can use this helper method as follow:
+Then those two step definitions can use this helper method:
 
 ```ruby
 # features/step_definitions/review_steps.rb
 Then("I should see {string} in my review") do |text|
+  # === USE HELPER FROM REVIEW HELPERS MODULE ===
   my_review = find_my_review
   expect(my_review).not_to be_nil
   expect(my_review).to have_content(text)
 end
 
 Then("I should see {int} stars for my review") do |count|
+  # === USE HELPER FROM REVIEW HELPERS MODULE ===
   my_review = find_my_review
   expect(my_review).not_to be_nil
   expect(my_review.find('[data-testid="review-rating"]').all('svg').size).to eq(count)
@@ -682,7 +684,7 @@ features
 
 How you organize your Cucumber step definitions can make a big difference as your test suite grows. While it's technically possible to keep all your steps in a single file, this quickly becomes unwieldy. A more sustainable approach is to group step definitions by domain concept, such as authentication, books, or reviews, mirroring the main features of your app. For example, in the Book Review Demo, you might have `authentication_steps.rb` for login-related steps, `book_steps.rb` for book setup, and `review_steps.rb` for anything review-related.
 
-As you add more features, you'll notice some steps are used across multiple domains, such as clicking buttons or verifying flash messages. When this happens, extract these into a shared file, such as `common_steps.rb`. For instance, a generic step like:
+As you add more features, you'll notice some steps are used across multiple domains, such as clicking buttons or verifying flash messages. These can be extracted into a shared file, such as `common_steps.rb`. For instance, a generic step like:
 
 ```ruby
 When("I click {string}") do |button|
