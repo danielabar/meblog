@@ -108,7 +108,7 @@ This is where Cucumber shines. Instead of encoding all the implementation detail
 It is possible to make RSpec system tests more readable using custom matchers, <a class="markdown-link" href="https://martinfowler.com/bliki/PageObject.html">page objects</a>, or helper methods. But these strategies can also add complexity or hide detail in other files. Cucumber, on the other hand, embraces the separation between intent and implementation from the start.
 </aside>
 
-And the best part? You don't have to throw out your existing Capybara setup to adopt it. Cucumber doesn't replace Capybara, it wraps around it. The same drivers, selectors, and test helpers still apply. You're just giving your tests a better top layer.
+And the best part? You don't have to throw out your existing Capybara setup to adopt it. Cucumber doesn't replace Capybara, it wraps around it. The same drivers and DSL methods can still be used. You're just giving your tests a better top layer.
 
 ## Setting Up Cucumber
 
@@ -116,7 +116,7 @@ In this section, we'll walk through setting up Cucumber in an existing Rails pro
 
 ### Installation
 
-Start by updating the project's `Gemfile` under the `:test` group. Note that we're opting for `cuprite` instead of the default `selenium-webdriver`:
+Start by updating the project's `Gemfile` under the `:test` group. Note that we're opting for `cuprite` instead of the default `selenium-webdriver` because it's easier to setup:
 
 ```ruby
 group :test do
@@ -150,7 +150,7 @@ All files in `features/support/*.rb` will be automatically loaded when tests run
 
 ### Browser Driver
 
-Cucumber itself is agnostic about how your tests interact with the browser - it just runs your scenarios and delegates the actual browser automation to whatever tool you choose. In Rails projects, a popular choice is [Capybara](https://github.com/teamcapybara/capybara), which provides a unified API for driving different browser engines.
+Cucumber itself is agnostic about how your tests interact with the browser - it runs your scenarios and delegates the actual browser automation to whatever tool you choose. In Rails projects, a popular choice is [Capybara](https://github.com/teamcapybara/capybara), which provides a unified API for driving different browser engines.
 
 Here, we configure Capybara to use [Cuprite](https://github.com/rubycdp/cuprite), a pure Ruby driver for Capybara. The configuration below sets Cuprite as the default driver for both regular and JavaScript-enabled tests. It enables headless mode by default, sets a large window size for consistent screenshots, and includes a Docker-friendly option.
 
@@ -183,7 +183,7 @@ Capybara.default_max_wait_time = 5
 
 ### DatabaseCleaner
 
-With JavaScript drivers, Capybara runs the app server in a separate thread from your tests, so transactions aren’t shared. Simply rolling back a transaction at the end of a test won't clean up data seen by both threads. This means we need to configure truncation to ensure a clean state between tests.
+With JavaScript drivers, Capybara runs the app server in a separate thread from your tests, so transactions aren't shared. Simply rolling back a transaction at the end of a test won't clean up data seen by both threads. This means we need to configure truncation to ensure a clean state between tests.
 
 Create `features/support/database_cleaner.rb`:
 
@@ -205,18 +205,22 @@ This makes methods like `create(:user)` available directly in your step definiti
 
 ### Fast Login
 
-If your project uses [Devise](https://github.com/heartcombo/devise) for authentication (as many Rails apps do), you can speed up login in tests by using test helpers from it's dependent library, [Warden](https://github.com/wardencommunity/warden/wiki). Instead of clicking through login forms in every test, we can sign in programmatically.
+If your Rails app uses [Devise](https://github.com/heartcombo/devise) for authentication (which depends on [Warden](https://github.com/wardencommunity/warden)), you can speed up your Cucumber tests by signing in users programmatically with Warden's test helpers instead of filling in login forms every time.
 
-Add `features/support/warden.rb`:
+Add this to `features/support/warden.rb` to enable and reset Warden’s test mode:
 
 ```ruby
+# Enable Warden test mode to bypass real authentication
 Warden.test_mode!
+
+# Make Warden test helper methods available in steps
 World(Warden::Test::Helpers)
 
+# Clean up Warden state after each scenario
 After { Warden.test_reset! }
 ```
 
-Now you can use `login_as(user)` in your steps to simulate a logged-in session. This technique is much faster than logging in through the UI for each test (although you should have at least one test that does this to ensure the login form is working).
+Now you can call `login_as(user)` in your step definitions to simulate a logged-in user quickly. This makes your tests faster, but you should still keep at least one test that exercises the actual login form to ensure it works correctly.
 
 ### Reports Service
 
