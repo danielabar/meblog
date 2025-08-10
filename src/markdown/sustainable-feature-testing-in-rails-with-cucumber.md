@@ -18,7 +18,7 @@ This post assumes you are familiar with Ruby on Rails and have some experience w
 
 ## What Is Cucumber?
 
-Cucumber is a testing tool that lets you describe application behavior in plain language. Unlike tools such as Capybara or Selenium, which control the browser directly, Cucumber sits *above* your browser automation stack. Its job isn't to drive the browser, but to express what you want to test in a way that anyone on your team, technical or non technical, can read and understand.
+Cucumber is a testing tool that lets you describe application behavior in plain language. Unlike Selenium WebDriver, which controls the browser directly through drivers like ChromeDriver, Cucumber sits *above* your browser automation stack. Its job isn't to drive the browser, but to express what you want to test in a way that anyone on your team, technical or non technical, can read and understand.
 
 Cucumber scenarios are written in a structured format called [Gherkin](https://cucumber.io/docs/gherkin/reference), which uses keywords like `Feature`, `Background`, `Scenario`, `Given`, `When`, and `Then` to describe user-facing behavior. Each line beginning with `Given`, `When`, `Then` or `And` is called a [step](https://cucumber.io/docs/cucumber/api#steps), which is a plain-language instruction that maps to Ruby code performing the actual test logic.
 
@@ -50,12 +50,12 @@ Feature: Book reviews
 
 We'll look at how those plain language steps connect to Ruby code in just a bit, but for now, notice how readable it is, even without knowing any Ruby or testing library syntax.
 
-These phrases aren't comments or placeholders, they make up an executable test. Behind the scenes, each plain language step is connected to Ruby code that can use Capybara (or any other browser automation tool) to interact with the web application under test. This provides the best of both worlds: readable intent at the top, and full control at the bottom.
+These phrases aren't comments or placeholders, they make up an executable test. Behind the scenes, each plain language step is connected to Ruby code that can use Capybara (or other browser automation tools) to interact with the web application under test. This provides the best of both worlds: readable intent at the top, and full control at the bottom.
 
 Cucumber is especially valuable in projects where collaboration matters. Product managers, QA engineers, designers, and even stakeholders can follow along with what's being tested without needing to parse through RSpec matchers or complex DOM selectors. And for developers, that same clarity makes tests easier to write, refactor, and maintain over the long haul.
 
 <aside class="markdown-aside">
-While this post uses a Ruby on Rails example, it's worth noting that Cucumber isn't Ruby-specific. Cucumber supports multiple languages including Java, JavaScript, Python, and many others. See <a class="markdown-link" href="https://cucumber.io/docs/installation/">installation options</a> for the full list.
+While this post uses a Ruby on Rails example, Cucumber, <a class="markdown-link" href="https://en.wikipedia.org/wiki/Cucumber_%28software%29">originally written in Ruby</a>, works with many languages, including Java, JavaScript, Python, and more. See the <a class="markdown-link" href="https://cucumber.io/docs/installation/">installation options</a> for a full list.
 </aside>
 
 ## Why Not Just RSpec + Capybara?
