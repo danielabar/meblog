@@ -12,8 +12,6 @@ related:
 
 I first heard about the benefits of meditation years ago on a podcast. An expert practitioner was being interviwed on a health podcast and said if the benefits of meditation were available as a pill, it would make some pharma company billions in profits. Benefits such as: lower stress, reduced anxiety, better blood pressure, improved focus, clearer thinking, enhanced performance on cognitive tasks, even longevity. I was intrigued enough to buy the author's book, especially because he billed it as a "no BS" guide.
 
-TODO: Insert joke about podcasts being book tours in disguise.
-
 But then… I got to the chapter about people meditating in the forest, claiming they could intuit which plants were safe to eat or use as medicine based on what the plants *told* them during meditation. While I’m sure some people genuinely feel that the plants are communicating with them, that chapter reminded me why I’ve often been skeptical of meditation in the past.
 
 That’s been my issue with meditation all along. I’m open to the science, but not the pseudoscience. I also didn’t find it easy: trying to meditate on my own usually resulted in me either zoning out or falling asleep. So I turned to a tech solution.
@@ -28,7 +26,7 @@ I wanted something simple: a gentle breathing reminder to help me focus. But eve
 * **Meditation podcasts**? Same issue - plus ads - and often just as "out there."
 * **YouTube**? Forget it. You sit down to meditate and end up watching cat videos for an hour.
 
-Then I read *Breath* by James Nestor (TODO: add link). It made a strong case for a simple practice: breathing in through the nose for 4.5 seconds, and out through the nose for 4.5 seconds - just a few minutes a day could activate the parasympathetic nervous system, improve oxygen saturation, and more.
+Then I read *Breath* by James Nestor. It made a strong case for a simple practice: breathing in through the nose for 4.5 seconds, and out through the nose for 4.5 seconds - just a few minutes a day could activate the parasympathetic nervous system, improve oxygen saturation, and more.
 
 That clicked. But when I tried to create a custom meditation session using this technique, new problems appeared.
 
@@ -80,25 +78,26 @@ Then the app will play a calming audio voice saying "Breath in" (I don't know wh
 
 Then after the number of seconds have elapsed for breath-in that user selected, same calming audio voice says "Breath out" (again where to find audio asset?)
 
-Then after the duration has elapsed (although let it go past the duration if in the middle of a breath in breath out so they can complete their last breathe out cycle because it would be jarring to be interrupted in the middle), same calming voice says "All done"
+Then after the duration has elapsed (although let it go past the duration if in the middle of a breath in breath out so they can complete their last breathe out cycle because it would be jarring to be interrupted in the middle), same calming voice says "All done".
 
-After some further iteration, the results are available:
+After submitting that prompt and a good deal of iteration, here are the results:
+
+![just breathe app landing](../images/just-breathe-app-landing.png "just breathe app landing")
+
+In the middle of a session:
+
+![just breathe app session](../images/just-breathe-app-session.png "just breathe app session")
+
 * [Live Demo](https://danielabar.github.io/just-breathe/)
-* [GitHub Repo: danielabar/just-breathe](https://github.com/danielabar/just-breathe)
-
-TODO: Screenshots
+* [GitHub Repo](https://github.com/danielabar/just-breathe)
 
 ## A Few Technical Highlights
 
 This app is deliberately minimal - no frameworks, no backend, no build system. Just modern browser APIs and modular JavaScript. Here's a closer look at some of the details.
 
-TODO: Update all code snippets with latest version from GitHub.
-
 ### Modular JavaScript with ESM
 
 All JavaScript is split into modules using [ESM (ECMAScript Modules)](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Guide/Modules), so each part of the app is responsible for its own domain: UI rendering, voice, session control, etc.
-
-TODO: Somewhere also explain about view switching...
 
 **index.js**
 
@@ -272,15 +271,11 @@ function updateState() {
 
 This updates every frame using `requestAnimationFrame`, so it remains fluid and responsive without timers or intervals.
 
-TODO: Show relevant code with requestAnimationFrame.
-
 ### Remember Preferences
 
-TODO: Explain use of localstorage, namespaced key(s) to remember user's previous selections so they don't need to fill out the form each time.
+Explain use of localstorage, namespaced key(s) to remember user's previous selections so they don't need to fill out the form each time.
 
 ### Modular Stylesheets
-
-TODO: Shorten up the entire stylesheets section, maybe just need one section.
 
 The CSS here is lean and modular - no Tailwind, no frameworks, no CSS-in-JS. Just vanilla CSS. Here are a few pieces worth calling out:
 
@@ -322,8 +317,6 @@ Need to change the visual feel later? Update a few tokens - not 50 selectors.
 
 ### Centered Layouts with Flexbox
 
-TODO: Update since code change
-
 The core layout uses simple, mobile-first flexbox:
 
 ```css
@@ -356,6 +349,8 @@ Each view is max-width constrained for readability:
 
 ### Animated Progress Bar with Easing
 
+TODO: Does this belong together with JS about requestAnimationFrame?
+
 The session progress is shown visually with a subtle bar using a gradient:
 
 ```css
@@ -364,8 +359,6 @@ The session progress is shown visually with a subtle bar using a gradient:
   background: linear-gradient(90deg, var(--color-accent-dark), var(--color-accent));
 }
 ```
-
-TODO: Include JS code that is updating it via requestAnimationFrame
 
 ### Calming Visuals for Guided Breathing
 
@@ -440,8 +433,6 @@ And it's all fluidly contained within `max-width: 420px` so it doesn’t sprawl 
 
 ### Automated Testing
 
-TODO: Phrasing
-
 Even though it's a small project, I found myself iterating and adding features often enough that it was worth having some automated test coverage.
 
 Testing with Vitest, started with Jest but surprised that it doesn't support ESM easily (some experimental feature that felt very messy). Out of scope to get into all the details so just point to some relevant files in project like vitest.config.js to configure jsdom (since this is a browser based project, not back end node) and coverage reporting.
@@ -467,12 +458,20 @@ If you’ve ever wanted to meditate but got turned off by mysticism, ads, paywal
 
 
 ## TODO
-* title
-* feature image
-* related
 * intro para
   * need to somewhere mention this post will explain how i built a vanilla js/css web app for meditation and why i built it...
-* main content
+* WIP main content
 * conclusion para
 * edit
-* Somewhere work in I always thought you had to buy in to a religion or something, since meditation is often associated with buddhism. Not to say there's anything wrong with being religious, but it's just not my bag.
+* Insert joke about podcasts being book tours in disguise.
+* Somewhere work in I always thought you had to buy in to a religion or something, since meditation is often associated with buddhism
+* Add link to Breath book
+* Maybe a few more details about the optimal breathing cadence and importance of nasal breathing from book
+* Update all js and css code snippets with latest version from GitHub.
+* Update screenshots - border? consistent
+* In JS tech details - view switching, simple no router, there's only the main view and an about view
+* Explain use of localstorage, namespaced keys for saving user prefs
+* For visual progress bar explanation, also show code that calls requestAnimationFrame in a loop
+* Shorten up stylesheets section, maybe just need one section.
+* Phrasing better explanation on Vitest automated testing
+* Phrasing on zero-build section, especially about returning to a project a few months later and webpack or whatever build no longer works
