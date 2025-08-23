@@ -93,197 +93,134 @@ In the middle of a session:
 
 ## A Few Technical Highlights
 
-This app is deliberately minimal - no frameworks, no backend, no build system. Just modern browser APIs and modular JavaScript. Here's a closer look at some of the details.
+This app is structured as follows:
 
-### Modular JavaScript with ESM
+```
+.
+├── assets
+│   └── fonts
+│       ├── InterVariable-Italic.woff2
+│       └── InterVariable.woff2
+├── index.html
+├── js
+│   ├── about.js
+│   ├── index.js
+│   ├── main.js
+│   ├── session.js
+│   ├── userPrefs.js
+│   └── voice.js
+└── styles
+    ├── app.css
+    ├── fonts.css
+    ├── global.css
+    ├── index.css
+    ├── reset.css
+    └── variables.css
+```
 
-All JavaScript is split into modules using [ESM (ECMAScript Modules)](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Guide/Modules), so each part of the app is responsible for its own domain: UI rendering, voice, session control, etc.
+Where `index.html` loads the entry point styles and code:
 
-**index.js**
+```htm
+<head>
+  <!-- other stuff... -->
+  <link rel="stylesheet" href="./styles/index.css">
+  <script type="module" src="./js/index.js" defer></script>
+</head>
+```
 
-```js
+Even though *Just Breathe* is simple on the surface, a few small technical decisions help keep it lightweight, offline-friendly, and distraction-free.
+
+### 1. Pure Vanilla Stack
+
+Using native ES modules means no bundler or transpiler is needed, and the whole app stays readable to anyone curious about the code. For example, the `js/index.js` entrypoint imports the main and about modules so the views can be toggled (no fancy router needed here for just two views):
+
+```javascript
+// js/index.js
 import { renderMainView } from './main.js';
 import { renderAboutView } from './about.js';
 
+const appView = document.getElementById('app-view');
+const navMain = document.getElementById('nav-main');
+const navAbout = document.getElementById('nav-about');
+
 function showView(view) {
-  // toggles between #view-main and #view-about
-}
-```
-
-**main.js**
-
-```js
-import { startBreathingSession } from './session.js';
-
-export function renderMainView(container) {
-  container.innerHTML = `...form and session area...`;
-  // Sets up form, validates input, triggers session
-}
-```
-
-**session.js**
-
-```js
-import { speak } from './voice.js';
-
-export function startBreathingSession({ inSec, outSec, durationMin, container, onDone }) {
-  // Handles countdown, state transitions, and animation
-}
-```
-
-### Voice Prompts via Speech Synthesis API
-
-Instead of bundling audio files, the app uses the built-in [Web Speech API](https://developer.mozilla.org/en-US/docs/Web/API/SpeechSynthesisUtterance) to generate voice prompts.
-
-**voice.js**
-
-```js
-export function speak(text, returnUtterance = false) {
-  if (!('speechSynthesis' in window)) return;
-  const utter = new SpeechSynthesisUtterance(text);
-  utter.rate = 0.85;
-  utter.pitch = 0.9;
-  utter.lang = 'en-US';
-  window.speechSynthesis.cancel(); // Stop any ongoing utterances
-  window.speechSynthesis.speak(utter);
-  return returnUtterance ? utter : undefined;
-}
-```
-
-To chain events (e.g. countdown), we return the utterance and listen for the `end` event:
-
-```js
-function speakAndWait(text, pauseMs, cb) {
-  const utter = speak(text, true);
-  if (utter?.addEventListener) {
-    utter.addEventListener('end', () => setTimeout(cb, pauseMs));
+  if (view === 'about') {
+    navMain.removeAttribute('aria-current');
+    navAbout.setAttribute('aria-current', 'page');
+    renderAboutView(appView);
   } else {
-    setTimeout(cb, pauseMs);
+    navMain.setAttribute('aria-current', 'page');
+    navAbout.removeAttribute('aria-current');
+    renderMainView(appView);
   }
+}
+
+navMain.addEventListener('click', () => showView('main'));
+navAbout.addEventListener('click', () => showView('about'));
+
+// Default view
+showView('main');
+```
+
+### 2. Voice-Guided Breathing
+
+All prompts come from the Web Speech API, so the user doesn't need to keep an eye on the screen during the breathing session:
+
+```js
+export function speak(text) {
+  const utter = new SpeechSynthesisUtterance(text);
+  speechSynthesis.speak(utter);
 }
 ```
 
-### Customizable Breathing Timing + Duration
+### 3. Staying Awake with the Wake Lock API
 
-The form accepts precise inhale/exhale timing down to tenths of a second. On submit, it converts everything to milliseconds and starts the session.
-
-**main.js**
+Sessions request a screen wake lock so the device won't lock up mid-breath:
 
 ```js
-form.addEventListener('submit', e => {
-  e.preventDefault();
-  const inSec = parseFloat(form.elements['in'].value);
-  const outSec = parseFloat(form.elements['out'].value);
-  const duration = getDurationFromForm();
-
-  startBreathingSession({
-    inSec,
-    outSec,
-    durationMin: duration,
-    container: container.querySelector('#session-area'),
-    onDone: () => renderMainView(container)
-  });
-});
-```
-
-**session.js**
-
-```js
-// Start breathing loop with alternating "Breathe in"/"Breathe out" every breathMs
-function updateState() {
-  const breathElapsed = Date.now() - breathStart;
-  if (breathElapsed >= breathMs) {
-    state = (state === 'in') ? 'out' : 'in';
-    breathMs = (state === 'in' ? inSec : outSec) * 1000;
-    speak(`Breathe ${state}`);
-    stateEl.textContent = `Breathe ${state}`;
-    breathStart = Date.now();
-  }
-  requestAnimationFrame(updateState);
-}
-```
-
-### Wake Lock API for Mobile Reliability
-
-To prevent the screen from dimming or locking mid-session, the app uses the [Wake Lock API](https://developer.mozilla.org/en-US/docs/Web/API/WakeLock). Without this, mobile sessions would often stop prematurely.
-
-**session.js**
-
-```js
-let wakeLock = null;
 async function requestWakeLock() {
-  try {
-    if ('wakeLock' in navigator) {
-      wakeLock = await navigator.wakeLock.request('screen');
-      wakeLock.addEventListener('release', () => {
-        wakeLock = null;
-      });
-    }
-  } catch (err) {
-    // silently ignore errors
-  }
+  wakeLock = await navigator.wakeLock.request('screen');
 }
 ```
 
-And it's released at the end of the session or when the user hits Stop:
+### 4. Custom Preferences with Local Storage
+
+Breathing pace and session duration are remembered between visits using local storage. Namespaced keys are used:
 
 ```js
-if (wakeLock && wakeLock.release) {
-  wakeLock.release();
-  wakeLock = null;
-}
+localStorage.setItem('justBreathe:prefs', JSON.stringify(prefs));
 ```
 
-### Countdown with Voice Sync
+For this simple storage requirements, no account or back end is needed.
 
-The app gently counts down from 3 before starting - both visually and audibly - using a recursive voice-and-wait function. This helps users settle in before the session starts - especially useful when using the app lying down:
+### 5. Progress Bar & Countdown
 
-**session.js**
+A simple countdown and filling progress bar track the session:
 
 ```js
-function startCountdown(count) {
-  if (count === 0) {
-    startBreathing();
-    return;
-  }
-
-  stateEl.textContent = count === 3 ? 'Starting in 3...' : `${count}...`;
-  speakAndWait(count === 3 ? 'Starting in 3' : String(count), 1000, () => {
-    startCountdown(count - 1);
-  });
-}
+stateEl.textContent = 'Starting in 3...';
+speak('Starting in 3');
+progressEl.style.width = (percent * 100) + '%';
 ```
 
-### Visual Progress Bar
+This provides just enough feedback to stay on pace for those who choose to look at the screen during the session.
 
-While the app is meant to be audio-led, there's also a non-distracting progress bar to give users a sense of how far along they are.
+### 6. Installable Like a Native App
 
-**session.js**
+With a manifest and icons, *Just Breathe* can be added to the device home screen:
 
-```js
-function updateState() {
-  elapsed = Date.now() - sessionStart;
-  const percent = Math.min(1, elapsed / totalMs);
-  progressEl.style.width = (percent * 100) + '%';
-  // ...
-}
+```html
+<link rel="manifest" href="site.webmanifest">
 ```
 
-This updates every frame using `requestAnimationFrame`, so it remains fluid and responsive without timers or intervals.
+TODO: Screenshot from my phone
 
-### Remember Preferences
+### 7. Use of @import in CSS for modularity
 
-Explain use of localstorage, namespaced key(s) to remember user's previous selections so they don't need to fill out the form each time.
-
-### Modular Stylesheets
-
-The CSS here is lean and modular - no Tailwind, no frameworks, no CSS-in-JS. Just vanilla CSS. Here are a few pieces worth calling out:
-
-Instead of a monolithic CSS file, styles are split into composable layers:
-
-TODO: Is `layers` the right term?
+In addition to the JavaScript setup, the CSS is organized into multiple smaller files and brought together in `index.css` using `@import`:
 
 ```css
+/* styles/index.css */
 @import './fonts.css';
 @import './reset.css';
 @import './variables.css';
@@ -291,118 +228,35 @@ TODO: Is `layers` the right term?
 @import './app.css';
 ```
 
-* **`reset.css`**: A simple reset to unify layout across browsers.
-* **`variables.css`**: Centralized color, typography, and spacing variables.
-* **`global.css`**: Base typography and layout rules.
-* **`app.css`**: App-specific component styles.
+While `@import` has historically been discouraged for performance reasons—since older browsers loaded files sequentially—HTTP/2’s multiplexing reduces that concern. In this small app, the tradeoff favors developer experience and maintainability, making the modular file structure more valuable than micro-optimizing CSS delivery. For more details see: https://css-tricks.com/almanac/rules/i/import
 
-### Design Tokens via CSS Custom Properties
+### 8. CSS Variables for Theming and Consistency
 
-Colors, fonts, and layout settings are abstracted into `:root` variables. This enables global theming and consistent styling throughout the app.
+The app defines a centralized color and typography system using CSS custom properties in `variables.css`. This makes it easy to maintain consistent design choices and update them globally:
 
 ```css
 :root {
-  --font-main: 'Inter', 'Segoe UI', 'Roboto', sans-serif;
+  --font-main: 'Inter', 'Segoe UI', 'Roboto', 'Arial', sans-serif;
   --color-bg: #f6f7f9;
   --color-text: #444;
   --color-accent: #6bb7b7;
-  --color-accent-dark: #3a7c7c;
   --color-card: #fff;
-  --color-border: #e0e0e0;
-  --color-success: #7fd47f;
 }
 ```
 
-Need to change the visual feel later? Update a few tokens - not 50 selectors.
-
-### Centered Layouts with Flexbox
-
-The core layout uses simple, mobile-first flexbox:
+Instead of hardcoding values across components, classes reference these variables:
 
 ```css
 body {
-  display: flex;
-  flex-direction: column;
-  min-height: 100vh;
-}
-main {
-  flex: 1;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: flex-start;
+  font-family: var(--font-main);
+  background: var(--color-bg);
+  color: var(--color-text);
 }
 ```
 
-Each view is max-width constrained for readability:
+### 9. Use of a Variable Font (Inter)
 
-```css
-#view-main, #view-about {
-  max-width: 420px;
-  margin: 0 auto;
-  padding: 2rem 1.5rem;
-  border-radius: 1.5rem;
-  background: var(--color-card);
-  box-shadow: 0 2px 12px rgba(0, 0, 0, 0.04);
-}
-```
-
-### Animated Progress Bar with Easing
-
-TODO: Does this belong together with JS about requestAnimationFrame?
-
-The session progress is shown visually with a subtle bar using a gradient:
-
-```css
-.progress {
-  height: 100%;
-  background: linear-gradient(90deg, var(--color-accent-dark), var(--color-accent));
-}
-```
-
-### Calming Visuals for Guided Breathing
-
-Everything - from spacing to color to button shape - is tuned for calm. A few examples:
-
-* **Rounded buttons and inputs**:
-
-  ```css
-  .breath-form button {
-    border-radius: 1.5rem;
-    padding: 0.7rem 0;
-    font-weight: 600;
-  }
-  ```
-
-* **Neutral background & accent palette**:
-
-  ```css
-  body {
-    background: var(--color-bg);
-    color: var(--color-text);
-  }
-  header {
-    background: var(--color-accent);
-    color: #fff;
-  }
-  ```
-
-* **Instructions panel with soft colors**:
-
-  ```css
-  .instructions {
-    background: var(--color-accent-light);
-    color: var(--color-accent-dark);
-    border-radius: 1rem;
-    padding: 1rem;
-  }
-  ```
-
-The tone is supportive and quiet - even before the voice kicks in.
-
-### 🧬 Fully Variable Fonts with Fallbacks
-
-Variable font **Inter Variable** for performance and typographic flexibility, with proper fallbacks and font-display for perceived speed:
+The project loads the Inter typeface as a variable font via `@font-face`. Variable fonts allow a single file to cover a wide weight range (100–900), reducing HTTP requests while offering flexibility in typography:
 
 ```css
 @font-face {
@@ -414,30 +268,21 @@ Variable font **Inter Variable** for performance and typographic flexibility, wi
 }
 ```
 
-This loads fast, scales well, and looks sharp across devices.
-
-### Mobile-First with Touch-Friendly Inputs
-
-All inputs and buttons are `100%` width on mobile, with ample spacing and large touch targets:
+Components can then select any weight without requiring separate font files:
 
 ```css
-.breath-form input,
-.breath-form button {
-  width: 100%;
-  padding: 0.5rem;
-  font-size: 1.1rem;
-}
+h1 { font-weight: 700; }
+p  { font-weight: 400; }
 ```
 
-And it's all fluidly contained within `max-width: 420px` so it doesn’t sprawl on wide screens.
 
-### Automated Testing
+### 10. Automated Testing
 
 Even though it's a small project, I found myself iterating and adding features often enough that it was worth having some automated test coverage.
 
 Testing with Vitest, started with Jest but surprised that it doesn't support ESM easily (some experimental feature that felt very messy). Out of scope to get into all the details so just point to some relevant files in project like vitest.config.js to configure jsdom (since this is a browser based project, not back end node) and coverage reporting.
 
-### Zero-Build, Zero-Dependency
+### 11. Zero-Build, Zero-Dependency
 
 The entire app runs as a static site. There’s no bundler, no framework, no auth, and no build process. It’s just plain HTML, JavaScript modules, and CSS. It's deployed via GitHub Pages using the `gh-pages` npm package.
 
