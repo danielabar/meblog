@@ -307,7 +307,6 @@ If you’ve ever wanted to meditate but got turned off by mysticism, ads, paywal
 
 
 ## TODO
-* WIP main content
 * conclusion para
 * edit
 * Insert joke about podcasts being book tours in disguise.
