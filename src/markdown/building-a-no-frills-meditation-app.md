@@ -14,9 +14,13 @@ This is the story of how I built Just Breathe, a no-frills meditation app: part 
 
 I first heard about the benefits of meditation years ago on a podcast. An expert practitioner was being interviewed on a health podcast and said if the benefits of meditation were available as a pill, it would make some pharmaceutical company billions in profits. Benefits such as: lower stress, reduced anxiety, better blood pressure, improved focus, clearer thinking, enhanced performance on cognitive tasks, even longevity. I was intrigued enough to buy the author's book, especially because he billed it as a "no BS" guide.
 
-But then I got to the chapter about people meditating in the forest, claiming they could intuit which plants were safe to eat or use as medicine based on what the plants *told* them during meditation. While I’m sure some people genuinely feel that the plants are communicating with them, that chapter reminded me why I’ve often been skeptical of meditation in the past.
+<aside class="markdown-aside">
+As someone who's been listening to podcasts for over a decade, I've noticed an increasing trend of podcasts being book tours in disguise: Casual conversations that somehow always end up pitching someone's latest "life changing" book.
+</aside>
 
-That’s been my issue with meditation all along. I’m open to the science, but not the pseudoscience. I also didn’t find it easy: trying to meditate on my own usually resulted in me either zoning out or falling asleep. So I turned to a tech solution.
+But then I got to the chapter about people meditating in the forest, claiming they could intuit which plants were safe to eat or use as medicine based on what the plants *told* them during meditation. While I'm sure some people genuinely feel that the plants are communicating with them, that chapter reminded me why I've been skeptical of meditation in the past.
+
+That's been my issue with meditation all along. I'm open to the science, but not the pseudoscience. I also didn't find it easy: trying to meditate on my own usually resulted in me either zoning out or falling asleep. So I turned to a tech solution.
 
 ## The Problem with Meditation Apps
 
@@ -36,7 +40,7 @@ That clicked. But when I tried to create a custom meditation session using this 
 
 The technique sounded simple, but practicing it revealed new problems:
 
-* **Counting 4.5 seconds** wasn’t intuitive - whole numbers felt easier, but stressing about the additional half second defeated the purpose.
+* **Counting 4.5 seconds** wasn't intuitive - whole numbers felt easier, but stressing about the additional half second defeated the purpose.
 * **Constant counting** was distracting, pulling attention away from the feeling of the breath.
 * **Mind wandering** often led to zoning out and forgetting the pattern altogether.
 * **Knowing when to stop** required setting a timer — but even the gentlest alert felt jarring if already relaxed, undoing the benefit of the session.
@@ -232,7 +236,7 @@ In addition to the JavaScript setup, the CSS is organized into multiple smaller 
 @import './app.css';
 ```
 
-While `@import` has historically been discouraged for performance reasons—since older browsers loaded files sequentially—HTTP/2’s multiplexing reduces that concern. In this small app, the tradeoff favors developer experience and maintainability, making the modular file structure more valuable than micro-optimizing CSS delivery. For more details see: https://css-tricks.com/almanac/rules/i/import
+While `@import` has historically been discouraged for performance reasons—since older browsers loaded files sequentially—HTTP/2's multiplexing reduces that concern. In this small app, the tradeoff favors developer experience and maintainability, making the modular file structure more valuable than micro-optimizing CSS delivery. For more details see: https://css-tricks.com/almanac/rules/i/import
 
 ### 8. CSS Variables for Theming and Consistency
 
@@ -288,29 +292,27 @@ Testing with Vitest, started with Jest but surprised that it doesn't support ESM
 
 ### 11. Zero-Build, Zero-Dependency
 
-The entire app runs as a static site. There’s no bundler, no framework, no auth, and no build process. It’s just plain HTML, JavaScript modules, and CSS. It's deployed via GitHub Pages using the `gh-pages` npm package.
+The entire app runs as a static site. There's no bundler, no framework, no auth, and no build process. It's just plain HTML, JavaScript modules, and CSS. It's deployed via GitHub Pages using the `gh-pages` npm package.
 
 TODO: Phrasing
 This keeps maintenance simple. On past JS projects with a bundler/build system - returning to maintain them after a few months often results in some build error because some js dependency is no longer maintained or doesn't work with newer node version or something like that.
 
 ## Using It in Real Life
 
-I now use it almost every day after my workout and stretching. It’s simple, peaceful, and effective.
+I now use it almost every day after my workout and stretching. It's simple, peaceful, and effective.
 
-Lying down, I prefer longer cycles: **7 seconds in, 9 seconds out**. But the app supports whatever timing feels best. It’s flexible.
+Lying down, I prefer longer cycles: **7 seconds in, 9 seconds out**. But the app supports whatever timing feels best. It's flexible.
 
 ## Final Thoughts
 
 This little project reminded me how satisfying it is to build tools *just* for yourself. Especially ones that make your day measurably better.
 
-If you’ve ever wanted to meditate but got turned off by mysticism, ads, paywalls, or distractions - give [Just Breathe](https://danielabar.github.io/just-breathe/) a try, and let me know if you found it helpful.
+If you've ever wanted to meditate but got turned off by mysticism, ads, paywalls, or distractions - give [Just Breathe](https://danielabar.github.io/just-breathe/) a try, and let me know if you found it helpful.
 
 
 ## TODO
 * conclusion para
 * edit
-* Insert joke about podcasts being book tours in disguise.
-* Somewhere work in I always thought you had to buy in to a religion or something, since meditation is often associated with buddhism
 * Maybe a few more details about the optimal breathing cadence and importance of nasal breathing from book
 * Update all js and css code snippets with latest version from GitHub.
   * include module file path/name as comment in each snippet
