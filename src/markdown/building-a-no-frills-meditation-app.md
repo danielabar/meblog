@@ -29,16 +29,16 @@ I wanted something simple: a gentle breathing reminder to help me focus. But eve
 * **Guided meditation apps** often required subscriptions. And it just didn't feel like something I should have to pay monthly for.
 * **Free versions** were full of distracting ads and usually demanded I create an account.
 * **Tone** Full of vague spiritual platitudes and ambient whale sounds. Not my thing.
-* **Meditation podcasts**? Same issue - plus ads - and often just as "out there."
-* **YouTube**? Forget it. You sit down to meditate and end up watching cat videos for an hour.
+* **Meditation podcasts** Same issue - plus ads - and often just as "out there."
+* **YouTube** Forget it. You sit down to meditate and end up watching cat videos for an hour.
 
 Then I read the book [Breath: The New Science of a Lost Art](https://www.mrjamesnestor.com/breath-book/). It made a strong case for a simple practice: breathing in through the nose for 4.5 seconds, and out through the nose for 4.5 seconds - just a few minutes a day could activate the parasympathetic nervous system, improve oxygen saturation, and more.
 
-That clicked. But when I tried to create a custom meditation session using this technique, new problems appeared.
+That clicked. But when I tried to create a custom meditation session using this technique, new problems emerged.
 
 ## Breathing Math
 
-The technique sounded simple, but practicing it revealed new problems:
+The technique sounded simple, but here's what happened in practice:
 
 * **Counting 4.5 seconds** wasn't intuitive - whole numbers felt easier, but stressing about the additional half second defeated the purpose.
 * **Constant counting** was distracting, pulling attention away from the feeling of the breath.
@@ -47,7 +47,7 @@ The technique sounded simple, but practicing it revealed new problems:
 
 What was really needed was an app that could talk out loud and simply say:
 
-> "Breathe in" ... 4.5 seconds ... "Breathe out" ... 4.5 seconds ... repeat ... "All done."
+> "Breathe in" ... 4.5 seconds "Breathe out" ... 4.5 seconds repeat ... "All done."
 
 No bells, no ads, no login, no mystical forest energy. Just a steady breathing reminder, with a gentle ending instead of a startling alarm.
 
