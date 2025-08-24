@@ -10,9 +10,11 @@ related:
   - "When the Password Field Says No to Paste"
 ---
 
+This is the story of how I built Just Breathe, a no-frills meditation app: part personal journey, part technical walkthrough.
+
 I first heard about the benefits of meditation years ago on a podcast. An expert practitioner was being interviewed on a health podcast and said if the benefits of meditation were available as a pill, it would make some pharmaceutical company billions in profits. Benefits such as: lower stress, reduced anxiety, better blood pressure, improved focus, clearer thinking, enhanced performance on cognitive tasks, even longevity. I was intrigued enough to buy the author's book, especially because he billed it as a "no BS" guide.
 
-But then… I got to the chapter about people meditating in the forest, claiming they could intuit which plants were safe to eat or use as medicine based on what the plants *told* them during meditation. While I’m sure some people genuinely feel that the plants are communicating with them, that chapter reminded me why I’ve often been skeptical of meditation in the past.
+But then I got to the chapter about people meditating in the forest, claiming they could intuit which plants were safe to eat or use as medicine based on what the plants *told* them during meditation. While I’m sure some people genuinely feel that the plants are communicating with them, that chapter reminded me why I’ve often been skeptical of meditation in the past.
 
 That’s been my issue with meditation all along. I’m open to the science, but not the pseudoscience. I also didn’t find it easy: trying to meditate on my own usually resulted in me either zoning out or falling asleep. So I turned to a tech solution.
 
@@ -26,7 +28,7 @@ I wanted something simple: a gentle breathing reminder to help me focus. But eve
 * **Meditation podcasts**? Same issue - plus ads - and often just as "out there."
 * **YouTube**? Forget it. You sit down to meditate and end up watching cat videos for an hour.
 
-Then I read *Breath* by James Nestor. It made a strong case for a simple practice: breathing in through the nose for 4.5 seconds, and out through the nose for 4.5 seconds - just a few minutes a day could activate the parasympathetic nervous system, improve oxygen saturation, and more.
+Then I read the book [Breath: The New Science of a Lost Art](https://www.mrjamesnestor.com/breath-book/). It made a strong case for a simple practice: breathing in through the nose for 4.5 seconds, and out through the nose for 4.5 seconds - just a few minutes a day could activate the parasympathetic nervous system, improve oxygen saturation, and more.
 
 That clicked. But when I tried to create a custom meditation session using this technique, new problems appeared.
 
@@ -306,18 +308,17 @@ If you’ve ever wanted to meditate but got turned off by mysticism, ads, paywal
 
 
 ## TODO
-* intro para
-  * need to somewhere mention this post will explain how i built a vanilla js/css web app for meditation and why i built it...
 * WIP main content
-* include module file path/name as comment in each snippet
 * conclusion para
 * edit
 * Insert joke about podcasts being book tours in disguise.
+* Convert Breathing Math problems into bullet point list
 * Somewhere work in I always thought you had to buy in to a religion or something, since meditation is often associated with buddhism
-* Add link to Breath book
 * Maybe a few more details about the optimal breathing cadence and importance of nasal breathing from book
 * Update all js and css code snippets with latest version from GitHub.
-* Update screenshots - border? consistent
+  * include module file path/name as comment in each snippet
+* WIP Update screenshots - frame in phone: https://mockuphone.com/
+  * Update "Stop" button in JB to be larger and consistent design, then update second screenshot
 * In JS tech details - view switching, simple no router, there's only the main view and an about view
 * Explain use of localstorage, namespaced keys for saving user prefs
 * For visual progress bar explanation, also show code that calls requestAnimationFrame in a loop
