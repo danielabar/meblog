@@ -34,19 +34,18 @@ That clicked. But when I tried to create a custom meditation session using this 
 
 ## Breathing Math
 
-Counting 4.5 seconds in my head wasn’t intuitive - whole numbers felt easier, but I’d stress about getting the “.5” right. Not exactly calming.
+The technique sounded simple, but practicing it revealed new problems:
 
-I also found it irritating to keep counting, it was a distraction from trying to focus on the feeling of the breath in and out.
+* **Counting 4.5 seconds** wasn’t intuitive - whole numbers felt easier, but stressing about the additional half second defeated the purpose.
+* **Constant counting** was distracting, pulling attention away from the feeling of the breath.
+* **Mind wandering** often led to zoning out and forgetting the pattern altogether.
+* **Knowing when to stop** required setting a timer — but even the gentlest alert felt jarring if already relaxed, undoing the benefit of the session.
 
-I also found myself zoning out, mind wandering, forgetting what I'm supposed to be doing.
-
-I also had to set a time limit, since I could only spare a few minutes a day on this activity. So I’d set a phone timer, but even the gentlest tones startled me if I had drifted into a relaxed state, which felt like it was undoing the entire benefit of the session.
-
-So I thought: What I really want is an app that simply says:
+What was really needed was an app that could talk out loud and simply say:
 
 > "Breathe in" ... 4.5 seconds ... "Breathe out" ... 4.5 seconds ... repeat ... "All done."
 
-No bells, no ads, no login, no mystical forest energy. Just breathing with a reminder on each breath so I don't drift too far off, then when finished, a gentle phrase to let me know the session is complete, without startling me out of the relaxed state.
+No bells, no ads, no login, no mystical forest energy. Just a steady breathing reminder, with a gentle ending instead of a startling alarm.
 
 ## So I Built It
 
@@ -312,7 +311,6 @@ If you’ve ever wanted to meditate but got turned off by mysticism, ads, paywal
 * conclusion para
 * edit
 * Insert joke about podcasts being book tours in disguise.
-* Convert Breathing Math problems into bullet point list
 * Somewhere work in I always thought you had to buy in to a religion or something, since meditation is often associated with buddhism
 * Maybe a few more details about the optimal breathing cadence and importance of nasal breathing from book
 * Update all js and css code snippets with latest version from GitHub.
