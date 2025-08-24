@@ -10,7 +10,7 @@ related:
   - "When the Password Field Says No to Paste"
 ---
 
-I first heard about the benefits of meditation years ago on a podcast. An expert practitioner was being interviwed on a health podcast and said if the benefits of meditation were available as a pill, it would make some pharma company billions in profits. Benefits such as: lower stress, reduced anxiety, better blood pressure, improved focus, clearer thinking, enhanced performance on cognitive tasks, even longevity. I was intrigued enough to buy the author's book, especially because he billed it as a "no BS" guide.
+I first heard about the benefits of meditation years ago on a podcast. An expert practitioner was being interviewed on a health podcast and said if the benefits of meditation were available as a pill, it would make some pharmaceutical company billions in profits. Benefits such as: lower stress, reduced anxiety, better blood pressure, improved focus, clearer thinking, enhanced performance on cognitive tasks, even longevity. I was intrigued enough to buy the author's book, especially because he billed it as a "no BS" guide.
 
 But then… I got to the chapter about people meditating in the forest, claiming they could intuit which plants were safe to eat or use as medicine based on what the plants *told* them during meditation. While I’m sure some people genuinely feel that the plants are communicating with them, that chapter reminded me why I’ve often been skeptical of meditation in the past.
 
@@ -34,15 +34,15 @@ That clicked. But when I tried to create a custom meditation session using this 
 
 Counting 4.5 seconds in my head wasn’t intuitive - whole numbers felt easier, but I’d stress about getting the “.5” right. Not exactly calming.
 
-I also found it irritating to keep counting, was a distraction from trying to focus on the feeling of the breath in and out.
+I also found it irritating to keep counting, it was a distraction from trying to focus on the feeling of the breath in and out.
 
 I also found myself zoning out, mind wandering, forgetting what I'm supposed to be doing.
 
 I also had to set a time limit, since I could only spare a few minutes a day on this activity. So I’d set a phone timer, but even the gentlest tones startled me if I had drifted into a relaxed state, which felt like it was undoing the entire benefit of the session.
 
-So I thought: what I really want is an app that simply says:
+So I thought: What I really want is an app that simply says:
 
-> "Breathe in" ... 4.5 seconds ... "Breathe out" ... 4.5 seconds ... repeat ... then "All done."
+> "Breathe in" ... 4.5 seconds ... "Breathe out" ... 4.5 seconds ... repeat ... "All done."
 
 No bells, no ads, no login, no mystical forest energy. Just breathing with a reminder on each breath so I don't drift too far off, then when finished, a gentle phrase to let me know the session is complete, without startling me out of the relaxed state.
 
@@ -50,7 +50,9 @@ No bells, no ads, no login, no mystical forest energy. Just breathing with a rem
 
 I opened VSCode, created a new project, and prompted my AI assistant to help build something simple and mobile-friendly - no frameworks, no accounts, no backend, just vanilla JS and CSS.
 
-Prompt:
+Here is the prompt used:
+
+<aside class="markdown-memory-lane">
 Help me think about how I could use vanilla web tech for building the following web app, which i plan to deploy to github pages because i don't need an application server:
 
 Mobile first layout because it will be used primarily on a phone
@@ -74,13 +76,14 @@ At this point the user no longer needs to look at the app, although it should sh
 
 But the idea is at this point the user would find a comfortable place to sit or lie down where they will be undisturbed for the duration. I'm not sure if these instructions, along with the instruction to nasal breathe should be displayed somewhere in the app either before or after they make their selections. I don't want to confuse the user with too much details, particularly on a small phone screen.
 
-Then the app will play a calming audio voice saying "Breath in" (I don't know where to find such an asset)
+Then the app will play a calming audio voice saying "Breath in" (I don't know where to find such an asset).
 
-Then after the number of seconds have elapsed for breath-in that user selected, same calming audio voice says "Breath out" (again where to find audio asset?)
+Then after the number of seconds have elapsed for breath-in that user selected, same calming audio voice says "Breath out" (again where to find audio asset?).
 
 Then after the duration has elapsed (although let it go past the duration if in the middle of a breath in breath out so they can complete their last breathe out cycle because it would be jarring to be interrupted in the middle), same calming voice says "All done".
+</aside>
 
-After submitting that prompt and a good deal of iteration, here are the results:
+After submitting that prompt and a good deal of iteration to resolve issues, here are the results:
 
 ![just breathe app landing](../images/just-breathe-app-landing.png "just breathe app landing")
 
@@ -164,7 +167,7 @@ showView('main');
 
 ### 2. Voice-Guided Breathing
 
-All prompts come from the Web Speech API, so the user doesn't need to keep an eye on the screen during the breathing session:
+All prompts come from the [Web Speech API](https://developer.mozilla.org/en-US/docs/Web/API/SpeechSynthesis), so the user doesn't need to keep an eye on the screen during the breathing session:
 
 ```js
 export function speak(text) {
@@ -306,6 +309,7 @@ If you’ve ever wanted to meditate but got turned off by mysticism, ads, paywal
 * intro para
   * need to somewhere mention this post will explain how i built a vanilla js/css web app for meditation and why i built it...
 * WIP main content
+* include module file path/name as comment in each snippet
 * conclusion para
 * edit
 * Insert joke about podcasts being book tours in disguise.
