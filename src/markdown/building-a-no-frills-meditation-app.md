@@ -313,11 +313,21 @@ If you've ever wanted to meditate but got turned off by mysticism, ads, paywalls
 ## TODO
 * conclusion para
 * edit
-* Maybe a few more details about the optimal breathing cadence and importance of nasal breathing from book
+* Another downside of apps: In-app purchases, notifications - even in the health & wellness space it's still competing in the attention economy
+* Maybe a few more details about the optimal breathing cadence and importance of nasal breathing from book, mention the book covers variety but this one stood out to me as being the simplest and most achievable as a daily practice:
+  * Resonant (Coherent) Breathing
+  * A calming practice that places the heart, lungs, and circulation into a state of coherence, where the systems of the body are working at peak efficiency. There is no more essential technique, and none more basic.
+  * Sit up straight, relax shoulders and belly, and exhale
+  * Inhale softly for 5.5 seconds, expanding the belly as air fills the bottom of the lungs
+  * Without pausing, exhale softly for 5.5 seconds, bringing the belly in as the lungs empty.
+  * Repeat at least 10 times, more if possible
+  * Maybe mention Paced Breathing app (but there are in-app purchases, notifications are off by default thankfully as of 2025=08-24)
+    * Choice between musical like tone or vibration to mark the breaths (although I found still have a tendancy to fall asleep, there's something about the spoken english words that keeps me awake).
 * Update all js and css code snippets with latest version from GitHub.
   * include module file path/name as comment in each snippet
 * WIP Update screenshots - frame in phone: https://mockuphone.com/
   * Update "Stop" button in JB to be larger and consistent design, then update second screenshot
+  * Fix 4.5 should be 5.5 as default
 * In JS tech details - view switching, simple no router, there's only the main view and an about view
 * Explain use of localstorage, namespaced keys for saving user prefs
 * For visual progress bar explanation, also show code that calls requestAnimationFrame in a loop
