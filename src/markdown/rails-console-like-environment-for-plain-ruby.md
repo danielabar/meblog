@@ -12,9 +12,9 @@ related:
 
 I've been working on a Ruby project without Rails. It's a CLI tool that simulates retirement drawdown strategies for Canadians (I'll write a future blog post with more details on that). While building it, I found myself missing the convenience of the Rails console (`bin/rails console`), which loads all application code, for interactive exploration and debugging.
 
-For example, in my project, I have both a tax calculator and a reverse tax calculator. Aside from formal unit tests, it's useful to experiment with these classes interactively. Similarly, I have market return sequence generators that I may want to inspect directly. A console enables exploratory coding — it's not a replacement for tests but is great for quickly validating ideas.
+In my project, for instance, I have both a tax calculator and a reverse tax calculator. Beyond running unit tests, it's often helpful to poke at these classes interactively. I also have market return sequence generators that I sometimes want to explore directly. A console makes this kind of exploratory coding easy, not a substitute for tests, but a fast way to validate ideas.
 
-This post will explain how to setup a Rails-like console environment, for a plain Ruby project.
+This post will explain how I setup a Rails-like console environment, for a plain Ruby project.
 
 ## Project Structure
 
@@ -59,13 +59,12 @@ Here is my project structure (ignoring documentation and test folders). Aside fr
 
 Before getting into the automated solution, let's cover how you could load and run an individual class from a project manually.
 
-On any Ruby project (and also Rails projects), you can always run [irb](https://ruby.github.io/irb/#label-Overview) at the terminal, to get into an interactive Ruby session. `irb` is a default gem of Ruby so no need to install it, if you've installed Ruby, then you already have `irb`. However, by default, it doesn't know about any code in the project, even when it's run from the root of the project. For example:
+In any Ruby project (Rails or otherwise), you can start an interactive Ruby session with [irb](https://ruby.github.io/irb/#label-Overview). Since `irb` ships with Ruby itself, there’s nothing extra to install - if you have Ruby, you have `irb`. Out of the box, though, it doesn't know anything about your project's code, even if you launch it from the project's root directory. For example:
 
 ```ruby
 # Try to instantiate the tax calculator
 irb(main):004> tx = Tax::IncomeTaxCalculator.new
 
-# Error because the Tax::IncomeTaxCalculator class hasn't been loaded
 # (irb):1:in `<main>': uninitialized constant Tax (NameError)
 # tx = Tax::IncomeTaxCalculator.new
 #      ^^^
@@ -84,7 +83,9 @@ irb(main):002> require_relative "lib/tax/income_tax_calculator"
 # ...
 ```
 
-But this is tedious to have to do every time you want to experiment with some of your project code. It would be nice if all the project code was always available, any time you ran `irb` form your project root. The next sections will walk through how to set this up.
+But this is tedious to have to do every time you want to experiment with some of your project code. It would be nice if all the project code was always available, any time you ran `irb` from your project root.
+
+The next sections will walk through how to set this up.
 
 ## Define config/environment.rb
 
@@ -126,7 +127,7 @@ You don’t have to place this file in `config` or name it `environment.rb` - th
 
 ## Create Project Specific .irbrc
 
-Now that we have the potential to load all project dependencies from a single file, the next step is to ensure this file is always run when starting an irb session. To achieve this, create a `.irbrc` file in the project directory. This provides an opportunity to customize the behaviour of [irb](https://ruby.github.io/irb/) when started from the project root.
+Now that we have the potential to load all project dependencies from a single file, the next step is to ensure this file is always run when starting an irb session. To achieve this, create a `.irbrc` file in the project directory. This provides an opportunity to customize the behaviour of `irb` when started from the project root.
 
 
 Edit the project level `.irbrc` file so it has the following. Note that any valid Ruby can be placed in this file:
@@ -148,7 +149,7 @@ IRB.conf[:PROMPT][:APP] = {
 IRB.conf[:PROMPT_MODE] = :APP # Set custom prompt
 ```
 <aside class="markdown-aside">
-IRB first loads the `.irbrc` file in your home directory (if it exists) and then looks for one in the current directory, applying both. This allows you to define project-specific settings without losing your global customizations, though some configurations may override or interact with each other. For more details, see <a class="markdown-link" href="https://ruby.github.io/irb/Configurations_md.html#label-Configuration+File+Path+Resolution">Configuration File Path Resolution</a>.
+IRB first loads the <code>.irbrc</code> file in your home directory (if it exists) and then looks for one in the current directory, applying both. This allows you to define project-specific settings without losing your global customizations, though some configurations may override or interact with each other. For more details, see <a class="markdown-link" href="https://ruby.github.io/irb/Configurations_md.html#label-Configuration+File+Path+Resolution">Configuration File Path Resolution</a>.
 </aside>
 
 Now when you run `irb` at the terminal, it will run all the code in `.irbrc` in the project root. If you chose to customize the prompt, it will display the project name instead of the default `irb(main)>` prompt.
@@ -174,7 +175,7 @@ end
 Now if you make any changes to application code, rather than being forced to exit and run `irb` again, running `reload!` will refresh the code loaded in memory.
 
 <aside class="markdown-aside">
-This is just the beginning of what can be done with `.irbrc`. It supports defining custom commands, setting up debugging tools, tweaking history behavior, and much more. While it's beyond the scope of this post to cover everything, you can explore further in the <a class="markdown-link" href="https://ruby.github.io/irb/#label-Configure+IRB">IRB documentation</a>.
+This is just the beginning of what can be done with <code>.irbrc</code>. It supports defining custom commands, setting up debugging tools, tweaking history behavior, and much more. While it's beyond the scope of this post to cover everything, you can explore further in the <a class="markdown-link" href="https://ruby.github.io/irb/#label-Configure+IRB">IRB documentation</a>.
 </aside>
 
 ## Optional Bin Script
@@ -235,7 +236,7 @@ require_relative "config/environment"
 Run::AppRunner.new("inputs.yml", ARGV[0]).run
 ```
 
-If using RSpec, then `spec/spec_helper.rb` can require the config right after loading `rspec`:
+If using RSpec for testing, then `spec/spec_helper.rb` can require the config right after loading `rspec`:
 
 ```ruby
 require "rspec"
