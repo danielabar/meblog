@@ -22,7 +22,7 @@ But then I got to the chapter about people meditating in the forest, claiming th
 
 That's been my issue with meditation all along. I'm open to the science, but not the pseudoscience. I also didn't find it easy: trying to meditate on my own usually resulted in me either zoning out or falling asleep. So I turned to a tech solution.
 
-## The Problem with Meditation Apps
+## Meditation Apps
 
 I wanted something simple: a gentle breathing reminder to help me focus. But everything I tried had problems.
 
@@ -32,7 +32,7 @@ I wanted something simple: a gentle breathing reminder to help me focus. But eve
 * **Meditation podcasts** Same issue - plus ads - and often just as "out there."
 * **YouTube** Forget it. You sit down to meditate and end up watching cat videos for an hour.
 
-Then I read the book [Breath: The New Science of a Lost Art](https://www.mrjamesnestor.com/breath-book/). It made a strong case for a simple practice: breathing in through the nose for 4.5 seconds, and out through the nose for 4.5 seconds - just a few minutes a day could activate the parasympathetic nervous system, improve oxygen saturation, and more.
+Then I read the book [Breath: The New Science of a Lost Art](https://www.mrjamesnestor.com/breath-book/). It made a strong case for a simple practice: breathing in through the nose for 5.5 seconds, and out through the nose for 5.5 seconds - just a few minutes a day could activate the parasympathetic nervous system, improve oxygen saturation, and more.
 
 That clicked. But when I tried to create a custom meditation session using this technique, new problems emerged.
 
@@ -40,46 +40,46 @@ That clicked. But when I tried to create a custom meditation session using this 
 
 The technique sounded simple, but here's what happened in practice:
 
-* **Counting 4.5 seconds** wasn't intuitive - whole numbers felt easier, but stressing about the additional half second defeated the purpose.
+* **Counting 5.5 seconds** wasn't intuitive - whole numbers felt easier, but stressing about the additional half second defeated the purpose.
 * **Constant counting** was distracting, pulling attention away from the feeling of the breath.
 * **Mind wandering** often led to zoning out and forgetting the pattern altogether.
 * **Knowing when to stop** required setting a timer — but even the gentlest alert felt jarring if already relaxed, undoing the benefit of the session.
 
 What was really needed was an app that could talk out loud and simply say:
 
-> "Breathe in" ... 4.5 seconds "Breathe out" ... 4.5 seconds repeat ... "All done."
+> "Breathe in" ... 5.5 seconds "Breathe out" ... 5.5 seconds repeat ... "All done."
 
 No bells, no ads, no login, no mystical forest energy. Just a steady breathing reminder, with a gentle ending instead of a startling alarm.
 
 ## So I Built It
 
-I opened VSCode, created a new project, and prompted my AI assistant to help build something simple and mobile-friendly - no frameworks, no accounts, no backend, just vanilla JS and CSS.
+I opened VS Code, created a new project, and prompted my AI assistant to help build something simple and mobile-friendly - no frameworks, no accounts, no backend, just vanilla JS and CSS.
 
-Here is the prompt used:
+Here's the prompt:
 
 <aside class="markdown-memory-lane">
-Help me think about how I could use vanilla web tech for building the following web app, which i plan to deploy to github pages because i don't need an application server:
+Help me think about how I could use vanilla web tech for building the following web app, which will be deployed to github pages because it shouldn't require an application server:
 
 Mobile first layout because it will be used primarily on a phone
 
-Kind of a very simple meditation app without all the "woo woo"
+Very simple meditation app without all the "woo woo"
 
-It's inspired by the learnings from James Nestor book Breath: The New Science of a Lost Art: https://www.mrjamesnestor.com/breath-book/
+Inspired by the learnings from James Nestor book Breath: The New Science of a Lost Art: https://www.mrjamesnestor.com/breath-book/
 
-Essentially the optimal breathing for good health is 4.5 seconds in, 4.5 seconds out, all through the nose
+Essentially the optimal breathing for good health is 5.5 seconds in, 5.5 seconds out, all through the nose
 
-But it's really hard to count 4.5 seconds, and it's kind of distracting to keep counting
+But it's really hard to count 5.5 seconds, and it's kind of distracting to keep counting
 
-So what I'm picturing is an app (still have to figure out a name), but the basic idea is it prompts the user for:
+I'm picturing an app that prompts user for:
 
-1. How many seconds they want to breathe in (default 4.5)
-2. How many seconds they want to breathe out (default 4.5)
-3. How many minutes they want to mediate for (default 10 minutes, other options 5, 10, 15, 20, 25, 30, maybe let user enter their own amount, validation integer, numeric, between 1 and whatever 3 hours is)
+1. How many seconds they want to breathe in (default 5.5)
+2. How many seconds they want to breathe out (default 5.5)
+3. How many minutes they want to mediate for (default 10 minutes, other options 5, 10, 15..., maybe let user enter their own amount, validation integer, numeric, between 1 and whatever 3 hours is)
 4. Click Start
 
-At this point the user no longer needs to look at the app, although it should show "something pleasing" if user is looking at it, maybe a horizontal bar animating the time remaining or something like that, I don't know.
+At this point the user no longer needs to look at the app, although it should show "something pleasing" if user is looking at it, maybe a horizontal bar animating the time remaining or something like that.
 
-But the idea is at this point the user would find a comfortable place to sit or lie down where they will be undisturbed for the duration. I'm not sure if these instructions, along with the instruction to nasal breathe should be displayed somewhere in the app either before or after they make their selections. I don't want to confuse the user with too much details, particularly on a small phone screen.
+At this point the user would find a comfortable place to sit or lie down where they will be undisturbed for the duration. I'm not sure if these instructions, along with the instruction to nasal breathe should be displayed somewhere in the app either before or after they make their selections. I don't want to confuse the user with too much details, particularly on a small phone screen.
 
 Then the app will play a calming audio voice saying "Breath in" (I don't know where to find such an asset).
 
@@ -92,14 +92,14 @@ After submitting that prompt and a good deal of iteration to resolve issues, her
 
 ![just breathe app landing](../images/just-breathe-app-landing.png "just breathe app landing")
 
-In the middle of a session:
+After clicking Start, it looks like this in the middle of the session:
 
 ![just breathe app session](../images/just-breathe-app-session.png "just breathe app session")
 
 * [Live Demo](https://danielabar.github.io/just-breathe/)
 * [GitHub Repo](https://github.com/danielabar/just-breathe)
 
-## A Few Technical Highlights
+## Technical Highlights
 
 This app is structured as follows:
 
@@ -138,7 +138,7 @@ Where `index.html` loads the entry point styles and code:
 
 Even though *Just Breathe* is simple on the surface, a few small technical decisions help keep it lightweight, offline-friendly, and distraction-free.
 
-### 1. Pure Vanilla Stack
+### Vanilla Stack
 
 Using native ES modules means no bundler or transpiler is needed, and the whole app stays readable to anyone curious about the code. For example, the `js/index.js` entrypoint imports the main and about modules so the views can be toggled (no fancy router needed here for just two views):
 
@@ -170,7 +170,7 @@ navAbout.addEventListener('click', () => showView('about'));
 showView('main');
 ```
 
-### 2. Voice-Guided Breathing
+### Voice-Guided
 
 All prompts come from the [Web Speech API](https://developer.mozilla.org/en-US/docs/Web/API/SpeechSynthesis), so the user doesn't need to keep an eye on the screen during the breathing session:
 
@@ -181,7 +181,7 @@ export function speak(text) {
 }
 ```
 
-### 3. Staying Awake with the Wake Lock API
+### Staying Awake
 
 Sessions request a screen wake lock so the device won't lock up mid-breath:
 
@@ -191,7 +191,7 @@ async function requestWakeLock() {
 }
 ```
 
-### 4. Custom Preferences with Local Storage
+### Custom Preferences
 
 Breathing pace and session duration are remembered between visits using local storage. Namespaced keys are used:
 
@@ -199,9 +199,9 @@ Breathing pace and session duration are remembered between visits using local st
 localStorage.setItem('justBreathe:prefs', JSON.stringify(prefs));
 ```
 
-For this simple storage requirements, no account or back end is needed.
+For this simple requirement, no account or back end is needed.
 
-### 5. Progress Bar & Countdown
+### Progress Bar
 
 A simple countdown and filling progress bar track the session:
 
@@ -213,7 +213,7 @@ progressEl.style.width = (percent * 100) + '%';
 
 This provides just enough feedback to stay on pace for those who choose to look at the screen during the session.
 
-### 6. Installable Like a Native App
+### Installable
 
 With a manifest and icons, *Just Breathe* can be added to the device home screen:
 
@@ -223,7 +223,7 @@ With a manifest and icons, *Just Breathe* can be added to the device home screen
 
 TODO: Screenshot from my phone
 
-### 7. Use of @import in CSS for modularity
+### CSS Modularity
 
 In addition to the JavaScript setup, the CSS is organized into multiple smaller files and brought together in `index.css` using `@import`:
 
@@ -238,7 +238,7 @@ In addition to the JavaScript setup, the CSS is organized into multiple smaller 
 
 While `@import` has historically been discouraged for performance reasons—since older browsers loaded files sequentially—HTTP/2's multiplexing reduces that concern. In this small app, the tradeoff favors developer experience and maintainability, making the modular file structure more valuable than micro-optimizing CSS delivery. For more details see: https://css-tricks.com/almanac/rules/i/import
 
-### 8. CSS Variables for Theming and Consistency
+### CSS Variables
 
 The app defines a centralized color and typography system using CSS custom properties in `variables.css`. This makes it easy to maintain consistent design choices and update them globally:
 
@@ -262,7 +262,7 @@ body {
 }
 ```
 
-### 9. Use of a Variable Font (Inter)
+### Variable Font
 
 The project loads the Inter typeface as a variable font via `@font-face`. Variable fonts allow a single file to cover a wide weight range (100–900), reducing HTTP requests while offering flexibility in typography:
 
@@ -284,34 +284,31 @@ p  { font-weight: 400; }
 ```
 
 
-### 10. Automated Testing
+### Automated Testing
 
 Even though it's a small project, I found myself iterating and adding features often enough that it was worth having some automated test coverage.
 
 Testing with Vitest, started with Jest but surprised that it doesn't support ESM easily (some experimental feature that felt very messy). Out of scope to get into all the details so just point to some relevant files in project like vitest.config.js to configure jsdom (since this is a browser based project, not back end node) and coverage reporting.
 
-### 11. Zero-Build, Zero-Dependency
+### Zero-Build
 
 The entire app runs as a static site. There's no bundler, no framework, no auth, and no build process. It's just plain HTML, JavaScript modules, and CSS. It's deployed via GitHub Pages using the `gh-pages` npm package.
 
 TODO: Phrasing
 This keeps maintenance simple. On past JS projects with a bundler/build system - returning to maintain them after a few months often results in some build error because some js dependency is no longer maintained or doesn't work with newer node version or something like that.
 
-## Using It in Real Life
+## Using It
 
-I now use it almost every day after my workout and stretching. It's simple, peaceful, and effective.
-
-Lying down, I prefer longer cycles: **7 seconds in, 9 seconds out**. But the app supports whatever timing feels best. It's flexible.
+I now use it almost every day after my workout and stretching. It's simple, peaceful, and effective. Lying down, I prefer longer cycles: **7 seconds in, 9 seconds out**. But the app supports whatever timing feels best. It's flexible.
 
 ## Final Thoughts
 
-This little project reminded me how satisfying it is to build tools *just* for yourself. Especially ones that make your day measurably better.
+This project reminded me how satisfying it is to build tools *just* for yourself. Especially ones that make your day measurably better.
 
 If you've ever wanted to meditate but got turned off by mysticism, ads, paywalls, or distractions - give [Just Breathe](https://danielabar.github.io/just-breathe/) a try, and let me know if you found it helpful.
 
 
 ## TODO
-* conclusion para
 * edit
 * Another downside of apps: In-app purchases, notifications - even in the health & wellness space it's still competing in the attention economy
 * Maybe a few more details about the optimal breathing cadence and importance of nasal breathing from book, mention the book covers variety but this one stood out to me as being the simplest and most achievable as a daily practice:
@@ -327,7 +324,7 @@ If you've ever wanted to meditate but got turned off by mysticism, ads, paywalls
   * include module file path/name as comment in each snippet
 * WIP Update screenshots - frame in phone: https://mockuphone.com/
   * Update "Stop" button in JB to be larger and consistent design, then update second screenshot
-  * Fix 4.5 should be 5.5 as default
+  * Fix 5.5 should be 5.5 as default
 * In JS tech details - view switching, simple no router, there's only the main view and an about view
 * Explain use of localstorage, namespaced keys for saving user prefs
 * For visual progress bar explanation, also show code that calls requestAnimationFrame in a loop
