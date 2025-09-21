@@ -330,9 +330,6 @@ If you've ever wanted to meditate but got turned off by mysticism, ads, paywalls
   * Choice between musical like tone or vibration to mark the breaths (although I found still have a tendancy to fall asleep, there's something about the spoken english words that keeps me awake).
 * Update all js and css code snippets with latest version from GitHub.
   * include module file path/name as comment in each snippet
-* Update screenshots - frame in phone: https://mockuphone.com/
-  * Update "Stop" button in JB to be larger and consistent design, then update second screenshot
-  * Fix 5.5 should be 5.5 as default
 * Explain use of localstorage, namespaced keys for saving user prefs
 * For visual progress bar explanation, also show code that calls requestAnimationFrame in a loop
 * Phrasing better explanation on Vitest automated testing
