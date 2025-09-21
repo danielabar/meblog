@@ -22,40 +22,60 @@ But then I got to the chapter about people meditating in the forest, claiming th
 
 That's been my issue with meditation all along. I'm open to the science, but not the pseudoscience. I also didn't find it easy: trying to meditate on my own usually resulted in me either zoning out or falling asleep. So I turned to a tech solution.
 
-## Meditation Apps
+## Tech Fixes?
 
 I wanted something simple: a gentle breathing reminder to help me focus. But everything I tried had problems.
 
-* **Guided meditation apps** often required subscriptions. And it just didn't feel like something I should have to pay monthly for.
-* **Free versions** were full of distracting ads and usually demanded I create an account.
+* **Guided meditation apps** often required subscriptions. While useful, they never felt worth a recurring fee.
+* **Free versions** were full of ads and usually demanded I create an account.
+* **Distractions** Even in the health and wellness space, many apps are still designed around the attention economy: upsells, notifications, and nudges to buy extras instead of just letting you breathe.
 * **Tone** Full of vague spiritual platitudes and ambient whale sounds. Not my thing.
 * **Meditation podcasts** Same issue - plus ads - and often just as "out there."
 * **YouTube** Forget it. You sit down to meditate and end up watching cat videos for an hour.
 
-Then I read the book [Breath: The New Science of a Lost Art](https://www.mrjamesnestor.com/breath-book/). It made a strong case for a simple practice: breathing in through the nose for 5.5 seconds, and out through the nose for 5.5 seconds - just a few minutes a day could activate the parasympathetic nervous system, improve oxygen saturation, and more.
+After a while I realized I wasn’t looking for "content" at all. I didn't need a guru, a playlist, or a subscription. I just needed a technique, something simple, concrete, and grounded in science.
 
-That clicked. But when I tried to create a custom meditation session using this technique, new problems emerged.
+## Simple Discovery
+
+Then I read the book [Breath: The New Science of a Lost Art](https://www.mrjamesnestor.com/breath-book/), by James Nestor. It made a strong case for a simple, yet effective practice: breathing in through the nose for 5.5 seconds, and out through the nose for 5.5 seconds. Just a few minutes a day, the author argued, could activate the parasympathetic nervous system, improve oxygen saturation, and more.
+
+Nestor calls this technique **Resonant (or Coherent) Breathing**. He describes it as:
+
+> A calming practice that places the heart, lungs, and circulation into a state of coherence, where the systems of the body are working at peak efficiency. There is no more essential technique, and none more basic.
+
+The instructions were straightforward:
+
+* Sit up straight, relax the shoulders and belly, and exhale.
+* Inhale softly for 5.5 seconds, expanding the belly as air fills the bottom of the lungs.
+* Without pausing, exhale softly for 5.5 seconds, bringing the belly in as the lungs empty.
+* Repeat at least ten times, more if possible.
+
+That clicked. Finally, here was something grounded and practical, stripped of mysticism. But when I tried to create a custom meditation session around this technique, new problems emerged.
 
 ## Breathing Math
 
-The technique sounded simple, but here's what happened in practice:
+The technique sounds simple, but here's what happened for me in practice:
 
-* **Counting 5.5 seconds** wasn't intuitive - whole numbers felt easier, but stressing about the additional half second defeated the purpose.
+* **Counting 5.5 seconds** wasn't intuitive, whole numbers felt easier, but stressing about the additional half second defeated the purpose.
 * **Constant counting** was distracting, pulling attention away from the feeling of the breath.
 * **Mind wandering** often led to zoning out and forgetting the pattern altogether.
-* **Knowing when to stop** required setting a timer — but even the gentlest alert felt jarring if already relaxed, undoing the benefit of the session.
+* **Knowing when to stop** required setting a timer, but even the gentlest alert felt jarring if already relaxed, undoing the benefit of the session.
 
-What was really needed was an app that could talk out loud and simply say:
+After running into all these frictions, I came to the realization that I needed a bare-bones tool that would:
 
-> "Breathe in" ... 5.5 seconds "Breathe out" ... 5.5 seconds repeat ... "All done."
+guide me through 5.5-second breaths with voice prompts,
 
-No bells, no ads, no login, no mystical forest energy. Just a steady breathing reminder, with a gentle ending instead of a startling alarm.
+keep me on track without me having to count, and
 
-## So I Built It
+end the session gently, not abruptly.
 
-I opened VS Code, created a new project, and prompted my AI assistant to help build something simple and mobile-friendly - no frameworks, no accounts, no backend, just vanilla JS and CSS.
+That was it. Nothing more.
 
-Here's the prompt:
+Since I couldn't find it, I decided to build it.
+
+## Building My Own
+
+I opened VS Code, created a new project, and asked my AI assistant to help me put together something simple and mobile-friendly. No frameworks, no accounts, no backend. Just vanilla JavaScript and CSS. Here’s the prompt I used:
 
 <aside class="markdown-memory-lane">
 Help me think about how I could use vanilla web tech for building the following web app, which will be deployed to github pages because it shouldn't require an application server:
@@ -74,7 +94,7 @@ I'm picturing an app that prompts user for:
 
 1. How many seconds they want to breathe in (default 5.5)
 2. How many seconds they want to breathe out (default 5.5)
-3. How many minutes they want to mediate for (default 10 minutes, other options 5, 10, 15..., maybe let user enter their own amount, validation integer, numeric, between 1 and whatever 3 hours is)
+3. How many minutes they want to mediate for (default 10 minutes, other options 5, 10, 15..., maybe let user enter their own amount, validation integer, numeric, between 1 and some max)
 4. Click Start
 
 At this point the user no longer needs to look at the app, although it should show "something pleasing" if user is looking at it, maybe a horizontal bar animating the time remaining or something like that.
@@ -221,8 +241,6 @@ With a manifest and icons, *Just Breathe* can be added to the device home screen
 <link rel="manifest" href="site.webmanifest">
 ```
 
-TODO: Screenshot from my phone
-
 ### CSS Modularity
 
 In addition to the JavaScript setup, the CSS is organized into multiple smaller files and brought together in `index.css` using `@import`:
@@ -236,7 +254,9 @@ In addition to the JavaScript setup, the CSS is organized into multiple smaller 
 @import './app.css';
 ```
 
-While `@import` has historically been discouraged for performance reasons—since older browsers loaded files sequentially—HTTP/2's multiplexing reduces that concern. In this small app, the tradeoff favors developer experience and maintainability, making the modular file structure more valuable than micro-optimizing CSS delivery. For more details see: https://css-tricks.com/almanac/rules/i/import
+<aside class="markdown-aside">
+While <code>@import</code> has historically been discouraged for performance reasons, since older browsers loaded files sequentially, HTTP/2's multiplexing reduces that concern. In this small app, the tradeoff favors developer experience and maintainability, making the modular file structure more valuable than micro-optimizing CSS delivery. <a class="markdown-link" href="https://css-tricks.com/almanac/rules/i/import">Details</a>.
+</aside>
 
 ### CSS Variables
 
@@ -292,10 +312,7 @@ Testing with Vitest, started with Jest but surprised that it doesn't support ESM
 
 ### Zero-Build
 
-The entire app runs as a static site. There's no bundler, no framework, no auth, and no build process. It's just plain HTML, JavaScript modules, and CSS. It's deployed via GitHub Pages using the `gh-pages` npm package.
-
-TODO: Phrasing
-This keeps maintenance simple. On past JS projects with a bundler/build system - returning to maintain them after a few months often results in some build error because some js dependency is no longer maintained or doesn't work with newer node version or something like that.
+The entire app runs as a static site. There's no bundler, no framework, no auth, and no build process. It's just plain HTML, JavaScript modules, and CSS. It's deployed via GitHub Pages using the `gh-pages` npm package. This keeps maintenance simple.
 
 ## Using It
 
@@ -309,25 +326,14 @@ If you've ever wanted to meditate but got turned off by mysticism, ads, paywalls
 
 
 ## TODO
-* edit
-* Another downside of apps: In-app purchases, notifications - even in the health & wellness space it's still competing in the attention economy
-* Maybe a few more details about the optimal breathing cadence and importance of nasal breathing from book, mention the book covers variety but this one stood out to me as being the simplest and most achievable as a daily practice:
-  * Resonant (Coherent) Breathing
-  * A calming practice that places the heart, lungs, and circulation into a state of coherence, where the systems of the body are working at peak efficiency. There is no more essential technique, and none more basic.
-  * Sit up straight, relax shoulders and belly, and exhale
-  * Inhale softly for 5.5 seconds, expanding the belly as air fills the bottom of the lungs
-  * Without pausing, exhale softly for 5.5 seconds, bringing the belly in as the lungs empty.
-  * Repeat at least 10 times, more if possible
-  * Maybe mention Paced Breathing app (but there are in-app purchases, notifications are off by default thankfully as of 2025=08-24)
-    * Choice between musical like tone or vibration to mark the breaths (although I found still have a tendancy to fall asleep, there's something about the spoken english words that keeps me awake).
+* Maybe mention Paced Breathing app (but there are in-app purchases, notifications are off by default thankfully as of 2025=08-24)
+  * Choice between musical like tone or vibration to mark the breaths (although I found still have a tendancy to fall asleep, there's something about the spoken english words that keeps me awake).
 * Update all js and css code snippets with latest version from GitHub.
   * include module file path/name as comment in each snippet
-* WIP Update screenshots - frame in phone: https://mockuphone.com/
+* Update screenshots - frame in phone: https://mockuphone.com/
   * Update "Stop" button in JB to be larger and consistent design, then update second screenshot
   * Fix 5.5 should be 5.5 as default
-* In JS tech details - view switching, simple no router, there's only the main view and an about view
 * Explain use of localstorage, namespaced keys for saving user prefs
 * For visual progress bar explanation, also show code that calls requestAnimationFrame in a loop
-* Shorten up stylesheets section, maybe just need one section.
 * Phrasing better explanation on Vitest automated testing
-* Phrasing on zero-build section, especially about returning to a project a few months later and webpack or whatever build no longer works
+* edit
