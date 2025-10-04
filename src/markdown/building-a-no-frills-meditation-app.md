@@ -190,22 +190,73 @@ navAbout.addEventListener('click', () => showView('about'));
 showView('main');
 ```
 
-### Voice-Guided
+### Session
 
-All prompts come from the [Web Speech API](https://developer.mozilla.org/en-US/docs/Web/API/SpeechSynthesis), so the user doesn't need to keep an eye on the screen during the breathing session:
+The session loop keeps track of time, alternates between inhale/exhale, updates the progress bar, and finishes with a friendly close. It's driven by `requestAnimationFrame`, which runs once per frame for smooth updates. You’ll also notice calls to `speak(...)` for voice prompts, I'll explain how that works in the next section.
 
 ```js
+// js/session.js
+function updateState() {
+  if (!running) return;
+
+  // Update progress bar
+  elapsed = Date.now() - sessionStart;
+  let percent = Math.min(1, elapsed / totalMs);
+  progressEl.style.width = (percent * 100) + '%';
+
+  // Switch inhale/exhale when time for the current breath is up
+  if (Date.now() - breathStart >= breathMs) {
+    if (state === 'in') {
+      state = 'out';
+      breathMs = outSec * 1000;
+      speak('Breathe out'); // voice prompts (explained in next section)
+      stateEl.textContent = 'Breathe out';
+    } else {
+      state = 'in';
+      breathMs = inSec * 1000;
+      speak('Breathe in');
+      stateEl.textContent = 'Breathe in';
+    }
+    breathStart = Date.now();
+  }
+
+  requestAnimationFrame(updateState);
+}
+```
+
+When the total time is reached, the app lets you finish your last out-breath before wrapping up:
+
+```js
+// js/session.js
+setTimeout(() => {
+  stateEl.textContent = 'All done!';
+  speak('All done');
+  progressEl.style.width = '100%';
+  stopBtn.textContent = 'Restart';
+  stopBtn.onclick = onDone;
+}, outSec * 1000);
+```
+
+### Voice-Guided
+
+All prompts are spoken using the [Web Speech API](https://developer.mozilla.org/en-US/docs/Web/API/SpeechSynthesis), so the user doesn't need to watch the screen during the session. The browser provides the voice, it may sound different depending on the OS and settings.
+
+```js
+// js/voice.js
 export function speak(text) {
   const utter = new SpeechSynthesisUtterance(text);
   speechSynthesis.speak(utter);
 }
 ```
 
+The call to `speak` returns immediately while the browser continues speaking in the background. That's why the session loop coordinates timing with `requestAnimationFrame` and `setTimeout` rather than waiting for the voice to finish.
+
 ### Staying Awake
 
 Sessions request a screen wake lock so the device won't lock up mid-breath:
 
 ```js
+// js/session.js
 async function requestWakeLock() {
   wakeLock = await navigator.wakeLock.request('screen');
 }
@@ -213,25 +264,26 @@ async function requestWakeLock() {
 
 ### Custom Preferences
 
-Breathing pace and session duration are remembered between visits using local storage. Namespaced keys are used:
+Just Breathe remembers your breathing pace and session duration between visits using local storage. Preferences are saved under a namespaced key `justBreathe:prefs` to avoid conflicts with other apps:
 
 ```js
+// js/userPrefs.js
 localStorage.setItem('justBreathe:prefs', JSON.stringify(prefs));
 ```
 
-For this simple requirement, no account or back end is needed.
-
-### Progress Bar
-
-A simple countdown and filling progress bar track the session:
+The app also provides sensible defaults and validation:
 
 ```js
-stateEl.textContent = 'Starting in 3...';
-speak('Starting in 3');
-progressEl.style.width = (percent * 100) + '%';
+const DEFAULT_PREFS = { inSec: 5.5, outSec: 5.5, duration: 10 };
+
+// When loading prefs from local storage
+const prefs = JSON.parse(localStorage.getItem('justBreathe:prefs'));
+// Validate each value; fallback to defaults if invalid
 ```
 
-This provides just enough feedback to stay on pace for those who choose to look at the screen during the session.
+Only reasonable values are accepted: in/out seconds between 1–15, and session durations between 1–180 minutes. This ensures that even if local storage is corrupted or manually edited, the app still works predictably.
+
+The combination of defaults, validation, and namespacing keeps preferences simple, safe, and completely local - no subscriptions, accounts, or external services required.
 
 ### Installable
 
@@ -303,34 +355,18 @@ h1 { font-weight: 700; }
 p  { font-weight: 400; }
 ```
 
-
-### Automated Testing
-
-Even though it's a small project, I found myself iterating and adding features often enough that it was worth having some automated test coverage.
-
-Testing with Vitest, started with Jest but surprised that it doesn't support ESM easily (some experimental feature that felt very messy). Out of scope to get into all the details so just point to some relevant files in project like vitest.config.js to configure jsdom (since this is a browser based project, not back end node) and coverage reporting.
-
 ### Zero-Build
 
 The entire app runs as a static site. There's no bundler, no framework, no auth, and no build process. It's just plain HTML, JavaScript modules, and CSS. It's deployed via GitHub Pages using the `gh-pages` npm package. This keeps maintenance simple.
 
 ## Using It
 
-I now use it almost every day after my workout and stretching. It's simple, peaceful, and effective. Lying down, I prefer longer cycles: **7 seconds in, 9 seconds out**. But the app supports whatever timing feels best. It's flexible.
+I now use it nearly every day after my workout. It's simple, peaceful, and effective. Lying down, I prefer longer cycles: **7 seconds in, 9 seconds out**. But the app supports whatever timing feels best. It's flexible.
 
 ## Final Thoughts
 
-This project reminded me how satisfying it is to build tools *just* for yourself. Especially ones that make your day measurably better.
+This project reminded me how satisfying it is to build tools *just* for yourself. Especially ones that make your day measurably better. If you've ever wanted to meditate but got turned off by mysticism, ads, paywalls, or distractions - give [Just Breathe](https://danielabar.github.io/just-breathe/) a try, and let me know if you found it helpful.
 
-If you've ever wanted to meditate but got turned off by mysticism, ads, paywalls, or distractions - give [Just Breathe](https://danielabar.github.io/just-breathe/) a try, and let me know if you found it helpful.
-
-
-## TODO
-* Maybe mention Paced Breathing app (but there are in-app purchases, notifications are off by default thankfully as of 2025=08-24)
-  * Choice between musical like tone or vibration to mark the breaths (although I found still have a tendancy to fall asleep, there's something about the spoken english words that keeps me awake).
-* Update all js and css code snippets with latest version from GitHub.
-  * include module file path/name as comment in each snippet
-* Explain use of localstorage, namespaced keys for saving user prefs
-* For visual progress bar explanation, also show code that calls requestAnimationFrame in a loop
-* Phrasing better explanation on Vitest automated testing
-* edit
+<aside class="markdown-aside">
+After building the first version of Just Breathe, I discovered the <a class="markdown-link" href="https://pacedbreathing.app/">Paced Breathing</a> app. It's beautifully designed, with musical tones or gentle vibrations to mark breaths, but I still found myself zoning out or falling asleep. For me, the spoken English voice prompts in Just Breathe work better to keep me on task. Paced Breathing also has in-app purchases, which I find a bit distracting, though it’s a fantastic option if you want a more polished, feature-rich experience.
+</aside>
