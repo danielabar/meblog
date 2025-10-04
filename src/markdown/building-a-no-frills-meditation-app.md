@@ -22,7 +22,7 @@ But then I got to the chapter about people meditating in the forest, claiming th
 
 That's been my issue with meditation all along. I'm open to the science, but not the pseudoscience. I also didn't find it easy: trying to meditate on my own usually resulted in me either zoning out or falling asleep. So I turned to a tech solution.
 
-## Tech Fixes?
+## Digital Helpers
 
 I wanted something simple: a gentle breathing reminder to help me focus. But everything I tried had problems.
 
@@ -63,11 +63,11 @@ The technique sounds simple, but here's what happened for me in practice:
 
 After running into all these frictions, I came to the realization that I needed a bare-bones tool that would:
 
-guide me through 5.5-second breaths with voice prompts,
+Guide me through 5.5-second breaths with voice prompts,
 
-keep me on track without me having to count, and
+Keep me on track without me having to count, and
 
-end the session gently, not abruptly.
+End the session gently, not abruptly.
 
 That was it. Nothing more.
 
@@ -115,6 +115,8 @@ After submitting that prompt and a good deal of iteration to resolve issues, her
 After clicking Start, it looks like this in the middle of the session:
 
 ![just breathe app session](../images/just-breathe-app-session.png "just breathe app session")
+
+While the session is running the user hears "Breathe in", then 5.5 seconds later (or whatever value they set in the form), "Breathe out". It repeats in this pattern until the session is complete.
 
 * [Live Demo](https://danielabar.github.io/just-breathe/)
 * [GitHub Repo](https://github.com/danielabar/just-breathe)
@@ -249,8 +251,6 @@ export function speak(text) {
 }
 ```
 
-The call to `speak` returns immediately while the browser continues speaking in the background. That's why the session loop coordinates timing with `requestAnimationFrame` and `setTimeout` rather than waiting for the voice to finish.
-
 ### Staying Awake
 
 Sessions request a screen wake lock so the device won't lock up mid-breath:
@@ -281,7 +281,7 @@ const prefs = JSON.parse(localStorage.getItem('justBreathe:prefs'));
 // Validate each value; fallback to defaults if invalid
 ```
 
-Only reasonable values are accepted: in/out seconds between 1–15, and session durations between 1–180 minutes. This ensures that even if local storage is corrupted or manually edited, the app still works predictably.
+Only reasonable values are accepted: in/out seconds between 1 - 15, and session durations between 1 - 180 minutes. This ensures that even if local storage is corrupted or manually edited, the app still works predictably.
 
 The combination of defaults, validation, and namespacing keeps preferences simple, safe, and completely local - no subscriptions, accounts, or external services required.
 
@@ -307,7 +307,7 @@ In addition to the JavaScript setup, the CSS is organized into multiple smaller 
 ```
 
 <aside class="markdown-aside">
-While <code>@import</code> has historically been discouraged for performance reasons, since older browsers loaded files sequentially, HTTP/2's multiplexing reduces that concern. In this small app, the tradeoff favors developer experience and maintainability, making the modular file structure more valuable than micro-optimizing CSS delivery. <a class="markdown-link" href="https://css-tricks.com/almanac/rules/i/import">Details</a>.
+While <code>@import</code> has historically been discouraged for performance reasons, since older browsers loaded files sequentially, HTTP/2's multiplexing reduces that concern. In this small app, the tradeoff favors developer experience and maintainability, making the modular file structure more valuable than micro-optimizing CSS delivery. <a class="markdown-link" href="https://css-tricks.com/almanac/rules/i/import">Further reading</a>.
 </aside>
 
 ### CSS Variables
@@ -359,13 +359,11 @@ p  { font-weight: 400; }
 
 The entire app runs as a static site. There's no bundler, no framework, no auth, and no build process. It's just plain HTML, JavaScript modules, and CSS. It's deployed via GitHub Pages using the `gh-pages` npm package. This keeps maintenance simple.
 
-## Using It
-
-I now use it nearly every day after my workout. It's simple, peaceful, and effective. Lying down, I prefer longer cycles: **7 seconds in, 9 seconds out**. But the app supports whatever timing feels best. It's flexible.
-
 ## Final Thoughts
 
-This project reminded me how satisfying it is to build tools *just* for yourself. Especially ones that make your day measurably better. If you've ever wanted to meditate but got turned off by mysticism, ads, paywalls, or distractions - give [Just Breathe](https://danielabar.github.io/just-breathe/) a try, and let me know if you found it helpful.
+I now use Just Breathe nearly every day after my workout. It's simple, peaceful, and effective. This project reminded me how satisfying it is to build tools *just* for yourself. Especially ones that make your day measurably better.
+
+If you've ever wanted to meditate but got turned off by mysticism, ads, paywalls, or distractions - give [Just Breathe](https://danielabar.github.io/just-breathe/) a try, and let me know if you found it helpful.
 
 <aside class="markdown-aside">
 After building the first version of Just Breathe, I discovered the <a class="markdown-link" href="https://pacedbreathing.app/">Paced Breathing</a> app. It's beautifully designed, with musical tones or gentle vibrations to mark breaths, but I still found myself zoning out or falling asleep. For me, the spoken English voice prompts in Just Breathe work better to keep me on task. Paced Breathing also has in-app purchases, which I find a bit distracting, though it’s a fantastic option if you want a more polished, feature-rich experience.
