@@ -194,24 +194,52 @@ showView('main');
 
 ### Session
 
-The session loop keeps track of time, alternates between inhale/exhale, updates the progress bar, and finishes with a friendly close. It's driven by `requestAnimationFrame`, which runs once per frame for smooth updates. You’ll also notice calls to `speak(...)` for voice prompts, I'll explain how that works in the next section.
+The session loop keeps track of time, alternates between inhale/exhale, updates the progress bar, and finishes with a friendly close. It's driven by `requestAnimationFrame`, which runs once per frame for smooth updates. This approach provides more precise timing than cascading `setTimeout` calls.
+
+You’ll also notice calls to `speak(...)` for voice prompts, I'll explain how that works in the next section.
 
 ```js
 // js/session.js
 function updateState() {
   if (!running) return;
 
-  // Update progress bar
+  // Update progress bar based on overall session completion
   elapsed = Date.now() - sessionStart;
   let percent = Math.min(1, elapsed / totalMs);
   progressEl.style.width = (percent * 100) + '%';
 
+  // Check if we're at the end of the session but in "in" state
+  if (elapsed >= totalMs && state === 'in') {
+    // Let user finish last out-breath before ending
+    state = 'out';
+    breathStart = Date.now();
+    breathMs = outSec * 1000;
+    speak('Breathe out');
+    stateEl.textContent = 'Breathe out';
+  }
+
+  // Check if session is complete and we're on the final out-breath
+  if (elapsed >= totalMs && state === 'out') {
+    running = false;
+    // Wait for the final breath to complete before showing "All done"
+    setTimeout(() => {
+      stateEl.textContent = 'All done!';
+      speak('All done');
+      progressEl.style.width = '100%';
+      finishSession(true);
+    }, outSec * 1000);
+    return;
+  }
+
+  // Calculate how long we've been in the current breath phase
+  let breathElapsed = Date.now() - breathStart;
+
   // Switch inhale/exhale when time for the current breath is up
-  if (Date.now() - breathStart >= breathMs) {
+  if (breathElapsed >= breathMs) {
     if (state === 'in') {
       state = 'out';
       breathMs = outSec * 1000;
-      speak('Breathe out'); // voice prompts (explained in next section)
+      speak('Breathe out'); // Voice prompts (explained in next section)
       stateEl.textContent = 'Breathe out';
     } else {
       state = 'in';
@@ -219,25 +247,18 @@ function updateState() {
       speak('Breathe in');
       stateEl.textContent = 'Breathe in';
     }
+    // Reset the timer for the new breath phase
     breathStart = Date.now();
   }
 
+  // Continue the animation loop - typically runs 60 times per second
   requestAnimationFrame(updateState);
 }
 ```
 
-When the total time is reached, the app lets you finish your last out-breath before wrapping up:
+Rather than "waiting" for exact intervals using timers, the app continuously checks if enough time has elapsed between breaths. Each animation frame (about every 16.7ms at 60fps), the function compares the current time against when the breath phase started. When the target duration is reached (e.g., 5.5 seconds for inhale), it transitions to the next phase and resets the timer.
 
-```js
-// js/session.js
-setTimeout(() => {
-  stateEl.textContent = 'All done!';
-  speak('All done');
-  progressEl.style.width = '100%';
-  stopBtn.textContent = 'Restart';
-  stopBtn.onclick = onDone;
-}, outSec * 1000);
-```
+When the total time is reached, the app lets you finish your last out-breath before wrapping up, speaking "All done".
 
 ### Voice-Guided
 
@@ -253,7 +274,7 @@ export function speak(text) {
 
 ### Staying Awake
 
-Sessions request a screen wake lock so the device won't lock up mid-breath:
+Sessions request a screen [wake lock](https://developer.mozilla.org/en-US/docs/Web/API/WakeLock) so the device won't lock up mid-breath:
 
 ```js
 // js/session.js
@@ -363,7 +384,7 @@ The entire app runs as a static site. There's no bundler, no framework, no auth,
 
 I now use Just Breathe nearly every day after my workout. It's simple, peaceful, and effective. This project reminded me how satisfying it is to build tools *just* for yourself. Especially ones that make your day measurably better.
 
-If you've ever wanted to meditate but got turned off by mysticism, ads, paywalls, or distractions - give [Just Breathe](https://danielabar.github.io/just-breathe/) a try, and let me know if you found it helpful.
+If you've ever wanted to meditate but got turned off by mysticism, ads, paywalls, or distractions - give [Just Breathe](https://danielabar.github.io/just-breathe/) a try, and let me know if you find it helpful.
 
 <aside class="markdown-aside">
 After building the first version of Just Breathe, I discovered the <a class="markdown-link" href="https://pacedbreathing.app/">Paced Breathing</a> app. It's beautifully designed, with musical tones or gentle vibrations to mark breaths, but I still found myself zoning out or falling asleep. For me, the spoken English voice prompts in Just Breathe work better to keep me on task. Paced Breathing also has in-app purchases, which I find a bit distracting, though it’s a fantastic option if you want a more polished, feature-rich experience.
