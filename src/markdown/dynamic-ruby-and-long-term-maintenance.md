@@ -1,13 +1,13 @@
 ---
 title: "Dynamic Ruby And Hidden Maintenance Costs"
-featuredImage: "../images/tbd.jpg"
+featuredImage: "../images/dynamic-ruby-maintenance-karla-hernandez-LrlyZzX6Sws-unsplash.jpg"
 description: "This post explores how Ruby's dynamic dispatch and runtime constant resolution can make code elegant but harder to understand and maintain over time."
 date: "2026-02-01"
 category: "ruby"
 related:
-  - "tbd"
-  - "tbd"
-  - "tbd"
+  - "Avoid this Bug with Numeric Environment Variables in Ruby"
+  - "Rails Console-like Environment for a Plain Ruby Project"
+  - "Configurable Retry with Ruby"
 ---
 
 Ruby makes it incredibly easy to write elegant, dynamic code. The language practically encourages it with features like `constantize`, `classify`, and metaprogramming. When you discover these capabilities, it feels empowering, like you're writing less code that does more.
@@ -57,7 +57,7 @@ This raised an immediate question: Why does `DataSyncer` have a `:article` handl
 
 But something made me pause. The code seemed too intentional to be simply forgotten. There had to be a reason for that flexibility.
 
-## The Discovery: A Dynamic Job Dispatcher
+## Dynamic Job Dispatcher
 
 After some deeper investigation, I discovered the missing piece. The `Article` model had a callback that didn't directly reference `DataSyncer` at all:
 
@@ -106,7 +106,7 @@ class BackgroundJobDispatcher
 end
 ```
 
-### How It Works
+**How it works:**
 
 The `BackgroundJobDispatcher` uses string manipulation to dynamically resolve job class names:
 
@@ -148,7 +148,7 @@ This isn't complex logic, but it's *surprising*. It requires extra mental energy
 
 ### Limited Reuse
 
-In this codebase, `BackgroundJobDispatcher` is only used by the `Article` model. The flexibility to handle multiple model types exists, but it's never exercised. The abstraction was built for a level of generality that wasn't actually needed.
+In this codebase, `BackgroundJobDispatcher` is only used by the `Article` model, which only had two sync operations. The flexibility to handle multiple model types and operations exists, but it's never exercised. The abstraction was built for a level of generality that wasn't actually needed.
 
 ## A Simpler Alternative
 
@@ -158,26 +158,25 @@ The same functionality could have been achieved with two explicit lines in the `
 # app/models/article.rb
 class Article < ApplicationRecord
   after_create_commit do
-    MetadataSyncer.perform_async(self.class.name, id)
-    DataSyncer.perform_async(self.class.name, id)
+    MetadataSyncer.perform_async(id)
+    DataSyncer.perform_async(id)
   end
 end
 ```
 
 This version:
-- Is immediately understandable to any Rails developer
+- Is immediately understandable to any developer
 - Shows up in static searches for `DataSyncer`
-- Requires no additional service class or tests
-- Makes the coupling between `Article` and its syncers explicit
+- Requires no additional service class
+- Makes the relationship between `Article` and its syncers explicit
 
 Yes, if you need to add a third syncer, you add a third line. Personally I don't view this as a burden, it's clarity.
 
 ## When Dynamic Patterns Make Sense
 
-To be clear, there's nothing inherently wrong with the dynamic job dispatcher pattern. It could be genuinely useful as:
+To be clear, there's nothing inherently wrong with the dynamic job dispatcher pattern. It could be useful as:
 
 - **A documented library or gem** that handles job dispatching across multiple projects
-- **Well-tested infrastructure code** with comprehensive documentation
 - **A framework-level abstraction** where the benefits of the pattern justify the cognitive overhead
 
 In those contexts, the investment in understanding the abstraction pays dividends because it's used widely and consistently.
@@ -188,11 +187,11 @@ But in application code, where the primary goal is to model your specific busine
 
 This experience reinforced a few principles for me:
 
-**Optimize for reading, not writing.** Code is read far more often than it's written. The few extra seconds it takes to write explicit job calls is dwarfed by the minutes (or hours) future developers will spend understanding a clever abstraction.
+**Optimize for reading, not writing.** Code is read far more often than it's written. The few extra seconds it takes to write explicit job calls is dwarfed by the minutes (or hours) future developers will spend understanding dynamic code.
 
 **Abstractions should pay for themselves.** Before creating an abstraction, ask: "Will this be reused enough to justify the cognitive overhead?" If the answer is unclear, err on the side of explicitness.
 
-**Consider the maintenance context.** On projects that will live for years with multiple developers coming and going, predictable patterns are more valuable than elegant ones. The boring code that future-you can understand at 2am is better than the clever code that present-you is proud of.
+**Consider the maintenance context.** On projects that will live for years with multiple developers coming and going, predictable patterns are more valuable than elegant ones. The boring code that future [on-call you can understand at 2am](https://www.pcloadletter.dev/blog/clever-code/) is better than the clever code that present-you is proud of.
 
 **Static analysis matters.** If your IDE, grep, and code search tools can't discover relationships in your code, you're working against the tools that make codebases navigable.
 
@@ -203,8 +202,7 @@ What feels like productivity gains when writing code can become maintenance cost
 The next time you're tempted to write a dynamic abstraction in your application code, ask yourself: "Will future developers thank me for this, or will they wish I had just written it out explicitly?" The answer might surprise you.
 
 ## TODO
-* feature image
-* related
-* edit
 * this example is from a Rails project but could apply to any Ruby code
 * is `clever` the best word to express this?
+* add aside in lessons learned: In the age of AI assistants they could find it but... code still needs to be understandable by humans, what if the AI is unavailable or costs become excessive etc
+* edit
