@@ -14,6 +14,8 @@ Ruby makes it incredibly easy to write elegant, dynamic code. The language pract
 
 But there's a hidden cost to elegant abstractions in application code, especially on projects that will be maintained by multiple developers over many years. This post explores a real-world example where a well-intentioned dynamic pattern made the codebase harder to understand and maintain, even though the code itself was technically correct and elegantly written.
 
+While the example comes from a Rails app, the trade-offs it illustrates are relevant to any Ruby project.
+
 ## Where Are the Callers?
 
 I was investigating a Sidekiq job called `DataSyncer` that accepts a `class_name` as an argument:
@@ -200,6 +202,5 @@ What feels like productivity gains when writing code can become maintenance cost
 The next time you're tempted to write a dynamic abstraction in your application code, ask yourself: "Will future developers thank me for this, or will they wish I had just written it out explicitly?" The answer might surprise you.
 
 ## TODO
-* this example is from a Rails project but could apply to any Ruby code
 * add aside in lessons learned: In the age of AI assistants they could find it but... code still needs to be understandable by humans, what if the AI is unavailable or costs become excessive etc
 * WIP edit
