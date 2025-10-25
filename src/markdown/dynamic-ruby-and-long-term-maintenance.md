@@ -59,7 +59,7 @@ But something made me pause. The code seemed too intentional to be simply forgot
 
 ## Dynamic Job Dispatcher
 
-After some deeper investigation, I discovered the missing piece. The `Article` model had a callback that didn't directly reference `DataSyncer` at all:
+After some deeper investigation, I discovered the missing piece. The `Article` model had a callback that didn't directly reference `DataSyncer`, but was invoking it indirectly:
 
 ```ruby
 # app/models/article.rb
@@ -123,9 +123,9 @@ From a design perspective, this pattern has some appealing qualities:
 - **Convention-driven**: Job names follow a predictable pattern (`{attribute}_syncer`)
 - **Decoupled**: The model doesn't need to know about specific job classes
 
-## The Cost of Cleverness
+## The Cost of Flexibility
 
-Here's the problem: while this code works perfectly from a technical standpoint, it creates significant friction for long-term maintenance.
+While this code works perfectly from a technical standpoint, it creates significant friction for long-term maintenance.
 
 ### Discoverability
 
@@ -148,11 +148,11 @@ This isn't complex logic, but it's *surprising*. It requires extra mental energy
 
 ### Limited Reuse
 
-In this codebase, `BackgroundJobDispatcher` is only used by the `Article` model, which only had two sync operations. The flexibility to handle multiple model types and operations exists, but it's never exercised. The abstraction was built for a level of generality that wasn't actually needed.
+In this codebase, `BackgroundJobDispatcher` is only used by the `Article` model, which only had two sync operations. The flexibility to handle multiple operations exists, but it's never exercised. The abstraction was built for a level of generality that wasn't actually needed.
 
 ## A Simpler Alternative
 
-The same functionality could have been achieved with two explicit lines in the `Article` model:
+The same functionality could be achieved with two explicit lines in the `Article` model:
 
 ```ruby
 # app/models/article.rb
@@ -181,7 +181,7 @@ To be clear, there's nothing inherently wrong with the dynamic job dispatcher pa
 
 In those contexts, the investment in understanding the abstraction pays dividends because it's used widely and consistently.
 
-But in application code, where the primary goal is to model your specific business logic, explicit is often better than clever.
+But in application code, where the primary goal is to model your specific business logic, explicit is often better than dynamic.
 
 ## Lessons for Long-Term Projects
 
@@ -193,16 +193,13 @@ This experience reinforced a few principles for me:
 
 **Consider the maintenance context.** On projects that will live for years with multiple developers coming and going, predictable patterns are more valuable than elegant ones. The boring code that future [on-call you can understand at 2am](https://www.pcloadletter.dev/blog/clever-code/) is better than the clever code that present-you is proud of.
 
-**Static analysis matters.** If your IDE, grep, and code search tools can't discover relationships in your code, you're working against the tools that make codebases navigable.
-
 ## Conclusion
 
-What feels like productivity gains when writing code can become maintenance costs when that code needs to be understood, modified, and debugged by others years later. Ruby gives us powerful tools for abstraction, but on long-lived projects, sometimes the best code is the code that doesn't try to be too clever.
+What feels like productivity gains when writing code can become maintenance costs when that code needs to be understood, modified, and debugged by others years later. Ruby gives us powerful tools for abstraction, but on long-lived projects, sometimes the best code is the code that solves the current problem as simply as possible, and doesn't try to be too flexible.
 
 The next time you're tempted to write a dynamic abstraction in your application code, ask yourself: "Will future developers thank me for this, or will they wish I had just written it out explicitly?" The answer might surprise you.
 
 ## TODO
 * this example is from a Rails project but could apply to any Ruby code
-* is `clever` the best word to express this?
 * add aside in lessons learned: In the age of AI assistants they could find it but... code still needs to be understandable by humans, what if the AI is unavailable or costs become excessive etc
-* edit
+* WIP edit
