@@ -1,4 +1,4 @@
 title,published_at,slug
 Migrating From Rails Secrets to Credentials,"March 4, 2025",/blog/migrating-from-rails-secrets-to-credentials/
-Active Storage & Form Errors: Preventing Lost File Uploads in Rails,"May 1, 2025",/blog/active_storage_form_errors/
 Nomad Tips and Tricks,"January 2, 2022",/blog/nomad-tips-and-tricks/
+Capture Browser Console Logs in Rails System Tests with Capybara and Cuprite,"July 1, 2025",/blog/capture-browser-console-logs-capybara-cuprite/
