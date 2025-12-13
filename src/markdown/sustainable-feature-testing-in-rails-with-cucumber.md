@@ -2,7 +2,7 @@
 title: "Sustainable Feature Testing in Rails with Cucumber"
 featuredImage: "../images/cucumber-feature-testing-kelly-neil-pdlC9_bgN9o-unsplash.jpg"
 description: "A practical guide to feature testing in Rails with Cucumber, highlighting its readability, maintainability, and team-friendly syntax through a working demo project."
-date: "2025-11-01"
+date: "2025-12-13"
 category: "rails"
 related:
   - "Rails Feature Test Solved by Regex"
