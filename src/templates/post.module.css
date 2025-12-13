@@ -139,6 +139,10 @@
   content: "javascript";
 }
 
+.content pre[data-language="gherkin"]::before {
+  content: "gherkin";
+}
+
 .content pre[data-language="html"]::before {
   content: "html";
 }
