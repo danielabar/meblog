@@ -10,44 +10,38 @@ related:
   - "Setup a Rails Project with Postgres and Docker"
 ---
 
-A while back, I built a site-wide search bar for a Rails app, the kind that lets users type anything and instantly find relevant content across the product. We used PostgreSQL’s full-text search via the excellent [pg_search](https://github.com/Casecommons/pg_search) gem.
+A while back, I built a site-wide search bar for a Rails app, the kind that lets users type anything and instantly find relevant content across the product. We used PostgreSQL's full-text search via the excellent [pg_search](https://github.com/Casecommons/pg_search) gem.
 
-At first glance, `pg_search` feels almost magical. If you just follow the README and test locally with a small dataset, everything works instantly. But once you hit production with millions of records, unexpected performance issues can appear. The gem itself is fast — the challenge is knowing **which implementation choices matter at scale** and measuring performance to catch traps before they bite.
+At first glance, `pg_search` feels almost magical. If you just follow the early part of the README and test locally with a small dataset, everything works instantly. But once you hit production with millions of records, unexpected performance issues can appear. These aren't necessarily the gem's fault. The challenge is knowing which implementation choices matter at scale and measuring performance to catch issues early.
 
-In this post, we’ll focus on **one specific performance issue**: computing PostgreSQL `tsvector`s on the fly for queries. To make the example concrete, we’ll use a **simplified Recipe app** — just enough to show the problem and the solution.
+In this post, we'll focus on one performance issue I ran into, computing PostgreSQL `tsvector`s on the fly for queries. To make the example concrete, we'll use a simplified Recipe app.
 
-Before diving in, I’ll also mention what we *didn’t* do:
+Before diving in, I'll also mention what we *didn't* do:
 
-* We’d already tried an **AI/RAG-style approach** (retrieval-augmented generation) earlier, embedding records into a vector store and letting a model generate search-like responses. The results were unpredictable and hard to explain — especially for business users who expected consistent matches. So we went back to traditional full-text search where we could reason about ranking and performance.
-* **Elasticsearch** or managed solutions like **Algolia** would’ve worked too, but for our volumes (millions of records, not billions) and a small engineering team without full-time ops, they would have been overkill. We wanted something native to Postgres — easy to deploy, easy to back up, and zero external dependencies.
+* We'd already tried an **AI/RAG-style approach** (retrieval-augmented generation) earlier, embedding records into a vector store and letting a model generate search-like responses. The results were unpredictable and hard to explain — especially for business users who expected consistent matches. So we went back to traditional full-text search where we could reason about ranking and performance.
+* Elasticsearch or managed solutions like Algolia would've worked too, but for our volumes (low millions) and a small engineering team without full-time ops, they would have been overkill. We wanted something native to PostgreSQL — easy to deploy, easy to back up, and zero external dependencies.
 
-With that context, let’s look at the Recipe example and what I learned along the way.
+With that context, let's look at the Recipe example and what I learned along the way.
 
 ## The Recipe App: A Simplified Example
 
-Imagine an app where users can browse and create recipes. For simplicity, we’ll just focus on public **Recipe** records. Each recipe has many **ingredients**, and our search needs to handle queries like:
-
-> “chicken soup”
-
-…and return recipes whose titles or ingredient lists match all query terms, supporting prefix matches (e.g., “chick” → “chicken”).
-
-This setup is representative of a common SaaS challenge: multiple text fields to search, large data volume, and user-facing performance expectations.
+Imagine an app where users can browse and create recipes. Each recipe has a title and many ingredients. The search needs to handle queries like "chicken soup" or "garlic", and return recipes whose titles or ingredient lists match all query terms, supporting prefix matches (e.g., “chick” → “chicken”).
 
 ```
 Recipe
  ├── has_many :ingredients
 ```
 
-## Starting Simple with pg_search
+## Setup Search
 
-Getting started with [pg_search](https://github.com/Casecommons/pg_search) is straightforward. After adding it to the `Gemfile` and installing it, generate the migration:
+Getting started with [pg_search](https://github.com/Casecommons/pg_search) is straightforward. After adding it to the `Gemfile` and installing it, generate and run the migration:
 
 ```bash
 bin/rails g pg_search:migration:multisearch
 bin/rails db:migrate
 ```
 
-This creates the `pg_search_documents` table:
+This creates the `pg_search_documents` table, which uses a polymorphic association (`searchable_type` / `searchable_id`), allowing many different models to share a single search index table:
 
 ```sql
 \d pg_search_documents
@@ -65,7 +59,21 @@ Indexes:
     "index_pg_search_documents_on_searchable" btree (searchable_type, searchable_id)
 ```
 
-Include the `PgSearch::Model` module in your model and add the `multisearchable` macro specifying which attribute to index:
+Next, configure `pg_search` to use the English text search dictionary (for stemming and stopwords) and enable prefix matching so partial terms like "chi" will match "chicken" or "chickpeas":
+
+```ruby
+# config/initializers/pg_search.rb
+PgSearch.multisearch_options = {
+  using: {
+    tsearch: {
+      dictionary: "english",
+      prefix: true
+    }
+  }
+}
+```
+
+Include the `PgSearch::Model` module in any Active Record model, and add the `multisearchable` macro specifying which attribute to index:
 
 ```ruby
 class Recipe < ApplicationRecord
@@ -74,19 +82,37 @@ class Recipe < ApplicationRecord
 end
 ```
 
-This keeps `pg_search_documents` in sync automatically via an `after_save` callback. To populate it initially:
+The `multisearchable` macro adds an Active Record `after_save` callback that extracts the configured attributes and writes (or updates) the corresponding row in `pg_search_documents`.
+
+Because this callback only runs on future saves, you need to explicitly backfill existing records once to generate their initial search documents. The gem provides a command you can run at the Rails console:
 
 ```ruby
 PgSearch::Multisearch.rebuild(Recipe)
 ```
 
-> **Aside:** In a full production app, we had several different types of searchable content, which is why we used `PgSearch.multisearch` instead of a simple `pg_search_scope`. Multisearch lets you query across multiple models in a single search. While this gave us flexibility, the performance issue discussed here is **independent of multisearch** — it can affect any large dataset, even a single model.
+<aside class="markdown-aside">
+In the full production app, we had several different types of searchable content, which is why we used <code>PgSearch.multisearch</code> instead of a simple <code>pg_search_scope</code>. Multisearch lets you query across multiple models in a single search. While this gave us flexibility, the performance issue discussed here is independent of multisearch, it can affect any large dataset, even a single model.
+</aside>
+
+## Usage
+
+TODO: Now that the search table is populated, we can use it. Here's an example in a Rails console:
+
+```ruby
+PgSearch.multisearch("chicken soup")
+  .limit(10)
+```
+
+Example output:
+
+TBD: Get example from earlier branch of demo project: https://github.com/danielabar/recipe_search_demo/commit/91ac106d76e2fc8110f690c4b4037a5f4d35508b
 
 ## On-The-Fly TSVectors
 
-By default, pg_search computes PostgreSQL **tsvectors** on the fly using `to_tsvector()` in each query. For a few hundred rows, this is fine — you won’t notice. But at larger scales, Postgres reprocesses every row’s text at query time, causing significant latency.
+By default, pg_search computes PostgreSQL **tsvectors** on the fly using `to_tsvector()` in each query. For a few hundred rows, this is fine — you won't notice. But at larger scales, Postgres reprocesses every row's text at query time, causing significant latency.
 
-Here’s what a generated query looks like:
+TODO: We're using `english` dictionary, not `simple`
+Here's what a generated query looks like:
 
 ```sql
 SELECT
@@ -167,7 +193,7 @@ class AddTsvectorColumnAndIndexToPgSearchDocuments < ActiveRecord::Migration[8.0
 end
 ```
 
-### Configure pg_search to Use the Vector Column
+### Update Configuration
 
 ```ruby
 # config/initializers/pg_search.rb
@@ -175,7 +201,7 @@ PgSearch.multisearch_options = {
   using: {
     tsearch: {
       dictionary: "english",
-      tsvector_column: "content_vector",
+      tsvector_column: "content_vector", # === NEW ===
       prefix: true
     }
   }
@@ -230,18 +256,21 @@ Query time drops from **~59 ms → 0.6 ms** — nearly 100× faster.
 
 ## Lesson Learned
 
-For significant volumes, **don’t compute tsvectors at query time**. Persist them in a dedicated column, index with a GIN index, and configure pg_search to use it. The speedup can be dramatic, even on relatively modest datasets.
-
+For significant volumes, **don't compute tsvectors at query time**. Persist them in a dedicated column, index with a GIN index, and configure `pg_search` to use it. The speedup can be dramatic, even on relatively modest datasets.
 
 ## TODO
 
 * WIP main content
-* conclusion para
-* briefly explain seeding local with larger than usual volumes, point to demo project for specific techniques
+* maybe explain multisearch vs pg_search_scope a little earlier and explain in our app we needed multisearch but to keep this demo simple only searching a single model `Recipe`
+* briefly explain seeding local with larger than usual volumes (eg: 100,000 recipes), point to demo project for specific techniques
+  * also mention to disregard "weird" recipe titles, this was done to generate more variety and uniqueness
 * explain how to extract explain analyze output from rails console, or psql session (also link to my other post `Efficient Database Queries in Rails: A Practical Approach`)
 * explain the explain/analyze output to show where most of time is being consumed (possibly visualize with tool mentioned in my other pg perf post)
 * aside about tsvector and link to my other post on pg fts `Roll Your Own Search with Rails and Postgres: Search Engine`
 * explain why we need a trigger
 * aside using raw sql since rails migration dsl does not support trigger
 * more explain re: `Query time: **~59 ms** for just 10k rows` - mention in production with thousands of simultaneous users, this was taking minutes
+* mention somewhere: focused on search perf so will not show any UI, will only use rails and psql consoles
+* even ingredients isn't really relevant to the ts vector perf issue, maybe leave it out? (it was relevant to the bulk population though, maybe second blog post or make this one bigger?)
+* conclusion para
 * edit
