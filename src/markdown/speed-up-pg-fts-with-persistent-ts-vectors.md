@@ -18,7 +18,7 @@ In this post, we'll focus on one performance issue I ran into, computing Postgre
 
 Before diving in, I'll also mention what we *didn't* do:
 
-* We'd already tried an **AI/RAG-style approach** (retrieval-augmented generation) earlier, embedding records into a vector store and letting a model generate search-like responses. The results were unpredictable and hard to explain — especially for business users who expected consistent matches. So we went back to traditional full-text search where we could reason about ranking and performance.
+* We'd already tried an AI/RAG-style approach (retrieval-augmented generation) earlier, embedding records into a vector store and letting a model generate search-like responses. The results were unpredictable and hard to explain — especially for business users who expected consistent matches. So we went back to traditional full-text search where we could reason about ranking and performance.
 * Elasticsearch or managed solutions like Algolia would've worked too, but for our volumes (low millions) and a small engineering team without full-time ops, they would have been overkill. We wanted something native to PostgreSQL — easy to deploy, easy to back up, and zero external dependencies.
 
 With that context, let's look at the Recipe example and what I learned along the way.
@@ -204,7 +204,7 @@ At ~283ms for a single search over 100k rows, this is already slow on a single-u
       Rows Removed by Filter: 49980
 ```
 
-PostgreSQL is forced into a parallel sequential scan and must evaluate `to_tsvector('english', COALESCE(content, ''))` for every row at query time. Because the tsvector is not precomputed or indexed, Postgres cannot use a GIN index and instead re-parses and tokenizes all text on each search, discarding ~50k rows after doing the work. The highlighted filter line in the plan is the bottleneck. This cost grows linearly with table size and concurrent users.
+PostgreSQL is forced into a parallel sequential scan and must evaluate `to_tsvector('english', COALESCE(content, ''))` for every row at query time. Because the tsvector is not precomputed or indexed, Postgres cannot use a GIN index and instead re-parses and tokenizes all text on each search, discarding ~50k rows after doing the work. The `Filter:` shown above is the bottleneck. This cost grows linearly with table size and concurrent users.
 
 ## Persist TSVectors and Add a GIN Index
 
@@ -283,6 +283,50 @@ PgSearch.multisearch_options = {
 ```
 
 Then we can rebuild to ensure the new column is populated: `PgSearch::Multisearch.rebuild(Recipe)`
+
+**Verify Search Table Schema and Contents**
+
+WIP...
+
+Let's take a look in the database to verify what we've done so far.
+
+`bin/rails db`
+
+```
+\d+ pg_search_documents
+                                                                       Table "public.pg_search_documents"
+     Column      |              Type              | Collation | Nullable |                     Default                     | Storage  | Compression | Stats target | Description
+-----------------+--------------------------------+-----------+----------+-------------------------------------------------+----------+-------------+--------------+-------------
+ id              | bigint                         |           | not null | nextval('pg_search_documents_id_seq'::regclass) | plain    |             |              |
+ content         | text                           |           |          |                                                 | extended |             |              |
+ searchable_type | character varying              |           |          |                                                 | extended |             |              |
+ searchable_id   | bigint                         |           |          |                                                 | plain    |             |              |
+ created_at      | timestamp(6) without time zone |           | not null |                                                 | plain    |             |              |
+ updated_at      | timestamp(6) without time zone |           | not null |                                                 | plain    |             |              |
+ content_vector  | tsvector                       |           |          |                                                 | extended |             |              |
+Indexes:
+    "pg_search_documents_pkey" PRIMARY KEY, btree (id)
+    "index_pg_search_documents_on_content_vector" gin (content_vector)
+    "index_pg_search_documents_on_searchable" btree (searchable_type, searchable_id)
+Not-null constraints:
+    "pg_search_documents_id_not_null" NOT NULL "id"
+    "pg_search_documents_created_at_not_null" NOT NULL "created_at"
+    "pg_search_documents_updated_at_not_null" NOT NULL "updated_at"
+Triggers:
+    pg_search_documents_content_vector_update BEFORE INSERT OR UPDATE ON pg_search_documents FOR EACH ROW EXECUTE FUNCTION tsvector_update_trigger('content_vector', 'pg_catalog.english', 'content')
+```
+
+Notice we still have `content` to store the text searchable content, but now we also have `content_vector` which is of type `tsvector` that contains the value of `content` transformed into a tsvector for performant searching.
+
+Example:
+
+```sql
+\x
+select content, content_vector from pg_search_documents limit 1;
+-- -[ RECORD 1 ]--+-----------------------------------------------
+-- content        | Caprese Salad with Bay Leaves #9b1f
+-- content_vector | '9b1f':6 'bay':4 'capres':1 'leav':5 'salad':2
+```
 
 ## Performance After the Fix
 
@@ -380,7 +424,7 @@ Taking the time to read beyond the quick start pays off. The nuances are usually
 
 ## TODO
 
-* maybe explain multisearch vs pg_search_scope a little earlier and explain in our app we needed multisearch but to keep this demo simple only searching a single model `Recipe`
+* intro mentions ingredients, but I'm not covering that here...
 * briefly explain seeding local with larger than usual volumes (eg: 100,000 recipes), point to demo project for specific techniques
   * also mention to disregard "weird" recipe titles, this was done to generate more variety and uniqueness
 * explain how to extract explain analyze output from rails console, or psql session (also link to my other post `Efficient Database Queries in Rails: A Practical Approach`)
