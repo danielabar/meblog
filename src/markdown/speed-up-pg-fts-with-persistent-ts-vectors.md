@@ -208,13 +208,15 @@ PostgreSQL is forced into a parallel sequential scan and must evaluate `to_tsvec
 
 ## Persist TSVectors and Add a GIN Index
 
+TODO: Better sequence of steps explained here: https://github.com/Casecommons/pg_search?tab=readme-ov-file#using-tsvector-columns
+
 To improve performance we need to persist a new column of type `tsvector` column and index it with a GIN index. Then, pg_search can query the precomputed vector instead of recalculating it.
 
 TODO: Brief definition of GIN index and what it's for, multi-value...
 
 But it's not enough to just create the column, we also need to add a `TRIGGER` so that this new column will be automatically populated every time the `content` in that row is created or updated.
 
-### Migration
+**Migration**
 
 We use techniques from the strong migration gem to avoid table locks during lengthy operations such as adding an index.
 
@@ -263,7 +265,7 @@ class AddTsvectorColumnAndIndexToPgSearchDocuments < ActiveRecord::Migration[8.0
 end
 ```
 
-### Update Configuration
+**Update Configuration**
 
 We also need to update the pg_search gem's configuration to tell it to use the new tsvector column when it's writing search queries:
 
@@ -320,7 +322,7 @@ ORDER BY
 LIMIT 10;
 ```
 
-Notice how this time, it's querying our new `content_vector` column rather than invoking the `to_tsvector` function to compute it on the fly from the `content` column.
+Notice how this time, it's querying the new `content_vector` column rather than invoking the `to_tsvector` function to compute it on the fly from the `content` column.
 
 Running this query through EXPLAIN ANALYZE shows performance has improved considerably:
 
@@ -345,19 +347,39 @@ Running this query through EXPLAIN ANALYZE shows performance has improved consid
  Execution Time: 2.409 ms
 ```
 
-Recall earlier when the tsvector was being computed on the fly, this query took ~283ms. Now it only takes 2.4ms, that's a ???% speedup!
+The query went from ~283ms to ~2.4ms — a ~118× speedup (~99% reduction in runtime). This improvement isn't a small optimization — it's a fundamental change in how PostgreSQL can execute the query.
 
-TODO: Why, index use, etc.
+**Before the fix**
+
+* PostgreSQL had to run `to_tsvector('english', content)` for every row at query time.
+* Because the expression was computed on the fly, PostgreSQL could not use an index.
+* The planner was forced into a parallel sequential scan over ~100k rows.
+* Full-text ranking (`ts_rank`) was evaluated for many rows that would ultimately be discarded.
+* Total work scaled linearly with table size.
+
+**After the fix**
+
+* The `content_vector` column stores a precomputed `tsvector`.
+* A GIN index exists on `content_vector`.
+* PostgreSQL can use the index instead of computing `to_tsvector` at query time.
+* The planner performs a bitmap index scan rather than a sequential scan.
+* Only rows matching the tsquery are visited (39 heap rows).
+* `ts_rank` is computed only for rows that already matched the query.
+* Sorting is limited to a top-N heapsort for the requested limit.
+* Total work now scales with the number of matches, not the total table size.
+
+This didn’t just make the query faster — it changed it from an O(N) table scan into an indexed lookup, which is why the speedup is so dramatic.
 
 ## Lesson Learned
 
 For significant volumes, don't compute tsvectors at query time. Persist them in a dedicated column, index with a GIN index, and configure `pg_search` to use it. The speedup can be dramatic, even on relatively modest datasets.
 
-TODO: Something about reading only the first part of a gem's readme, getting immediate results, very gratifying and amazing how easy it is to accomplish complex tasks in the ruby/rails ecosystem. But there are some sharp edges to watch out for at scale, so do take the time to read through entire readme to really understand the nuances...
+The Rails ecosystem and its gems makes it incredibly easy to unlock complex functionality with just a few lines of code, and that ease can feel like a superpower. But it also makes it tempting to stop reading once things "work". Performance-critical details could be mentioned later in the README, and they tend to matter only once you hit real data.
+
+Taking the time to read beyond the quick start pays off. The nuances are usually there, clearly explained, just not always at the top. Understanding these early can save you from surprises as your application scales.
 
 ## TODO
 
-* WIP main content
 * maybe explain multisearch vs pg_search_scope a little earlier and explain in our app we needed multisearch but to keep this demo simple only searching a single model `Recipe`
 * briefly explain seeding local with larger than usual volumes (eg: 100,000 recipes), point to demo project for specific techniques
   * also mention to disregard "weird" recipe titles, this was done to generate more variety and uniqueness
@@ -369,5 +391,4 @@ TODO: Something about reading only the first part of a gem's readme, getting imm
 * more explain re: `Query time: **~59 ms** for just 10k rows` - mention in production with thousands of simultaneous users, this was taking minutes
 * mention somewhere: focused on search perf so will not show any UI, will only use rails and psql consoles
 * even ingredients isn't really relevant to the ts vector perf issue, maybe leave it out? (it was relevant to the bulk population though, maybe second blog post or make this one bigger?)
-* conclusion para
 * edit
