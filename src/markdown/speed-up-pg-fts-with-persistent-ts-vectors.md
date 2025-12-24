@@ -39,6 +39,8 @@ class Recipe < ApplicationRecord
 end
 ```
 
+To make the performance characteristics visible, the database is seeded with 100,000 recipes rather than the tiny datasets typical of development environments. This volume is large enough to trigger the query planner behavior and latency issues discussed later. The data is generated using Faker and written to CSV, then bulk-loaded into PostgreSQL. This avoids the overhead of creating records one-by-one with Active Record, which would be too slow. See the demo [recipe seeds](https://github.com/danielabar/recipe_search_demo/blob/main/db/seeds/recipes.rb) and [utilities](https://github.com/danielabar/recipe_search_demo/blob/main/db/seeds/shared/utilities.rb) for more details on this technique.
+
 ## Setup Search
 
 Getting started with [pg_search](https://github.com/Casecommons/pg_search) is straightforward. After adding it to the `Gemfile` and installing it, generate and run the migration:
@@ -109,9 +111,7 @@ Now that the search table is populated, we can query it. Here's an example in a 
 PgSearch.multisearch("chicken soup").limit(10)
 ```
 
-Example output:
-
-Disregard "weird" recipe titles due to faker and trying to make large number of unique titles, the recipes table is seeded with 100,000 recipes.
+Example output (the slightly odd recipe titles are an artifact of synthetic seed data designed to guarantee uniqueness at scale):
 
 ```
 [#<PgSearch::Document:0x00000001224e4260
@@ -431,8 +431,6 @@ Taking the time to read beyond the quick start pays off. The nuances are usually
 
 ## TODO
 
-* briefly explain seeding local with larger than usual volumes (eg: 100,000 recipes), point to demo project for specific techniques
-  * also mention to disregard "weird" recipe titles, this was done to generate more variety and uniqueness
 * explain how to extract explain analyze output from rails console, or psql session (also link to my other post `Efficient Database Queries in Rails: A Practical Approach`)
 * explain the explain/analyze output to show where most of time is being consumed (possibly visualize with tool mentioned in my other pg perf post)
 * aside about tsvector and other `ts...` terms, link to my other post on pg fts `Roll Your Own Search with Rails and Postgres: Search Engine`
