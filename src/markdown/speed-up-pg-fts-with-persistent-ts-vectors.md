@@ -14,7 +14,7 @@ A while back, I built a site-wide search bar for a Rails app, one of those "type
 
 At first, everything felt effortless. Following the README, search worked instantly in development and even with a moderate dataset. But once the application reached production scale, performance issues started to appear. Not because `pg_search` is slow necessarily, but because some default choices that are perfectly reasonable for small datasets become problematic at scale.
 
-This post focuses on one of those choices: computing PostgreSQL tsvectors at query time. It’s an easy trap to fall into, because it works so well, until it doesn’t.
+This post focuses on one of those choices: computing PostgreSQL tsvectors at query time. It's an easy trap to fall into, because it works so well, until it doesn't.
 
 Before diving in, I'll also mention what we *didn't* do:
 
@@ -25,7 +25,7 @@ With that context, let's look at the Recipe example and what I learned along the
 
 ## A Simplified Example
 
-To keep the example concrete and reproducible, I’ll use a deliberately simplified Recipe app and focus only on searching recipe titles. The real application was more complex, but the performance issue discussed here shows up even in the simplest possible setup.
+To keep the example concrete and reproducible, I'll use a deliberately simplified Recipe app and focus only on searching recipe titles. The real application was more complex, but the performance issue discussed here shows up even in the simplest possible setup.
 
 In a real application, recipes would have many searchable attribute such as ingredients, descriptions, tags, categories, and so on. But for this post, those details would only add noise. The performance issue we're exploring shows up even in the simplest possible case.
 
@@ -39,7 +39,7 @@ class Recipe < ApplicationRecord
 end
 ```
 
-To make the performance characteristics visible, the database is seeded with 100,000 recipes rather than the tiny datasets typical of development environments. This volume is large enough to trigger the query planner behavior and latency issues discussed later. The data is generated using Faker and written to CSV, then bulk-loaded into PostgreSQL. This avoids the overhead of creating records one-by-one with Active Record, which would be too slow. See the demo [recipe seeds](https://github.com/danielabar/recipe_search_demo/blob/main/db/seeds/recipes.rb) and [utilities](https://github.com/danielabar/recipe_search_demo/blob/main/db/seeds/shared/utilities.rb) for more details on this technique.
+To make the performance characteristics visible, the database is seeded with 100,000 recipes rather than the tiny datasets typical of development environments. This volume is large enough to trigger the query planner behavior and latency issues discussed later. The data is generated using Faker and written to CSV, then bulk-loaded into PostgreSQL. This avoids the overhead of creating records one-by-one with Active Record, which would be too slow. If interested, see the demo [recipe seeds](https://github.com/danielabar/recipe_search_demo/blob/main/db/seeds/recipes.rb) and [utilities](https://github.com/danielabar/recipe_search_demo/blob/main/db/seeds/shared/utilities.rb) for more details on this technique.
 
 ## Setup Search
 
@@ -97,6 +97,22 @@ Because this callback only runs on future saves, you need to explicitly backfill
 
 ```ruby
 PgSearch::Multisearch.rebuild(Recipe)
+```
+
+The `rebuild` step populates the `content` column in `pg_search_documents` by concatenating the attributes declared in the `against:` option of `multisearchable`. In this example, only `:title` is indexed, so the `content` column contains just the recipe title.
+
+You can verify this by opening a database console (`bin/rails db`) and inspecting a row in `pg_search_documents`:
+
+```sql
+\x
+select * from pg_search_documents limit 1;
+-- -[ RECORD 1 ]---+-----------------------------------------------
+-- id              | 100001
+-- content         | Caprese Salad with Bay Leaves #9b1f
+-- searchable_type | Recipe
+-- searchable_id   | 120001
+-- created_at      | 2025-12-20 14:45:27.409956
+-- updated_at      | 2025-12-20 14:45:27.409956
 ```
 
 <aside class="markdown-aside">
@@ -419,7 +435,7 @@ The query went from ~283ms to ~2.4ms — a ~118× speedup (~99% reduction in run
 * Sorting is limited to a top-N heapsort for the requested limit.
 * Total work now scales with the number of matches, not the total table size.
 
-This didn’t just make the query faster — it changed it from an O(N) table scan into an indexed lookup, which is why the speedup is so dramatic.
+This didn't just make the query faster — it changed it from an O(N) table scan into an indexed lookup, which is why the speedup is so dramatic.
 
 ## Lesson Learned
 
