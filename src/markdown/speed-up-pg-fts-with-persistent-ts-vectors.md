@@ -99,11 +99,18 @@ Because this callback only runs on future saves, you need to explicitly backfill
 PgSearch::Multisearch.rebuild(Recipe)
 ```
 
-The `rebuild` step populates the `content` column in `pg_search_documents` by concatenating the attributes declared in the `against:` option of `multisearchable`. In this example, only `:title` is indexed, so the `content` column contains just the recipe title.
+The `rebuild` step creates one search document for every recipe in the database. Each `pg_search_documents` row corresponds to a single `Recipe` record: the `searchable_type` column identifies the model (`"Recipe"`) and the `searchable_id` column points to the recipe’s `id`. The `content` column is populated from the attributes declared in the `against:` option of `multisearchable—in this example, just `:title`.
 
-You can verify this by opening a database console (`bin/rails db`) and inspecting a row in `pg_search_documents`:
+You can verify this in a Rails database console (`bin/rails db`):
 
 ```sql
+-- Confirm there is one search document per recipe
+select count(*) from pg_search_documents;
+--  count
+-- --------
+-- 100000
+
+-- Inspect a sample row
 \x
 select * from pg_search_documents limit 1;
 -- -[ RECORD 1 ]---+-----------------------------------------------
