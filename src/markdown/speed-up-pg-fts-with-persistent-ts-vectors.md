@@ -16,8 +16,6 @@ At first, everything felt effortless. Following the README, search worked instan
 
 This post focuses on one of those choices: computing PostgreSQL tsvectors at query time. It’s an easy trap to fall into, because it works so well, until it doesn’t.
 
-To keep the example concrete and reproducible, I’ll use a deliberately simplified Recipe app and focus only on searching recipe titles. The real application was more complex, but the performance issue discussed here shows up even in the simplest possible setup.
-
 Before diving in, I'll also mention what we *didn't* do:
 
 * We'd already tried an AI/RAG-style approach (retrieval-augmented generation) earlier, embedding records into a vector store and letting a model generate search-like responses. The results were unpredictable and hard to explain — especially for business users who expected consistent matches. So we went back to traditional full-text search where we could reason about ranking and performance.
@@ -27,7 +25,7 @@ With that context, let's look at the Recipe example and what I learned along the
 
 ## A Simplified Example
 
-To keep the example focused, imagine a very small Recipe app where users can browse and create recipes, and each recipe has **only a title**.
+To keep the example concrete and reproducible, I’ll use a deliberately simplified Recipe app and focus only on searching recipe titles. The real application was more complex, but the performance issue discussed here shows up even in the simplest possible setup.
 
 In a real application, recipes would have many searchable attribute such as ingredients, descriptions, tags, categories, and so on. But for this post, those details would only add noise. The performance issue we're exploring shows up even in the simplest possible case.
 
@@ -442,6 +440,4 @@ Taking the time to read beyond the quick start pays off. The nuances are usually
   * aside using raw sql since rails migration dsl does not support trigger
 * more explain re: `Query time: **~283 ms** for just 100k rows` - mention in production with thousands of simultaneous users, this was taking minutes
 * mention somewhere: focused on search perf so will not show any UI, will only use rails and psql consoles
-* intro mentions ingredients, but I'm not covering that here...
-  * even ingredients isn't really relevant to the ts vector perf issue, maybe leave it out? (it was relevant to the bulk population though, maybe second blog post or make this one bigger?)
 * edit
