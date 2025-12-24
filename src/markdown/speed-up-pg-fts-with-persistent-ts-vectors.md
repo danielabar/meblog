@@ -10,11 +10,13 @@ related:
   - "Setup a Rails Project with Postgres and Docker"
 ---
 
-A while back, I built a site-wide search bar for a Rails app, the kind that lets users type anything and instantly find relevant content across the product. We used PostgreSQL's full-text search via the excellent [pg_search](https://github.com/Casecommons/pg_search) gem.
+A while back, I built a site-wide search bar for a Rails app, one of those "type anything and get relevant results instantly" features. We implemented it using PostgreSQL full-text search via the excellent [pg_search](https://github.com/Casecommons/pg_search) gem.
 
-At first glance, `pg_search` feels almost magical. If you just follow the early part of the README and test locally with a small dataset, everything works instantly. But once you hit production with millions of records, unexpected performance issues can appear. These aren't necessarily the gem's fault. The challenge is knowing which implementation choices matter at scale and measuring performance to catch issues early.
+At first, everything felt effortless. Following the README, search worked instantly in development and even with a moderate dataset. But once the application reached production scale, performance issues started to appear. Not because `pg_search` is slow necessarily, but because some default choices that are perfectly reasonable for small datasets become problematic at scale.
 
-In this post, we'll focus on one performance issue I ran into, computing PostgreSQL `tsvector`s on the fly for queries. To make the example concrete, we'll use a simplified Recipe app.
+This post focuses on one of those choices: computing PostgreSQL tsvectors at query time. It’s an easy trap to fall into, because it works so well, until it doesn’t.
+
+To keep the example concrete and reproducible, I’ll use a deliberately simplified Recipe app and focus only on searching recipe titles. The real application was more complex, but the performance issue discussed here shows up even in the simplest possible setup.
 
 Before diving in, I'll also mention what we *didn't* do:
 
@@ -23,13 +25,20 @@ Before diving in, I'll also mention what we *didn't* do:
 
 With that context, let's look at the Recipe example and what I learned along the way.
 
-## The Recipe App: A Simplified Example
+## A Simplified Example
 
-Imagine an app where users can browse and create recipes. Each recipe has a title and many ingredients. The search needs to handle queries like "chicken soup" or "garlic", and return recipes whose titles or ingredient lists match all query terms, supporting prefix matches (e.g., “chick” → “chicken”).
+To keep the example focused, imagine a very small Recipe app where users can browse and create recipes, and each recipe has **only a title**.
 
-```
-Recipe
- ├── has_many :ingredients
+In a real application, recipes would have many searchable attribute such as ingredients, descriptions, tags, categories, and so on. But for this post, those details would only add noise. The performance issue we're exploring shows up even in the simplest possible case.
+
+The search needs to handle queries like `"chicken soup"` and return recipes whose **titles** match all query terms, including support for prefix matches (for example, `"chick"` → `"chicken"`).
+
+Imagine the app has a `Recipe` model like:
+
+```ruby
+class Recipe < ApplicationRecord
+  validates :title, presence: true, uniqueness: true
+end
 ```
 
 ## Setup Search
@@ -424,15 +433,15 @@ Taking the time to read beyond the quick start pays off. The nuances are usually
 
 ## TODO
 
-* intro mentions ingredients, but I'm not covering that here...
 * briefly explain seeding local with larger than usual volumes (eg: 100,000 recipes), point to demo project for specific techniques
   * also mention to disregard "weird" recipe titles, this was done to generate more variety and uniqueness
 * explain how to extract explain analyze output from rails console, or psql session (also link to my other post `Efficient Database Queries in Rails: A Practical Approach`)
 * explain the explain/analyze output to show where most of time is being consumed (possibly visualize with tool mentioned in my other pg perf post)
-* aside about tsvector and link to my other post on pg fts `Roll Your Own Search with Rails and Postgres: Search Engine`
+* aside about tsvector and other `ts...` terms, link to my other post on pg fts `Roll Your Own Search with Rails and Postgres: Search Engine`
 * explain why we need a trigger
-* aside using raw sql since rails migration dsl does not support trigger
-* more explain re: `Query time: **~59 ms** for just 10k rows` - mention in production with thousands of simultaneous users, this was taking minutes
+  * aside using raw sql since rails migration dsl does not support trigger
+* more explain re: `Query time: **~283 ms** for just 100k rows` - mention in production with thousands of simultaneous users, this was taking minutes
 * mention somewhere: focused on search perf so will not show any UI, will only use rails and psql consoles
-* even ingredients isn't really relevant to the ts vector perf issue, maybe leave it out? (it was relevant to the bulk population though, maybe second blog post or make this one bigger?)
+* intro mentions ingredients, but I'm not covering that here...
+  * even ingredients isn't really relevant to the ts vector perf issue, maybe leave it out? (it was relevant to the bulk population though, maybe second blog post or make this one bigger?)
 * edit
