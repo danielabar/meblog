@@ -14,7 +14,7 @@ A while back, I built a site-wide search bar for a Rails app, one of those "type
 
 At first, everything felt effortless. Following the README, search worked instantly in development and even with a moderate dataset. But once the application reached production scale, performance issues started to appear. Not because `pg_search` is slow necessarily, but because some default choices that are perfectly reasonable for small datasets become problematic at scale.
 
-This post focuses on one of those choices: computing PostgreSQL tsvectors at query time. It's an easy trap to fall into, because it works so well, until it doesn't.
+This post focuses on one of those choices: computing PostgreSQL tsvectors at query time. It's an easy trap to fall into, because it works so well, until it doesn't. To keep things focused, I’m looking strictly at the backend search and database performance here, not UI or frontend code.
 
 Before diving in, I'll also mention what we *didn't* do:
 
@@ -477,5 +477,4 @@ Taking the time to read beyond the quick start pays off. The nuances are usually
 
 ## TODO
 
-* mention somewhere: focused on search perf so will not show any UI, will only use rails and psql consoles
 * edit
