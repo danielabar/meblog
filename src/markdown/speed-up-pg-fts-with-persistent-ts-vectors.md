@@ -223,6 +223,10 @@ Let's use PostgreSQL's `EXPLAIN ANALYZE` to see what's going on under the hood w
 
 At ~283ms for a single search over 100k rows, this is already slow on a single-user machine!
 
+<aside class="markdown-aside">
+If you’re not already comfortable reading PostgreSQL <code>EXPLAIN ANALYZE</code> output, or want a refresher on how to interpret query plans and spot performance bottlenecks, I wrote a more in-depth walkthrough in an earlier post: <a class="markdown-link" href="https://danielabaron.me/blog/rails-query-perf/">Rails Query Performance: A Practical Guide</a>.
+</aside>
+
 **Why so slow?**
 
 ```
@@ -465,8 +469,6 @@ Taking the time to read beyond the quick start pays off. The nuances are usually
 
 ## TODO
 
-* explain how to extract explain analyze output from rails console, or psql session (also link to my other post `Efficient Database Queries in Rails: A Practical Approach`)
-* explain the explain/analyze output to show where most of time is being consumed (possibly visualize with tool mentioned in my other pg perf post)
 * aside about tsvector and other `ts...` terms, link to my other post on pg fts `Roll Your Own Search with Rails and Postgres: Search Engine`
 * explain why we need a trigger
   * aside using raw sql since rails migration dsl does not support trigger
