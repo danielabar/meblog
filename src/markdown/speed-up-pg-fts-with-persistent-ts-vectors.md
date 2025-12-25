@@ -225,10 +225,10 @@ Let's use PostgreSQL's `EXPLAIN ANALYZE` to see what's going on under the hood w
  Execution Time: 283.426 ms
 ```
 
-At ~283ms for a single search over 100k rows, this is already slow on a single-user machine!
+At ~283ms for a single search over 100k rows, this is already slow on a single-user machine. In production with thousands of simultaneous users, searches were taking upwards of a minute!
 
 <aside class="markdown-aside">
-If you're not already comfortable reading PostgreSQL <code>EXPLAIN ANALYZE</code> output, or want a refresher on how to interpret query plans and spot performance bottlenecks, I wrote a more in-depth walkthrough in an earlier post: <a class="markdown-link" href="https://danielabaron.me/blog/rails-query-perf/">Rails Query Performance: A Practical Guide</a>.
+If you're unfamiliar with reading PostgreSQL <code>EXPLAIN ANALYZE</code> output, I wrote a more in-depth walkthrough in an earlier post: <a class="markdown-link" href="https://danielabaron.me/blog/rails-query-perf/">Rails Query Performance: A Practical Guide</a>.
 </aside>
 
 **Why so slow?**
@@ -477,6 +477,5 @@ Taking the time to read beyond the quick start pays off. The nuances are usually
 
 ## TODO
 
-* more explain re: `Query time: **~283 ms** for just 100k rows` - mention in production with thousands of simultaneous users, this was taking minutes
 * mention somewhere: focused on search perf so will not show any UI, will only use rails and psql consoles
 * edit
