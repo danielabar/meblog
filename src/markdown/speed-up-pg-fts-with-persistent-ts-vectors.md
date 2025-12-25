@@ -139,14 +139,14 @@ Example output (the slightly odd recipe titles are an artifact of synthetic seed
 ```
 [#<PgSearch::Document:0x00000001224e4260
   id: 29879,
-  content: "Vegetable Soup with Chicken with Chervil",
+  content: "Vegetable Soup with Chicken with Chervil #e926",
   searchable_type: "Recipe",
   searchable_id: 149850,
   created_at: "2025-12-20 14:00:01.752899000 +0000",
   updated_at: "2025-12-20 14:00:01.752899000 +0000">,
  #<PgSearch::Document:0x00000001224e4120
   id: 39849,
-  content: "Homemade Vegetable Soup with Chicken",
+  content: "Homemade Vegetable Soup with Chicken #227b",
   searchable_type: "Recipe",
   searchable_id: 159815,
   created_at: "2025-12-20 14:00:01.752899000 +0000",
@@ -198,7 +198,7 @@ ORDER BY
 LIMIT 10;
 ```
 
-By default, pg_search computes PostgreSQL tsvectors on the fly using `to_tsvector()` function in each query. For a few hundred rows, this is fine. But at larger scales, Postgres has to reprocess every row's text at query time, causing significant latency.
+By default, `pg_search` computes PostgreSQL tsvectors on the fly using `to_tsvector()` function in each query. For a few hundred rows, this is fine. But at larger scales, Postgres has to reprocess every row's text at query time, causing significant latency.
 
 Let's use PostgreSQL's `EXPLAIN ANALYZE` to see what's going on under the hood when this query runs:
 
@@ -238,17 +238,25 @@ PostgreSQL is forced into a parallel sequential scan and must evaluate `to_tsvec
 
 ## Persist TSVectors and Add a GIN Index
 
-TODO: Better sequence of steps explained here: https://github.com/Casecommons/pg_search?tab=readme-ov-file#using-tsvector-columns
+The solution is to move tsvector generation out of the query path entirely. Instead of calling `to_tsvector(...)` on every search, we need to persist the result in a dedicated tsvector column and index it with a GIN index. PostgreSQL can then evaluate the tsquery directly against an indexed vector, turning a full table scan into an index lookup.
 
-To improve performance we need to persist a new column of type `tsvector` column and index it with a GIN index. Then, pg_search can query the precomputed vector instead of recalculating it.
+**What we'll build:**
 
-TODO: Brief definition of GIN index and what it's for, multi-value...
+* A new column of type `tsvector` that stores a precomputed search vector.
+* A `GIN` index on that column for fast full-text lookups.
+* A database trigger that keeps the vector in sync whenever the source text changes.
+* A small configuration change so `pg_search` uses this column instead of recomputing vectors.
 
-But it's not enough to just create the column, we also need to add a `TRIGGER` so that this new column will be automatically populated every time the `content` in that row is created or updated.
+**Why a GIN Index?**
+
+A `GIN` (Generalized Inverted Index) is designed for multi-value data types, things like arrays, JSONB, and `tsvector`.
+Instead of indexing an entire row value, it indexes *individual tokens* and maps them back to the rows that contain them. This is exactly what we want for full-text search: "find all rows that contain these lexemes".
 
 **Migration**
 
-We use techniques from the strong migration gem to avoid table locks during lengthy operations such as adding an index.
+Creating the column alone isn’t enough. We also need a trigger so PostgreSQL automatically updates the `tsvector` whenever the underlying text changes.
+
+Because this table may already be large, we’ll follow **strong_migrations** best practices to avoid blocking writes, by creating the index concurrently.
 
 ```ruby
 class AddTsvectorColumnAndIndexToPgSearchDocuments < ActiveRecord::Migration[8.0]
@@ -297,7 +305,7 @@ end
 
 **Update Configuration**
 
-We also need to update the pg_search gem's configuration to tell it to use the new tsvector column when it's writing search queries:
+By default, `pg_search` generates a `to_tsvector(...)` expression inline. We now want it to query our persisted column instead.
 
 ```ruby
 # config/initializers/pg_search.rb
@@ -316,11 +324,7 @@ Then we can rebuild to ensure the new column is populated: `PgSearch::Multisearc
 
 **Verify Search Table Schema and Contents**
 
-WIP...
-
-Let's take a look in the database to verify what we've done so far.
-
-`bin/rails db`
+Let's inspect the table schema now:
 
 ```
 \d+ pg_search_documents
@@ -346,9 +350,14 @@ Triggers:
     pg_search_documents_content_vector_update BEFORE INSERT OR UPDATE ON pg_search_documents FOR EACH ROW EXECUTE FUNCTION tsvector_update_trigger('content_vector', 'pg_catalog.english', 'content')
 ```
 
-Notice we still have `content` to store the text searchable content, but now we also have `content_vector` which is of type `tsvector` that contains the value of `content` transformed into a tsvector for performant searching.
+Notice the important pieces:
 
-Example:
+* The original `content` column is still present
+* A new `content_vector` column of type `tsvector`
+* A `GIN` index on `content_vector`
+* A trigger that keeps the vector up to date
+
+Now look at an example row in the table:
 
 ```sql
 \x
@@ -357,6 +366,8 @@ select content, content_vector from pg_search_documents limit 1;
 -- content        | Caprese Salad with Bay Leaves #9b1f
 -- content_vector | '9b1f':6 'bay':4 'capres':1 'leav':5 'salad':2
 ```
+
+The `content_vector` column contains the tokenized, normalized, and stemmed form of `content`. This is what PostgreSQL can now search directly, without recomputing it on every query.
 
 ## Performance After the Fix
 
