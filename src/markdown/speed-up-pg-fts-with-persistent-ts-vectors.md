@@ -99,7 +99,7 @@ Because this callback only runs on future saves, you need to explicitly backfill
 PgSearch::Multisearch.rebuild(Recipe)
 ```
 
-The `rebuild` step creates one search document for every recipe in the database. Each `pg_search_documents` row corresponds to a single `Recipe` record: the `searchable_type` column identifies the model (`"Recipe"`) and the `searchable_id` column points to the recipe’s `id`. The `content` column is populated from the attributes declared in the `against:` option of `multisearchable—in this example, just `:title`.
+The `rebuild` step creates one search document for every recipe in the database. Each `pg_search_documents` row corresponds to a single `Recipe` record: the `searchable_type` column identifies the model (`"Recipe"`) and the `searchable_id` column points to the recipe's `id`. The `content` column is populated from the attributes declared in the `against:` option of `multisearchable—in this example, just `:title`.
 
 You can verify this in a Rails database console (`bin/rails db`):
 
@@ -228,7 +228,7 @@ Let's use PostgreSQL's `EXPLAIN ANALYZE` to see what's going on under the hood w
 At ~283ms for a single search over 100k rows, this is already slow on a single-user machine!
 
 <aside class="markdown-aside">
-If you’re not already comfortable reading PostgreSQL <code>EXPLAIN ANALYZE</code> output, or want a refresher on how to interpret query plans and spot performance bottlenecks, I wrote a more in-depth walkthrough in an earlier post: <a class="markdown-link" href="https://danielabaron.me/blog/rails-query-perf/">Rails Query Performance: A Practical Guide</a>.
+If you're not already comfortable reading PostgreSQL <code>EXPLAIN ANALYZE</code> output, or want a refresher on how to interpret query plans and spot performance bottlenecks, I wrote a more in-depth walkthrough in an earlier post: <a class="markdown-link" href="https://danielabaron.me/blog/rails-query-perf/">Rails Query Performance: A Practical Guide</a>.
 </aside>
 
 **Why so slow?**
@@ -262,9 +262,9 @@ Instead of indexing an entire row value, it indexes *individual tokens* and maps
 
 **Migration**
 
-Creating the column alone isn’t enough. We also need a trigger so PostgreSQL automatically updates the `tsvector` whenever the underlying text changes.
+Creating the column alone isn't enough. We also need a trigger so PostgreSQL automatically updates the `tsvector` whenever the underlying text changes.
 
-Because this table may already be large, we’ll follow **strong_migrations** best practices to avoid blocking writes, by creating the index concurrently.
+Because this table may already be large, we'll follow **strong_migrations** best practices to avoid blocking writes, by creating the index concurrently.
 
 ```ruby
 class AddTsvectorColumnAndIndexToPgSearchDocuments < ActiveRecord::Migration[8.0]
@@ -310,6 +310,10 @@ class AddTsvectorColumnAndIndexToPgSearchDocuments < ActiveRecord::Migration[8.0
   end
 end
 ```
+
+<aside class="markdown-aside">
+Rails migrations don't have a DSL for defining database triggers, so this migration uses a small amount of raw SQL. If you're curious about managing SQL-backed schemas in Rails, I've written more about that <a class="markdown-link" href="https://danielabaron.me/blog/from-ruby-to-sql-schema/">here</a>.
+</aside>
 
 **Update Configuration**
 
@@ -473,8 +477,6 @@ Taking the time to read beyond the quick start pays off. The nuances are usually
 
 ## TODO
 
-* explain why we need a trigger
-  * aside using raw sql since rails migration dsl does not support trigger
 * more explain re: `Query time: **~283 ms** for just 100k rows` - mention in production with thousands of simultaneous users, this was taking minutes
 * mention somewhere: focused on search perf so will not show any UI, will only use rails and psql consoles
 * edit
