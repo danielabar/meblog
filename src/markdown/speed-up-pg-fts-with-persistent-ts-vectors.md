@@ -14,7 +14,7 @@ A while back, I built a site-wide search bar for a Rails app, one of those "type
 
 At first, everything felt effortless. Following the README, search worked instantly in development and even with a moderate dataset. But once the application reached production scale, performance issues started to appear. Not because `pg_search` is slow necessarily, but because some default choices that are perfectly reasonable for small datasets become problematic at scale.
 
-This post focuses on one of those choices: computing PostgreSQL tsvectors at query time. It's an easy trap to fall into, because it works so well, until it doesn't. To keep things focused, I’m looking strictly at the backend search and database performance here, not UI or frontend code.
+This post focuses on one of those choices: computing PostgreSQL tsvectors at query time. It's an easy trap to fall into, because it works so well, until it doesn't. We'll look at the SQL that `pg_search` generates by default, why it forces PostgreSQL into expensive sequential scans, and how persisting and indexing tsvectors fundamentally changes the query plan and performance characteristics.
 
 Before diving in, I'll also mention what we *didn't* do:
 
@@ -25,7 +25,7 @@ With that context, let's look at a simplified demo app and what I learned along 
 
 ## A Simplified Example
 
-To keep the example concrete and reproducible, I'll use a deliberately simplified Recipe app and focus only on searching recipe titles. The real application was more complex, but the performance issue discussed here shows up even in the simplest possible setup.
+To keep the example concrete and reproducible, I'll use a deliberately simplified Recipe app and focus only on searching recipe titles. The real application was more complex, but the performance issue discussed here shows up even in the simplest possible setup. To keep things focused, I'm looking strictly at the backend search and database performance, not UI or frontend code.
 
 In a real application, recipes would have many searchable attribute such as ingredients, descriptions, tags, categories, and so on. But for this post, those details would only add noise. The performance issue we're exploring shows up even in the simplest possible case.
 
@@ -244,7 +244,7 @@ If you're unfamiliar with reading PostgreSQL <code>EXPLAIN ANALYZE</code> output
 
 PostgreSQL is forced into a parallel sequential scan and must evaluate `to_tsvector('english', COALESCE(content, ''))` for every row at query time. Because the tsvector is not precomputed or indexed, Postgres cannot use a GIN index and instead re-parses and tokenizes all text on each search, discarding ~50k rows after doing the work. The `Filter:` shown above is the bottleneck. This cost grows linearly with table size and concurrent users.
 
-## Persist TSVectors and Add a GIN Index
+## Persist TSVectors
 
 The solution is to move tsvector generation out of the query path entirely. Instead of calling `to_tsvector(...)` on every search, we need to persist the result in a dedicated tsvector column and index it with a GIN index. PostgreSQL can then evaluate the tsquery directly against an indexed vector, turning a full table scan into an index lookup.
 
