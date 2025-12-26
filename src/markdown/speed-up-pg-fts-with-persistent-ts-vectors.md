@@ -18,10 +18,10 @@ This post focuses on one of those choices: computing PostgreSQL tsvectors at que
 
 Before diving in, I'll also mention what we *didn't* do:
 
-* We'd already tried an AI/RAG-style approach (retrieval-augmented generation) earlier, embedding records into a vector store and letting a model generate search-like responses. The results were unpredictable and hard to explain — especially for business users who expected consistent matches. So we went back to traditional full-text search where we could reason about ranking and performance.
-* Elasticsearch or managed solutions like Algolia would've worked too, but for our volumes (low millions) and a small engineering team without full-time ops, they would have been overkill. We wanted something native to PostgreSQL — easy to deploy, easy to back up, and zero external dependencies.
+* We'd already tried an AI/RAG-style approach (retrieval-augmented generation) earlier, embedding records into a vector store and letting a model generate search-like responses. The results were unpredictable and hard to explain, especially for business users who expected consistent matches. So we went back to traditional full-text search where we could reason about ranking and performance.
+* Elasticsearch or managed solutions like Algolia would've worked too, but for our volumes (low millions) and a small engineering team without full-time ops, they would have been overkill. We wanted something native to PostgreSQL, easy to deploy, easy to back up, and zero external dependencies.
 
-With that context, let's look at the Recipe example and what I learned along the way.
+With that context, let's look at a simplified demo app and what I learned along the way.
 
 ## A Simplified Example
 
@@ -29,7 +29,7 @@ To keep the example concrete and reproducible, I'll use a deliberately simplifie
 
 In a real application, recipes would have many searchable attribute such as ingredients, descriptions, tags, categories, and so on. But for this post, those details would only add noise. The performance issue we're exploring shows up even in the simplest possible case.
 
-The search needs to handle queries like `"chicken soup"` and return recipes whose **titles** match all query terms, including support for prefix matches (for example, `"chick"` → `"chicken"`).
+The search needs to handle queries like "chicken soup" and return recipes whose titles match all query terms, including support for prefix matches (for example, "chick" → "chicken", "chickpeas", etc).
 
 Imagine the app has a `Recipe` model like:
 
@@ -82,7 +82,7 @@ PgSearch.multisearch_options = {
 }
 ```
 
-Include the `PgSearch::Model` module in any Active Record model, and add the `multisearchable` macro specifying which attribute to index:
+Include the `PgSearch::Model` module in any Active Record model, and add the `multisearchable` macro specifying which attribute(s) to index:
 
 ```ruby
 class Recipe < ApplicationRecord
@@ -93,13 +93,13 @@ end
 
 The `multisearchable` macro adds an Active Record `after_save` callback that extracts the configured attributes and writes (or updates) the corresponding row in `pg_search_documents`.
 
-Because this callback only runs on future saves, you need to explicitly backfill existing records once to generate their initial search documents. The gem provides a command you can run at the Rails console:
+Because this callback only runs on future saves, you need to explicitly backfill existing records to generate their initial search documents. The gem provides a command you can run at the Rails console:
 
 ```ruby
 PgSearch::Multisearch.rebuild(Recipe)
 ```
 
-The `rebuild` step creates one search document for every recipe in the database. Each `pg_search_documents` row corresponds to a single `Recipe` record: the `searchable_type` column identifies the model (`"Recipe"`) and the `searchable_id` column points to the recipe's `id`. The `content` column is populated from the attributes declared in the `against:` option of `multisearchable—in this example, just `:title`.
+The `rebuild` step creates one search document for every recipe in the database. Each `pg_search_documents` row corresponds to a single `Recipe` record: the `searchable_type` column identifies the model (`"Recipe"`) and the `searchable_id` column points to the recipe's `id`. The `content` column is populated from the attributes declared in the `against:` option of `multisearchable`, which in this example, is just `:title`.
 
 You can verify this in a Rails database console (`bin/rails db`):
 
@@ -123,7 +123,7 @@ select * from pg_search_documents limit 1;
 ```
 
 <aside class="markdown-aside">
-In the full production app, we had several different types of searchable content, which is why we used <code>PgSearch.multisearch</code> instead of a simple <code>pg_search_scope</code>. Multisearch lets you query across multiple models in a single search. While this gave us flexibility, the performance issue discussed here is independent of multisearch, it can affect any large dataset, even a single model.
+In the full production app, we had several different types of searchable content, which is why we used <code>PgSearch.multisearch</code> instead of <code>pg_search_scope</code>, which is to only search a single model. Multisearch lets you query across multiple models in a single query. While this gave us flexibility, the performance issue discussed here is independent of multisearch, it can affect any large dataset, even a single model.
 </aside>
 
 ## Usage
@@ -156,7 +156,7 @@ Example output (the slightly odd recipe titles are an artifact of synthetic seed
 
 ## On-The-Fly TSVectors
 
-Let's take a closer look at the query that was generated by `PgSearch.multisearch("chicken soup")`. This is displayed in the Rails console when you run `multisearch` or you can run `PgSearch.multisearch("chicken soup").limit(10).to_sql`
+Let's take a closer look at the query that was generated by `PgSearch.multisearch("chicken soup")`. This is displayed in the Rails console when you run `multisearch`.
 
 <aside class="markdown-aside">
 This section assumes some familiarity with PostgreSQL full-text search concepts like <code>tsvector</code>, <code>to_tsvector()</code>, <code>tsquery</code>, and how stemming and lexemes work. If those are new or fuzzy, I walk through them in more detail in an earlier post: <a class="markdown-link" href="https://danielabaron.me/blog/roll-your-own-search-service-for-gatsby-part3/">Roll Your Own Search with Rails and PostgreSQL Full Text Search</a>.
@@ -264,7 +264,7 @@ Instead of indexing an entire row value, it indexes *individual tokens* and maps
 
 Creating the column alone isn't enough. We also need a trigger so PostgreSQL automatically updates the `tsvector` whenever the underlying text changes.
 
-Because this table may already be large, we'll follow **strong_migrations** best practices to avoid blocking writes, by creating the index concurrently.
+Because this table may already be large, we'll follow [strong_migrations](https://github.com/ankane/strong_migrations) best practices to avoid blocking writes, by creating the index concurrently.
 
 ```ruby
 class AddTsvectorColumnAndIndexToPgSearchDocuments < ActiveRecord::Migration[8.0]
@@ -272,10 +272,10 @@ class AddTsvectorColumnAndIndexToPgSearchDocuments < ActiveRecord::Migration[8.0
   disable_ddl_transaction!
 
   def up
-    # 1. Add the column (fast metadata change)
+    # 1. Add the column
     add_column :pg_search_documents, :content_vector, :tsvector
 
-    # 2. Create trigger function binding
+    # 2. Create trigger function
     execute <<~SQL
       CREATE TRIGGER pg_search_documents_content_vector_update
       BEFORE INSERT OR UPDATE ON pg_search_documents
@@ -336,7 +336,7 @@ Then we can rebuild to ensure the new column is populated: `PgSearch::Multisearc
 
 **Verify Search Table Schema and Contents**
 
-Let's inspect the table schema now:
+Let's inspect the table schema now. Adding `+` to the `\d` PostgreSQL meta-command will also display the trigger:
 
 ```
 \d+ pg_search_documents
@@ -364,12 +364,12 @@ Triggers:
 
 Notice the important pieces:
 
-* The original `content` column is still present
-* A new `content_vector` column of type `tsvector`
-* A `GIN` index on `content_vector`
-* A trigger that keeps the vector up to date
+* Original `content` text column still present
+* New `content_vector` column of type `tsvector`
+* `GIN` index on `content_vector`
+* Trigger that keeps the vector up to date
 
-Now look at an example row in the table:
+Let's look at a row in the table to compare `content` vs `content_vector`:
 
 ```sql
 \x
@@ -383,7 +383,7 @@ The `content_vector` column contains the tokenized, normalized, and stemmed form
 
 ## Performance After the Fix
 
-Let's take a look at the query that is now generated from `PgSearch.multisearch("chicken soup").limit(10).to_sql`:
+With these changes, running `PgSearch.multisearch("chicken soup").limit(10)` now generates the following query:
 
 ```sql
 SELECT
@@ -421,7 +421,7 @@ LIMIT 10;
 
 Notice how this time, it's querying the new `content_vector` column rather than invoking the `to_tsvector` function to compute it on the fly from the `content` column.
 
-Running this query through EXPLAIN ANALYZE shows performance has improved considerably:
+Running this query through EXPLAIN ANALYZE shows performance has improved significantly:
 
 ```
  Limit  (cost=734.10..734.13 rows=10 width=214) (actual time=2.253..2.257 rows=10.00 loops=1)
@@ -444,7 +444,7 @@ Running this query through EXPLAIN ANALYZE shows performance has improved consid
  Execution Time: 2.409 ms
 ```
 
-The query went from ~283ms to ~2.4ms — a ~118× speedup (~99% reduction in runtime). This improvement isn't a small optimization — it's a fundamental change in how PostgreSQL can execute the query.
+The query went from ~283ms to ~2.4ms, which is a ~118× speedup (~99% reduction in runtime). This improvement is a fundamental change in how PostgreSQL can execute the query.
 
 **Before the fix**
 
@@ -456,16 +456,12 @@ The query went from ~283ms to ~2.4ms — a ~118× speedup (~99% reduction in run
 
 **After the fix**
 
-* The `content_vector` column stores a precomputed `tsvector`.
-* A GIN index exists on `content_vector`.
-* PostgreSQL can use the index instead of computing `to_tsvector` at query time.
+* PostgreSQL can use the GIN index on `content_vector` instead of computing `to_tsvector` at query time.
 * The planner performs a bitmap index scan rather than a sequential scan.
 * Only rows matching the tsquery are visited (39 heap rows).
 * `ts_rank` is computed only for rows that already matched the query.
 * Sorting is limited to a top-N heapsort for the requested limit.
 * Total work now scales with the number of matches, not the total table size.
-
-This didn't just make the query faster — it changed it from an O(N) table scan into an indexed lookup, which is why the speedup is so dramatic.
 
 ## Lesson Learned
 
@@ -473,8 +469,4 @@ For significant volumes, don't compute tsvectors at query time. Persist them in 
 
 The Rails ecosystem and its gems makes it incredibly easy to unlock complex functionality with just a few lines of code, and that ease can feel like a superpower. But it also makes it tempting to stop reading once things "work". Performance-critical details could be mentioned later in the README, and they tend to matter only once you hit real data.
 
-Taking the time to read beyond the quick start pays off. The nuances are usually there, clearly explained, just not always at the top. Understanding these early can save you from surprises as your application scales.
-
-## TODO
-
-* edit
+When integrating gems into a project, taking the time to read beyond the quick start pays off. The nuances are usually there, clearly explained, just not always at the top. Understanding these early can save you from surprises as your application scales.
