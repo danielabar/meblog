@@ -50,7 +50,7 @@ bin/rails g pg_search:migration:multisearch
 bin/rails db:migrate
 ```
 
-This creates the `pg_search_documents` table, which uses a polymorphic association (`searchable_type` / `searchable_id`), allowing many different models to share a single search index table:
+This creates the `pg_search_documents` table, which uses a polymorphic association (`searchable_type` / `searchable_id`), allowing many different models to share a single search index table. Think of `pg_search_documents` as a denormalized table that exists purely for search, not as a primary data table:
 
 ```sql
 \d pg_search_documents
