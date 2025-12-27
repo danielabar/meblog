@@ -68,7 +68,7 @@ Crucially, I don't let it jump to "the best solution". I want to see:
 
 The output goes into another markdown document in the same directory, which adds to the context.
 
-## Make Clarifying Questions Mandatory
+## Have the AI Ask Me Questions
 
 When doing this kind of analysis, I'll ask the AI to *ask me clarifying questions*, and include it ask an `## Outstanding Questions` section in the analysis document. Then we go back and forth exactly like I would with another engineer:
 
@@ -78,6 +78,14 @@ When doing this kind of analysis, I'll ask the AI to *ask me clarifying question
 * ambiguities are resolved
 
 Each iteration tightens the shared understanding. This is where most AI workflows fail: they reward confidence over correctness. I design mine to do the opposite.
+
+## Catching Subtle Details Early
+
+By forcing the AI to fully analyze the current system before writing code, it can surface complexities that might otherwise be overlooked. For example:
+
+While summarizing the existing feature set, the AI might notice that different functionality is available depending on a user's subscription tier. If a new feature overlaps with these tiers, this early analysis highlights the need for a policy decision before coding begins, preventing a scenario where the code works technically but violates business rules.
+
+These are the kinds of issues that usually only come up during testing or code review, but with upfront analysis, they can be caught proactively, keeping the design aligned with the system's constraints.
 
 ## Agree on an Approach, Then Decompose
 
@@ -129,6 +137,5 @@ If you already collaborate this way with humans, you don't need a new mindset fo
 
 ## TODO
 
-- eg of things that can be caught earlier this way: will notice from previous implementation that there are different feature availability for different subscription tiers, and realize that the new feature overlaps with this and requires a policy as well
 - link to my past posts on power of written communication, markdown for highly effective teams and that hasn't changed with AI, if anything, being strong written communication skills is a superpower in getting better results from AI assisted coding.
 * edit
