@@ -117,9 +117,16 @@ This keeps the AI from "helpfully" solving problems I didn't agree to solve yet.
 
 ## Why I Work This Way
 
-This approach is slower than asking AI to "just implement the feature".
+This workflow leans heavily on written reasoning and documentation, a skill that has been under-valued in tech. But with LLM based AI, it's a superpower. The clearer the engineer can write questions, prompts, and feedback, the better the AI can reason, and produce high quality work.
 
-It's also:
+<aside class="markdown-aside">
+If the idea of leveraging written communication skills for more effective engineering is new to you, see a few of my previous posts on this topic:
+<a class="markdown-link" href="https://danielabaron.me/blog/reflections-on-effective-teams/#culture-of-writing">Culture of Writing</a>,
+<a class="markdown-link" href="https://danielabaron.me/blog/about-those-docs/">About Those Docs</a>,
+<a class="markdown-link" href="https://danielabaron.me/blog/working-towards-asynchronous-future/#communication">Communication for Asynchronous Teams</a>
+</aside>
+
+This approach can seem slower than asking AI to "just implement the feature". However, the payoff is huge:
 
 * far less error-prone
 * much easier to stop and resume
@@ -134,8 +141,3 @@ AI is very good at generating answers. It's less good at knowing whether it unde
 With my current process, I spend much more time in back-and-forth analysis and design. But by the time we get to writing code, it's usually correct the first time and literally only takes minutes. The upfront time invested in reasoning carefully with the AI pays off massively — the work becomes faster, safer, and more reliable than rushing straight into implementation. This is the power of using AI as a design partner rather than (solely) a code generator.
 
 If you already collaborate this way with humans, you don't need a new mindset for AI, you just need to insist on the same standards.
-
-## TODO
-
-- link to my past posts on power of written communication, markdown for highly effective teams and that hasn't changed with AI, if anything, being strong written communication skills is a superpower in getting better results from AI assisted coding.
-* edit
