@@ -29,6 +29,10 @@ I don't ask AI to start by writing code. Rather, I ask it to:
 
 The most important output in this process is not code, but a living analysis document.
 
+<aside class="markdown-aside">
+I'm using Claude Code at the VS Code integrated terminal, but this workflow isn't tied to a specific tool, you could do the same with any AI assistant.
+</aside>
+
 ## Establish Context Using Commit History
 
 When I'm working on a large feature that's grown over multiple commits, I'll give the AI a list of git commit SHAs that led to the current state and ask it something like this:
@@ -62,7 +66,7 @@ Crucially, I don't let it jump to "the best solution". I want to see:
 * how it weighs constraints
 * whether it respects the codebase's existing shape
 
-Again, the output goes into another markdown document in the same directory, which adds to the context.
+The output goes into another markdown document in the same directory, which adds to the context.
 
 ## Make Clarifying Questions Mandatory
 
@@ -119,14 +123,12 @@ Most importantly, it keeps *me* in control of the design. The analysis document 
 
 AI is very good at generating answers. It's less good at knowing whether it understood the question. By externalizing its understanding, forcing iteration, and delaying code, I've found I can use AI on serious work without giving up the things I care about most: clarity, intent, and maintainability.
 
-With my current process, I spend much more time in back-and-forth analysis and design. But by the time we get to writing code, it's usually correct the first time and literally only takes minutes. The upfront time invested in reasoning carefully with the AI pays off massively — the work becomes faster, safer, and more reliable than rushing straight into implementation. This is the power of using AI as a design partner rather than a code generator.
+With my current process, I spend much more time in back-and-forth analysis and design. But by the time we get to writing code, it's usually correct the first time and literally only takes minutes. The upfront time invested in reasoning carefully with the AI pays off massively — the work becomes faster, safer, and more reliable than rushing straight into implementation. This is the power of using AI as a design partner rather than (solely) a code generator.
 
 If you already collaborate this way with humans, you don't need a new mindset for AI, you just need to insist on the same standards.
 
 ## TODO
 
-- specific tool: Claude Code, integrated terminal VSCode
-- preference for reading longer tech details in markdown than long scrolling output in the terminal
 - eg of things that can be caught earlier this way: will notice from previous implementation that there are different feature availability for different subscription tiers, and realize that the new feature overlaps with this and requires a policy as well
 - link to my past posts on power of written communication, markdown for highly effective teams and that hasn't changed with AI, if anything, being strong written communication skills is a superpower in getting better results from AI assisted coding.
 * edit
