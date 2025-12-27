@@ -10,15 +10,15 @@ related:
   - "Cover Letter Writing for Nerds"
 ---
 
-There's been a lot written about using AI to generate code, and I've found plenty of that advice useful. What I want to describe here is a slightly different angle: how I use AI when working in a large, long-lived codebase, where substantial features are broken down, shipped incrementally, often behind feature flags, and expected to remain understandable long after the original authors have moved on.
+When I first started using AI to generate code, my instinct was to give it a prompt with the requirements, and have it write everything at once. Occasionally it produced something useful, but more often it created a mess — not quite what I wanted, or code that wouldn't even work. Cleaning up or undoing those attempts often took longer than writing it myself. It felt impulsive, like the work of a student who had recently learned to code but had little real-world experience.
 
-This post isn't about prompts or productivity hacks. It's about a workflow I've settled into that treats AI primarily as a *design partner* rather than a code generator. It's slower than "just write the code", but it scales much better to non-trivial changes.
+Over time, I realized that rushing straight to code with AI doesn't scale well in large, long-lived codebases. Substantial features are often broken down, shipped incrementally (sometimes behind feature flags), and expected to remain understandable long after the original authors have moved on.
+
+This post isn't about prompts or productivity hacks. It's about a workflow I've settled into that treats AI primarily as a design partner rather than a code generator. It's slower than "just write the code", but it scales much better for non-trivial changes and helps maintain clarity, intent, and maintainability over time.
 
 ## The Core Idea
 
-I don't ask AI to start by writing code.
-
-I ask it to:
+I don't ask AI to start by writing code. Rather, I ask it to:
 
 1. Understand the system as it exists today
 2. Externalize that understanding in a durable form
@@ -31,15 +31,11 @@ The most important output in this process is not code, but a living analysis doc
 
 ## Establish Context Using Commit History
 
-When I'm working on a large feature that's grown over multiple commits, I'll give the AI a list of git commit SHAs that led to the current state.
-
-I don't ask it to summarize the commits mechanically. Instead, I ask something like:
+When I'm working on a large feature that's grown over multiple commits, I'll give the AI a list of git commit SHAs that led to the current state and ask it something like this:
 
 > Based on these commits, write a summary of your understanding of the system so far: what problem it's solving, how it's structured, and any constraints or patterns you notice.
 
-The distinction matters.
-
-I'm not looking for a changelog. I'm checking whether the AI has a *mental model* of the system that matches mine.
+I'm checking whether the AI has an accurate *mental model* of the system and specific feature area we'll be building in.
 
 ## Force the Thinking Into a Markdown Document
 
@@ -121,15 +117,14 @@ Most importantly, it keeps *me* in control of the design. The analysis document 
 
 ## Final Thoughts
 
-AI is very good at generating answers. It's less good at knowing whether it understood the question.
+AI is very good at generating answers. It's less good at knowing whether it understood the question. By externalizing its understanding, forcing iteration, and delaying code, I've found I can use AI on serious work without giving up the things I care about most: clarity, intent, and maintainability.
 
-By externalizing its understanding, forcing iteration, and delaying code, I've found I can use AI on serious work without giving up the things I care about most: clarity, intent, and maintainability.
+With my current process, I spend much more time in back-and-forth analysis and design. But by the time we get to writing code, it's usually correct the first time and literally only takes minutes. The upfront time invested in reasoning carefully with the AI pays off massively — the work becomes faster, safer, and more reliable than rushing straight into implementation. This is the power of using AI as a design partner rather than a code generator.
 
 If you already collaborate this way with humans, you don't need a new mindset for AI, you just need to insist on the same standards.
 
 ## TODO
 
-- when i first started with ai/llm assisted coding, would just type a prompt with requirements and have it write all the code in one go - it was a big mess, was never what i wanted, and had to spend more time cleaning up after the ai, it felt so impulsive
 - specific tool: Claude Code, integrated terminal VSCode
 - preference for reading longer tech details in markdown than long scrolling output in the terminal
 - eg of things that can be caught earlier this way: will notice from previous implementation that there are different feature availability for different subscription tiers, and realize that the new feature overlaps with this and requires a policy as well
