@@ -2,7 +2,7 @@
 title: "Dynamic Ruby And Hidden Maintenance Costs"
 featuredImage: "../images/dynamic-ruby-maintenance-karla-hernandez-LrlyZzX6Sws-unsplash.jpg"
 description: "This post explores how Ruby's dynamic dispatch and runtime constant resolution can make code elegant but harder to understand and maintain over time."
-date: "2026-02-01"
+date: "2026-04-01"
 category: "ruby"
 related:
   - "Avoid this Bug with Numeric Environment Variables in Ruby"
@@ -12,13 +12,13 @@ related:
 
 Ruby makes it incredibly easy to write elegant, dynamic code. The language practically encourages it with features like `constantize`, `classify`, and metaprogramming. When you discover these capabilities, it feels empowering, like you're writing less code that does more.
 
-But there's a hidden cost to elegant abstractions in application code, especially on projects that will be maintained by multiple developers over many years. This post explores a real-world example where a dynamic pattern made the codebase harder to understand and maintain, even though the code itself was technically correct and elegantly written.
+But there's a hidden cost to elegant abstractions in application code, especially on projects that will be maintained by multiple developers over many years. This post explores some code from a project I was maintaining, where a dynamic pattern made the codebase harder to understand and maintain, even though the code itself was technically correct and elegantly written.
 
-While the example comes from a Rails app, the trade-offs it illustrates are relevant to any Ruby project.
+The example that follows is adapted from this project. Class names and other details have been changed so I can share them publicly, but the patterns and trade-offs illustrate are exactly what I encountered.
 
 ## Where Are the Callers?
 
-I was investigating a Sidekiq job called `DataSyncer` that accepts a `class_name` as an argument:
+I was investigating a Sidekiq job that accepts a `class_name` as an argument:
 
 ```ruby
 class DataSyncer
