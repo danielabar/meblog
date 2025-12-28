@@ -2,7 +2,7 @@
 title: "Building a No Frills Meditation App"
 featuredImage: "../images/building-no-frills-meditation-app-chelsea-audibert-lDEW4qMiizc-unsplash.jpg"
 description: "A skeptical, but-curious take on meditation led me to build Just Breathe, a minimalist, ad-free web app that guides simple timed breathing with no mysticism, no subscriptions, and no distractions, just science-based calm."
-date: "2026-01-01"
+date: "2026-03-01"
 category: "web development"
 related:
   - "Rapid Prototyping with ChatGPT: OAS Pension Calculator Part 1"
@@ -12,7 +12,7 @@ related:
 
 This is the story of how I built Just Breathe, a no-frills meditation app: part personal journey, part technical walkthrough.
 
-I first heard about the benefits of meditation years ago on a podcast. An expert practitioner was being interviewed on a health podcast and said if the benefits of meditation were available as a pill, it would make some pharmaceutical company billions in profits. Benefits such as: lower stress, reduced anxiety, better blood pressure, improved focus, clearer thinking, enhanced performance on cognitive tasks, even longevity. I was intrigued enough to buy the author's book, especially because he billed it as a "no BS" guide.
+I first heard about the benefits of meditation years ago on a podcast. An expert practitioner was being interviewed on a health podcast and said if the benefits of meditation were available as a pill, it would make some pharmaceutical company billions in profits. Benefits such as: lower stress, improved sleep, reduced anxiety, better blood pressure, improved focus, clearer thinking, enhanced performance on cognitive tasks, even longevity. I was intrigued enough to buy the author's book, especially because he billed it as a "no BS" guide.
 
 <aside class="markdown-aside">
 As someone who's been listening to podcasts for over a decade, I've noticed an increasing trend of podcasts being book tours in disguise: Casual conversations that somehow always end up pitching someone's latest "life changing" book.
@@ -33,7 +33,7 @@ I wanted something simple: a gentle breathing reminder to help me focus. But eve
 * **Meditation podcasts** Same issue - plus ads - and often just as "out there."
 * **YouTube** Forget it. You sit down to meditate and end up watching cat videos for an hour.
 
-After a while I realized I wasn’t looking for "content" at all. I didn't need a guru, a playlist, or a subscription. I just needed a technique, something simple, concrete, and grounded in science.
+After a while I realized I wasn't looking for "content" at all. I didn't need a guru, a playlist, or a subscription. I just needed a technique, something simple, concrete, and grounded in science.
 
 ## Simple Discovery
 
@@ -75,7 +75,7 @@ Since I couldn't find it, I decided to build it.
 
 ## Building My Own
 
-I opened VS Code, created a new project, and asked my AI assistant to help me put together something simple and mobile-friendly. No frameworks, no accounts, no backend. Just vanilla JavaScript and CSS. Here’s the prompt I used:
+I opened VS Code, created a new project, and asked my AI assistant to help me put together something simple and mobile-friendly. No frameworks, no accounts, no backend. Just vanilla JavaScript and CSS. Here's the prompt I used:
 
 <aside class="markdown-memory-lane">
 Help me think about how I could use vanilla web tech for building the following web app, which will be deployed to github pages because it shouldn't require an application server:
@@ -120,6 +120,12 @@ While the session is running the user hears "Breathe in", then 5.5 seconds later
 
 * [Live Demo](https://danielabar.github.io/just-breathe/)
 * [GitHub Repo](https://github.com/danielabar/just-breathe)
+
+## From Prototype to Structure
+
+The first working version came together quickly, but it wasn't especially tidy. The AI had no trouble producing something functional, but the early iterations tended toward a single, intertwined script where timing, UI updates, voice prompts, and state all lived together. Getting from "it works" to something I could continue to iterate on involved a lot of back-and-forth: asking for smaller files, clearer responsibilities, and refactors that pulled unrelated concerns apart.
+
+What follows walks through some of the technical choices that fell out of that process.
 
 ## Technical Highlights
 
@@ -196,7 +202,7 @@ showView('main');
 
 The session loop keeps track of time, alternates between inhale/exhale, updates the progress bar, and finishes with a friendly close. It's driven by `requestAnimationFrame`, which runs once per frame for smooth updates. This approach provides more precise timing than cascading `setTimeout` calls.
 
-You’ll also notice calls to `speak(...)` for voice prompts, I'll explain how that works in the next section.
+You'll also notice calls to `speak(...)` for voice prompts, I'll explain how that works in the next section.
 
 ```js
 // js/session.js
@@ -256,13 +262,13 @@ function updateState() {
 }
 ```
 
-Rather than "waiting" for exact intervals using timers, the app continuously checks if enough time has elapsed between breaths. Each animation frame (about every 16.7ms at 60fps), the function compares the current time against when the breath phase started. When the target duration is reached (e.g., 5.5 seconds for inhale), it transitions to the next phase and resets the timer.
+Rather than waiting for exact intervals using timers, the app continuously checks how much actual time has elapsed using [requestAnimationFrame](https://developer.mozilla.org/en-US/docs/Web/API/Window/requestAnimationFrame). This schedules the loop to run in sync with the browser's repaint cycle. On each frame, the function compares the current time against when the breath phase started. When the target duration is reached (for example, 5.5 seconds for an inhale), it transitions to the next phase and resets the timer.
 
 When the total time is reached, the app lets you finish your last out-breath before wrapping up, speaking "All done".
 
 ### Voice-Guided
 
-All prompts are spoken using the [Web Speech API](https://developer.mozilla.org/en-US/docs/Web/API/SpeechSynthesis), so the user doesn't need to watch the screen during the session. The browser provides the voice, it may sound different depending on the OS and settings.
+All prompts are spoken using the [Web Speech API](https://developer.mozilla.org/en-US/docs/Web/API/SpeechSynthesis), so the user doesn't need to watch the screen during the session. The browser provides the voice, it may sound different depending on the operating system and settings.
 
 ```js
 // js/voice.js
@@ -274,7 +280,7 @@ export function speak(text) {
 
 ### Staying Awake
 
-Sessions request a screen [wake lock](https://developer.mozilla.org/en-US/docs/Web/API/WakeLock) so the device won't lock up mid-breath:
+Sessions request a screen [wake lock](https://developer.mozilla.org/en-US/docs/Web/API/WakeLock) so the device won't lock up in the middle of the breathing exercise:
 
 ```js
 // js/session.js
@@ -306,12 +312,47 @@ Only reasonable values are accepted: in/out seconds between 1 - 15, and session 
 
 The combination of defaults, validation, and namespacing keeps preferences simple, safe, and completely local - no subscriptions, accounts, or external services required.
 
-### Installable
+### Add to Home Screen
 
-With a manifest and icons, *Just Breathe* can be added to the device home screen:
+Just Breathe isn't in an app store, but it supports "Add to Home Screen", giving it an app-like presence: a standalone window, home screen icon, and quick launch.
+
+Modern browsers like Chrome and Edge use a Web App Manifest, which is linked in `index.html`:
 
 ```html
 <link rel="manifest" href="site.webmanifest">
+```
+
+The manifest defines the app name, icons, start URL, and display mode:
+
+```json
+{
+  "name": "Just Breathe",
+  "short_name": "Just Breathe",
+  "icons": [
+    {
+      "src": "web-app-manifest-192x192.png",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "maskable"
+    },
+    {
+      "src": "web-app-manifest-512x512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "maskable"
+    }
+  ],
+  "theme_color": "#ffffff",
+  "background_color": "#ffffff",
+  "display": "standalone"
+}
+```
+
+iOS and macOS Safari use the icon and page title defined in `index.html`:
+
+```html
+<link rel="apple-touch-icon" sizes="180x180" href="apple-touch-icon.png" />
+<meta name="apple-mobile-web-app-title" content="Just Breathe" />
 ```
 
 ### CSS Modularity
@@ -376,16 +417,20 @@ h1 { font-weight: 700; }
 p  { font-weight: 400; }
 ```
 
+<aside class="markdown-aside">
+Since building this app, I came across <a class="markdown-link" href="https://github.com/robzolkos/csscaffold">CSS Scaffold</a>, which offers a very clean and organized approach to structuring CSS. If I were starting a new project today, I'd likely reach for that instead of the more "vibe coded" setup here, which got a little messy.
+</aside>
+
 ### Zero-Build
 
-The entire app runs as a static site. There's no bundler, no framework, no auth, and no build process. It's just plain HTML, JavaScript modules, and CSS. It's deployed via GitHub Pages using the `gh-pages` npm package. This keeps maintenance simple.
+The entire app runs as a static site. There's no bundler, no framework, no auth, and no build process. It's just plain HTML, JavaScript modules, and CSS. It's deployed via GitHub Pages using the [gh-pages](https://www.npmjs.com/package/gh-pages) npm package. This keeps maintenance simple.
 
 ## Final Thoughts
 
 I now use Just Breathe nearly every day after my workout. It's simple, peaceful, and effective. This project reminded me how satisfying it is to build tools *just* for yourself. Especially ones that make your day measurably better.
 
-If you've ever wanted to meditate but got turned off by mysticism, ads, paywalls, or distractions - give [Just Breathe](https://danielabar.github.io/just-breathe/) a try, and let me know if you find it helpful.
+If you've ever wanted to meditate but got turned off by mysticism, ads, paywalls, or distractions, give [Just Breathe](https://danielabar.github.io/just-breathe/) a try, and let me know if you find it helpful.
 
 <aside class="markdown-aside">
-After building the first version of Just Breathe, I discovered the <a class="markdown-link" href="https://pacedbreathing.app/">Paced Breathing</a> app. It's beautifully designed, with musical tones or gentle vibrations to mark breaths, but I still found myself zoning out or falling asleep. For me, the spoken English voice prompts in Just Breathe work better to keep me on task. Paced Breathing also has in-app purchases, which I find a bit distracting, though it’s a fantastic option if you want a more polished, feature-rich experience.
+After building the first version of Just Breathe, I discovered the <a class="markdown-link" href="https://pacedbreathing.app/">Paced Breathing</a> app. It's beautifully designed, with musical tones or gentle vibrations to mark breaths, but I still found myself zoning out or falling asleep. For me, the spoken English voice prompts in Just Breathe work better to keep me on task. Paced Breathing also has in-app purchases, which I find a bit distracting, though it's a fantastic option if you want a more polished, feature-rich experience.
 </aside>
