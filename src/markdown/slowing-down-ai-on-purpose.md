@@ -10,7 +10,7 @@ related:
   - "Cover Letter Writing for Nerds"
 ---
 
-When I first started using AI to generate code, my instinct was to give it a prompt with the requirements, and have it write everything at once. Occasionally it produced something useful, but more often it created a mess — not quite what I wanted, or code that wouldn't even work. Cleaning up or undoing those attempts often took longer than writing it myself. It felt impulsive, like the work of a student who had recently learned to code but had little real-world experience.
+When I first started using AI to generate code, my instinct was to give it a prompt with the requirements, and have it write everything at once. Occasionally it produced something useful, but more often it created a mess - not quite what I wanted, or code that wouldn't even work. Cleaning up or undoing those attempts often took longer than writing it myself. It felt impulsive, like the work of a student who had recently learned to code but had little real-world experience.
 
 Over time, I realized that rushing straight to code with AI doesn't scale well in large, long-lived codebases. Substantial features are often broken down, shipped incrementally (sometimes behind feature flags), and expected to remain understandable long after the original authors have moved on.
 
@@ -30,7 +30,7 @@ I don't ask AI to start by writing code. Rather, I ask it to:
 The most important output in this process is not code, but a living analysis document.
 
 <aside class="markdown-aside">
-I'm using Claude Code at the VS Code integrated terminal, but this workflow isn't tied to a specific tool, you could do the same with any AI assistant.
+I'm using Claude Code at the VS Code integrated terminal, but this workflow isn't tied to a specific tool, you could do the same with any AI coding assistant.
 </aside>
 
 ## Establish Context Using Commit History
@@ -70,14 +70,14 @@ The output goes into another markdown document in the same directory, which adds
 
 ## Have the AI Ask Me Questions
 
-When doing this kind of analysis, I'll ask the AI to *ask me clarifying questions*, and include it ask an `## Outstanding Questions` section in the analysis document. Then we go back and forth exactly like I would with another engineer:
+When doing this kind of analysis, I'll ask the AI to *ask me clarifying questions*, and include it in an `## Outstanding Questions` section in the analysis document. Then we go back and forth exactly like I would with another engineer:
 
 * I answer questions
 * it updates the analysis doc
 * assumptions are corrected
 * ambiguities are resolved
 
-Each iteration tightens the shared understanding. This is where most AI workflows fail: they reward confidence over correctness. I design mine to do the opposite.
+Each iteration tightens the shared understanding of the system.
 
 ## Catching Subtle Details Early
 
@@ -96,6 +96,7 @@ But still, I don't let it touch any code yet. The goal here is to answer:
 * What changes, in what order?
 * What can be validated independently?
 * Where are the risky parts?
+* Is this work too big for a single PR?
 
 Only when that list feels reasonable do we proceed.
 
@@ -106,10 +107,11 @@ Finally, we can write code according to the plan, but only:
 * one step
 * one change
 * one reviewable unit at a time
+* make sure tests are passing
 
 After each step:
 
-* I review the diff
+* I review the diff and try it out in the browser
 * we update context if needed
 * then move on
 
@@ -138,6 +140,6 @@ Most importantly, it keeps *me* in control of the design. The analysis document 
 
 AI is very good at generating answers. It's less good at knowing whether it understood the question. By externalizing its understanding, forcing iteration, and delaying code, I've found I can use AI on serious work without giving up the things I care about most: clarity, intent, and maintainability.
 
-With my current process, I spend much more time in back-and-forth analysis and design. But by the time we get to writing code, it's usually correct the first time and literally only takes minutes. The upfront time invested in reasoning carefully with the AI pays off massively — the work becomes faster, safer, and more reliable than rushing straight into implementation. This is the power of using AI as a design partner rather than (solely) a code generator.
+With my current process, I spend much more time in back-and-forth analysis and design. By the time we get to writing code, it's usually correct the first time and literally only takes minutes. The upfront time invested in reasoning carefully with the AI pays off massively - the work becomes faster, safer, and more reliable than rushing straight into implementation. This is the power of using AI as a design partner rather than (solely) a code generator.
 
 If you already collaborate this way with humans, you don't need a new mindset for AI, you just need to insist on the same standards.
