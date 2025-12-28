@@ -14,7 +14,7 @@ Ruby makes it incredibly easy to write elegant, dynamic code. The language pract
 
 But there's a hidden cost to elegant abstractions in application code, especially on projects that will be maintained by multiple developers over many years. This post explores some code from a project I was maintaining, where a dynamic pattern made the codebase harder to understand and maintain, even though the code itself was technically correct and elegantly written.
 
-The example that follows is adapted from this project. Class names and other details have been changed so I can share them publicly, but the patterns and trade-offs illustrate are exactly what I encountered.
+The example that follows is adapted from this project. Class names and other details have been changed so I can share them publicly, but the patterns and trade-offs illustrate what I encountered.
 
 ## Where Are the Callers?
 
