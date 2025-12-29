@@ -10,28 +10,28 @@ related:
   - "Rapid Prototyping with ChatGPT: OAS Pension Calculator Part 1"
 ---
 
-Lately, I've noticed something odd about my podcast feed. An increasing number of episodes seems to have some flavor of "AI will do X or Y…" prediction — from the doom‑and‑gloom end ("AI will turn humans into paperclips!") to the utopian extreme ("AI will solve all our problems!"). And when you add in variants like "AI will take *all* our jobs by next year," it starts to feel like a constant signal drowned in noise.
+Lately, I've noticed something disturbing about my podcast feed. An increasing number of episodes seems to have some flavor of "AI will do X or Y…" predictions. From the doom‑and‑gloom end ("AI will turn humans into paperclips!") to the utopian extreme ("AI will solve all our problems!"). And when you add in variants like "AI will take all our jobs by 2030", it starts to get very anxiety inducing.
 
 Over time I've realized: this kind of content is low‑value, and I've consciously started tuning it out. Here's why.
 
 ## Most Predictions Are Wrong
 
-There's a well‑known body of research showing that many confident expert predictions fail to come true. One of the most widely discussed studies on this was led by Philip E. Tetlock in his book *Expert Political Judgment* and later expanded in *Superforecasting*. Tetlock had hundreds of experts make tens of thousands of predictions about politics, economics, wars, and other complex domains — and then checked how those forecasts actually panned out.
+There's a body of research showing that many confident expert predictions fail to come true. One of the most widely discussed studies on this was led by Philip E. Tetlock in his book [Expert Political Judgment](https://press.princeton.edu/books/hardcover/9780691178288/expert-political-judgment) and later expanded in [Superforecasting](https://www.penguinrandomhouse.com/books/227815/superforecasting-by-philip-e-tetlock-and-dan-gardner/). Tetlock had hundreds of experts make tens of thousands of predictions about politics, economics, wars, and other complex domains, and then checked how those forecasts actually panned out.
 
-The surprising result? Average experts were often no better at predicting the future than random chance, and the most confident pundits were often among the worst at forecasting. Credentials and media prominence didn't reliably translate into accuracy. ([Wikipedia][1])
+The surprising result? The majority of so-called "experts" were often no better at predicting the future than random chance, or a "dart-throwing chimpanzee" as Tetlock put it. The most confident pundits were often among the worst at forecasting. Credentials and media prominence didn't reliably translate into accuracy.
 
-What *did* matter was how people approached predictions:
+![dart throwing chimpanzee](../images/dart-throwing-chimpanzee.png "dart throwing chimpanzee")
 
-* Those who used probabilistic thinking — assigning odds rather than absolutes — tended to do better.
-* Those who updated their views with new evidence, instead of sticking to an initial bold claim, also fared better.
-* A small subset of disciplined forecasters (often called "superforecasters") consistently outperformed average predictions over time, because they broke problems down and treated uncertainty explicitly. ([Richard Hughes-Jones][2])
+What did matter was how people approached prediction itself. Tetlock found that a small group he called [superforecasters](https://www.richardhughesjones.com/superforecasting-summary/) consistently performed better by thinking in probabilities rather than absolutes, breaking complex questions into smaller parts, and continuously updating their beliefs as new evidence emerged. Their edge didn't come from bold confidence or impressive credentials, but from treating uncertainty as something to be measured and revised, not ignored.
 
-This doesn't mean all prediction is useless — it means sensational, confident (and often vague) predictions are usually not trustworthy, especially when they're made for entertainment or clicks rather than clear, measurable foresight.
+This doesn't mean all predictions are useless. But it does mean sensational, confident (and often vague) predictions are usually not trustworthy, especially when they're made for capturing attention rather than clear, measurable foresight. Which raises a question: Is there any reason to believe today's AI doomer or utopian predictions are any more accurate than the forecasts Tetlock tested?
 
 ## Negativity Bias
 
+WIP
 Our brains pay more attention to fear...
 
+TODO: Not accurate lead in
 Even when you know predictions aren't reliable, they're still everywhere. That's not an accident — it's rooted in how our brains are wired.
 
 Psychologists call this the negativity bias — the tendency for negative information (threats, doom scenarios, alarming predictions) to grab and hold our attention more than positive or neutral information. This bias likely evolved because early humans needed to spot danger quickly to survive — missing a threat could mean death, whereas missing something positive (like berries) usually wasn't as costly. ([PubMed][3])
@@ -91,10 +91,12 @@ AI is fascinating and important, and there will always be questions about where 
 
 
 ## TODO
+* WIP work in references into inline markdown links and check them, update them if better resources available
+* additional sentence at end of "most experts wrong" section, like is there any reason to suppose today's AI doomer or utopian predictors are any more accurate than a dart throwing chimpanzee?
 * awkward wording "it starts to feel like a constant signal drowned in noise"
 * more accurate lead up for negativity bias section
-* work in references into inline markdown links
-* superforecasters in AI?
+* are there any superforecasters in AI that we should be listening to?
+* is "Good Judgement Project" still active? Any AI analysis within that?
 * related - Slowing Down AI On Purpose
 * intro para
 * main content
