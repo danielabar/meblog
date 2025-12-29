@@ -44,13 +44,17 @@ In our modern world, that ancient instinct gets hijacked by the attention econom
 
 So when a podcast teases "Is AI going to end civilization?" or "Will AI take your job next quarter?", your brain pays attention *because it's wired to seek out threats*, not because the prediction is anchored in evidence.
 
-## Circle of Concern vs. Circle of Influence
+## Circles
 
-Part of why I tune this stuff out comes from something I first learned from Stephen Covey's "Circle of Concern" vs. "Circle of Influence." The idea — popularized in *The 7 Habits of Highly Effective People* — is simple but powerful: we all have a wide range of things we care about (our Circle of Concern), but only a subset of those things are within our power to *do something about* (our Circle of Influence). ([dplearningzone.the-dp.co.uk][5])
+Part of why I tune this stuff out comes from something I first learned from the book [The 7 Habits of Highly Effective People](https://www.franklincovey.com/books/the-7-habits-of-highly-effective-people/) by Steven Covey. In Habit 1, Be Proactive, Covey introduces two concepts that are surprisingly relevant to how we engage with AI today: the Circle of Concern and the Circle of Influence.
 
-Worrying about how AI might affect the entire world twenty years from now is in the Circle of Concern — it might matter, but you and I don't have direct control over it. Spending energy there often leads to anxiety or distraction.
+> We each have a wide range of concerns, our health, our children, problems at work, the national debt, nuclear war… As we look at those things within our Circle of Concern, it becomes apparent that there are some things over which we have no real control and others that we can do something about. We could identify those concerns in the latter group by circumscribing them within a smaller Circle of Influence.
 
-By contrast, focusing on what I *can* influence — like my own skills, learning, and how I use tools today — is in my Circle of Influence. Over time, that's where real progress happens. ([modern.works][6])
+In other words, the Circle of Concern contains everything we care about, while the Circle of Influence contains the subset of concerns where our actions, habits, and decisions actually make a difference. Covey emphasizes that proactive people focus on the latter: they put energy into the things they can influence, expanding that circle over time. Reactive people, by contrast, spend most of their attention on worries outside their control, which can increase stress and shrink their influence.
+
+Even though The 7 Habits of Highly Effective People was first published in 1989, this lesson is timeless. Applied to AI, much of the media hype, from doomsday scenarios to utopian promises, sits squarely in our Circle of Concern. Focusing on it might trigger anxiety or fascination, but it rarely changes anything we can act on.
+
+By focusing instead on what we can influence, such as our skills, our understanding of AI tools, and how we use them in daily life, we can put energy into tangible progress. This mindset shift, from reactivity and speculation to acting within influence, is a simple but powerful way to regain control over our attention and mental bandwidth.
 
 ## What I Focus On
 
@@ -90,9 +94,11 @@ AI is fascinating and important, and there will always be questions about where 
 
 ## TODO
 * WIP work in references into inline markdown links and check them, update them if better resources available
+* Stephen Covey's "circle" analogy - needs more work, more accuracy from original book (he never mentioned "circle of control" but rather, thinking of the things you can control as being within your circle of influence)
 * intro para
   * awkward wording "it starts to feel like a constant signal drowned in noise"
 * more accurate lead up for negativity bias section
+* convert "What I Focus on" to more prose than bullet points maybe?
 * Should the topic of superforecasters be a separate section?
   * are there any superforecasters in AI that we should be listening to?
   * is "Good Judgement Project" still active? Any AI analysis within that? https://en.wikipedia.org/wiki/The_Good_Judgment_Project
