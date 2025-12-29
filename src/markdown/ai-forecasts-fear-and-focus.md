@@ -82,8 +82,6 @@ That's my Circle of Influence, and it's where I believe attention, rather than f
 AI is fascinating and important, and there will always be questions about where it's headed. But not all predictions are equally worth listening to. By understanding how our minds are wired, how predictions really stack up, and where our real influence lies, it's possible to cut through the hype and make your attention work for you, not against you.
 
 
-[1]: https://en.wikipedia.org/wiki/Expert_Political_Judgment?utm_source=chatgpt.com "Expert Political Judgment"
-[2]: https://www.richardhughesjones.com/superforecasting-summary/?utm_source=chatgpt.com "Superforecasting: The Art & Science of Prediction - Summary"
 [3]: https://pubmed.ncbi.nlm.nih.gov/31750790/?utm_source=chatgpt.com "The negativity bias, revisited: Evidence from neuroscience measures and an individual differences approach - PubMed"
 [4]: https://en.wikipedia.org/wiki/Doomscrolling?utm_source=chatgpt.com "Doomscrolling"
 [5]: https://dplearningzone.the-dp.co.uk/wp-content/uploads/sites/2/2015/06/Covey.pdf?utm_source=chatgpt.com "[PDF] Stephen Covey's circle of concern and circle of influence"
@@ -92,13 +90,11 @@ AI is fascinating and important, and there will always be questions about where 
 
 ## TODO
 * WIP work in references into inline markdown links and check them, update them if better resources available
-* additional sentence at end of "most experts wrong" section, like is there any reason to suppose today's AI doomer or utopian predictors are any more accurate than a dart throwing chimpanzee?
-* awkward wording "it starts to feel like a constant signal drowned in noise"
-* more accurate lead up for negativity bias section
-* are there any superforecasters in AI that we should be listening to?
-* is "Good Judgement Project" still active? Any AI analysis within that?
-* related - Slowing Down AI On Purpose
 * intro para
-* main content
-* conclusion para
+  * awkward wording "it starts to feel like a constant signal drowned in noise"
+* more accurate lead up for negativity bias section
+* Should the topic of superforecasters be a separate section?
+  * are there any superforecasters in AI that we should be listening to?
+  * is "Good Judgement Project" still active? Any AI analysis within that? https://en.wikipedia.org/wiki/The_Good_Judgment_Project
 * edit
+* add related after Jan. 1 published -> Slowing Down AI On Purpose
