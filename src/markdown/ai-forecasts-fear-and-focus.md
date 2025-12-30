@@ -28,25 +28,23 @@ This doesn't mean all predictions are useless. But it does mean sensational, con
 
 ## Negativity Bias
 
-If confident predictions are usually unreliable, why do the most alarming ones feel so compelling anyway? The answer has less to do with evidence and more to do with how our brains allocate attention.
-Psychologists refer to this tendency as *negativity bias*: The finding that negative information carries more psychological weight than positive or neutral information. Threats, losses, and worst-case scenarios are processed more quickly, remembered more vividly, and exert a disproportionate influence on our judgments.
+If confident predictions are usually unreliable, why do the most alarming ones feel so compelling anyway? The answer has to do with how our brains allocate attention.
 
-This bias wasn't discovered by AI researchers or media companies, it's a feature of human cognition shaped by evolution. For most of human history, failing to notice danger carried far higher costs than overlooking something beneficial. Missing a predator could be fatal, while missing a pleasant opportunity usually wasn't. Over time, our brains adapted to err on the side of vigilance.
+Psychologists call this *negativity bias*: the tendency for negative information to carry more psychological weight than positive or neutral information. Threats, losses, and worst-case scenarios are processed more quickly, remembered more vividly, and exert a disproportionate influence on our judgments.
 
-Modern psychology has repeatedly confirmed this pattern. In their paper [Negativity Bias, Negativity Dominance, and Contagion](https://www.researchgate.net/publication/228778181_Negativity_Bias_Negativity_Dominance_and_Contagion), researchers Paul Rozin and Edward Royzman showed that negative information is more potent than equivalent positive information, grows more salient as it approaches in time or relevance, and tends to dominate mixed evaluations, so that a single negative element can outweigh multiple positive ones. They also highlighted that negative events are more contagious, spreading more easily across judgments, memories, and social narratives.
+This bias isn't a modern media invention. It's a feature of human cognition shaped by evolution. For most of human history, failing to notice danger carried far higher costs than overlooking opportunity. Missing a predator could be fatal; missing a benefit usually wasn't. Our brains evolved to err on the side of vigilance.
 
-Roy Baumeister and colleagues extended this idea empirically in a paper titled [Bad Is Stronger than Good](https://www.researchgate.net/publication/46608952_Bad_Is_Stronger_than_Good). They demonstrated that across a wide range of domains (such as relationships, learning, and social interaction), bad events have stronger and longer-lasting effects than good ones of comparable intensity. Negative information is processed more thoroughly, forms impressions more quickly, and is harder to dislodge once established.
+TODO: Paul Rozin is a psychologist? scientist? what?
+Modern psychology has repeatedly confirmed this pattern. In a paper titled [Negativity Bias, Negativity Dominance, and Contagion](https://www.researchgate.net/publication/228778181_Negativity_Bias_Negativity_Dominance_and_Contagion), Paul Rozin and Edward Royzman showed that negative information is more potent than equivalent positive information, tends to dominate mixed evaluations, and spreads more easily through memory and social narratives. A single negative element can outweigh many positives.
 
-Daniel Kahneman’s book [Thinking, Fast and Slow](https://www.penguinrandomhouse.ca/books/89308/thinking-fast-and-slow-by-daniel-kahneman/9780385676533) offers an accessible synthesis of these findings within a broader framework of cognitive biases. This book demonstrates how related mechanisms such as loss aversion, the availability heuristic, and fast, threat-sensitive intuitive processing, cause negative possibilities to loom larger in our judgments than neutral or positive outcomes, especially under uncertainty.
+TODO: Roy Baumeister is a psychologist? scientist? what?
+Roy Baumeister and colleagues extended this idea in [Bad Is Stronger than Good](https://www.researchgate.net/publication/46608952_Bad_Is_Stronger_than_Good), demonstrating that across relationships, learning, and social interaction, bad events have stronger and longer-lasting effects than good ones of similar intensity. Negative impressions form faster, are processed more deeply, and are harder to dislodge once established.
 
-In today's media environment, that ancient survival mechanism is easily exploited. Predictions framed around catastrophe, loss, or existential threat are far more likely to grab attention than cautious, probabilistic analysis. A headline asking whether AI will end civilization triggers a different neurological response than one explaining incremental productivity gains, even if the latter is far more plausible.
+Daniel Kahneman's *Thinking, Fast and Slow* ties these findings together, explaining how related mechanisms like loss aversion and the availability heuristic cause negative possibilities to loom larger in our minds, especially under uncertainty.
 
-This is why alarming AI forecasts spread so easily. Your brain isn't responding because the prediction is well-reasoned or statistically grounded; it's responding because it sounds like a threat. The attention economy rewards whatever activates that response, regardless of predictive accuracy.
+In today's media environment, this ancient survival mechanism is easy to exploit. Predictions framed around catastrophe, loss, or existential threat reliably outperform cautious, probabilistic analysis in the attention economy. A podcast teaser asking *Is AI going to end civilization?* or *Will AI take your job next quarter?* triggers a very different response than one about incremental productivity gains. This type of content feels impossible to ignore because it sounds like a threat.
 
-Understanding negativity bias doesn't make us immune to it, but it does make the pattern easier to recognize. And once you see that many sensational AI predictions are optimized for attention rather than truth, tuning them out becomes less an act of denial and more an act of cognitive self-defense.
-
-TODO: Where does this sentence fit in?
-So when a podcast teases "Is AI going to end civilization?" or "Will AI take your job next quarter?", your brain pays attention *because it's wired to seek out threats*, not because the prediction is anchored in evidence.
+Your brain is doing exactly what it evolved to do: paying close attention to potential danger. The problem is that attention is being captured, not informed. Understanding negativity bias doesn't make us immune to it. But it does make the pattern easier to recognize. And once you see that many sensational AI predictions are optimized for attention rather than accuracy, tuning them out becomes less an act of denial and more an act of cognitive self-defense.
 
 ## Circles
 
