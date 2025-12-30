@@ -10,8 +10,9 @@ related:
   - "Rapid Prototyping with ChatGPT: OAS Pension Calculator Part 1"
 ---
 
-Lately, I've noticed something disturbing about my podcast feed. An increasing number of episodes seems to have some flavor of "AI will do X or Y…" predictions. From the doom‑and‑gloom end ("AI will turn humans into paperclips!") to the utopian extreme ("AI will solve all our problems!"). And when you add in variants like "AI will take all our jobs by 2030", it starts to get very anxiety inducing.
+Lately, I've noticed something disturbing about my podcast feed. An increasing number of episodes have some flavor of "AI will do X or Y…" predictions. From the doom‑and‑gloom end ("AI will turn humans into paperclips!") to the utopian extreme ("AI will solve all our problems!"). And when you add in variants like "AI will take all our jobs by 2030", it starts to get very anxiety inducing.
 
+TODO: This post will cover how I came to realize this kind of content is low-value, why it should be tuned out, and what can be done instead.
 Over time I've realized: this kind of content is low‑value, and I've consciously started tuning it out. Here's why.
 
 ## Most Predictions Are Wrong
@@ -28,19 +29,17 @@ This doesn't mean all predictions are useless. But it does mean sensational, con
 
 ## Negativity Bias
 
-If confident predictions are usually unreliable, why do the most alarming ones feel so compelling anyway? The answer has to do with how our brains allocate attention.
+If confident predictions are usually unreliable, why do the most alarming ones feel so compelling? The answer has to do with how our brains allocate attention.
 
 Psychologists call this *negativity bias*: the tendency for negative information to carry more psychological weight than positive or neutral information. Threats, losses, and worst-case scenarios are processed more quickly, remembered more vividly, and exert a disproportionate influence on our judgments.
 
 This bias isn't a modern media invention. It's a feature of human cognition shaped by evolution. For most of human history, failing to notice danger carried far higher costs than overlooking opportunity. Missing a predator could be fatal; missing a benefit usually wasn't. Our brains evolved to err on the side of vigilance.
 
-TODO: Paul Rozin is a psychologist? scientist? what?
-Modern psychology has repeatedly confirmed this pattern. In a paper titled [Negativity Bias, Negativity Dominance, and Contagion](https://www.researchgate.net/publication/228778181_Negativity_Bias_Negativity_Dominance_and_Contagion), Paul Rozin and Edward Royzman showed that negative information is more potent than equivalent positive information, tends to dominate mixed evaluations, and spreads more easily through memory and social narratives. A single negative element can outweigh many positives.
+Modern psychology has confirmed this pattern. A research paper [Negativity Bias, Negativity Dominance, and Contagion](https://www.researchgate.net/publication/228778181_Negativity_Bias_Negativity_Dominance_and_Contagion) showed that negative information is more potent than equivalent positive information, tends to dominate mixed evaluations, and spreads more easily through memory and social narratives. A single negative element can outweigh many positives.
 
-TODO: Roy Baumeister is a psychologist? scientist? what?
-Roy Baumeister and colleagues extended this idea in [Bad Is Stronger than Good](https://www.researchgate.net/publication/46608952_Bad_Is_Stronger_than_Good), demonstrating that across relationships, learning, and social interaction, bad events have stronger and longer-lasting effects than good ones of similar intensity. Negative impressions form faster, are processed more deeply, and are harder to dislodge once established.
+Another paper [Bad Is Stronger than Good](https://www.researchgate.net/publication/46608952_Bad_Is_Stronger_than_Good), demonstrated that across relationships, learning, and social interaction, bad events have stronger and longer-lasting effects than good ones of similar intensity. Negative impressions form faster, are processed more deeply, and are harder to dislodge once established.
 
-Daniel Kahneman's *Thinking, Fast and Slow* ties these findings together, explaining how related mechanisms like loss aversion and the availability heuristic cause negative possibilities to loom larger in our minds, especially under uncertainty.
+These ideas were later synthesized for a broader audience by Daniel Kahneman, a psychologist and Nobel Prize winning behavioral economist, in [Thinking, Fast and Slow](https://www.penguinrandomhouse.ca/books/89308/thinking-fast-and-slow-by-daniel-kahneman/9780385676533). Kahneman explains how related mechanisms, such as loss aversion and the availability heuristic, cause negative possibilities to loom larger in our minds, especially under uncertainty.
 
 In today's media environment, this ancient survival mechanism is easy to exploit. Predictions framed around catastrophe, loss, or existential threat reliably outperform cautious, probabilistic analysis in the attention economy. A podcast teaser asking *Is AI going to end civilization?* or *Will AI take your job next quarter?* triggers a very different response than one about incremental productivity gains. This type of content feels impossible to ignore because it sounds like a threat.
 
@@ -48,16 +47,17 @@ Your brain is doing exactly what it evolved to do: paying close attention to pot
 
 ## Circles
 
-TODO: Cleaner wording/grammar re: "tuning this stuff out..."
-Part of tuning this stuff out comes from a lesson I first learned in [The 7 Habits of Highly Effective People](https://www.franklincovey.com/books/the-7-habits-of-highly-effective-people/) by Steven Covey. In Habit 1, Be Proactive, Covey introduces two concepts that are surprisingly relevant to how we engage with AI today: the Circle of Concern and the Circle of Influence.
+Once you recognize how easily fear-based predictions hijack attention, the obvious follow-up question is: *What should you do instead?* It's one thing to understand why alarming AI narratives are hard to ignore; it's another to decide where your attention is actually worth spending.
+
+A framework that's helped me answer that question comes from the book [The 7 Habits of Highly Effective People](https://www.franklincovey.com/books/the-7-habits-of-highly-effective-people/) by Steven Covey. In Habit 1, *Be Proactive*, Covey introduces two deceptively simple ideas that map almost perfectly onto today's AI discourse: the **Circle of Concern** and the **Circle of Influence**:
 
 > We each have a wide range of concerns, our health, our children, problems at work, the national debt, nuclear war… As we look at those things within our Circle of Concern, it becomes apparent that there are some things over which we have no real control and others that we can do something about. We could identify those concerns in the latter group by circumscribing them within a smaller Circle of Influence.
 
 In other words, the Circle of Concern contains everything we care about, while the Circle of Influence contains the subset of concerns where our actions, habits, and decisions actually make a difference. Covey emphasizes that proactive people focus on the latter: they put energy into the things they can influence, expanding that circle over time. Reactive people, by contrast, spend most of their attention on worries outside their control, which can increase stress and shrink their influence.
 
-Even though The 7 Habits of Highly Effective People was first published in 1989, this lesson is timeless. Applied to AI, much of the media hype, from doomsday scenarios to utopian promises, sits squarely in our Circle of Concern. Focusing on it might trigger anxiety or fascination, but it rarely changes anything we can act on.
+Even though the book was first published in 1989, this lesson is timeless. Applied to AI, much of the media hype, from doomsday scenarios to utopian promises, falls within in our *Circle of Concern*. Focusing on it might trigger anxiety or fascination, but it rarely changes anything we can act on.
 
-By focusing instead on what we can influence, such as our skills, our understanding of AI tools, and how we use them in daily life, we can put energy into tangible progress. This mindset shift, from reactivity and speculation to acting within influence, is a simple but powerful way to regain control over our attention and mental bandwidth.
+By focusing instead on what we can influence, such as our skills, our understanding of AI tools, and how we use them in daily life, we can put energy into tangible progress. This shift, from reacting to speculative futures to acting within our sphere of influence, is a simple but powerful way to reclaim attention from fear-driven narratives.
 
 ## What I Focus On
 
