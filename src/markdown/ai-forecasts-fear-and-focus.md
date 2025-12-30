@@ -25,13 +25,13 @@ The surprising result? The majority of so-called "experts" were often no better 
 
 What did matter was how people approached prediction itself. Tetlock found that a small group he called [superforecasters](https://www.richardhughesjones.com/superforecasting-summary/) consistently performed better by thinking in probabilities rather than absolutes, breaking complex questions into smaller parts, and continuously updating their beliefs as new evidence emerged. Their edge didn't come from bold confidence or impressive credentials, but from treating uncertainty as something to be measured and revised, not ignored.
 
-This doesn't mean all predictions are useless. But it does mean sensational, confident (and often vague) predictions are usually not trustworthy, especially when they're made for capturing attention rather than clear, measurable foresight. Which raises a question: Is there any reason to believe today's AI doomer or utopian predictions are any more accurate than the forecasts Tetlock tested?
+This doesn't mean all predictions are useless. But it does mean sensational, confident (and often vague) predictions are usually not trustworthy, especially when they're made for capturing attention rather than clear, measurable foresight.
+
+So why do the most alarming AI predictions still feel so compelling?
 
 ## Negativity Bias
 
-If confident predictions are usually unreliable, why do the most alarming ones feel so compelling? The answer has to do with how our brains allocate attention.
-
-Psychologists call this *negativity bias*: the tendency for negative information to carry more psychological weight than positive or neutral information. Threats, losses, and worst-case scenarios are processed more quickly, remembered more vividly, and exert a disproportionate influence on our judgments.
+The short answer is that our brains are wired to treat potential threats as urgent. Psychologists call this *negativity bias*: the tendency for negative information to carry more psychological weight than positive or neutral information. Threats, losses, and worst-case scenarios are processed more quickly, remembered more vividly, and exert a disproportionate influence on our judgments.
 
 This bias isn't a modern media invention. It's a feature of human cognition shaped by evolution. For most of human history, failing to notice danger carried far higher costs than overlooking opportunity. Missing a predator could be fatal; missing a benefit usually wasn't. Our brains evolved to err on the side of vigilance.
 
@@ -74,7 +74,6 @@ The practical effect of this shift has been noticeable. Tuning out fear-driven n
 AI is fascinating and important, and there will always be questions about where it's headed. But not all predictions are equally worth listening to. By understanding how our minds are wired, how predictions really stack up, and where our real influence lies, it's possible to cut through the hype and make your attention work for you, not against you.
 
 ## TODO
-* From "predictions are wrong" to "negativity bias" question at end of one and another at beginning of next feels awkward
 * intro para
   * awkward wording "it starts to feel like a constant signal drowned in noise"
 * Should the topic of superforecasters be a separate section?
