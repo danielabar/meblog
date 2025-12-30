@@ -45,7 +45,7 @@ In today's media environment, this ancient survival mechanism is easy to exploit
 
 Your brain is doing exactly what it evolved to do: paying close attention to potential danger. The problem is that attention is being captured, not informed. Understanding negativity bias doesn't make us immune to it. But it does make the pattern easier to recognize. And once you see that many sensational AI predictions are optimized for attention rather than accuracy, tuning them out becomes less an act of denial and more an act of cognitive self-defense.
 
-## Circles
+## Concern vs Influence
 
 Once you recognize how easily fear-based predictions hijack attention, the obvious follow-up question is: *What should you do instead?* It's one thing to understand why alarming AI narratives are hard to ignore; it's another to decide where your attention is actually worth spending.
 
