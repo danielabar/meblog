@@ -57,32 +57,17 @@ In other words, the Circle of Concern contains everything we care about, while t
 
 Even though the book was first published in 1989, this lesson is timeless. Applied to AI, much of the media hype, from doomsday scenarios to utopian promises, falls within in our *Circle of Concern*. Focusing on it might trigger anxiety or fascination, but it rarely changes anything we can act on.
 
-By focusing instead on what we can influence, such as our skills, our understanding of AI tools, and how we use them in daily life, we can put energy into tangible progress. This shift, from reacting to speculative futures to acting within our sphere of influence, is a simple but powerful way to reclaim attention from fear-driven narratives.
+By focusing instead on what we can influence, such as our skills, our understanding of AI tools, and how we use them in daily life, we can put energy into tangible progress. This shift, from reacting to speculative futures to acting within our sphere of influence, helps to reclaim attention from fear-driven narratives.
 
 ## What I Focus On
 
-So how do I sift through the noise?
+So how do I actually sift through the noise?
 
-I've developed a simple personal filter:
+At this point, it's less about having strong opinions on AI's distant future and more about having a filter for my attention. When considering a piece of content, I'm no longer asking Is this exciting? Is this alarming? I'm asking a simpler question: Does this help me do something better today?
 
-**I tune in to content that's:**
+That usually means I gravitate toward material that's educational or practical - explanations that deepen my understanding, or concrete examples of how a tool can be used to solve a real problem. By contrast, I've learned to skip content that exists purely to provoke a reaction. If the entire premise is *Will AI destroy everything?* or *Nothing will ever be the same again!*, there's rarely anything actionable hiding underneath.
 
-* Educational or practical — e.g., how to use a new tool, how to solve a problem with AI in your workflow.
-* Measured and specific — it gives tangible ideas instead of vague doom/utopia narratives.
-
-**I skip content that's:**
-
-* Entirely about "Will AI destroy everything?"
-* Designed to provoke fear, outrage, or hype.
-* Confidently predicting a distant future without *any clear basis in measurable reasoning*.
-
-The result? I have more mental bandwidth to focus on what matters to me:
-
-* learning the tools and integrating them into my daily work as an engineer,
-* using AI to streamline problem‑solving,
-* and even applying these tools to *everyday life* (like interpreting a medical lab results or summarizing scientific research).
-
-That's my Circle of Influence, and it's where I believe attention, rather than fear is best spent.
+The practical effect of this shift has been noticeable. Tuning out fear-driven narratives frees up mental bandwidth to focus on things that compound over time: learning new tools, integrating AI into my workflow as an engineer, and using it to reduce friction in everyday tasks. That's my Circle of Influence. It's not about predicting where AI will be in 2040; it's about deciding where my attention goes this week. For me, that's been a far better use of cognitive energy than worrying about futures I can't control.
 
 ## Closing Thoughts
 
@@ -92,7 +77,6 @@ AI is fascinating and important, and there will always be questions about where 
 * From "predictions are wrong" to "negativity bias" question at end of one and another at beginning of next feels awkward
 * intro para
   * awkward wording "it starts to feel like a constant signal drowned in noise"
-* convert "What I Focus on" to more prose than bullet points maybe?
 * Should the topic of superforecasters be a separate section?
   * are there any superforecasters in AI that we should be listening to?
   * is "Good Judgement Project" still active? Any AI analysis within that? https://en.wikipedia.org/wiki/The_Good_Judgment_Project
