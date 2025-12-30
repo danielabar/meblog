@@ -28,25 +28,30 @@ This doesn't mean all predictions are useless. But it does mean sensational, con
 
 ## Negativity Bias
 
-WIP
-Our brains pay more attention to fear...
+If confident predictions are usually unreliable, why do the most alarming ones feel so compelling anyway? The answer has less to do with evidence and more to do with how our brains allocate attention.
+Psychologists refer to this tendency as *negativity bias*: The finding that negative information carries more psychological weight than positive or neutral information. Threats, losses, and worst-case scenarios are processed more quickly, remembered more vividly, and exert a disproportionate influence on our judgments.
 
-TODO: Not accurate lead in
-Even when you know predictions aren't reliable, they're still everywhere. That's not an accident — it's rooted in how our brains are wired.
+This bias wasn't discovered by AI researchers or media companies, it's a feature of human cognition shaped by evolution. For most of human history, failing to notice danger carried far higher costs than overlooking something beneficial. Missing a predator could be fatal, while missing a pleasant opportunity usually wasn't. Over time, our brains adapted to err on the side of vigilance.
 
-Psychologists call this the negativity bias — the tendency for negative information (threats, doom scenarios, alarming predictions) to grab and hold our attention more than positive or neutral information. This bias likely evolved because early humans needed to spot danger quickly to survive — missing a threat could mean death, whereas missing something positive (like berries) usually wasn't as costly. ([PubMed][3])
+Modern psychology has repeatedly confirmed this pattern. In their paper [Negativity Bias, Negativity Dominance, and Contagion](https://www.researchgate.net/publication/228778181_Negativity_Bias_Negativity_Dominance_and_Contagion), researchers Paul Rozin and Edward Royzman showed that negative information is more potent than equivalent positive information, grows more salient as it approaches in time or relevance, and tends to dominate mixed evaluations, so that a single negative element can outweigh multiple positive ones. They also highlighted that negative events are more contagious, spreading more easily across judgments, memories, and social narratives.
 
-In our modern world, that ancient instinct gets hijacked by the attention economy:
+Roy Baumeister and colleagues extended this idea empirically in a paper titled [Bad Is Stronger than Good](https://www.researchgate.net/publication/46608952_Bad_Is_Stronger_than_Good). They demonstrated that across a wide range of domains (such as relationships, learning, and social interaction), bad events have stronger and longer-lasting effects than good ones of comparable intensity. Negative information is processed more thoroughly, forms impressions more quickly, and is harder to dislodge once established.
 
-* Fear and uncertainty sell.
-* Negative headlines and predictions get clicks, listens, and engagement far more easily than calm, nuanced analysis.
-* Doomscrolling (continually consuming bad news) is now a recognized phenomenon tied to our innate bias toward the negative. ([Wikipedia][4])
+Daniel Kahneman’s book [Thinking, Fast and Slow](https://www.penguinrandomhouse.ca/books/89308/thinking-fast-and-slow-by-daniel-kahneman/9780385676533) offers an accessible synthesis of these findings within a broader framework of cognitive biases. This book demonstrates how related mechanisms such as loss aversion, the availability heuristic, and fast, threat-sensitive intuitive processing, cause negative possibilities to loom larger in our judgments than neutral or positive outcomes, especially under uncertainty.
 
+In today's media environment, that ancient survival mechanism is easily exploited. Predictions framed around catastrophe, loss, or existential threat are far more likely to grab attention than cautious, probabilistic analysis. A headline asking whether AI will end civilization triggers a different neurological response than one explaining incremental productivity gains, even if the latter is far more plausible.
+
+This is why alarming AI forecasts spread so easily. Your brain isn't responding because the prediction is well-reasoned or statistically grounded; it's responding because it sounds like a threat. The attention economy rewards whatever activates that response, regardless of predictive accuracy.
+
+Understanding negativity bias doesn't make us immune to it, but it does make the pattern easier to recognize. And once you see that many sensational AI predictions are optimized for attention rather than truth, tuning them out becomes less an act of denial and more an act of cognitive self-defense.
+
+TODO: Where does this sentence fit in?
 So when a podcast teases "Is AI going to end civilization?" or "Will AI take your job next quarter?", your brain pays attention *because it's wired to seek out threats*, not because the prediction is anchored in evidence.
 
 ## Circles
 
-Part of why I tune this stuff out comes from something I first learned from the book [The 7 Habits of Highly Effective People](https://www.franklincovey.com/books/the-7-habits-of-highly-effective-people/) by Steven Covey. In Habit 1, Be Proactive, Covey introduces two concepts that are surprisingly relevant to how we engage with AI today: the Circle of Concern and the Circle of Influence.
+TODO: Cleaner wording/grammar re: "tuning this stuff out..."
+Part of tuning this stuff out comes from a lesson I first learned in [The 7 Habits of Highly Effective People](https://www.franklincovey.com/books/the-7-habits-of-highly-effective-people/) by Steven Covey. In Habit 1, Be Proactive, Covey introduces two concepts that are surprisingly relevant to how we engage with AI today: the Circle of Concern and the Circle of Influence.
 
 > We each have a wide range of concerns, our health, our children, problems at work, the national debt, nuclear war… As we look at those things within our Circle of Concern, it becomes apparent that there are some things over which we have no real control and others that we can do something about. We could identify those concerns in the latter group by circumscribing them within a smaller Circle of Influence.
 
@@ -85,19 +90,10 @@ That's my Circle of Influence, and it's where I believe attention, rather than f
 
 AI is fascinating and important, and there will always be questions about where it's headed. But not all predictions are equally worth listening to. By understanding how our minds are wired, how predictions really stack up, and where our real influence lies, it's possible to cut through the hype and make your attention work for you, not against you.
 
-
-[3]: https://pubmed.ncbi.nlm.nih.gov/31750790/?utm_source=chatgpt.com "The negativity bias, revisited: Evidence from neuroscience measures and an individual differences approach - PubMed"
-[4]: https://en.wikipedia.org/wiki/Doomscrolling?utm_source=chatgpt.com "Doomscrolling"
-[5]: https://dplearningzone.the-dp.co.uk/wp-content/uploads/sites/2/2015/06/Covey.pdf?utm_source=chatgpt.com "[PDF] Stephen Covey's circle of concern and circle of influence"
-[6]: https://www.modern.works/blog/the-power-of-coveys-circle-of-concern-influence-and-control?utm_source=chatgpt.com "The Power of Covey's Circle of Concern, Influence, and Control"
-
-
 ## TODO
-* WIP work in references into inline markdown links and check them, update them if better resources available
-* Stephen Covey's "circle" analogy - needs more work, more accuracy from original book (he never mentioned "circle of control" but rather, thinking of the things you can control as being within your circle of influence)
+* From "predictions are wrong" to "negativity bias" question at end of one and another at beginning of next feels awkward
 * intro para
   * awkward wording "it starts to feel like a constant signal drowned in noise"
-* more accurate lead up for negativity bias section
 * convert "What I Focus on" to more prose than bullet points maybe?
 * Should the topic of superforecasters be a separate section?
   * are there any superforecasters in AI that we should be listening to?
