@@ -24,6 +24,10 @@ The surprising result? The majority of so-called "experts" were often no better 
 
 What did matter was how people approached prediction itself. Tetlock found that a small group he called [superforecasters](https://www.richardhughesjones.com/superforecasting-summary/) consistently performed better by thinking in probabilities rather than absolutes, breaking complex questions into smaller parts, and continuously updating their beliefs as new evidence emerged. Their edge didn't come from bold confidence or impressive credentials, but from treating uncertainty as something to be measured and revised, not ignored.
 
+<aside class="markdown-aside">
+The existence of superforecasters doesn’t mean we should spend more time consuming predictions, it shows that careful, probabilistic thinking is rare, quiet, and almost the opposite of the bold AI forecasts that dominate headlines.
+</aside>
+
 This doesn't mean all predictions are useless. But it does mean sensational, confident (and often vague) predictions are usually not trustworthy, especially when they're made for capturing attention rather than clear, measurable foresight.
 
 So why do the most alarming AI predictions still feel so compelling?
@@ -73,8 +77,5 @@ The practical effect of this shift has been noticeable. Tuning out fear-driven n
 AI is fascinating and important, and there will always be questions about where it's headed. But not all predictions are equally worth listening to. By understanding how our minds are wired, how predictions really stack up, and where our real influence lies, it's possible to cut through the hype and make your attention work for you, not against you.
 
 ## TODO
-* Should the topic of superforecasters be a separate section?
-  * are there any superforecasters in AI that we should be listening to?
-  * is "Good Judgement Project" still active? Any AI analysis within that? https://en.wikipedia.org/wiki/The_Good_Judgment_Project
 * edit
 * add related after Jan. 1 published -> Slowing Down AI On Purpose
