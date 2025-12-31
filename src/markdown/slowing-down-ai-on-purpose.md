@@ -43,16 +43,13 @@ I'm checking whether the AI has an accurate *mental model* of the system and spe
 
 ## Force the Thinking Into a Markdown Document
 
-Every time, I ask for the analysis in a markdown document. That document becomes:
+Every time, I ask the AI to put its analysis into a markdown document. That document becomes the durable artifact of the work: a design checkpoint I can read calmly, revisit later, and keep even if the session ends. I open it in VS Code’s markdown preview and review it the same way I would any design doc. I find this easier to read than long scrolling terminal output.
 
-* a design checkpoint
-* something I can read calmly
-* something I can keep if the session ends
-* something I can reopen later and continue from
-
-I open it in VS Code's markdown preview and review it the same way I would a lightweight design doc. I find this easier to read than long scrolling terminal output. This flips the dynamic: The AI's reasoning is explicit and reviewable, not hidden behind (often false) confidence. If the understanding is wrong, we fix it here, before new requirements enter the picture and muddy the waters.
+This flips the dynamic: The AI's reasoning is explicit and reviewable, not hidden behind (often false) confidence. If the understanding is wrong, we fix it here, before new requirements enter the picture and muddy the waters.
 
 ## Introduce the New Business Requirement
+
+TODO: prose rather than bullet points
 
 Only after we're aligned on the current system do I introduce the new requirement. Then I ask the AI to:
 
@@ -69,6 +66,8 @@ Crucially, I don't let it jump to "the best solution". I want to see:
 The output goes into another markdown document in the same directory, which adds to the context.
 
 ## Have the AI Ask Me Questions
+
+TODO: prose rather than bullet points
 
 When doing this kind of analysis, I'll ask the AI to *ask me clarifying questions*, and include it in an `## Outstanding Questions` section in the analysis document. Then we go back and forth exactly like I would with another engineer:
 
@@ -89,6 +88,8 @@ These are the kinds of issues that usually only come up during testing or code r
 
 ## Agree on an Approach, Then Decompose
 
+TODO: prose rather than bullet points
+
 Once we've converged on a technical approach, I ask the AI to break the work down into small, discrete steps, and document each one. Here we get very specific as to which files will be modified, existing methods vs new methods, what tests will be added or maintained, etc.
 
 But still, I don't let it touch any code yet. The goal here is to answer:
@@ -101,6 +102,8 @@ But still, I don't let it touch any code yet. The goal here is to answer:
 Only when that list feels reasonable do we proceed.
 
 ## Write Code One Small Step at a Time
+
+TODO: prose rather than bullet points
 
 Finally, we can write code according to the plan, but only:
 
