@@ -10,10 +10,9 @@ related:
   - "Rapid Prototyping with ChatGPT: OAS Pension Calculator Part 1"
 ---
 
-Lately, I've noticed something disturbing about my podcast feed. An increasing number of episodes have some flavor of "AI will do X or Y…" predictions. From the doom‑and‑gloom end ("AI will turn humans into paperclips!") to the utopian extreme ("AI will solve all our problems!"). And when you add in variants like "AI will take all our jobs by 2030", it starts to get very anxiety inducing.
+Lately, I've noticed something disturbing about my podcast feed. An increasing number of episodes are full of "AI will do X or Y…" predictions. From the doom‑and‑gloom end ("*AI will turn humans into paperclips!*") to the utopian extreme ("*AI will solve all our problems!*"), and everything in between, including the dreaded "*AI will take all our jobs by 20...something...*", the stories can get anxiety-inducing fast.
 
-TODO: This post will cover how I came to realize this kind of content is low-value, why it should be tuned out, and what can be done instead.
-Over time I've realized: this kind of content is low‑value, and I've consciously started tuning it out. Here's why.
+Over time, I've realized that most of this content isn’t very useful. It's designed to grab attention, not help you make better decisions. In this post, I'll explain why alarming AI predictions are likely to be untrue, why your brain is wired to pay attention to them anyway, and what you can do instead to focus on what really matters.
 
 ## Most Predictions Are Wrong
 
@@ -74,8 +73,6 @@ The practical effect of this shift has been noticeable. Tuning out fear-driven n
 AI is fascinating and important, and there will always be questions about where it's headed. But not all predictions are equally worth listening to. By understanding how our minds are wired, how predictions really stack up, and where our real influence lies, it's possible to cut through the hype and make your attention work for you, not against you.
 
 ## TODO
-* intro para
-  * awkward wording "it starts to feel like a constant signal drowned in noise"
 * Should the topic of superforecasters be a separate section?
   * are there any superforecasters in AI that we should be listening to?
   * is "Good Judgement Project" still active? Any AI analysis within that? https://en.wikipedia.org/wiki/The_Good_Judgment_Project
