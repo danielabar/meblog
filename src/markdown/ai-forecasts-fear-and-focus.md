@@ -12,7 +12,7 @@ related:
 
 Lately, I've noticed something disturbing about my podcast feed. An increasing number of episodes are full of "AI will do X or Y…" predictions. From the doom‑and‑gloom end ("*AI will turn humans into paperclips!*") to the utopian extreme ("*AI will solve all our problems!*"), and everything in between, including the dreaded "*AI will take all our jobs by 20...something...*", the stories can get anxiety-inducing fast.
 
-Over time, I've realized that most of this content isn’t very useful. It's designed to grab attention, not help you make better decisions. In this post, I'll explain why alarming AI predictions are likely to be untrue, why your brain is wired to pay attention to them anyway, and what you can do instead to focus on what really matters.
+Over time, I've realized that most of this content isn't useful. It's designed to grab attention, not help you make better decisions. In this post, I'll explain why alarming AI predictions tend to overreach what anyone can know, why your brain is wired to pay attention to them anyway, and what you can do to focus on what really matters.
 
 ## Most Predictions Are Wrong
 
@@ -25,7 +25,7 @@ The surprising result? The majority of so-called "experts" were often no better 
 What did matter was how people approached prediction itself. Tetlock found that a small group he called [superforecasters](https://www.richardhughesjones.com/superforecasting-summary/) consistently performed better by thinking in probabilities rather than absolutes, breaking complex questions into smaller parts, and continuously updating their beliefs as new evidence emerged. Their edge didn't come from bold confidence or impressive credentials, but from treating uncertainty as something to be measured and revised, not ignored.
 
 <aside class="markdown-aside">
-The existence of superforecasters doesn’t mean we should spend more time consuming predictions, it shows that careful, probabilistic thinking is rare, quiet, and almost the opposite of the bold AI forecasts that dominate headlines.
+The existence of superforecasters doesn't mean we should spend more time consuming predictions, it shows that careful, probabilistic thinking is rare, quiet, and almost the opposite of the bold AI forecasts that dominate headlines.
 </aside>
 
 This doesn't mean all predictions are useless. But it does mean sensational, confident (and often vague) predictions are usually not trustworthy, especially when they're made for capturing attention rather than clear, measurable foresight.
@@ -36,13 +36,13 @@ So why do the most alarming AI predictions still feel so compelling?
 
 The short answer is that our brains are wired to treat potential threats as urgent. Psychologists call this *negativity bias*: the tendency for negative information to carry more psychological weight than positive or neutral information. Threats, losses, and worst-case scenarios are processed more quickly, remembered more vividly, and exert a disproportionate influence on our judgments.
 
-This bias isn't a modern media invention. It's a feature of human cognition shaped by evolution. For most of human history, failing to notice danger carried far higher costs than overlooking opportunity. Missing a predator could be fatal; missing a benefit usually wasn't. Our brains evolved to err on the side of vigilance.
+This bias is a feature of human cognition shaped by evolution. For most of human history, failing to notice danger carried far higher costs than overlooking opportunity. Missing a predator could be fatal; missing a benefit usually wasn't. Our brains evolved to err on the side of vigilance.
 
 Modern psychology has confirmed this pattern. A research paper [Negativity Bias, Negativity Dominance, and Contagion](https://www.researchgate.net/publication/228778181_Negativity_Bias_Negativity_Dominance_and_Contagion) showed that negative information is more potent than equivalent positive information, tends to dominate mixed evaluations, and spreads more easily through memory and social narratives. A single negative element can outweigh many positives.
 
 Another paper [Bad Is Stronger than Good](https://www.researchgate.net/publication/46608952_Bad_Is_Stronger_than_Good), demonstrated that across relationships, learning, and social interaction, bad events have stronger and longer-lasting effects than good ones of similar intensity. Negative impressions form faster, are processed more deeply, and are harder to dislodge once established.
 
-These ideas were later synthesized for a broader audience by Daniel Kahneman, a psychologist and Nobel Prize winning behavioral economist, in [Thinking, Fast and Slow](https://www.penguinrandomhouse.ca/books/89308/thinking-fast-and-slow-by-daniel-kahneman/9780385676533). Kahneman explains how related mechanisms, such as loss aversion and the availability heuristic, cause negative possibilities to loom larger in our minds, especially under uncertainty.
+These ideas were later synthesized for a broader audience by Daniel Kahneman, a psychologist and Nobel Prize winning behavioral economist, in [Thinking, Fast and Slow](https://www.penguinrandomhouse.ca/books/89308/thinking-fast-and-slow-by-daniel-kahneman/9780385676533). Kahneman explains how related mechanisms, such as loss aversion (the tendency to feel losses more strongly than equivalent gains) and the availability heuristic (the tendency to judge likelihood by how easily examples come to mind), cause negative possibilities to loom larger in our minds, especially under uncertainty.
 
 In today's media environment, this ancient survival mechanism is easy to exploit. Predictions framed around catastrophe, loss, or existential threat reliably outperform cautious, probabilistic analysis in the attention economy. A podcast teaser asking *Is AI going to end civilization?* or *Will AI take your job next quarter?* triggers a very different response than one about incremental productivity gains. This type of content feels impossible to ignore because it sounds like a threat.
 
@@ -70,11 +70,11 @@ At this point, it's less about having strong opinions on AI's distant future and
 
 That usually means I gravitate toward material that's educational or practical - explanations that deepen my understanding, or concrete examples of how a tool can be used to solve a real problem. By contrast, I've learned to skip content that exists purely to provoke a reaction. If the entire premise is *Will AI destroy everything?* or *Nothing will ever be the same again!*, there's rarely anything actionable hiding underneath.
 
-The practical effect of this shift has been noticeable. Tuning out fear-driven narratives frees up mental bandwidth to focus on things that compound over time: learning new tools, integrating AI into my workflow as an engineer, and using it to reduce friction in everyday tasks. That's my Circle of Influence. It's not about predicting where AI will be in 2040; it's about deciding where my attention goes this week. For me, that's been a far better use of cognitive energy than worrying about futures I can't control.
+Tuning out fear-driven narratives frees up mental bandwidth to focus on things that compound over time: learning new tools, integrating AI into my workflow as an engineer, and using it to reduce friction in everyday tasks. That's my Circle of Influence. It's not about predicting where AI will be a decade from now; it's about deciding where my attention goes this week. For me, that's been a far better use of cognitive energy than worrying about futures I can't control.
 
 ## Closing Thoughts
 
-AI is fascinating and important, and there will always be questions about where it's headed. But not all predictions are equally worth listening to. By understanding how our minds are wired, how predictions really stack up, and where our real influence lies, it's possible to cut through the hype and make your attention work for you, not against you.
+AI is fascinating and important, and it's natural to wonder where it's headed. But not all predictions are equally worth listening to. By understanding how our minds are wired, how predictions really stack up, and where our real influence lies, it's possible to cut through the hype and make your attention work for you, not against you.
 
 ## TODO
 * edit
