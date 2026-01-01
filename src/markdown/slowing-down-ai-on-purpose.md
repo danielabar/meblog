@@ -33,7 +33,7 @@ The most important output in this process is not code, but a living analysis doc
 I'm using Claude Code at the VS Code integrated terminal, but this workflow isn't tied to a specific tool, you could do the same with any AI coding assistant.
 </aside>
 
-## Establish Context Using Commit History
+## Establish Context
 
 When I'm working on a large feature that's grown over multiple commits, I'll give the AI a list of git commit SHAs that led to the current state and ask it something like this:
 
@@ -41,44 +41,25 @@ When I'm working on a large feature that's grown over multiple commits, I'll giv
 
 I'm checking whether the AI has an accurate *mental model* of the system and specific feature area we'll be building in.
 
-## Force the Thinking Into a Markdown Document
+## Persist Thinking
 
-Every time, I ask the AI to put its analysis into a markdown document. That document becomes the durable artifact of the work: a design checkpoint I can read calmly, revisit later, and keep even if the session ends. I open it in VS Code’s markdown preview and review it the same way I would any design doc. I find this easier to read than long scrolling terminal output.
+Every time, I ask the AI to put its analysis into a markdown document. That document becomes the durable artifact of the work: a design checkpoint I can read calmly, revisit later, and keep even if the session ends. I open it in VS Code's markdown preview and review it the same way I would any design doc. I find this easier to read than long scrolling terminal output.
 
 This flips the dynamic: The AI's reasoning is explicit and reviewable, not hidden behind (often false) confidence. If the understanding is wrong, we fix it here, before new requirements enter the picture and muddy the waters.
 
-## Introduce the New Business Requirement
+## Introduce New Requirement
 
-TODO: prose rather than bullet points
+Only after we're aligned on the current system do I introduce the new requirement. At that point, I ask the AI to explore the solution space by considering multiple possible approaches, rather than jumping straight to an answer. I want to see multiple viable approaches, grounded in the project's existing patterns, with tradeoffs called out clearly.
 
-Only after we're aligned on the current system do I introduce the new requirement. Then I ask the AI to:
+This is a useful moment to gauge how the AI is reasoning: what it thinks is possible, how it weighs constraints, and whether it respects the shape of the codebase instead of trying to redesign it. That analysis goes into a second markdown document alongside the first, extending the shared context rather than overwriting it.
 
-* propose several implementation options
-* keep them consistent with the project's existing patterns
-* call out tradeoffs explicitly
+## Ask Me Questions
 
-Crucially, I don't let it jump to "the best solution". I want to see:
+At this stage, I ask the AI to review the new requirements in the context of the system analyzed so far and identify areas where clarification is needed. I then instruct it to list those as questions in an `## Outstanding Questions` section of the analysis document. We then work through them exactly as I would with another engineer. One at a time, I answer the questions and the AI updates the analysis document accordingly.
 
-* what it thinks is possible
-* how it weighs constraints
-* whether it respects the codebase's existing shape
+At the end of this phase, assumptions are corrected, ambiguities shrink with each pass. Each iteration tightens our shared understanding of the system.
 
-The output goes into another markdown document in the same directory, which adds to the context.
-
-## Have the AI Ask Me Questions
-
-TODO: prose rather than bullet points
-
-When doing this kind of analysis, I'll ask the AI to *ask me clarifying questions*, and include it in an `## Outstanding Questions` section in the analysis document. Then we go back and forth exactly like I would with another engineer:
-
-* I answer questions
-* it updates the analysis doc
-* assumptions are corrected
-* ambiguities are resolved
-
-Each iteration tightens the shared understanding of the system.
-
-## Catching Subtle Details Early
+**Catching Subtle Details Early**
 
 By forcing the AI to fully analyze the current system before writing code, it can surface complexities that might otherwise be overlooked. For example:
 
@@ -86,43 +67,21 @@ While summarizing the existing feature set, the AI might notice that different f
 
 These are the kinds of issues that usually only come up during testing or code review, but with upfront analysis, they can be caught proactively, keeping the design aligned with the system's constraints.
 
-## Agree on an Approach, Then Decompose
+## Decompose
 
-TODO: prose rather than bullet points
+Once we’ve converged on an approach, I ask the AI to decompose the work into small, explicit steps and document them. We get concrete here: which files will change, what existing code will be extended versus replaced, and where tests need to be added or updated.
 
-Once we've converged on a technical approach, I ask the AI to break the work down into small, discrete steps, and document each one. Here we get very specific as to which files will be modified, existing methods vs new methods, what tests will be added or maintained, etc.
+Still, no code yet. The goal is to answer whether the work is well-scoped and understandable: what changes happen in what order, what can be validated independently, where the risk lies, and whether this belongs in a single pull request or does it seem big enough that it should be split up further. Only when that plan feels solid do we move forward.
 
-But still, I don't let it touch any code yet. The goal here is to answer:
+## Implementation
 
-* What changes, in what order?
-* What can be validated independently?
-* Where are the risky parts?
-* Is this work too big for a single PR?
+Only then do we start writing code, following the plan one small step at a time. Each change is intentionally narrow: one step, one diff, one reviewable unit, with tests passing before moving on.
 
-Only when that list feels reasonable do we proceed.
-
-## Write Code One Small Step at a Time
-
-TODO: prose rather than bullet points
-
-Finally, we can write code according to the plan, but only:
-
-* one step
-* one change
-* one reviewable unit at a time
-* make sure tests are passing
-
-After each step:
-
-* I review the diff and try it out in the browser
-* we update context if needed
-* then move on
-
-This keeps the AI from "helpfully" solving problems I didn't agree to solve yet.
+After each step, I review the diff, try it locally, update context if needed, and then proceed. This prevents the AI from "helpfully" solving problems I didn't agree to solve yet, and keeps the work aligned with the original intent.
 
 ## Why I Work This Way
 
-This workflow leans heavily on written reasoning and documentation, a skill that has been under-valued in tech. But with LLM based AI, it's a superpower. The clearer the engineer can write questions, prompts, and feedback, the better the AI can reason, and produce high quality work.
+This workflow leans heavily on written reasoning and documentation — a skill that’s been undervalued in tech, but becomes a superpower when working with LLMs. The clearer the engineer can write questions, prompts, and feedback, the better the AI can reason, and produce high quality work.
 
 <aside class="markdown-aside">
 If the idea of leveraging written communication skills for more effective engineering is new to you, see a few of my previous posts on this topic:
@@ -131,13 +90,10 @@ If the idea of leveraging written communication skills for more effective engine
 <a class="markdown-link" href="https://danielabaron.me/blog/working-towards-asynchronous-future/#communication">Communication for Asynchronous Teams</a>
 </aside>
 
-This approach can seem slower than asking AI to "just implement the feature". However, the payoff is huge:
 
-* far less error-prone
-* much easier to stop and resume
-* better aligned with how engineering teams already work
+This approach can feel slower than asking an AI to "just implement the feature", especially if speed is being measured by how quickly code appears on the screen. In practice, the tradeoff is overwhelmingly positive. The work becomes far less error-prone because misunderstandings are surfaced early, before they harden into code. It's also much easier to pause and resume: the analysis document captures intent, decisions, and open questions in a way a half-written diff never does. This also aligns with how effective engineering teams already operate — through shared context, explicit design, and incremental change rather than heroic leaps.
 
-Most importantly, it keeps *me* in control of the design. The analysis document is the real artifact. The code is just one possible outcome of good thinking.
+Most importantly, it keeps me in control of the design. The analysis document is the real artifact. The code is just one possible outcome of good thinking.
 
 ## Final Thoughts
 
