@@ -57,7 +57,7 @@ This is a useful moment to gauge how the AI is reasoning: what it thinks is poss
 
 At this stage, I ask the AI to review the new requirements in the context of the system analyzed so far and identify areas where clarification is needed. I then instruct it to list those as questions in an `## Outstanding Questions` section of the analysis document. We then work through them exactly as I would with another engineer. One at a time, I answer the questions and the AI updates the analysis document accordingly.
 
-At the end of this phase, assumptions are corrected, ambiguities shrink with each pass. Each iteration tightens our shared understanding of the system.
+By the end of this phase, assumptions have been corrected and ambiguities reduced, leaving us with a much tighter shared understanding of the system.
 
 **Catching Subtle Details Early**
 
