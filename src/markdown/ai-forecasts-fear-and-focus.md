@@ -10,7 +10,7 @@ related:
   - "Rapid Prototyping with ChatGPT: OAS Pension Calculator Part 1"
 ---
 
-Lately, I've noticed something disturbing about my podcast feed. An increasing number of episodes are full of "AI will do X or Y…" predictions. From the doom‑and‑gloom end ("*AI will turn humans into paperclips!*") to the utopian extreme ("*AI will solve all our problems!*"), and everything in between, including the dreaded "*AI will take all our jobs by 20...something...*", the stories can get anxiety-inducing fast.
+Lately, I've noticed a disturbing trend in my podcast feed. An increasing number of episodes are full of "AI will do X or Y…" predictions. From the doom‑and‑gloom end (*AI will turn humans into paperclips!*) to the utopian extreme (*AI will solve all our problems!*), and everything in between, including the dreaded *AI will take all our jobs by 20...something...*, the stories can get anxiety-inducing fast.
 
 Over time, I've realized that most of this content isn't useful. It's designed to grab attention, not help you make better decisions. In this post, I'll explain why alarming AI predictions tend to overreach what anyone can know, why your brain is wired to pay attention to them anyway, and what you can do to focus on what really matters.
 
@@ -25,7 +25,7 @@ The surprising result? The majority of so-called "experts" were often no better 
 What did matter was how people approached prediction itself. Tetlock found that a small group he called [superforecasters](https://www.richardhughesjones.com/superforecasting-summary/) consistently performed better by thinking in probabilities rather than absolutes, breaking complex questions into smaller parts, and continuously updating their beliefs as new evidence emerged. Their edge didn't come from bold confidence or impressive credentials, but from treating uncertainty as something to be measured and revised, not ignored.
 
 <aside class="markdown-aside">
-The existence of superforecasters doesn't mean we should spend more time consuming predictions, it shows that careful, probabilistic thinking is rare, quiet, and almost the opposite of the bold AI forecasts that dominate headlines.
+I wouldn't spend time seeking out "AI superforecasters", they're unlikely to be the bold, attention-grabbing types making headlines, and in any case, only time will tell.
 </aside>
 
 This doesn't mean all predictions are useless. But it does mean sensational, confident (and often vague) predictions are usually not trustworthy, especially when they're made for capturing attention rather than clear, measurable foresight.
@@ -66,7 +66,7 @@ By focusing instead on what we can influence, such as our skills, our understand
 
 So how do I actually sift through the noise?
 
-At this point, it's less about having strong opinions on AI's distant future and more about having a filter for my attention. When considering a piece of content, I'm no longer asking Is this exciting? Is this alarming? I'm asking a simpler question: Does this help me do something better today?
+At this point, it's less about having strong opinions on AI's distant future and more about having a filter for my attention. When considering a piece of content, I'm no longer asking Is this exciting? Is this alarming? I'm asking a actionable question: Does this help me do something better today?
 
 That usually means I gravitate toward material that's educational or practical - explanations that deepen my understanding, or concrete examples of how a tool can be used to solve a real problem. By contrast, I've learned to skip content that exists purely to provoke a reaction. If the entire premise is *Will AI destroy everything?* or *Nothing will ever be the same again!*, there's rarely anything actionable hiding underneath.
 
@@ -77,5 +77,4 @@ Tuning out fear-driven narratives frees up mental bandwidth to focus on things t
 AI is fascinating and important, and it's natural to wonder where it's headed. But not all predictions are equally worth listening to. By understanding how our minds are wired, how predictions really stack up, and where our real influence lies, it's possible to cut through the hype and make your attention work for you, not against you.
 
 ## TODO
-* edit
 * add related after Jan. 1 published -> Slowing Down AI On Purpose
