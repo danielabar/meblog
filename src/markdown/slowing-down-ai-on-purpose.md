@@ -7,7 +7,7 @@ category: "productivity"
 related:
   - "About Those Docs"
   - "Reflections on Effective Teams"
-  - "Cover Letter Writing for Nerds"
+  - "The Machines Finally Made Us Care About Documentation"
 ---
 
 When I first started using AI to generate code, my instinct was to give it a prompt with the requirements, and have it write everything at once. Occasionally it produced something useful, but more often it created a mess - not quite what I wanted, or code that wouldn't even work. Cleaning up or undoing those attempts often took longer than writing it myself. It felt impulsive, like the work of a student who had recently learned to code but had little real-world experience.
@@ -25,7 +25,7 @@ I don't ask AI to start by writing code. Rather, I ask it to:
 3. Reason about new requirements *within* that context
 4. Ask me questions until we're aligned
 5. Break work into small, explicit steps
-6. Only then, write code — one step at a time
+6. Only then, write code - one step at a time
 
 The most important output in this process is not code, but a living analysis document.
 
@@ -71,17 +71,17 @@ These are the kinds of issues that usually only come up during testing or code r
 
 Once we've converged on an approach, I ask the AI to decompose the work into small, explicit steps and document them. We get concrete here: which files will change, what existing code will be extended versus replaced, and where tests need to be added or updated.
 
-Still, no code yet. The goal is to answer whether the work is well-scoped and understandable: what changes happen in what order, what can be validated independently, where the risk lies, and whether this belongs in a single pull request or does it seem big enough that it should be split up further. When that plan feels solid, we can move forward.
+At this point, the AI is outlining the changes, but nothing is actually modified in the codebase yet. The goal is to answer whether the work is well-scoped and understandable: what changes happen in what order, what can be validated independently, where the risk lies, and whether this belongs in a single pull request or does it seem big enough that it should be split up further. When that plan feels solid, we can move forward.
 
 ## Implementation
 
-Now we're ready to write code. I ask the AI to implement the first step in the plan. After the code for that step has been written, I review the diff and run tests locally — automated tests can be handled by the AI, but for UI-related changes I like to exercise them in the browser as a sanity check. Once everything works as expected, the AI updates the analysis document to reflect the completed step.
+Now we're ready to write code. I ask the AI to implement the first step in the plan. After the code for that step has been written, I review the diff and run tests; automated tests can be handled by the AI, but for UI-related changes I like to exercise them in the browser as a sanity check. Once everything works as expected, the AI updates the analysis document to reflect the completed step.
 
 We then move on to the next step, repeating the process: implement, review, test, update the document. By keeping changes narrow and reviewable, and persisting context in the markdown document, the work stays aligned with the original plan. This prevents the AI from "helpfully" solving problems I didn't agree to solve yet.
 
 ## Why I Work This Way
 
-This workflow leans heavily on written reasoning and documentation — a skill that's been undervalued in tech, but becomes a superpower when working with LLMs. The clearer the engineer can write questions, prompts, and feedback, the better the AI can reason, and produce high quality work.
+This workflow leans heavily on written reasoning and documentation, a skill that's been undervalued in tech, but becomes a superpower when working with LLMs. The clearer the engineer can write questions, prompts, and feedback, the better the AI can reason, and produce high quality work.
 
 <aside class="markdown-aside">
 If the idea of leveraging written communication skills for more effective engineering is new to you, see a few of my previous posts on this topic:
@@ -90,7 +90,7 @@ If the idea of leveraging written communication skills for more effective engine
 <a class="markdown-link" href="https://danielabaron.me/blog/working-towards-asynchronous-future/#communication">Communication for Asynchronous Teams</a>
 </aside>
 
-This approach can feel slower than asking an AI to "just implement the feature", especially if speed is being measured by how quickly code appears on the screen. In practice, the tradeoff is overwhelmingly positive. The work becomes far less error-prone because misunderstandings are surfaced early, before they harden into code. It's also much easier to pause and resume: the analysis document captures intent, decisions, and open questions in a way a half-written diff never does. This also aligns with how effective engineering teams already operate — through shared context, explicit design, and incremental change rather than heroic leaps.
+This approach can feel slower than asking the AI to "just implement the feature", especially if speed is being measured by how quickly code is committed to version control. In practice, the tradeoff is overwhelmingly positive. The work becomes far less error-prone because misunderstandings are surfaced early, before they harden into code. It's also much easier to pause and resume: the analysis document captures intent, decisions, and open questions in a way a half-written diff never does. This also aligns with how effective engineering teams already operate - through shared context and incremental change rather than heroic leaps.
 
 Most importantly, it keeps me in control of the design. The analysis document is the real artifact. The code is just one possible outcome of good thinking.
 
@@ -98,6 +98,6 @@ Most importantly, it keeps me in control of the design. The analysis document is
 
 AI is very good at generating answers. It's less good at knowing whether it understood the question. By externalizing its understanding, forcing iteration, and delaying code, I've found I can use AI on serious work without giving up the things I care about most: clarity, intent, and maintainability.
 
-With my current process, I spend much more time in back-and-forth analysis and design. By the time we get to writing code, it's usually correct the first time and literally only takes minutes. The upfront time invested in reasoning carefully with the AI pays off massively - the work becomes faster, safer, and more reliable than rushing straight into implementation. This is the power of using AI as a design partner rather than (solely) a code generator.
+With my current process, I spend much more time in back-and-forth analysis and design. By the time we get to writing code, it's usually correct the first time and literally only takes minutes. The upfront time invested in reasoning carefully with the AI pays off massively. The work becomes faster, safer, and more reliable than rushing straight into implementation. This is the power of using AI as a design partner rather than (solely) a code generator.
 
 If you already collaborate this way with humans, you don't need a new mindset for AI, you just need to insist on the same standards.
