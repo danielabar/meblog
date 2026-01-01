@@ -73,7 +73,7 @@ By forcing the AI to fully analyze the current system before writing code, it ca
 
 These are the kinds of issues that usually only come up during testing or code review, but with upfront analysis, they can be caught proactively, keeping the design aligned with the system's constraints.
 
-## Decompose
+## Outline Work
 
 Once we've converged on an approach, I ask the AI to decompose the work into small, explicit steps and document them. We get concrete here: which files will change, what existing code will be extended versus replaced, and where tests need to be added or updated.
 
