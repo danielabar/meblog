@@ -43,15 +43,17 @@ I'm checking whether the AI has an accurate *mental model* of the system and spe
 
 ## Persist Thinking
 
-Every time, I ask the AI to put its analysis into a markdown document. That document becomes the durable artifact of the work: a design checkpoint I can read calmly, revisit later, and keep even if the session ends. I open it in VS Code's markdown preview and review it the same way I would any design doc. I find this easier to read than long scrolling terminal output.
+Instead of letting the AI's reasoning disappear into terminal scrolling, I ask it to capture the summary in a markdown document. That document becomes the durable artifact of the work: a design checkpoint I can read calmly, revisit later, and keep even if the session ends. I open it in VS Code's markdown preview and review it the same way I would any design doc, which I find far easier than parsing long terminal output.
 
 This flips the dynamic: The AI's reasoning is explicit and reviewable, not hidden behind (often false) confidence. If the understanding is wrong, we fix it here, before new requirements enter the picture and muddy the waters.
+
+This document is the first durable artifact in the workflow. As the work progresses, I keep understanding and decisions persisted in markdown rather than letting them live in terminal scrollback or my head.
 
 ## Introduce New Requirement
 
 Only after we're aligned on the current system do I introduce the new requirement. At that point, I ask the AI to explore the solution space by considering multiple possible approaches, rather than jumping straight to an answer. I want to see multiple viable approaches, grounded in the project's existing patterns, with tradeoffs called out clearly.
 
-This is a useful moment to gauge how the AI is reasoning: what it thinks is possible, how it weighs constraints, and whether it respects the shape of the codebase instead of trying to redesign it. That analysis goes into a second markdown document alongside the first, extending the shared context rather than overwriting it.
+This is a useful moment to gauge how the AI is reasoning: what it thinks is possible, how it weighs constraints, and whether it respects the shape of the codebase instead of trying to redesign it. That analysis goes into a second markdown document alongside the first. The initial document becomes reference material, while the new one becomes the active working surface for exploring requirements and design decisions.
 
 ## Ask Me Questions
 
@@ -61,27 +63,25 @@ By the end of this phase, assumptions have been corrected and ambiguities reduce
 
 **Catching Subtle Details Early**
 
-By forcing the AI to fully analyze the current system before writing code, it can surface complexities that might otherwise be overlooked. For example:
-
-While summarizing the existing feature set, the AI might notice that different functionality is available depending on a user's subscription tier. If a new feature overlaps with these tiers, this early analysis highlights the need for a policy decision before coding begins, preventing a scenario where the code works technically but violates business rules.
+By forcing the AI to fully analyze the current system before writing code, it can surface complexities that might otherwise be overlooked. For example, while summarizing the existing feature set, the AI might notice that different functionality is available depending on a user's subscription tier. If a new feature overlaps with these tiers, this early analysis highlights the need for a policy decision before coding begins, preventing a scenario where the code works technically but violates business rules.
 
 These are the kinds of issues that usually only come up during testing or code review, but with upfront analysis, they can be caught proactively, keeping the design aligned with the system's constraints.
 
 ## Decompose
 
-Once we’ve converged on an approach, I ask the AI to decompose the work into small, explicit steps and document them. We get concrete here: which files will change, what existing code will be extended versus replaced, and where tests need to be added or updated.
+Once we've converged on an approach, I ask the AI to decompose the work into small, explicit steps and document them. We get concrete here: which files will change, what existing code will be extended versus replaced, and where tests need to be added or updated.
 
-Still, no code yet. The goal is to answer whether the work is well-scoped and understandable: what changes happen in what order, what can be validated independently, where the risk lies, and whether this belongs in a single pull request or does it seem big enough that it should be split up further. Only when that plan feels solid do we move forward.
+Still, no code yet. The goal is to answer whether the work is well-scoped and understandable: what changes happen in what order, what can be validated independently, where the risk lies, and whether this belongs in a single pull request or does it seem big enough that it should be split up further. When that plan feels solid, we can move forward.
 
 ## Implementation
 
-Only then do we start writing code, following the plan one small step at a time. Each change is intentionally narrow: one step, one diff, one reviewable unit, with tests passing before moving on.
+Now we're ready to write code. I ask the AI to implement the first step in the plan. After the code for that step has been written, I review the diff and run tests locally — automated tests can be handled by the AI, but for UI-related changes I like to exercise them in the browser as a sanity check. Once everything works as expected, the AI updates the analysis document to reflect the completed step.
 
-After each step, I review the diff, try it locally, update context if needed, and then proceed. This prevents the AI from "helpfully" solving problems I didn't agree to solve yet, and keeps the work aligned with the original intent.
+We then move on to the next step, repeating the process: implement, review, test, update the document. By keeping changes narrow and reviewable, and persisting context in the markdown document, the work stays aligned with the original plan. This prevents the AI from "helpfully" solving problems I didn't agree to solve yet.
 
 ## Why I Work This Way
 
-This workflow leans heavily on written reasoning and documentation — a skill that’s been undervalued in tech, but becomes a superpower when working with LLMs. The clearer the engineer can write questions, prompts, and feedback, the better the AI can reason, and produce high quality work.
+This workflow leans heavily on written reasoning and documentation — a skill that's been undervalued in tech, but becomes a superpower when working with LLMs. The clearer the engineer can write questions, prompts, and feedback, the better the AI can reason, and produce high quality work.
 
 <aside class="markdown-aside">
 If the idea of leveraging written communication skills for more effective engineering is new to you, see a few of my previous posts on this topic:
