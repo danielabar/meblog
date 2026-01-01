@@ -5,7 +5,7 @@ description: "Why I tune out sensational AI predictions and focus on what I can 
 date: "2026-01-15"
 category: "productivity"
 related:
-  - "How to Learn New Things"
+  - "Slowing Down AI On Purpose"
   - "The Machines Finally Made Us Care About Documentation"
   - "Rapid Prototyping with ChatGPT: OAS Pension Calculator Part 1"
 ---
@@ -75,6 +75,3 @@ Tuning out fear-driven narratives frees up mental bandwidth to focus on things t
 ## Closing Thoughts
 
 AI is fascinating and important, and it's natural to wonder where it's headed. But not all predictions are equally worth listening to. By understanding how our minds are wired, how predictions really stack up, and where our real influence lies, it's possible to cut through the hype and make your attention work for you, not against you.
-
-## TODO
-* add related after Jan. 1 published -> Slowing Down AI On Purpose
