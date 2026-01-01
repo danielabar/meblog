@@ -90,7 +90,6 @@ If the idea of leveraging written communication skills for more effective engine
 <a class="markdown-link" href="https://danielabaron.me/blog/working-towards-asynchronous-future/#communication">Communication for Asynchronous Teams</a>
 </aside>
 
-
 This approach can feel slower than asking an AI to "just implement the feature", especially if speed is being measured by how quickly code appears on the screen. In practice, the tradeoff is overwhelmingly positive. The work becomes far less error-prone because misunderstandings are surfaced early, before they harden into code. It's also much easier to pause and resume: the analysis document captures intent, decisions, and open questions in a way a half-written diff never does. This also aligns with how effective engineering teams already operate — through shared context, explicit design, and incremental change rather than heroic leaps.
 
 Most importantly, it keeps me in control of the design. The analysis document is the real artifact. The code is just one possible outcome of good thinking.
