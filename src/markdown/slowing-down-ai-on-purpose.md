@@ -53,6 +53,10 @@ This document is the first durable artifact in the workflow. As the work progres
 
 Only after we're aligned on the current system do I introduce the new requirement. At that point, I ask the AI to explore the solution space by considering multiple possible approaches, rather than jumping straight to an answer. I want to see multiple viable approaches, grounded in the project's existing patterns, with tradeoffs called out clearly.
 
+<aside class="markdown-aside">
+New requirements can be introduced in different ways: you might paste text from Notion, Confluence, or a ticket; or, if using Jira, you can set up the <a class="markdown-link" href="https://github.com/atlassian/atlassian-mcp-server/">Atlassian MCP server</a> to let the AI read ticket descriptions directly.
+</aside>
+
 This is a useful moment to gauge how the AI is reasoning: what it thinks is possible, how it weighs constraints, and whether it respects the shape of the codebase instead of trying to redesign it. That analysis goes into a second markdown document alongside the first. The initial document becomes reference material, while the new one becomes the active working surface for exploring requirements and design decisions.
 
 ## Ask Me Questions
