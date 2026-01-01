@@ -12,9 +12,11 @@ related:
 
 When I first started using AI to generate code, my instinct was to give it a prompt with the requirements, and have it write everything at once. Occasionally it produced something useful, but more often it created a mess - not quite what I wanted, or code that wouldn't even work. Cleaning up or undoing those attempts often took longer than writing it myself. It felt impulsive, like the work of a student who had recently learned to code but had little real-world experience.
 
-Over time, I realized that rushing straight to code with AI doesn't scale well in large, long-lived codebases. Substantial features are often broken down, shipped incrementally (sometimes behind feature flags), and expected to remain understandable long after the original authors have moved on.
+Over time, I realized that rushing straight to code with AI doesn't scale well in large, long-lived codebases. Unlike quick side projects, hackathon prototypes, or throwaway experiments, substantial features in production systems are often broken down, shipped incrementally (sometimes behind feature flags), and expected to remain understandable long after the original authors have moved on.
 
 This post isn't about prompts or productivity hacks. It's about a workflow I've settled into that treats AI primarily as a design partner rather than a code generator. It's slower than "just write the code", but it scales much better for non-trivial changes and helps maintain clarity, intent, and maintainability over time.
+
+Just a quick clarification before moving on: in this post, "AI" refers specifically to large language model (LLM) based coding assistants like Claude, Cursor, GitHub Copilot, and similar tools.
 
 ## The Core Idea
 
