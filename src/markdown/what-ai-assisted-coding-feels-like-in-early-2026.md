@@ -66,7 +66,7 @@ On a public road full of traffic lights, stop signs, pedestrians, buses, school 
 
 In the same way, AI gives us an engine capable of ludicrous speed, but the *roads* we're actually on — mature codebases, complex requirements, regulatory or compliance constraints, legacy interactions, and real users — haven't magically turned into race tracks overnight.
 
-We've gained horsepower. We haven't gained the infrastructure, tooling, or organization designed around moving at that speed, without causing serious damage.
+We've gained horsepower. We haven't gained the infrastructure, tooling, or organization designed around moving at that speed, without causing serious damage. Some of that may come with time, but for now, we're still figuring out how to handle the horsepower.
 
 **To clarify**
 
@@ -84,11 +84,8 @@ If the speed of coding is outpacing our ability to fully absorb and stand behind
 
 
 ## TODO
-* publish date in Jan?
-* intro needs work - from "dinner conversation" to what this post is actually about?
 * subtlety about F1 fuel optimization: https://las-motorsport.com/f1/blog/what-kind-of-fuel-do-f1-cars-use/17211/
 - in Metaphor section, explain about impossibility of driving at F1 speeds on city streets without injuries or property damage, and imagine you're still responsible/liable for that.
-- re: "We haven't gained the infrastructure, tooling, or organization designed around moving at that speed." - somewhere work in I'm sure that will all come in good time, but not quite there now?
 - F1 track: Run-off areas: Big areas around the track where cars can safely go if they spin or crash. Surface: Very smooth asphalt for grip
 - telemetry and F1? https://f1briefing.com/how-metrics-shape-f1-team-outcomes/ or https://www.veritasnewspaper.org/post/telemetry-in-f1-the-invisible-communication-between-car-and-pit
 * maybe work in safety analogy: F1 used to be extremely dangerous, but now it's much safer, thanks to technology:
@@ -97,5 +94,7 @@ If the speed of coding is outpacing our ability to fully absorb and stand behind
   * Safety cars: If there's a crash, a slower “safety car” comes out to control the pace.
   * Medical teams: Highly trained medics are always track side.
   * i.e. healthy respect for the fact that uncontrolled speed can seriously injure or kill. Most dev is not matter of life or death (although some is), but do we need proportionate safety culture?
-* edit
+* intro needs work - from "dinner conversation" to what this post is actually about?
 * also read: https://addyosmani.com/blog/code-review-ai/
+* publish date in Jan?
+* edit
