@@ -29,6 +29,8 @@ If you've been doing software development for a while, you've experienced the rh
 * Monitor/observe behaviour in production
 * Fix with bugs if they come up
 
+To be clear about the context I'm talking about here: this isn't side projects, hackathons, or early-stage prototypes. This is long-running, mature products with large user bases, real revenue, and real consequences when things break. The kind of systems where behavior accumulates over years, institutional knowledge is uneven, and changes ripple in ways that aren't always obvious upfront.
+
 Before AI was in the picture, the act of *taking time* to think through each of those steps served a useful purpose: you marinated in the problem. That slower cadence gave you space to really absorb the requirements, grapple with edge cases, and deeply understand the business problem and code you were working on.
 
 With AI-assisted tooling today, many parts of that process happen in minutes — minutes where you previously might have been stuck for hours. Drafts of design options, trade-off analysis, even scaffolding for new features and the entire solution can be composed almost instantly. It's remarkable!
@@ -72,21 +74,19 @@ We've gained horsepower. We haven't gained the infrastructure, tooling, or organ
 
 To be clear: I'm not arguing against AI-assisted coding. I've been using it almost exclusively in my work for nearly a year now, and the benefits are obvious.
 
-This isn't a nostalgia post for handwritten code, nor a plea for slower pace. The Ai genie isn't going back in the bottle. What I'm trying to name is a *tension* that's real in day-to-day work:
+This isn't a nostalgia post for handwritten code. The AI genie isn't going back in the bottle. What I'm trying to name is a *tension* that's real in day-to-day work:
 
-* We're being asked to produce more in less time.
-* We're still fully responsible for the correctness and reliability of what ships.
+* Engineers being asked to produce more in less time.
+* Engineers are still *fully responsible* for the correctness and reliability of what ships.
 * The cognitive load of *truly understanding* what's been produced hasn't gotten easier.
 
-This isn't about side projects or greenfield experiments. This is about mature systems with real users, revenue, and consequences. It's not "move fast and break things".
+## Closing Thoughts
 
-## So What Now?
+AI has radically changed the pace of production, but our accountability for the systems we operate hasn't changed. That gap creates a tension: how do we move faster without losing our grip on understanding and responsibility?
 
-I don't have a neat solution. AI has changed the pace of production, but our accountability for the systems we operate hasn't changed. That creates a tension: how do we move faster without losing our grip on understanding and responsibility?
+My own first attempt at addressing this has been to slow down on purpose before the code generation phase — adding an explicit planning and reasoning phase as a safety layer when working with AI, which I've written about in [Slowing Down AI on Purpose](../slowing-down-ai-on-purpose).
 
-If the speed of coding has outpaced our ability to fully absorb and stand behind it, we may need to invest in practices that help teams stay responsibly fast — for example, clearer design thinking, review processes that account for rapid generation, and organizational expectations aligned with human cognitive limits.
-
-AI isn't going away. Neither is responsibility. The question is how we build the tools, workflows, and culture that let us keep pace safely. I'm curious what approaches other teams have tried, and what's worked (or hasn't) in practice.
+If the speed of coding is outpacing our ability to fully absorb and stand behind what we ship, then we need practices that help teams stay responsibly fast. What matters now is whether our tools, workflows, and expectations evolve alongside human cognitive abilities, rather than assuming speed alone is progress.
 
 ## TODO
 * publish date in Jan?
@@ -99,10 +99,11 @@ AI isn't going away. Neither is responsibility. The question is how we build the
 - re: "We haven't gained the infrastructure, tooling, or organization designed around moving at that speed." - somewhere work in I'm sure that will all come in good time, but not quite there now?
 - F1 track: Run-off areas: Big areas around the track where cars can safely go if they spin or crash. Surface: Very smooth asphalt for grip
 - telemetry and F1? https://f1briefing.com/how-metrics-shape-f1-team-outcomes/ or https://www.veritasnewspaper.org/post/telemetry-in-f1-the-invisible-communication-between-car-and-pit
-* maybe work in safety analogy: F1 used to be extremely dangerous, but now it’s much safer, thanks to technology:
+* maybe work in safety analogy: F1 used to be extremely dangerous, but now it's much safer, thanks to technology:
   * Halo: Protects drivers from flying debris or crashes.
   * Crash structures: Cars are designed to absorb energy so drivers survive high-speed impacts.
-  * Safety cars: If there’s a crash, a slower “safety car” comes out to control the pace.
+  * Safety cars: If there's a crash, a slower “safety car” comes out to control the pace.
   * Medical teams: Highly trained medics are always track side.
   * i.e. healthy respect for the fact that uncontrolled speed can seriously injure or kill. Most dev is not matter of life or death (although some is), but do we need proportionate safety culture?
 * edit
+* also read: https://addyosmani.com/blog/code-review-ai/
