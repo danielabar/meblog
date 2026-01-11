@@ -82,8 +82,7 @@ AI has radically changed the pace of production, but our accountability for the 
 
 My own first attempt at addressing this has been to slow down on purpose before the code generation phase — adding an explicit planning and reasoning phase as a safety layer when working with AI, which I've written about in [Slowing Down AI on Purpose](../slowing-down-ai-on-purpose).
 
-If the speed of coding is outpacing our ability to fully absorb and stand behind what we ship, then we need practices that help teams stay responsibly fast. What matters now is whether our tools, workflows, and expectations evolve alongside human cognitive abilities, rather than assuming speed alone is progress. This would allow us to harness AI's velocity without sacrificing reliability and comprehension.
-
+Given the speed of coding is outpacing our ability to fully absorb and stand behind what we ship, we need practices to help teams stay responsibly fast. Workflows and expectations need to evolve alongside human cognitive abilities, rather than assuming speed alone is progress. This will allow us to harness AI's velocity without sacrificing reliability and comprehension, and hopefully avoid unintentional damage!
 
 ## TODO
 * subtlety about F1 fuel optimization: https://las-motorsport.com/f1/blog/what-kind-of-fuel-do-f1-cars-use/17211/
