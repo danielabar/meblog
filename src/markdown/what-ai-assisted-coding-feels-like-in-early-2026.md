@@ -20,7 +20,7 @@ Before I dive into the metaphor, let me back up a few steps. To understand why t
 
 * Analyze the requirement
 * Explore the codebase
-* Make design decisions (maybe you even document this, sometimes as a few paragraphs in the ticket, or maybe more formally as an ADR)
+* Make design decisions, potentially formalized as [Architecture Decision Records](../about-those-docs/#architecture-decision-records)
 * Write the code and automated tests
 * Iterate and refine
 * Deploy to staging or a test environment and address business user's feedback (and/or QA if project uses human QA testers)
@@ -86,7 +86,6 @@ If the speed of coding is outpacing our ability to fully absorb and stand behind
 ## TODO
 * publish date in Jan?
 * intro needs work - from "dinner conversation" to what this post is actually about?
-* link to ADR definition and/or aside
 * subtlety about F1 fuel optimization: https://las-motorsport.com/f1/blog/what-kind-of-fuel-do-f1-cars-use/17211/
 - in Metaphor section, explain about impossibility of driving at F1 speeds on city streets without injuries or property damage, and imagine you're still responsible/liable for that.
 - re: "We haven't gained the infrastructure, tooling, or organization designed around moving at that speed." - somewhere work in I'm sure that will all come in good time, but not quite there now?
