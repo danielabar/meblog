@@ -51,26 +51,28 @@ In other words, AI accelerates *production of documents and code*, but it doesn'
 
 Later that evening, I was trying to describe the situation to my husband. He doesn't work in tech, but was curious about what it feels like to have a machine do the coding humans used to do. I spent a while trying to find an explanation that would make sense outside of engineering circles, and this metaphor came to mind:
 
-Imagine your usual weekly grocery shopping. Let's say it takes a couple hours between driving to the store, finding parking, picking up what you need, checking out, and driving home. You're doing it in your trusty old Honda Civic — reliable, predictable.
+Imagine your usual weekly grocery shopping. Let's say it takes a couple of hours between driving to the store, finding parking, picking up what you need, checking out, and driving home. You're doing it in your trusty old Honda Civic — reliable, predictable, if not the fastest acceleration.
 
 Now imagine that overnight, someone swaps your Honda Civic for a Formula 1 racing car, and you're told you're expected to complete your usual errands *10× faster* because you now have a car that is capable of insane speeds.
 
 That sounds appealing at first, until you consider a few things about F1 cars:
 
-* They require a *special track* to go fast.
-* They need *special fuel*.
-* They demand a *highly trained driver*.
-* They are supported by a whole *pit crew, telemetry and safety infrastructure*.
+* They require a special track to go fast.
+* They need special fuel.
+* They demand a highly trained driver.
+* They are supported by a specially trained pit crew, telemetry and safety infrastructure.
 
-On a public road full of traffic lights, stop signs, pedestrians, buses, school zones, pot holes, lanes closed for construction, etc. you'd be lucky to make it out of the driveway in one piece.
+On a public road full of traffic lights, stop signs, pedestrians, buses, school zones, pot holes, lanes closed for construction, etc. you'd be lucky to make it out of the driveway in one piece!
 
-In the same way, AI gives us an engine capable of ludicrous speed, but the *roads* we're actually on — mature codebases, complex requirements, regulatory or compliance constraints, legacy interactions, and real users — haven't magically turned into race tracks overnight.
+Now also imagine that while you're expected to run errands faster because you have a faster car, you're still fully liable for any property damage, fender benders, or accidents along the way. You can't blame the car, the responsibility still rests entirely on you. Unlike your old car, where mistakes might have been minor and easily recoverable, every slip at F1 speed could have serious consequences. You need not just speed, but careful attention, foresight, and an awareness of every risk around you.
 
-We've gained horsepower. We haven't gained the infrastructure, tooling, or organization designed around moving at that speed, without causing serious damage. Some of that may come with time, but for now, we're still figuring out how to handle the horsepower.
+In the same way, AI gives us an engine capable of ludicrous speed, but the *roads* we're actually on: mature codebases, complex requirements, regulatory or compliance constraints, legacy interactions, and real users, haven't magically turned into race tracks overnight.
 
-**To clarify**
+We've gained horsepower, but we haven't gained the infrastructure, tooling, or organization designed around moving at that speed, without causing serious damage. Some of that may come with time, but for now, we're still figuring out how to handle the horsepower.
 
-To be clear: I'm not arguing against AI-assisted coding. I've been using it almost exclusively in my work for nearly a year now, and the benefits are obvious. This is not a nostalgia post for going back to the days of handwritten code. The AI genie isn't going back in the bottle.
+**Not Anti-AI**
+
+To be clear: I'm not arguing against AI-assisted coding. I've been using it almost exclusively in my work for nearly a year now, and the benefits are obvious. This is not a nostalgia post for going back to the "old" days of handwritten code. The AI genie isn't going back in the bottle.
 
 But there is a tension that needs to be acknowledged: engineers are expected to produce more in less time, while remaining fully responsible for the correctness and reliability of what ships. At the same time, the cognitive load of truly understanding what has been generated hasn't gotten any easier — if anything, it can feel heavier, because the pace leaves less space to absorb and reason through the work.
 
@@ -85,7 +87,6 @@ If the speed of coding is outpacing our ability to fully absorb and stand behind
 
 ## TODO
 * subtlety about F1 fuel optimization: https://las-motorsport.com/f1/blog/what-kind-of-fuel-do-f1-cars-use/17211/
-- in Metaphor section, explain about impossibility of driving at F1 speeds on city streets without injuries or property damage, and imagine you're still responsible/liable for that.
 - F1 track: Run-off areas: Big areas around the track where cars can safely go if they spin or crash. Surface: Very smooth asphalt for grip
 - telemetry and F1? https://f1briefing.com/how-metrics-shape-f1-team-outcomes/ or https://www.veritasnewspaper.org/post/telemetry-in-f1-the-invisible-communication-between-car-and-pit
 * maybe work in safety analogy: F1 used to be extremely dangerous, but now it's much safer, thanks to technology:
