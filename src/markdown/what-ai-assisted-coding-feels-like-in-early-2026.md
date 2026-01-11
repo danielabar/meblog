@@ -55,7 +55,7 @@ Imagine your usual weekly grocery shopping. Let's say it takes a couple of hours
 
 Now imagine that overnight, someone swaps your Honda Civic for a Formula 1 racing car, and you're told you're expected to complete your usual errands *10× faster* because you now have a car that is capable of insane speeds.
 
-That sounds appealing at first, until you consider a few things about F1 cars:
+That sounds appealing at first, exhilarating even, until you consider a few things about F1 cars:
 
 * They require a special track that includes run-off areas, barriers designed to absorb mistakes, and strategically placed medical facilities to ensure rapid response in case of accidents.
 * They run on engineered fuel blends, optimized and tuned for each engine to extract maximum performance.
@@ -64,9 +64,9 @@ That sounds appealing at first, until you consider a few things about F1 cars:
 
 On a public road full of traffic lights, stop signs, pedestrians, buses, school zones, pot holes, lanes closed for construction, etc. you'd be lucky to make it out of the driveway in one piece!
 
-Now also imagine that while you're expected to run errands faster because you have a faster car, you're still fully liable for any property damage, fender benders, or accidents along the way. You can't blame the car, the responsibility still rests entirely on you. Unlike your old car, where mistakes might have been minor and easily recoverable, every slip at F1 speed could have serious consequences. You need not just speed, but careful attention, foresight, and an awareness of every risk around you.
+Now also imagine that while you're expected to run errands faster because you have a faster car, you're still fully liable for any property damage or accidents along the way. You can't blame the car — the responsibility still rests entirely on you. What once would have been minor mistakes now feel terrifying: every slip at F1 speed could have serious consequences. You need not just speed, but careful attention, foresight, and an awareness of every risk around you.
 
-Similarly, AI gives us an engine capable of ludicrous speed, but the *roads* we're actually on: mature codebases, complex requirements, regulatory or compliance constraints, legacy interactions, and real users, haven't magically turned into race tracks overnight.
+That’s the feeling AI-assisted coding can evoke: exhilarating to see solutions and scaffolds appear almost instantly, yet terrifying in the sense that the responsibility for correctness and stability remains entirely on you. AI gives us an engine capable of ludicrous speed, but the *roads* we're actually on: mature codebases, complex requirements, regulatory or compliance constraints, legacy interactions, and real users, haven't magically turned into race tracks overnight.
 
 We've gained horsepower, but we haven't gained the infrastructure, tooling, or organization designed around moving at that speed, without causing serious damage. Some of that may come with time, but for now, we're still figuring out how to handle the horsepower.
 
@@ -86,7 +86,6 @@ Given the speed of coding is outpacing our ability to fully absorb and stand beh
 
 ## TODO
 - i don't have an exact solution but...
-- exhilarating and terrifying at the same time
 - telemetry and F1? https://f1briefing.com/how-metrics-shape-f1-team-outcomes/ or https://www.veritasnewspaper.org/post/telemetry-in-f1-the-invisible-communication-between-car-and-pit
 * maybe work in safety analogy: F1 used to be extremely dangerous, but now it's much safer, thanks to technology:
   * Halo: Protects drivers from flying debris or crashes.
