@@ -57,16 +57,16 @@ Now imagine that overnight, someone swaps your Honda Civic for a Formula 1 racin
 
 That sounds appealing at first, until you consider a few things about F1 cars:
 
-* They require a special track to go fast.
-* They need special fuel.
-* They demand a highly trained driver.
+* They require a special track that includes run-off areas, barriers designed to absorb mistakes, and strategically placed medical facilities to ensure rapid response in case of accidents.
+* They run on engineered fuel blends, optimized and tuned for each engine to extract maximum performance.
+* They require a highly trained driver: an athlete conditioned through rigorous physical and mental training to endure extreme forces, heat, and sustained focus at extreme speeds.
 * They are supported by a specially trained pit crew, telemetry and safety infrastructure.
 
 On a public road full of traffic lights, stop signs, pedestrians, buses, school zones, pot holes, lanes closed for construction, etc. you'd be lucky to make it out of the driveway in one piece!
 
 Now also imagine that while you're expected to run errands faster because you have a faster car, you're still fully liable for any property damage, fender benders, or accidents along the way. You can't blame the car, the responsibility still rests entirely on you. Unlike your old car, where mistakes might have been minor and easily recoverable, every slip at F1 speed could have serious consequences. You need not just speed, but careful attention, foresight, and an awareness of every risk around you.
 
-In the same way, AI gives us an engine capable of ludicrous speed, but the *roads* we're actually on: mature codebases, complex requirements, regulatory or compliance constraints, legacy interactions, and real users, haven't magically turned into race tracks overnight.
+Similarly, AI gives us an engine capable of ludicrous speed, but the *roads* we're actually on: mature codebases, complex requirements, regulatory or compliance constraints, legacy interactions, and real users, haven't magically turned into race tracks overnight.
 
 We've gained horsepower, but we haven't gained the infrastructure, tooling, or organization designed around moving at that speed, without causing serious damage. Some of that may come with time, but for now, we're still figuring out how to handle the horsepower.
 
@@ -80,13 +80,13 @@ But there is a tension that needs to be acknowledged: engineers are expected to 
 
 AI has radically changed the pace of production, but our accountability for the systems we operate hasn't changed. That gap creates a tension: how do we move faster without losing our grip on understanding and responsibility?
 
-My own first attempt at addressing this has been to slow down on purpose before the code generation phase — adding an explicit planning and reasoning phase as a safety layer when working with AI, which I've written about in [Slowing Down AI on Purpose](../slowing-down-ai-on-purpose).
+My own first attempt at addressing this has been to slow down before the code generation phase — adding an explicit planning and reasoning phase as a safety layer when working with AI, which I've written about in [Slowing Down AI on Purpose](../slowing-down-ai-on-purpose).
 
 Given the speed of coding is outpacing our ability to fully absorb and stand behind what we ship, we need practices to help teams stay responsibly fast. Workflows and expectations need to evolve alongside human cognitive abilities, rather than assuming speed alone is progress. This will allow us to harness AI's velocity without sacrificing reliability and comprehension, and hopefully avoid unintentional damage!
 
 ## TODO
-* subtlety about F1 fuel optimization: https://las-motorsport.com/f1/blog/what-kind-of-fuel-do-f1-cars-use/17211/
-- F1 track: Run-off areas: Big areas around the track where cars can safely go if they spin or crash. Surface: Very smooth asphalt for grip
+- i don't have an exact solution but...
+- exhilarating and terrifying at the same time
 - telemetry and F1? https://f1briefing.com/how-metrics-shape-f1-team-outcomes/ or https://www.veritasnewspaper.org/post/telemetry-in-f1-the-invisible-communication-between-car-and-pit
 * maybe work in safety analogy: F1 used to be extremely dangerous, but now it's much safer, thanks to technology:
   * Halo: Protects drivers from flying debris or crashes.
