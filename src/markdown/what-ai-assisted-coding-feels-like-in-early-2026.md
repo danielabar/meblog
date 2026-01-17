@@ -86,13 +86,6 @@ Given the speed of coding is outpacing our ability to fully absorb and stand beh
 
 ## TODO
 - i don't have an exact solution but...
-- telemetry and F1? https://f1briefing.com/how-metrics-shape-f1-team-outcomes/ or https://www.veritasnewspaper.org/post/telemetry-in-f1-the-invisible-communication-between-car-and-pit
-* maybe work in safety analogy: F1 used to be extremely dangerous, but now it's much safer, thanks to technology:
-  * Halo: Protects drivers from flying debris or crashes.
-  * Crash structures: Cars are designed to absorb energy so drivers survive high-speed impacts.
-  * Safety cars: If there's a crash, a slower “safety car” comes out to control the pace.
-  * Medical teams: Highly trained medics are always track side.
-  * i.e. healthy respect for the fact that uncontrolled speed can seriously injure or kill. Most dev is not matter of life or death (although some is), but do we need proportionate safety culture?
 * intro needs work - from "dinner conversation" to what this post is actually about?
 * also read: https://addyosmani.com/blog/code-review-ai/
 * publish date in Jan?
