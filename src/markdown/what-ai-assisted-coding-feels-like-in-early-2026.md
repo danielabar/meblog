@@ -51,7 +51,7 @@ In other words, AI accelerates *production of documents and code*, but it doesn'
 
 ## A Metaphor
 
-Later that evening, I was trying to describe the situation to my husband. He doesn't work in tech, but was curious about what it feels like to have a machine do the coding humans used to do. I spent a while trying to find an explanation that would make sense outside of engineering circles, and this metaphor came to mind:
+This was the metaphor I eventually landed on while trying to make sense of it out loud, one that felt intuitive even outside engineering circles.
 
 Imagine your usual weekly grocery shopping. Let's say it takes a couple of hours between driving to the store, finding parking, picking up what you need, checking out, and driving home. You're doing it in your trusty old Honda Civic — reliable, predictable, if not the fastest acceleration.
 
@@ -89,4 +89,4 @@ As an industry, we’re still in the early stages of figuring out what responsib
 ## TODO
 * also read: https://addyosmani.com/blog/code-review-ai/
 * publish date in Jan?
-* edit
+* WIP edit
