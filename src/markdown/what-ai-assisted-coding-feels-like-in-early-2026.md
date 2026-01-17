@@ -33,7 +33,7 @@ To be clear about the context: this isn't side projects or early-stage prototype
 
 Before AI was in the picture, the act of *taking time* to think through each of those steps served a useful purpose: you marinated in the problem. That slower cadence gave you space to really absorb the requirements, grapple with edge cases, and deeply understand the business problem and code you were working on.
 
-With AI-assisted tooling, many parts of that process happen in minutes — minutes where you previously might have spent for hours, or even days and weeks. Drafts of design options, trade-off analysis, even scaffolding for new features and the entire solution can be composed almost instantly. It's remarkable!
+With AI-assisted tooling, many parts of that process happen in minutes, where you previously might have spent for hours, or even days and weeks. Drafts of design options, trade-off analysis, even scaffolding for new features and the entire solution can be composed almost instantly. It's remarkable!
 
 But what hasn't sped up is the human side of this work. This was the source of the discomfort I couldn't name earlier — the sense that speed has increased, but our ability to absorb and fully understand the work has not.
 
@@ -55,7 +55,7 @@ This was the metaphor I eventually landed on while trying to make sense of it ou
 
 Imagine your usual weekly grocery shopping. Let's say it takes a couple of hours between driving to the store, finding parking, picking up what you need, checking out, and driving home. You're doing it in your trusty old Honda Civic — reliable, predictable, if not the fastest acceleration.
 
-Now imagine that overnight, someone swaps your Honda Civic for a Formula 1 racing car, and you're told you're expected to complete your usual errands *10× faster* because you now have a car that is capable of insane speeds.
+Now imagine that overnight, someone has swapped out your Honda Civic for a Formula 1 racing car, and you're expected to complete your usual errands *10× faster* because you now have a car that is capable of insane speeds.
 
 That sounds appealing at first, exhilarating even, until you consider a few things about F1 cars:
 
@@ -68,7 +68,7 @@ Now also imagine that while you're expected to run errands faster because you ha
 
 On a public road full of traffic lights, stop signs, pedestrians, buses, school zones, pot holes, lanes closed for construction, etc. you'd be lucky to make it out of the driveway in one piece!
 
-That's the feeling AI-assisted coding can evoke: exhilarating to see solutions and scaffolds appear almost instantly, yet terrifying in the sense that the responsibility for correctness and stability remains entirely on you. AI gives us an engine capable of ludicrous speed, but the *roads* we're actually on: mature codebases, complex requirements, regulatory or compliance constraints, legacy interactions, and real users, haven't magically turned into race tracks overnight.
+That's the feeling AI-assisted coding can evoke: exhilarating to see solutions appear almost instantly, yet terrifying in the sense that the responsibility for correctness and stability remains entirely on you. AI gives us an engine capable of ludicrous speed, but the *roads* we're actually on: mature codebases, complex requirements, regulatory or compliance constraints, legacy interactions, and real users, haven't magically turned into race tracks overnight.
 
 We've gained horsepower, but we haven't gained the infrastructure, tooling, or organization designed around moving at that speed, without causing serious damage. Some of that may come with time, but for now, we're still figuring out how to handle this new power.
 
