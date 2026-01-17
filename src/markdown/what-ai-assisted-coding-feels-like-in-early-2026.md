@@ -80,11 +80,6 @@ But there is a tension that needs to be acknowledged: engineers are expected to 
 
 ## So What Now?
 
-I don't think there's a single correct solution here, at least not yet. We're still learning what it means to work responsibly with tools that can move faster than our own capacity to reason.
+I don't think there's a single correct solution here, at least not yet. We're still learning what it means to work responsibly with tools that can move faster than our own capacity to reason. My current approach has been to add an explicit planning and reasoning phase as a counterweight to AI's speed, which I've written about in [Slowing Down AI on Purpose](../slowing-down-ai-on-purpose). While not a silver bullet, this practice has helped me stay grounded in understanding rather than just throughput.
 
-My current approach has been to add an explicit planning and reasoning phase as a counterweight to AI's speed, which I've written about in [Slowing Down AI on Purpose](../slowing-down-ai-on-purpose). While not a silver bullet, this practice has helped me stay grounded in understanding rather than just throughput.
-
-As an industry, we’re still in the early stages of figuring out what responsible speed looks like. It's likely that more practices like this will emerge as we learn where the serious risks tend to hide.
-
-## TODO
-* also read: https://addyosmani.com/blog/code-review-ai/
+As an industry, we're still in the early stages of figuring out what responsible speed looks like. It's likely that more best practices will emerge as we learn where the serious risks tend to hide. For further reading on responsible AI-assisted coding and human oversight, see [AI writes code faster. Your job is still to prove it works](https://addyosmani.com/blog/code-review-ai/).
