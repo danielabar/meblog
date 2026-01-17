@@ -66,7 +66,7 @@ On a public road full of traffic lights, stop signs, pedestrians, buses, school 
 
 Now also imagine that while you're expected to run errands faster because you have a faster car, you're still fully liable for any property damage or accidents along the way. You can't blame the car — the responsibility still rests entirely on you. What once would have been minor mistakes now feel terrifying: every slip at F1 speed could have serious consequences. You need not just speed, but careful attention, foresight, and an awareness of every risk around you.
 
-That’s the feeling AI-assisted coding can evoke: exhilarating to see solutions and scaffolds appear almost instantly, yet terrifying in the sense that the responsibility for correctness and stability remains entirely on you. AI gives us an engine capable of ludicrous speed, but the *roads* we're actually on: mature codebases, complex requirements, regulatory or compliance constraints, legacy interactions, and real users, haven't magically turned into race tracks overnight.
+That's the feeling AI-assisted coding can evoke: exhilarating to see solutions and scaffolds appear almost instantly, yet terrifying in the sense that the responsibility for correctness and stability remains entirely on you. AI gives us an engine capable of ludicrous speed, but the *roads* we're actually on: mature codebases, complex requirements, regulatory or compliance constraints, legacy interactions, and real users, haven't magically turned into race tracks overnight.
 
 We've gained horsepower, but we haven't gained the infrastructure, tooling, or organization designed around moving at that speed, without causing serious damage. Some of that may come with time, but for now, we're still figuring out how to handle the horsepower.
 
@@ -78,15 +78,15 @@ But there is a tension that needs to be acknowledged: engineers are expected to 
 
 ## So What Now?
 
-AI has radically changed the pace of production, but our accountability for the systems we operate hasn't changed. That gap creates a tension: how do we move faster without losing our grip on understanding and responsibility?
+I don't think there's a single correct solution here, at least not yet. We're still learning what it means to work responsibly with tools that can move faster than our own capacity to reason.
 
-My own first attempt at addressing this has been to slow down before the code generation phase — adding an explicit planning and reasoning phase as a safety layer when working with AI, which I've written about in [Slowing Down AI on Purpose](../slowing-down-ai-on-purpose).
+My current approach has been to add an explicit planning and reasoning phase as a counterweight to AI's speed, which I've written about in [Slowing Down AI on Purpose](../slowing-down-ai-on-purpose). While not a silver bullet, this practice has helped me stay grounded in understanding rather than just throughput.
 
-Given the speed of coding is outpacing our ability to fully absorb and stand behind what we ship, we need practices to help teams stay responsibly fast. Workflows and expectations need to evolve alongside human cognitive abilities, rather than assuming speed alone is progress. This will allow us to harness AI's velocity without sacrificing reliability and comprehension, and hopefully avoid unintentional damage!
+As an industry, we’re still in the early stages of figuring out what responsible speed looks like, and it’s likely that more practices like this will emerge as we learn where the real risks tend to hide.
 
 ## TODO
-- i don't have an exact solution but...
 * intro needs work - from "dinner conversation" to what this post is actually about?
+* maybe also mention different types of projects, i'm referring to big long running mature, reliable ARR where there's real consequences to regressions - or was this already mentioned?
 * also read: https://addyosmani.com/blog/code-review-ai/
 * publish date in Jan?
 * edit
