@@ -2,7 +2,7 @@
 title: "AI Forecasts, Fear, and Focus"
 featuredImage: "../images/ai-forecasts-petr-sidorov-XoBdj1zV-EA-unsplash.jpg"
 description: "Why I tune out sensational AI predictions and focus on what I can actually control."
-date: "2026-01-15"
+date: "2026-01-25"
 category: "productivity"
 related:
   - "Slowing Down AI On Purpose"
