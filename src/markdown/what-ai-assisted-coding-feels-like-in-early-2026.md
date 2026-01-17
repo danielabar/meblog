@@ -2,7 +2,7 @@
 title: "What AI-Assisted Coding Feels Like in Early 2026"
 featuredImage: "../images/ai-assisted-coding-early-2026-feels-like.jpg"
 description: "Exploring the pace, responsibility, and understanding required when AI enables faster-than-ever coding in real-world systems."
-date: "2026-02-01"
+date: "2026-01-18"
 category: "productivity"
 related:
   - "The Machines Finally Made Us Care About Documentation"
@@ -64,13 +64,13 @@ That sounds appealing at first, exhilarating even, until you consider a few thin
 * They require a highly trained driver: an athlete conditioned through rigorous physical and mental training to endure extreme forces, heat, and sustained focus at extreme speeds.
 * They are supported by a specially trained pit crew, telemetry and safety infrastructure.
 
-On a public road full of traffic lights, stop signs, pedestrians, buses, school zones, pot holes, lanes closed for construction, etc. you'd be lucky to make it out of the driveway in one piece!
+Now also imagine that while you're expected to run errands faster because you have a faster car, you're still fully liable for any property damage or accidents along the way. You can't blame the car, the responsibility still rests entirely on you. What once would have been minor mistakes now feel terrifying: every slip at F1 speed could have serious consequences. You need not just speed, but careful attention, foresight, and an awareness of every risk around you.
 
-Now also imagine that while you're expected to run errands faster because you have a faster car, you're still fully liable for any property damage or accidents along the way. You can't blame the car — the responsibility still rests entirely on you. What once would have been minor mistakes now feel terrifying: every slip at F1 speed could have serious consequences. You need not just speed, but careful attention, foresight, and an awareness of every risk around you.
+On a public road full of traffic lights, stop signs, pedestrians, buses, school zones, pot holes, lanes closed for construction, etc. you'd be lucky to make it out of the driveway in one piece!
 
 That's the feeling AI-assisted coding can evoke: exhilarating to see solutions and scaffolds appear almost instantly, yet terrifying in the sense that the responsibility for correctness and stability remains entirely on you. AI gives us an engine capable of ludicrous speed, but the *roads* we're actually on: mature codebases, complex requirements, regulatory or compliance constraints, legacy interactions, and real users, haven't magically turned into race tracks overnight.
 
-We've gained horsepower, but we haven't gained the infrastructure, tooling, or organization designed around moving at that speed, without causing serious damage. Some of that may come with time, but for now, we're still figuring out how to handle the horsepower.
+We've gained horsepower, but we haven't gained the infrastructure, tooling, or organization designed around moving at that speed, without causing serious damage. Some of that may come with time, but for now, we're still figuring out how to handle this new power.
 
 **Not Anti-AI**
 
@@ -84,9 +84,7 @@ I don't think there's a single correct solution here, at least not yet. We're st
 
 My current approach has been to add an explicit planning and reasoning phase as a counterweight to AI's speed, which I've written about in [Slowing Down AI on Purpose](../slowing-down-ai-on-purpose). While not a silver bullet, this practice has helped me stay grounded in understanding rather than just throughput.
 
-As an industry, we’re still in the early stages of figuring out what responsible speed looks like, and it’s likely that more practices like this will emerge as we learn where the real risks tend to hide.
+As an industry, we’re still in the early stages of figuring out what responsible speed looks like. It's likely that more practices like this will emerge as we learn where the serious risks tend to hide.
 
 ## TODO
 * also read: https://addyosmani.com/blog/code-review-ai/
-* publish date in Jan?
-* WIP edit
