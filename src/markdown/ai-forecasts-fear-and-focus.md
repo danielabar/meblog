@@ -7,7 +7,7 @@ category: "productivity"
 related:
   - "Slowing Down AI On Purpose"
   - "The Machines Finally Made Us Care About Documentation"
-  - "Rapid Prototyping with ChatGPT: OAS Pension Calculator Part 1"
+  - "What AI-Assisted Coding Feels Like in Early 2026"
 ---
 
 Lately, I've noticed a disturbing trend in my podcast feed. An increasing number of episodes are full of "AI will do X or Y…" predictions. From the doom‑and‑gloom end (*AI will turn humans into paperclips!*) to the utopian extreme (*AI will solve all our problems!*), and everything in between, including the dreaded *AI will take all our jobs by 20...something...*, the stories can get anxiety-inducing fast.
