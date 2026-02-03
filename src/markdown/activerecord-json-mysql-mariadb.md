@@ -10,6 +10,8 @@ related:
   - "Maximize Learning from Screencasts"
 ---
 
+**Update (February 2026):** Since publishing this post, a reader pointed me to an [existing Rails issue](https://github.com/rails/rails/issues/44997) about ActiveRecord JSON and MariaDB compatibility. Two alternative solutions are proposed there: The first uses [attribute to force the data type](https://github.com/rails/rails/issues/44997#issuecomment-1114903733). The second is a [monkey patch](https://github.com/rails/rails/issues/44997#issuecomment-1176057987) that helps ActiveRecord properly detect MariaDB `LONGTEXT` columns with a `json_valid` constraint. Thanks to [@AlexeyDemidov](https://github.com/AlexeyDemidov) for the tip.
+
 When using a relational database, it can be convenient to occasionally store some data as JSON in a table column. As of [MySQL 5.7.8](https://dev.mysql.com/doc/refman/5.7/en/json.html), the JSON column type is supported. It's also supported in [MariaDB](https://mariadb.org/documentation/). In theory, MySQL and MariaDB are 100% compatible, but it turns out, there's an important difference to be aware of when using the JSON column type in a Rails project with ActiveRecord.
 
 ## Background
