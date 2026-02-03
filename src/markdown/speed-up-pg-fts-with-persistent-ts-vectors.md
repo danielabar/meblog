@@ -2,7 +2,7 @@
 title: "Speeding Up PostgreSQL Full-Text Search with Persistent TSVectors"
 featuredImage: "../images/speed-up-pg-fts-ts-vectpr-charles-etoroma-jC5blC1BZ0U-unsplash.jpg"
 description: "Learn how to dramatically speed up PostgreSQL full-text search by persisting TSVectors and using GIN indexes in Rails apps."
-date: "2026-02-01"
+date: "2026-02-03"
 category: "rails"
 related:
   - "Efficient Database Queries in Rails: A Practical Approach"
