@@ -554,8 +554,6 @@ This build system meant that `npm run dev` served locally with root paths, `npm 
 
 ## Problem 5: Page Refresh
 
-TODO: Explain why sessionStorage needed to temporarily maintain state between two different document loads.
-
 Just when I thought I had routing figured out, I discovered that direct URL access completely broke the application. If a user bookmarked `/about` or refreshed the page while viewing the contact form, they'd get an error. Static hosting providers like GitHub Pages don't know about client-side routes, they look for actual files. This problem required implementing the SPA fallback pattern, which involved creating a `404.html` file that would intercept failed requests and redirect them back to the main application:
 
 ```html
@@ -581,6 +579,23 @@ Just when I thought I had routing figured out, I discovered that direct URL acce
 </body>
 </html>
 ```
+
+The other half of the SPA fallback pattern is in `index.html`, where an inline script restores the intended URL before the router initializes:
+
+```html
+<!-- index.html - Restore intended route from 404 redirect -->
+<script>
+    (function() {
+        var redirect = sessionStorage.redirect;
+        delete sessionStorage.redirect;
+        if (redirect && redirect != location.href) {
+            history.replaceState(null, null, redirect);
+        }
+    })();
+</script>
+```
+
+This script runs before the router initializes, so when `handleInitialRoute()` reads `location.pathname`, it gets the user's intended destination, not just the base path. The two-part solution works as follows: when a user visits `/contact` directly, GitHub Pages serves the 404.html which stores the full URL in sessionStorage and redirects to the base path. Then index.html loads, its inline script reads the stored URL, uses `history.replaceState()` to update the browser's address bar back to `/contact`, and deletes the sessionStorage value. Finally, the router initializes and navigates to the correct route based on the restored pathname.
 
 Implementing SPA fallback correctly meant users could bookmark any route, refresh pages without losing their place, and share direct links that worked reliably. But it also meant adding more complexity to handle edge cases that frameworks typically manage invisibly.
 
@@ -649,7 +664,6 @@ Building vanilla routing taught me that the web platform is remarkably capable, 
 
 ## TODO
 * explain WHY basePath became an issue wrt route/url determination, string parsing???
-* problem 5 page refresh: Explain why sessionStorage needed to temporarily maintain state between two different document loads.
 * work in link to the code and tests https://github.com/danielabar/web_native_routing
 * intro: not having to worry about breaking changes, upgrades, backward-compatibility
 * edit
