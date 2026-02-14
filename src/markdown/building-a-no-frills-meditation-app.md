@@ -140,19 +140,21 @@ This app is structured as follows:
 ├── index.html
 ├── js
 │   ├── about.js
+│   ├── history.js
 │   ├── index.js
 │   ├── main.js
 │   ├── session.js
 │   ├── userPrefs.js
 │   └── voice.js
 └── styles
-    ├── app.css
     ├── fonts.css
-    ├── global.css
     ├── index.css
     ├── reset.css
-    └── variables.css
+    ├── variables.css
+    └── (additional component styles...)
 ```
+
+*Showing key files - see the [GitHub repo](https://github.com/danielabar/just-breathe) for the complete project structure including test files, additional utility modules, and component stylesheets.*
 
 Where `index.html` loads the entry point styles and code:
 
