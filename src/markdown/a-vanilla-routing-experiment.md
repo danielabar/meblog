@@ -18,7 +18,7 @@ But there's always that moment in every project where you build out your main vi
 
 This question became particularly relevant after reading [Anti-frameworkism: Choosing native web APIs over frameworks](https://blog.logrocket.com/anti-frameworkism-native-web-apis). This article makes a compelling argument for embracing web standards, which got me wondering: "What about vanilla routing? How hard could it be to build client-side navigation without a framework?"
 
-For this particular exploration into vanilla routing, I worked with AI assistance, specifically GitHub Copilot with the Claude Sonnet 4 model in VS Code. The AI pair programming approach proved valuable for iterating through different architectural approaches.
+For this particular exploration into vanilla routing, I worked with AI assistance, specifically GitHub Copilot with the Claude Sonnet 4 model in VS Code. The AI pair programming approach proved valuable for iterating through different architectural approaches. You can explore the complete implementation and test suite at [github.com/danielabar/web_native_routing](https://github.com/danielabar/web_native_routing).
 
 ## The Simple Dream vs. Reality
 
@@ -707,6 +707,11 @@ If your project needs any of the features listed above, you'll likely spend more
 ## Closing Thoughts
 
 Building vanilla routing taught me that the web platform is remarkably capable, but using these capabilities directly involves meaningful tradeoffs. The real value wasn't in replacing SPA frameworks entirely, but in understanding what problems they solve through firsthand experience. Sometimes the best tool is the one that lets you ship features instead of debugging browser history APIs, but other times, understanding how things work under the hood is worth the journey itself.
+
+**Resources:**
+
+- [Complete implementation and test suite](https://github.com/danielabar/web_native_routing) - Full source code with comprehensive Playwright/BDD tests
+- [Anti-frameworkism: Choosing native web APIs over frameworks](https://blog.logrocket.com/anti-frameworkism-native-web-apis) - The article that inspired this exploration
 
 ## TODO
 * work in link to the code and tests https://github.com/danielabar/web_native_routing
