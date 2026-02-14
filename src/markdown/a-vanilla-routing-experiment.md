@@ -611,19 +611,13 @@ This script runs before the router initializes, so when `handleInitialRoute()` r
 
 Implementing SPA fallback correctly meant users could bookmark any route, refresh pages without losing their place, and share direct links that worked reliably. But it also meant adding more complexity to handle edge cases that frameworks typically manage invisibly.
 
-## Automated Testing
+## Problem 6 Regression Testing
 
-Each problem I solved—view lifecycle, browser navigation, invalid routes, deployment paths, SPA fallback—introduced behavior that needed verification. What started as a "simple" router now had dozens of edge cases to test.
+Building your own routing system means you're now responsible for behaviors that framework users simply take for granted. With every code change — fixing a bug, adding a feature, refactoring — I found myself doing manual regression testing of the most basic interactions. Click "About". Does it load? Click "Contact". Does it work? Hit the back button twice. Does it return to home? Refresh the page. Does the view persist? Type `/about` directly into the address bar. Does it navigate correctly?
 
-Building your own routing system means taking responsibility for testing scenarios that framework users take for granted. When you click a navigation link, does it work? Do browser back and forward buttons behave correctly? Can users bookmark and return to specific routes? Does page refresh preserve the current view? Each of these fundamental behaviors required explicit verification.
+This constant manual verification became exhausting. Framework routers have these fundamentals battle-tested through years of production use and hundreds or more test scenarios, but my vanilla solution required me to personally verify everything, every time. The realization hit that I needed comprehensive automated browser tests just to maintain confidence in basic navigation.
 
-Manual testing quickly became tedious. I found myself constantly clicking through navigation sequences, hitting back and forward buttons, refreshing pages, and trying direct URLs with every code change. This repetitive process made me realize I needed automated browser tests to maintain confidence in the routing system's reliability.
-
-I decided to add Playwright end-to-end tests, taking the opportunity to layer on Cucumber BDD for Given/When/Then style testing and feature tests written in plain English. While it's beyond the scope of this post to dive deep into the testing implementation (perhaps a future blog post topic), I had to add comprehensive test automation covering user navigation by clicking links, direct URL access through bookmarks, browser back and forward navigation, and invalid path handling.
-
-The key insight was that these are behaviors you normally take for granted with SPA framework routers, but with vanilla routing, I had to explicitly test for all of them across multiple browsers—Chromium, Firefox, and WebKit.
-
-Here's an example of the BDD-style test coverage that became essential:
+I added Playwright end-to-end tests with Cucumber BDD for Given/When/Then style testing across multiple browsers—Chromium, Firefox, and WebKit. Here's an example of the test coverage that became essential:
 
 ```gherkin
 Scenario: Browser navigation controls
@@ -643,7 +637,7 @@ Scenario: Browser navigation controls
   And the URL should be "/about"
 ```
 
-SPA frameworks have these scenarios covered by thousands of community-contributed tests, but my vanilla solution needed its own comprehensive test suite. Automated testing became essential to prevent regressions, and the complexity of the testing matched the complexity of the routing solution itself. Adding those automated browser tests was a game-changer for development confidence, eliminating the manual testing tedium and catching issues that would have been easy to miss.
+Setting up Playwright, configuring the test runners for multiple browsers, and writing comprehensive test scenarios is beyond the scope of this post. If you're interested in the full testing implementation, you can explore the [complete test suite](https://github.com/danielabar/web_native_routing/tree/main/tests/e2e) in the repository.
 
 ## To Route Or Not To Route
 
@@ -675,8 +669,3 @@ If your project needs any of the features listed above, you'll likely spend more
 ## Closing Thoughts
 
 Building vanilla routing taught me that the web platform is remarkably capable, but using these capabilities directly involves meaningful tradeoffs. The real value wasn't in replacing SPA frameworks entirely, but in understanding what problems they solve through firsthand experience. Sometimes the best tool is the one that lets you ship features instead of debugging browser history APIs, but other times, understanding how things work under the hood is worth the journey itself.
-
-**Resources:**
-
-- [Complete implementation and test suite](https://github.com/danielabar/web_native_routing) - Full source code with comprehensive Playwright/BDD tests
-- [Anti-frameworkism: Choosing native web APIs over frameworks](https://blog.logrocket.com/anti-frameworkism-native-web-apis) - The article that inspired this exploration
