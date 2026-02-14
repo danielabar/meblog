@@ -24,7 +24,7 @@ For this particular exploration into vanilla routing, I worked with AI assistanc
 
 My idea was to create a set of drop-in routing files that I could reuse across projects. Not a reusable library that others would depend on, but a pattern I could copy and customize for each project's needs. On the surface, the concept sounded simple. Set up an `index.html` with `<nav>` for links, a `<main>` for swappable content, and a `<footer>`. Then listen for navigation events, swap out the content in the main section, and voilà! Client-side routing without the overhead.
 
-To test this routing idea, I decided to build exactly the kind of project where vanilla routing might make sense, a basic profile website. The requirements were intentionally simple: a home page for the main landing content, an about page with static information, and a contact page with an actual form requiring JavaScript interactivity.
+To test this routing idea, I decided to build exactly the kind of project where vanilla routing might make sense, a basic profile website. The requirements were intentionally simple: a home page for the main landing content, an about page with static information, and a contact page with an form requiring JavaScript interactivity.
 
 The contact page would be the litmus test. Form validation, submission handling, loading states, displaying a success messages. These interactive behaviors would reveal whether the routing system could handle view-specific logic without everything devolving into a tangled mess.
 
