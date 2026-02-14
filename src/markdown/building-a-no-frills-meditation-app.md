@@ -201,6 +201,8 @@ navAbout.addEventListener('click', () => showView('about'));
 showView('main');
 ```
 
+This is a simplified version for clarity. The actual implementation includes additional features like mobile hamburger menu, desktop/mobile navigation handling, and the ability to prefill session values from history - see the [repo](https://github.com/danielabar/just-breathe) for the complete code.
+
 ### Session
 
 The session loop keeps track of time, alternates between inhale/exhale, updates the progress bar, and finishes with a friendly close. It's driven by `requestAnimationFrame`, which runs once per frame for smooth updates. This approach provides more precise timing than cascading `setTimeout` calls.
