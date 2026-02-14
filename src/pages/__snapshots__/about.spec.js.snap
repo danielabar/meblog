@@ -78,25 +78,64 @@ exports[`About Page renders with layout and all-link 1`] = `
               About
             </h1>
             <p>
-              Welcome to my programming blog! I'm thrilled you've stumbled upon it. With over two decades in software development, I've worked across many industries and technology stacks, predominantly focusing on web applications in projects, products, and SaaS solutions. My journey began with Java, transitioning into full-stack JavaScript with the growing popularity of Node.js and single page apps. Then after brief sojourns into Python and GoLang, I found my professional haven in Ruby on Rails about five years ago. It's in this environment that I've found not only happiness but also peak productivity.
+              Welcome! I'm a software engineer who's been building web applications for over 15 years. My journey has taken me through startups, product companies, and SaaS platforms across financial services, health tech, data infrastructure, and more. Through it all, I've maintained one clear focus: delivering working software that makes a difference.
+            </p>
+            <h2>
+              What Drives Me
+            </h2>
+            <p>
+              I'm drawn to the kind of work that makes teams stronger and systems more resilient. That means tackling the foundational improvements others avoid, such as replacing inefficient search implementations with proper full-text indexing, platform and legacy upgrades, hardening security gaps, or transforming a codebase's architectural patterns so new developers can contribute confidently.
             </p>
             <p>
-              But let's rewind a bit. My fascination with software development began during my first year at university. An introductory computer course, covering everything from hardware to programming, to networking and theoretical computer science introduced me to the world of coding through the Karel programming language. I was captivated by the elegance of programming, spending countless hours perfecting assignments and even adding extra features just for fun. Little did I know that this newfound passion would become my lifelong career.
+              I believe software engineering is about solving real problems for real people, not demonstrating technical cleverness. My job is to understand what needs to happen, communicate the approach clearly, and deliver it in a way that others can maintain and build upon. Readable code beats clever code. Tests that tell a story beat tests that check implementation. Working solutions beat perfect architecture. Documented decisions beat institutional knowledge that lives in peoples heads.
+            </p>
+            <h2>
+              How I Work
+            </h2>
+            <p>
+              I'm proactive about identifying problems before they become critical. When I see a revenue gap, a performance bottleneck, or a documentation void, I investigate, propose a solution, and execute it. I don't wait for perfect specifications, instead, I ask clarifying questions, build iteratively, and course-correct based on feedback.
             </p>
             <p>
-              Upon graduation, I landed a role working on a major retailer's e-commerce platform. It was here that the disparity between academic theory and practical application first became apparent. While my formal education had equipped me with a solid foundation in computer science theory, the demands of the job were markedly different. Instead of loop invariants and Big-O complexity analysis, I found myself navigating the intricacies of communicating within a multi-disciplinary team, version control, database management, and the art of translating design comps into pixel-perfect HTML and CSS (before box model standardization!). Fortunately I had several wonderful mentors to guide me through the on-the-job learning process.
+              I value transparency and knowledge-sharing. Whether it's through detailed PR reviews, comprehensive documentation, or writing blog posts that demystify complex topics, I invest in making knowledge accessible. Strong teams aren't built on hero developers; they're built on shared understanding and collective capability.
+            </p>
+            <h2>
+              My Technical Philosophy
+            </h2>
+            <p>
+              I'm a full-stack generalist with deep expertise in Rails and PostgreSQL. I understand the entire system, from database design and query optimization to service layer to front-end interactivity to CI/CD pipeline configuration. I can navigate architectural decisions with a pragmatic eye toward trade-offs and long-term maintainability.
             </p>
             <p>
-              Since then, my career has been defined by a commitment to bridging the gap between theory and practice. As I transitioned from a junior developer to a leadership role as a Staff Engineer, I've made it my mission to advocate for practices that prioritize both efficiency and long-term maintainability. From fostering clear communication with product stakeholders to championing automated testing and CI/CD pipelines, I'm dedicated to nurturing an environment where every engineer thrives.
+              I embrace modern development practices: comprehensive testing, automated linting, observability with proper monitoring, incremental migrations that avoid big-bang rewrites, and feature flags for safe roll-outs. I also embrace AI-assisted development — not as autopilot, but as a force multiplier that lets me move faster while maintaining engineering rigor.
+            </p>
+            <h2>
+              Beyond the Code
+            </h2>
+            <p>
+              I contribute to the broader engineering community through writing and open source work. My technical blog draws thousands of monthly readers and has been featured in Ruby Weekly, Short Ruby Newsletter, and Women on Rails. I write about practical problem-solving, architectural decisions, debugging strategies, and career development. I'm also active on
+               
+              <a
+                href="https://linkedin.com/in/danielabaron"
+              >
+                LinkedIn
+              </a>
+               
+              and
+               
+              <a
+                href="https://github.com/danielabar"
+              >
+                GitHub
+              </a>
+              .
+            </p>
+            <h2>
+              What I Value in Teams
+            </h2>
+            <p>
+              The best teams I've worked with share a few key traits: they communicate clearly and directly, they trust each other to make good decisions, they document their architectural choices, and they treat production issues as learning opportunities rather than blame opportunities. I thrive in environments where initiative is encouraged, where asking "why are we doing it this way?" is welcomed, and where improving developer experience is seen as valuable work.
             </p>
             <p>
-              Moreover, as an experienced practitioner, I actively mentor and guide fellow engineers, believing strongly in the power of knowledge sharing to elevate the entire team. I'm deeply invested in advocating for architectural improvements, tackling technical debt, and consistently striving for performance optimization and observability best practices.
-            </p>
-            <p>
-              Beyond the confines of my organization, I'm passionate about sharing insights and best practices with the broader tech community through blogging. This platform not only serves as a means of personal growth but also as a conduit for sharing programming stories, problem solving techniques, learning strategies, and career development.
-            </p>
-            <p>
-              So whether you're a seasoned developer or just starting your journey, I invite you to join me as we explore the ever-evolving landscape of software engineering together. Here's to learning, growing, and building better software, one blog post at a time.
+              I don't do leetcode-style interviews - years of public work (GitHub repos dating back to 2013, 100+ blog posts, documented volunteer contributions) offers better evidence of how I think and what I can deliver. Strong technical teams recognize that proven capability matters more than performance on contrived exercises.
             </p>
             <div
               data-testid="all-wrapper"
@@ -267,25 +306,64 @@ exports[`About Page renders with layout and all-link 1`] = `
             About
           </h1>
           <p>
-            Welcome to my programming blog! I'm thrilled you've stumbled upon it. With over two decades in software development, I've worked across many industries and technology stacks, predominantly focusing on web applications in projects, products, and SaaS solutions. My journey began with Java, transitioning into full-stack JavaScript with the growing popularity of Node.js and single page apps. Then after brief sojourns into Python and GoLang, I found my professional haven in Ruby on Rails about five years ago. It's in this environment that I've found not only happiness but also peak productivity.
+            Welcome! I'm a software engineer who's been building web applications for over 15 years. My journey has taken me through startups, product companies, and SaaS platforms across financial services, health tech, data infrastructure, and more. Through it all, I've maintained one clear focus: delivering working software that makes a difference.
+          </p>
+          <h2>
+            What Drives Me
+          </h2>
+          <p>
+            I'm drawn to the kind of work that makes teams stronger and systems more resilient. That means tackling the foundational improvements others avoid, such as replacing inefficient search implementations with proper full-text indexing, platform and legacy upgrades, hardening security gaps, or transforming a codebase's architectural patterns so new developers can contribute confidently.
           </p>
           <p>
-            But let's rewind a bit. My fascination with software development began during my first year at university. An introductory computer course, covering everything from hardware to programming, to networking and theoretical computer science introduced me to the world of coding through the Karel programming language. I was captivated by the elegance of programming, spending countless hours perfecting assignments and even adding extra features just for fun. Little did I know that this newfound passion would become my lifelong career.
+            I believe software engineering is about solving real problems for real people, not demonstrating technical cleverness. My job is to understand what needs to happen, communicate the approach clearly, and deliver it in a way that others can maintain and build upon. Readable code beats clever code. Tests that tell a story beat tests that check implementation. Working solutions beat perfect architecture. Documented decisions beat institutional knowledge that lives in peoples heads.
+          </p>
+          <h2>
+            How I Work
+          </h2>
+          <p>
+            I'm proactive about identifying problems before they become critical. When I see a revenue gap, a performance bottleneck, or a documentation void, I investigate, propose a solution, and execute it. I don't wait for perfect specifications, instead, I ask clarifying questions, build iteratively, and course-correct based on feedback.
           </p>
           <p>
-            Upon graduation, I landed a role working on a major retailer's e-commerce platform. It was here that the disparity between academic theory and practical application first became apparent. While my formal education had equipped me with a solid foundation in computer science theory, the demands of the job were markedly different. Instead of loop invariants and Big-O complexity analysis, I found myself navigating the intricacies of communicating within a multi-disciplinary team, version control, database management, and the art of translating design comps into pixel-perfect HTML and CSS (before box model standardization!). Fortunately I had several wonderful mentors to guide me through the on-the-job learning process.
+            I value transparency and knowledge-sharing. Whether it's through detailed PR reviews, comprehensive documentation, or writing blog posts that demystify complex topics, I invest in making knowledge accessible. Strong teams aren't built on hero developers; they're built on shared understanding and collective capability.
+          </p>
+          <h2>
+            My Technical Philosophy
+          </h2>
+          <p>
+            I'm a full-stack generalist with deep expertise in Rails and PostgreSQL. I understand the entire system, from database design and query optimization to service layer to front-end interactivity to CI/CD pipeline configuration. I can navigate architectural decisions with a pragmatic eye toward trade-offs and long-term maintainability.
           </p>
           <p>
-            Since then, my career has been defined by a commitment to bridging the gap between theory and practice. As I transitioned from a junior developer to a leadership role as a Staff Engineer, I've made it my mission to advocate for practices that prioritize both efficiency and long-term maintainability. From fostering clear communication with product stakeholders to championing automated testing and CI/CD pipelines, I'm dedicated to nurturing an environment where every engineer thrives.
+            I embrace modern development practices: comprehensive testing, automated linting, observability with proper monitoring, incremental migrations that avoid big-bang rewrites, and feature flags for safe roll-outs. I also embrace AI-assisted development — not as autopilot, but as a force multiplier that lets me move faster while maintaining engineering rigor.
+          </p>
+          <h2>
+            Beyond the Code
+          </h2>
+          <p>
+            I contribute to the broader engineering community through writing and open source work. My technical blog draws thousands of monthly readers and has been featured in Ruby Weekly, Short Ruby Newsletter, and Women on Rails. I write about practical problem-solving, architectural decisions, debugging strategies, and career development. I'm also active on
+             
+            <a
+              href="https://linkedin.com/in/danielabaron"
+            >
+              LinkedIn
+            </a>
+             
+            and
+             
+            <a
+              href="https://github.com/danielabar"
+            >
+              GitHub
+            </a>
+            .
+          </p>
+          <h2>
+            What I Value in Teams
+          </h2>
+          <p>
+            The best teams I've worked with share a few key traits: they communicate clearly and directly, they trust each other to make good decisions, they document their architectural choices, and they treat production issues as learning opportunities rather than blame opportunities. I thrive in environments where initiative is encouraged, where asking "why are we doing it this way?" is welcomed, and where improving developer experience is seen as valuable work.
           </p>
           <p>
-            Moreover, as an experienced practitioner, I actively mentor and guide fellow engineers, believing strongly in the power of knowledge sharing to elevate the entire team. I'm deeply invested in advocating for architectural improvements, tackling technical debt, and consistently striving for performance optimization and observability best practices.
-          </p>
-          <p>
-            Beyond the confines of my organization, I'm passionate about sharing insights and best practices with the broader tech community through blogging. This platform not only serves as a means of personal growth but also as a conduit for sharing programming stories, problem solving techniques, learning strategies, and career development.
-          </p>
-          <p>
-            So whether you're a seasoned developer or just starting your journey, I invite you to join me as we explore the ever-evolving landscape of software engineering together. Here's to learning, growing, and building better software, one blog post at a time.
+            I don't do leetcode-style interviews - years of public work (GitHub repos dating back to 2013, 100+ blog posts, documented volunteer contributions) offers better evidence of how I think and what I can deliver. Strong technical teams recognize that proven capability matters more than performance on contrived exercises.
           </p>
           <div
             data-testid="all-wrapper"
