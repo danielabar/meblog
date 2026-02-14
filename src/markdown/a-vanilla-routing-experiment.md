@@ -213,7 +213,7 @@ router.init();
 
 The basic mechanics worked beautifully. Navigation between views was smooth, template loading was efficient with caching, and the whole thing felt surprisingly straightforward. But then I had to deal with the elephant in the room: view-specific JavaScript.
 
-## Problem 1 View Specific Logic Mixed With Router
+## Problem 1: View Specific Logic Mixed With Router
 
 The contact form needed interactive behavior such as event handlers for form submission, loading states, validation, and success messaging. Where should this logic live? In the naive first attempt, all this logic was placed in the router itself, in a method called `initializeView()` that would check which view was active and initialize the appropriate functionality.
 
@@ -388,7 +388,7 @@ This refactoring solved the separation of concerns problem. Views were now self-
 
 Then I uncovered another critical issue.
 
-## Problem 2 Browser Back/Forward Buttons
+## Problem 2: Browser Back/Forward Buttons
 
 Users expect browser navigation to just work. When they click the back button, they should return to the previous view. When they click forward, they should move ahead in their navigation history. This seems basic, but implementing it correctly with the History API turned out to be surprisingly tricky.
 
