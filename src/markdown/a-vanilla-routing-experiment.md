@@ -575,9 +575,9 @@ Then modified the `deploy` script in `package.json` to first run the build scrip
 
 This build system meant that `npm run dev` served locally with root paths, `npm run build` created a production-ready distribution with correct GitHub Pages paths, and `npm run deploy` published everything with zero manual configuration changes. Following established patterns from the framework ecosystem led to a much cleaner solution than my initial attempts at path auto-detection.
 
-## Problem 5: Page Refresh
+## Problem 5: Deep Links
 
-Just when I thought I had routing figured out, I discovered that direct URL access completely broke the application. If a user bookmarked `/about` or refreshed the page while viewing the contact form, they'd get an error. Static hosting providers like GitHub Pages don't know about client-side routes, they look for actual files. This problem required implementing the SPA fallback pattern, which involved creating a `404.html` file that would intercept failed requests and redirect them back to the main application:
+Just when I thought I had routing figured out, I discovered that direct URL access completely broke the application. If a user bookmarked `/about` or refreshed the page while viewing the contact form, they'd get an error. Static hosting providers like GitHub Pages don't know about client-side routes, they look for actual files. This problem required implementing what's known as the SPA fallback pattern—a standard technique for making client-side routes work on static hosts. The solution involved creating a `404.html` file that would intercept failed requests and redirect them back to the main application:
 
 ```html
 <!DOCTYPE html>
