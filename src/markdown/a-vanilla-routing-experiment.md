@@ -645,6 +645,8 @@ Implementing SPA fallback correctly meant users could bookmark any route, refres
 
 ## Automated Testing
 
+Each problem I solved—view lifecycle, browser navigation, invalid routes, deployment paths, SPA fallback—introduced behavior that needed verification. What started as a "simple" router now had dozens of edge cases to test.
+
 Building your own routing system means taking responsibility for testing scenarios that framework users take for granted. When you click a navigation link, does it work? Do browser back and forward buttons behave correctly? Can users bookmark and return to specific routes? Does page refresh preserve the current view? Each of these fundamental behaviors required explicit verification.
 
 Manual testing quickly became tedious. I found myself constantly clicking through navigation sequences, hitting back and forward buttons, refreshing pages, and trying direct URLs with every code change. This repetitive process made me realize I needed automated browser tests to maintain confidence in the routing system's reliability.
