@@ -26,7 +26,7 @@ My idea was to create a set of drop-in routing files that I could reuse across p
 
 To test this routing idea, I decided to build exactly the kind of project where vanilla routing might make sense, a basic profile website. The requirements were intentionally simple: a home page for the main landing content, an about page with static information, and a contact page with an form requiring JavaScript interactivity.
 
-The contact page would be the litmus test. Form validation, submission handling, loading states, displaying a success messages. These interactive behaviors would reveal whether the routing system could handle view-specific logic without everything devolving into a tangled mess.
+The contact page would be the litmus test. Form validation, submission handling, loading states, displaying a success messages. These interactive behaviors would reveal whether the routing system could handle view-specific logic without devolving into a tangled mess.
 
 ## Naive Implementation
 
@@ -215,7 +215,7 @@ The basic mechanics worked beautifully. Navigation between views was smooth, tem
 
 ## Problem 1 View Specific Logic Mixed With Router
 
-The contact form needed interactive behavior—event handlers for form submission, loading states, validation, and success messaging. Where should this logic live? In the naive first attempt, all this logic was placed in the router itself, in a method called `initializeView()` that would check which view was active and initialize the appropriate functionality.
+The contact form needed interactive behavior such as event handlers for form submission, loading states, validation, and success messaging. Where should this logic live? In the naive first attempt, all this logic was placed in the router itself, in a method called `initializeView()` that would check which view was active and initialize the appropriate functionality.
 
 The router was responsible for routing, but it also contained form handling logic, and potentially any other interactive behavior I might need in future views. It was a clear violation of separation of concerns, and I could already see how unwieldy this would become as the application grew.
 
