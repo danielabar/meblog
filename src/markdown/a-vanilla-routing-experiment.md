@@ -570,7 +570,7 @@ Just when I thought I had routing figured out, I discovered that direct URL acce
         import { deploymentConfig } from './js/config.js';
 
         // Store the intended URL
-        sessionStorage.redirect = location.href;
+        sessionStorage.setItem('redirect', location.href);
 
         // Redirect to app base path (no detection needed)
         location.replace(deploymentConfig.basePath);
@@ -588,8 +588,8 @@ The other half of the SPA fallback pattern is in `index.html`, where an inline s
 <!-- index.html - Restore intended route from 404 redirect -->
 <script>
     (function() {
-        var redirect = sessionStorage.redirect;
-        delete sessionStorage.redirect;
+        var redirect = sessionStorage.getItem('redirect');
+        sessionStorage.removeItem('redirect');
         if (redirect && redirect != location.href) {
             history.replaceState(null, null, redirect);
         }
