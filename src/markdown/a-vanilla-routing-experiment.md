@@ -490,7 +490,7 @@ Then introduced a simple config file that defaults to using the root as the base
 
 ```javascript
 // js/config.js - Development configuration
-export const config = {
+export const deploymentConfig = {
     basePath: '/', // Local development
     // Build system replaces this for deployment
 };
@@ -648,6 +648,7 @@ If your project needs any of the features listed above, you'll likely spend more
 Building vanilla routing taught me that the web platform is remarkably capable, but using these capabilities directly involves meaningful tradeoffs. The real value wasn't in replacing SPA frameworks entirely, but in understanding what problems they solve through firsthand experience. Sometimes the best tool is the one that lets you ship features instead of debugging browser history APIs, but other times, understanding how things work under the hood is worth the journey itself.
 
 ## TODO
+* explain WHY basePath became an issue wrt route/url determination, string parsing???
 * problem 5 page refresh: Explain why sessionStorage needed to temporarily maintain state between two different document loads.
 * work in link to the code and tests https://github.com/danielabar/web_native_routing
 * intro: not having to worry about breaking changes, upgrades, backward-compatibility
