@@ -273,13 +273,23 @@ When the total time is reached, the app lets you finish your last out-breath bef
 
 ### Voice-Guided
 
-All prompts are spoken using the [Web Speech API](https://developer.mozilla.org/en-US/docs/Web/API/SpeechSynthesis), so the user doesn't need to watch the screen during the session. The browser provides the voice, it may sound different depending on the operating system and settings.
+All prompts are spoken using the [Web Speech API](https://developer.mozilla.org/en-US/docs/Web/API/SpeechSynthesis), so the user doesn't need to watch the screen during the session. The browser provides the voice, which may sound different depending on the operating system and settings.
+
+The implementation includes some careful tuning to make the voice guidance more pleasant during meditation. The speech rate is slowed down slightly (`0.85`), and the pitch is lowered a bit (`0.9`) to create a calmer, more soothing tone. The function also cancels any previous utterances before speaking - this prevents voice prompts from queuing up or overlapping if something unexpected happens.
+
+Additionally, the function can optionally return the utterance object, which is used during the countdown sequence to synchronize timing with the actual speech events:
 
 ```js
 // js/voice.js
-export function speak(text) {
-  const utter = new SpeechSynthesisUtterance(text);
-  speechSynthesis.speak(utter);
+export function speak(text, returnUtterance = false) {
+  if (!('speechSynthesis' in window)) return;
+  const utter = new window.SpeechSynthesisUtterance(text);
+  utter.rate = 0.85;    // Slightly slower for a calmer pace
+  utter.pitch = 0.9;    // Slightly lower for a soothing tone
+  utter.lang = 'en-US';
+  window.speechSynthesis.cancel(); // Stop any previous utterances
+  window.speechSynthesis.speak(utter);
+  if (returnUtterance) return utter; // Used for countdown timing
 }
 ```
 
