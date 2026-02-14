@@ -317,11 +317,23 @@ async function requestWakeLock() {
 
 ### Custom Preferences
 
-Just Breathe remembers your breathing pace and session duration between visits using local storage. Preferences are saved under a namespaced key `justBreathe:prefs` to avoid conflicts with other apps:
+Just Breathe remembers your breathing pace and session duration between visits using local storage. To keep the localStorage keys organized and avoid magic strings scattered throughout the code, all keys are defined in a central constants module:
+
+```js
+// js/constants.js
+export const NAMESPACE = 'justBreathe';
+export const PREFS_KEY = `${NAMESPACE}:prefs`;
+export const HISTORY_KEY = `${NAMESPACE}:history`;
+```
+
+This approach makes it easy to change the namespace if needed, and prevents typos from causing hard-to-debug issues. The keys are then imported and used in the relevant modules:
 
 ```js
 // js/userPrefs.js
-localStorage.setItem('justBreathe:prefs', JSON.stringify(prefs));
+import { PREFS_KEY } from './constants.js';
+
+// Save preferences
+localStorage.setItem(PREFS_KEY, JSON.stringify(prefs));
 ```
 
 The app also provides sensible defaults and validation:
