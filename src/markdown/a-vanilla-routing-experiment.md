@@ -487,7 +487,7 @@ Each of these questions led to more edge cases and more code. The simple router 
 
 ## Problem 4: Deployment Path
 
-The final major technical hurdle came when I tried to deploy the application to GitHub Pages, and it's where I had to abandon one of vanilla JavaScript's core appeals: avoiding build complexity entirely.
+Another major technical hurdle came when I tried to deploy the application to GitHub Pages, and it's where I had to abandon one of vanilla JavaScript's core appeals: avoiding build complexity entirely.
 
 Local development served the app from the root path (`localhost:3000/`). GitHub Pages serves project sites from subdirectories (`username.github.io/project-name/`). The mismatch meant hardcoded paths worked in one environment but broke in the other. Manually changing configuration for each deployment was unacceptable.
 
