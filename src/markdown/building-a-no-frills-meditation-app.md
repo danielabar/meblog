@@ -203,6 +203,10 @@ showView('main');
 
 This is a simplified version for clarity. The actual implementation includes additional features like mobile hamburger menu, desktop/mobile navigation handling, and the ability to prefill session values from history - see the [repo](https://github.com/danielabar/just-breathe) for the complete code.
 
+### Zero-Build
+
+The entire app runs as a static site. There's no bundler, no framework, no auth, and no build process. It's just plain HTML, JavaScript modules, and CSS. It's deployed via GitHub Pages using the [gh-pages](https://www.npmjs.com/package/gh-pages) npm package. This keeps maintenance simple.
+
 ### Session
 
 The session loop keeps track of time, alternates between inhale/exhale, updates the progress bar, and finishes with a friendly close. It's driven by `requestAnimationFrame`, which runs once per frame for smooth updates. This approach provides more precise timing than cascading `setTimeout` calls.
@@ -503,10 +507,6 @@ p  { font-weight: 400; }
 <aside class="markdown-aside">
 Since building this app, I came across <a class="markdown-link" href="https://github.com/robzolkos/csscaffold">CSS Scaffold</a>, which offers a very clean and organized approach to structuring CSS. If I were starting a new project today, I'd likely reach for that instead of the more "vibe coded" setup here, which got a little messy.
 </aside>
-
-### Zero-Build
-
-The entire app runs as a static site. There's no bundler, no framework, no auth, and no build process. It's just plain HTML, JavaScript modules, and CSS. It's deployed via GitHub Pages using the [gh-pages](https://www.npmjs.com/package/gh-pages) npm package. This keeps maintenance simple.
 
 ## Final Thoughts
 
