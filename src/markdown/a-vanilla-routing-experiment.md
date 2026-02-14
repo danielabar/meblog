@@ -474,6 +474,8 @@ showError(message) {
 }
 ```
 
+These error methods are invoked in the router's `navigate()` method: `show404()` is called when no route matches the requested path, and `showError()` is called in the catch block if template loading or view initialization fails.
+
 But the challenge extended beyond just showing an error page. I had to consider:
 
 - Should invalid routes update the browser's address bar?
