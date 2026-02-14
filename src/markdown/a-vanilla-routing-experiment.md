@@ -535,6 +535,7 @@ mkdir -p dist
 rsync -av --exclude='dist' --exclude='node_modules' --exclude='.git' . dist/
 
 # Replace basePath in config.js for production deployment
+# sed requires -i.bak on macOS (creates backup), then remove it
 sed -i.bak "s|basePath: '[^']*'|basePath: '$DEPLOY_BASE_PATH'|g" dist/js/config.js
 rm -f dist/js/config.js.bak
 
