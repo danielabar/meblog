@@ -168,30 +168,31 @@ Even though *Just Breathe* is simple on the surface, a few small technical decis
 
 ### Vanilla Stack
 
-Using native ES modules means no bundler or transpiler is needed, and the whole app stays readable to anyone curious about the code. For example, the `js/index.js` entrypoint imports the main and about modules so the views can be toggled (no fancy router needed here for just two views):
+Using native ES modules means no bundler or transpiler is needed, and the whole app stays readable to anyone curious about the code. For example, the `js/index.js` entrypoint imports the main, history, and about modules so the views can be toggled (no fancy router needed here for just three views):
 
 ```javascript
 // js/index.js
 import { renderMainView } from './main.js';
+import { renderHistoryView } from './history.js';
 import { renderAboutView } from './about.js';
 
 const appView = document.getElementById('app-view');
 const navMain = document.getElementById('nav-main');
+const navHistory = document.getElementById('nav-history');
 const navAbout = document.getElementById('nav-about');
 
 function showView(view) {
   if (view === 'about') {
-    navMain.removeAttribute('aria-current');
-    navAbout.setAttribute('aria-current', 'page');
     renderAboutView(appView);
+  } else if (view === 'history') {
+    renderHistoryView(appView);
   } else {
-    navMain.setAttribute('aria-current', 'page');
-    navAbout.removeAttribute('aria-current');
     renderMainView(appView);
   }
 }
 
 navMain.addEventListener('click', () => showView('main'));
+navHistory.addEventListener('click', () => showView('history'));
 navAbout.addEventListener('click', () => showView('about'));
 
 // Default view
