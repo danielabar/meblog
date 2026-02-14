@@ -382,10 +382,12 @@ My initial implementation created duplicate history entries whenever users used 
 async navigate(path, { pushState = true } = {}) {
     // ... navigation logic ...
 
-    // CRITICAL: Only push state for user-initiated navigation
-    // Not for browser back/forward or initial page load
+    // Two guards prevent duplicate history entries:
+    // 1. pushState=false for browser back/forward navigation
+    // 2. currentRoute===null for initial page load
     if (pushState && this.currentRoute !== null) {
-        history.pushState({ route: path }, '', path);
+        const fullPath = this.buildFullPath(path);
+        history.pushState({ route: path }, '', fullPath);
     }
 
     // ... rest of navigation logic
