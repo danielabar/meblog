@@ -207,6 +207,8 @@ This is a simplified version for clarity. The actual implementation includes add
 
 The entire app runs as a static site. There's no bundler, no framework, no auth, and no build process. It's just plain HTML, JavaScript modules, and CSS. It's deployed via GitHub Pages using the [gh-pages](https://www.npmjs.com/package/gh-pages) npm package. This keeps maintenance simple.
 
+With the architecture in place, the heart of the app is the breathing session itself. The session loop manages timing, state transitions, and voice prompts.
+
 ### Session
 
 The session loop keeps track of time, alternates between inhale/exhale, updates the progress bar, and finishes with a friendly close. It's driven by `requestAnimationFrame`, which runs once per frame for smooth updates. This approach provides more precise timing than cascading `setTimeout` calls.
