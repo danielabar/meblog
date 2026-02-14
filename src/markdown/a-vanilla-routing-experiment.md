@@ -712,8 +712,3 @@ Building vanilla routing taught me that the web platform is remarkably capable, 
 
 - [Complete implementation and test suite](https://github.com/danielabar/web_native_routing) - Full source code with comprehensive Playwright/BDD tests
 - [Anti-frameworkism: Choosing native web APIs over frameworks](https://blog.logrocket.com/anti-frameworkism-native-web-apis) - The article that inspired this exploration
-
-## TODO
-* work in link to the code and tests https://github.com/danielabar/web_native_routing
-* intro: not having to worry about breaking changes, upgrades, backward-compatibility
-* edit
