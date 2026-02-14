@@ -489,7 +489,7 @@ Each of these questions led to more edge cases and more code. The simple router 
 
 The final major technical hurdle came when I tried to deploy the application to GitHub Pages, and it's where I had to abandon one of vanilla JavaScript's core appeals: avoiding build complexity entirely.
 
-Local development served the app from the root path (`localhost:3000/`), but GitHub Pages serves project sites from subdirectories (`username.github.io/project-name/`). Hardcoded paths broke in one environment or the other, and manually changing configuration for each deployment was a terrible developer experience.
+Local development served the app from the root path (`localhost:3000/`). GitHub Pages serves project sites from subdirectories (`username.github.io/project-name/`). The mismatch meant hardcoded paths worked in one environment but broke in the other. Manually changing configuration for each deployment was unacceptable.
 
 This problem sent me down a rabbit hole of deployment strategies, ultimately forcing me to introduce what I had been trying to avoid: a build system. Ironically, while researching solutions, I discovered that even the GitHub Pages documentation acknowledges this challenge—there's an entire section explaining how different frameworks (Jekyll, Next.js, Nuxt.js, etc.) each have their own solutions for handling base paths in subdirectory deployments. Here I was, trying to avoid framework complexity, only to find myself building the same kinds of tools that frameworks provide.
 
@@ -707,7 +707,6 @@ If your project needs any of the features listed above, you'll likely spend more
 Building vanilla routing taught me that the web platform is remarkably capable, but using these capabilities directly involves meaningful tradeoffs. The real value wasn't in replacing SPA frameworks entirely, but in understanding what problems they solve through firsthand experience. Sometimes the best tool is the one that lets you ship features instead of debugging browser history APIs, but other times, understanding how things work under the hood is worth the journey itself.
 
 ## TODO
-* explain WHY basePath became an issue wrt route/url determination, string parsing???
 * work in link to the code and tests https://github.com/danielabar/web_native_routing
 * intro: not having to worry about breaking changes, upgrades, backward-compatibility
 * edit
