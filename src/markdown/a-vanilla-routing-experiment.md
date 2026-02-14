@@ -254,7 +254,7 @@ router.addRoute('/contact', 'contact');
 router.init();
 ```
 
-And here is the updated router, loading HTML templates and view classes that could manage their own lifecycle, just focusing on the key changes
+And here is the updated router, loading HTML templates and view classes that could manage their own lifecycle (showing the key changes; `init()`, error handling, and other utility methods remain similar to the previous version)
 
 ```javascript
 class Router {
