@@ -238,6 +238,22 @@ views/
     └── script.js
 ```
 
+With this new structure, route registration changed to point to view directory names instead of template file paths:
+
+```javascript
+// Updated app.js after refactoring to view-based architecture
+import Router from './router.js';
+
+const router = new Router();
+
+// Routes now point to view directory names (not template files)
+router.addRoute('/', 'home');
+router.addRoute('/about', 'about');
+router.addRoute('/contact', 'contact');
+
+router.init();
+```
+
 And here is the updated router, loading HTML templates and view classes that could manage their own lifecycle, just focusing on the key changes
 
 ```javascript
