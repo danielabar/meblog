@@ -295,12 +295,23 @@ export function speak(text, returnUtterance = false) {
 
 ### Staying Awake
 
-Sessions request a screen [wake lock](https://developer.mozilla.org/en-US/docs/Web/API/WakeLock) so the device won't lock up in the middle of the breathing exercise:
+Sessions request a screen [wake lock](https://developer.mozilla.org/en-US/docs/Web/API/WakeLock) so the device won't lock up in the middle of the breathing exercise. Since this API is relatively new and can fail for various reasons (battery saver mode, permissions, browser support), the implementation includes proper feature detection and error handling.
+
+The wake lock is a nice-to-have enhancement rather than a critical feature - if it fails, the app still works perfectly fine, users just need to keep their screen awake manually. That's why the catch block intentionally does nothing beyond acknowledging the failure. The function also sets up a listener to clean up the wake lock reference when it's released:
 
 ```js
 // js/session.js
 async function requestWakeLock() {
-  wakeLock = await navigator.wakeLock.request('screen');
+  try {
+    if ('wakeLock' in navigator) {
+      wakeLock = await navigator.wakeLock.request('screen');
+      wakeLock.addEventListener('release', () => {
+        wakeLock = null;
+      });
+    }
+  } catch (err) {
+    // Wake Lock may fail due to battery saver mode or permissions
+  }
 }
 ```
 
