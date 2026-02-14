@@ -446,6 +446,7 @@ In addition to the JavaScript setup, the CSS is organized into multiple smaller 
 @import './variables.css';
 @import './global.css';
 @import './app.css';
+/* ...additional component styles (button.css, history.css) */
 ```
 
 <aside class="markdown-aside">
