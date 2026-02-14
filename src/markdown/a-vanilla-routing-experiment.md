@@ -376,7 +376,9 @@ Then I uncovered another critical issue.
 
 Users expect browser navigation to just work. When they click the back button, they should return to the previous view. When they click forward, they should move ahead in their navigation history. This seems basic, but implementing it correctly with the History API turned out to be surprisingly tricky.
 
-My initial implementation created duplicate history entries whenever users used browser navigation. The key insight was learning to distinguish between user-initiated navigation (clicking links) and browser-initiated navigation (back/forward buttons). Each type needed different treatment:
+My initial implementation created duplicate history entries whenever users used browser navigation. The key insight was learning to distinguish between user-initiated navigation (clicking links) and browser-initiated navigation (back/forward buttons). Each type needed different treatment.
+
+Here's how I solved it by introducing a `pushState` parameter to distinguish between navigation types:
 
 ```javascript
 async navigate(path, { pushState = true } = {}) {
