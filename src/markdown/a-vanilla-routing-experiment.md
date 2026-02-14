@@ -542,24 +542,45 @@ rm -f dist/js/config.js.bak
 echo "✅ Build complete! Deploy base path set to: $DEPLOY_BASE_PATH"
 ```
 
-The router integrated this configuration throughout its path handling logic:
+The basePath created a fundamental challenge: the router needs to work with "clean" routes internally (`/`, `/about`, `/contact`) but the browser URL and History API need full paths (`/web_native_routing/`, `/web_native_routing/about`, `/web_native_routing/contact`).
+
+This meant every navigation required bidirectional path transformation:
+
+- **Incoming (browser → router)**: When the browser shows `/web_native_routing/about`, the router must NORMALIZE it to `/about` for route matching
+- **Outgoing (router → browser)**: When navigating to `/about`, the router must BUILD the full path `/web_native_routing/about` for the browser's address bar
+
+Here's how the router handles this translation:
 
 ```javascript
-buildUrl(path) {
-    const basePath = this.basePath.replace(/\/$/, '');
-    const cleanPath = path.startsWith('/') ? path : '/' + path;
-    return basePath + cleanPath;
-}
-
-extractRoute(fullPath) {
+/**
+ * Remove base path from incoming browser path for route matching
+ * Example: '/web_native_routing/about' → '/about'
+ */
+normalizePath(fullPath) {
     if (this.basePath === '/') return fullPath;
 
-    const basePath = this.basePath.replace(/\/$/, '');
-    return fullPath.startsWith(basePath)
-        ? fullPath.substring(basePath.length) || '/'
-        : fullPath;
+    if (fullPath.startsWith(this.basePath)) {
+        const normalized = fullPath.slice(this.basePath.length) || '/';
+        return normalized.startsWith('/') ? normalized : '/' + normalized;
+    }
+
+    return fullPath;
+}
+
+/**
+ * Add base path to route for browser URLs and history
+ * Example: '/about' → '/web_native_routing/about'
+ */
+buildFullPath(routePath) {
+    if (this.basePath === '/') return routePath;
+
+    if (routePath === '/') return this.basePath.slice(0, -1) || '/';
+
+    return this.basePath + routePath.slice(1);
 }
 ```
+
+These methods are used throughout the router: `normalizePath()` in `handleInitialRoute()` and the `popstate` handler, and `buildFullPath()` in `navigate()` when calling `history.pushState()`.
 
 Then modified the `deploy` script in `package.json` to first run the build script, and then deploy to GitHub Pages from the `dist` dir:
 
