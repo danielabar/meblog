@@ -487,28 +487,37 @@ Each of these questions led to more edge cases and more code. The simple router 
 
 ## Problem 4: Deployment Path
 
-Another major technical hurdle came when I tried to deploy the application to GitHub Pages, and it's where I had to abandon one of vanilla JavaScript's core appeals: avoiding build complexity entirely.
+Another major hurdle emerged during deployment to GitHub Pages, which was URL construction during navigation. Look back at the naive implementation's `navigate()` method. See that `history.pushState()` call?
 
-Local development served the app from the root path (`localhost:3000/`). GitHub Pages serves project sites from subdirectories (`username.github.io/project-name/`). The mismatch meant hardcoded paths worked in one environment but broke in the other. Manually changing configuration for each deployment was unacceptable.
+```javascript
+async navigate(path) {
+  // ...
+  history.pushState({ route: path }, '', path);  // Passing path directly
+}
+```
 
-This problem sent me down a rabbit hole of deployment strategies, ultimately forcing me to introduce what I had been trying to avoid: a build system. Ironically, while researching solutions, I discovered that even the GitHub Pages documentation acknowledges this challenge—there's an entire section explaining how different frameworks (Jekyll, Next.js, Nuxt.js, etc.) each have their own solutions for handling base paths in subdirectory deployments. Here I was, trying to avoid framework complexity, only to find myself building the same kinds of tools that frameworks provide.
+This was passing the route path directly to `history.pushState()`—`/about`, `/contact`, etc. This worked perfectly during local development at `localhost:3000/about`, but broke completely on GitHub Pages.
 
-I tried auto-detection first, attempting to figure out the base path from the hosting environment dynamically, but this approach proved complex and brittle. The solution that finally worked was to introduce a lightweight build system in the form of `scripts/build.sh`—a simple bash script that would modify a single configuration file to specify the base path.
+Here's what happened when users clicked "About" on the deployed site:
 
-First I added a `deploy_base_path` attribute to `package.json`:
+- Router received: `/about`
+- Browser navigated to: `https://username.github.io/about` ❌
+- Should have been: `https://username.github.io/web_native_routing/about` ✅
+
+The router had no awareness it was running in a subdirectory. Every navigation stripped away the base path. I tried auto-detecting the base path from the hosting environment, but that proved complex and brittle. The solution that finally worked was introducing explicit configuration with a simple build script.
+
+First, I added a `deploy_base_path` attribute to `package.json`:
 
 ```json
-// package.json
 {
   "name": "web_native_routing",
   "version": "1.0.0",
-  "description": "Vanilla JS static web app demonstrating client-side routing without SPA frameworks",
   "deploy_base_path": "/web_native_routing/",
   // ...
 }
 ```
 
-Then introduced a simple config file that defaults to using the root as the base path `/`:
+Then created a config file that serves as the single source of truth for the base path:
 
 ```javascript
 // js/config.js - Development configuration
@@ -518,83 +527,42 @@ export const deploymentConfig = {
 };
 ```
 
-Then a build script that would copy the app code to a `dist` dir, then extract the value of `deploy_base_path` from `package.json` and update the value in `dist/js/config.js`:
+The build script copies all the code to a new `dist` directory, then extracts the value from `package.json` and replaces it in the production build:
 
 ```bash
 #!/bin/bash
-# scripts/build.sh - Production build with base path injection
+# scripts/build.sh
 
 # Extract deploy base path from package.json
 DEPLOY_BASE_PATH=$(node -p "require('./package.json').deploy_base_path || '/web_native_routing/'")
 
-# Clean and create dist directory
-rm -rf dist
-mkdir -p dist
-
-# Copy all files except development artifacts
+# Copy files to dist/
 rsync -av --exclude='dist' --exclude='node_modules' --exclude='.git' . dist/
 
 # Replace basePath in config.js for production deployment
-# sed requires -i.bak on macOS (creates backup), then remove it
 sed -i.bak "s|basePath: '[^']*'|basePath: '$DEPLOY_BASE_PATH'|g" dist/js/config.js
 rm -f dist/js/config.js.bak
-
-echo "✅ Build complete! Deploy base path set to: $DEPLOY_BASE_PATH"
 ```
 
-The basePath created a fundamental challenge: the router needs to work with "clean" routes internally (`/`, `/about`, `/contact`) but the browser URL and History API need full paths (`/web_native_routing/`, `/web_native_routing/about`, `/web_native_routing/contact`).
-
-This meant every navigation required bidirectional path transformation:
-
-- **Incoming (browser → router)**: When the browser shows `/web_native_routing/about`, the router must NORMALIZE it to `/about` for route matching
-- **Outgoing (router → browser)**: When navigating to `/about`, the router must BUILD the full path `/web_native_routing/about` for the browser's address bar
-
-Here's how the router handles this translation:
+The router imports this config and uses a `buildFullPath()` method to construct correct URLs for `history.pushState()`:
 
 ```javascript
-/**
- * Remove base path from incoming browser path for route matching
- * Example: '/web_native_routing/about' → '/about'
- */
-normalizePath(fullPath) {
-    if (this.basePath === '/') return fullPath;
-
-    if (fullPath.startsWith(this.basePath)) {
-        const normalized = fullPath.slice(this.basePath.length) || '/';
-        return normalized.startsWith('/') ? normalized : '/' + normalized;
-    }
-
-    return fullPath;
-}
-
-/**
- * Add base path to route for browser URLs and history
- * Example: '/about' → '/web_native_routing/about'
- */
+// Router now constructs URLs correctly for any deployment context
 buildFullPath(routePath) {
     if (this.basePath === '/') return routePath;
-
     if (routePath === '/') return this.basePath.slice(0, -1) || '/';
-
     return this.basePath + routePath.slice(1);
 }
-```
 
-These methods are used throughout the router: `normalizePath()` in `handleInitialRoute()` and the `popstate` handler, and `buildFullPath()` in `navigate()` when calling `history.pushState()`.
-
-Then modified the `deploy` script in `package.json` to first run the build script, and then deploy to GitHub Pages from the `dist` dir:
-
-```json
-{
-  "scripts": {
-    "dev": "serve",
-    "build": "./scripts/build.sh",
-    "deploy": "npm run build && gh-pages -d dist",
-  }
+// Fixed navigate() method:
+async navigate(path) {
+  // ...
+  const fullPath = this.buildFullPath(path);
+  history.pushState({ route: path }, '', fullPath);
 }
 ```
 
-This build system meant that `npm run dev` served locally with root paths, `npm run build` created a production-ready distribution with correct GitHub Pages paths, and `npm run deploy` published everything with zero manual configuration changes. Following established patterns from the framework ecosystem led to a much cleaner solution than my initial attempts at path auto-detection.
+The irony wasn't lost on me, I started this project to avoid build complexity, but deployment realities forced me to introduce exactly that.
 
 ## Problem 5: Deep Links
 
