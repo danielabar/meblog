@@ -350,6 +350,48 @@ Only reasonable values are accepted: in/out seconds between 1 - 15, and session 
 
 The combination of defaults, validation, and namespacing keeps preferences simple, safe, and completely local - no subscriptions, accounts, or external services required.
 
+### Session History
+
+Beyond preferences, Just Breathe also remembers your last 10 completed sessions. Each session is saved with a timestamp and the breathing settings you used, making it easy to track your meditation practice over time.
+
+The History view displays these sessions in a clean list format, showing when each session took place along with the inhale/exhale duration and total session time. Each entry has a replay button - clicking it navigates back to the main view with those exact settings prefilled, ready to start another session with the same configuration. This makes it effortless to repeat a breathing pattern you found particularly effective.
+
+Session history uses the same localStorage approach as preferences, with automatic management to keep only the most recent entries:
+
+```js
+// js/historyStorage.js
+import { HISTORY_KEY } from './constants.js';
+
+export function saveSessionToHistory({ inSec, outSec, duration }) {
+  const timestamp = Date.now();
+  let history = [];
+
+  // Load existing history
+  try {
+    const raw = localStorage.getItem(HISTORY_KEY);
+    if (raw) history = JSON.parse(raw);
+    if (!Array.isArray(history)) history = [];
+  } catch {
+    history = [];
+  }
+
+  // Add new session at the beginning
+  history.unshift({ timestamp, inSec, outSec, duration });
+
+  // Keep only last 10 sessions
+  history = history.slice(0, 10);
+
+  // Save back to localStorage
+  try {
+    localStorage.setItem(HISTORY_KEY, JSON.stringify(history));
+  } catch {
+    // Ignore storage errors
+  }
+}
+```
+
+The history feature adds a helpful layer of tracking without any server-side complexity or privacy concerns - everything stays on your device.
+
 ### Add to Home Screen
 
 Just Breathe isn't in an app store, but it supports "Add to Home Screen", giving it an app-like presence: a standalone window, home screen icon, and quick launch.
