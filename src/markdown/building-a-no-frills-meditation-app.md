@@ -267,6 +267,8 @@ function updateState() {
 }
 ```
 
+This shows the core breathing loop. The full implementation also handles saving completed sessions to history, stop/restart button functionality, and wake lock cleanup when sessions end.
+
 Rather than waiting for exact intervals using timers, the app continuously checks how much actual time has elapsed using [requestAnimationFrame](https://developer.mozilla.org/en-US/docs/Web/API/Window/requestAnimationFrame). This schedules the loop to run in sync with the browser's repaint cycle. On each frame, the function compares the current time against when the breath phase started. When the target duration is reached (for example, 5.5 seconds for an inhale), it transitions to the next phase and resets the timer.
 
 When the total time is reached, the app lets you finish your last out-breath before wrapping up, speaking "All done".
