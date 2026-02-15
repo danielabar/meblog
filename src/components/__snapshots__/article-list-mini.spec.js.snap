@@ -8,31 +8,24 @@ exports[`ArticleListMini renders correctly 1`] = `
       <section
         data-testid="article-list-mini"
       >
-        <h2>
-          Recent Posts
-        </h2>
         <a
           href="/article-1"
         >
           <div>
-            <span>
-              Article 1
-            </span>
-            <div>
-              2024-04-10
-            </div>
+            2024-04-10
+          </div>
+          <div>
+            Article 1
           </div>
         </a>
         <a
           href="/article-2"
         >
           <div>
-            <span>
-              Article 2
-            </span>
-            <div>
-              2024-04-09
-            </div>
+            2024-04-09
+          </div>
+          <div>
+            Article 2
           </div>
         </a>
       </section>
@@ -42,31 +35,24 @@ exports[`ArticleListMini renders correctly 1`] = `
     <section
       data-testid="article-list-mini"
     >
-      <h2>
-        Recent Posts
-      </h2>
       <a
         href="/article-1"
       >
         <div>
-          <span>
-            Article 1
-          </span>
-          <div>
-            2024-04-10
-          </div>
+          2024-04-10
+        </div>
+        <div>
+          Article 1
         </div>
       </a>
       <a
         href="/article-2"
       >
         <div>
-          <span>
-            Article 2
-          </span>
-          <div>
-            2024-04-09
-          </div>
+          2024-04-09
+        </div>
+        <div>
+          Article 2
         </div>
       </a>
     </section>

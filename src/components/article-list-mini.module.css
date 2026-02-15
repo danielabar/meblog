@@ -1,41 +1,51 @@
+/* Modern Article List Card Design */
+
 .container {
-  flex: 1 1 0;
-  width: 0;
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+  gap: 2rem;
 }
 
-.header {
-  color: #81439C;
-  font-size: 22px;
-  font-weight: 500;
-  letter-spacing: 1.5px;
-  margin-bottom: 25px;
-  text-transform: uppercase;
+.card {
+  background: white;
+  border-radius: 8px;
+  padding: 2rem;
+  border: 1px solid #e0e0e0;
+  transition: all 0.3s ease;
+  cursor: pointer;
+  text-decoration: none;
+  display: block;
 }
 
-.article {
-  margin-bottom: 20px;
+.card:hover {
+  transform: translateY(-4px);
+  box-shadow:
+    0 4px 6px rgba(129, 67, 156, 0.12),
+    0 12px 32px rgba(129, 67, 156, 0.15);
+  border-color: var(--brand-lighten-10, #9c5ab8);
 }
 
-.articleTitle {
-  color: #1A0D1F;
-  font-size: 20px;
-  font-weight: 500;
-  margin-bottom: 5px;
+.meta {
+  font-size: 0.8125rem;
+  color: var(--base-font-color-muted, #706e71);
+  margin-bottom: 0.75rem;
+  font-variant-numeric: tabular-nums;
 }
 
-.articleTitle:hover {
-  border-bottom: 1px solid var(--base-font-color);
+.title {
+  font-size: 1.125rem;
+  font-weight: 600;
+  color: var(--base-font-color, #1a0d1f);
+  line-height: 1.4;
 }
 
-.articleDate {
-  color: #1A0D1F;
-  font-size: 18px;
-  opacity: 0.8;
+.card:hover .title {
+  color: var(--brand, #81439c);
 }
 
+/* Mobile */
 @media (max-width: 768px) {
   .container {
-    flex: initial; /* Resets flex-grow, flex-shrink, and flex-basis to their initial values */
-    width: auto; /* Resets width to auto */
+    grid-template-columns: 1fr;
   }
 }

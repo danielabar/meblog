@@ -23,17 +23,15 @@ describe("ArticleListMini", () => {
   ]
 
   it("renders correctly", () => {
-    const container = render(
-      <ArticleListMini articles={articles} title="Recent Posts" />
-    )
+    const container = render(<ArticleListMini articles={articles} />)
     expect(container).toMatchSnapshot()
 
-    expect(screen.getByText("Recent Posts")).toBeInTheDocument()
-
-    const articleTitles = screen.getAllByRole("link", { name: /article/i })
+    const articleTitles = screen.getAllByRole("link")
     expect(articleTitles.length).toBe(2)
 
     expect(screen.getByText("Article 1")).toBeInTheDocument()
     expect(screen.getByText("Article 2")).toBeInTheDocument()
+    expect(screen.getByText("2024-04-10")).toBeInTheDocument()
+    expect(screen.getByText("2024-04-09")).toBeInTheDocument()
   })
 })
