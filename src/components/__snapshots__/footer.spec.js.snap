@@ -10,7 +10,7 @@ exports[`Footer renders correctly 1`] = `
       >
         <hr />
         <p>
-          All materials © Daniela Baron 2025
+          All materials © Daniela Baron 2026
         </p>
         <div>
           <a
@@ -93,7 +93,7 @@ exports[`Footer renders correctly 1`] = `
     >
       <hr />
       <p>
-        All materials © Daniela Baron 2025
+        All materials © Daniela Baron 2026
       </p>
       <div>
         <a

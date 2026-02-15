@@ -84,7 +84,7 @@ exports[`About Page renders with layout and all-link 1`] = `
               What Drives Me
             </h2>
             <p>
-              I'm drawn to the kind of work that makes teams stronger and systems more resilient. That means tackling the foundational improvements others avoid, such as replacing inefficient search implementations with proper full-text indexing, platform and legacy upgrades, hardening security gaps, or transforming a codebase's architectural patterns so new developers can contribute confidently.
+              I'm drawn to the kind of work that makes teams stronger and systems more resilient. That means tackling the foundational improvements such as replacing inefficient search implementations with proper full-text indexing, platform and legacy upgrades, hardening security gaps, or transforming a codebase's architectural patterns so new developers can contribute confidently.
             </p>
             <p>
               I believe software engineering is about solving real problems for real people, not demonstrating technical cleverness. My job is to understand what needs to happen, communicate the approach clearly, and deliver it in a way that others can maintain and build upon. Readable code beats clever code. Tests that tell a story beat tests that check implementation. Working solutions beat perfect architecture. Documented decisions beat institutional knowledge that lives in peoples heads.
@@ -108,7 +108,16 @@ exports[`About Page renders with layout and all-link 1`] = `
               I embrace modern development practices: comprehensive testing, automated linting, observability with proper monitoring, incremental migrations that avoid big-bang rewrites, and feature flags for safe roll-outs. I also embrace AI-assisted development — not as autopilot, but as a force multiplier that lets me move faster while maintaining engineering rigor.
             </p>
             <h2>
-              Beyond the Code
+              What I Value in Teams
+            </h2>
+            <p>
+              The best teams I've worked with share a few key traits: they communicate clearly and directly, they trust each other to make good decisions, they document their architectural choices, and they treat production issues as learning opportunities rather than blame opportunities. I thrive in environments where initiative is encouraged, where asking "why are we doing it this way?" is welcomed, and where improving developer experience is seen as valuable work.
+            </p>
+            <p>
+              I don't do leetcode-style interviews - years of public work (GitHub repos dating back to 2013, 100+ blog posts, documented volunteer contributions) offers better evidence of how I think and what I can deliver. Strong technical teams recognize that proven capability matters more than performance on contrived exercises.
+            </p>
+            <h2>
+              Community & Contributions
             </h2>
             <p>
               I contribute to the broader engineering community through writing and open source work. My technical blog draws thousands of monthly readers and has been featured in Ruby Weekly, Short Ruby Newsletter, and Women on Rails. I write about practical problem-solving, architectural decisions, debugging strategies, and career development. I'm also active on
@@ -128,15 +137,6 @@ exports[`About Page renders with layout and all-link 1`] = `
               </a>
               .
             </p>
-            <h2>
-              What I Value in Teams
-            </h2>
-            <p>
-              The best teams I've worked with share a few key traits: they communicate clearly and directly, they trust each other to make good decisions, they document their architectural choices, and they treat production issues as learning opportunities rather than blame opportunities. I thrive in environments where initiative is encouraged, where asking "why are we doing it this way?" is welcomed, and where improving developer experience is seen as valuable work.
-            </p>
-            <p>
-              I don't do leetcode-style interviews - years of public work (GitHub repos dating back to 2013, 100+ blog posts, documented volunteer contributions) offers better evidence of how I think and what I can deliver. Strong technical teams recognize that proven capability matters more than performance on contrived exercises.
-            </p>
             <div
               data-testid="all-wrapper"
               style="margin-top: 30px;"
@@ -154,7 +154,7 @@ exports[`About Page renders with layout and all-link 1`] = `
         >
           <hr />
           <p>
-            All materials © Daniela Baron 2025
+            All materials © Daniela Baron 2026
           </p>
           <div>
             <a
@@ -312,7 +312,7 @@ exports[`About Page renders with layout and all-link 1`] = `
             What Drives Me
           </h2>
           <p>
-            I'm drawn to the kind of work that makes teams stronger and systems more resilient. That means tackling the foundational improvements others avoid, such as replacing inefficient search implementations with proper full-text indexing, platform and legacy upgrades, hardening security gaps, or transforming a codebase's architectural patterns so new developers can contribute confidently.
+            I'm drawn to the kind of work that makes teams stronger and systems more resilient. That means tackling the foundational improvements such as replacing inefficient search implementations with proper full-text indexing, platform and legacy upgrades, hardening security gaps, or transforming a codebase's architectural patterns so new developers can contribute confidently.
           </p>
           <p>
             I believe software engineering is about solving real problems for real people, not demonstrating technical cleverness. My job is to understand what needs to happen, communicate the approach clearly, and deliver it in a way that others can maintain and build upon. Readable code beats clever code. Tests that tell a story beat tests that check implementation. Working solutions beat perfect architecture. Documented decisions beat institutional knowledge that lives in peoples heads.
@@ -336,7 +336,16 @@ exports[`About Page renders with layout and all-link 1`] = `
             I embrace modern development practices: comprehensive testing, automated linting, observability with proper monitoring, incremental migrations that avoid big-bang rewrites, and feature flags for safe roll-outs. I also embrace AI-assisted development — not as autopilot, but as a force multiplier that lets me move faster while maintaining engineering rigor.
           </p>
           <h2>
-            Beyond the Code
+            What I Value in Teams
+          </h2>
+          <p>
+            The best teams I've worked with share a few key traits: they communicate clearly and directly, they trust each other to make good decisions, they document their architectural choices, and they treat production issues as learning opportunities rather than blame opportunities. I thrive in environments where initiative is encouraged, where asking "why are we doing it this way?" is welcomed, and where improving developer experience is seen as valuable work.
+          </p>
+          <p>
+            I don't do leetcode-style interviews - years of public work (GitHub repos dating back to 2013, 100+ blog posts, documented volunteer contributions) offers better evidence of how I think and what I can deliver. Strong technical teams recognize that proven capability matters more than performance on contrived exercises.
+          </p>
+          <h2>
+            Community & Contributions
           </h2>
           <p>
             I contribute to the broader engineering community through writing and open source work. My technical blog draws thousands of monthly readers and has been featured in Ruby Weekly, Short Ruby Newsletter, and Women on Rails. I write about practical problem-solving, architectural decisions, debugging strategies, and career development. I'm also active on
@@ -356,15 +365,6 @@ exports[`About Page renders with layout and all-link 1`] = `
             </a>
             .
           </p>
-          <h2>
-            What I Value in Teams
-          </h2>
-          <p>
-            The best teams I've worked with share a few key traits: they communicate clearly and directly, they trust each other to make good decisions, they document their architectural choices, and they treat production issues as learning opportunities rather than blame opportunities. I thrive in environments where initiative is encouraged, where asking "why are we doing it this way?" is welcomed, and where improving developer experience is seen as valuable work.
-          </p>
-          <p>
-            I don't do leetcode-style interviews - years of public work (GitHub repos dating back to 2013, 100+ blog posts, documented volunteer contributions) offers better evidence of how I think and what I can deliver. Strong technical teams recognize that proven capability matters more than performance on contrived exercises.
-          </p>
           <div
             data-testid="all-wrapper"
             style="margin-top: 30px;"
@@ -382,7 +382,7 @@ exports[`About Page renders with layout and all-link 1`] = `
       >
         <hr />
         <p>
-          All materials © Daniela Baron 2025
+          All materials © Daniela Baron 2026
         </p>
         <div>
           <a
