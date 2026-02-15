@@ -1,3 +1,13 @@
+/**
+ * Legacy Footer Component
+ *
+ * Original footer design used across most of the site.
+ * A modern redesign is available in src/components/shared/footer.js
+ * (currently used only on homepage).
+ *
+ * This component will remain in use on non-homepage pages until
+ * the modern design is adopted site-wide.
+ */
 import React from "react"
 import * as styles from "./footer.module.css"
 import { FaTwitter, FaGithub, FaLinkedinIn } from "react-icons/fa"
