@@ -10,7 +10,7 @@
     linear-gradient(rgba(129, 67, 156, 0.02) 1px, transparent 1px),
     linear-gradient(90deg, rgba(129, 67, 156, 0.02) 1px, transparent 1px);
   background-size: 20px 20px;
-  padding: 4rem 2rem;
+  padding: 3rem 2rem;
 }
 
 @media (max-width: 768px) {
