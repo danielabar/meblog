@@ -16,7 +16,7 @@ const FocusAreas = () => {
     {
       title: "AI-Assisted Development",
       description:
-        "Using AI as a force multiplier for engineering rigor and productivity",
+        "Leveraging AI while prioritizing system understanding and sustainable engineering practices",
     },
   ]
 
