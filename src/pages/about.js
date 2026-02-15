@@ -23,11 +23,11 @@ const About = () => (
 
       <p className={styles.para}>
         I'm drawn to the kind of work that makes teams stronger and systems more
-        resilient. That means tackling the foundational improvements others
-        avoid, such as replacing inefficient search implementations with proper
-        full-text indexing, platform and legacy upgrades, hardening security
-        gaps, or transforming a codebase's architectural patterns so new
-        developers can contribute confidently.
+        resilient. That means tackling the foundational improvements such as
+        replacing inefficient search implementations with proper full-text
+        indexing, platform and legacy upgrades, hardening security gaps, or
+        transforming a codebase's architectural patterns so new developers can
+        contribute confidently.
       </p>
 
       <p className={styles.para}>
@@ -76,25 +76,6 @@ const About = () => (
         multiplier that lets me move faster while maintaining engineering rigor.
       </p>
 
-      <h2 className={styles.subheader}>Beyond the Code</h2>
-
-      <p className={styles.para}>
-        I contribute to the broader engineering community through writing and
-        open source work. My technical blog draws thousands of monthly readers
-        and has been featured in Ruby Weekly, Short Ruby Newsletter, and Women
-        on Rails. I write about practical problem-solving, architectural
-        decisions, debugging strategies, and career development. I'm also active
-        on{" "}
-        <a href="https://linkedin.com/in/danielabaron" className={styles.link}>
-          LinkedIn
-        </a>{" "}
-        and{" "}
-        <a href="https://github.com/danielabar" className={styles.link}>
-          GitHub
-        </a>
-        .
-      </p>
-
       <h2 className={styles.subheader}>What I Value in Teams</h2>
 
       <p className={styles.para}>
@@ -113,6 +94,25 @@ const About = () => (
         contributions) offers better evidence of how I think and what I can
         deliver. Strong technical teams recognize that proven capability matters
         more than performance on contrived exercises.
+      </p>
+
+      <h2 className={styles.subheader}>Community & Contributions</h2>
+
+      <p className={styles.para}>
+        I contribute to the broader engineering community through writing and
+        open source work. My technical blog draws thousands of monthly readers
+        and has been featured in Ruby Weekly, Short Ruby Newsletter, and Women
+        on Rails. I write about practical problem-solving, architectural
+        decisions, debugging strategies, and career development. I'm also active
+        on{" "}
+        <a href="https://linkedin.com/in/danielabaron" className={styles.link}>
+          LinkedIn
+        </a>{" "}
+        and{" "}
+        <a href="https://github.com/danielabar" className={styles.link}>
+          GitHub
+        </a>
+        .
       </p>
       <AllLink marginTop="30px" />
     </div>
