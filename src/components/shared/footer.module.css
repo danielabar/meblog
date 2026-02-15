@@ -5,6 +5,7 @@
   border-top: 1px solid rgba(129, 67, 156, 0.1);
   padding: 3rem 2rem;
   margin-top: 4rem;
+  font-family: var(--font-family-2026);
 }
 
 .inner {
