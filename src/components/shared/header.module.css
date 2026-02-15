@@ -36,7 +36,7 @@
   width: 48px;
   height: 48px;
   border-radius: 50%;
-  border: 2px solid var(--brand-lighten-40, #9c5ab8);
+  border: 2px solid var(--brand-lighten-40, #dcc5e6);
   overflow: hidden;
   background: white;
 }
