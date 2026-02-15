@@ -155,7 +155,7 @@ exports[`Blog List Renders in layout with pagination set to second page 1`] = `
         >
           <hr />
           <p>
-            All materials © Daniela Baron 2025
+            All materials © Daniela Baron 2026
           </p>
           <div>
             <a
@@ -384,7 +384,7 @@ exports[`Blog List Renders in layout with pagination set to second page 1`] = `
       >
         <hr />
         <p>
-          All materials © Daniela Baron 2025
+          All materials © Daniela Baron 2026
         </p>
         <div>
           <a
@@ -670,7 +670,7 @@ exports[`Blog List Renders in layout with pagination set to third page 1`] = `
         >
           <hr />
           <p>
-            All materials © Daniela Baron 2025
+            All materials © Daniela Baron 2026
           </p>
           <div>
             <a
@@ -899,7 +899,7 @@ exports[`Blog List Renders in layout with pagination set to third page 1`] = `
       >
         <hr />
         <p>
-          All materials © Daniela Baron 2025
+          All materials © Daniela Baron 2026
         </p>
         <div>
           <a
