@@ -61,7 +61,7 @@ exports[`Layout renders correctly with children 1`] = `
                 © 2026 Daniela Baron
               </div>
               <div>
-                Building software that compounds in value
+                Writing software that works, scales, and remains clear to the next engineer
               </div>
             </div>
             <div>
@@ -202,7 +202,7 @@ exports[`Layout renders correctly with children 1`] = `
               © 2026 Daniela Baron
             </div>
             <div>
-              Building software that compounds in value
+              Writing software that works, scales, and remains clear to the next engineer
             </div>
           </div>
           <div>

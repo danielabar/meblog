@@ -105,7 +105,7 @@ exports[`Home Page renders with layout, article list, and all-link 1`] = `
                     AI-Assisted Development
                   </div>
                   <div>
-                    Leveraging AI for analysis and implementation while prioritizing system understanding and sustainable engineering practices
+                    Leveraging AI while prioritizing system understanding and sustainable engineering practices
                   </div>
                 </div>
               </div>
@@ -187,7 +187,7 @@ exports[`Home Page renders with layout, article list, and all-link 1`] = `
                 © 2026 Daniela Baron
               </div>
               <div>
-                Building software that compounds in value
+                Writing software that works, scales, and remains clear to the next engineer
               </div>
             </div>
             <div>
@@ -372,7 +372,7 @@ exports[`Home Page renders with layout, article list, and all-link 1`] = `
                   AI-Assisted Development
                 </div>
                 <div>
-                  Leveraging AI for analysis and implementation while prioritizing system understanding and sustainable engineering practices
+                  Leveraging AI while prioritizing system understanding and sustainable engineering practices
                 </div>
               </div>
             </div>
@@ -454,7 +454,7 @@ exports[`Home Page renders with layout, article list, and all-link 1`] = `
               © 2026 Daniela Baron
             </div>
             <div>
-              Building software that compounds in value
+              Writing software that works, scales, and remains clear to the next engineer
             </div>
           </div>
           <div>

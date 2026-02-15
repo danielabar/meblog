@@ -31,7 +31,7 @@ exports[`FocusAreas renders correctly 1`] = `
               AI-Assisted Development
             </div>
             <div>
-              Leveraging AI for analysis and implementation while prioritizing system understanding and sustainable engineering practices
+              Leveraging AI while prioritizing system understanding and sustainable engineering practices
             </div>
           </div>
         </div>
@@ -65,7 +65,7 @@ exports[`FocusAreas renders correctly 1`] = `
             AI-Assisted Development
           </div>
           <div>
-            Leveraging AI for analysis and implementation while prioritizing system understanding and sustainable engineering practices
+            Leveraging AI while prioritizing system understanding and sustainable engineering practices
           </div>
         </div>
       </div>

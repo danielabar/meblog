@@ -21,7 +21,7 @@ const Footer = () => {
         <div className={styles.left}>
           <div className={styles.copyright}>© 2026 Daniela Baron</div>
           <div className={styles.tagline}>
-            Building software that compounds in value
+            Writing software that works, scales, and remains clear to the next engineer
           </div>
         </div>
 
