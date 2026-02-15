@@ -1,0 +1,75 @@
+/* Modern Footer Component Styles */
+
+.footer {
+  background: white;
+  border-top: 1px solid rgba(129, 67, 156, 0.1);
+  padding: 3rem 2rem;
+  margin-top: 4rem;
+}
+
+.inner {
+  max-width: 1100px;
+  margin: 0 auto;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.left {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.copyright {
+  font-size: 0.9375rem;
+  color: var(--base-font-color-muted, #706e71);
+  font-weight: 500;
+}
+
+.tagline {
+  font-size: 0.8125rem;
+  color: var(--base-font-color-muted, #706e71);
+  opacity: 0.7;
+}
+
+.social {
+  display: flex;
+  gap: 1.25rem;
+  align-items: center;
+}
+
+.social a {
+  color: var(--base-font-color-muted, #706e71);
+  font-size: 1.5rem;
+  transition: all 0.2s ease;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 40px;
+  height: 40px;
+  border-radius: 8px;
+}
+
+.social a:hover {
+  color: var(--brand, #81439c);
+  background: rgba(129, 67, 156, 0.08);
+}
+
+.social svg {
+  width: 1.25rem;
+  height: 1.25rem;
+}
+
+/* Mobile landscape and smaller */
+@media (max-width: 768px) {
+  .inner {
+    flex-direction: column;
+    gap: 2rem;
+    text-align: center;
+  }
+
+  .left {
+    align-items: center;
+  }
+}
