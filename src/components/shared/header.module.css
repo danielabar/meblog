@@ -50,7 +50,7 @@
 .name {
   font-size: 1.125rem;
   font-weight: 600;
-  color: var(--base-font-color, #1a0d1f);
+  color: var(--brand, #81439c);
   letter-spacing: -0.01em;
 }
 
