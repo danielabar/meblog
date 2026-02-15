@@ -1,61 +1,95 @@
 // Jest Snapshot v1, https://goo.gl/fbAQLP
 
-exports[`ArticleListMini renders correctly 1`] = `
+exports[`Header renders correctly 1`] = `
 {
   "asFragment": [Function],
   "baseElement": <body>
     <div>
-      <section
-        data-testid="article-list-mini"
+      <header
+        data-testid="header"
       >
-        <a
-          href="/article-1"
-        >
-          <div>
-            2024-04-10
-          </div>
-          <div>
-            Article 1
-          </div>
-        </a>
-        <a
-          href="/article-2"
-        >
-          <div>
-            2024-04-09
-          </div>
-          <div>
-            Article 2
-          </div>
-        </a>
-      </section>
+        <div>
+          <a
+            href="/"
+          >
+            <div>
+              <img
+                alt="Daniela Baron Profile"
+                src="/images/dbaron_profile.png"
+              />
+            </div>
+            <div>
+              Daniela Baron
+            </div>
+          </a>
+          <nav>
+            <a
+              href="/blog"
+            >
+              Blog
+            </a>
+            <a
+              href="/learning"
+            >
+              Learning
+            </a>
+            <a
+              href="/about"
+            >
+              About
+            </a>
+            <a
+              href="/rss.xml"
+            >
+              RSS
+            </a>
+          </nav>
+        </div>
+      </header>
     </div>
   </body>,
   "container": <div>
-    <section
-      data-testid="article-list-mini"
+    <header
+      data-testid="header"
     >
-      <a
-        href="/article-1"
-      >
-        <div>
-          2024-04-10
-        </div>
-        <div>
-          Article 1
-        </div>
-      </a>
-      <a
-        href="/article-2"
-      >
-        <div>
-          2024-04-09
-        </div>
-        <div>
-          Article 2
-        </div>
-      </a>
-    </section>
+      <div>
+        <a
+          href="/"
+        >
+          <div>
+            <img
+              alt="Daniela Baron Profile"
+              src="/images/dbaron_profile.png"
+            />
+          </div>
+          <div>
+            Daniela Baron
+          </div>
+        </a>
+        <nav>
+          <a
+            href="/blog"
+          >
+            Blog
+          </a>
+          <a
+            href="/learning"
+          >
+            Learning
+          </a>
+          <a
+            href="/about"
+          >
+            About
+          </a>
+          <a
+            href="/rss.xml"
+          >
+            RSS
+          </a>
+        </nav>
+      </div>
+    </header>
   </div>,
   "debug": [Function],
   "findAllByAltText": [Function],

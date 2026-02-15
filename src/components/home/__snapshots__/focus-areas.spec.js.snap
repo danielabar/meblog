@@ -1,61 +1,75 @@
 // Jest Snapshot v1, https://goo.gl/fbAQLP
 
-exports[`ArticleListMini renders correctly 1`] = `
+exports[`FocusAreas renders correctly 1`] = `
 {
   "asFragment": [Function],
   "baseElement": <body>
     <div>
-      <section
-        data-testid="article-list-mini"
-      >
-        <a
-          href="/article-1"
-        >
+      <div>
+        <div>
+          Areas of Focus
+        </div>
+        <div>
           <div>
-            2024-04-10
+            <div>
+              Full-Stack Development
+            </div>
+            <div>
+              Building complete solutions from database architecture to user interfaces
+            </div>
           </div>
           <div>
-            Article 1
-          </div>
-        </a>
-        <a
-          href="/article-2"
-        >
-          <div>
-            2024-04-09
+            <div>
+              Team Effectiveness
+            </div>
+            <div>
+              Developer experience, CI/CD, documentation, and workflows that compound value
+            </div>
           </div>
           <div>
-            Article 2
+            <div>
+              AI-Assisted Development
+            </div>
+            <div>
+              Leveraging AI while prioritizing system understanding and sustainable engineering practices
+            </div>
           </div>
-        </a>
-      </section>
+        </div>
+      </div>
     </div>
   </body>,
   "container": <div>
-    <section
-      data-testid="article-list-mini"
-    >
-      <a
-        href="/article-1"
-      >
+    <div>
+      <div>
+        Areas of Focus
+      </div>
+      <div>
         <div>
-          2024-04-10
+          <div>
+            Full-Stack Development
+          </div>
+          <div>
+            Building complete solutions from database architecture to user interfaces
+          </div>
         </div>
         <div>
-          Article 1
-        </div>
-      </a>
-      <a
-        href="/article-2"
-      >
-        <div>
-          2024-04-09
+          <div>
+            Team Effectiveness
+          </div>
+          <div>
+            Developer experience, CI/CD, documentation, and workflows that compound value
+          </div>
         </div>
         <div>
-          Article 2
+          <div>
+            AI-Assisted Development
+          </div>
+          <div>
+            Leveraging AI while prioritizing system understanding and sustainable engineering practices
+          </div>
         </div>
-      </a>
-    </section>
+      </div>
+    </div>
   </div>,
   "debug": [Function],
   "findAllByAltText": [Function],

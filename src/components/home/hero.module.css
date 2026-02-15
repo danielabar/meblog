@@ -1,0 +1,122 @@
+/* Hero Component Styles */
+
+.hero {
+  text-align: center;
+  margin-bottom: 3rem;
+  padding: 1.5rem 0;
+}
+
+.metricDisplay {
+  display: inline-flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 1rem;
+  margin-bottom: 1.5rem;
+}
+
+.metricVisual {
+  width: 160px;
+  height: 160px;
+  position: relative;
+  background: white;
+  border-radius: 12px;
+  box-shadow:
+    0 1px 3px rgba(129, 67, 156, 0.12),
+    0 8px 24px rgba(129, 67, 156, 0.08);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  overflow: hidden;
+}
+
+.metricBars {
+  display: flex;
+  align-items: flex-end;
+  gap: 8px;
+  height: 80px;
+}
+
+.bar {
+  width: 16px;
+  background: linear-gradient(180deg, var(--brand-lighten-10, #9c5ab8) 0%, var(--brand-darken-10, #633478) 100%);
+  border-radius: 3px 3px 0 0;
+  animation: growBar 1.5s ease-out forwards;
+  transform-origin: bottom;
+  opacity: 0;
+}
+
+.bar:nth-child(1) {
+  height: 45%;
+  animation-delay: 0.1s;
+}
+
+.bar:nth-child(2) {
+  height: 60%;
+  animation-delay: 0.2s;
+}
+
+.bar:nth-child(3) {
+  height: 85%;
+  animation-delay: 0.3s;
+}
+
+.bar:nth-child(4) {
+  height: 70%;
+  animation-delay: 0.4s;
+}
+
+.bar:nth-child(5) {
+  height: 100%;
+  animation-delay: 0.5s;
+}
+
+@keyframes growBar {
+  from {
+    transform: scaleY(0);
+    opacity: 0;
+  }
+  to {
+    transform: scaleY(1);
+    opacity: 1;
+  }
+}
+
+.metricNumber {
+  font-size: 4rem;
+  font-weight: 700;
+  color: var(--brand, #81439c);
+  line-height: 1;
+  letter-spacing: -0.02em;
+}
+
+.metricLabel {
+  font-size: 0.875rem;
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+  color: var(--base-font-color-muted, #706e71);
+  font-weight: 500;
+}
+
+.heroText {
+  max-width: 700px;
+  margin: 0 auto;
+  font-size: 1.375rem;
+  line-height: 1.7;
+  color: var(--base-font-color, #1a0d1f);
+}
+
+.heroText strong {
+  color: var(--brand, #81439c);
+  font-weight: 600;
+}
+
+/* Mobile landscape and smaller */
+@media (max-width: 768px) {
+  .metricNumber {
+    font-size: 3rem;
+  }
+
+  .heroText {
+    font-size: 1.125rem;
+  }
+}

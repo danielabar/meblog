@@ -76,3 +76,6 @@ yarn-error.log
 search.sql
 
 tmp
+
+# AI Assistant files
+.claude/settings.local.json

@@ -1,61 +1,71 @@
 // Jest Snapshot v1, https://goo.gl/fbAQLP
 
-exports[`ArticleListMini renders correctly 1`] = `
+exports[`Hero renders correctly 1`] = `
 {
   "asFragment": [Function],
   "baseElement": <body>
     <div>
-      <section
-        data-testid="article-list-mini"
-      >
-        <a
-          href="/article-1"
-        >
+      <div>
+        <div>
           <div>
-            2024-04-10
+            <div>
+              <div />
+              <div />
+              <div />
+              <div />
+              <div />
+            </div>
           </div>
           <div>
-            Article 1
+            <div>
+              15+
+            </div>
+            <div>
+              Years Building Software
+            </div>
           </div>
-        </a>
-        <a
-          href="/article-2"
-        >
-          <div>
-            2024-04-09
-          </div>
-          <div>
-            Article 2
-          </div>
-        </a>
-      </section>
+        </div>
+        <div>
+          I'm a senior software engineer with extensive experience delivering solutions that scale. I specialize in
+           
+          <strong>
+            Rails, PostgreSQL, and full-stack development
+          </strong>
+           — turning complex technical challenges into working software that real people use.
+        </div>
+      </div>
     </div>
   </body>,
   "container": <div>
-    <section
-      data-testid="article-list-mini"
-    >
-      <a
-        href="/article-1"
-      >
+    <div>
+      <div>
         <div>
-          2024-04-10
+          <div>
+            <div />
+            <div />
+            <div />
+            <div />
+            <div />
+          </div>
         </div>
         <div>
-          Article 1
+          <div>
+            15+
+          </div>
+          <div>
+            Years Building Software
+          </div>
         </div>
-      </a>
-      <a
-        href="/article-2"
-      >
-        <div>
-          2024-04-09
-        </div>
-        <div>
-          Article 2
-        </div>
-      </a>
-    </section>
+      </div>
+      <div>
+        I'm a senior software engineer with extensive experience delivering solutions that scale. I specialize in
+         
+        <strong>
+          Rails, PostgreSQL, and full-stack development
+        </strong>
+         — turning complex technical challenges into working software that real people use.
+      </div>
+    </div>
   </div>,
   "debug": [Function],
   "findAllByAltText": [Function],

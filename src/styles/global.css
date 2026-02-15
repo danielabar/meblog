@@ -50,6 +50,7 @@
   --base-font-color: var(--brand-darken-35);
   --base-font-family: "Bai Jamjuree", -apple-system, system-ui, "Segoe UI",
     Roboto, Oxygen-Sans, Ubuntu, Cantarell, "Helvetica Neue", sans-serif;
+  --font-family-2026: "DM Sans", -apple-system, sans-serif;
 }
 
 /* apply a natural box layout model to all elements, but allowing components to change */
