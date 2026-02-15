@@ -6,14 +6,16 @@ exports[`Layout renders correctly with children 1`] = `
   "baseElement": <body>
     <div>
       <div>
-        <header>
+        <header
+          data-testid="header"
+        >
           <div>
             <a
               href="/"
             >
               <div>
                 <img
-                  alt="Profile photo of Daniela Baron"
+                  alt="Daniela Baron Profile"
                   src="/images/dbaron_profile.png"
                 />
               </div>
@@ -50,7 +52,9 @@ exports[`Layout renders correctly with children 1`] = `
             Test Content
           </div>
         </main>
-        <footer>
+        <footer
+          data-testid="footer"
+        >
           <div>
             <div>
               <div>
@@ -143,14 +147,16 @@ exports[`Layout renders correctly with children 1`] = `
   </body>,
   "container": <div>
     <div>
-      <header>
+      <header
+        data-testid="header"
+      >
         <div>
           <a
             href="/"
           >
             <div>
               <img
-                alt="Profile photo of Daniela Baron"
+                alt="Daniela Baron Profile"
                 src="/images/dbaron_profile.png"
               />
             </div>
@@ -187,7 +193,9 @@ exports[`Layout renders correctly with children 1`] = `
           Test Content
         </div>
       </main>
-      <footer>
+      <footer
+        data-testid="footer"
+      >
         <div>
           <div>
             <div>

@@ -16,7 +16,7 @@ import * as styles from "./footer.module.css"
 
 const Footer = () => {
   return (
-    <footer className={styles.footer}>
+    <footer className={styles.footer} data-testid="footer">
       <div className={styles.inner}>
         <div className={styles.left}>
           <div className={styles.copyright}>© 2026 Daniela Baron</div>

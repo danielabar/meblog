@@ -5,14 +5,16 @@ exports[`Header renders correctly 1`] = `
   "asFragment": [Function],
   "baseElement": <body>
     <div>
-      <header>
+      <header
+        data-testid="header"
+      >
         <div>
           <a
             href="/"
           >
             <div>
               <img
-                alt="Profile photo of Daniela Baron"
+                alt="Daniela Baron Profile"
                 src="/images/dbaron_profile.png"
               />
             </div>
@@ -47,14 +49,16 @@ exports[`Header renders correctly 1`] = `
     </div>
   </body>,
   "container": <div>
-    <header>
+    <header
+      data-testid="header"
+    >
       <div>
         <a
           href="/"
         >
           <div>
             <img
-              alt="Profile photo of Daniela Baron"
+              alt="Daniela Baron Profile"
               src="/images/dbaron_profile.png"
             />
           </div>

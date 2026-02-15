@@ -77,7 +77,7 @@ describe("Home Page", () => {
     expect(articleLists.length).toBe(2)
     expect(screen.getByTestId("footer")).toBeInTheDocument()
 
-    expect(screen.getByText("Recent Posts")).toBeInTheDocument()
-    expect(screen.getByText("Popular Posts")).toBeInTheDocument()
+    expect(screen.getByText("Recent Writing")).toBeInTheDocument()
+    expect(screen.getByText("Popular Archives")).toBeInTheDocument()
   })
 })

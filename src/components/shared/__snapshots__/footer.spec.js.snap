@@ -5,7 +5,9 @@ exports[`Footer renders correctly 1`] = `
   "asFragment": [Function],
   "baseElement": <body>
     <div>
-      <footer>
+      <footer
+        data-testid="footer"
+      >
         <div>
           <div>
             <div>
@@ -96,7 +98,9 @@ exports[`Footer renders correctly 1`] = `
     </div>
   </body>,
   "container": <div>
-    <footer>
+    <footer
+      data-testid="footer"
+    >
       <div>
         <div>
           <div>
