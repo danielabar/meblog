@@ -1,0 +1,63 @@
+/* FocusAreas Component Styles */
+
+.container {
+  background: white;
+  border-radius: 12px;
+  padding: 2.5rem;
+  margin-bottom: 4rem;
+  box-shadow:
+    0 1px 3px rgba(129, 67, 156, 0.12),
+    0 8px 24px rgba(129, 67, 156, 0.08);
+}
+
+.header {
+  font-size: 1.125rem;
+  font-weight: 700;
+  color: var(--base-font-color, #1a0d1f);
+  margin-bottom: 2rem;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+
+.grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+  gap: 2rem;
+}
+
+.item {
+  padding: 1.5rem;
+  background: linear-gradient(135deg, rgba(129, 67, 156, 0.03) 0%, transparent 100%);
+  border-left: 3px solid var(--brand, #81439c);
+  border-radius: 4px;
+  transition: all 0.3s ease;
+}
+
+.item:hover {
+  background: linear-gradient(135deg, rgba(129, 67, 156, 0.06) 0%, transparent 100%);
+  transform: translateX(4px);
+}
+
+.title {
+  font-size: 1.0625rem;
+  font-weight: 600;
+  color: var(--base-font-color, #1a0d1f);
+  margin-bottom: 0.75rem;
+}
+
+.description {
+  font-size: 0.9375rem;
+  color: var(--base-font-color-muted, #706e71);
+  line-height: 1.6;
+}
+
+/* Mobile landscape and smaller */
+@media (max-width: 768px) {
+  .container {
+    padding: 1.5rem;
+  }
+
+  .grid {
+    grid-template-columns: 1fr;
+  }
+}
