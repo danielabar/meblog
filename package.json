@@ -22,6 +22,7 @@
   },
   "dependencies": {
     "@fontsource/bai-jamjuree": "4.2.1",
+    "@fontsource/dm-sans": "^5.2.8",
     "@fontsource/figtree": "4.5.3",
     "@fontsource/fira-code": "4.5.1",
     "applescript": "git+https://github.com/danielabar/vscode-applescript.git",
@@ -48,9 +49,9 @@
     "react-helmet": "5.2.1",
     "react-icons": "4.8.0",
     "rest-client": "github:Huachao/vscode-restclient",
+    "vscode-gherkin": "file:vendor/vscode-gherkin",
     "vscode-graphql-syntax": "github:danielabar/vscode-graphql-syntax",
-    "vscode-ruby-syntax": "github:smridge/vscode-ruby-syntax",
-    "vscode-gherkin": "file:vendor/vscode-gherkin"
+    "vscode-ruby-syntax": "github:smridge/vscode-ruby-syntax"
   },
   "devDependencies": {
     "@testing-library/jest-dom": "5.16.5",
