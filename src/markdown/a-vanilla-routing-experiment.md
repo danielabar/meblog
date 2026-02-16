@@ -14,19 +14,19 @@ There's something deeply appealing about vanilla JavaScript. In a world of const
 
 Over the years, I've built several portfolio projects like the [OAS Delay Calculator](https://danielabar.github.io/oas-delay-calculator-prototype/) and [Just Breathe](https://danielabar.github.io/just-breathe/) using almost entirely native web APIs, and each time, I'm reminded of how powerful modern browsers have become, and how refreshing it is to skip the build complexity entirely.
 
-But there's always that moment in every project where you build out your main view and think, "You know what would be nice? A few more pages." Maybe an about section, a contact form, or a portfolio gallery. Suddenly, you're faced with a choice: introduce a heavyweight SPA framework just for routing, or figure out how to handle navigation yourself.
+But there's always that moment in every project where you build out your main view and think, "You know what would be nice? A few more pages." Maybe an about section, a contact form, or a portfolio gallery. Suddenly, you're faced with a choice: introduce a heavyweight SPA (Single Page Application) framework just for routing, or figure out how to handle navigation yourself.
 
-This question became particularly relevant after reading [Anti-frameworkism: Choosing native web APIs over frameworks](https://blog.logrocket.com/anti-frameworkism-native-web-apis). This article makes a compelling argument for embracing web standards, which got me wondering: "What about vanilla routing? How hard could it be to build client-side navigation without a framework?"
-
-For this particular exploration into vanilla routing, I worked with AI assistance, specifically GitHub Copilot with the Claude Sonnet 4 model in VS Code. The AI pair programming approach proved valuable for iterating through different architectural approaches. You can explore the complete implementation and test suite at [github.com/danielabar/web_native_routing](https://github.com/danielabar/web_native_routing).
+This question became particularly relevant after reading [Anti-frameworkism: Choosing native web APIs over frameworks](https://blog.logrocket.com/anti-frameworkism-native-web-apis). This article makes a compelling argument for embracing web standards, which got me wondering: What about vanilla routing? How hard could it be to build client-side navigation without a framework?
 
 ## The Simple Dream vs. Reality
 
 My idea was to create a set of drop-in routing files that I could reuse across projects. Not a reusable library that others would depend on, but a pattern I could copy and customize for each project's needs. On the surface, the concept sounded simple. Set up an `index.html` with `<nav>` for links, a `<main>` for swappable content, and a `<footer>`. Then listen for navigation events, swap out the content in the main section, and voilà! Client-side routing without the overhead.
 
-To test this routing idea, I decided to build exactly the kind of project where vanilla routing might make sense, a basic profile website. The requirements were intentionally simple: a home page for the main landing content, an about page with static information, and a contact page with an form requiring JavaScript interactivity.
+To test this routing idea, I built a basic profile website, exactly the kind of project where vanilla routing makes sense. The requirements were intentionally simple: a home page for the main landing content, an about page with static information, and a contact page with an form requiring JavaScript interactivity.
 
 The contact page would be the litmus test. Form validation, submission handling, loading states, displaying a success messages. These interactive behaviors would reveal whether the routing system could handle view-specific logic without devolving into a tangled mess.
+
+For this particular exploration into vanilla routing, I worked with AI assistance, specifically GitHub Copilot with the Claude Sonnet 4 model in VS Code. The AI pair programming approach proved valuable for iterating through different architectural approaches. You can explore the complete implementation at [github.com/danielabar/web_native_routing](https://github.com/danielabar/web_native_routing).
 
 ## Naive Implementation
 
@@ -562,7 +562,7 @@ async navigate(path) {
 }
 ```
 
-The irony wasn't lost on me, I started this project to avoid build complexity, but deployment realities forced me to introduce exactly that.
+The irony: I started this project to avoid build complexity, yet deployment realities forced me to introduce exactly that.
 
 ## Problem 5: Deep Links
 
@@ -613,11 +613,9 @@ Implementing SPA fallback correctly meant users could bookmark any route, refres
 
 ## Problem 6 Regression Testing
 
-Building your own routing system means you're now responsible for behaviors that framework users simply take for granted. With every code change — fixing a bug, adding a feature, refactoring — I found myself doing manual regression testing of the most basic interactions. Click "About". Does it load? Click "Contact". Does it work? Hit the back button twice. Does it return to home? Refresh the page. Does the view persist? Type `/about` directly into the address bar. Does it navigate correctly?
+Building your own routing system means you're now responsible for behaviors that framework users take for granted. With every code change — fixing a bug, adding a feature, refactoring — I found myself doing manual regression testing of the most basic interactions. Click "About". Does it load? Click "Contact". Does it work? Hit the back button twice. Does it return to home? Refresh the page. Does the view persist? Type `/about` directly into the address bar. Does it navigate correctly?
 
-This constant manual verification became exhausting. Framework routers have these fundamentals battle-tested through years of production use and hundreds or more test scenarios, but my vanilla solution required me to personally verify everything, every time. The realization hit that I needed comprehensive automated browser tests just to maintain confidence in basic navigation.
-
-I added Playwright end-to-end tests with Cucumber BDD for Given/When/Then style testing across multiple browsers—Chromium, Firefox, and WebKit. Here's an example of the test coverage that became essential:
+This constant manual verification became exhausting. Framework routers have these fundamentals battle-tested through years of production use and automated test suites, but my vanilla solution required personally verifying everything, every time. The realization hit that I needed comprehensive automated browser tests to maintain confidence in the navigation. So I added Playwright end-to-end tests with Cucumber BDD for Given/When/Then style testing across multiple browsers. Here's an example of the test coverage that became essential:
 
 ```gherkin
 Scenario: Browser navigation controls
@@ -637,7 +635,7 @@ Scenario: Browser navigation controls
   And the URL should be "/about"
 ```
 
-Setting up Playwright, configuring the test runners for multiple browsers, and writing comprehensive test scenarios is beyond the scope of this post. If you're interested in the full testing implementation, you can explore the [complete test suite](https://github.com/danielabar/web_native_routing/tree/main/tests/e2e) in the repository.
+Setting up Playwright, configuring the test runners for multiple browsers, and writing test scenarios is beyond the scope of this post. If you're interested in the full testing implementation, you can explore the [complete test suite](https://github.com/danielabar/web_native_routing/tree/main/tests/e2e) in the repository.
 
 ## To Route Or Not To Route
 
