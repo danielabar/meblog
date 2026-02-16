@@ -440,8 +440,6 @@ The breakthrough was realizing that different types of navigation needed differe
 - **Browser back/forward**: Don't create additional entries (just navigate)
 - **Initial page load**: Don't push state (the browser already has an entry)
 
-This was a reminder that browser APIs, while powerful, have nuances that framework authors have spent years perfecting.
-
 ## Problem 3: Invalid Routes
 
 Up to this point, I had been ignoring a fundamental question: what happens when users type something like `/foo` or `/nonexistent-page` into their browser? Implementing proper invalid route handling meant adding another method to the router:
@@ -592,7 +590,7 @@ The other half of the SPA fallback pattern is in `index.html`, where an inline s
 
 This script runs before the router initializes, so when `handleInitialRoute()` reads `location.pathname`, it gets the user's intended destination, not just the base path. The two-part solution works as follows: when a user visits `/contact` directly, GitHub Pages serves the 404.html which stores the full URL in sessionStorage and redirects to the base path. Then index.html loads, its inline script reads the stored URL, uses `history.replaceState()` to update the browser's address bar back to `/contact`, and deletes the sessionStorage value. Finally, the router initializes and navigates to the correct route based on the restored pathname.
 
-Implementing SPA fallback correctly meant users could bookmark any route, refresh pages without losing their place, and share direct links that worked reliably. But it also meant adding more complexity to handle edge cases that frameworks typically manage invisibly.
+Implementing SPA fallback correctly meant users could bookmark any route, refresh pages without losing their place, and share direct links that worked reliably. But it also meant adding more complexity to handle these edge cases.
 
 ## Problem 6: Regression Testing
 
