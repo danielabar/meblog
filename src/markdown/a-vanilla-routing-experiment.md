@@ -384,7 +384,7 @@ export default class ContactView {
 }
 ```
 
-This refactoring solved the separation of concerns problem. Views were now self-contained, the router focused purely on navigation logic. Although this ws starting to feel like framework building...
+This refactoring solved the separation of concerns problem. Views were now self-contained, the router focused purely on navigation logic.
 
 Then I uncovered another critical issue.
 
@@ -483,7 +483,7 @@ But the challenge extended beyond just showing an error page. I had to consider:
 - How does this interact with the SPA fallback system?
 - Should 404 pages be treated as "real" routes for history purposes?
 
-Each of these questions led to more edge cases and more code. The simple router was growing more complex as it encountered the realities of user behavior and web standards. Framework routers handle these scenarios because they've been tested against thousands of real-world applications, but my vanilla solution had to discover and solve each problem individually, or decide that for a simple project, it doesn't have to solve every edge case.
+Each of these questions led to more edge cases and more code. The simple router was growing more complex as it encountered the realities of user behavior and web standards. My vanilla solution had to discover and solve each problem individually—or decide that for a simple project, it doesn't have to solve every edge case.
 
 ## Problem 4: Deployment Path
 
