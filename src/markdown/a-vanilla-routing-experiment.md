@@ -496,15 +496,13 @@ async navigate(path) {
 }
 ```
 
-This was passing the route path directly to `history.pushState()`—`/about`, `/contact`, etc. This worked perfectly during local development at `localhost:3000/about`, but broke completely on GitHub Pages.
-
-Here's what happened when users clicked "About" on the deployed site:
+This was passing the route path directly to `history.pushState()`—`/about`, `/contact`, etc. This worked locally but broke on GitHub Pages:
 
 - Router received: `/about`
 - Browser navigated to: `https://username.github.io/about` ❌
 - Should have been: `https://username.github.io/web_native_routing/about` ✅
 
-The router had no awareness it was running in a subdirectory. Every navigation stripped away the base path. I tried auto-detecting the base path from the hosting environment, but that proved complex and brittle. The solution that finally worked was introducing explicit configuration with a simple build script.
+The router had no subdirectory awareness. After trying auto-detection (too brittle), I settled on explicit configuration via a build script.
 
 First, I added a `deploy_base_path` attribute to `package.json`:
 
