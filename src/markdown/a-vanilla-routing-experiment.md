@@ -22,9 +22,9 @@ This question became particularly relevant after reading [Anti-frameworkism: Cho
 
 My idea was to create a set of drop-in routing files that I could reuse across projects. Not a reusable library that others would depend on, but a pattern I could copy and customize for each project's needs. On the surface, the concept sounded simple. Set up an `index.html` with `<nav>` for links, a `<main>` for swappable content, and a `<footer>`. Then listen for navigation events, swap out the content in the main section, and voilà! Client-side routing without the overhead.
 
-To test this routing idea, I built a basic profile website, exactly the kind of project where vanilla routing makes sense. The requirements were intentionally simple: a home page for the main landing content, an about page with static information, and a contact page with an form requiring JavaScript interactivity.
+To test this routing idea, I built a basic profile website, exactly the kind of project where vanilla routing makes sense. The requirements were intentionally simple: a home page for the main landing content, an about page with static information, and a contact page with a form requiring JavaScript interactivity.
 
-The contact page would be the litmus test. Form validation, submission handling, loading states, displaying a success messages. These interactive behaviors would reveal whether the routing system could handle view-specific logic without devolving into a tangled mess.
+The contact page would be the litmus test. Form validation, submission handling, loading states, and displaying a success message. These interactive behaviors would reveal whether the routing system could handle view-specific logic without devolving into a tangled mess.
 
 For this particular exploration into vanilla routing, I worked with AI assistance, specifically GitHub Copilot with the Claude Sonnet 4 model in VS Code. The AI pair programming approach proved valuable for iterating through different architectural approaches. You can explore the complete implementation at [github.com/danielabar/web_native_routing](https://github.com/danielabar/web_native_routing).
 
