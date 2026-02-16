@@ -30,7 +30,7 @@ For this particular exploration into vanilla routing, I worked with AI assistanc
 
 ## Naive Implementation
 
-I started with a Router class that maintained a registry of routes, cached templates to avoid repeated network requests, and handled the fundamental mechanics of swapping content and updating browser history. Note that the AI assistant took the initiative to add caching of the view templates and error handling:
+I started with a Router class that maintained a registry of routes, cached templates to avoid repeated network requests, and handled the fundamental mechanics of swapping content and updating browser history:
 
 ```javascript
 class Router {
@@ -41,9 +41,6 @@ class Router {
       this.cache = new Map(); // Simple template cache
     }
 
-    /**
-     * Initialize router - set up event listeners and handle initial route
-     */
     init() {
       // Handle browser back/forward buttons
       window.addEventListener('popstate', (event) => {
@@ -63,24 +60,10 @@ class Router {
       this.handleInitialRoute();
     }
 
-    /**
-     * Handle the initial page load route
-     */
-    async handleInitialRoute() {
-        const path = location.pathname;
-        await this.navigate(path);
-    }
-
-    /**
-     * Register a new route and content
-     */
     addRoute(path, templatePath) {
         this.routes.set(path, templatePath);
     }
 
-    /**
-     * Navigate to a specific route
-     */
     async navigate(path) {
       if (this.currentRoute === path) return;
 
@@ -95,74 +78,25 @@ class Router {
       this.updateNavigation(path);
     }
 
-    /**
-     * Load HTML template and inject into content area
-     */
     async loadView(templatePath) {
       if (this.cache.has(templatePath)) {
         this.contentElement.innerHTML = this.cache.get(templatePath);
         return;
       }
 
-      const response = await fetch(templatePath);
-      if (!response.ok) {
-        throw new Error(`Failed to load template: ${response.status}`);
-      }
-
-      const html = await response.text();
+      const html = await fetch(templatePath).then(r => r.text());
       this.cache.set(templatePath, html);
       this.contentElement.innerHTML = html;
+
+      // View-specific logic mixed in here (see Problem 1)
       this.initializeView();
     }
 
-    /**
-     * Update navigation active states
-     */
-    updateNavigation(currentPath) {
-      const navLinks = document.querySelectorAll('.nav-link');
-      navLinks.forEach(link => {
-        const href = link.getAttribute('href');
-        link.classList.toggle('active', href === currentPath);
-      });
-    }
-
-    /**
-     * Initialize any JavaScript needed for the current view
-     */
-    initializeView() {
-        // Handle contact form if on contact page
-        const contactForm = document.getElementById('contact-form');
-        if (contactForm) {
-            this.initContactForm(contactForm);
-        }
-    }
-
-    /**
-     * Initialize contact form (example of view-specific functionality)
-     */
-    initContactForm(form) {
-        form.addEventListener('submit', async (e) => {
-            e.preventDefault();
-            const formData = new FormData(form);
-
-            // Simulate form submission
-            const submitButton = form.querySelector('button[type="submit"]');
-            const originalText = submitButton.textContent;
-            submitButton.textContent = 'Sending...';
-            submitButton.disabled = true;
-
-            // Simulate API call
-            await new Promise(resolve => setTimeout(resolve, 1000));
-
-            // Show success message
-            form.innerHTML = '<p class="success">Thank you! Your message has been sent.</p>';
-        });
-    }
+    // ... updateNavigation, initializeView, and form handling methods
 }
-
-// Make Router available globally
-window.Router = Router;
 ```
+
+The router also included methods for updating navigation states and handling view-specific functionality like form submissions—which would later become a key architectural problem.
 
 Here is the `index.html` containing a navigation bar with route links and a content area where views would be swapped:
 
