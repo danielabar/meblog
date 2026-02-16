@@ -211,7 +211,7 @@ router.addRoute('/contact', 'views/contact.html');
 router.init();
 ```
 
-The basic mechanics worked beautifully. Navigation between views was smooth, template loading was efficient with caching, and the whole thing felt surprisingly straightforward. But then I had to deal with the elephant in the room: view-specific JavaScript.
+The basic mechanics worked well. But there was a problem with view-specific JavaScript.
 
 ## Problem 1: View Specific Logic Mixed With Router
 
