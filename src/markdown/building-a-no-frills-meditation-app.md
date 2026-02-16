@@ -265,19 +265,17 @@ function updateState() {
 
 Rather than waiting for exact intervals using timers, the app continuously checks how much actual time has elapsed using [requestAnimationFrame](https://developer.mozilla.org/en-US/docs/Web/API/Window/requestAnimationFrame). This schedules the loop to run in sync with the browser's repaint cycle. On each frame, the function compares the current time against when the breath phase started. When the target duration is reached (for example, 5.5 seconds for an inhale), it transitions to the next phase and resets the timer.
 
-When the total time is reached, the app lets you finish your last out-breath before wrapping up, speaking "All done".
+When the total time is reached, the app lets you finish your last out-breath before wrapping up. With the session loop handling timing, the next question was how to guide users without requiring them to watch the screen.
 
 ### Voice-Guided
 
-All prompts are spoken using the [Web Speech API](https://developer.mozilla.org/en-US/docs/Web/API/SpeechSynthesis), so the user doesn't need to watch the screen during the session. The browser provides the voice, which may sound different depending on the operating system and settings.
+All prompts - "Breathe in", "Breathe out", and "All done" at the end - are spoken using the [Web Speech API](https://developer.mozilla.org/en-US/docs/Web/API/SpeechSynthesis), so the user doesn't need to watch the screen during the session and knows when it's over. The browser provides the voice, which may sound different depending on the operating system and settings.
 
 The implementation includes some careful tuning to make the voice guidance more pleasant during meditation. The speech rate is slowed down slightly (`0.85`), and the pitch is lowered a bit (`0.9`) to create a calmer, more soothing tone. The function also cancels any previous utterances before speaking - this prevents voice prompts from queuing up or overlapping if something unexpected happens.
 
-Additionally, the function can optionally return the utterance object, which is used during the countdown sequence to synchronize timing with the actual speech events:
-
 ```js
 // js/voice.js
-export function speak(text, returnUtterance = false) {
+export function speak(text) {
   if (!('speechSynthesis' in window)) return;
   const utter = new window.SpeechSynthesisUtterance(text);
   utter.rate = 0.85;    // Slightly slower for a calmer pace
@@ -285,7 +283,6 @@ export function speak(text, returnUtterance = false) {
   utter.lang = 'en-US';
   window.speechSynthesis.cancel(); // Stop any previous utterances
   window.speechSynthesis.speak(utter);
-  if (returnUtterance) return utter; // Used for countdown timing
 }
 ```
 
