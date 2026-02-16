@@ -320,33 +320,43 @@ The breakthrough was realizing that different types of navigation needed differe
 - **Browser back/forward**: Don't create additional entries (just navigate)
 - **Initial page load**: Don't push state (the browser already has an entry)
 
-## Problem 3: Invalid Routes
+## Problem 3: Deep Links
 
-Up to this point, I had been ignoring a fundamental question: what happens when users type something like `/foo` or `/nonexistent-page` into their browser? Implementing proper invalid route handling meant adding another method to the router:
+Just when I thought I had routing figured out, I discovered that direct URL access was broken. If a user bookmarked `/about` or typed `/contact` directly into their browser, they'd get an error. But here's the twist: it didn't matter whether the route was valid or not. Even typing `/about` (a perfectly valid route in my router) failed, because the request never reached my router at all.
+
+The web server received the request first, looked for `/about.html`, didn't find it, and served a generic 404 error. The vanilla router never got a chance to run. This is the fundamental challenge of client-side routing on static hosts: you need to convince the hosting provider to serve `index.html` for ALL paths, letting your router decide what to do with them.
+
+This was solved by adding a 404.html page to intercepts failed requests and capture the intended URL:
 
 ```javascript
-/**
- * Show 404 error page
- */
-show404() {
-  this.contentElement.innerHTML = `
-    <div class="error-page">
-      <h1>404 - Page Not Found</h1>
-      <p>The page you're looking for doesn't exist.</p>
-      <a href="/" class="btn btn-primary" data-route>Go Home</a>
-    </div>
-  `;
-}
+// 404.html - SPA fallback script
+import { deploymentConfig } from './js/config.js';
+
+// Store intended URL and redirect to base path
+sessionStorage.setItem('redirect', location.href);
+location.replace(deploymentConfig.basePath);
 ```
 
-The error method is invoked in the router's `navigate()` method when no route matches the requested path. But the challenge extended beyond just showing an error page. I had to consider:
+Then `index.html` was enhanced with an inline script to restore the intended URL before the router initializes:
 
-- Should invalid routes update the browser's address bar?
-- What happens if someone bookmarks a 404 URL?
-- How does this interact with the SPA fallback system?
-- Should 404 pages be treated as "real" routes for history purposes?
+```html
+<!-- index.html - Restore intended route from 404 redirect -->
+<script>
+    (function() {
+        var redirect = sessionStorage.getItem('redirect');
+        sessionStorage.removeItem('redirect');
+        if (redirect && redirect != location.href) {
+            history.replaceState(null, null, redirect);
+        }
+    })();
+</script>
+```
 
-Each of these questions led to more edge cases and more code. The simple router was growing more complex as it encountered the realities of user behavior and web standards. My vanilla solution had to discover and solve each problem individually—or decide that for a simple project, it doesn't have to solve every edge case.
+This script runs before the router initializes, so when `handleInitialRoute()` reads `location.pathname`, it gets the user's intended destination, not just the base path.
+
+This two-part solution works as follows: when a user visits `/contact` directly, GitHub Pages serves the 404.html which stores the full URL in sessionStorage and redirects to the base path. Then index.html loads, its inline script reads the stored URL, uses `history.replaceState()` to update the browser's address bar back to `/contact`, and deletes the sessionStorage value. Finally, the router initializes and navigates to the correct route based on the restored pathname.
+
+But there was one piece still missing: my router was now receiving ALL paths from the SPA fallback, including paths like `/foo` or `/nonexistent-page` that I never registered as routes. The SPA fallback solved getting URLs to my router, but now I needed to handle invalid routes gracefully.
 
 ## Problem 4: Deployment Path
 
@@ -410,39 +420,35 @@ async navigate(path) {
 
 **The irony:** I started this project to avoid build complexity, yet deployment realities forced me to introduce exactly that.
 
-## Problem 5: Deep Links
+## Problem 5: Invalid Routes
 
-Just when I thought I had routing figured out, I discovered that direct URL access completely broke the application. If a user bookmarked `/about` or refreshed the page while viewing the contact form, they'd get an error. Static hosting providers like GitHub Pages don't know about client-side routes, they look for actual files. This problem required implementing the SPA fallback pattern—a standard technique for making client-side routes work on static hosts.
+With the SPA fallback working, my router was now receiving all direct URL requests, both valid routes like `/about` and invalid routes like `/foo` or `/nonexistent-page`. The static server was no longer rejecting these requests; instead, they were all being forwarded to `index.html` where my router would process them.
 
-The `404.html` file intercepts failed requests and captures the intended URL:
+This created a new problem: what should happen when users type a path that isn't registered in the router? Should they see a blank page? Get silently redirected to home? The answer was implementing a custom 404 page that lived inside the SPA itself. This meant adding another method to the router:
 
 ```javascript
-// 404.html - SPA fallback script
-import { deploymentConfig } from './js/config.js';
-
-// Store intended URL and redirect to base path
-sessionStorage.setItem('redirect', location.href);
-location.replace(deploymentConfig.basePath);
+/**
+ * Show 404 error page
+ */
+show404() {
+  this.contentElement.innerHTML = `
+    <div class="error-page">
+      <h1>404 - Page Not Found</h1>
+      <p>The page you're looking for doesn't exist.</p>
+      <a href="/" class="btn btn-primary" data-route>Go Home</a>
+    </div>
+  `;
+}
 ```
 
-The other half of the SPA fallback pattern is in `index.html`, where an inline script restores the intended URL before the router initializes:
+The error method is invoked in the router's `navigate()` method when no route matches the requested path. But the challenge extended beyond just showing an error page. I had to consider:
 
-```html
-<!-- index.html - Restore intended route from 404 redirect -->
-<script>
-    (function() {
-        var redirect = sessionStorage.getItem('redirect');
-        sessionStorage.removeItem('redirect');
-        if (redirect && redirect != location.href) {
-            history.replaceState(null, null, redirect);
-        }
-    })();
-</script>
-```
+- Should invalid routes update the browser's address bar?
+- What happens if someone bookmarks a 404 URL?
+- How does this interact with the SPA fallback system?
+- Should 404 pages be treated as "real" routes for history purposes?
 
-This script runs before the router initializes, so when `handleInitialRoute()` reads `location.pathname`, it gets the user's intended destination, not just the base path. The two-part solution works as follows: when a user visits `/contact` directly, GitHub Pages serves the 404.html which stores the full URL in sessionStorage and redirects to the base path. Then index.html loads, its inline script reads the stored URL, uses `history.replaceState()` to update the browser's address bar back to `/contact`, and deletes the sessionStorage value. Finally, the router initializes and navigates to the correct route based on the restored pathname.
-
-Implementing SPA fallback correctly meant users could bookmark any route, refresh pages without losing their place, and share direct links that worked reliably. But it also meant adding more complexity to handle these edge cases.
+Each of these questions led to more edge cases and more code. The SPA fallback had solved the server-level routing problem, but now I had to solve the client-level routing problem. My vanilla solution had to discover and handle each layer individually—or decide that for a simple project, some edge cases could remain unsolved.
 
 ## Problem 6: Regression Testing
 
