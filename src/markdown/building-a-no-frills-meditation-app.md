@@ -404,55 +404,6 @@ In addition to the JavaScript setup, the CSS is organized into multiple smaller 
 While <code>@import</code> has historically been discouraged for performance reasons, since older browsers loaded files sequentially, HTTP/2's multiplexing reduces that concern. In this small app, the tradeoff favors developer experience and maintainability, making the modular file structure more valuable than micro-optimizing CSS delivery. <a class="markdown-link" href="https://css-tricks.com/almanac/rules/i/import">Further reading</a>.
 </aside>
 
-### CSS Variables
-
-The app defines a centralized color and typography system using CSS custom properties in `variables.css`. This makes it easy to maintain consistent design choices and update them globally:
-
-```css
-:root {
-  --font-main: 'Inter', 'Segoe UI', 'Roboto', 'Arial', sans-serif;
-  --color-bg: #f6f7f9;
-  --color-text: #444;
-  --color-accent: #6bb7b7;
-  --color-card: #fff;
-}
-```
-
-Instead of hardcoding values across components, classes reference these variables:
-
-```css
-body {
-  font-family: var(--font-main);
-  background: var(--color-bg);
-  color: var(--color-text);
-}
-```
-
-### Variable Font
-
-The project loads the Inter typeface as a variable font via `@font-face`. Variable fonts allow a single file to cover a wide weight range (100–900), reducing HTTP requests while offering flexibility in typography:
-
-```css
-@font-face {
-  font-family: 'Inter';
-  src: url('../assets/fonts/InterVariable.woff2') format('woff2');
-  font-weight: 100 900;
-  font-style: normal;
-  font-display: swap;
-}
-```
-
-Components can then select any weight without requiring separate font files:
-
-```css
-h1 { font-weight: 700; }
-p  { font-weight: 400; }
-```
-
-<aside class="markdown-aside">
-Since building this app, I came across <a class="markdown-link" href="https://github.com/robzolkos/csscaffold">CSS Scaffold</a>, which offers a very clean and organized approach to structuring CSS. If I were starting a new project today, I'd likely reach for that instead of the more "vibe coded" setup here, which got a little messy.
-</aside>
-
 ## Final Thoughts
 
 I now use Just Breathe nearly every day after my workout. It's simple, peaceful, and effective. This project reminded me how satisfying it is to build tools *just* for yourself. Especially ones that make your day measurably better.
