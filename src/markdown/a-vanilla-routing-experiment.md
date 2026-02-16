@@ -358,7 +358,37 @@ This two-part solution works as follows: when a user visits `/contact` directly,
 
 But there was one piece still missing: my router was now receiving ALL paths from the SPA fallback, including paths like `/foo` or `/nonexistent-page` that I never registered as routes. The SPA fallback solved getting URLs to my router, but now I needed to handle invalid routes gracefully.
 
-## Problem 4: Deployment Path
+## Problem 4: Invalid Routes
+
+With the SPA fallback working, my router was now receiving all direct URL requests, both valid routes like `/about` and invalid routes like `/foo` or `/nonexistent-page`. The static server was no longer rejecting these requests; instead, they were all being forwarded to `index.html` where my router would process them.
+
+This created a new problem: what should happen when users type a path that isn't registered in the router? Should they see a blank page? Get silently redirected to home? The answer was implementing a custom 404 page that lived inside the SPA itself. This meant adding another method to the router:
+
+```javascript
+/**
+ * Show 404 error page
+ */
+show404() {
+  this.contentElement.innerHTML = `
+    <div class="error-page">
+      <h1>404 - Page Not Found</h1>
+      <p>The page you're looking for doesn't exist.</p>
+      <a href="/" class="btn btn-primary" data-route>Go Home</a>
+    </div>
+  `;
+}
+```
+
+The error method is invoked in the router's `navigate()` method when no route matches the requested path. But the challenge extended beyond just showing an error page. I had to consider:
+
+- Should invalid routes update the browser's address bar?
+- What happens if someone bookmarks a 404 URL?
+- How does this interact with the SPA fallback system?
+- Should 404 pages be treated as "real" routes for history purposes?
+
+Each of these questions led to more edge cases and more code. The SPA fallback had solved the server-level routing problem, but now I had to solve the client-level routing problem. My vanilla solution had to discover and handle each layer individually—or decide that for a simple project, some edge cases could remain unsolved.
+
+## Problem 5: Deployment Path
 
 Another major hurdle emerged during deployment to GitHub Pages, which was URL construction during navigation. Look back at the naive implementation's `navigate()` method. See that `history.pushState()` call?
 
@@ -420,36 +450,6 @@ async navigate(path) {
 
 **The irony:** I started this project to avoid build complexity, yet deployment realities forced me to introduce exactly that.
 
-## Problem 5: Invalid Routes
-
-With the SPA fallback working, my router was now receiving all direct URL requests, both valid routes like `/about` and invalid routes like `/foo` or `/nonexistent-page`. The static server was no longer rejecting these requests; instead, they were all being forwarded to `index.html` where my router would process them.
-
-This created a new problem: what should happen when users type a path that isn't registered in the router? Should they see a blank page? Get silently redirected to home? The answer was implementing a custom 404 page that lived inside the SPA itself. This meant adding another method to the router:
-
-```javascript
-/**
- * Show 404 error page
- */
-show404() {
-  this.contentElement.innerHTML = `
-    <div class="error-page">
-      <h1>404 - Page Not Found</h1>
-      <p>The page you're looking for doesn't exist.</p>
-      <a href="/" class="btn btn-primary" data-route>Go Home</a>
-    </div>
-  `;
-}
-```
-
-The error method is invoked in the router's `navigate()` method when no route matches the requested path. But the challenge extended beyond just showing an error page. I had to consider:
-
-- Should invalid routes update the browser's address bar?
-- What happens if someone bookmarks a 404 URL?
-- How does this interact with the SPA fallback system?
-- Should 404 pages be treated as "real" routes for history purposes?
-
-Each of these questions led to more edge cases and more code. The SPA fallback had solved the server-level routing problem, but now I had to solve the client-level routing problem. My vanilla solution had to discover and handle each layer individually—or decide that for a simple project, some edge cases could remain unsolved.
-
 ## Problem 6: Regression Testing
 
 Building your own routing system means you're now responsible for behaviors that framework users take for granted. With every code change — fixing a bug, adding a feature, refactoring — I found myself doing manual regression testing of the most basic interactions. Click "About". Does it load? Click "Contact". Does it work? Hit the back button twice. Does it return to home? Refresh the page. Does the view persist? Type `/about` directly into the address bar. Does it navigate correctly?
@@ -476,9 +476,11 @@ Scenario: Browser navigation controls
 
 Setting up Playwright, configuring the test runners for multiple browsers, and writing test scenarios is beyond the scope of this post. If you're interested in the full testing implementation, you can explore the [complete test suite](https://github.com/danielabar/web_native_routing/tree/main/tests/e2e) in the repository.
 
-## To Route Or Not To Route
+## Weighing the Tradeoffs
 
 After working through all these challenges, I gained a deep appreciation for both the power of vanilla JavaScript and the value of well-tested frameworks. The experience clarified when each approach makes sense.
+
+![to route or not to route](../images/to-route-or-not-to-route.png "to route or not to route")
 
 **The Case for Vanilla Routing**
 
