@@ -12,7 +12,7 @@ related:
 
 This is the story of how I built Just Breathe, a no-frills meditation app: part personal journey, part technical walkthrough.
 
-I first heard about the benefits of meditation years ago on a podcast. An expert practitioner was being interviewed on a health podcast and said if the benefits of meditation were available as a pill, it would make some pharmaceutical company billions in profits. Benefits such as: lower stress, improved sleep, reduced anxiety, better blood pressure, improved focus, clearer thinking, enhanced performance on cognitive tasks, even longevity. I was intrigued enough to buy the author's book, especially because he billed it as a "no BS" guide.
+I first heard about the benefits of meditation years ago on a podcast. An expert practitioner was being interviewed on a health podcast and said if the benefits of meditation were available as a pill, it would make some pharmaceutical company billions in profits. Benefits such as: lower stress, improved sleep, reduced anxiety, better blood pressure, improved focus, clearer thinking, enhanced performance on cognitive tasks, even longevity. Intrigued, I bought the book, especially since the author billed it as 'no BS.'
 
 <aside class="markdown-aside">
 As someone who's been listening to podcasts for over a decade, I've noticed an increasing trend of podcasts being book tours in disguise: Casual conversations that somehow always end up pitching someone's latest "life changing" book.
@@ -26,8 +26,8 @@ That's been my issue with meditation all along. I'm open to the science, but not
 
 I wanted something simple: a gentle breathing reminder to help me focus. But everything I tried had problems.
 
-* **Guided meditation apps** often required subscriptions. While useful, they never felt worth a recurring fee.
-* **Free versions** were full of ads and usually demanded I create an account.
+* **Guided meditation apps** required subscriptions that never felt worth the recurring cost.
+* **Free versions** bombarded me with ads and account creation demands.
 * **Distractions** Even in the health and wellness space, many apps are still designed around the attention economy: upsells, notifications, and nudges to buy extras instead of just letting you breathe.
 * **Tone** Full of vague spiritual platitudes and ambient whale sounds. Not my thing.
 * **Meditation podcasts** Same issue - plus ads - and often just as "out there."
@@ -56,18 +56,18 @@ That clicked. Finally, here was something grounded and practical, stripped of my
 
 The technique sounds simple, but here's what happened for me in practice:
 
-* **Counting 5.5 seconds** wasn't intuitive, whole numbers felt easier, but stressing about the additional half second defeated the purpose.
-* **Constant counting** was distracting, pulling attention away from the feeling of the breath.
-* **Mind wandering** often led to zoning out and forgetting the pattern altogether.
-* **Knowing when to stop** required setting a timer, but even the gentlest alert felt jarring if already relaxed, undoing the benefit of the session.
+**Counting 5.5 seconds** wasn't intuitive, whole numbers felt easier, but stressing about the additional half second defeated the purpose.
 
-After running into all these frictions, I came to the realization that I needed a bare-bones tool that would:
+**Constant counting** was distracting, pulling attention away from the feeling of the breath.
 
-Guide me through 5.5-second breaths with voice prompts,
+**Mind wandering** often led to zoning out and forgetting the pattern altogether.
 
-Keep me on track without me having to count, and
+**Knowing when to stop** required setting a timer, but even the gentlest alert felt jarring if already relaxed, undoing the benefit of the session.
 
-End the session gently, not abruptly.
+After running into all these frictions, I realized I needed a bare-bones tool that would:
+- Guide me through 5.5-second breaths with voice prompts
+- Keep me on track without counting
+- End sessions gently, not abruptly
 
 That was it. Nothing more.
 
@@ -123,7 +123,7 @@ While the session is running the user hears "Breathe in", then 5.5 seconds later
 
 ## From Prototype to Structure
 
-The first working version came together quickly, but it wasn't especially tidy. The AI had no trouble producing something functional, but the early iterations tended toward a single, intertwined script where timing, UI updates, voice prompts, and state all lived together. Getting from "it works" to something I could continue to iterate on involved a lot of back-and-forth: asking for smaller files, clearer responsibilities, and refactors that pulled unrelated concerns apart.
+The first working version came together quickly, but it wasn't especially tidy. The AI had no trouble producing something functional, but the early iterations tended toward a single, intertwined script where timing, UI updates, voice prompts, and state all lived together. Getting from "it works" to maintainable code involved extensive back-and-forth: requesting smaller files, clearer responsibilities, and separation of concerns.
 
 What follows walks through some of the technical choices that fell out of that process.
 
