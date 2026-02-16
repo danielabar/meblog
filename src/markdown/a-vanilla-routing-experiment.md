@@ -388,22 +388,7 @@ export const deploymentConfig = {
 };
 ```
 
-The build script copies all the code to a new `dist` directory, then extracts the value from `package.json` and replaces it in the production build:
-
-```bash
-#!/bin/bash
-# scripts/build.sh
-
-# Extract deploy base path from package.json
-DEPLOY_BASE_PATH=$(node -p "require('./package.json').deploy_base_path || '/web_native_routing/'")
-
-# Copy files to dist/
-rsync -av --exclude='dist' --exclude='node_modules' --exclude='.git' . dist/
-
-# Replace basePath in config.js for production deployment
-sed -i.bak "s|basePath: '[^']*'|basePath: '$DEPLOY_BASE_PATH'|g" dist/js/config.js
-rm -f dist/js/config.js.bak
-```
+The [build script](https://github.com/danielabar/web_native_routing/blob/main/scripts/build.sh) extracts `deploy_base_path` from package.json and uses `sed` to replace the value in `config.js`, then copies everything to the `dist/` directory for deployment.
 
 The router imports this config and uses a `buildFullPath()` method to construct correct URLs for `history.pushState()`:
 
@@ -423,7 +408,7 @@ async navigate(path) {
 }
 ```
 
-The irony: I started this project to avoid build complexity, yet deployment realities forced me to introduce exactly that.
+**The irony:** I started this project to avoid build complexity, yet deployment realities forced me to introduce exactly that.
 
 ## Problem 5: Deep Links
 
