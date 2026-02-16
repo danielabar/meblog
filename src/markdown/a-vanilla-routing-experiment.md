@@ -444,7 +444,7 @@ This was a reminder that browser APIs, while powerful, have nuances that framewo
 
 ## Problem 3: Invalid Routes
 
-Up to this point, I had been blissfully ignoring a fundamental question: what happens when users type something like `/foo` or `/nonexistent-page` into their browser? Implementing proper invalid route handling meant adding several new methods to the router:
+Up to this point, I had been ignoring a fundamental question: what happens when users type something like `/foo` or `/nonexistent-page` into their browser? Implementing proper invalid route handling meant adding another method to the router:
 
 ```javascript
 /**
@@ -459,24 +459,9 @@ show404() {
     </div>
   `;
 }
-
-/**
- * Show general error message
- */
-showError(message) {
-  this.contentElement.innerHTML = `
-    <div class="error-page">
-      <h1>Error</h1>
-      <p>${message}</p>
-      <button class="btn btn-secondary" onclick="location.reload()">Reload Page</button>
-    </div>
-  `;
-}
 ```
 
-These error methods are invoked in the router's `navigate()` method: `show404()` is called when no route matches the requested path, and `showError()` is called in the catch block if template loading or view initialization fails.
-
-But the challenge extended beyond just showing an error page. I had to consider:
+The error method is invoked in the router's `navigate()` method when no route matches the requested path. But the challenge extended beyond just showing an error page. I had to consider:
 
 - Should invalid routes update the browser's address bar?
 - What happens if someone bookmarks a 404 URL?
@@ -609,7 +594,7 @@ This script runs before the router initializes, so when `handleInitialRoute()` r
 
 Implementing SPA fallback correctly meant users could bookmark any route, refresh pages without losing their place, and share direct links that worked reliably. But it also meant adding more complexity to handle edge cases that frameworks typically manage invisibly.
 
-## Problem 6 Regression Testing
+## Problem 6: Regression Testing
 
 Building your own routing system means you're now responsible for behaviors that framework users take for granted. With every code change — fixing a bug, adding a feature, refactoring — I found myself doing manual regression testing of the most basic interactions. Click "About". Does it load? Click "Contact". Does it work? Hit the back button twice. Does it return to home? Refresh the page. Does the view persist? Type `/about` directly into the address bar. Does it navigate correctly?
 
