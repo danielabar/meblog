@@ -337,9 +337,7 @@ Only reasonable values are accepted: in/out seconds between 1 - 15, and session 
 
 ### Add to Home Screen
 
-Just Breathe isn't in an app store, but it supports "Add to Home Screen", giving it an app-like presence: a standalone window, home screen icon, and quick launch.
-
-Modern browsers like Chrome and Edge use a Web App Manifest, which is linked in `index.html`:
+Just Breathe isn't in an app store, but it supports "Add to Home Screen", giving it an app-like presence: a standalone window, home screen icon, and quick launch. This works with an app manifest, which is linked in `index.html`:
 
 ```html
 <link rel="manifest" href="site.webmanifest">
@@ -398,10 +396,6 @@ While <code>@import</code> has historically been discouraged for performance rea
 
 ## Final Thoughts
 
-I now use Just Breathe nearly every day after my workout. It's simple, peaceful, and effective. This project reminded me how satisfying it is to build tools *just* for yourself. Especially ones that make your day measurably better.
+I now use Just Breathe nearly every day after my workout. It's simple and solves exactly the problem I set out to fix: guided breathing without the baggage. This project reminded me why I love building for the web. With just HTML, CSS, and JavaScript (and a capable AI assistant!), you can quickly create useful tools that work everywhere, require no installation, and cost nothing to run.
 
-If you've ever wanted to meditate but got turned off by mysticism, ads, paywalls, or distractions, give [Just Breathe](https://danielabar.github.io/just-breathe/) a try, and let me know if you find it helpful.
-
-<aside class="markdown-aside">
-After building the first version of Just Breathe, I discovered the <a class="markdown-link" href="https://pacedbreathing.app/">Paced Breathing</a> app. It's beautifully designed, with musical tones or gentle vibrations to mark breaths, but I still found myself zoning out or falling asleep. For me, the spoken English voice prompts in Just Breathe work better to keep me on task. Paced Breathing also has in-app purchases, which I find a bit distracting, though it's a fantastic option if you want a more polished, feature-rich experience.
-</aside>
+If you want to try it, [Just Breathe](https://danielabar.github.io/just-breathe/) works in any modern browser and takes seconds to start using. Add it to your home screen for quick access. I hope it helps you find a moment of calm in your day.
