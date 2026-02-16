@@ -236,7 +236,7 @@ class Router {
 
 The key changes: tracking the active view instance for cleanup, caching view modules, and using ES6 dynamic imports to load view scripts on demand. The full implementation includes template loading, error handling, and navigation state management—see the [complete router code](https://github.com/danielabar/web_native_routing/blob/main/js/router.js) for details.
 
-Each view class followed a consistent pattern with a default export and lifecycle methods, allowing for proper setup and cleanup:
+Each view class followed a consistent pattern with lifecycle methods for proper setup and cleanup:
 
 ```javascript
 // views/contact/script.js
@@ -253,21 +253,13 @@ export default class ContactView {
     // Clean up event listeners to prevent memory leaks
     const form = document.getElementById('contact-form');
     if (form && this.formHandler) {
-        form.removeEventListener('submit', this.formHandler);
+      form.removeEventListener('submit', this.formHandler);
     }
     this.formHandler = null;
   }
 
   setupContactForm() {
-    const form = document.getElementById('contact-form');
-    if (!form) return;
-
-    this.formHandler = async (e) => {
-      e.preventDefault();
-      await this.handleFormSubmission(form);
-    };
-
-    form.addEventListener('submit', this.formHandler);
+    // Form submission handling with validation, loading states, etc.
   }
 }
 ```
