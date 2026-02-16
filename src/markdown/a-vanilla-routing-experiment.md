@@ -624,17 +624,13 @@ After working through all these challenges, I gained a deep appreciation for bot
 
 **The Case for Vanilla Routing**
 
-There are compelling reasons to consider building your own routing system. Web standards provide remarkable stability—code written against native APIs works the same way years later, without breaking changes or migration headaches. You'll never spend weeks on "framework upgrade projects" or deal with dependency vulnerability alerts from routing libraries. There's no risk of framework abandonment leaving your project in maintenance limbo.
+Web standards provide remarkable stability - code written against native APIs work largely the same way years later, without breaking changes or migration headaches. You'll never spend weeks on "framework upgrade projects" or deal with dependency vulnerability alerts from routing libraries. There's no risk of framework abandonment leaving your project in maintenance limbo.
 
-Building vanilla routing forces you to understand web fundamentals deeply. There's no "magic" happening behind the scenes—you know exactly how every piece works, which makes debugging much more straightforward when issues arise. This knowledge transfers across any JavaScript environment and gives you insights that prove valuable regardless of which tools you use in other projects.
-
-For the right projects, vanilla routing can be perfectly simple. Small to medium static sites with three to ten pages, portfolio and marketing sites, and documentation sites can benefit from the minimal overhead and straightforward implementation. Projects where routing complexity won't grow over time are ideal candidates.
+For the right projects, vanilla routing can be a good choice. Small to medium static sites with a handful of views can benefit from the minimal overhead. Projects where routing complexity won't grow over time are ideal candidates.
 
 **The Case Against Vanilla Routing**
 
-But there are equally compelling reasons to reach for established routing solutions. The time investment in building, testing, and maintaining your own routing system is substantial. You're reinventing wheels that others have perfected over years of real-world use, and you'll encounter edge cases that you haven't anticipated yet.
-
-For example, my simple attempt leaves some gaps that modern applications often need:
+The time investment in building, testing, and maintaining your own routing system is substantial. You're reinventing wheels that others have perfected over years of real-world use. For example, my simple attempt leaves some gaps that modern applications often need:
 
 - **URL Parameters**: No built-in support for routes like `/product/:id` or `/user/:id/edit/:field`
 - **Nested Routes**: Can't handle complex hierarchies like `/dashboard/users/:id/settings`
