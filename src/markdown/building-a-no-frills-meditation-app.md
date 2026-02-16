@@ -1,7 +1,7 @@
 ---
 title: "Building a No Frills Meditation App"
 featuredImage: "../images/building-no-frills-meditation-app-chelsea-audibert-lDEW4qMiizc-unsplash.jpg"
-description: "A skeptical, but-curious take on meditation led me to build Just Breathe, a minimalist, ad-free web app that guides simple timed breathing with no mysticism, no subscriptions, and no distractions, just science-based calm."
+description: "Building a minimalist breathing app: no ads, no subscriptions, no mysticism. Just science-based calm, open source and free."
 date: "2026-03-01"
 category: "web development"
 related:
@@ -15,7 +15,7 @@ This is the story of how I built Just Breathe, a no-frills meditation app: part 
 I first heard about the benefits of meditation years ago on a podcast. An expert practitioner was being interviewed on a health podcast and said if the benefits of meditation were available as a pill, it would make some pharmaceutical company billions in profits. Benefits such as: lower stress, improved sleep, reduced anxiety, better blood pressure, improved focus, clearer thinking, enhanced performance on cognitive tasks, even longevity. Intrigued, I bought the book, especially since the author billed it as 'no BS.'
 
 <aside class="markdown-aside">
-As someone who's been listening to podcasts for over a decade, I've noticed an increasing trend of podcasts being book tours in disguise: Casual conversations that somehow always end up pitching someone's latest "life changing" book.
+As someone who's been listening to podcasts for over a decade, I've noticed an increasing trend of podcasts being book tours in disguise: Casual conversations that somehow always end up pitching someone's latest "life-changing" book.
 </aside>
 
 But then I got to the chapter about people meditating in the forest, claiming they could intuit which plants were safe to eat or use as medicine based on what the plants *told* them during meditation. While I'm sure some people genuinely feel that the plants are communicating with them, that chapter reminded me why I've been skeptical of meditation in the past.
