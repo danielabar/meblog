@@ -10,7 +10,7 @@ related:
   - "Rapid Prototyping with ChatGPT: OAS Pension Calculator Part 1"
 ---
 
-There's something deeply appealing about vanilla JavaScript. In a world of constantly changing frameworks and build tools, I find myself drawn to the simplicity of writing code that just works with what the browser provides. No complex build systems with countless dependencies that become fragile as Node.js versions update and tooling incompatibilities emerge. No webpack configurations that break after minor updates, no Babel transforms that suddenly stop working, no package-lock.json conflicts that consume entire afternoons.
+There's something deeply appealing about vanilla JavaScript. In a world of constantly changing frameworks and build tools, I'm drawn to code that just works with what browsers provide, no fragile dependency chains, breaking webpack configs, or afternoon-consuming package-lock conflicts.
 
 Over the years, I've built several portfolio projects like the [OAS Delay Calculator](https://danielabar.github.io/oas-delay-calculator-prototype/) and [Just Breathe](https://danielabar.github.io/just-breathe/) using almost entirely native web APIs, and each time, I'm reminded of how powerful modern browsers have become, and how refreshing it is to skip the build complexity entirely.
 
