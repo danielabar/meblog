@@ -258,7 +258,7 @@ function updateState() {
     breathStart = Date.now();
   }
 
-  // Continue the animation loop - typically runs 60 times per second
+  // Continue the animation loop (synced to display refresh rate)
   requestAnimationFrame(updateState);
 }
 ```
