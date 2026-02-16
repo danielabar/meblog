@@ -140,7 +140,6 @@ This app is structured as follows:
 ├── index.html
 ├── js
 │   ├── about.js
-│   ├── history.js
 │   ├── index.js
 │   ├── main.js
 │   ├── session.js
@@ -153,8 +152,6 @@ This app is structured as follows:
     ├── variables.css
     └── (additional component styles...)
 ```
-
-*Showing key files - see the [GitHub repo](https://github.com/danielabar/just-breathe) for the complete project structure including test files, additional utility modules, and component stylesheets.*
 
 Where `index.html` loads the entry point styles and code:
 
@@ -170,38 +167,31 @@ Even though *Just Breathe* is simple on the surface, a few small technical decis
 
 ### Vanilla Stack
 
-Using native ES modules means no bundler or transpiler is needed, and the whole app stays readable to anyone curious about the code. For example, the `js/index.js` entrypoint imports the main, history, and about modules so the views can be toggled (no fancy router needed here for just three views):
+Using native ES modules means no bundler or transpiler is needed, and the whole app stays readable to anyone curious about the code. For example, the `js/index.js` entrypoint imports the main, and about modules so the views can be toggled (no fancy router needed here for just two views):
 
 ```javascript
 // js/index.js
 import { renderMainView } from './main.js';
-import { renderHistoryView } from './history.js';
 import { renderAboutView } from './about.js';
 
 const appView = document.getElementById('app-view');
 const navMain = document.getElementById('nav-main');
-const navHistory = document.getElementById('nav-history');
 const navAbout = document.getElementById('nav-about');
 
 function showView(view) {
   if (view === 'about') {
     renderAboutView(appView);
-  } else if (view === 'history') {
-    renderHistoryView(appView);
   } else {
     renderMainView(appView);
   }
 }
 
 navMain.addEventListener('click', () => showView('main'));
-navHistory.addEventListener('click', () => showView('history'));
 navAbout.addEventListener('click', () => showView('about'));
 
 // Default view
 showView('main');
 ```
-
-This is a simplified version for clarity. The actual implementation includes additional features like mobile hamburger menu, desktop/mobile navigation handling, and the ability to prefill session values from history - see the [repo](https://github.com/danielabar/just-breathe) for the complete code.
 
 ### Zero-Build
 
@@ -273,8 +263,6 @@ function updateState() {
 }
 ```
 
-This shows the core breathing loop. The full implementation also handles saving completed sessions to history, stop/restart button functionality, and wake lock cleanup when sessions end.
-
 Rather than waiting for exact intervals using timers, the app continuously checks how much actual time has elapsed using [requestAnimationFrame](https://developer.mozilla.org/en-US/docs/Web/API/Window/requestAnimationFrame). This schedules the loop to run in sync with the browser's repaint cycle. On each frame, the function compares the current time against when the breath phase started. When the target duration is reached (for example, 5.5 seconds for an inhale), it transitions to the next phase and resets the timer.
 
 When the total time is reached, the app lets you finish your last out-breath before wrapping up, speaking "All done".
@@ -331,10 +319,7 @@ Just Breathe remembers your breathing pace and session duration between visits u
 // js/constants.js
 export const NAMESPACE = 'justBreathe';
 export const PREFS_KEY = `${NAMESPACE}:prefs`;
-export const HISTORY_KEY = `${NAMESPACE}:history`;
 ```
-
-This approach makes it easy to change the namespace if needed, and prevents typos from causing hard-to-debug issues. The keys are then imported and used in the relevant modules:
 
 ```js
 // js/userPrefs.js
@@ -357,48 +342,6 @@ const prefs = JSON.parse(localStorage.getItem('justBreathe:prefs'));
 Only reasonable values are accepted: in/out seconds between 1 - 15, and session durations between 1 - 180 minutes. This ensures that even if local storage is corrupted or manually edited, the app still works predictably.
 
 The combination of defaults, validation, and namespacing keeps preferences simple, safe, and completely local - no subscriptions, accounts, or external services required.
-
-### Session History
-
-Beyond preferences, Just Breathe also remembers your last 10 completed sessions. Each session is saved with a timestamp and the breathing settings you used, making it easy to track your meditation practice over time.
-
-The History view displays these sessions in a clean list format, showing when each session took place along with the inhale/exhale duration and total session time. Each entry has a replay button - clicking it navigates back to the main view with those exact settings prefilled, ready to start another session with the same configuration. This makes it effortless to repeat a breathing pattern you found particularly effective.
-
-Session history uses the same localStorage approach as preferences, with automatic management to keep only the most recent entries:
-
-```js
-// js/historyStorage.js
-import { HISTORY_KEY } from './constants.js';
-
-export function saveSessionToHistory({ inSec, outSec, duration }) {
-  const timestamp = Date.now();
-  let history = [];
-
-  // Load existing history
-  try {
-    const raw = localStorage.getItem(HISTORY_KEY);
-    if (raw) history = JSON.parse(raw);
-    if (!Array.isArray(history)) history = [];
-  } catch {
-    history = [];
-  }
-
-  // Add new session at the beginning
-  history.unshift({ timestamp, inSec, outSec, duration });
-
-  // Keep only last 10 sessions
-  history = history.slice(0, 10);
-
-  // Save back to localStorage
-  try {
-    localStorage.setItem(HISTORY_KEY, JSON.stringify(history));
-  } catch {
-    // Ignore storage errors
-  }
-}
-```
-
-The history feature adds a helpful layer of tracking without any server-side complexity or privacy concerns - everything stays on your device.
 
 ### Add to Home Screen
 
@@ -454,7 +397,7 @@ In addition to the JavaScript setup, the CSS is organized into multiple smaller 
 @import './variables.css';
 @import './global.css';
 @import './app.css';
-/* ...additional component styles (button.css, history.css) */
+/* additional component styles... */
 ```
 
 <aside class="markdown-aside">
