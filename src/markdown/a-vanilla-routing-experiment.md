@@ -412,30 +412,17 @@ async navigate(path) {
 
 ## Problem 5: Deep Links
 
-Just when I thought I had routing figured out, I discovered that direct URL access completely broke the application. If a user bookmarked `/about` or refreshed the page while viewing the contact form, they'd get an error. Static hosting providers like GitHub Pages don't know about client-side routes, they look for actual files. This problem required implementing what's known as the SPA fallback pattern—a standard technique for making client-side routes work on static hosts. The solution involved creating a `404.html` file that would intercept failed requests and redirect them back to the main application:
+Just when I thought I had routing figured out, I discovered that direct URL access completely broke the application. If a user bookmarked `/about` or refreshed the page while viewing the contact form, they'd get an error. Static hosting providers like GitHub Pages don't know about client-side routes, they look for actual files. This problem required implementing the SPA fallback pattern—a standard technique for making client-side routes work on static hosts.
 
-```html
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Web Native Router</title>
-    <script type="module">
-        // SPA fallback - redirect to configured base path
-        import { deploymentConfig } from './js/config.js';
+The `404.html` file intercepts failed requests and captures the intended URL:
 
-        // Store the intended URL
-        sessionStorage.setItem('redirect', location.href);
+```javascript
+// 404.html - SPA fallback script
+import { deploymentConfig } from './js/config.js';
 
-        // Redirect to app base path (no detection needed)
-        location.replace(deploymentConfig.basePath);
-    </script>
-</head>
-<body>
-    <p>Redirecting...</p>
-</body>
-</html>
+// Store intended URL and redirect to base path
+sessionStorage.setItem('redirect', location.href);
+location.replace(deploymentConfig.basePath);
 ```
 
 The other half of the SPA fallback pattern is in `index.html`, where an inline script restores the intended URL before the router initializes:
