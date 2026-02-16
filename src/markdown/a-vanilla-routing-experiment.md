@@ -188,99 +188,53 @@ router.addRoute('/contact', 'contact');
 router.init();
 ```
 
-And here is the updated router, loading HTML templates and view classes that could manage their own lifecycle (showing the key changes; `init()`, error handling, and other utility methods remain similar to the previous version)
+The refactored router introduced lifecycle management and dynamic view loading:
 
 ```javascript
 class Router {
   constructor() {
     this.routes = new Map();
-
-    // NEW: track active view instance for lifecycle cleanup
-    this.currentView = null;
-
-    // Existing template cache
-    this.templateCache = new Map();
-
-    // NEW: cache loaded view modules (controllers)
-    this.viewCache = new Map();
-
+    this.currentView = null;        // Track active view for cleanup
+    this.templateCache = new Map(); // Cache templates
+    this.viewCache = new Map();     // Cache view modules
     this.contentElement = document.getElementById('content');
   }
 
-  /**
-    * UPDATED: routes now point to a view directory instead of a single template file
-    */
-  addRoute(path, viewDir) {
-    this.routes.set(path, viewDir);
-  }
-
-  /**
-    * UPDATED: navigation now loads both template + view-specific script
-    */
   async navigate(path) {
     const viewDir = this.routes.get(path);
     if (!viewDir) return;
 
-    // NEW: clean up previous view if it defines a destroy hook
+    // Clean up previous view
     if (this.currentView?.destroy) {
       this.currentView.destroy();
       this.currentView = null;
     }
 
-    // Load HTML
+    // Load template and view script
     await this.loadTemplate(`views/${viewDir}/template.html`);
-
-    // Load and initialize JS controller
     await this.loadViewScript(viewDir);
 
     this.currentRoute = path;
     history.pushState({ route: path }, '', path);
   }
 
-  /**
-    * RENAMED: clearer separation of concerns
-    */
-  async loadTemplate(templatePath) {
-    if (this.templateCache.has(templatePath)) {
-      this.contentElement.innerHTML = this.templateCache.get(templatePath);
-      return;
-    }
-
-    const html = await fetch(templatePath).then(r => r.text());
-    this.templateCache.set(templatePath, html);
-    this.contentElement.innerHTML = html;
-  }
-
-  /**
-    * NEW: dynamically load view controller module
-    */
   async loadViewScript(viewDir) {
-    // Use cached module if already loaded
-    if (this.viewCache.has(viewDir)) {
-      return this.initializeView(this.viewCache.get(viewDir));
+    // Use cached module or dynamically import it
+    if (!this.viewCache.has(viewDir)) {
+      const module = await import(`../views/${viewDir}/script.js`);
+      this.viewCache.set(viewDir, module.default);
     }
 
-    // Dynamic imports return a module object, so accessing .default
-    // retrieves the class exported with export default from each view script
-    const module = await import(`../views/${viewDir}/script.js`);
-    const ViewClass = module.default;
-
-    this.viewCache.set(viewDir, ViewClass);
-    this.initializeView(ViewClass);
-  }
-
-  /**
-    * NEW: lifecycle-safe view initialization
-    */
-  initializeView(ViewClass) {
-    this.currentView = new ViewClass();
-
+    // Initialize the view with lifecycle support
+    this.currentView = new (this.viewCache.get(viewDir))();
     if (this.currentView.init) {
       this.currentView.init();
     }
   }
 }
 ```
+
+The key changes: tracking the active view instance for cleanup, caching view modules, and using ES6 dynamic imports to load view scripts on demand. The full implementation includes template loading, error handling, and navigation state management—see the [complete router code](https://github.com/danielabar/web_native_routing/blob/main/js/router.js) for details.
 
 Each view class followed a consistent pattern with a default export and lifecycle methods, allowing for proper setup and cleanup:
 
