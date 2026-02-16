@@ -163,8 +163,6 @@ Where `index.html` loads the entry point styles and code:
 </head>
 ```
 
-Even though *Just Breathe* is simple on the surface, a few small technical decisions help keep it lightweight, offline-friendly, and distraction-free.
-
 ### Vanilla Stack
 
 Using native ES modules means no bundler or transpiler is needed, and the whole app stays readable to anyone curious about the code. For example, the `js/index.js` entrypoint imports the main, and about modules so the views can be toggled (no fancy router needed here for just two views):
@@ -201,7 +199,7 @@ With the architecture in place, the heart of the app is the breathing session it
 
 ### Session
 
-The session loop keeps track of time, alternates between inhale/exhale, updates the progress bar, and finishes with a friendly close. It's driven by `requestAnimationFrame`, which runs once per frame for smooth updates. This approach provides more precise timing than cascading `setTimeout` calls.
+The session loop keeps track of time, alternates between inhale/exhale and updates the progress bar. It's driven by `requestAnimationFrame`, which runs once per frame for smooth updates. This approach provides more precise timing than cascading `setTimeout` calls.
 
 You'll also notice calls to `speak(...)` for voice prompts, I'll explain how that works in the next section.
 
@@ -271,7 +269,7 @@ When the total time is reached, the app lets you finish your last out-breath bef
 
 All prompts - "Breathe in", "Breathe out", and "All done" at the end - are spoken using the [Web Speech API](https://developer.mozilla.org/en-US/docs/Web/API/SpeechSynthesis), so the user doesn't need to watch the screen during the session and knows when it's over. The browser provides the voice, which may sound different depending on the operating system and settings.
 
-The implementation includes some careful tuning to make the voice guidance more pleasant during meditation. The speech rate is slowed down slightly (`0.85`), and the pitch is lowered a bit (`0.9`) to create a calmer, more soothing tone. The function also cancels any previous utterances before speaking - this prevents voice prompts from queuing up or overlapping if something unexpected happens.
+The implementation includes some tuning to make the voice guidance more pleasant during meditation. The speech rate is slowed down slightly (`0.85`), and the pitch is lowered a bit (`0.9`) to create a calmer, more soothing tone. The function also cancels any previous utterances before speaking - this prevents voice prompts from queuing up or overlapping if something unexpected happens.
 
 ```js
 // js/voice.js
@@ -309,7 +307,7 @@ async function requestWakeLock() {
 
 ### Custom Preferences
 
-Just Breathe remembers your breathing pace and session duration between visits using local storage. To keep the localStorage keys organized and avoid magic strings scattered throughout the code, all keys are defined in a central constants module:
+Just Breathe remembers your breathing pace and session duration between visits, so the form pre-populates with your last used values. This is implemented using local storage. To avoid magic strings scattered throughout the code, keys are defined in a central constants module:
 
 ```js
 // js/constants.js
@@ -336,8 +334,6 @@ const prefs = JSON.parse(localStorage.getItem('justBreathe:prefs'));
 ```
 
 Only reasonable values are accepted: in/out seconds between 1 - 15, and session durations between 1 - 180 minutes. This ensures that even if local storage is corrupted or manually edited, the app still works predictably.
-
-The combination of defaults, validation, and namespacing keeps preferences simple, safe, and completely local - no subscriptions, accounts, or external services required.
 
 ### Add to Home Screen
 
