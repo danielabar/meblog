@@ -78,8 +78,6 @@ I've now used this skill for several blog posts, and it feels remarkably close t
 - **Sentence tightening:** It excels at identifying overly long sentences and suggesting more concise alternatives.
 - **Transitions:** It points out where transitions between sections are needed to avoid jarring jumps in topic.
 
-## The Complete Skill
-
 The full skill implementation is available in my blog's GitHub repository: [blog-editor/SKILL.md](https://github.com/danielabar/meblog/blob/master/.claude/skills/blog-editor/SKILL.md)
 
 ## Conclusion
