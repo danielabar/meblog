@@ -63,7 +63,7 @@ Ironically, even after reading the official documentation, Claude initially crea
 
 Invoking the skill is simple—use the `/blog-editor` command (Claude makes skills available via slash-command syntax) with the path to your draft:
 
-```bash
+```
 /blog-editor src/markdown/building-a-no-frills-meditation-app.md
 ```
 
