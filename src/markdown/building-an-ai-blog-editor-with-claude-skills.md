@@ -87,8 +87,3 @@ Building this Claude skill has been like having a dedicated editor on call 24/7.
 If you're a technical blogger, I'd encourage you to try building a similar skill or feel free to copy and modify mine. The investment is minimal, it took one conversation with Claude to create, and the ongoing value is substantial. Every post I publish now gets that "second pair of eyes" review I've always wanted.
 
 And in a pleasant bit of meta-circularity, this very post was edited by the skill it describes.
-
-## TODO
-
-- clarify in "Using the Skill" that slash commands are a different thing, but claude also makes skills available via the same syntax
-- use blog-editor!
