@@ -55,11 +55,9 @@ My requirements for a technical blog post editor:
 
 Claude came up with additional checks I hadn't even considered, like reviewing SEO elements in the frontmatter description. And categorizing recommendations by priority like Must Address, Should Address, and Nice to Have.
 
-## A Gotcha: File Naming Matters
-
-Ironically, even after reading the official documentation, Claude initially created the skill file as `.claude/skills/blog-editor.md`. When I tried to use it, I kept getting "unknown skill 'blog-editor'" errors, even after restarting.
-
-The correct location is `.claude/skills/blog-editor/SKILL.md`. The skill needs to be in its own directory with a file named `SKILL.md`. Once I renamed it, everything worked perfectly.
+<aside class="markdown-aside">
+Ironically, even after reading the official documentation, Claude initially created the skill file as <code>.claude/skills/blog-editor.md</code>. When I tried to use it, I kept getting "unknown skill 'blog-editor'" errors, even after restarting. The correct location is <code>.claude/skills/blog-editor/SKILL.md</code>—the skill needs to be in its own directory with a file named <code>SKILL.md</code>. Once I renamed it, everything worked perfectly.
+</aside>
 
 ## Using the Skill
 
@@ -94,6 +92,5 @@ And in a pleasant bit of meta-circularity, this very post was edited by the skil
 
 ## TODO
 
-- gotcha is not enough for its own section, make it aside somewhere
 - clarify in "Using the Skill" that slash commands are a different thing, but claude also makes skills available via the same syntax
 - use blog-editor!
