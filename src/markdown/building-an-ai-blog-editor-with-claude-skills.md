@@ -10,7 +10,7 @@ related:
   - "AI Forecasts, Fear, and Focus"
 ---
 
-I've been blogging for years, but I've never had an editor. My process has always been: write a draft, sleep on it for a few days, then come back with "fresh eyes" to do my own editing. It works, but it's far from ideal. When I worked at a company with an engineering blog, we had a group of writers who would take turns editing each other's posts. Having another person's feedback and perspective was invaluable. But on my personal blog? I could ask a friend or colleague, but I don't like to bother people with that kind of commitment.
+I've been blogging for years, but I've never had an editor. My process has always been: write a draft, sleep on it for a few days, then come back with "fresh eyes" to do my own editing. It works, but it's not optimal. When I worked at a company with an engineering blog, we had a group of writers who would take turns editing each other's posts. Having another person's feedback and perspective was invaluable. But on my personal blog? I could ask a friend or colleague, but I don't like to bother people with that kind of commitment.
 
 ## The Code Review Parallel
 
@@ -53,7 +53,18 @@ My requirements for a technical blog post editor:
 - Generate editorial review in `scratch/{post-slug}-editorial-review.md`
 - (I keep a `scratch` directory in all my projects for AI output)
 
-Claude came up with additional checks I hadn't even considered, like reviewing SEO elements in the frontmatter description. And categorizing recommendations by priority like Must Address, Should Address, and Nice to Have.
+Claude came up with additional checks I hadn't even considered, such as:
+
+* Does the introduction hook the reader?
+* Preferring active over passive voice
+* Reviewing elements in the frontmatter for SEO
+* Code to prose ratio - is there good balance?
+* Verify all link text is descriptive
+* Are asides adding value or distracting?
+* Is the value that the reader gains clear?
+* Are the examples relatable?
+* Is the conclusion satisfying?
+* Categorizing recommendations by priority: Must Address, Should Address, and Nice to Have
 
 <aside class="markdown-aside">
 Ironically, even after reading the official documentation, Claude initially created the skill file as <code>.claude/skills/blog-editor.md</code>. When I tried to use it, I kept getting "unknown skill 'blog-editor'" errors, even after restarting. The correct location is <code>.claude/skills/blog-editor/SKILL.md</code>—the skill needs to be in its own directory with a file named <code>SKILL.md</code>. Once I renamed it, everything worked perfectly.
