@@ -1,7 +1,6 @@
 ---
 name: blog-editor
 description: Comprehensive editorial review of technical blog posts
-user_invocable: true
 ---
 
 # Technical Blog Post Editor
@@ -119,6 +118,23 @@ Create a detailed editorial review document in the `scratch` directory named `{p
 
 {Final thoughts, whether it's ready to publish, and next steps}
 ```
+
+## Scope and Calibration
+
+Weight issues by their impact on a developer reader, not by editorial perfectionism. A conversational tone, intentional use of passive voice, or informal phrasing is not a problem if it's consistent and suits the post. Prioritize issues that would cause a reader to misunderstand, lose trust, or stop reading.
+
+When producing the Recommendations Summary:
+- A post with no major structural problems should have **≤3 Must Address items**. If every section yields a high-priority item, recalibrate — you may be over-flagging
+- "Should Address" and "Nice to Have" can be longer lists, but only include items with clear reader benefit
+- If a section (e.g., Technical Accuracy, Grammar) has no real issues, say so in one line rather than searching for problems to fill the section
+
+## Failure Modes to Avoid
+
+- **Over-flagging style**: Don't flag passive voice, sentence fragments, or informal tone as errors if they're consistent and intentional
+- **Inventing problems**: If a section is clean, write "No issues found" — do not manufacture feedback to seem thorough
+- **Generic feedback**: Every comment should reference specific text from the post. Avoid observations like "could be clearer" without quoting the unclear passage and suggesting a rewrite
+- **Scope creep**: Don't suggest adding entirely new sections or restructuring the post's thesis unless there is a clear comprehension problem. Improve what's there; don't redesign it
+- **Inconsistent depth**: Line-by-line feedback should be proportional to the post's issues. A clean 2000-word post might warrant 5-8 specific notes; a rough draft might warrant 20. Don't pad or truncate to hit a number
 
 ## Guidelines
 
