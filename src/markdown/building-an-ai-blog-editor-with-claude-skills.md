@@ -45,15 +45,10 @@ My requirements for a technical blog post editor:
 - Validate code snippets for the specified language
 - Verify that technical explanations are accurate
 
-**Provide actionable feedback:**
+**Provide organized, actionable output:**
 
-- Don't just point out problems—suggest rewrites
-- Give concrete recommendations
-
-**Save output systematically:**
-
-- Generate editorial review in `scratch/{post-slug}-editorial-review.md`
-- (I keep a `scratch` directory in all my projects for AI output)
+- Suggest concrete rewrites instead of just pointing out issues
+- Generate editorial review in `scratch/{post-slug}-editorial-review.md` (I keep a `scratch` directory in all my projects for AI output)
 
 Claude came up with additional checks I hadn't even considered, such as:
 
@@ -74,13 +69,13 @@ Ironically, even after reading the official documentation, Claude initially crea
 
 ## Using the Skill
 
-Invoking the skill is simple—use the `/blog-editor` command (Claude makes skills available via slash-command syntax) with the path to your draft:
+Invoking the skill is simple—use the `/blog-editor` command (Claude makes skills available via slash-command syntax) with the path to a draft blog post. For example:
 
 ```
 /blog-editor src/markdown/building-a-no-frills-meditation-app.md
 ```
 
-The skill reads the post, analyzes it comprehensively, and generates a detailed editorial review with specific suggestions in the `scratch` directory.
+The skill reads the post, and generates a detailed editorial review with specific suggestions in the `scratch` directory.
 
 ## Real-World Results
 
