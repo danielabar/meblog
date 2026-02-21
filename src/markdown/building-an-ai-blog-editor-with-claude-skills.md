@@ -14,9 +14,11 @@ I've been blogging for years, but I've never had an editor. My process has alway
 
 ## The Code Review Parallel
 
-In software development, no matter how confident you are in your code, you always have another developer review it before merging. That fresh perspective catches issues you'd never notice yourself. It's not about skill level, it's about having been too close to the problem.
+In software development, no matter how confident you are in your code, you always have another developer review it before merging. That fresh perspective catches issues you'd never notice yourself. It's not about skill level, it's about being too close to the problem.
 
 Blog posts are the same way. After spending hours crafting an article, you lose objectivity. You know what you meant to say, so you read what you intended rather than what you actually wrote.
+
+Which brings me to an intriguing possibility: what if AI could provide that objective perspective?
 
 ## Enter Claude Skills
 
@@ -78,7 +80,7 @@ Invoking the skill is simple—use the `/blog-editor` command (Claude makes skil
 /blog-editor src/markdown/building-a-no-frills-meditation-app.md
 ```
 
-The skill reads the post, analyzes it comprehensively, and generates a detailed editorial review with specific suggestions in the `scratch` dir.
+The skill reads the post, analyzes it comprehensively, and generates a detailed editorial review with specific suggestions in the `scratch` directory.
 
 ## Real-World Results
 
@@ -93,7 +95,7 @@ The full skill implementation is available in my blog's GitHub repository: [blog
 
 ## Conclusion
 
-Building this Claude skill has been like having a dedicated editor on call 24/7. While it won't replace the nuanced feedback of an experienced human editor, it provides a remarkably thorough editorial review that catches the majority of common issues.
+Building this Claude skill has been like having a dedicated editor on call 24/7. While it won't replace the nuanced feedback of an experienced human editor, it provides a thorough editorial review that catches the majority of common issues.
 
 If you're a technical blogger, I'd encourage you to try building a similar skill or feel free to copy and modify mine. The investment is minimal, it took one conversation with Claude to create, and the ongoing value is substantial. Every post I publish now gets that "second pair of eyes" review I've always wanted.
 
