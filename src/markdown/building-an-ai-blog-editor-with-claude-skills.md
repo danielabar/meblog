@@ -1,7 +1,7 @@
 ---
 title: "Building an AI Blog Editor with Claude Skills"
 featuredImage: "../images/ai-blog-editor-yannick-pulver-hopX_jpVtRM-unsplash.jpg"
-description: "How I built a custom Claude skill to act as a technical blog post editor, automating editorial review that previously required human reviewers."
+description: "Creating an AI blog editor with Claude Skills—like having a code reviewer for your writing when you don't have a human editor."
 date: "2026-02-21"
 category: "productivity"
 related:
