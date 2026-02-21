@@ -86,6 +86,30 @@ I've now used this skill for several blog posts, and it feels remarkably close t
 - **Sentence tightening:** It excels at identifying overly long sentences and suggesting more concise alternatives.
 - **Transitions:** It points out where transitions between sections are needed to avoid jarring jumps in topic.
 
+Here's a sampling of feedback from the review of an upcoming post about building vanilla JavaScript routing (the full review was much more comprehensive):
+
+```markdown
+**Word Count**: 3,809 words
+**Reading Time**: ~15-19 minutes
+
+**Verbosity (Opening paragraph)**
+Original: "There's something deeply appealing about vanilla JavaScript. In a world of constantly changing frameworks and build tools, I find myself drawn to the simplicity of writing code that just works with what the browser provides. No complex build systems with countless dependencies that become fragile as Node.js versions update and tooling incompatibilities emerge..."
+
+Suggested: "There's something deeply appealing about vanilla JavaScript. In a world of constantly changing frameworks and build tools, I'm drawn to code that just works with what browsers provide—no fragile dependency chains, breaking webpack configs, or afternoon-consuming package-lock conflicts."
+
+(Cut ~30 words while maintaining impact)
+
+**Repetition Tracking**
+The phrase "frameworks solve these problems" appeared 6 times across the 3,800-word post
+(lines 220, 387, 443, 486, 616, 654).
+Suggested consolidating into the conclusion section rather than repeating throughout.
+
+**Grammar**
+- Line 387: "ws" → "was"
+- Line 28: "an form" → "a form"
+- Line 614: "Problem 6 Regression Testing" → "Problem 6: Regression Testing" (missing colon for consistency)
+```
+
 The full skill implementation is available in my blog's GitHub repository: [blog-editor/SKILL.md](https://github.com/danielabar/meblog/blob/master/.claude/skills/blog-editor/SKILL.md)
 
 ## Conclusion
