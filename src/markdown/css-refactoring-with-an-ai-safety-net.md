@@ -50,7 +50,7 @@ The plan was clear. What wasn't yet clear was how to prove that each phase hadn'
 
 ## The hard part: proving nothing broke
 
-Here's what makes CSS refactors risky. There's no compiler to catch a mistake. A 2px layout shift, a slightly different `line-height`, a shadow that disappeared — things just quietly look wrong, and can easily be missed.
+CSS refactors are risky: A `2px` layout shift, a slightly different `line-height`, a shadow that disappeared — small details that shape how polished a design feels, but easy to miss on a quick visual scan.
 
 You might think: won't browser-based tests catch this — Playwright, Capybara, Selenium? Not this kind. E2E tests verify *functionality*: can you click this button, does this form submit, does this page navigate correctly. They say nothing about whether the button looks right, whether the spacing changed, or whether a color was silently overridden.
 
