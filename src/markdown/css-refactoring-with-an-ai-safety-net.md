@@ -60,7 +60,7 @@ I pointed Claude Code at csscaffold and asked it to plan how to restructure the 
 | 6     | Unified button system with shared `.btn` base         |
 | 7     | Replace hard-coded hex values with CSS variables      |
 
-Before AI assistants, I wouldn't have attempted a refactor like this. I'd have looked at csscaffold, thought "that's the right approach — I'll use it on my next project" — and done a conservative cleanup of what was there instead. Why? Because retrofitting an entire CSS architecture onto an existing codebase risks breaking things that used to work, and at the end the app still looks the same. But having a capable AI assistant changes the calculus.
+Before AI assistants, I'd have looked at csscaffold, thought "that's the right approach — I'll use it on my next project" — and done a conservative cleanup of what was there instead. Why? Because retrofitting an entire CSS architecture onto an existing codebase risks breaking things that used to work, and at the end the app still looks the same. But having a capable AI assistant changes the calculus.
 
 The plan was clear. What wasn't yet clear was how to prove that each phase hadn't broken anything.
 
@@ -116,7 +116,7 @@ The comparison step was: ask Claude to read both sets of PNG files and describe 
 "Read the baseline screenshots and the current phase screenshots and tell me if anything looks different."
 ```
 
-Claude would load all 9 pairs of PNGs and compare them. If something changed — a spacing shift, a color difference, a layout jump — it would describe exactly what changed and in which screenshot. Not "these pixels differ" but "the card border radius looks slightly sharper, and there's a small increase in the spacing above the heading." This gave me a plain English description of what changed — specific enough to direct Claude to fix it. And because we were comparing after each individual phase, the regression had to be from whatever that phase had just touched.
+Claude would load all 9 pairs of PNGs and compare them. If something changed — a spacing shift, a color difference — it would describe exactly what changed and in which screenshot. Not "these pixels differ" but "the card border radius looks slightly sharper, and there's a small increase in the spacing above the heading on the home page." This gave me a plain English description of what changed — specific enough to direct Claude to fix it. And because we were comparing after each individual phase, the regression had to be from whatever that phase had just touched.
 
 ## Results
 
@@ -132,8 +132,6 @@ To:
 - A unified `.btn` base class with BEM variants (`.btn--primary`, `.btn--secondary`, `.btn--menu`)
 - All colors via CSS variables, no stray hex values
 
-Zero visual regressions across all 9 states, across all 7 phases.
-
 The entire thing — analysis, planning, and execution across all 7 phases — took around 3 hours. Without an AI assistant to help plan the phases, write and iterate on the capture script, make the CSS changes, and compare the screenshots, this is the kind of refactor that would have stretched across multiple days.
 
 The screenshot comparison earned its keep in Phase 5. Replacing the old reset with a modern one introduced a different default `line-height` that subtly changed how body text rendered. I'm not sure I would have caught it by eye in a manual review. Claude flagged it immediately when comparing the PNGs and made a one-liner fix.
@@ -144,9 +142,9 @@ Looking back, three things were essential.
 
 **Enumerate states exhaustively:** The baseline only protects you for the states you captured. A regression in the navigation drawer won't show up if you never took a screenshot of the navigation drawer open. I spent time upfront listing every meaningful state — not just page routes but transient interactive states: open drawers, populated vs. empty lists, revealed form fields, in-progress indicators. That list was the most important artifact of the whole process.
 
-**Keep refactoring phases small:** Each phase was one conceptual change. When a regression appeared, the cause was obvious because there was only one thing that could have caused it. A 7-phase refactor with 9 screenshots per phase is 63 comparison points, but each comparison is against a narrow, well-defined change. That's a completely different risk profile than "I changed all the CSS things, let me see if anything broke."
+**Keep refactoring phases small:** Each phase was one conceptual change. When a regression appeared, the cause was obvious because there was only one thing that could have caused it. A 7-phase refactor with 9 screenshots per phase is 63 comparison points, but each comparison is against a narrow, well-defined change.
 
-**Use a capable model:** The original CSS (and entire project) was built with a free-tier Copilot model through casual vibe coding. That model was fine for generating working code on demand. But it couldn't hold the architectural picture in mind, reason about cascade behavior across files, or identify the root cause of a visual regression from a screenshot. Using Claude Code — a paid subscription with a more capable model — made a meaningful difference at every step: planning the phases, reasoning about which duplicated rules were actually rendering, identifying regression causes from PNG comparisons, and proposing correct fixes.
+**Use a capable model:** The original CSS (and entire project) was built with a free-tier Copilot model through casual vibe coding. That model was fine for generating working code on demand. But it couldn't hold the architectural picture in mind, reason about cascade behavior across files, or identify the root cause of a visual regression from a screenshot. Using Claude Code — a paid subscription with a more capable model — made a meaningful difference at every step.
 
 ## Why not a dedicated visual regression tool?
 
