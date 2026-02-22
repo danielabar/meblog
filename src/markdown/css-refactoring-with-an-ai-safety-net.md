@@ -71,11 +71,12 @@ free-tier AI model. It works until it doesn't.
 
 Around this time I came across [csscaffold](https://github.com/robzolkos/csscaffold), a project
 by Rob Zolkos that lays out a sane, opinionated CSS architecture built on cascade layers. It's
-framed as a Rails tool, but the CSS organization ideas apply to any project — the layer structure
-and file conventions work just as well in a plain HTML app with no framework at all. Reading it
+framed as a Rails tool, but the CSS organization ideas apply to any project. Reading it
 made clear just how far my CSS was from where it could be, and gave me a concrete target to aim
 for. This is what I pointed Claude Code to when planning the refactor. I wanted an architecture I
 could actually reason about and build on, not just a cleaned-up version of the existing mess.
+
+Before AI assistants, I wouldn't have attempted this. I'd have looked at csscaffold, thought "that's the right approach — I'll use it on the next new project" — and done a conservative cleanup of what was there instead. Retrofitting an entire CSS architecture onto an existing codebase is easy to rationalize deferring: the payoff is invisible (the app looks identical when you're done), the risk is real, and it's all on you to catch every regression. Having Claude Code to help plan the phases, make the changes, and verify nothing broke shifted that calculation enough to make it worth attempting.
 
 The key idea from csscaffold is **CSS cascade layers**:
 
@@ -363,7 +364,6 @@ phase ended with "all screenshots identical to baseline." That's not usually how
 ## TODO
 
 - Artificial line breaks from earlier outline?
-- After introducing cssscaffold project, maybe mention something like in a world before AI coding assistants, i never would have thought it was worth the effort to completely rewrite the entire css of a project, just because i happened to come across a better idea. Would have been like "well that will be nice for the next new project I start, but for this current project, will make do with what's there and just attempt a smaller cleanup".
 - Make it more clear around "the objective I gave Claude Code was strict" - that I told Claude i wanted a complete restructure of the CSS as per the principles in cssscaffold project (TODO: point to examples dir in that project)
 - This sentence is awkward "I had an idea that if all the app state screenshots could be captured before starting, then again after each refactoring step and compared, and if this could be automated, it would save me a lot of time and headaches."
 - Can some details be shortened? details of actual project, details of other tools like percy etc.
