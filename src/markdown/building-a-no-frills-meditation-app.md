@@ -33,7 +33,7 @@ I wanted something simple: a gentle breathing reminder to help me focus. But eve
 * **Meditation podcasts** Same issue - plus ads - and often just as "out there."
 * **YouTube** Forget it. You sit down to meditate and end up watching cat videos for an hour.
 
-After a while I realized I wasn't looking for "content" at all. I didn't need a guru, a playlist, or a subscription. I just needed a technique, something simple, concrete, and grounded in science.
+After a while I realized I wasn't looking for "content" at all. I didn't need a guru, a playlist, or a subscription. I just needed a technique, something concrete, and grounded in science.
 
 ## Simple Discovery
 
@@ -62,20 +62,18 @@ The technique sounds simple, but here's what happened for me in practice:
 
 **Mind wandering** often led to zoning out and forgetting the pattern altogether.
 
-**Knowing when to stop** required setting a timer, but even the gentlest alert felt jarring if already relaxed, undoing the benefit of the session.
+**Knowing when to stop** required a timer, but even the "When Timer Ends" tones that sounded like they should be calming — Slow Rise, Dreamer — still jolted me out of whatever calm I'd built.
 
 After running into all these frictions, I realized I needed a bare-bones tool that would:
 - Guide me through 5.5-second breaths with voice prompts
 - Keep me on track without counting
 - End sessions gently, not abruptly
 
-That was it. Nothing more.
-
-Since I couldn't find it, I decided to build it.
+That was it. Nothing more. And the cue had to be spoken words — "Breathe in", "Breathe out", "All done" — not a tone I'd have to interpret. I couldn't find something like this so decided to build it.
 
 ## Building My Own
 
-I opened VS Code, created a new project, and asked my AI assistant to help me put together something simple and mobile-friendly. No frameworks, no accounts, no backend. Just vanilla JavaScript and CSS. Here's the prompt I used:
+I opened VS Code, created a new project, and asked my AI assistant (at the time, one of the free models via VSCode Copilot) to help me put together something simple and mobile-friendly. No frameworks, no accounts, no backend. Just vanilla JavaScript and CSS. Here's the prompt I used:
 
 <aside class="markdown-memory-lane">
 Help me think about how I could use vanilla web tech for building the following web app, which will be deployed to github pages because it shouldn't require an application server:
@@ -115,6 +113,10 @@ After submitting that prompt and a good deal of iteration to resolve issues, her
 After clicking Start, it looks like this in the middle of the session:
 
 ![just breathe app session](../images/just-breathe-app-session.png "just breathe app session")
+
+<aside class="markdown-aside">
+Note: the live app may look different from these screenshots — a design refresh was underway around the time this was written.
+</aside>
 
 While the session is running the user hears "Breathe in", then 5.5 seconds later (or whatever value they set in the form), "Breathe out". It repeats in this pattern until the session is complete.
 
