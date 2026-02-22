@@ -99,7 +99,7 @@ await page.waitForTimeout(300); // wait for CSS transition to finish
 await capture(page, 'menu-open');
 ```
 
-With the script written, running it is one command:
+The [full script is in the project repo](https://github.com/danielabar/just-breathe/blob/main/scripts/screenshots.js). With it written, running it is one command:
 
 ```bash
 node scripts/screenshots.js baseline   # before touching anything
