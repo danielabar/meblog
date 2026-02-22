@@ -134,17 +134,9 @@ To:
 
 Zero visual regressions across all 9 states, across all 7 phases.
 
-The entire thing — analysis, planning, and execution across all 7 phases — took around 3 hours. Without an AI assistant to help plan the phases, write and iterate on the capture script, make the CSS changes, and compare the screenshots, this is the kind of refactor that would have stretched across multiple days, with long gaps between attempts while you worked up the nerve to touch the next file.
+The entire thing — analysis, planning, and execution across all 7 phases — took around 3 hours. Without an AI assistant to help plan the phases, write and iterate on the capture script, make the CSS changes, and compare the screenshots, this is the kind of refactor that would have stretched across multiple days.
 
-The screenshot comparison earned its keep in Phase 5. Replacing the old reset with a modern one introduced a different default `line-height` that subtly changed how body text rendered — slightly different spacing across several states. It wasn't dramatic; I'm not sure I would have caught it by eye in a manual review. Claude flagged it immediately when comparing the PNGs. The fix was a single line. Without the comparison, that regression would have shipped.
-
-## Why not a dedicated visual regression tool?
-
-Playwright ships built-in visual testing via `expect(page).toHaveScreenshot()` — since I was already using Playwright for the capture script, this was the obvious alternative. But the output is a pixel diff, not a description. "42 pixels changed in screenshot-5.png" doesn't tell you *what* changed. You'd still need to open the diff image and interpret it manually, and you'd need to tune thresholds to suppress rendering noise from antialiasing and subpixel differences.
-
-I also looked at [Percy](https://www.browserstack.com/docs/percy/overview/visual-testing-basics) briefly, but it requires creating an account before you can do anything, and I didn't want to introduce a SaaS dependency for a small one-off refactor.
-
-That said, if you're doing this kind of visual comparison regularly — on a larger project, or wired into CI on every push — having the AI do the diffing every time would add up in token costs. At that point it probably makes sense to invest in dedicated tooling with proper baseline management and CI integration.
+The screenshot comparison earned its keep in Phase 5. Replacing the old reset with a modern one introduced a different default `line-height` that subtly changed how body text rendered. I'm not sure I would have caught it by eye in a manual review. Claude flagged it immediately when comparing the PNGs and made a one-liner fix.
 
 ## What made it work
 
@@ -155,6 +147,16 @@ Looking back, three things were essential.
 **Keep refactoring phases small:** Each phase was one conceptual change. When a regression appeared, the cause was obvious because there was only one thing that could have caused it. A 7-phase refactor with 9 screenshots per phase is 63 comparison points, but each comparison is against a narrow, well-defined change. That's a completely different risk profile than "I changed all the CSS things, let me see if anything broke."
 
 **Use a capable model:** The original CSS (and entire project) was built with a free-tier Copilot model through casual vibe coding. That model was fine for generating working code on demand. But it couldn't hold the architectural picture in mind, reason about cascade behavior across files, or identify the root cause of a visual regression from a screenshot. Using Claude Code — a paid subscription with a more capable model — made a meaningful difference at every step: planning the phases, reasoning about which duplicated rules were actually rendering, identifying regression causes from PNG comparisons, and proposing correct fixes.
+
+## Why not a dedicated visual regression tool?
+
+One question worth addressing: why use AI for the diffing step at all, rather than a dedicated visual regression tool?
+
+Playwright ships built-in visual testing via `expect(page).toHaveScreenshot()` — since I was already using Playwright for the capture script, this was the obvious alternative. But the output is a pixel diff, not a description. "42 pixels changed in screenshot-5.png" doesn't tell you *what* changed. You'd still need to open the diff image and interpret it manually, and you'd need to tune thresholds to suppress rendering noise.
+
+I also looked at [Percy](https://www.browserstack.com/docs/percy/overview/visual-testing-basics) briefly, but it requires creating an account before you can do anything, and I didn't want to introduce a SaaS dependency for a small one-off refactor.
+
+That said, if you're doing this kind of visual comparison regularly — on a larger project, or wired into CI on every push — having the AI do the diffing every time would add up in token costs. At that point it probably makes sense to invest in dedicated tooling with proper baseline management and CI integration.
 
 ## Conclusion
 
