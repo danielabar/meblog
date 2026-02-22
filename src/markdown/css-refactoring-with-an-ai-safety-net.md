@@ -18,19 +18,19 @@ It became clear that the CSS had to be cleaned up to make it maintainable. By th
 
 ## What was wrong with the CSS
 
-Before touching anything, I had Claude Code perform an audit of the existing styles. The results were what you'd expect from CSS that grew organically through vibe-coding: duplicated rules spread across multiple files silently fighting each other for cascade priority, no `@layer` so every specificity conflict was a coin flip, a 2011-era reset missing `box-sizing: border-box`, button styles copy-pasted into four different files, and hard-coded hex values scattered everywhere despite a `variables.css` already existing. It worked until it didn't.
+Before touching anything, I had Claude Code perform an audit of the existing styles. The results were what you'd expect from CSS that grew organically through vibe-coding: duplicated rules spread across multiple files silently fighting each other for cascade priority, a 2011-era reset missing `box-sizing: border-box`, button styles copy-pasted into four different files, and hard-coded hex values scattered everywhere despite a `variables.css` already existing. It worked until it didn't.
 
 ## The goal: a true refactor
 
 Around this time I came across [csscaffold](https://github.com/robzolkos/csscaffold), a project that lays out a lightly opinionated CSS architecture built on cascade layers. It's framed as a Rails tool, but the CSS organization ideas apply to any project. Reading it made clear just how far my CSS was from where it could be, and gave me a concrete target to aim for. I wanted an architecture I could build on, not just a cleaned-up version of the existing mess.
 
-The key idea from csscaffold is **CSS cascade layers**:
+The key idea from csscaffold is [cascade layers](https://developer.mozilla.org/en-US/docs/Web/CSS/Reference/At-rules/@layer):
 
 ```css
 @layer reset, base, components, utilities;
 ```
 
-This declaration means cascade priority is determined by layer membership, not selector specificity. `utilities` always beats `components`; `reset` always loses. You can write `.btn` and `nav button` without worrying about which one has higher specificity. No more specificity wars.
+This declaration means cascade priority is determined by layer membership, not selector specificity. It also suggests a corresponding file structure — `reset.css`, `base.css`, `layout.css`, `nav.css`, and so on — one file per concern, each wrapped in the appropriate layer. The [examples directory](https://github.com/robzolkos/csscaffold/tree/master/examples) shows what this looks like in practice.
 
 I pointed Claude Code at csscaffold and asked it to plan how to restructure the existing CSS to match — with one hard constraint: **zero visual change**. Improve the organization, don't touch the output. Classic refactor. It came up with a multi-phase plan to keep each change relatively small and easy to review:
 
