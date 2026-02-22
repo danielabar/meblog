@@ -62,21 +62,25 @@ I pointed Claude Code at csscaffold and asked it to plan how to restructure the 
 
 Before AI assistants, I wouldn't have attempted a refactor like this. I'd have looked at csscaffold, thought "that's the right approach — I'll use it on my next project" — and done a conservative cleanup of what was there instead. Why? Because retrofitting an entire CSS architecture onto an existing codebase risks breaking things that used to work, and at the end the app still looks the same. But having a capable AI assistant changes the calculus.
 
+The plan was clear. What wasn't yet clear was how to prove that each phase hadn't broken anything.
+
 ## The hard part: proving nothing broke
 
-Here's what makes CSS refactors risky. There's no compiler to catch a mistake. Things just quietly look wrong, and can be missed when just checking "does it look ok?". A 2px layout shift, a slightly different `line-height`, a shadow that disappeared.
+Here's what makes CSS refactors risky. There's no compiler to catch a mistake. A 2px layout shift, a slightly different `line-height`, a shadow that disappeared — things just quietly look wrong, and can easily be missed.
 
-You might think: I already have Playwright tests (or some other tooling for browser based tests) — won't those catch regressions? Not this kind. E2E tests verify *functionality*: can you click this button, does this form submit, does this page navigate correctly. They say nothing about whether the button looks right, whether the spacing changed, or whether a color was silently overridden.
+You might think: won't browser-based tests catch this — Playwright, Capybara, Selenium? Not this kind. E2E tests verify *functionality*: can you click this button, does this form submit, does this page navigate correctly. They say nothing about whether the button looks right, whether the spacing changed, or whether a color was silently overridden.
 
-With seven phases to work through, I needed a way to verify after every single change that nothing had shifted visually. Doing that manually — opening a browser, clicking through the app, eyeballing it — isn't just tedious. It's unreliable, because the app isn't just one page. It has states that require interaction to reach: a navigation drawer that has to be opened, a list view that looks completely different when populated vs. empty, form states that are only visible after a specific dropdown selection. A manual check that misses any of those states isn't really a check at all.
+Second thought: I'll just check it manually — open a browser, click through the app, eyeball it. But the app isn't just one page. It has states that require interaction to reach: a navigation drawer that has to be opened, a list view that looks different when populated vs. empty, form states that are only visible after a specific dropdown selection. Doing that carefully after each of seven phases would be tedious.
 
-I had an idea that if all the app state screenshots could be captured before starting, then again after each refactoring step and compared, and if this could be automated, it would save me a lot of time and headaches.
+What I needed was automation — something that could navigate every meaningful app state and capture a screenshot of each, reproducibly, after every phase, and compare to a baseline. I'd initially looked into using the Chrome DevTools MCP server for this, but landed on [playwright-cli](https://github.com/microsoft/playwright-cli) as a better fit — it's more token-efficient for agentic use.
+
+That could handle capture. But a folder of PNGs doesn't tell you anything by itself. I needed something to *compare* them. Then it clicked: the same AI assistant that was making the CSS changes could also read the screenshots.
 
 ## Capturing every state
 
-I'd initially looked into using the Chrome DevTools MCP server for browser automation, but landed on [playwright-cli](https://github.com/microsoft/playwright-cli) as a better fit — it's more token-efficient for agentic use since it doesn't load large tool schemas into the model's context. I asked Claude Code to write a script that would navigate through every meaningful app state, capture a screenshot of each, and save them to a labeled directory — designed from the start to be re-run after every refactor phase.
+I asked Claude Code to write a script that would navigate through every meaningful app state, capture a screenshot of each, and save them to a directory — designed from the start to be re-run after every refactor phase.
 
-The first step in writing that script was to enumerate every meaningful state the app could be in — not just the page routes, but the transient states that require interaction to reach: a form with a secondary input revealed by a dropdown selection, the navigation drawer mid-open, a list view that looks completely different when populated vs. empty, an in-progress state with a visible status indicator. For this app, that came to nine distinct states.
+The first step was enumerating every meaningful state the app could be in — not just the page routes, but the transient states that require interaction to reach. For this app, that came to nine distinct states.
 
 The script drives the browser through all of them automatically — clicking navigation elements, filling out forms, waiting for transitions to fully settle, then saving a named PNG. The label passed on the command line determines the output directory, which is what makes the workflow reusable across phases:
 
@@ -99,48 +103,20 @@ With the script written, running it is one command:
 
 ```bash
 node scripts/screenshots.js baseline   # before touching anything
-node scripts/screenshots.js phase-3    # after each refactor phase
+node scripts/screenshots.js phase-n    # after each refactor phase
 ```
 
 ## Screenshot diffing with AI
 
 The screenshot script has no diffing code at all. It just saves PNGs.
 
-The comparison step was: **ask Claude to read both sets of PNG files and describe any differences.**
-
-Claude Code can read image files directly — it processes the actual visual content of the screenshots. After each phase, the workflow was literally one prompt:
+The comparison step was: ask Claude to read both sets of PNG files and describe any differences. Claude Code can read image files directly — it processes the actual visual content of the screenshots. After each phase, the workflow was literally one prompt:
 
 ```
-"Read the baseline screenshots and the phase-3 screenshots and tell me if anything looks different."
+"Read the baseline screenshots and the current phase screenshots and tell me if anything looks different."
 ```
 
-Claude would load all 9 pairs of PNGs and compare them. If something changed — a spacing shift, a color difference, a layout jump — it would describe exactly what changed and in which screenshot. Not "these pixels differ" but "the card border radius looks slightly sharper, and there's a small increase in the spacing above the heading."
-
-A few things made this particularly effective:
-
-*Signal vs. noise.* Pixel-diff tools are binary within a threshold. Anti-aliasing variations in text glyphs, tiny rendering differences between runs, slight PNG compression artifacts — all of these generate noise that requires threshold tuning. Claude's visual comparison filters this naturally, the same way a human looking at two screenshots would. It ignores imperceptible variations and flags things that actually look different.
-
-*Actionable output.* "The card border radius looks slightly sharper in the phase-4 screenshot" tells me exactly what to search for in the CSS. A diff heatmap doesn't.
-
-*No context switch.* The same assistant that made the CSS changes read the screenshots. When a regression appeared, it could immediately connect the visual change to the code change that caused it. When replacing the old reset introduced a different default `line-height`, Claude flagged it in the comparison, identified which reset property caused it, and proposed the fix — all in one response. There was no jumping between a diff viewer and a code editor.
-
-*Zero integration overhead.* No SDK, no account, no CI config, no test runner. The "infrastructure" is a folder of PNGs and a natural language prompt.
-
-## Why not a dedicated visual regression tool?
-
-This is not an unexplored problem. Visual regression testing tools have existed for years — Percy, Chromatic, Playwright's own built-in visual testing. It's worth being honest about why none of them were the right fit here.
-
-**Percy** (now owned by BrowserStack) is the most well-known SaaS option. You install their SDK, run your test suite, and Percy handles screenshot capture, storage, baseline management, and diff review in the cloud. It even recently added an AI layer that draws bounding boxes around meaningful changes and filters rendering noise. The free tier covers 5,000 screenshots a month, which is more than enough for a project like this.
-
-The cost isn't money, it's overhead. Percy is built for team environments with CI pipelines, shared baseline approval workflows, and a review dashboard for pull requests. For a solo developer doing a one-time refactor with no CI at all, setting up Percy would mean: creating an account, installing and configuring the SDK, wiring it into a test runner I wasn't otherwise using, and learning its baseline management model. It felt like installing a freight elevator to move one box.
-
-**Chromatic** is similar to Percy but built around Storybook. Not applicable here — plain HTML app, no component library.
-
-**Playwright's built-in visual testing** is the closest alternative and worth dwelling on. Playwright ships `expect(page).toHaveScreenshot()` which uses pixelmatch under the hood to compare against a committed baseline image. Since I was already using Playwright for the capture script, this was genuinely tempting.
-
-The problem is a well-documented one: OS-specific rendering differences. Baseline screenshots taken on macOS differ from screenshots taken on Linux due to font rendering, subpixel antialiasing, and color profile differences. If you ever run this in CI (even just on a different machine), your baselines won't match. For a purely local workflow on one machine, it might work — but you'd still need to tune pixel-diff thresholds to suppress rendering noise, and you'd need to restructure the script as a proper test file.
-
-**pixelmatch** is the raw library that Playwright and others use under the hood. Lightweight, no cloud dependency, runs locally. You'd extend the screenshot script to load both PNGs, run them through pixelmatch, and report the diff percentage. But the output is a pixel heatmap, not a description. "42 pixels changed in screenshot-5.png" doesn't tell you *what* changed. You'd still need to open the diff image and interpret it manually. And the false-positive problem with rendering noise would still require threshold tuning.
+Claude would load all 9 pairs of PNGs and compare them. If something changed — a spacing shift, a color difference, a layout jump — it would describe exactly what changed and in which screenshot. Not "these pixels differ" but "the card border radius looks slightly sharper, and there's a small increase in the spacing above the heading." This gave me a plain English description of what changed — specific enough to direct Claude to fix it. And because we were comparing after each individual phase, the regression had to be from whatever that phase had just touched.
 
 ## Results
 
@@ -162,7 +138,13 @@ The entire thing — analysis, planning, and execution across all 7 phases — t
 
 The screenshot comparison earned its keep in Phase 5. Replacing the old reset with a modern one introduced a different default `line-height` that subtly changed how body text rendered — slightly different spacing across several states. It wasn't dramatic; I'm not sure I would have caught it by eye in a manual review. Claude flagged it immediately when comparing the PNGs. The fix was a single line. Without the comparison, that regression would have shipped.
 
-## The honest tradeoffs
+## Why not a dedicated visual regression tool?
+
+Playwright ships built-in visual testing via `expect(page).toHaveScreenshot()` — since I was already using Playwright for the capture script, this was the obvious alternative. But the output is a pixel diff, not a description. "42 pixels changed in screenshot-5.png" doesn't tell you *what* changed. You'd still need to open the diff image and interpret it manually, and you'd need to tune thresholds to suppress rendering noise from antialiasing and subpixel differences.
+
+I also looked at [Percy](https://www.browserstack.com/docs/percy/overview/visual-testing-basics) briefly, but it requires creating an account before you can do anything, and I didn't want to introduce a SaaS dependency for a small one-off refactor.
+
+## Tradeoffs
 
 I want to be upfront about where this approach falls short.
 
