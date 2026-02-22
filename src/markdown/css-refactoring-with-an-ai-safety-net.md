@@ -152,25 +152,17 @@ Looking back, three things were essential.
 
 **Enumerate states exhaustively:** The baseline only protects you for the states you captured. A regression in the navigation drawer won't show up if you never took a screenshot of the navigation drawer open. I spent time upfront listing every meaningful state — not just page routes but transient interactive states: open drawers, populated vs. empty lists, revealed form fields, in-progress indicators. That list was the most important artifact of the whole process.
 
-**Keep refactoring phases small:** Each phase was one conceptual change. When a regression appeared, the cause was obvious because there was only one thing that could have caused it. A 7-phase refactor with 9 screenshots per phase is 63 comparison points, but each comparison is against a narrow, well-defined change. That's a completely different risk profile than "I refactored the CSS, let me see if anything broke."
+**Keep refactoring phases small:** Each phase was one conceptual change. When a regression appeared, the cause was obvious because there was only one thing that could have caused it. A 7-phase refactor with 9 screenshots per phase is 63 comparison points, but each comparison is against a narrow, well-defined change. That's a completely different risk profile than "I changed all the CSS things, let me see if anything broke."
 
-**Use a capable model:** The original CSS was built with a free-tier Copilot model through casual vibe coding. That model was fine for generating working code on demand. But it couldn't hold the architectural picture in mind, reason about cascade behavior across files, or identify the root cause of a visual regression from a screenshot. Using Claude Code — a paid subscription with a more capable model — made a meaningful difference at every step: planning the phases, reasoning about which duplicated rules were actually rendering, identifying regression causes from PNG comparisons, and proposing correct fixes.
+**Use a capable model:** The original CSS (and entire project) was built with a free-tier Copilot model through casual vibe coding. That model was fine for generating working code on demand. But it couldn't hold the architectural picture in mind, reason about cascade behavior across files, or identify the root cause of a visual regression from a screenshot. Using Claude Code — a paid subscription with a more capable model — made a meaningful difference at every step: planning the phases, reasoning about which duplicated rules were actually rendering, identifying regression causes from PNG comparisons, and proposing correct fixes.
+
+## Conclusion
 
 The refactor is done. The CSS is now layered, de-duplicated, uses a modern reset, and has a unified button system with all colors tokenized. And I can finally work on the design refresh I wanted to do in the first place.
 
-The technique turned a refactor that touched every CSS file in the project into a process where every phase ended with "all screenshots identical to baseline." That's not usually how CSS refactors feel.
-
-## References
-
-- [csscaffold](https://github.com/robzolkos/csscaffold)
-- [playwright-cli](https://github.com/microsoft/playwright-cli)
-- [Playwright Visual Testing](https://playwright.dev/docs/test-snapshots)
-- [Percy](https://percy.io/)
-- [Claude image token pricing](https://platform.claude.com/docs/en/build-with-claude/vision) — Anthropic docs on how image tokens are calculated (`width × height / 750`)
+The technique described in this post turned a refactor that touched every CSS file in the project into a process where every phase ended with "all screenshots identical to baseline." That's not usually how CSS refactors feel.
 
 ## TODO
 
-- Make it more clear around "the objective I gave Claude Code was strict" - that I told Claude i wanted a complete restructure of the CSS as per the principles in cssscaffold project (TODO: point to examples dir in that project)
-- This sentence is awkward "I had an idea that if all the app state screenshots could be captured before starting, then again after each refactoring step and compared, and if this could be automated, it would save me a lot of time and headaches."
 - Can some details be shortened? details of actual project, details of other tools like percy etc.
 - Transitions between sections so reader can follow-along thought process that led to solution (a little jumpy right now?)
