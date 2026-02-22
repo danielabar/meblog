@@ -10,31 +10,15 @@ related:
   - "Rapid Prototyping with ChatGPT: OAS Pension Calculator Part 1"
 ---
 
-A while back I built a small breathing meditation app — vanilla HTML, CSS, and JavaScript, no frameworks, no build tools. I vibe-coded most of it using GitHub Copilot's free tier in VS Code, which at the time was backed by an older, less capable model. The result was exactly what you'd expect from that workflow: it worked, the resulting app solved a real problem for me, the features were all there, and I used it daily. But the code, particularly the CSS, was a hot mess.
+A while back I built a small breathing meditation app with just vanilla HTML, CSS, and JavaScript. It was mostly vibe-coded using GitHub Copilot's free tier in VS Code. The result was an app that worked, solving a real problem for me, but the code, particularly the CSS, was a hot mess.
 
-I eventually wanted to do a visual design refresh — new typography, tighter spacing, a more polished feel. And I immediately ran into a wall. The CSS was so tangled that I couldn't safely change anything. I'd edit one rule and something unrelated would break. I'd try to understand which styles were actually applying to an element and find three different files all claiming to style the same thing. The free-tier vibe coding session had left me with a functioning app but unmaintainable styles.
+Then I attempted a visual design refresh — new typography, tighter spacing, a more polished feel, but ran into problems. The CSS was so tangled that almost nothing could be safely changed. Edit one rule and something unrelated would break. I'd try to understand which styles were actually applying to an element and find three different files all claiming to style the same thing. And even Copilot was spinning in whack-a-mole loops.
 
-Before I could do the design work I wanted, I had to clean up the CSS first. By this point I'd moved on from Copilot to a paid Claude Code subscription, which gave me access to more capable models. Here's the technique I came up with to do that refactor safely with AI assistance — and why it's different from the E2E testing you might already be familiar with.
+It became clear that the CSS had to be cleaned up to make it maintainable. By this point I'd moved on from Copilot to a paid Claude Code subscription, which gave me access to more capable models. Here's the technique I came up with to do that refactor safely with AI assistance — and why it's different from the E2E testing you might already be familiar with.
 
 ## What was wrong with the CSS
 
-Before touching anything, I had Claude Code perform an audit of the existing styles. Here's what it found:
-
-**`index.css` wasn't just an entry point.** There was even a TODO comment in the file saying it should only import other files. But it had accumulated ~130 lines of real styles, mostly duplicating rules that already existed in `global.css`. Two files styling the same elements, with the later one silently winning.
-
-**A subtle import order bug.** `reset.css` referenced CSS custom properties (`var(--color-bg)`) that weren't defined until the *next* file in the import chain, `variables.css`. This worked because browsers resolve custom property values lazily at paint time, not at parse time. So it never broke — but it was fragile by accident, not by design.
-
-**No cascade layers, so everything was a specificity fight.** Without `@layer`, every CSS rule competes on selector specificity. Add a class and something breaks somewhere else. This is the root cause of the "can't touch it without breaking it" feeling that makes CSS refactors terrifying.
-
-**A circa-2011 Eric Meyer reset.** The old-school approach: a long list of every HTML element zeroed out. No `box-sizing: border-box` globally, no `prefers-reduced-motion`, no modern element handling. As a result, `box-sizing: border-box` was sprinkled ad-hoc across individual elements wherever someone noticed it was needed.
-
-**`width: 100vw` used about ten times.** This is almost always wrong — `100vw` includes the scrollbar width and causes horizontal overflow. `width: 100%` is what was almost certainly intended.
-
-**Button styles in four different files.** There were four visually similar button types around the app, all sharing the same brand colors, all styled independently with zero shared base. Changing the primary color meant hunting down four separate declarations.
-
-**Hard-coded hex values scattered throughout.** `#fff`, `#888`, `#f9f9f9`, `#e0f7fa` — all appearing inline in rules, even though a `variables.css` file with CSS custom properties already existed.
-
-None of this is unusual for CSS that grew organically through a vibe-coding session with a free-tier AI model. It works until it doesn't.
+Before touching anything, I had Claude Code perform an audit of the existing styles. The results were what you'd expect from CSS that grew organically through vibe-coding: duplicated rules spread across multiple files silently fighting each other for cascade priority, no `@layer` so every specificity conflict was a coin flip, a 2011-era reset missing `box-sizing: border-box`, button styles copy-pasted into four different files, and hard-coded hex values scattered everywhere despite a `variables.css` already existing. It worked until it didn't.
 
 ## The goal: a true refactor
 
@@ -127,18 +111,18 @@ All 7 phases completed. The CSS went from:
 - Hard-coded hex colors scattered alongside the CSS variables that should have been used
 
 To:
-- `@layer reset, base, components, utilities` — predictable cascade, no more specificity fights
-- Modern reset with universal `box-sizing: border-box` and `prefers-reduced-motion`
-- A unified `.btn` base class with BEM variants (`.btn--primary`, `.btn--secondary`, `.btn--menu`)
-- All colors via CSS variables, no stray hex values
+- `@layer reset, base, components, utilities` — predictable cascade
+- Modern reset
+- Unified `.btn` base class with BEM variants (`.btn--primary`, `.btn--secondary`, `.btn--menu`)
+- All colors via CSS variables
 
-The entire thing — analysis, planning, and execution across all 7 phases — took around 3 hours. Without an AI assistant to help plan the phases, write and iterate on the capture script, make the CSS changes, and compare the screenshots, this is the kind of refactor that would have stretched across multiple days.
+The entire thing — analysis, planning, and execution across all 7 phases — took around 3 hours. Without an AI assistant to plan the phases, write the capture script, make the CSS changes, and compare the screenshots, this is the kind of refactor that would have stretched across multiple days.
 
 The screenshot comparison earned its keep in Phase 5. Replacing the old reset with a modern one introduced a different default `line-height` that subtly changed how body text rendered. I'm not sure I would have caught it by eye in a manual review. Claude flagged it immediately when comparing the PNGs and made a one-liner fix.
 
 ## What made it work
 
-Looking back, three things were essential.
+Looking back, three things were essential:
 
 **Enumerate states exhaustively:** The baseline only protects you for the states you captured. A regression in the navigation drawer won't show up if you never took a screenshot of the navigation drawer open. I spent time upfront listing every meaningful state — not just page routes but transient interactive states: open drawers, populated vs. empty lists, revealed form fields, in-progress indicators. That list was the most important artifact of the whole process.
 
@@ -161,8 +145,3 @@ That said, if you're doing this kind of visual comparison regularly — on a lar
 The refactor is done. The CSS is now layered, de-duplicated, uses a modern reset, and has a unified button system with all colors tokenized. And I can finally work on the design refresh I wanted to do in the first place.
 
 The technique described in this post turned a refactor that touched every CSS file in the project into a process where every phase ended with "all screenshots identical to baseline." That's not usually how CSS refactors feel.
-
-## TODO
-
-- Can some details be shortened? details of actual project, details of other tools like percy etc.
-- Transitions between sections so reader can follow-along thought process that led to solution (a little jumpy right now?)
