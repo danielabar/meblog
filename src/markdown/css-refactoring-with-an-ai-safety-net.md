@@ -144,41 +144,17 @@ Playwright ships built-in visual testing via `expect(page).toHaveScreenshot()` �
 
 I also looked at [Percy](https://www.browserstack.com/docs/percy/overview/visual-testing-basics) briefly, but it requires creating an account before you can do anything, and I didn't want to introduce a SaaS dependency for a small one-off refactor.
 
-## Tradeoffs
-
-I want to be upfront about where this approach falls short.
-
-**Token cost is real, just small at this scale.** Claude charges for image inputs based on pixel dimensions: `tokens = (width × height) / 750`. Each screenshot here was 375px wide with a typical full-page height of around 1,200px, which is roughly 600 tokens per image. A comparison run reads 18 images (9 baseline + 9 new), plus the prompt and response: about 12,000 tokens total. At Claude Sonnet pricing ($3 per million input tokens), that's around **$0.04 per comparison run**. With 7 phases and a few re-runs after fixes, I estimate the total image comparison cost for this entire refactor was around **$0.40**. For a personal project, that's nothing. For a large team running comparisons against 100 states on every CI push, the economics shift and dedicated tools become more attractive.
-
-**It could miss extreme precision regressions.** A 1px shift that a human wouldn't consciously notice could slip through. For this project — where "visually identical" meant "looks the same to a developer at a glance" — that precision level was right. For a pixel-perfect design system where every spacing token is load-bearing, you'd probably want pixel-diff precision layered on top.
-
-**It optimizes for the one-time refactor scenario.** Percy and Chromatic are better fits for ongoing CI workflows with team review processes. This technique shines for a bounded task: a refactor, a migration, a one-time reorganization.
-
-One observation worth noting: Percy recently added an AI review layer that draws bounding boxes around meaningful changes and provides human-readable summaries of what changed. They're explicitly trying to close the gap between pixel-diff output and semantic visual comparison. The industry is moving toward the approach I described here — just with more infrastructure around it.
-
-## When to use this technique
-
-I'd reach for this approach for:
-
-- **CSS refactors targeting zero visual change** — exactly this scenario
-- **Design system migrations** — moving from ad-hoc styles to a token-based system
-- **Framework migrations** — Bootstrap to Tailwind, or similar, where visual parity matters
-- **Any small-to-medium project with no existing visual regression setup** — this is lighter weight than Percy or Chromatic to get started
-
-I'd use something else for:
-- Projects already running Percy, Chromatic, or Playwright visual tests in CI — don't replace what's working
-- Apps with significant animation where screenshots capture only a moment in time
-- Very large apps with hundreds of distinct UI states run on every commit — the token economics and snapshot management favor dedicated tooling at that scale
+That said, if you're doing this kind of visual comparison regularly — on a larger project, or wired into CI on every push — having the AI do the diffing every time would add up in token costs. At that point it probably makes sense to invest in dedicated tooling with proper baseline management and CI integration.
 
 ## What made it work
 
 Looking back, three things were essential.
 
-**Enumerate states exhaustively before writing a single line of the capture script.** The baseline only protects you for the states you captured. A regression in the navigation drawer won't show up if you never took a screenshot of the navigation drawer open. I spent time upfront listing every meaningful state — not just page routes but transient interactive states: open drawers, populated vs. empty lists, revealed form fields, in-progress indicators. That list was the most important artifact of the whole process.
+**Enumerate states exhaustively:** The baseline only protects you for the states you captured. A regression in the navigation drawer won't show up if you never took a screenshot of the navigation drawer open. I spent time upfront listing every meaningful state — not just page routes but transient interactive states: open drawers, populated vs. empty lists, revealed form fields, in-progress indicators. That list was the most important artifact of the whole process.
 
-**Keep phases small.** Each phase was one conceptual change. When a regression appeared, the cause was obvious because there was only one thing that could have caused it. A 7-phase refactor with 9 screenshots per phase is 63 comparison points, but each comparison is against a narrow, well-defined change. That's a completely different risk profile than "I refactored the CSS, let me see if anything broke."
+**Keep refactoring phases small:** Each phase was one conceptual change. When a regression appeared, the cause was obvious because there was only one thing that could have caused it. A 7-phase refactor with 9 screenshots per phase is 63 comparison points, but each comparison is against a narrow, well-defined change. That's a completely different risk profile than "I refactored the CSS, let me see if anything broke."
 
-**Use a more capable model for the work that requires reasoning.** The original CSS was built with a free-tier Copilot model through casual vibe coding. That model was fine for generating working code on demand. But it couldn't hold the architectural picture in mind, reason about cascade behavior across files, or identify the root cause of a visual regression from a screenshot. Using Claude Code — a paid subscription with a more capable model — made a meaningful difference at every step: planning the phases, reasoning about which duplicated rules were actually rendering, identifying regression causes from PNG comparisons, and proposing correct fixes.
+**Use a capable model:** The original CSS was built with a free-tier Copilot model through casual vibe coding. That model was fine for generating working code on demand. But it couldn't hold the architectural picture in mind, reason about cascade behavior across files, or identify the root cause of a visual regression from a screenshot. Using Claude Code — a paid subscription with a more capable model — made a meaningful difference at every step: planning the phases, reasoning about which duplicated rules were actually rendering, identifying regression causes from PNG comparisons, and proposing correct fixes.
 
 The refactor is done. The CSS is now layered, de-duplicated, uses a modern reset, and has a unified button system with all colors tokenized. And I can finally work on the design refresh I wanted to do in the first place.
 
@@ -186,12 +162,10 @@ The technique turned a refactor that touched every CSS file in the project into 
 
 ## References
 
-- [csscaffold](https://github.com/robzolkos/csscaffold) — the CSS architecture project that inspired the layer-based approach
-- [playwright-cli](https://github.com/microsoft/playwright-cli) — Playwright CLI used for the screenshot capture script
-- [Percy](https://percy.io/) — visual regression testing SaaS (BrowserStack)
-- [Percy AI Review Agent](https://bug0.com/knowledge-base/percy-visual-regression-testing) — overview of Percy's AI-powered diff analysis feature
-- [Percy vs Chromatic](https://medium.com/@crissyjoshua/percy-vs-chromatic-which-visual-regression-testing-tool-to-use-6cdce77238dc) — comparison of the two main visual regression SaaS tools
-- [Visual Regression Testing with Playwright and pixelmatch](https://testrig.medium.com/visual-regression-testing-with-playwright-and-pixelmatch-002770005019) — how pixelmatch integrates with Playwright
+- [csscaffold](https://github.com/robzolkos/csscaffold)
+- [playwright-cli](https://github.com/microsoft/playwright-cli)
+- [Playwright Visual Testing](https://playwright.dev/docs/test-snapshots)
+- [Percy](https://percy.io/)
 - [Claude image token pricing](https://platform.claude.com/docs/en/build-with-claude/vision) — Anthropic docs on how image tokens are calculated (`width × height / 750`)
 
 ## TODO
