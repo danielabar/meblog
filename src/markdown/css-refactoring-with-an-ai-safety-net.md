@@ -38,9 +38,7 @@ None of this is unusual for CSS that grew organically through a vibe-coding sess
 
 ## The goal: a true refactor
 
-Around this time I came across [csscaffold](https://github.com/robzolkos/csscaffold), a project by Rob Zolkos that lays out a sane, opinionated CSS architecture built on cascade layers. It's framed as a Rails tool, but the CSS organization ideas apply to any project. Reading it made clear just how far my CSS was from where it could be, and gave me a concrete target to aim for. This is what I pointed Claude Code to when planning the refactor. I wanted an architecture I could actually reason about and build on, not just a cleaned-up version of the existing mess.
-
-Before AI assistants, I wouldn't have attempted this. I'd have looked at csscaffold, thought "that's the right approach — I'll use it on the next new project" — and done a conservative cleanup of what was there instead. Retrofitting an entire CSS architecture onto an existing codebase is easy to rationalize deferring: the payoff is invisible (the app looks identical when you're done), the risk is real, and it's all on you to catch every regression. Having Claude Code to help plan the phases, make the changes, and verify nothing broke shifted that calculation enough to make it worth attempting.
+Around this time I came across [csscaffold](https://github.com/robzolkos/csscaffold), a project that lays out a lightly opinionated CSS architecture built on cascade layers. It's framed as a Rails tool, but the CSS organization ideas apply to any project. Reading it made clear just how far my CSS was from where it could be, and gave me a concrete target to aim for. I wanted an architecture I could build on, not just a cleaned-up version of the existing mess.
 
 The key idea from csscaffold is **CSS cascade layers**:
 
@@ -50,7 +48,7 @@ The key idea from csscaffold is **CSS cascade layers**:
 
 This declaration means cascade priority is determined by layer membership, not selector specificity. `utilities` always beats `components`; `reset` always loses. You can write `.btn` and `nav button` without worrying about which one has higher specificity. No more specificity wars.
 
-With that as the target, the objective I gave Claude Code was strict: **zero visual change**. Improve the structure, don't touch the output. Classic refactor. We planned the work in seven phases, one conceptual change at a time:
+I pointed Claude Code at csscaffold and asked it to plan how to restructure the existing CSS to match — with one hard constraint: **zero visual change**. Improve the organization, don't touch the output. Classic refactor. It came up with a multi-phase plan to keep each change relatively small and easy to review:
 
 | Phase | What                                                  |
 | ----- | ----------------------------------------------------- |
@@ -62,11 +60,13 @@ With that as the target, the objective I gave Claude Code was strict: **zero vis
 | 6     | Unified button system with shared `.btn` base         |
 | 7     | Replace hard-coded hex values with CSS variables      |
 
+Before AI assistants, I wouldn't have attempted a refactor like this. I'd have looked at csscaffold, thought "that's the right approach — I'll use it on my next project" — and done a conservative cleanup of what was there instead. Why? Because retrofitting an entire CSS architecture onto an existing codebase risks breaking things that used to work, and at the end the app still looks the same. But having a capable AI assistant changes the calculus.
+
 ## The hard part: proving nothing broke
 
-Here's what makes CSS refactors treacherous. There's no compiler to catch a mistake. Things just quietly look wrong — and often subtly wrong, in a way that slips past a quick manual browse. A 2px layout shift, a slightly different `line-height`, a border radius that got crisper. Nothing that throws an error. Nothing that breaks a test.
+Here's what makes CSS refactors risky. There's no compiler to catch a mistake. Things just quietly look wrong, and can be missed when just checking "does it look ok?". A 2px layout shift, a slightly different `line-height`, a shadow that disappeared.
 
-You might think: I already have Playwright tests, or some E2E suite — won't those catch regressions? Not this kind. E2E tests verify *functionality*: can you click this button, does this form submit, does this page navigate correctly. They say nothing about whether the button looks right, whether the spacing changed, or whether a color was silently overridden. CSS regressions are visual, and visual is exactly what functional tests skip.
+You might think: I already have Playwright tests (or some other tooling for browser based tests) — won't those catch regressions? Not this kind. E2E tests verify *functionality*: can you click this button, does this form submit, does this page navigate correctly. They say nothing about whether the button looks right, whether the spacing changed, or whether a color was silently overridden.
 
 With seven phases to work through, I needed a way to verify after every single change that nothing had shifted visually. Doing that manually — opening a browser, clicking through the app, eyeballing it — isn't just tedious. It's unreliable, because the app isn't just one page. It has states that require interaction to reach: a navigation drawer that has to be opened, a list view that looks completely different when populated vs. empty, form states that are only visible after a specific dropdown selection. A manual check that misses any of those states isn't really a check at all.
 
