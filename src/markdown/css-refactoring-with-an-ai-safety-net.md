@@ -44,7 +44,7 @@ I pointed Claude Code at csscaffold and asked it to plan how to restructure the 
 | 6     | Unified button system with shared `.btn` base         |
 | 7     | Replace hard-coded hex values with CSS variables      |
 
-Before AI assistants, I'd have looked at csscaffold, thought "that's the right approach — I'll use it on my next project" — and done a conservative cleanup of what was there instead. Why? Because retrofitting an entire CSS architecture onto an existing codebase risks breaking things that used to work, and at the end the app still looks the same. But having a capable AI assistant changes the calculus.
+Before AI assistants, I'd have looked at csscaffold, thought "that's the right approach — I'll use it on my next project" — and done a conservative cleanup of what was there instead. Retrofitting a whole CSS architecture risks breaking things that used to work, for zero visible payoff. But a capable AI assistant changes that calculus.
 
 The plan was clear. What wasn't yet clear was how to prove that each phase hadn't broken anything.
 
