@@ -58,7 +58,7 @@ Second thought: I'll just check it manually — open a browser, click through th
 
 What I needed was automation — something that could navigate every meaningful app state and capture a screenshot of each, reproducibly, after every phase, and compare to a baseline. I'd initially looked into using the Chrome DevTools MCP server for this, but landed on [Playwright](https://playwright.dev/docs/api/class-playwright) as a better fit — its Node.js API is more token-efficient for agentic use than the DevTools protocol directly.
 
-That could handle capture. But a folder of PNGs doesn't tell you anything by itself. I needed something to *compare* them. Then it clicked: the same AI assistant that was making the CSS changes could also read the screenshots.
+That could handle capture. But a folder of PNGs doesn't tell you anything by itself. I needed something to *compare* them. The answer was already in the workflow: the same AI assistant making the CSS changes could also read screenshots.
 
 ## Capturing every state
 
