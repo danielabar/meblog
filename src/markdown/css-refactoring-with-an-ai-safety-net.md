@@ -18,7 +18,7 @@ It became clear that the CSS had to be cleaned up to make it maintainable. By th
 
 ## What was wrong with the CSS
 
-Before touching anything, I had Claude Code perform an audit of the existing styles. The results were what you'd expect from CSS that grew organically through vibe-coding: duplicated rules spread across multiple files silently fighting each other for cascade priority, a 2011-era reset missing `box-sizing: border-box`, button styles copy-pasted into four different files, and hard-coded hex values scattered everywhere despite a `variables.css` already existing. It worked until it didn't.
+Before touching anything, I had Claude Code perform an audit of the existing styles. The results were what you'd expect from vibe-coded CSS: duplicated rules spread across multiple files silently fighting each other for cascade priority, a 2011-era reset missing `box-sizing: border-box`, button styles copy-pasted into four different files, and hard-coded hex values scattered everywhere despite a `variables.css` already existing. It worked until it didn't.
 
 ## The goal: a true refactor
 
