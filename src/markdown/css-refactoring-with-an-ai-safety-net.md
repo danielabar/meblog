@@ -56,7 +56,7 @@ You might think: won't browser-based tests catch this — Playwright, Capybara, 
 
 Second thought: I'll just check it manually — open a browser, click through the app, eyeball it. But the app isn't just one page. It has states that require interaction to reach: a navigation drawer that has to be opened, a list view that looks different when populated vs. empty, form states that are only visible after a specific dropdown selection. Doing that carefully after each of seven phases would be tedious.
 
-What I needed was automation — something that could navigate every meaningful app state and capture a screenshot of each, reproducibly, after every phase, and compare to a baseline. I'd initially looked into using the Chrome DevTools MCP server for this, but landed on [playwright-cli](https://github.com/microsoft/playwright-cli) as a better fit — it's more token-efficient for agentic use.
+What I needed was automation — something that could navigate every meaningful app state and capture a screenshot of each, reproducibly, after every phase, and compare to a baseline. I'd initially looked into using the Chrome DevTools MCP server for this, but landed on [Playwright](https://playwright.dev/docs/api/class-playwright) as a better fit — its Node.js API is more token-efficient for agentic use than the DevTools protocol directly.
 
 That could handle capture. But a folder of PNGs doesn't tell you anything by itself. I needed something to *compare* them. Then it clicked: the same AI assistant that was making the CSS changes could also read the screenshots.
 
