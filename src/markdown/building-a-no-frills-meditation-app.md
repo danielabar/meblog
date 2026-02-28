@@ -20,7 +20,7 @@ As someone who's been listening to podcasts for over a decade, I've noticed an i
 
 But then I got to the chapter about people meditating in the forest, claiming they could intuit which plants were safe to eat or use as medicine based on what the plants *told* them during meditation. While I'm sure some people genuinely feel that the plants are communicating with them, that chapter reminded me why I've been skeptical of meditation in the past.
 
-That's been my issue with meditation all along. I'm open to the science, but not the pseudoscience. I also didn't find it easy: trying to meditate on my own usually resulted in me either zoning out or falling asleep. So I turned to a tech solution.
+That's been my issue with meditation all along. I'm open to the science, but not the pseudoscience. I also didn't find it easy: trying to meditate on my own usually resulted in zoning out or falling asleep. So I turned to a tech solution.
 
 ## Digital Helpers
 
@@ -54,7 +54,7 @@ That clicked. Finally, here was something grounded and practical, stripped of my
 
 ## Breathing Math
 
-The technique sounds simple, but here's what happened for me in practice:
+The technique sounds simple, but here's what happened in practice:
 
 **Counting 5.5 seconds** wasn't intuitive, whole numbers felt easier, but stressing about the additional half second defeated the purpose.
 
@@ -97,13 +97,13 @@ I'm picturing an app that prompts user for:
 
 At this point the user no longer needs to look at the app, although it should show "something pleasing" if user is looking at it, maybe a horizontal bar animating the time remaining or something like that.
 
-At this point the user would find a comfortable place to sit or lie down where they will be undisturbed for the duration. I'm not sure if these instructions, along with the instruction to nasal breathe should be displayed somewhere in the app either before or after they make their selections. I don't want to confuse the user with too much details, particularly on a small phone screen.
+At this point the user would find a comfortable place to sit or lie down where they will be undisturbed for the duration.
 
 Then the app will play a calming audio voice saying "Breath in" (I don't know where to find such an asset).
 
 Then after the number of seconds have elapsed for breath-in that user selected, same calming audio voice says "Breath out" (again where to find audio asset?).
 
-Then after the duration has elapsed (although let it go past the duration if in the middle of a breath in breath out so they can complete their last breathe out cycle because it would be jarring to be interrupted in the middle), same calming voice says "All done".
+Then after the duration has elapsed, same calming voice says "All done".
 </aside>
 
 After submitting that prompt and a good deal of iteration to resolve issues, here are the results:
@@ -167,7 +167,7 @@ Where `index.html` loads the entry point styles and code:
 
 ### Vanilla Stack
 
-Using native ES modules means no bundler or transpiler is needed, and the whole app stays readable to anyone curious about the code. For example, the `js/index.js` entrypoint imports the main, and about modules so the views can be toggled (no fancy router needed here for just two views):
+Using native ES modules means no bundler or transpiler is needed, and the whole app stays readable to anyone curious about the code. For example, the `js/index.js` entrypoint imports the main and about modules so the views can be toggled (no fancy router needed here for just two views):
 
 ```javascript
 // js/index.js
@@ -193,9 +193,7 @@ navAbout.addEventListener('click', () => showView('about'));
 showView('main');
 ```
 
-### Zero-Build
-
-The entire app runs as a static site. There's no bundler, no framework, no auth, and no build process. It's just plain HTML, JavaScript modules, and CSS. It's deployed via GitHub Pages using the [gh-pages](https://www.npmjs.com/package/gh-pages) npm package. This keeps maintenance simple.
+The entire app runs as a static site with no framework, no auth, and no build process — just plain HTML, JavaScript modules, and CSS, deployed via GitHub Pages using the [gh-pages](https://www.npmjs.com/package/gh-pages) npm package. This keeps maintenance simple.
 
 With the architecture in place, the heart of the app is the breathing session itself. The session loop manages timing, state transitions, and voice prompts.
 
@@ -203,7 +201,7 @@ With the architecture in place, the heart of the app is the breathing session it
 
 The session loop keeps track of time, alternates between inhale/exhale and updates the progress bar. It's driven by `requestAnimationFrame`, which runs once per frame for smooth updates. This approach provides more precise timing than cascading `setTimeout` calls.
 
-You'll also notice calls to `speak(...)` for voice prompts, I'll explain how that works in the next section.
+Values like `inSec` and `outSec` come from a form submission handler in `main.js` — passed into the session when the user clicks Start. You'll also notice calls to `speak(...)` for voice prompts, which I'll explain in the next section.
 
 ```js
 // js/session.js
@@ -265,8 +263,6 @@ function updateState() {
 
 Rather than waiting for exact intervals using timers, the app continuously checks how much actual time has elapsed using [requestAnimationFrame](https://developer.mozilla.org/en-US/docs/Web/API/Window/requestAnimationFrame). This schedules the loop to run in sync with the browser's repaint cycle. On each frame, the function compares the current time against when the breath phase started. When the target duration is reached (for example, 5.5 seconds for an inhale), it transitions to the next phase and resets the timer.
 
-When the total time is reached, the app lets you finish your last out-breath before wrapping up. With the session loop handling timing, the next question was how to guide users without requiring them to watch the screen.
-
 ### Voice-Guided
 
 All prompts - "Breathe in", "Breathe out", and "All done" at the end - are spoken using the [Web Speech API](https://developer.mozilla.org/en-US/docs/Web/API/SpeechSynthesis), so the user doesn't need to watch the screen during the session and knows when it's over. The browser provides the voice, which may sound different depending on the operating system and settings.
@@ -317,25 +313,39 @@ export const NAMESPACE = 'justBreathe';
 export const PREFS_KEY = `${NAMESPACE}:prefs`;
 ```
 
+The full `userPrefs.js` module handles saving, loading, and validation in one place:
+
 ```js
 // js/userPrefs.js
 import { PREFS_KEY } from './constants.js';
 
-// Save preferences
-localStorage.setItem(PREFS_KEY, JSON.stringify(prefs));
+export const DEFAULT_PREFS = { inSec: 4.5, outSec: 4.5, duration: 10 };
+
+export function savePrefs({ inSec, outSec, duration }) {
+  try {
+    localStorage.setItem(PREFS_KEY, JSON.stringify({ inSec, outSec, duration }));
+  } catch (e) {
+    // ignore storage errors
+  }
+}
+
+export function loadPrefs() {
+  try {
+    const raw = localStorage.getItem(PREFS_KEY);
+    if (!raw) return { ...DEFAULT_PREFS };
+    const prefs = JSON.parse(raw);
+    return {
+      inSec: typeof prefs.inSec === 'number' && prefs.inSec >= 1 && prefs.inSec <= 15 ? prefs.inSec : DEFAULT_PREFS.inSec,
+      outSec: typeof prefs.outSec === 'number' && prefs.outSec >= 1 && prefs.outSec <= 15 ? prefs.outSec : DEFAULT_PREFS.outSec,
+      duration: typeof prefs.duration === 'number' && prefs.duration >= 1 && prefs.duration <= 180 ? prefs.duration : DEFAULT_PREFS.duration,
+    };
+  } catch {
+    return { ...DEFAULT_PREFS };
+  }
+}
 ```
 
-The app also provides sensible defaults and validation:
-
-```js
-const DEFAULT_PREFS = { inSec: 5.5, outSec: 5.5, duration: 10 };
-
-// When loading prefs from local storage
-const prefs = JSON.parse(localStorage.getItem('justBreathe:prefs'));
-// Validate each value; fallback to defaults if invalid
-```
-
-Only reasonable values are accepted: in/out seconds between 1 - 15, and session durations between 1 - 180 minutes. This ensures that even if local storage is corrupted or manually edited, the app still works predictably.
+`loadPrefs` returns the defaults if nothing is stored yet, and falls back to them if parsing fails — for example if local storage was manually edited or corrupted. Each value is also range-checked: in/out seconds must be between 1–15, and session duration between 1–180 minutes. This ensures the app always starts in a sensible state regardless of what's in storage.
 
 ### Add to Home Screen
 
@@ -371,7 +381,7 @@ The manifest defines the app name, icons, start URL, and display mode:
 }
 ```
 
-iOS and macOS Safari use the icon and page title defined in `index.html`:
+iOS uses the icon and page title defined in `index.html`:
 
 ```html
 <link rel="apple-touch-icon" sizes="180x180" href="apple-touch-icon.png" />
@@ -393,11 +403,11 @@ In addition to the JavaScript setup, the CSS is organized into multiple smaller 
 ```
 
 <aside class="markdown-aside">
-While <code>@import</code> has historically been discouraged for performance reasons, since older browsers loaded files sequentially, HTTP/2's multiplexing reduces that concern. In this small app, the tradeoff favors developer experience and maintainability, making the modular file structure more valuable than micro-optimizing CSS delivery. <a class="markdown-link" href="https://css-tricks.com/almanac/rules/i/import">Further reading</a>.
+While <code>@import</code> has historically been discouraged for performance reasons, since older browsers loaded files sequentially, HTTP/2's multiplexing <a class="markdown-link" href="https://css-tricks.com/almanac/rules/i/import">largely reduces that concern</a>. In this small app, the tradeoff favors developer experience and maintainability, making the modular file structure more valuable than micro-optimizing CSS delivery.
 </aside>
 
 ## Final Thoughts
 
-I now use Just Breathe nearly every day after my workout. It's simple and solves exactly the problem I set out to fix: guided breathing without the baggage. This project reminded me why I love building for the web. With just HTML, CSS, and JavaScript (and a capable AI assistant!), you can quickly create useful tools that work everywhere, require no installation, and cost nothing to run.
+I now use Just Breathe daily after my workout. It's simple and solves exactly the problem I set out to fix: guided breathing without the baggage. This project reminded me why I love building for the web. With just HTML, CSS, and JavaScript (and an AI assistant!), you can quickly create useful tools that work everywhere, require no installation, and cost nothing to run.
 
 If you want to try it, [Just Breathe](https://danielabar.github.io/just-breathe/) works in any modern browser and takes seconds to start using. Add it to your home screen for quick access. I hope it helps you find a moment of calm in your day.
