@@ -130,7 +130,30 @@ Looking back, three things were essential:
 
 One question worth addressing: why use AI for the diffing step at all, rather than a dedicated visual regression tool?
 
-Playwright ships built-in visual testing via `expect(page).toHaveScreenshot()` — since I was already using Playwright for the capture script, this was the obvious alternative. But the output is a pixel diff, not a description. "42 pixels changed in screenshot-5.png" doesn't tell you *what* changed. You'd still need to open the diff image and interpret it manually, and you'd need to tune thresholds to suppress rendering noise.
+Playwright ships built-in visual testing via `expect(page).toHaveScreenshot()` — since I was already using Playwright for the capture script, this was the obvious alternative. I tried it, using the Phase 5 regression as the test case. The test itself is simple enough:
+
+```js
+// tests/visual/views.spec.js
+test('main view', async ({ page }) => {
+  await page.goto('/');
+  await page.waitForSelector('.main-view-card');
+  await expect(page).toHaveScreenshot('main.png');
+});
+```
+
+When it catches a difference, this is what the terminal output looks like:
+
+```
+Error: expect(page).toHaveScreenshot(expected) failed
+
+  28894 pixels (ratio 0.10 of all image pixels) are different.
+
+  Expected: tests/visual/views.spec.js-snapshots/main-darwin.png
+  Received: test-results/views-main-view/main-actual.png
+  Diff:     test-results/views-main-view/main-diff.png
+```
+
+That's essentially all you get in the terminal: a pixel count and a ratio, with paths to three image files — expected, actual, and diff. Playwright does have an HTML reporter (`npx playwright show-report`) that renders a side-by-side view of the two screenshots with a diff overlay, which is genuinely more useful. But it's a separate browser tab to open, and even then you can see that *something* shifted and roughly *where*, but not *why*. With Claude comparing the screenshots, the output was immediately actionable: "Vertical spacing has increased throughout — this looks like it's caused by the new CSS reset setting `line-height: 1.5` on body." One explanation, pointing directly at the source.
 
 I also looked at [Percy](https://www.browserstack.com/docs/percy/overview/visual-testing-basics) briefly, but it requires creating an account before you can do anything, and I didn't want to introduce a SaaS dependency for a small one-off refactor.
 
