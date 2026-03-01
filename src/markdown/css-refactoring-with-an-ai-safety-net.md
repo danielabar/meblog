@@ -10,21 +10,19 @@ related:
   - "Rapid Prototyping with ChatGPT: OAS Pension Calculator Part 1"
 ---
 
-A while back I built a small breathing meditation app with just vanilla HTML, CSS, and JavaScript. It was mostly vibe-coded using GitHub Copilot's free tier in VS Code. The result was an app that worked, solving a real problem for me, but the code, particularly the CSS, was a hot mess.
+A while back I built a small breathing meditation app with just vanilla HTML, CSS, and JavaScript. It was mostly vibe-coded using GitHub Copilot's free tier in VS Code. The result was an app that worked, solving a real problem for me, but the CSS was a hot mess.
 
-Then I attempted a visual design refresh — new typography, tighter spacing, a more polished feel, but ran into problems. The CSS was so tangled that almost nothing could be safely changed. Edit one rule and something unrelated would break. I'd try to understand which styles were actually applying to an element and find three different files all claiming to style the same thing. And even Copilot was spinning in whack-a-mole loops.
+Then I attempted a visual design refresh, but ran into problems. The CSS was so tangled that almost nothing could be safely changed. Edit one rule and something unrelated would break. I'd try to understand which styles were actually applying to an element and find three different files all claiming to style the same thing. And even Copilot was spinning in whack-a-mole loops.
 
-It became clear that the CSS had to be cleaned up to make it maintainable. By this point I'd moved on from Copilot to a paid Claude Code subscription, which gave me access to more capable models. Here's the technique I came up with to do that refactor safely with AI assistance — and why it's different from the E2E testing you might already be familiar with.
+It became clear that the CSS had to be cleaned up to make it maintainable. By this point I'd moved on from Copilot to a paid Claude Code subscription, which gave me access to more capable models. Here's the technique I came up with to do that refactor safely with AI assistance.
 
-## What was wrong with the CSS
+## The problem and the plan
 
-Before touching anything, I had Claude Code perform an audit of the existing styles. The results were what you'd expect from vibe-coded CSS: duplicated rules spread across multiple files silently fighting each other for cascade priority, a 2011-era reset missing `box-sizing: border-box`, button styles copy-pasted into four different files, and hard-coded hex values scattered everywhere despite a `variables.css` already existing. It worked until it didn't.
+Before touching anything, I had Claude Code perform an audit of the existing styles. It found issues such as duplicated rules spread across multiple files, a 2011-era reset missing `box-sizing: border-box`, button styles copy-pasted into four different files, and hard-coded hex values scattered everywhere despite a `variables.css` already existing.
 
-## The goal: a true refactor
+Around this time I came across [csscaffold](https://github.com/robzolkos/csscaffold), a project that lays out a lightly opinionated CSS architecture built on cascade layers. It's framed as a Rails tool, but the CSS organization ideas can apply to any project. This gave me a concrete target to aim for.
 
-Around this time I came across [csscaffold](https://github.com/robzolkos/csscaffold), a project that lays out a lightly opinionated CSS architecture built on cascade layers. It's framed as a Rails tool, but the CSS organization ideas apply to any project. Reading it made clear just how far my CSS was from where it could be, and gave me a concrete target to aim for. I wanted an architecture I could build on, not just a cleaned-up version of the existing mess.
-
-The key idea from csscaffold is [cascade layers](https://developer.mozilla.org/en-US/docs/Web/CSS/Reference/At-rules/@layer):
+The key idea from csscaffold is [cascade layers](https://developer.mozilla.org/en-US/docs/Web/CSS/Reference/At-rules/@layer), for example:
 
 ```css
 @layer reset, base, components, utilities;
@@ -48,25 +46,23 @@ Before AI assistants, I'd have looked at csscaffold, thought "that's the right a
 
 The plan was clear. What wasn't yet clear was how to prove that each phase hadn't broken anything.
 
-## The hard part: proving nothing broke
+## Proving nothing broke
 
 CSS refactors are risky: A `2px` layout shift, a slightly different `line-height`, a shadow that disappeared — small details that shape how polished a design feels, but easy to miss on a quick visual scan.
 
-You might think: won't browser-based tests catch this — Playwright, Capybara, Selenium? Not this kind. E2E tests verify *functionality*: can you click this button, does this form submit, does this page navigate correctly. They say nothing about whether the button looks right, whether the spacing changed, or whether a color was silently overridden.
+My first thought: won't browser-based tests catch this? Not quite. Most end-to-end testing tools verify *functionality*: can you click this button, does this form submit, does this page navigate to the intended destination. They say nothing about whether the button *looks* right or the spacing was changed.
 
 Second thought: I'll just check it manually — open a browser, click through the app, eyeball it. But the app isn't just one page. It has states that require interaction to reach: a navigation drawer that has to be opened, a list view that looks different when populated vs. empty, form states that are only visible after a specific dropdown selection. Doing that carefully after each of seven phases would be tedious.
 
-What I needed was automation — something that could navigate every meaningful app state and capture a screenshot of each, reproducibly, after every phase, and compare to a baseline. I'd initially looked into using the Chrome DevTools MCP server for this, but landed on [Playwright](https://playwright.dev/docs/api/class-playwright) as a better fit — its Node.js API is more token-efficient for agentic use than the DevTools protocol directly.
+What I needed was automation — something that could navigate every meaningful app state and capture a screenshot of each, reproducibly, after every phase, and compare to a baseline. I'd initially looked into using the Chrome DevTools MCP server for this, but landed on [Playwright](https://playwright.dev/docs/api/class-playwright) as a better fit — its Node.js API is more token-efficient for agentic use.
 
 That could handle capture. But a folder of PNGs doesn't tell you anything by itself. I needed something to *compare* them. The answer was already in the workflow: the same AI assistant making the CSS changes could also read screenshots.
 
 ## Capturing every state
 
-I asked Claude Code to write a script that would navigate through every meaningful app state, capture a screenshot of each, and save them to a directory — designed from the start to be re-run after every refactor phase.
+I asked Claude Code to write a Playwright script that would navigate through every meaningful app state, capture a screenshot of each, and save them to a directory. The first step was enumerating every meaningful state the app could be in — not just the page routes, but the transient states that require interaction to reach. For this app, that came to nine distinct states.
 
-The first step was enumerating every meaningful state the app could be in — not just the page routes, but the transient states that require interaction to reach. For this app, that came to nine distinct states.
-
-The script drives the browser through all of them automatically — clicking navigation elements, filling out forms, waiting for transitions to fully settle, then saving a named PNG. The label passed on the command line determines the output directory, which is what makes the workflow reusable across phases:
+The script drives the browser through all of them automatically — clicking navigation elements, filling out forms, waiting for transitions to fully settle, then saving a named PNG. The argument passed on the command line determines the output directory, which is what makes the workflow reusable across phases:
 
 ```javascript
 const OUT_DIR = `scratch/css-reorg/screenshots/${process.argv[2] ?? 'run'}`;
@@ -128,9 +124,9 @@ Looking back, three things were essential:
 
 **Keep refactoring phases small:** Each phase was one conceptual change. When a regression appeared, the cause was obvious because there was only one thing that could have caused it. A 7-phase refactor with 9 screenshots per phase is 63 comparison points, but each comparison is against a narrow, well-defined change.
 
-**Use a capable model:** The original CSS (and entire project) was built with a free-tier Copilot model through casual vibe coding. That model was fine for generating working code on demand. But it couldn't hold the architectural picture in mind, reason about cascade behavior across files, or identify the root cause of a visual regression from a screenshot. Using Claude Code — a paid subscription with a more capable model — made a meaningful difference at every step.
+**Use a capable model:** The original CSS (and entire project) was built with a free-tier Copilot model through casual vibe coding. That model was fine for generating working code on demand. But it couldn't hold the architectural picture in mind, reason about cascade behavior across files, or identify the root cause of a visual regression from a screenshot. Using a paid Claude Code subscription made a significant difference.
 
-## Why not a dedicated visual regression tool?
+## Visual regression tool?
 
 One question worth addressing: why use AI for the diffing step at all, rather than a dedicated visual regression tool?
 
@@ -142,6 +138,6 @@ That said, if you're doing this kind of visual comparison regularly — on a lar
 
 ## Conclusion
 
-The refactor is done. The CSS is now layered, de-duplicated, uses a modern reset, and has a unified button system with all colors tokenized. And I can finally work on the design refresh I wanted to do in the first place.
+The refactor is done. The CSS is now layered, de-duplicated, uses a modern reset, and has a unified button system with all colors tokenized. The design refresh followed shortly after, and having well-structured CSS made it easier.
 
 The technique described in this post turned a refactor that touched every CSS file in the project into a process where every phase ended with "all screenshots identical to baseline." That's not usually how CSS refactors feel.
