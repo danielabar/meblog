@@ -36,7 +36,7 @@ Our app is built with Ruby on Rails. Emails are sent via Action Mailer (Rails' b
 
 When events happen in Stripe — a payment succeeds, a subscription is canceled, an invoice fails — Stripe can notify your application by sending an HTTP POST request to a URL you configure. This is a webhook. You choose which events you care about from Stripe's extensive list, and Stripe sends you a JSON payload describing what happened.
 
-For our case, the key events are `invoice.payment_failed` and `customer.subscription.deleted`. The payment failed payload includes the customer ID, the attempt count (1, 2, or 3), and details about the invoice. The deleted payload tells us we need to clean out this customers info from our database.
+For our case, the key event is `invoice.payment_failed`. The payload includes the customer ID, the attempt count (1, 2, or 3), and details about the invoice.
 
 The Rails app has a controller endpoint that receives these webhooks and decides what to do:
 
@@ -44,11 +44,7 @@ The Rails app has a controller endpoint that receives these webhooks and decides
 def receive
   event_json = JSON.parse(request.body.read)
 
-  if event_json['type'] == 'customer.subscription.deleted'
-    customer_id = event_json['data']['object']['customer']
-    CustomerExpunger.perform_async(customer_id)
-
-  elsif event_json['type'] == 'invoice.payment_failed'
+  if event_json['type'] == 'invoice.payment_failed'
     customer_id = event_json['data']['object']['customer']
     user = User.find_by_customer_id(customer_id)  # field name depends on your schema
 
@@ -72,7 +68,7 @@ def receive
 end
 ```
 
-Two things to note here. First, this endpoint handles multiple Stripe event types. The `customer.subscription.deleted` event fires when Stripe cancels a subscription (for example, after all payment retries are exhausted). When that happens, `CustomerExpunger` — a background job — clears the user's subscription data from our database. Second, the payment failure emails are routed based on both the attempt number and the user's billing period. Keep these two branches in mind — they become important later.
+The payment failure emails are routed based on two factors: the attempt number (1, 2, or 3) and the user's billing period. Keep this routing logic in mind — it becomes important later.
 
 But how do you test that this actually works end-to-end?
 
@@ -386,7 +382,27 @@ Then repeat for `PLAN=yearly` and verify the yearly variants: does the closure e
 
 ## Surprising Race Condition
 
-During testing of the third failure email for yearly subscribers, I noticed something wrong: they were receiving the monthly version of the closure email — the one warning about permanent data deletion — instead of the yearly version reassuring them their data would be preserved.
+There's one more event the webhook controller handles. When Stripe cancels a subscription after all payment retries are exhausted, it sends a `customer.subscription.deleted` event. Our app responds by running a background job to clean up the account on our end:
+
+```ruby
+def receive
+  event_json = JSON.parse(request.body.read)
+
+  if event_json['type'] == 'customer.subscription.deleted'
+    customer_id = event_json['data']['object']['customer']
+    AccountCloser.perform_async(customer_id)
+
+  elsif event_json['type'] == 'invoice.payment_failed'
+    # ... payment failure email routing
+  end
+
+  head :ok
+end
+```
+
+`AccountCloser` is a background job that clears the user's subscription data from our database — things like resetting subscription type and status fields.
+
+This seems straightforward. But during testing of the third failure email for yearly subscribers, I noticed something wrong: they were receiving the monthly version of the closure email — the one warning about permanent data deletion — instead of the yearly version reassuring them their data would be preserved.
 
 The webhook logs told the story. As visible in the terminal running `stripe listen --forward-to...`, when the third payment fails, Stripe sends two events in quick succession:
 
@@ -397,22 +413,52 @@ webhook_received event_type=invoice.payment_failed
 
 The subscription deletion event arrives *before* the third payment failure event. This is because our Stripe settings say "if all retries fail, cancel the subscription." So Stripe cancels first, then reports the final failure.
 
-Our app processes the deletion event by running a background job that clears the user's subscription data — including setting `subscription_type` to `nil`. By the time the third `invoice.payment_failed` webhook arrives a moment later, the code that checks `user.plan_billing_period` gets `nil` back. The `else` branch fires. The yearly subscriber gets the monthly email.
+By the time `AccountCloser` finishes clearing the subscription data and the third `invoice.payment_failed` webhook arrives a moment later, the code that checks `user.plan_billing_period` gets `nil` back. The `else` branch fires. The yearly subscriber gets the monthly email.
 
 This would never surface in a unit test, where you control the payload and there's no asynchronous event ordering to worry about. It would never surface with a curl-based approach, where you're sending one event at a time.
 
-The fix was straightforward: for the third attempt, instead of relying on the user record from the database (which may already be cleared), extract the billing period directly from the Stripe invoice payload. The invoice's line items contain the price object, which includes the billing interval. I extracted this logic to another method to avoid cluttering the webhook controller, and support unit testing, but it could also be a private method in the controller:
+The fix was in the hooks controller: for the first and second attempts the user record is still intact, so reading `user.plan_billing_period` is fine. But for the third attempt, the data may no longer be in the database. Instead, we extract the billing period directly from the Stripe invoice payload. The invoice's line items contain the price object, which includes the billing interval:
 
 ```ruby
-class StripeInvoiceParser
-  def self.billing_period(event_json)
-    lines = event_json.dig("data", "object", "lines", "data") || []
-    subscription_line = lines.find { |line| line["type"] == "subscription" }
-    return :monthly unless subscription_line
+elsif event_json['type'] == 'invoice.payment_failed'
+  customer_id = event_json['data']['object']['customer']
+  user = User.find_by_customer_id(customer_id)
 
-    interval = subscription_line.dig("price", "recurring", "interval")
-    interval == "year" ? :yearly : :monthly
+  case event_json['data']['object']['attempt_count']
+  when 1
+    if user&.plan_billing_period == :yearly
+      SubscriptionMailer.first_failure_yearly(event_json).deliver_later
+    else
+      SubscriptionMailer.first_failure_monthly(event_json).deliver_later
+    end
+  when 2
+    if user&.plan_billing_period == :yearly
+      SubscriptionMailer.second_failure_yearly(event_json).deliver_later
+    else
+      SubscriptionMailer.second_failure_monthly(event_json).deliver_later
+    end
+  when 3
+    # === Parse event payload rather than checking User model
+    if billing_period_from_invoice(event_json) == :yearly
+      SubscriptionMailer.third_failure_yearly(event_json).deliver_later
+    else
+      SubscriptionMailer.third_failure_monthly(event_json).deliver_later
+    end
   end
+```
+
+Where `billing_period_from_invoice` is a private method on the controller that reads the interval from the invoice line items:
+
+```ruby
+private
+
+def billing_period_from_invoice(event_json)
+  lines = event_json.dig("data", "object", "lines", "data") || []
+  subscription_line = lines.find { |line| line["type"] == "subscription" }
+  return :monthly unless subscription_line
+
+  interval = subscription_line.dig("price", "recurring", "interval")
+  interval == "year" ? :yearly : :monthly
 end
 ```
 
