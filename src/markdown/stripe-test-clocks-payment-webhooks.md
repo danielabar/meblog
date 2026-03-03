@@ -150,21 +150,48 @@ The `test_clock: test_clock.id` parameter on the customer is the critical link. 
 
 Notice the customer starts with a valid card. We need the initial subscription to succeed — just like a real customer whose card works fine at first.
 
+Next we create a subscription for this customer:
+
 ```ruby
 namespace :test_clock do
   task setup: :environment do
     # ...
 
-    # Create a real subscription (this succeeds)
     subscription = Stripe::Subscription.create(
       customer: customer.id,
-      items: [{ price: stripe_price_id }]  # your Stripe price ID
+      items: [{ price: stripe_price_id }],
+      expand: ["latest_invoice.payment_intent"]
     )
 
     # ...
   end
 end
 ```
+
+**Where does `stripe_price_id` come from?** This will depend on your Stripe integration, but in general: Stripe uses [Products and Prices](https://docs.stripe.com/billing/subscriptions/build-subscriptions#create-pricing-model) to model what you sell. A Price defines the billing terms — amount, currency, and interval — and each one has an ID like `price_abc123`. The rake file includes a `resolve_plan_config` helper that reads the `PLAN` environment variable and maps it to the right price ID:
+
+```ruby
+namespace :test_clock do
+  def resolve_plan_config
+    plan_key = ENV.fetch("PLAN", "monthly")
+
+    configs = {
+      "monthly" => {
+        stripe_price_id: ENV.fetch("STRIPE_MONTHLY_PRICE_ID"),
+        billing_period: :monthly
+      },
+      "yearly" => {
+        stripe_price_id: ENV.fetch("STRIPE_YEARLY_PRICE_ID"),
+        billing_period: :yearly
+      }
+    }
+
+    configs.fetch(plan_key)
+  end
+end
+```
+
+You set `STRIPE_MONTHLY_PRICE_ID` and `STRIPE_YEARLY_PRICE_ID` to the test-mode price IDs from your Stripe dashboard.
 
 Now comes the trick. We swap the payment method to one of Stripe's [test cards that always fails](https://docs.stripe.com/testing#declined-payments):
 
@@ -336,9 +363,9 @@ namespace :test_clock do
 end
 ```
 
-Running the full test requires three terminals open simultaneously:
+Exercising this harness requires three terminals open simultaneously:
 
-1. **Your web server and background jobs** — `bin/dev`, which starts both the Rails app server to receive the HTTP POST requests from Stripe, and Sidekiq (the background job processor that actually sends the emails)
+1. **Your web server and background jobs** — `bin/dev`, which starts both the Rails app server to receive the HTTP POST requests from Stripe, and your background job processor (ours is Sidekiq).
 2. **Stripe CLI webhook forwarding** — `stripe listen --forward-to localhost:5000/hooks` so that Stripe's webhooks reach your local machine
 3. **The test harness commands** — where you run the rake tasks to set up test data, advance time, and clean up
 
@@ -351,9 +378,9 @@ Terminal 3: bin/rails test_clock:setup PLAN=monthly
             bin/rails test_clock:cleanup
 ```
 
-When you run `advance_past_renewal`, Stripe processes the events in the background: the subscription renews, the payment fails, Stripe retries according to your retry schedule, each retry fails, and eventually Stripe cancels the subscription. All three `invoice.payment_failed` webhooks arrive in sequence — the first failure, then a bit later the second, then the third — from a single advance command.
+When you run `advance_past_renewal`, Stripe executes the billing cycle on their end — the subscription renewal, the payment failure, the retries, the cancellation — and sends an HTTP POST webhook to your endpoint for each event. `stripe listen` forwards those to your local server, your Rails app receives and processes them, and Sidekiq delivers the emails. In development, we use the `letter_opener` gem, which intercepts outgoing emails and opens them as browser tabs — so three tabs pop open, one for each payment failure email.
 
-You see the webhooks arriving in real time in the `stripe listen` terminal. In our case, we use the `letter_opener` gem in development, which intercepts outgoing emails and opens them as browser tabs — so three tabs pop open, one for each payment failure email. You can visually verify: Does the first email say "Action needed: Update your payment method"? Does it mention "monthly subscription"? Is the closure email appropriately dire about data deletion?
+You can see all three `invoice.payment_failed` webhooks arriving in sequence in the `stripe listen` terminal — the first failure, then a bit later the second, then the third — all from a single advance command. And you can visually verify the emails: Does the first one say "Action needed: Update your payment method"? Does it mention "monthly subscription"? Is the closure email appropriately dire about data deletion?
 
 Then repeat for `PLAN=yearly` and verify the yearly variants: does the closure email now reassure the subscriber their data is preserved? Six emails total across two plan types, each one visually verifiable in about a minute.
 
