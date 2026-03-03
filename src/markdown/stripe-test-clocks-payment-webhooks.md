@@ -112,36 +112,38 @@ stripe listen --forward-to localhost:5000/hooks
 
 This creates a temporary additional webhook endpoint that forwards events to your local development server. It doesn't replace or interfere with any webhook endpoints you've already configured in the Stripe dashboard — those continue to receive events normally. The CLI just adds your local server as an extra destination. You see the events arrive in real time in your terminal.
 
-It's worth noting that Stripe lets you configure different webhook endpoints for test mode and live mode. Everything we're doing here — the CLI, the Test Clocks, the test cards — operates entirely in test mode. Your production webhook configuration and live customer data are completely untouched.
+Stripe lets you configure different webhook endpoints for test mode and live mode. Everything we're doing here — the CLI, the Test Clocks, the test cards — operates entirely in test mode. Your production webhook configuration and live customer data are completely untouched.
 
 ## Building the Test Harness
 
-I wrapped the whole workflow into a set of rake tasks, living in `lib/tasks/test_clock.rake`. Each task is defined with `task setup: :environment do` — the `:environment` dependency is what loads Rails and your models, so the `Stripe::*` gem constants and your `User` model are all available. Here's the approach. You need three terminal windows running simultaneously:
-
-1. **Your web server and background jobs** — `bin/dev`, which starts both the Rails app server and Sidekiq (the background job processor that actually sends the emails)
-2. **Stripe CLI webhook forwarding** — `stripe listen --forward-to localhost:5000/hooks` so that Stripe's webhooks reach your local machine
-3. **The test harness commands** — where you run the rake tasks to set up test data, advance time, and clean up
-
-With all three running, here's what each step does.
+I wrapped the whole workflow into a set of rake tasks, living in `lib/tasks/test_clock.rake`. Each task is defined with `task <name>: :environment do` — the `:environment` dependency is what loads Rails and your models, so the `Stripe::*` gem constants and your `User` model are all available. Here's what each step does.
 
 ### Create a Subscriber Destined to Fail
 
 The setup task creates everything Stripe needs for a realistic payment failure scenario:
 
 ```ruby
-# Create a test clock — this is our time machine
-test_clock = Stripe::TestHelpers::TestClock.create(
-  frozen_time: Time.current.to_i,
-  name: "Payment Failure Test"
-)
+namespace :test_clock do
+  task setup: :environment do
+    frozen_time = Time.current.to_i
 
-# Create a customer attached to the clock, with a GOOD payment method
-customer = Stripe::Customer.create(
-  email: email,
-  test_clock: test_clock.id,
-  payment_method: "pm_card_visa",
-  invoice_settings: { default_payment_method: "pm_card_visa" }
-)
+    # Create a test clock — this is our time machine
+    test_clock = Stripe::TestHelpers::TestClock.create(
+      frozen_time: frozen_time,
+      name: "Payment Failure Test"
+    )
+
+    # Create a customer attached to the clock, with a GOOD payment method
+    customer = Stripe::Customer.create(
+      email: email,
+      test_clock: test_clock.id,
+      payment_method: "pm_card_visa",
+      invoice_settings: { default_payment_method: "pm_card_visa" }
+    )
+
+    # ...
+  end
+end
 ```
 
 The `test_clock: test_clock.id` parameter on the customer is the critical link. Without it, the customer exists independently of the clock, and advancing time won't affect them — no events fire, no emails appear, and there's no error to tell you why. Everything that should live inside the simulation must be created after the clock and linked to it. This same association is also what makes cleanup automatic: when you delete the clock, Stripe automatically deletes everything attached to it.
@@ -149,41 +151,86 @@ The `test_clock: test_clock.id` parameter on the customer is the critical link. 
 Notice the customer starts with a valid card. We need the initial subscription to succeed — just like a real customer whose card works fine at first.
 
 ```ruby
-# Create a real subscription (this succeeds)
-subscription = Stripe::Subscription.create(
-  customer: customer.id,
-  # Or however you identify your products
-  items: [{ price: stripe_price_id }]
-)
+namespace :test_clock do
+  task setup: :environment do
+    # ...
+
+    # Create a real subscription (this succeeds)
+    subscription = Stripe::Subscription.create(
+      customer: customer.id,
+      items: [{ price: stripe_price_id }]  # your Stripe price ID
+    )
+
+    # ...
+  end
+end
 ```
 
 Now comes the trick. We swap the payment method to one of Stripe's [test cards that always fails](https://docs.stripe.com/testing#declined-payments):
 
 ```ruby
-# Attach a card that will fail on future charges
-failing_pm = Stripe::PaymentMethod.attach(
-  "pm_card_chargeCustomerFail",
-  { customer: customer.id }
-)
+namespace :test_clock do
+  task setup: :environment do
+    # ...
 
-Stripe::Customer.update(customer.id, {
-  invoice_settings: { default_payment_method: failing_pm.id }
-})
+    # Attach a card that will fail on future charges
+    failing_pm = Stripe::PaymentMethod.attach(
+      "pm_card_chargeCustomerFail",
+      { customer: customer.id }
+    )
+
+    Stripe::Customer.update(customer.id, {
+      invoice_settings: { default_payment_method: failing_pm.id }
+    })
+
+    # ...
+  end
+end
 ```
 
 The subscription is active and healthy. But the next time Stripe tries to charge this customer, it will fail.
 
-We also create a local user in our database linked to this Stripe customer, so our webhook handler can look them up by `stripe_customer_id`:
+We also create a local user in our database linked to this Stripe customer, so our webhook handler can look them up by Stripe customer ID. How you model this varies — you might have a separate subscriptions table, a different field name, or additional associations. The code below shows a simple example where `User` has a `stripe_customer_id` column:
 
 ```ruby
-user = User.create!(
-  email: email,
-  stripe_customer_id: customer.id,
-  # ... other required fields for your User model
-)
+namespace :test_clock do
+  task setup: :environment do
+    # ...
+
+    user = User.create!(
+      email: email,
+      stripe_customer_id: customer.id,
+      # ... other required fields for your User model
+    )
+
+    # ...
+  end
+end
 ```
 
-The task saves all the IDs to a state file at `tmp/test_clock_state.json` for subsequent steps:
+The task saves all the IDs to a state file for subsequent steps:
+
+```ruby
+namespace :test_clock do
+  task setup: :environment do
+    # ...
+
+    state = {
+      clock_id: test_clock.id,
+      customer_id: customer.id,
+      subscription_id: subscription.id,
+      user_id: user.id,
+      billing_period: plan_config[:billing_period].to_s,
+      frozen_time: frozen_time,
+      renewal_time: subscription.current_period_end,
+      current_attempt: 0
+    }
+    File.write(state_file_path, state.to_json)
+  end
+end
+```
+
+Which produces a file like this:
 
 ```json
 {
@@ -192,71 +239,129 @@ The task saves all the IDs to a state file at `tmp/test_clock_state.json` for su
   "subscription_id": "sub_1RGx3nOpQrStUv",
   "user_id": 12345,
   "billing_period": "monthly",
-  "renewal_time": 1743504000
+  "frozen_time": 1740825600,
+  "renewal_time": 1743504000,
+  "current_attempt": 0
 }
 ```
 
-Note that only one test can be active at a time — running setup again overwrites this file. You need to run cleanup before switching to a different plan type.
-
 ### Fast-Forward Time
 
-This is where Test Clocks shine. Instead of waiting a month (or a year, depending on which plan we're testing) for the subscription to renew, we just advance the clock. The task reads the `renewal_time` stored in the state file (which was set from `subscription.current_period_end` at setup), then adds 30 days to ensure enough days have gone by to process all the renewal attempts:
+This is where Test Clocks shine. Instead of waiting a month (or a year, depending on which plan we're testing) for the subscription to renew, we just advance the clock:
 
 ```ruby
-target_time = renewal_time + (30 * 24 * 60 * 60)
+namespace :test_clock do
+  task advance_past_renewal: :environment do
+    state = load_state
+    days_past_renewal = ENV.fetch("DAYS", "30").to_i
 
-Stripe::TestHelpers::TestClock.advance(
-  clock_id,
-  { frozen_time: target_time }
-)
-```
+    renewal_time = state["renewal_time"]
+    target_time = renewal_time + (days_past_renewal * 24 * 60 * 60)
 
-Stripe processes the events: the subscription renews, the payment fails, Stripe retries according to your retry schedule, each retry fails, and eventually Stripe cancels the subscription. All three `invoice.payment_failed` webhooks arrive in sequence — the first failure, then a bit later the second, then the third — from a single advance command.
+    Stripe::TestHelpers::TestClock.advance(
+      state["clock_id"],
+      { frozen_time: target_time }
+    )
 
-The task polls until the clock has finished advancing:
+    wait_for_clock_ready(state["clock_id"])
 
-```ruby
-loop do
-  sleep 2
-  test_clock = Stripe::TestHelpers::TestClock.retrieve(clock_id)
-  break if test_clock.status == "ready"
+    state["frozen_time"] = target_time
+    File.write(state_file_path, state.to_json)
+  end
 end
 ```
 
-### Observe the Results
+The `renewal_time` was stored in the state file during setup (from `subscription.current_period_end`). We add 30 days past that — a conservative buffer that guarantees Stripe has had time to process all the retries regardless of your configured retry schedule. `wait_for_clock_ready` is a helper method defined in the rake file that polls Stripe until the clock is done advancing:
 
-With `stripe listen` running in one terminal and the Rails server in another, you see the webhooks arrive in real time. In our case, we use the `letter_opener` gem in development, which intercepts outgoing emails and opens them as browser tabs. So after advancing the clock, three browser tabs pop open — one for each payment failure email.
+```ruby
+def wait_for_clock_ready(clock_id)
+  loop do
+    sleep 2
+    test_clock = Stripe::TestHelpers::TestClock.retrieve(clock_id)
+    break if test_clock.status == "ready"
 
-You can visually verify: Does the first email say "Action needed: Update your payment method"? Does the monthly version mention "monthly subscription"? Does the yearly version say "annual subscription"? Is the closure email appropriately dire for monthly subscribers and reassuring for yearly ones?
+    if test_clock.status == "internal_failure"
+      puts "\nERROR: Clock advancement failed!"
+      exit 1
+    end
+  end
+end
+```
+
+Once the clock is ready, the updated frozen time is written back to the state file.
 
 ### Clean Up
 
 Here's one of the nicest things about Test Clocks: when you delete the clock, Stripe automatically deletes everything that was created inside it — the customer, the subscription, the invoices, the payment intents, the charges. No test data accumulating in your Stripe test environment.
 
 ```ruby
-Stripe::TestHelpers::TestClock.delete(clock_id)
+namespace :test_clock do
+  task cleanup: :environment do
+    state = load_state
+
+    Stripe::TestHelpers::TestClock.delete(state["clock_id"])
+
+    user = User.find_by(id: state["user_id"])
+    user.destroy if user
+  end
+end
 ```
 
-The rake task also delete the local user that was created for the test. Clean slate, ready to test the next plan type.
+Clean slate, ready to test the next plan type.
 
 ### Putting It All Together
 
-With all three terminals running, the full test cycle for one plan type looks like this:
+Before running everything, here's the shape of the full rake file — all the tasks we've been building up, in one view:
+
+```ruby
+namespace :test_clock do
+  task setup: :environment do
+    # create test clock, customer with good card
+    # create subscription (succeeds)
+    # swap to failing payment method
+    # create local user linked to Stripe customer
+    # save IDs to tmp/test_clock_state.json
+  end
+
+  task advance_past_renewal: :environment do
+    # load state, calculate target time (renewal + 30 days)
+    # advance the clock, poll until ready
+    # update frozen_time in state file
+  end
+
+  task cleanup: :environment do
+    # delete test clock (cascades to all Stripe objects)
+    # delete local user
+  end
+end
+```
+
+Running the full test requires three terminals open simultaneously:
+
+1. **Your web server and background jobs** — `bin/dev`, which starts both the Rails app server to receive the HTTP POST requests from Stripe, and Sidekiq (the background job processor that actually sends the emails)
+2. **Stripe CLI webhook forwarding** — `stripe listen --forward-to localhost:5000/hooks` so that Stripe's webhooks reach your local machine
+3. **The test harness commands** — where you run the rake tasks to set up test data, advance time, and clean up
+
+The full test cycle for one plan type looks like this:
 
 ```
 Terminal 3: bin/rails test_clock:setup PLAN=monthly
-            bin/rails test_clock:advance_to_renewal
+            bin/rails test_clock:advance_past_renewal
             → 3 emails appear in browser (letter_opener)
             bin/rails test_clock:cleanup
 ```
 
-Repeat for `PLAN=yearly`. Six emails total across two plan types, each one visually verifiable in about a minute.
+When you run `advance_past_renewal`, Stripe processes the events in the background: the subscription renews, the payment fails, Stripe retries according to your retry schedule, each retry fails, and eventually Stripe cancels the subscription. All three `invoice.payment_failed` webhooks arrive in sequence — the first failure, then a bit later the second, then the third — from a single advance command.
+
+You see the webhooks arriving in real time in the `stripe listen` terminal. In our case, we use the `letter_opener` gem in development, which intercepts outgoing emails and opens them as browser tabs — so three tabs pop open, one for each payment failure email. You can visually verify: Does the first email say "Action needed: Update your payment method"? Does it mention "monthly subscription"? Is the closure email appropriately dire about data deletion?
+
+Then repeat for `PLAN=yearly` and verify the yearly variants: does the closure email now reassure the subscriber their data is preserved? Six emails total across two plan types, each one visually verifiable in about a minute.
 
 ## Surprising Race Condition
 
 During testing of the third failure email for yearly subscribers, I noticed something wrong: they were receiving the monthly version of the closure email — the one warning about permanent data deletion — instead of the yearly version reassuring them their data would be preserved.
 
-The webhook logs told the story. When the third payment fails, Stripe sends two events in quick succession:
+The webhook logs told the story. As visible in the terminal running `stripe listen --forward-to...`, when the third payment fails, Stripe sends two events in quick succession:
 
 ```
 webhook_received event_type=customer.subscription.deleted
@@ -301,11 +406,14 @@ One other takeaway: my AI coding assistant's first answer — and second, and th
 
 ## Summary
 
+Here are all the tools that make this work, and what each one contributes:
+
 | Tool | Role |
 |------|------|
-| Stripe Test Clocks | Fast-forward time to trigger real payment failures |
-| Stripe CLI (`stripe listen`) | Forward webhooks from Stripe to localhost |
-| letter_opener gem | Preview emails instantly in the browser |
+| [Stripe Test Clocks](https://docs.stripe.com/billing/testing/test-clocks) | Fast-forward time to trigger real payment failures |
+| [Stripe CLI](https://docs.stripe.com/stripe-cli) (`stripe listen`) | Forward webhooks from Stripe to localhost |
+| [stripe](https://github.com/stripe/stripe-ruby) | Gem to make Stripe API calls from the rake tasks |
+| [letter_opener](https://github.com/ryanb/letter_opener) | Gem to preview emails instantly in the browser |
 | Rake tasks (`lib/tasks/test_clock.rake`) | Orchestrate setup, time advancement, and cleanup |
 
 If your SaaS handles subscription payment failures and you want confidence that the right customer gets the right email at the right time — especially when multiple webhook events interact in ways you might not expect — I'd encourage you to explore Stripe's Test Clock API. It turned what used to be a manual, slow, error-prone process into something I can run in a few minutes and trust completely.
@@ -313,7 +421,3 @@ If your SaaS handles subscription payment failures and you want confidence that 
 ## TODO
 
 * re: `the exact schedule is configurable in your Stripe dashboard under Smart Retries` - check exactly where this is
-* re: `The task saves all the IDs to a state file` - show how this is done
-* re: `The rake task also delete the local user that was created for the test` - show how this is done
-* add `stripe` gem to summary table
-* add sentence before summary table explaining, like these are all the tools...
