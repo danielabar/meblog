@@ -18,7 +18,7 @@ I recently built a test harness that solves this, and along the way discovered a
 
 ## The Problem
 
-I work on a SaaS that uses Stripe to manage subscriptions and recurring payments. Customers can choose to pay monthly or yearly. When a customer's credit card fails at renewal, Stripe retries the payment up to three times over about two weeks (the exact schedule is configurable in your Stripe dashboard under Smart Retries). After the third failure, Stripe cancels the subscription (also configurable).
+I work on a SaaS that uses Stripe to manage subscriptions and recurring payments. Customers can choose to pay monthly or yearly. When a customer's credit card fails at renewal, Stripe retries the payment up to three times over about two weeks (the exact schedule is configurable in your Stripe dashboard under Settings → Billing → Manage Failed Payments). After the third failure, Stripe cancels the subscription (also configurable).
 
 We wanted to send a different email for each attempt:
 
@@ -489,9 +489,4 @@ Here are all the tools that make this work, and what each one contributes:
 | [letter_opener](https://github.com/ryanb/letter_opener) | Gem to preview emails instantly in the browser |
 | Rake tasks (`lib/tasks/test_clock.rake`) | Orchestrate setup, time advancement, and cleanup |
 
-If your SaaS handles subscription payment failures and you want confidence that the right customer gets the right email at the right time — especially when multiple webhook events interact in ways you might not expect — I'd encourage you to explore Stripe's Test Clock API. It turned what used to be a manual, slow, error-prone process into something I can run in a few minutes and trust completely.
-
-## TODO
-
-* re: `the exact schedule is configurable in your Stripe dashboard under Smart Retries` - check exactly where this is
-* `trust completely` - soften wording
+If your SaaS handles subscription payment failures and you want confidence that the right customer gets the right email at the right time — especially when multiple webhook events interact in ways you might not expect — I'd encourage you to explore Stripe's Test Clock API. It turned what used to be a manual, slow, error-prone process into something I can run in a few minutes and feel confident about.
