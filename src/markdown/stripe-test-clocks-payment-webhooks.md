@@ -161,30 +161,7 @@ namespace :test_clock do
 end
 ```
 
-**Where does `stripe_price_id` come from?** This will depend on your Stripe integration, but in general: Stripe uses [Products and Prices](https://docs.stripe.com/billing/subscriptions/build-subscriptions#create-pricing-model) to model what you sell. A Price defines the billing terms — amount, currency, and interval — and each one has an ID like `price_abc123`. The rake file includes a `resolve_plan_config` helper that reads the `PLAN` environment variable and maps it to the right price ID:
-
-```ruby
-namespace :test_clock do
-  def resolve_plan_config
-    plan_key = ENV.fetch("PLAN", "monthly")
-
-    configs = {
-      "monthly" => {
-        stripe_price_id: ENV.fetch("STRIPE_MONTHLY_PRICE_ID"),
-        billing_period: :monthly
-      },
-      "yearly" => {
-        stripe_price_id: ENV.fetch("STRIPE_YEARLY_PRICE_ID"),
-        billing_period: :yearly
-      }
-    }
-
-    configs.fetch(plan_key)
-  end
-end
-```
-
-You set `STRIPE_MONTHLY_PRICE_ID` and `STRIPE_YEARLY_PRICE_ID` to the test-mode price IDs from your Stripe dashboard.
+The `stripe_price_id` comes from your own integration — it's the test-mode ID for the [Price](https://docs.stripe.com/billing/subscriptions/build-subscriptions#create-pricing-model) associated with your subscription product.
 
 Now comes the trick. We swap the payment method to one of Stripe's [test cards that always fails](https://docs.stripe.com/testing#declined-payments):
 
