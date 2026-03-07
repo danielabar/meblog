@@ -92,15 +92,11 @@ This works for smoke-testing individual mailer methods, but it's not *real* test
 
 I wanted something better: a way to make Stripe actually simulate the entire payment failure sequence and send real webhooks to my local server.
 
-## Stripe Clocks
+## Stripe Tools
 
-A colleague pointed me to Stripe's [Test Clocks](https://docs.stripe.com/billing/testing/test-clocks) feature (also called the Simulation API). Test Clocks let you create a sandbox where you can fast-forward time. You create a customer in the sandbox, give them a subscription, then advance the clock past the renewal date. Stripe simulates everything that would happen: the renewal attempt, the payment failure, the retries, the subscription cancellation. And it sends real webhooks for each event.
+**Test Clocks.** A colleague pointed me to Stripe's [Test Clocks](https://docs.stripe.com/billing/testing/test-clocks) feature (also called the Simulation API). Test Clocks let you create a sandbox where you can fast-forward time. You create a customer in the sandbox, give them a subscription, then advance the clock past the renewal date. Stripe simulates everything that would happen: the renewal attempt, the payment failure, the retries, the subscription cancellation. And it sends real webhooks for each event.
 
-This was exactly what I needed.
-
-## Stripe CLI
-
-Before getting into the test harness, it's worth mentioning the [Stripe CLI](https://docs.stripe.com/stripe-cli). This is a command-line tool that lets you interact with your Stripe account. Critically, when you run `stripe login`, you're authenticated against Stripe's **test mode** only. There's no risk of accidentally touching production data.
+**Stripe CLI.** The [Stripe CLI](https://docs.stripe.com/stripe-cli) is a command-line tool that lets you interact with your Stripe account. Critically, when you run `stripe login`, you're authenticated against Stripe's **test mode** only. Everything we're doing here — the CLI, the Test Clocks, the test cards — operates entirely in test mode, so there's no risk of touching production data.
 
 The CLI has a command that's essential for local webhook testing:
 
@@ -110,7 +106,7 @@ stripe listen --forward-to localhost:5000/hooks
 
 This creates a temporary additional webhook endpoint that forwards events to your local development server. It doesn't replace or interfere with any webhook endpoints you've already configured in the Stripe dashboard — those continue to receive events normally. The CLI just adds your local server as an extra destination. You see the events arrive in real time in your terminal.
 
-Stripe lets you configure different webhook endpoints for test mode and live mode. Everything we're doing here — the CLI, the Test Clocks, the test cards — operates entirely in test mode. Your production webhook configuration and live customer data are completely untouched.
+Together, these two tools were exactly what I needed.
 
 ## Building the Test Harness
 
@@ -486,7 +482,7 @@ The test harness isn't a one-time tool. It becomes part of the development workf
 
 The combination of Stripe Test Clocks (for realistic time simulation), the Stripe CLI (for local webhook forwarding), and letter_opener (for instant email preview) creates a feedback loop that's almost as fast as running unit tests, but with the fidelity of a production environment.
 
-One other takeaway: my AI coding assistant's first answer — and second, and third — was to curl a hand-crafted payload at the endpoint. It took some back-and-forth, almost arguing, before it acknowledged that a proper end-to-end simulation was possible and worth building. AI tools are genuinely useful here, but they'll sometimes anchor on a simplistic answer. It's worth pushing past it.
+One other takeaway: AI coding assistants will sometimes anchor on the simplest possible answer. It's worth pushing past it to discover if a more thorough approach exists.
 
 ## Summary
 
