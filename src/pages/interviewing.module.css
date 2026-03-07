@@ -1,0 +1,159 @@
+/* ─── Page container — two-column grid ─── */
+.container {
+  margin: 0 auto;
+  max-width: 1100px;
+  padding: 0 2rem 6rem;
+  display: grid;
+  grid-template-columns: 200px 1fr;
+  gap: 3rem;
+  align-items: start;
+}
+
+/* ─── Left sidebar (sticky TOC) ─── */
+.sidebar {
+  position: sticky;
+  top: 80px;
+  padding-top: 3rem;
+}
+
+.sidebarLabel {
+  font-size: 0.65rem;
+  font-weight: 700;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--brand-desaturate-35);
+  margin-bottom: 1rem;
+}
+
+.tocList {
+  border-left: 2px solid var(--brand-lighten-40);
+}
+
+.tocList li {
+  padding: 0.3rem 0 0.3rem 1rem;
+  list-style: none;
+}
+
+.tocList a {
+  font-size: 0.875rem;
+  color: var(--brand-desaturate-35);
+  text-decoration: none;
+  transition: color 0.2s;
+  line-height: 1.4;
+  display: block;
+}
+
+.tocList a:hover {
+  color: var(--brand);
+}
+
+/* ─── Main content column ─── */
+.mainColumn {
+  padding-top: 3rem;
+  max-width: 800px;
+}
+
+/* ─── Page header (label + title above the prose) ─── */
+.pageHeader {
+  margin-bottom: 2.5rem;
+  padding-bottom: 2rem;
+  border-bottom: 2px solid var(--brand-lighten-40);
+}
+
+/* Small uppercase eyebrow label */
+.pageLabel {
+  display: inline-block;
+  font-size: 0.75rem;
+  font-weight: 700;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--brand);
+  margin-bottom: 0.75rem;
+}
+
+/* Large tracked-tight title */
+.pageTitle {
+  font-size: clamp(2rem, 5vw, 3rem);
+  font-weight: 700;
+  letter-spacing: -1.5px;
+  line-height: 1.1;
+  color: var(--brand-darken-20);
+  opacity: 0.95;
+}
+
+/* ─── Rendered markdown wrapper ─── */
+.content {
+  font-size: 1.1rem;
+  line-height: 1.78;
+}
+
+/*
+ * Override global markdown-para for this page.
+ * Global markdown.css sets font-size: (unset) and margin-bottom: 20px.
+ * Design A calls for slightly looser rhythm.
+ */
+.content :global(.markdown-para) {
+  font-size: 1.1rem;
+  line-height: 1.78;
+  margin-bottom: 1.35rem;
+}
+
+/*
+ * Override global markdown-subtitle (h2) for this page.
+ * Global markdown.css: font-size 34px, opacity 0.8, no border.
+ * Design A: slightly smaller, full opacity, thin border-bottom underline.
+ */
+.content :global(.markdown-subtitle) {
+  font-size: 1.75rem;
+  font-weight: 600;
+  letter-spacing: -0.5px;
+  color: var(--brand-darken-10);
+  margin: 2.5rem 0 0.75rem;
+  padding-bottom: 0.4rem;
+  border-bottom: 1px solid var(--brand-lighten-40);
+  opacity: 1;
+}
+
+/*
+ * Inline code — Design A uses a purple-tinted background with a visible border,
+ * different from the blog post style (grey background, no border).
+ * element selector `code` doesn't need :global() in CSS Modules.
+ */
+.content code {
+  font-family: "Fira Code", "Cascadia Code", "Consolas", monospace;
+  font-size: 0.88em;
+  background: var(--brand-lighten-50);
+  color: var(--brand-darken-10);
+  border: 1px solid var(--brand-lighten-40);
+  border-radius: 4px;
+  padding: 0.15em 0.45em;
+  white-space: nowrap;
+}
+
+/* ─── Tablet / mobile — collapse to single column ─── */
+@media (max-width: 768px) {
+  .container {
+    grid-template-columns: 1fr;
+    max-width: 800px;
+    gap: 0;
+  }
+
+  .sidebar {
+    display: none;
+  }
+
+  .mainColumn {
+    max-width: 100%;
+  }
+}
+
+/* ─── Mobile portrait ─── */
+@media (max-width: 640px) {
+  .container {
+    padding: 0 1.25rem 4rem;
+  }
+
+  .content :global(.markdown-para) {
+    font-size: 1rem;
+  }
+}

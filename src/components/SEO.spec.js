@@ -230,4 +230,21 @@ describe("SEO", () => {
       ])
     )
   })
+
+  it("renders noindex meta tag when noindex prop is true", () => {
+    render(<SEO title="Interviewing" pathname="/interviewing" track="NO" noindex={true} />)
+
+    const helmet = Helmet.peek()
+    expect(helmet.metaTags).toEqual(
+      expect.arrayContaining([{ content: "noindex", name: "robots" }])
+    )
+  })
+
+  it("does not render noindex meta tag when noindex prop is omitted", () => {
+    render(<SEO title="About" pathname="/about" track="NO" />)
+
+    const helmet = Helmet.peek()
+    const robotsTag = helmet.metaTags.find(tag => tag.name === "robots")
+    expect(robotsTag).toBeUndefined()
+  })
 })
