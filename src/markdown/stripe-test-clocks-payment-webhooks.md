@@ -28,9 +28,9 @@ We wanted to send a different email for each attempt:
 
 On top of that, monthly and yearly subscribers need different wording. Monthly subscribers' data gets deleted after a grace period. Yearly subscribers' data is preserved indefinitely. That's six distinct emails (3 attempts x 2 billing periods), and getting the wrong one to the wrong person at the wrong time is a bad customer experience.
 
-## The Stack
+**The Stack:**
 
-Our app is built with Ruby on Rails. Emails are sent via Action Mailer (Rails' built-in email framework). A mailer class `SubscriptionMailer` defines methods that compose emails, and calling `.deliver_later` queues the email for asynchronous delivery through a background job processor (we use Sidekiq). Controllers handle incoming HTTP requests and responses (used for receiving Stripe webhooks, more on that in the next section). The test harness uses rake tasks, which are Ruby's standard way of defining command-line automation scripts, invoked via `bin/rails`. Stripe API calls in the rake tasks use the official `stripe` Ruby gem.
+The app is a Rails monolith: Action Mailer for emails, Sidekiq for background jobs, and rake tasks for the test harness automation. Stripe API calls use the official `stripe` gem.
 
 ## Stripe Webhooks
 
