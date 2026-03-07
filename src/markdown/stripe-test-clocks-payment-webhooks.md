@@ -114,7 +114,7 @@ Stripe lets you configure different webhook endpoints for test mode and live mod
 
 ## Building the Test Harness
 
-I wrapped the whole workflow into a set of rake tasks, living in `lib/tasks/test_clock.rake`. Each task is defined with `task <name>: :environment do` — the `:environment` dependency is what loads Rails and your models, so the `Stripe::*` gem constants and your `User` model are all available. Here's what each step does.
+I wrapped the workflow into a set of rake tasks, defined at `lib/tasks/test_clock.rake`.
 
 ### Create a Subscriber Destined to Fail
 
@@ -297,7 +297,7 @@ namespace :test_clock do
 end
 ```
 
-The `renewal_time` was stored in the state file during setup (from `subscription.current_period_end`). We add 30 days past that — a conservative buffer that guarantees Stripe has had time to process all the retries regardless of your configured retry schedule. `wait_for_clock_ready`, `load_state`, and `state_file_path` are helper methods defined in the rake file:
+The `renewal_time` was stored in the state file during setup (from `subscription.current_period_end`). We add 30 days past that — a buffer to ensure all retries have completed. `wait_for_clock_ready`, `load_state`, and `state_file_path` are helper methods defined in the rake file:
 
 ```ruby
 def wait_for_clock_ready(clock_id)
