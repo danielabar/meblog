@@ -166,3 +166,19 @@
   cursor: default;
   margin-bottom: 15px;
 }
+
+.markdown-thematic-break {
+  border: none;
+  margin: 2rem 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.markdown-thematic-break::before {
+  content: '· · ·';
+  font-size: 1.5rem;
+  letter-spacing: 0.5rem;
+  color: var(--brand-lighten-20);
+  line-height: 1;
+}

@@ -11,6 +11,7 @@ export default function SEO({
   pathname,
   article,
   track,
+  noindex,
 }) {
   const data = useStaticQuery(graphql`
     query SEOQuery {
@@ -48,6 +49,7 @@ export default function SEO({
         title={seo.title}
         titleTemplate={data.site.siteMetadata.titleTemplate}
       >
+        {noindex && <meta name="robots" content="noindex" />}
         <meta name="description" content={seo.description} />
         <meta name="image" content={seo.image} />
         <meta
