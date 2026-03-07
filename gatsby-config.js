@@ -21,7 +21,12 @@ module.exports = {
     "gatsby-transformer-sharp",
     "gatsby-transformer-remark",
     "gatsby-plugin-react-helmet",
-    "gatsby-plugin-sitemap",
+    {
+      resolve: "gatsby-plugin-sitemap",
+      options: {
+        excludes: ["/interviewing/"],
+      },
+    },
     "gatsby-plugin-workerize-loader",
     "gatsby-transformer-csv",
     {
@@ -52,6 +57,7 @@ module.exports = {
                 linkReference: "markdown-link-ref",
                 imageReference: "markdown-image-ref",
                 table: "markdown-table",
+                thematicBreak: "markdown-thematic-break",
               },
             },
           },
@@ -207,6 +213,13 @@ module.exports = {
       options: {
         name: "files",
         path: `${__dirname}/src/learning`,
+      },
+    },
+    {
+      resolve: "gatsby-source-filesystem",
+      options: {
+        name: "content",
+        path: `${__dirname}/src/content`,
       },
     },
     {
