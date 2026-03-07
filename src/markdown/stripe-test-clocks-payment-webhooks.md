@@ -42,6 +42,8 @@ The Rails app has a controller endpoint that receives these webhooks and decides
 
 ```ruby
 def receive
+  # Signature verification omitted for clarity — see Stripe docs:
+  # https://docs.stripe.com/webhooks#verify-official-libraries
   event_json = JSON.parse(request.body.read)
 
   if event_json['type'] == 'invoice.payment_failed'
