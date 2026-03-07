@@ -76,7 +76,7 @@ But how do you test that this actually works end-to-end?
 
 ## How to Test?
 
-Real payment failures take weeks. Stripe's retry schedule spaces out attempts over days. You can't sit around waiting for time to pass. And it's tedious to have to create a new subscriber each time, setup a valid payment method, then change to an invalid method that would fail renewal.
+Real payment failures take weeks. Stripe's retry schedule spaces out attempts over days. You can't sit around waiting for time to pass. And it's tedious to have to create a new subscriber each time, set up a valid payment method, then change to an invalid method that would fail renewal.
 
 Unit tests with mocked payloads verify that *given this JSON, the right mailer is called*. That's necessary, but it doesn't tell you whether the real Stripe webhook payload matches what your code expects, whether the events arrive in the order you assumed, or whether your async job processing introduces timing issues.
 
@@ -94,7 +94,7 @@ I wanted something better: a way to make Stripe actually simulate the entire pay
 
 ## Stripe Tools
 
-**Test Clocks.** A colleague pointed me to Stripe's [Test Clocks](https://docs.stripe.com/billing/testing/test-clocks) feature (also called the Simulation API). Test Clocks let you create a sandbox where you can fast-forward time. You create a customer in the sandbox, give them a subscription, then advance the clock past the renewal date. Stripe simulates everything that would happen: the renewal attempt, the payment failure, the retries, the subscription cancellation. And it sends real webhooks for each event.
+**Test Clocks.** A colleague pointed me to Stripe's [Test Clocks](https://docs.stripe.com/billing/testing/test-clocks) feature (also called the Simulation API). Test Clocks support a simulated environment where you can fast-forward time. You create a customer associated with the clock, give them a subscription, then advance the clock past the renewal date. Stripe simulates everything that would happen: the renewal attempt, the payment failure, the retries, the subscription cancellation. And it sends real webhooks for each event.
 
 **Stripe CLI.** The [Stripe CLI](https://docs.stripe.com/stripe-cli) is a command-line tool that lets you interact with your Stripe account. Critically, when you run `stripe login`, you're authenticated against Stripe's **test mode** only. Everything we're doing here — the CLI, the Test Clocks, the test cards — operates entirely in test mode, so there's no risk of touching production data.
 
@@ -114,7 +114,7 @@ I wrapped the workflow into a set of rake tasks, defined at `lib/tasks/test_cloc
 
 ### Create a Subscriber Destined to Fail
 
-The setup task creates everything Stripe needs for a realistic payment failure scenario:
+The setup task creates everything Stripe needs for a realistic payment renewal failure. Notice the customer starts with a valid card. We need the initial subscription to succeed — just like a real customer whose card works fine at first:
 
 ```ruby
 namespace :test_clock do
@@ -141,9 +141,7 @@ namespace :test_clock do
 end
 ```
 
-The `test_clock: test_clock.id` parameter on the customer is the critical link. Without it, the customer exists independently of the clock, and advancing time won't affect them — no events fire, no emails appear, and there's no error to tell you why. Everything that should live inside the simulation must be created after the clock and linked to it. This same association is also what makes cleanup automatic: when you delete the clock, Stripe automatically deletes everything attached to it.
-
-Notice the customer starts with a valid card. We need the initial subscription to succeed — just like a real customer whose card works fine at first.
+The `test_clock: test_clock.id` parameter on the customer is the critical link. Without it, the customer exists independently of the clock and advancing time won't affect them.
 
 Next we create a subscription for this customer:
 
