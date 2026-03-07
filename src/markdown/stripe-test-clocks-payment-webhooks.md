@@ -124,6 +124,7 @@ The setup task creates everything Stripe needs for a realistic payment failure s
 namespace :test_clock do
   task setup: :environment do
     frozen_time = Time.current.to_i
+    email = ENV.fetch("EMAIL", "testclock+#{Time.current.to_i}@localhost.test")
 
     # Create a test clock — this is our time machine
     test_clock = Stripe::TestHelpers::TestClock.create(
@@ -296,7 +297,7 @@ namespace :test_clock do
 end
 ```
 
-The `renewal_time` was stored in the state file during setup (from `subscription.current_period_end`). We add 30 days past that — a conservative buffer that guarantees Stripe has had time to process all the retries regardless of your configured retry schedule. `wait_for_clock_ready` is a helper method defined in the rake file that polls Stripe until the clock is done advancing:
+The `renewal_time` was stored in the state file during setup (from `subscription.current_period_end`). We add 30 days past that — a conservative buffer that guarantees Stripe has had time to process all the retries regardless of your configured retry schedule. `wait_for_clock_ready`, `load_state`, and `state_file_path` are helper methods defined in the rake file:
 
 ```ruby
 def wait_for_clock_ready(clock_id)
@@ -310,6 +311,14 @@ def wait_for_clock_ready(clock_id)
       exit 1
     end
   end
+end
+
+def state_file_path
+  Rails.root.join("tmp/test_clock_state.json")
+end
+
+def load_state
+  JSON.parse(File.read(state_file_path))
 end
 ```
 
