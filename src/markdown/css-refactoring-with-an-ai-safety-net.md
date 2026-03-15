@@ -62,10 +62,11 @@ That could handle capture. But a folder of PNGs doesn't tell you anything by its
 
 I asked Claude Code to write a Playwright script that would navigate through every meaningful app state, capture a screenshot of each, and save them to a directory. The first step was enumerating every meaningful state the app could be in — not just the page routes, but the transient states that require interaction to reach. For this app, that came to nine distinct states.
 
-The script drives the browser through all of them automatically — clicking navigation elements, filling out forms, waiting for transitions to fully settle, then saving a named PNG. The argument passed on the command line determines the output directory, which is what makes the workflow reusable across phases:
+The script drives the browser through all of them automatically — clicking navigation elements, filling out forms, waiting for transitions to fully settle, then saving a named PNG. It runs against the local dev server, so that needs to be up first. The argument passed on the command line determines the output directory, which is what makes the workflow reusable across phases:
 
 ```javascript
-const OUT_DIR = `scratch/css-reorg/screenshots/${process.argv[2] ?? 'run'}`;
+const label = process.argv[2] || 'run';
+const OUT_DIR = `scratch/css-reorg/screenshots/${label}`;
 
 async function capture(page, name) {
   const file = `${OUT_DIR}/${name}.png`;
@@ -73,13 +74,14 @@ async function capture(page, name) {
 }
 
 // example: capturing the navigation drawer in its open state
+await page.goto('http://localhost:8080');
 await page.click('#hamburger-btn');
 await page.waitForSelector('.mobile-menu:not([hidden])');
 await page.waitForTimeout(300); // wait for CSS transition to finish
 await capture(page, 'menu-open');
 ```
 
-The [full script is in the project repo](https://github.com/danielabar/just-breathe/blob/main/scripts/screenshots.js). With it written, running it is one command:
+The [full script is in the project repo](https://github.com/danielabar/just-breathe/blob/main/scripts/screenshots.js). With it written, running it is one command per phase:
 
 ```bash
 node scripts/screenshots.js baseline   # before touching anything
@@ -124,13 +126,13 @@ Looking back, three things were essential:
 
 **Keep refactoring phases small:** Each phase was one conceptual change. When a regression appeared, the cause was obvious because there was only one thing that could have caused it. A 7-phase refactor with 9 screenshots per phase is 63 comparison points, but each comparison is against a narrow, well-defined change.
 
-**Use a capable model:** The original CSS (and entire project) was built with a free-tier Copilot model through casual vibe coding. That model was fine for generating working code on demand. But it couldn't hold the architectural picture in mind, reason about cascade behavior across files, or identify the root cause of a visual regression from a screenshot. Using a paid Claude Code subscription made a significant difference.
+**Use a capable model:** The original CSS (and entire project) was built with a free-tier Copilot model through casual vibe coding. That model was fine for generating working code on demand. But it couldn't hold the architectural picture in mind. Using a paid Claude Code subscription made a significant difference.
 
 ## Visual regression tool?
 
 One question worth addressing: why use AI for the diffing step at all, rather than a dedicated visual regression tool?
 
-Playwright ships built-in visual testing via `expect(page).toHaveScreenshot()` — since I was already using Playwright for the capture script, this was the obvious alternative. I tried it, using the Phase 5 regression as the test case. The test itself is simple enough:
+Playwright ships with built-in visual testing via `expect(page).toHaveScreenshot()` — since I was already using Playwright for the capture script, this was the obvious alternative. It works through Playwright's test runner (`@playwright/test`) rather than the scripting API, so this required adding a separate dependency. I tried it, using the Phase 5 regression as the test case. The test itself is simple enough:
 
 ```js
 // tests/visual/views.spec.js
@@ -153,7 +155,9 @@ Error: expect(page).toHaveScreenshot(expected) failed
   Diff:     test-results/views-main-view/main-diff.png
 ```
 
-That's essentially all you get in the terminal: a pixel count and a ratio, with paths to three image files — expected, actual, and diff. Playwright does have an HTML reporter (`npx playwright show-report`) that renders a side-by-side view of the two screenshots with a diff overlay, which is genuinely more useful. But it's a separate browser tab to open, and even then you can see that *something* shifted and roughly *where*, but not *why*. With Claude comparing the screenshots, the output was immediately actionable: "Vertical spacing has increased throughout — this looks like it's caused by the new CSS reset setting `line-height: 1.5` on body." One explanation, pointing directly at the source.
+That's essentially all you get in the terminal: a pixel count and a ratio, with paths to three image files — expected, actual, and diff. Playwright does have an HTML reporter (`npx playwright show-report`) that renders a side-by-side view of the two screenshots with a diff overlay, which is genuinely more useful. But it's a separate browser tab to open, and even then you can see that *something* shifted and roughly *where*, but not *why*. With Claude comparing the screenshots, the output was immediately actionable:
+
+> Vertical spacing has increased throughout — this looks like it's caused by the new CSS reset setting `line-height: 1.5` on body.
 
 I also looked at [Percy](https://www.browserstack.com/docs/percy/overview/visual-testing-basics) briefly, but it requires creating an account before you can do anything, and I didn't want to introduce a SaaS dependency for a small one-off refactor.
 
