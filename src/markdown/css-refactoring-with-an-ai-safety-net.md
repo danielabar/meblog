@@ -1,0 +1,170 @@
+---
+title: "CSS Refactoring with an AI Safety Net"
+featuredImage: "../images/css-refactoring-with-ai-safety-net-maya-alexa-g-romero-lTv2oYFaAmE-unsplash.jpg"
+description: "How to safely refactor messy CSS using AI assistance and screenshot-based visual diffing as a regression safety net."
+date: "2026-03-15"
+category: "css"
+related:
+  - "Slowing Down AI On Purpose"
+  - "What AI-Assisted Coding Feels Like in Early 2026"
+  - "Rapid Prototyping with ChatGPT: OAS Pension Calculator Part 1"
+---
+
+A while back I built a small breathing meditation app with just vanilla HTML, CSS, and JavaScript. It was mostly vibe-coded using GitHub Copilot's free tier in VS Code. The result was an app that worked, solving a real problem for me, but the CSS was a hot mess.
+
+Then I attempted a visual design refresh, but ran into problems. The CSS was so tangled that almost nothing could be safely changed. Edit one rule and something unrelated would break. I'd try to understand which styles were actually applying to an element and find three different files all claiming to style the same thing. And even Copilot was spinning in whack-a-mole loops.
+
+It became clear that the CSS had to be cleaned up to make it maintainable. By this point I'd moved on from Copilot to a paid Claude Code subscription, which gave me access to more capable models. Here's the technique I came up with to do that refactor safely with AI assistance.
+
+## The problem and the plan
+
+Before touching anything, I had Claude Code perform an audit of the existing styles. It found issues such as duplicated rules spread across multiple files, a 2011-era reset missing `box-sizing: border-box`, button styles copy-pasted into four different files, and hard-coded hex values scattered everywhere despite a `variables.css` already existing.
+
+Around this time I came across [csscaffold](https://github.com/robzolkos/csscaffold), a project that lays out a lightly opinionated CSS architecture built on cascade layers. It's framed as a Rails tool, but the CSS organization ideas can apply to any project. This gave me a concrete target to aim for.
+
+The key idea from csscaffold is [cascade layers](https://developer.mozilla.org/en-US/docs/Web/CSS/Reference/At-rules/@layer), for example:
+
+```css
+@layer reset, base, components, utilities;
+```
+
+This declaration means cascade priority is determined by layer membership, not selector specificity. It also suggests a corresponding file structure — `reset.css`, `base.css`, `layout.css`, `nav.css`, and so on — one file per concern, each wrapped in the appropriate layer. The [examples directory](https://github.com/robzolkos/csscaffold/tree/master/examples) shows what this looks like in practice.
+
+I pointed Claude Code at csscaffold and asked it to plan how to restructure the existing CSS to match — with one hard constraint: **zero visual change**. Improve the organization, don't touch the output. Classic refactor. It came up with a multi-phase plan to keep each change relatively small and easy to review:
+
+| Phase | What                                                  |
+| ----- | ----------------------------------------------------- |
+| 1     | Add `@layer` declaration to `index.css`               |
+| 2     | Fix import order (variables before reset)             |
+| 3     | Consolidate duplicates, make `index.css` imports-only |
+| 4     | Wrap each file's content in `@layer` blocks           |
+| 5     | Replace old reset with modern reset                   |
+| 6     | Unified button system with shared `.btn` base         |
+| 7     | Replace hard-coded hex values with CSS variables      |
+
+Before AI assistants, I'd have looked at csscaffold, thought "that's the right approach — I'll use it on my next project" — and done a conservative cleanup of what was there instead. Retrofitting a whole CSS architecture risks breaking things that used to work, for zero visible payoff. But a capable AI assistant changes that calculus.
+
+The plan was clear. What wasn't yet clear was how to prove that each phase hadn't broken anything.
+
+## Proving nothing broke
+
+CSS refactors are risky: A `2px` layout shift, a slightly different `line-height`, a shadow that disappeared — small details that shape how polished a design feels, but easy to miss on a quick visual scan.
+
+My first thought: won't browser-based tests catch this? Not quite. Most end-to-end testing tools verify *functionality*: can you click this button, does this form submit, does this page navigate to the intended destination. They say nothing about whether the button *looks* right or the spacing was changed.
+
+Second thought: I'll just check it manually — open a browser, click through the app, eyeball it. But the app isn't just one page. It has states that require interaction to reach: a navigation drawer that has to be opened, a list view that looks different when populated vs. empty, form states that are only visible after a specific dropdown selection. Doing that carefully after each of seven phases would be tedious.
+
+What I needed was automation — something that could navigate every meaningful app state and capture a screenshot of each, reproducibly, after every phase, and compare to a baseline. I'd initially looked into using the Chrome DevTools MCP server for this, but landed on [Playwright](https://playwright.dev/docs/api/class-playwright) as a better fit — its Node.js API is more token-efficient for agentic use.
+
+That could handle capture. But a folder of PNGs doesn't tell you anything by itself. I needed something to *compare* them. The answer was already in the workflow: the same AI assistant making the CSS changes could also read screenshots.
+
+## Capturing every state
+
+I asked Claude Code to write a Playwright script that would navigate through every meaningful app state, capture a screenshot of each, and save them to a directory. The first step was enumerating every meaningful state the app could be in — not just the page routes, but the transient states that require interaction to reach. For this app, that came to nine distinct states.
+
+The script drives the browser through all of them automatically — clicking navigation elements, filling out forms, waiting for transitions to fully settle, then saving a named PNG. It runs against the local dev server, so that needs to be up first. The argument passed on the command line determines the output directory, which is what makes the workflow reusable across phases:
+
+```javascript
+const label = process.argv[2] || 'run';
+const OUT_DIR = `scratch/css-reorg/screenshots/${label}`;
+
+async function capture(page, name) {
+  const file = `${OUT_DIR}/${name}.png`;
+  await page.screenshot({ path: file, fullPage: true });
+}
+
+// example: capturing the navigation drawer in its open state
+await page.goto('http://localhost:8080');
+await page.click('#hamburger-btn');
+await page.waitForSelector('.mobile-menu:not([hidden])');
+await page.waitForTimeout(300); // wait for CSS transition to finish
+await capture(page, 'menu-open');
+```
+
+The [full script is in the project repo](https://github.com/danielabar/just-breathe/blob/main/scripts/screenshots.js). With it written, running it is one command per phase:
+
+```bash
+node scripts/screenshots.js baseline   # before touching anything
+node scripts/screenshots.js phase-n    # after each refactor phase
+```
+
+## Screenshot diffing with AI
+
+The screenshot script has no diffing code at all. It just saves PNGs.
+
+The comparison step was: ask Claude to read both sets of PNG files and describe any differences. Claude Code can read image files directly — it processes the actual visual content of the screenshots. After each phase, the workflow was literally one prompt:
+
+```
+"Read the baseline screenshots and the current phase screenshots and tell me if anything looks different."
+```
+
+Claude would load all 9 pairs of PNGs and compare them. If something changed — a spacing shift, a color difference — it would describe exactly what changed and in which screenshot. Not "these pixels differ" but "the card border radius looks slightly sharper, and there's a small increase in the spacing above the heading on the home page." This gave me a plain English description of what changed — specific enough to direct Claude to fix it. And because we were comparing after each individual phase, the regression had to be from whatever that phase had just touched.
+
+## Results
+
+All 7 phases completed. The CSS went from:
+- Duplicated rules in multiple files fighting each other for cascade priority
+- A 2011-era reset with no `box-sizing: border-box`
+- Button styles in four different files with no shared base
+- Hard-coded hex colors scattered alongside the CSS variables that should have been used
+
+To:
+- `@layer reset, base, components, utilities` — predictable cascade
+- Modern reset
+- Unified `.btn` base class with BEM variants (`.btn--primary`, `.btn--secondary`, `.btn--menu`)
+- All colors via CSS variables
+
+The entire thing — analysis, planning, and execution across all 7 phases — took around 3 hours. Without an AI assistant to plan the phases, write the capture script, make the CSS changes, and compare the screenshots, this is the kind of refactor that would have stretched across multiple days.
+
+The screenshot comparison earned its keep in Phase 5. Replacing the old reset with a modern one introduced a different default `line-height` that subtly changed how body text rendered. I'm not sure I would have caught it by eye in a manual review. Claude flagged it immediately when comparing the PNGs and made a one-liner fix.
+
+## What made it work
+
+Looking back, three things were essential:
+
+**Enumerate states exhaustively:** The baseline only protects you for the states you captured. A regression in the navigation drawer won't show up if you never took a screenshot of the navigation drawer open. I spent time upfront listing every meaningful state — not just page routes but transient interactive states: open drawers, populated vs. empty lists, revealed form fields, in-progress indicators. That list was the most important artifact of the whole process.
+
+**Keep refactoring phases small:** Each phase was one conceptual change. When a regression appeared, the cause was obvious because there was only one thing that could have caused it. A 7-phase refactor with 9 screenshots per phase is 63 comparison points, but each comparison is against a narrow, well-defined change.
+
+**Use a capable model:** The original CSS (and entire project) was built with a free-tier Copilot model through casual vibe coding. That model was fine for generating working code on demand. But it couldn't hold the architectural picture in mind. Using a paid Claude Code subscription made a significant difference.
+
+## Visual regression tool?
+
+One question worth addressing: why use AI for the diffing step at all, rather than a dedicated visual regression tool?
+
+Playwright ships with built-in visual testing via `expect(page).toHaveScreenshot()` — since I was already using Playwright for the capture script, this was the obvious alternative. It works through Playwright's test runner (`@playwright/test`) rather than the scripting API, so this required adding a separate dependency. I tried it, using the Phase 5 regression as the test case. The test itself is simple enough:
+
+```js
+// tests/visual/views.spec.js
+test('main view', async ({ page }) => {
+  await page.goto('/');
+  await page.waitForSelector('.main-view-card');
+  await expect(page).toHaveScreenshot('main.png');
+});
+```
+
+When it catches a difference, this is what the terminal output looks like:
+
+```
+Error: expect(page).toHaveScreenshot(expected) failed
+
+  28894 pixels (ratio 0.10 of all image pixels) are different.
+
+  Expected: tests/visual/views.spec.js-snapshots/main-darwin.png
+  Received: test-results/views-main-view/main-actual.png
+  Diff:     test-results/views-main-view/main-diff.png
+```
+
+That's essentially all you get in the terminal: a pixel count and a ratio, with paths to three image files — expected, actual, and diff. Playwright does have an HTML reporter (`npx playwright show-report`) that renders a side-by-side view of the two screenshots with a diff overlay, which is genuinely more useful. But it's a separate browser tab to open, and even then you can see that *something* shifted and roughly *where*, but not *why*. With Claude comparing the screenshots, the output was immediately actionable:
+
+> Vertical spacing has increased throughout — this looks like it's caused by the new CSS reset setting `line-height: 1.5` on body.
+
+I also looked at [Percy](https://www.browserstack.com/docs/percy/overview/visual-testing-basics) briefly, but it requires creating an account before you can do anything, and I didn't want to introduce a SaaS dependency for a small one-off refactor.
+
+That said, if you're doing this kind of visual comparison regularly — on a larger project, or wired into CI on every push — having the AI do the diffing every time would add up in token costs. At that point it probably makes sense to invest in dedicated tooling with proper baseline management and CI integration.
+
+## Conclusion
+
+The refactor is done. The CSS is now layered, de-duplicated, uses a modern reset, and has a unified button system with all colors tokenized. The design refresh followed shortly after, and having well-structured CSS made it easier.
+
+The technique described in this post turned a refactor that touched every CSS file in the project into a process where every phase ended with "all screenshots identical to baseline." That's not usually how CSS refactors feel.
