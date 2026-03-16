@@ -96,7 +96,7 @@ class Router {
 }
 ```
 
-The router also included methods for updating navigation states and handling view-specific functionality like form submissions—which would later become a key architectural problem.
+The router also included methods for updating navigation states and handling view-specific functionality like form submissions.
 
 Here is the `index.html` containing a navigation bar with route links and a content area where views would be swapped:
 
@@ -326,16 +326,28 @@ Just when I thought I had routing figured out, I discovered that direct URL acce
 
 The web server received the request first, looked for `/about.html`, didn't find it, and served a generic 404 error. The vanilla router never got a chance to run. This is the fundamental challenge of client-side routing on static hosts: you need to convince the hosting provider to serve `index.html` for ALL paths, letting your router decide what to do with them.
 
-This was solved by adding a 404.html page to intercepts failed requests and capture the intended URL:
+This was solved by adding a 404.html page to intercept failed requests and capture the intended URL:
 
-```javascript
-// 404.html - SPA fallback script
-import { deploymentConfig } from './js/config.js';
+```html
+<!-- 404.html - SPA fallback -->
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <script type="module">
+        import { basePath } from './js/base-path.js';
 
-// Store intended URL and redirect to base path
-sessionStorage.setItem('redirect', location.href);
-location.replace(deploymentConfig.basePath);
+        // Store intended URL and redirect to base path
+        sessionStorage.setItem('redirect', location.href);
+        location.replace(basePath);
+    </script>
+</head>
+<body>
+    <p>Redirecting...</p>
+</body>
+</html>
 ```
+
+The `basePath` import handles deployment to subdirectories like GitHub Pages—I'll explain how that works in [Problem 5](#problem-5-deployment-path).
 
 Then `index.html` was enhanced with an inline script to restore the intended URL before the router initializes:
 
@@ -354,7 +366,7 @@ Then `index.html` was enhanced with an inline script to restore the intended URL
 
 This script runs before the router initializes, so when `handleInitialRoute()` reads `location.pathname`, it gets the user's intended destination, not just the base path.
 
-This two-part solution works as follows: when a user visits `/contact` directly, GitHub Pages serves the 404.html which stores the full URL in sessionStorage and redirects to the base path. Then index.html loads, its inline script reads the stored URL, uses `history.replaceState()` to update the browser's address bar back to `/contact`, and deletes the sessionStorage value. Finally, the router initializes and navigates to the correct route based on the restored pathname.
+This two-part solution works as follows: when a user visits `/contact` directly, GitHub Pages serves the 404.html which stores the full URL in sessionStorage and redirects to the base path. Then `index.html` loads, its inline script reads the stored URL, uses `history.replaceState()` to update the browser's address bar back to `/contact`, and deletes the sessionStorage value. Finally, the router initializes and navigates to the correct route based on the restored pathname.
 
 But there was one piece still missing: my router was now receiving ALL paths from the SPA fallback, including paths like `/foo` or `/nonexistent-page` that I never registered as routes. The SPA fallback solved getting URLs to my router, but now I needed to handle invalid routes gracefully.
 
@@ -362,7 +374,7 @@ But there was one piece still missing: my router was now receiving ALL paths fro
 
 With the SPA fallback working, my router was now receiving all direct URL requests, both valid routes like `/about` and invalid routes like `/foo` or `/nonexistent-page`. The static server was no longer rejecting these requests; instead, they were all being forwarded to `index.html` where my router would process them.
 
-This created a new problem: what should happen when users type a path that isn't registered in the router? Should they see a blank page? Get silently redirected to home? The answer was implementing a custom 404 page that lived inside the SPA itself. This meant adding another method to the router:
+This created a new problem: what should happen when users type a path that isn't registered in the router? Should they see a blank page? Get silently redirected to home? The answer was implementing a custom 404 view that lived inside the SPA itself. This meant adding another method to the router:
 
 ```javascript
 /**
@@ -399,41 +411,43 @@ async navigate(path) {
 }
 ```
 
-This was passing the route path directly to `history.pushState()`—`/about`, `/contact`, etc. This worked locally but broke on GitHub Pages:
+This was passing the route path directly to `history.pushState()`—`/about`, `/contact`, etc. This worked locally but broke on GitHub Pages, where project sites are served under a `/repository-name/` subpath rather than the domain root:
 
 - Router received: `/about`
 - Browser navigated to: `https://username.github.io/about` ❌
 - Should have been: `https://username.github.io/web_native_routing/about` ✅
 
-The router had no subdirectory awareness. After trying auto-detection (too brittle), I settled on explicit configuration via a build script.
+The router had no subdirectory awareness. It needed to know its base path so it could both strip the prefix from incoming URLs (to match routes) and prepend it when constructing URLs for `history.pushState()`.
 
-First, I added a `deploy_base_path` attribute to `package.json`:
+The solution used a clever trick: ES modules know their own URL via [import.meta](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Operators/import.meta). Since the module file always lives at a known location relative to the deployment root, you can derive the base path from its URL at runtime—no configuration or build step needed.
 
-```json
-{
-  "name": "web_native_routing",
-  "version": "1.0.0",
-  "deploy_base_path": "/web_native_routing/",
-  // ...
-}
-```
-
-Then created a config file that serves as the single source of truth for the base path:
+The entire detection lives in a two-line module:
 
 ```javascript
-// js/config.js - Development configuration
-export const deploymentConfig = {
-    basePath: '/', // Local development
-    // Build system replaces this for deployment
-};
+// js/base-path.js
+const moduleDir = new URL(".", import.meta.url).pathname;
+export const basePath = moduleDir.replace(/js\/$/, "");
 ```
 
-The [build script](https://github.com/danielabar/web_native_routing/blob/main/scripts/build.sh) extracts `deploy_base_path` from package.json and uses `sed` to replace the value in `config.js`, then copies everything to the `dist/` directory for deployment.
+Here's how it works: `import.meta.url` returns the fully-resolved URL of the currently executing module. Passing `"."` to the `URL` constructor resolves to the module's directory. Since `base-path.js` always lives at `<deployment-root>/js/base-path.js`, the directory is always `<deployment-root>/js/`, and stripping the `js/` suffix yields the deployment root:
 
-The router imports this config and uses a `buildFullPath()` method to construct correct URLs for `history.pushState()`:
+**Local dev:** `import.meta.url` → `http://localhost:3000/js/base-path.js` → directory `/js/` → `basePath` = `/`
+
+**GitHub Pages:** `import.meta.url` → `https://user.github.io/web_native_routing/js/base-path.js` → directory `/web_native_routing/js/` → `basePath` = `/web_native_routing/`
+
+The app entry point imports this value and passes it to the router:
 
 ```javascript
-// Router now constructs URLs correctly for any deployment context
+// js/app.js
+import { basePath } from './base-path.js';
+
+const router = new Router({ basePath });
+```
+
+The router uses `basePath` in two complementary methods—one to strip the prefix from incoming URLs for route matching, and one to add it back when constructing URLs for the browser:
+
+```javascript
+// Router constructs URLs correctly for any deployment context
 buildFullPath(routePath) {
     if (this.basePath === '/') return routePath;
     if (routePath === '/') return this.basePath.slice(0, -1) || '/';
@@ -448,7 +462,7 @@ async navigate(path) {
 }
 ```
 
-**The irony:** I started this project to avoid build complexity, yet deployment realities forced me to introduce exactly that.
+With this approach, the same source files work in any deployment context. There's no build step rewriting config values, no configuration to keep in sync, and no risk of dev/prod divergence. Deploy the source directory directly and the base path is detected correctly at runtime.
 
 ## Problem 6: Regression Testing
 
