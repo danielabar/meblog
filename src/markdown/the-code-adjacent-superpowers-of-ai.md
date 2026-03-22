@@ -28,16 +28,15 @@ A recent example: a customer success team member asked in Slack what happens whe
 
 I had Claude analyze the entire payment failure flow — the Stripe webhook events, the controller routing, the mailer logic, the background jobs, the cron-based cleanup. Within about thirty minutes, it produced a comprehensive document that included:
 
-- A plain-English explanation of the business problem (with a gym membership analogy that made it immediately understandable)
-- A technical architecture section with flow diagrams showing how webhook events route through the system
-- The discovery that Stripe's email sending was turned off and nobody knew when or why
-- A race condition where two webhook events arriving in rapid succession could cause yearly subscribers to receive monthly-specific messaging
-- A table showing exactly what each subscriber type would see at each stage of the payment failure process
+- A plain-English explanation of the business problem
+- Flow diagrams showing how webhook events route through the system
+- The discovery that Stripe's email sending was actually turned off
+- A table showing exactly what emails/content different subscriber types would see at each stage of the payment failure process
 
-The resulting document served both the technical team (who used it to plan the implementation) and the business team (who could finally see what customers were actually experiencing). Work that would have taken a developer most of a week to research and write up happened in a single sitting.
+The resulting document served both the technical team (who used it to plan the implementation) and the business team (who could finally see what customers were actually experiencing). Work that would have taken a developer a day or more to research and write up happened in under an hour.
 
 <aside class="markdown-aside">
-The key here isn't that AI wrote the code to fix the problem — it's that AI did the investigative and explanatory work that had to happen *before* anyone could write code. Understanding the current state of a system is often harder and more time-consuming than changing it.
+The key here isn't that AI wrote the code to fix the problem — it's that AI did the investigative and explanatory work that had to happen *before* anyone could write code. Understanding the current state of a system can be more difficult and time-consuming than changing it.
 </aside>
 
 ## Mining Open Source for Patterns
