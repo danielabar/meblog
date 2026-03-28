@@ -73,9 +73,7 @@ The result is a document I keep open alongside the code. When I encounter an unf
 
 Developers often struggle with breaking a large feature into smaller pieces that can be delivered, reviewed, and shipped independently. The natural instinct — and what AI assistants default to if you don't guide them — is to split horizontally: one ticket for the data model, one for the service layer, one for the API, one for the frontend. Clean slices that make architectural sense.
 
-The problem with horizontal slices is that nothing works end-to-end until the very last piece lands. You can't demo it, you can't get feedback, and you can't catch integration issues early. Worse, when you finally wire up the frontend, you often discover that the data model or API doesn't quite support what the UI needs, and you're reworking layers you thought were done.
-
-Vertical slices are better: each ticket delivers a thin, end-to-end piece of functionality that a user can actually exercise. Maybe the first slice only supports one account type, or only handles the happy path, or only works with hardcoded configuration. But it works. You can ship it behind a feature flag, demo it, and get feedback before investing in the next slice.
+The problem is that nothing works end-to-end until the very last piece lands. Vertical slices are better: each ticket delivers a thin, end-to-end piece of functionality that a user can actually exercise — maybe only the happy path, or only one account type — but it works. You can demo it, get feedback, and catch integration issues before investing in the next slice.
 
 When I describe a feature to an AI assistant and explicitly ask for vertical slices, it produces a breakdown that I'd estimate takes me about 70% of the way there. I usually need to adjust priorities, merge some tickets that are too granular, or add edge cases it missed. But the structure — the act of identifying what the thin slices are — is done in minutes instead of the hour-plus it used to take me staring at a blank Jira board.
 
