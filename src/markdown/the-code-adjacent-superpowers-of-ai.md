@@ -130,7 +130,3 @@ These tasks share a few characteristics that make them particularly well-suited 
 - **The output quality matters but isn't precious** — a well-organized backlog is valuable, but it doesn't need to be perfect. A workflow analysis document is a starting point for discussion, not a final artifact. This makes them forgiving of the occasional AI mistake in a way that production code is not.
 
 I've written before about [slowing down AI on purpose](../slowing-down-ai-on-purpose) — using it as a design partner rather than a code generator. These code-adjacent uses are the natural extension of that philosophy. When you stop thinking of AI as a thing that writes code and start thinking of it as a thing that processes and organizes information, the range of useful applications expands dramatically.
-
-## TODO
-
-- maybe too long, can some details within each section be cut out?
