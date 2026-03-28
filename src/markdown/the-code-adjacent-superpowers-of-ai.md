@@ -20,7 +20,7 @@ Here's what that looks like in practice.
 
 On long-running projects, there's a sort of question that comes up from time to time: "How does this feature *actually* work? It usually comes from a business stakeholder — a product manager, a customer success lead, someone who needs to understand the current behavior before they can decide what to change. The problem is that nobody knows the answer. The original developers are gone, the PM who wrote the spec left two years ago, and the documentation (if it exists at all) is outdated.
 
-This used to mean hours or days of a developer tracing through the code, leaving breadcrumbs in a scratch document, cross-referencing database schemas, services, background jobs, etc. and then translating all of that into something a non-technical person could follow. It was valuable work, but it was slow and tedious.
+This used to mean hours or days of a developer tracing through the code, leaving breadcrumbs in a scratch document, cross-referencing database schemas, services, background jobs, etc. and then translating all of that into something a non-technical person could follow.
 
 Now I point an AI assistant at the codebase and ask.
 
