@@ -12,7 +12,7 @@ related:
 
 When most people think about AI coding assistants, they picture the obvious: writing code. And yes, that's what these tools are marketed for, and it's where much of the conversation lives. But after months of daily use, I've found that some of the most valuable things I do with AI assistants aren't about producing code directly.
 
-They're the tasks that surround the code. The analysis that precedes a feature. The documentation that explains it. The planning that breaks it down. The onboarding that makes it accessible. I've started calling these *code-adjacent* activities, and they're where AI's superpowers really shine — in compressing work that used to take hours or days into minutes.
+They're the tasks that surround the code — analysis, documentation, planning, onboarding. I've started calling these *code-adjacent* activities, and they're where AI's superpowers really shine — in compressing work that used to take hours or days into minutes.
 
 Here's what that looks like in practice.
 
@@ -35,15 +35,9 @@ I had Claude analyze the entire payment failure flow — the Stripe webhook even
 
 The resulting document served both the technical team (who used it to plan the implementation) and the business team (who could finally see what customers were actually experiencing). Work that would have taken a developer a day or more to research and write up happened in under an hour.
 
-<aside class="markdown-aside">
-The key here isn't that AI wrote the code to fix the problem — it's that AI did the investigative and explanatory work that had to happen *before* anyone could write code. Understanding the current state of a system can be more difficult and time-consuming than changing it.
-</aside>
-
 ## Mining Open Source for Patterns
 
-Sometimes you know that an open source project has solved a problem similar to yours, but extracting the relevant pattern means reading through a codebase you're not familiar with — understanding its conventions, tracing how pieces connect, and figuring out which parts are essential to the pattern versus incidental to that project's domain.
-
-AI assistants are remarkably good at this. Point them at a repository, tell them what you're looking for, and they'll pull out the structural pattern without you having to understand the entire codebase.
+Sometimes you know that an open source project has solved a problem similar to yours, but extracting the relevant pattern means reading through an unfamiliar codebase and figuring out which parts are essential versus incidental. AI assistants are remarkably good at this — point them at a repository, tell them what you're looking for, and they'll pull out the structural pattern in minutes.
 
 A recent example: I was working on a back office system where we were adding admin features and onboarding internal users for customer support. We needed structured audit events — who did what, when, and to which record — rather than the scattered `Rails.logger.info` calls we'd been relying on. I knew [Fizzy](https://github.com/basecamp/fizzy), 37signals' open source Kanban tool, had an event tracking system worth studying.
 
@@ -87,17 +81,13 @@ Vertical slices are better: each ticket delivers a thin, end-to-end piece of fun
 
 When I describe a feature to an AI assistant and explicitly ask for vertical slices, it produces a breakdown that I'd estimate takes me about 70% of the way there. I usually need to adjust priorities, merge some tickets that are too granular, or add edge cases it missed. But the structure — the act of identifying what the thin slices are — is done in minutes instead of the hour-plus it used to take me staring at a blank Jira board.
 
-<aside class="markdown-aside">
-Tip: Be explicit about wanting vertical slices. In my experience, AI assistants default to horizontal decomposition unless you tell them otherwise. I usually say something like: "Split this into vertical slices — each piece should have end-to-end functionality that a user can exercise, even if it's limited."
-</aside>
+Once I approve the breakdown, I use an MCP server for the ticketing system to have the assistant create the tickets directly, What used to be an afternoon of writing tickets becomes a focused thirty-minute session.
 
-Once I approve the breakdown, I use an MCP server for the ticketing system (Jira, Linear, whatever the project uses) to have the assistant create the tickets directly. It drafts the summary and description for each one, I review and adjust, and then it creates them under the parent epic. What used to be an afternoon of writing tickets becomes a focused thirty-minute conversation.
+## Managing your TODO List
 
-## Organizing your TODO List
+I had a flat bullet-point list in Apple Notes. Every time something came up at work — a Slack discussion about a bug we should investigate, a nice-to-have idea someone mentioned, a deprecation warning from our hosting provider, a Dependabot PR with breaking changes, a support ticket revealing a deeper issue — I'd add a line. Sometimes I'd copy-paste a raw Slack URL with a one-word reminder. Other times I'd dump in a paragraph of context with no formatting.
 
-I had a flat bullet-point list in Apple Notes. Every time something came up at work — a Slack discussion about a bug we should investigate, a nice-to-have idea someone mentioned in standup, a deprecation warning from our hosting provider, a Dependabot PR with breaking changes, a support ticket revealing a deeper issue — I'd add a line. Sometimes I'd copy-paste a raw Slack URL with a one-word reminder. Other times I'd dump in a paragraph of context with no formatting.
-
-Within a few months, it was eighty-plus items in a wall of text. Active work mixed with vague future ideas. Bug reports tangled with tech debt notes. Items with Jira tickets next to items that were just a Slack link and a half-formed thought. Too messy to share with a PM, too disorganized to prioritize, and too long to even scan effectively.
+Within a few months, it was eighty-plus items in a wall of text. Active work mixed with vague future ideas. Bug reports tangled with tech debt notes. Items with Jira tickets next to items that were just a Slack link and a half-formed thought.
 
 I moved the whole thing into a Markdown file and asked Claude to organize it. It read through every item, inferred the nature of each one, and sorted them into categories: Active (things I'm currently working on, with their PR and review status), Business Priority (items the product team cares about), Tech Debt (upgrades, flaky tests, seed data improvements), Product Backlog (feature ideas and enhancements), Data Warehouse (analytics and reporting work), and Documentation. Items that were just a raw Slack URL got expanded into a clear one-line description with the link preserved as a reference. Related items that I'd logged separately got grouped together. Vague entries like "log tech debt upgrades" got enough context to be actionable.
 
@@ -117,7 +107,7 @@ But the documentation work didn't stop at the README. Claude also helped analyze
 
 ## SR&ED Report Generation
 
-Scientific Research and Experimental Development (SR&ED) is a Canadian federal tax incentive program that provides credits for companies doing eligible R&D work — with small Canadian-controlled private corporations able to receive up to 35% back on qualifying expenditures. Small Canadian-owned private companies can get up to 35% back on eligible expenditures. The application process involves answering detailed questions about what technological uncertainties you encountered, what systematic approaches you tried, and what you learned — essentially proving that work qualified as genuine research rather than routine development.
+Scientific Research and Experimental Development (SR&ED) is a Canadian federal tax incentive program that provides credits for companies doing eligible R&D work — with small Canadian-controlled private corporations able to receive up to 35% back on qualifying expenditures. The application process involves answering detailed questions about what technological uncertainties you encountered, what systematic approaches you tried, and what you learned — essentially proving that work qualified as genuine research rather than routine development.
 
 If you've ever filed an SR&ED claim, you know the pain: go back through months of git history — sometimes even the reflog for aborted experiments — to find evidence of repeated attempts to solve problems that couldn't be easily answered by existing knowledge. Then map those struggles onto the government's specific questions about technological uncertainty, systematic investigation, and advancement.
 
