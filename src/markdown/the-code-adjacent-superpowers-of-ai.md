@@ -12,19 +12,17 @@ related:
 
 When most people think about AI coding assistants, they picture the obvious: writing code. And yes, that's what these tools are marketed for, and it's where much of the conversation lives. But after months of daily use, I've found that some of the most valuable things I do with AI assistants aren't about producing code directly.
 
-They're the tasks that surround the code — analysis, documentation, planning, onboarding. I've started calling these *code-adjacent* activities, and they're where AI's superpowers really shine — in compressing work that used to take hours or days into minutes.
-
-Here's what that looks like in practice.
+They're the tasks that surround the code — analysis, documentation, planning, onboarding. I've started calling these *code-adjacent* activities, and they're where AI's superpowers really shine. Here's what that looks like in practice.
 
 ## Analyzing Existing Workflows
 
-On long-running projects, there's a sort of question that comes up from time to time: "How does this feature *actually* work? It usually comes from a business stakeholder — a product manager, a customer success lead, someone who needs to understand the current behavior before they can decide what to change. The problem is that nobody knows the answer. The original developers are gone, the PM who wrote the spec left two years ago, and the documentation (if it exists at all) is outdated.
+On long-running projects, there's a sort of question that comes up from time to time: "How does this feature *actually* work? It usually comes from a business stakeholder who has observed that something is not quite right, but needs to understand the current behavior before they can decide what needs to change. The problem is that nobody knows the answer. The original developers are gone, the early tickets (if they exist at all) are one-liners with no context, and there's no documentation.
 
 This used to mean hours or days of a developer tracing through the code, leaving breadcrumbs in a scratch document, cross-referencing database schemas, services, background jobs, etc. and then translating all of that into something a non-technical person could follow.
 
 Now I point an AI assistant at the codebase and ask.
 
-A recent example: a customer success team member asked in Slack what happens when a subscriber's payment fails. Simple question, right? It turned into a deep investigation because nobody was certain which emails were being sent, when, or by whom. Some people thought Stripe was handling the notifications. Others assumed the app was covering it.
+A recent example: a customer success team member asked in Slack what happens when a subscriber's renewal payment fails. Simple question, right? It turned into a deep investigation because nobody was certain which emails were being sent, when, or by whom. Some people thought Stripe was handling the notifications. Others assumed the app was covering it.
 
 I had Claude analyze the entire payment failure flow — the Stripe webhook events, the controller routing, the mailer logic, the background jobs, the cron-based cleanup. Within about thirty minutes, it produced a comprehensive document that included:
 
