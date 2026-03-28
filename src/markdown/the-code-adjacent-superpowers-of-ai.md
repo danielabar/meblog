@@ -101,8 +101,6 @@ When I asked Claude to review the README, its first observation was that the doc
 
 The rewritten README leads with what the project *does* and *why it matters*, then moves to how to use it. It includes annotated sample output that walks through a specific scenario year by year, explaining what each number means and why it matters for the financial decision. It even has a failure scenario showing how a bad sequence of early returns can drain an otherwise reasonable plan.
 
-But the documentation work didn't stop at the README. Claude also helped analyze the simulator's output across different scenarios — running the code repeatedly with different parameters and producing comparison documents. Questions like "is a 4% withdrawal rate really safe?" or "what happens if you delay CPP to age 70?" were turned into structured analyses with data tables, outcome comparisons, and plain-English explanations of the implications. These became the [Insights section](https://github.com/danielabar/retirement_drawdown_simulator_canada#insights) of the project — documents that bridge the gap between raw simulation output and actionable personal finance understanding.
-
 ## SR&ED Report Generation
 
 Scientific Research and Experimental Development (SR&ED) is a Canadian federal tax incentive program that provides credits for companies doing eligible R&D work — with small Canadian-controlled private corporations able to receive up to 35% back on qualifying expenditures. The application process involves answering detailed questions about what technological uncertainties you encountered, what systematic approaches you tried, and what you learned — essentially proving that work qualified as genuine research rather than routine development.
