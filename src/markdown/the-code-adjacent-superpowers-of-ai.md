@@ -14,7 +14,7 @@ When most people think about AI coding assistants, they picture the obvious: wri
 
 ## Analyzing Existing Workflows
 
-On long-running projects, there's a sort of question that comes up from time to time: "How does this feature *actually* work? It usually comes from a business stakeholder who has observed that something is not quite right, but needs to understand the current behavior before they can decide what needs to change. The problem is that nobody knows the answer. The original developers are gone, the early tickets (if they exist at all) are one-liners with no context, and there's no documentation.
+On long-running projects, there's a sort of question that comes up from time to time: "How does this feature *actually* work?" It usually comes from a business stakeholder who has observed that something is not quite right, but needs to understand the current behavior before they can decide what needs to change. The problem is that nobody knows the answer. The original developers are gone, the early tickets (if they exist at all) are one-liners with no context, and there's no documentation.
 
 This used to mean hours or days of a developer tracing through the code, leaving breadcrumbs in a scratch document, cross-referencing database schemas, services, background jobs, etc. and then translating all of that into something a non-technical person could follow.
 
@@ -75,7 +75,7 @@ The problem is that nothing works end-to-end until the very last piece lands. Ve
 
 When I describe a feature to an AI assistant and explicitly ask for vertical slices, it produces a breakdown that I'd estimate takes me about 70% of the way there. I usually need to adjust priorities, merge some tickets that are too granular, or add edge cases it missed. But the structure — the act of identifying what the thin slices are — is done in minutes instead of the hour-plus it used to take me staring at a blank Jira board.
 
-Once I approve the breakdown, I use an MCP server for the ticketing system to have the assistant create the tickets directly, What used to be an afternoon of writing tickets becomes a focused thirty-minute session.
+Once I approve the breakdown, I use an MCP server for the ticketing system to have the assistant create the tickets directly. What used to be an afternoon of writing tickets becomes a focused thirty-minute session.
 
 ## Managing your TODO List
 
@@ -83,7 +83,7 @@ I used to keep a flat bullet-point list in Apple Notes. Every time something cam
 
 Within a few months, it was eighty-plus items in a wall of text. Active work mixed with vague future ideas. Bug reports tangled with tech debt notes. Items with Jira tickets next to items that were just a Slack link and a half-formed thought.
 
-I moved the whole thing into a Markdown file and asked Claude to organize it. It read through every item, inferred the nature of each one, and sorted them into categories — Active, Business Priority, Tech Debt, Product Backlog, and others. Items that were just a raw Slack URL got expanded into a clear one-line description with the link preserved as a reference. Related items that I'd logged separately got grouped together
+I moved the whole thing into a Markdown file and asked Claude to organize it. It read through every item, inferred the nature of each one, and sorted them into categories — Active, Business Priority, Tech Debt, Product Backlog, and others. Items that were just a raw Slack URL got expanded into a clear one-line description with the link preserved as a reference. Related items that I'd logged separately got grouped together.
 
 But the real value isn't the one-time organization — it's the ongoing maintenance. When something new comes up, I can point the AI assistant to the Slack discussion and say "add this to the TODO." The assistant reads the thread, understands the context, writes up a well-worded item, and places it in the appropriate category. When I finish something, I tell it and it removes the item.
 
