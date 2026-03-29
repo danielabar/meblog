@@ -10,7 +10,7 @@ related:
   - "Building an AI Blog Editor with Claude Skills"
 ---
 
-When most people think about AI coding assistants, they picture the obvious: writing code. And yes, that's what these tools are marketed for, and it's where much of the conversation lives. But after months of daily use, I've found that some of the most valuable things I do with AI assistants aren't about producing code directly. I've started calling these *code-adjacent* activities, and they're where AI's superpowers really shine. Here's what that looks like in practice.
+When most people think about AI coding assistants, they picture the obvious: writing code. And yes, that's what these tools are marketed for. But after months of daily use, I've found that some of the most valuable things I do with AI assistants aren't about producing code directly. I've started calling these *code-adjacent* activities, and they're where AI's superpowers really shine. Here's what that looks like in practice. (My AI assistant of choice is [Claude Code](https://docs.anthropic.com/en/docs/claude-code/overview), but the workflows described here aren't specific to any one tool.)
 
 ## Analyzing Existing Workflows
 
@@ -120,6 +120,3 @@ What would have been days of archaeological work — re-reading old commits, rec
 ## Beyond Code Generation
 
 None of these examples involve AI writing production code. They're about the cognitive overhead that surrounds the code — synthesizing existing information, translating between contexts, organizing what's already there. I've written before about [slowing down AI on purpose](../slowing-down-ai-on-purpose) — using it as a design partner rather than a code generator. These code-adjacent uses are the natural extension of that philosophy. When you stop thinking of AI as a thing that writes code and start thinking of it as a thing that processes and organizes information, the range of useful applications expands dramatically.
-
-## TODO
-- Clarify my AI assitant is claude code opus 4.6?
