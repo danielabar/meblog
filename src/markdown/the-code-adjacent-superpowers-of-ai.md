@@ -117,17 +117,9 @@ Claude cross-referenced all of this against the SR&ED eligibility framework and 
 
 What would have been days of archaeological work — re-reading old commits, reconstructing the timeline of what I tried and why, translating it into SR&ED language — became an afternoon of reviewing and validating what the assistant produced.
 
-## So What Ties These Together?
+## Beyond Code Generation
 
-Looking at this list, a pattern emerges. The common thread isn't that AI writes code for me. It's that AI handles the *cognitive overhead* that surrounds the code — the reading, the cross-referencing, the organizing, the translating between audiences, the reformatting. Work that was always necessary but never anyone's favorite part of the job.
-
-These tasks share a few characteristics that make them particularly well-suited to AI:
-
-- **They involve synthesizing large volumes of existing information** — codebases, git histories, Slack threads, personal notes, government forms — rather than inventing something new.
-- **They require translating between contexts** — technical to business, code to documentation, raw notes to structured plans, experience to interview answers.
-- **The output quality matters but isn't precious** — a well-organized backlog is valuable, but it doesn't need to be perfect. A workflow analysis document is a starting point for discussion, not a final artifact. This makes them forgiving of the occasional AI mistake in a way that production code is not.
-
-I've written before about [slowing down AI on purpose](../slowing-down-ai-on-purpose) — using it as a design partner rather than a code generator. These code-adjacent uses are the natural extension of that philosophy. When you stop thinking of AI as a thing that writes code and start thinking of it as a thing that processes and organizes information, the range of useful applications expands dramatically.
+None of these examples involve AI writing production code. They're about the cognitive overhead that surrounds the code — synthesizing existing information, translating between contexts, organizing what's already there. I've written before about [slowing down AI on purpose](../slowing-down-ai-on-purpose) — using it as a design partner rather than a code generator. These code-adjacent uses are the natural extension of that philosophy. When you stop thinking of AI as a thing that writes code and start thinking of it as a thing that processes and organizes information, the range of useful applications expands dramatically.
 
 ## TODO
 - Clarify my AI assitant is claude code opus 4.6?
