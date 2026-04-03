@@ -117,6 +117,16 @@ Create a detailed editorial review document in the `scratch` directory named `{p
 ## Overall Assessment
 
 {Final thoughts, whether it's ready to publish, and next steps}
+
+## Edit Tracker
+
+{This section MUST be the last section in the review. Include a checklist table of ALL items from the Recommendations Summary (High, Medium, and Low priority) with a status column for tracking progress. Number each item sequentially. This table is used to track edits as they are implemented.}
+
+| # | Priority | Item | Line(s) | Status |
+|---|----------|------|---------|--------|
+| 1 | High | {brief description of the issue} | {line number(s)} | [ ] |
+| 2 | Medium | {brief description of the issue} | {line number(s)} | [ ] |
+| 3 | Low | {brief description of the issue} | {line number(s)} | [ ] |
 ```
 
 ## Scope and Calibration
