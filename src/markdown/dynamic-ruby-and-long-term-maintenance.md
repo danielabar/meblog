@@ -12,7 +12,7 @@ related:
 
 Ruby makes it easy to write dynamic code, and Rails amplifies this with ActiveSupport conveniences like `constantize` and `classify`. When you discover these capabilities, it feels empowering, like you're writing less code that does more. But there's a hidden cost to elegant abstractions in application code, especially on projects that will be maintained by multiple developers over many years.
 
-This post explores some code from a project I was maintaining, where a dynamic pattern made the codebase harder to understand. The example that follows is adapted from the project I was maintaining. Class names and other details have been changed so I can share them publicly, but the patterns and trade-offs illustrate what I encountered.
+This post explores some code from a project I was maintaining, where a dynamic pattern made the codebase harder to understand. Class names and other details have been changed so I can share them publicly, but the patterns and trade-offs illustrate what I encountered.
 
 ## Where Are the Callers?
 
