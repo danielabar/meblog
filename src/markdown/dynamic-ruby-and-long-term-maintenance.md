@@ -1,20 +1,18 @@
 ---
 title: "Dynamic Ruby And Hidden Maintenance Costs"
 featuredImage: "../images/dynamic-ruby-maintenance-karla-hernandez-LrlyZzX6Sws-unsplash.jpg"
-description: "This post explores how Ruby's dynamic dispatch and runtime constant resolution can make code elegant but harder to understand and maintain over time."
+description: "This post explores how dynamic dispatch and ActiveSupport's runtime constant resolution can make Rails code elegant but harder to maintain."
 date: "2026-04-01"
-category: "ruby"
+category: "rails"
 related:
   - "Avoid this Bug with Numeric Environment Variables in Ruby"
   - "Rails Console-like Environment for a Plain Ruby Project"
   - "Configurable Retry with Ruby"
 ---
 
-Ruby makes it easy to write elegant, dynamic code. The language practically encourages it with features like `constantize`, `classify`, and metaprogramming. When you discover these capabilities, it feels empowering, like you're writing less code that does more.
+Ruby makes it easy to write dynamic code, and Rails amplifies this with ActiveSupport conveniences like `constantize` and `classify`. When you discover these capabilities, it feels empowering, like you're writing less code that does more. But there's a hidden cost to elegant abstractions in application code, especially on projects that will be maintained by multiple developers over many years.
 
-But there's a hidden cost to elegant abstractions in application code, especially on projects that will be maintained by multiple developers over many years. This post explores some code from a project I was maintaining, where a dynamic pattern made the codebase harder to understand and maintain, even though the code itself was technically correct and elegantly written.
-
-The example that follows is adapted from the project I was maintaining. Class names and other details have been changed so I can share them publicly, but the patterns and trade-offs illustrate what I encountered.
+This post explores some code from a project I was maintaining, where a dynamic pattern made the codebase harder to understand. The example that follows is adapted from the project I was maintaining. Class names and other details have been changed so I can share them publicly, but the patterns and trade-offs illustrate what I encountered.
 
 ## Where Are the Callers?
 
@@ -114,8 +112,8 @@ The `BackgroundJobDispatcher` uses string manipulation to dynamically resolve jo
 
 1. For each attribute in `sync_attributes` (`:metadata` and `:data`)
 2. It constructs a string by joining the attribute with `:syncer`: `"metadata_syncer"`, `"data_syncer"`
-3. It converts these to class names: `"MetadataSyncer"`, `"DataSyncer"`
-4. It looks up these classes as constants and calls `.perform_async` on them
+3. ActiveSupport's `classify` converts these to class names: `"MetadataSyncer"`, `"DataSyncer"`
+4. ActiveSupport's `safe_constantize` looks up these classes as constants, and `.perform_async` is called on them
 
 So when an `Article` is created, it automatically triggers `MetadataSyncer` and `DataSyncer` jobs without the `Article` model ever explicitly naming those classes.
 
@@ -146,14 +144,14 @@ Every future developer who encounters this code needs to:
 3. Mentally map attributes to their corresponding job classes
 4. Remember this pattern exists when making future changes
 
-This isn't complex logic, but it's *surprising*. It requires extra mental energy that compounds over time as more developers join the project.
+These activities require additional mental energy that compounds over time as more developers join the project.
 
 ### Limited Reuse
 
-In this codebase, `BackgroundJobDispatcher` is only used by the `Article` model, which only had two sync operations. The flexibility to handle multiple operations exists, but it's never exercised. The abstraction was built for a level of generality that wasn't actually needed.
+In this codebase, `BackgroundJobDispatcher` is only used by the `Article` model, which only had two sync operations. The flexibility to handle multiple operations and models exists, but it's never exercised. The abstraction was built for a level of generality that wasn't actually needed.
 
 <aside class="markdown-aside">
-Some might say that as long as AI coding assistants can trace these relationships, it doesn't matter if the code is hard for humans to follow. But I'm not fully convinced. Code should be understandable even without machine assistance, because AI tools go down, hit capacity limits, and aren't always reliable when you need them most. And even when they're available, teams may not trust their conclusions for critical debugging. Maintainability still depends on people being able to reason about the system.
+An argument could be made that as long as AI coding assistants can trace these relationships, it doesn't matter if the code is hard for humans to follow. But I'm not fully convinced. Code should be understandable even without machine assistance, because AI service providers can have outages, hit capacity limits, and aren't always reliable when you need them most. And even when they're available, teams may not trust their conclusions for critical debugging. Maintainability still depends on people being able to reason about the system.
 </aside>
 
 ## A Simpler Alternative
@@ -199,6 +197,6 @@ This experience reinforced a few principles for me:
 
 ## Conclusion
 
-What feels like a productivity gain when writing code can become a maintenance burden when others inherit it. Ruby gives us powerful tools for abstraction, but on long-lived projects, sometimes the best code is the code that solves the current problem as simply as possible, and doesn't try to be too flexible.
+What feels like a productivity gain when writing code can become a maintenance burden when others inherit it. Ruby (and Rails) give us powerful tools for abstraction, but on long-lived projects, sometimes the best code is the code that solves the current problem as simply as possible, and doesn't try to be too flexible.
 
 I nearly removed a working feature because I couldn't trace its callers through a dynamic abstraction. The next time you're tempted to write one, ask yourself whether the elegance is worth that risk.
