@@ -10,11 +10,11 @@ related:
   - "Configurable Retry with Ruby"
 ---
 
-Ruby makes it incredibly easy to write elegant, dynamic code. The language practically encourages it with features like `constantize`, `classify`, and metaprogramming. When you discover these capabilities, it feels empowering, like you're writing less code that does more.
+Ruby makes it easy to write elegant, dynamic code. The language practically encourages it with features like `constantize`, `classify`, and metaprogramming. When you discover these capabilities, it feels empowering, like you're writing less code that does more.
 
 But there's a hidden cost to elegant abstractions in application code, especially on projects that will be maintained by multiple developers over many years. This post explores some code from a project I was maintaining, where a dynamic pattern made the codebase harder to understand and maintain, even though the code itself was technically correct and elegantly written.
 
-The example that follows is adapted from this project. Class names and other details have been changed so I can share them publicly, but the patterns and trade-offs illustrate what I encountered.
+The example that follows is adapted from the project I was maintaining. Class names and other details have been changed so I can share them publicly, but the patterns and trade-offs illustrate what I encountered.
 
 ## Where Are the Callers?
 
@@ -131,7 +131,7 @@ While this code works perfectly from a technical standpoint, it creates signific
 
 ### Discoverability
 
-When I searched for `DataSyncer` in the codebase, the dynamic dispatch through `BackgroundJobDispatcher` didn't show up. The connection between `Article` and `DataSyncer` was invisible to static analysis tools. It was only after I asked my AI assistant to scan the codebase that it found the connection.
+When I searched for `DataSyncer` in the codebase, the dynamic dispatch through `BackgroundJobDispatcher` didn't show up. The connection between `Article` and `DataSyncer` was invisible to standard search tools and static analysis.
 
 This made it difficult to:
 - Understand the full scope of where `DataSyncer` is called
@@ -153,7 +153,7 @@ This isn't complex logic, but it's *surprising*. It requires extra mental energy
 In this codebase, `BackgroundJobDispatcher` is only used by the `Article` model, which only had two sync operations. The flexibility to handle multiple operations exists, but it's never exercised. The abstraction was built for a level of generality that wasn't actually needed.
 
 <aside class="markdown-aside">
-Some might say that as long as tools like Copilot, Claude, Cursor etc. can trace these relationships, it doesn't matter if the code is hard for humans to follow. But I'm not fully convinced. Code should be understandable even without machine assistance, because one day the AI might not be available, or the team might not trust its conclusions. Maintainability still depends on people being able to reason about the system.
+Some might say that as long as AI coding assistants can trace these relationships, it doesn't matter if the code is hard for humans to follow. But I'm not fully convinced. Code should be understandable even without machine assistance, because AI tools go down, hit capacity limits, and aren't always reliable when you need them most. And even when they're available, teams may not trust their conclusions for critical debugging. Maintainability still depends on people being able to reason about the system.
 </aside>
 
 ## A Simpler Alternative
@@ -164,8 +164,8 @@ The same functionality could be achieved with two explicit lines in the `Article
 # app/models/article.rb
 class Article < ApplicationRecord
   after_create_commit do
-    MetadataSyncer.perform_async(id)
-    DataSyncer.perform_async(id)
+    MetadataSyncer.perform_async(self.class.name, id)
+    DataSyncer.perform_async(self.class.name, id)
   end
 end
 ```
@@ -176,7 +176,7 @@ This version:
 - Requires no additional service class
 - Makes the relationship between `Article` and its syncers explicit
 
-Yes, if you need to add a third syncer, you add a third line. Personally I don't view this as a burden, it's clarity.
+Yes, if you need to add a third syncer, you add a third line. To me, the increased clarity is well worth the extra line.
 
 ## When Dynamic Patterns Make Sense
 
@@ -199,6 +199,6 @@ This experience reinforced a few principles for me:
 
 ## Conclusion
 
-What feels like productivity gains when writing code can become maintenance costs when that code needs to be understood, modified, and debugged by others years later. Ruby gives us powerful tools for abstraction, but on long-lived projects, sometimes the best code is the code that solves the current problem as simply as possible, and doesn't try to be too flexible.
+What feels like a productivity gain when writing code can become a maintenance burden when others inherit it. Ruby gives us powerful tools for abstraction, but on long-lived projects, sometimes the best code is the code that solves the current problem as simply as possible, and doesn't try to be too flexible.
 
-The next time you're tempted to write a dynamic abstraction in your application code, ask yourself: "Will future developers thank me for this, or will they wish I had just written it out explicitly?" The answer might surprise you.
+I nearly removed a working feature because I couldn't trace its callers through a dynamic abstraction. The next time you're tempted to write one, ask yourself whether the elegance is worth that risk.
