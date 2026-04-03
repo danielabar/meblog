@@ -2,7 +2,7 @@
 title: "Dynamic Ruby And Hidden Maintenance Costs"
 featuredImage: "../images/dynamic-ruby-maintenance-karla-hernandez-LrlyZzX6Sws-unsplash.jpg"
 description: "This post explores how dynamic dispatch and ActiveSupport's runtime constant resolution can make Rails code elegant but harder to maintain."
-date: "2026-04-01"
+date: "2026-04-03"
 category: "rails"
 related:
   - "Avoid this Bug with Numeric Environment Variables in Ruby"
