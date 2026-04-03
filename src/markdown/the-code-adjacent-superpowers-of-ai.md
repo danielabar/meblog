@@ -10,7 +10,7 @@ related:
   - "Building an AI Blog Editor with Claude Skills"
 ---
 
-When most people think about AI coding assistants, they picture the obvious: writing code. And yes, that's what these tools are marketed for. But after months of daily use, I've found that some of the most valuable things I do with AI assistants aren't about producing code directly. I've started calling these *code-adjacent* activities, and they're where AI's superpowers really shine. Here's what that looks like in practice. (My AI assistant of choice is [Claude Code](https://docs.anthropic.com/en/docs/claude-code/overview), but the workflows described here aren't specific to any one tool.)
+When most people think about AI coding assistants, they picture the obvious: writing code. But after months of daily use, I've found that some of the most valuable things I do with AI assistants aren't about producing code directly. I've started calling these *code-adjacent* activities, and they're where AI's superpowers really shine. Here's what that looks like in practice. (My AI assistant of choice is [Claude Code](https://docs.anthropic.com/en/docs/claude-code/overview), but the workflows described here aren't specific to any one tool.)
 
 ## Analyzing Existing Workflows
 
@@ -35,9 +35,9 @@ The resulting document served both the technical team (who used it to plan the c
 
 Sometimes you know that an open source project has solved a problem similar to yours, but extracting the relevant pattern means reading through an unfamiliar codebase and figuring out which parts are essential. AI assistants are remarkably good at this — point them at a repository, tell them what you're looking for, and they'll pull out the structural pattern in minutes.
 
-A recent example: I was working on a back office system where we were adding admin features and onboarding internal users for customer support. We needed structured audit events — who did what, when, and to which record — rather than the scattered `Rails.logger.info` calls we'd been relying on. I knew [Fizzy](https://github.com/basecamp/fizzy), 37signals' open source Kanban tool, had an event tracking system worth studying.
+Here's how this played out recently: I was working on a back office system where we were adding admin features and onboarding internal users for customer support. We needed structured audit events — who did what, when, and to which record — rather than the scattered `Rails.logger.info` calls we'd been relying on. I knew [Fizzy](https://github.com/basecamp/fizzy), 37signals' open source Kanban tool, had an event tracking system worth studying.
 
-So I pointed Claude at Fizzy's `Event` model and the related files and asked it to explain the pattern. Within minutes, it identified the key architectural decisions:
+So I had Claude analyze Fizzy's `Event` model and the related files. It quickly identified the key architectural decisions:
 
 - **Polymorphic `eventable` association** — any model can generate events by including a concern, with actions automatically prefixed by the model name (`card_published`, `comment_created`) so event types are self-documenting.
 - **A JSON `particulars` column** — context-specific metadata stored in a flexible JSON column rather than separate tables for every event type.
@@ -52,7 +52,7 @@ And because the assistant also has access to *your* codebase, it can go further 
 
 Starting on a new codebase is disorienting. Even experienced developers spend their first days (or weeks) building a mental model of how things fit together. What business problem does this solve? How is authentication handled? How about authorization? Where does the business logic live — service objects? Concerns? Plain old Ruby objects? How are tests organized? What's the deployment process?
 
-This gets even harder when you're crossing technology boundaries. I'm a Rails developer. My day-to-day is a Rails monolith — ActiveRecord, PostgreSQL, RSpec, Sidekiq, the usual. But an upcoming initiative requires me to work across our company's main product, which is a .NET application, backed by MongoDB with an Angular SPA frontend.
+This gets even harder when you're crossing technology boundaries. I'm a Rails developer. My day-to-day is developing within a Rails monolith — ActiveRecord, PostgreSQL, RSpec, Sidekiq, the usual. But an upcoming initiative requires me to work across our company's main product, which is a .NET application, backed by MongoDB with an Angular SPA frontend.
 
 Rather than spending days sifting through unfamiliar directories and trying to figure out how the pieces fit together, I pointed Claude at the codebase and asked it to generate onboarding documentation *for me specifically* — a Rails developer who needs to understand this system.
 
@@ -63,7 +63,7 @@ What it produced wasn't a generic .NET tutorial. It was a customized orientation
 - Dependency injection? "In Rails, you just call `User.find(id)` or `SomeService.new` anywhere. In .NET, dependencies are declared in constructors and wired up at boot time." Followed by side-by-side code examples in C# and Ruby showing the same service written both ways.
 - MongoDB instead of PostgreSQL — no schema, no migrations, no `rails db:migrate`. "Adding a field to an entity just works. Old documents without that field return `null`. But also no rollback safety net."
 
-The result is a document that serves as a bilingual dictionary for codebases — and it was generated in a few minutes instead of the days it would take to build that mental model from scratch.
+The result is a document that serves as a bilingual dictionary for codebases — and it was generated in short order instead of the days it would take to build that mental model from scratch.
 
 ## Splitting Large Features into Deliverable Work
 
@@ -75,9 +75,9 @@ The problem is that nothing works end-to-end until the very last piece lands. Ve
 
 When I describe a feature to an AI assistant and explicitly ask for vertical slices, it produces a breakdown that I'd estimate takes me about 70% of the way there. I usually need to adjust priorities, merge some tickets that are too granular, or add edge cases it missed. But the structure — the act of identifying what the thin slices are — is done in minutes instead of the hour-plus it used to take me staring at a blank Jira board.
 
-Once I approve the breakdown, I use an MCP server for the ticketing system to have the assistant create the tickets directly. What used to be an afternoon of writing tickets becomes a focused thirty-minute session.
+Once I approve the breakdown, I use an [MCP server](https://modelcontextprotocol.io) for the ticketing system to have the assistant create the tickets directly. What used to be an afternoon of writing tickets becomes a focused thirty-minute session.
 
-## Managing your TODO List
+## Managing Your TODO List
 
 I used to keep a flat bullet-point list in Apple Notes. Every time something came up at work — a Slack discussion about a bug we should investigate, a nice-to-have idea someone mentioned, a deprecation warning from our hosting provider, a Dependabot PR with breaking changes, a support ticket revealing a deeper issue — I'd add a line. Sometimes I'd copy-paste a raw Slack URL with a one-word reminder. Other times I'd dump in a paragraph of context with no formatting.
 
@@ -105,7 +105,7 @@ If you've ever filed an SR&ED claim, you know the pain: go back through months o
 
 I used an AI assistant for our most recent claim in two phases. First, I had Claude help me understand what SR&ED eligibility actually looks like from an accountant's perspective — what questions they'd ask, what red flags disqualify work, and what green flags suggest eligibility. It produced a structured questionnaire covering technological uncertainty, systematic investigation, advancement, and the critical distinction between eligible experimentation and routine development. That alone saved me hours of reading government documentation.
 
-Then came the real heavy lifting. I'd completed a major global search overhaul about eight months earlier and the details had faded. The project had two areas that potentially qualified: a PostgreSQL full-text search optimization where a widely-used gem's generated SQL became unusable at production scale with user-ownership filtering, and a hybrid architecture pattern for embedding server-rendered Rails views inside a legacy Backbone/Marionette SPA.
+Then came the real heavy lifting. I'd completed a major global search overhaul about eight months earlier and the details had faded. The project had two areas that potentially qualified. The first was a PostgreSQL full-text search optimization — a widely-used gem's generated SQL became unusable at production scale once we added user-ownership filtering. The second was a hybrid architecture pattern for embedding server-rendered Rails views inside a legacy Backbone/Marionette SPA.
 
 I fed Claude the Jira epic and child tickets, then had it traverse the corresponding git commits (our commits always reference the Jira ticket, so the mapping was straightforward). I also told it to search through my `git reflog` for abandoned experimental commits. What it found in the git history told the story of systematic experimentation far better than my memory could have:
 
