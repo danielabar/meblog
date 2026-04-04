@@ -73,7 +73,7 @@ The problem is that nothing works end-to-end until the very last piece lands. Ve
 
 When I describe a feature to an AI assistant and explicitly ask for vertical slices, it produces a breakdown that I'd estimate takes me about 70% of the way there. I usually need to adjust priorities, merge some tickets that are too granular, or add edge cases it missed. But the structure — the act of identifying what the thin slices are — comes from the conversation itself rather than staring at a blank Jira board.
 
-Once I approve the breakdown, I use an [MCP server](https://modelcontextprotocol.io) for the ticketing system to have the assistant create the tickets directly.
+Once I approve the breakdown, I use an [MCP server](https://modelcontextprotocol.io) for the ticketing system to have the assistant create the tickets directly. The decomposition that used to be an exercise in Jira wrangling is now something the assistant handles — I just steer.
 
 ## Managing Your TODO List
 
