@@ -29,11 +29,11 @@ I had Claude analyze the entire payment failure flow — the Stripe webhook even
 - The discovery that Stripe's email sending was actually turned off
 - A table showing exactly what emails/content different subscriber types would see at each stage of the payment failure process
 
-The resulting document served both the technical team (who used it to plan the changes required) and the business team (who could finally see what customers were actually experiencing). Work that would have taken a developer a day or more to research and write up happened in under an hour.
+The resulting document served both the technical team (who used it to plan the changes required) and the business team (who could finally see what customers were actually experiencing).
 
 ## Mining Open Source for Patterns
 
-Sometimes you know that an open source project has solved a problem similar to yours, but extracting the relevant pattern means reading through an unfamiliar codebase and figuring out which parts are essential. AI assistants are remarkably good at this — point them at a repository, tell them what you're looking for, and they'll pull out the structural pattern in minutes.
+Sometimes you know that an open source project has solved a problem similar to yours, but extracting the relevant pattern means reading through an unfamiliar codebase and figuring out which parts are essential. AI assistants are remarkably good at this — point them at a repository, tell them what you're looking for, and they'll pull out the structural pattern without you having to build a mental model of the whole project first.
 
 Here's how this played out recently: I was working on a back office system where we were adding admin features and onboarding internal users for customer support. We needed structured audit events — who did what, when, and to which record — rather than the scattered `Rails.logger.info` calls we'd been relying on. I knew [Fizzy](https://github.com/basecamp/fizzy), 37signals' open source Kanban tool, had an event tracking system worth studying.
 
@@ -43,8 +43,6 @@ So I had Claude analyze Fizzy's `Event` model and the related files. It quickly 
 - **A JSON `particulars` column** — context-specific metadata stored in a flexible JSON column rather than separate tables for every event type.
 - **Separate `Description` class** — display logic kept out of the model, with a dedicated class that renders human-readable sentences from event data.
 - **Webhook dispatch on create** — every event automatically triggers webhook delivery for external system integration.
-
-A half-day of reading unfamiliar code and taking notes compressed into a thirty-minute exploration.
 
 And because the assistant also has access to *your* codebase, it can go further than just explaining the open source pattern — it can identify where the adaptation points are. Fizzy uses plain old Ruby objects and concerns to organize its event logic. The project I maintain organizes business logic in service objects. The assistant can bridge that gap: here's the pattern, here's how your code is structured differently, and here's how you might reconcile the two.
 
@@ -73,9 +71,9 @@ AI assistants can help with the decomposition, but their default instinct is to 
 
 The problem is that nothing works end-to-end until the very last piece lands. Vertical slices are better: each ticket delivers a thin, end-to-end piece of functionality that a user can actually exercise. You can demo it, get feedback, and catch integration issues before investing in the next slice.
 
-When I describe a feature to an AI assistant and explicitly ask for vertical slices, it produces a breakdown that I'd estimate takes me about 70% of the way there. I usually need to adjust priorities, merge some tickets that are too granular, or add edge cases it missed. But the structure — the act of identifying what the thin slices are — is done in minutes instead of the hour-plus it used to take me staring at a blank Jira board.
+When I describe a feature to an AI assistant and explicitly ask for vertical slices, it produces a breakdown that I'd estimate takes me about 70% of the way there. I usually need to adjust priorities, merge some tickets that are too granular, or add edge cases it missed. But the structure — the act of identifying what the thin slices are — comes from the conversation itself rather than staring at a blank Jira board.
 
-Once I approve the breakdown, I use an [MCP server](https://modelcontextprotocol.io) for the ticketing system to have the assistant create the tickets directly. What used to be an afternoon of writing tickets becomes a focused thirty-minute session.
+Once I approve the breakdown, I use an [MCP server](https://modelcontextprotocol.io) for the ticketing system to have the assistant create the tickets directly.
 
 ## Managing Your TODO List
 
@@ -103,7 +101,7 @@ Scientific Research and Experimental Development (SR&ED) is a Canadian federal t
 
 If you've ever filed an SR&ED claim, you know the pain: go back through months of git history — sometimes even the reflog for aborted experiments — to find evidence of repeated attempts to solve problems that couldn't be easily answered by existing knowledge. Then map those struggles onto the government's specific questions.
 
-I used an AI assistant for our most recent claim in two phases. First, I had Claude help me understand what SR&ED eligibility actually looks like from an accountant's perspective — what questions they'd ask, what red flags disqualify work, and what green flags suggest eligibility. It produced a structured questionnaire covering each of these dimensions and the critical distinction between eligible experimentation and routine development. That alone saved me hours of reading government documentation.
+I used an AI assistant for our most recent claim in two phases. First, I had Claude help me understand what SR&ED eligibility actually looks like from an accountant's perspective — what questions they'd ask, what red flags disqualify work, and what green flags suggest eligibility. It produced a structured questionnaire covering each of these dimensions and the critical distinction between eligible experimentation and routine development. That alone replaced the usual exercise of sifting through government PDFs trying to figure out what qualifies.
 
 Then came the real heavy lifting. I'd completed a major global search overhaul about eight months earlier and the details had faded. The project had two areas that potentially qualified. The first was a PostgreSQL full-text search optimization — a widely-used gem's generated SQL became unusable at production scale once we added user-ownership filtering. The second was a hybrid architecture pattern for embedding server-rendered Rails views inside a legacy Backbone/Marionette SPA.
 
@@ -115,7 +113,7 @@ I fed Claude the Jira epic and child tickets, then had it traverse the correspon
 
 Claude cross-referenced all of this against the SR&ED eligibility framework and produced a document structured around the program's eligibility criteria. It even pulled relevant open source issue threads from the search gem's GitHub repository to demonstrate that the performance limitations were acknowledged but unresolved.
 
-What would have been days of archaeological work — re-reading old commits, reconstructing the timeline of what I tried and why, translating it into SR&ED language — became an afternoon of reviewing and validating what the AI assistant produced.
+The archaeological work — re-reading old commits, reconstructing the timeline of what I tried and why, translating it into SR&ED language — was handled by the assistant. My job was reviewing and validating what it produced.
 
 ## Beyond Code Generation
 
