@@ -1,6 +1,6 @@
 ---
 title: "The Code-Adjacent Power of AI"
-featuredImage: "../images/code-adjacent-power-ai-paul-felberbauer-tM16SjCYy84-unsplash.jpg"
+featuredImage: "../images/code-adjacent-powers-of-ai-reto-simonet-WN9QRESOu5c-unsplash.jpg"
 description: "AI coding assistants are obviously useful for writing code, but some of their most valuable contributions happen in the work that surrounds it."
 date: "2026-04-15"
 category: "productivity"
