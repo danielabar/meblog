@@ -14,9 +14,9 @@ When most people think about AI coding assistants, they picture the obvious: wri
 
 ## Analyzing Existing Workflows
 
-On long-running projects, there's a sort of question that comes up from time to time: "How does this feature *actually* work?" It usually comes from a business stakeholder who has observed that something is not quite right, but needs to understand the current behavior before they can decide what needs to change. The problem is that nobody knows the answer. The original developers are gone, the early tickets (if they exist at all) are one-liners with no context, and there's no documentation.
+On long-running projects, a question inevitably surfaces: "How does this feature *actually* work?" It usually comes from a business stakeholder who has observed that something is not quite right, but needs to understand the current behavior before they can decide what needs to change. The problem is that nobody knows the answer. The original developers are gone, the early tickets (if they exist at all) are one-liners with no context, and there's no documentation.
 
-This used to mean hours or days of a developer tracing through the code, leaving breadcrumbs in a scratch document, cross-referencing database schemas, services, background jobs, etc. and then translating all of that into something a non-technical person could follow.
+This used to mean hours or days of a developer tracing through the code, leaving breadcrumbs in a scratch document, cross-referencing database schemas, services, background jobs, etc., and then translating it into something a non-technical person could follow.
 
 Now I point an AI assistant at the codebase and ask.
 
@@ -44,7 +44,7 @@ So I had Claude analyze Fizzy's `Event` model and the related files. It quickly 
 - **Separate `Description` class** — display logic kept out of the model, with a dedicated class that renders human-readable sentences from event data.
 - **Webhook dispatch on create** — every event automatically triggers webhook delivery for external system integration.
 
-What would normally be a half-day of reading unfamiliar code and taking notes became a thirty-minute exploration.
+A half-day of reading unfamiliar code and taking notes compressed into a thirty-minute exploration.
 
 And because the assistant also has access to *your* codebase, it can go further than just explaining the open source pattern — it can identify where the adaptation points are. Fizzy uses plain old Ruby objects and concerns to organize its event logic. The project I maintain organizes business logic in service objects. The assistant can bridge that gap: here's the pattern, here's how your code is structured differently, and here's how you might reconcile the two.
 
@@ -91,7 +91,7 @@ The document went from an overwhelming dump of unsorted notes to a structured re
 
 ## Rewriting Project Documentation
 
-One of my side projects, [Retirement Drawdown Simulator Canada](https://github.com/danielabar/retirement_drawdown_simulator_canada) had a README that covered the basics: it explained how to install and run the project, a list of features, showed some sample output, and listed the configuration options. But this didn't reflect the true depth. I knew the project was substantial, but couldn't figure out how to communicate that succinctly.
+One of my side projects, [Retirement Drawdown Simulator Canada](https://github.com/danielabar/retirement_drawdown_simulator_canada), had a README that covered the basics: it explained how to install and run the project, listed features, showed some sample output, and described the configuration options. But this didn't reflect the true depth. I knew the project was substantial, but couldn't figure out how to communicate that succinctly.
 
 When I asked Claude to review the README, its first observation was that the documentation focused on *how* — configuration, commands, output format — but never explained *why* someone should care. It didn't convey that the simulator models tax-aware withdrawals across multiple account types with interacting government benefits, enforces mandatory withdrawal rules, and uses statistical modeling to stress-test plans against futures worse than history.
 
