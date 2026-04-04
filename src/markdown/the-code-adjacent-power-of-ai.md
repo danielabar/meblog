@@ -1,6 +1,6 @@
 ---
-title: "The Code-Adjacent Superpowers of AI"
-featuredImage: "../images/code-adjacent-superpowers-ai-paul-felberbauer-tM16SjCYy84-unsplash.jpg"
+title: "The Code-Adjacent Power of AI"
+featuredImage: "../images/code-adjacent-power-ai-paul-felberbauer-tM16SjCYy84-unsplash.jpg"
 description: "AI coding assistants are obviously useful for writing code, but some of their most valuable contributions happen in the work that surrounds it."
 date: "2026-04-15"
 category: "productivity"
@@ -10,7 +10,7 @@ related:
   - "Building an AI Blog Editor with Claude Skills"
 ---
 
-When most people think about AI coding assistants, they picture the obvious: writing code. But after months of daily use, I've found that some of the most valuable things I do with AI assistants aren't about producing code directly. I've started calling these *code-adjacent* activities, and they're where AI's superpowers really shine. Here's what that looks like in practice. (My AI assistant of choice is [Claude Code](https://docs.anthropic.com/en/docs/claude-code/overview), but the workflows described here aren't specific to any one tool.)
+When most people think about AI coding assistants, they picture the obvious: writing code. But after months of daily use, I've found that some of the most valuable things I do with AI assistants aren't about producing code directly. I've started calling these *code-adjacent* activities. Here's what that looks like in practice. (My AI assistant of choice is [Claude Code](https://docs.anthropic.com/en/docs/claude-code/overview), but the workflows described here aren't specific to any one tool.)
 
 ## Analyzing Existing Workflows
 
