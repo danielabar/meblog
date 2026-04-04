@@ -20,7 +20,7 @@ This used to mean hours or days of a developer tracing through the code, leaving
 
 Now I point an AI assistant at the codebase and ask.
 
-A recent example: a customer success team member asked in Slack what happens when a subscriber's renewal payment fails. Simple question, right? It turned into a deep investigation because nobody was certain which emails were being sent, when, or by whom. Some people thought Stripe was handling the notifications. Others assumed the app was covering it.
+A recent example: a subscriber received an email that didn't quite match their situation — it contained content meant for a different type of account. A customer success team member flagged it in Slack, and it turned into a deep investigation because nobody was certain which emails were being sent, when, or by whom. Some people thought Stripe was handling the notifications. Others assumed the app was covering it.
 
 I had Claude analyze the entire payment failure flow — the Stripe webhook events, the controller routing, the mailer logic, the background jobs, the cron-based cleanup. Within a few minutes, it produced a comprehensive document that included:
 
@@ -46,11 +46,11 @@ So I had Claude analyze Fizzy's `Event` model and the related files. It quickly 
 
 What would normally be a half-day of reading unfamiliar code and taking notes became a thirty-minute exploration.
 
-And because the assistant also has access to *your* codebase, it can go further than just explaining the open source pattern — it can identify where the adaptation points are. Fizzy uses plain old Ruby objects and concerns to organize its event logic. Our codebase organizes business logic in service objects. The assistant can bridge that gap: here's the pattern, here's how your code is structured differently, and here's how you might reconcile the two.
+And because the assistant also has access to *your* codebase, it can go further than just explaining the open source pattern — it can identify where the adaptation points are. Fizzy uses plain old Ruby objects and concerns to organize its event logic. The project I maintain organizes business logic in service objects. The assistant can bridge that gap: here's the pattern, here's how your code is structured differently, and here's how you might reconcile the two.
 
 ## Onboarding to a New Codebase
 
-Starting on a new codebase is disorienting. Even experienced developers spend their first days (or weeks) building a mental model of how things fit together. What business problem does this solve? How is authentication handled? How about authorization? Where does the business logic live — service objects? Concerns? Plain old Ruby objects? How are tests organized? What's the deployment process?
+Starting on a new codebase is disorienting. It can take weeks to build a mental model of how things fit together. What business problem does this solve? How are authentication and authorization handled? Where does the business logic live? How are tests organized? What's the deployment process?
 
 This gets even harder when you're crossing technology boundaries. I'm a Rails developer. My day-to-day is developing within a Rails monolith — ActiveRecord, PostgreSQL, RSpec, Sidekiq, the usual. But an upcoming initiative requires me to work across our company's main product, which is a .NET application, backed by MongoDB with an Angular SPA frontend.
 
@@ -61,15 +61,15 @@ What it produced wasn't a generic .NET tutorial. It was a customized orientation
 - The `.sln` solution file with numerous `.csproj` projects? "Think of each project like a gem that lives inside the repo instead of being published externally. The `.sln` ties them together so `dotnet build` knows what to compile."
 - The layered architecture with Controllers, Services, Providers, Domain, and Data projects? A table mapping each one to Rails equivalents — `App.Web.Services` is like `app/services/`, `App.Providers` is like your Faraday client wrappers, `App.Domain` is like ActiveRecord models but without the ORM magic.
 - Dependency injection? "In Rails, you just call `User.find(id)` or `SomeService.new` anywhere. In .NET, dependencies are declared in constructors and wired up at boot time." Followed by side-by-side code examples in C# and Ruby showing the same service written both ways.
-- MongoDB instead of PostgreSQL — no schema, no migrations, no `rails db:migrate`. "Adding a field to an entity just works. Old documents without that field return `null`. But also no rollback safety net."
+- MongoDB instead of PostgreSQL — no schema, no migrations, no `rails db:migrate`. "Adding a field to an entity just works. Old documents without that field return `null`."
 
-The result is a document that serves as a bilingual dictionary for codebases — and it was generated in short order instead of the days it would take to build that mental model from scratch.
+The result is a document that serves as a bilingual dictionary for codebases.
 
 ## Splitting Large Features into Deliverable Work
 
 Developers often struggle with breaking a large feature into smaller pieces that can be delivered, reviewed, and shipped independently. Without that decomposition, the default path is a long-running feature branch that drifts further from the mainline with every passing day. Merge conflicts accumulate. Integration issues hide until the end. And when it's finally time to open a pull request, the diff is so large that reviewers can't meaningfully evaluate it — they skim, approve, and hope for the best.
 
-AI assistants can help with the decomposition, but their default instinct — like most developers' — is to split horizontally: one ticket for the data model, one for the service layer, one for the API, one for the frontend.
+AI assistants can help with the decomposition, but their default instinct is to split horizontally: one ticket for the data model, one for the service layer, one for the API, one for the frontend.
 
 The problem is that nothing works end-to-end until the very last piece lands. Vertical slices are better: each ticket delivers a thin, end-to-end piece of functionality that a user can actually exercise. You can demo it, get feedback, and catch integration issues before investing in the next slice.
 
@@ -85,9 +85,9 @@ Within a few months, it was eighty-plus items in a wall of text. Active work mix
 
 I moved the whole thing into a Markdown file and asked Claude to organize it. It read through every item, inferred the nature of each one, and sorted them into categories — Active, Business Priority, Tech Debt, Product Backlog, and others. Items that were just a raw Slack URL got expanded into a clear one-line description with the link preserved as a reference. Related items that I'd logged separately got grouped together.
 
-But the real value isn't the one-time organization — it's the ongoing maintenance. When something new comes up, I can point the AI assistant to the Slack discussion and say "add this to the TODO." The assistant reads the thread, understands the context, writes up a well-worded item, and places it in the appropriate category. When I finish something, I tell it and it removes the item.
+But the real value isn't the one-time organization — it's the ongoing maintenance. When something new comes up, I can point my AI assistant to the Slack discussion and say "add this to the TODO." The assistant reads the thread, understands the context, writes up a well-worded item, and places it in the appropriate category. When I finish something, I tell it and it removes the item.
 
-The document went from an overwhelming wall of text I couldn't make sense of to a structured reference. It's a living document that stays organized without me having to do the organizing.
+The document went from an overwhelming dump of unsorted notes to a structured reference. It's now a living document that stays organized without me having to do the organizing.
 
 ## Rewriting Project Documentation
 
@@ -113,9 +113,9 @@ I fed Claude the Jira epic and child tickets, then had it traverse the correspon
 
 - For the architecture work: the iterative journey from a first experiment (server-rendering just the navigation bar) to discovering that server-rendered links break SPA routing, to building a bridge layer, to the final "shell" pattern. Each phase had its own ticket and commits showing the progression.
 
-Claude cross-referenced all of this against the SR&ED eligibility framework and produced a document with the technological uncertainty, evidence of systematic investigation, and advancements achieved. It even pulled relevant open source issue threads from the gem's GitHub repository to demonstrate that the performance limitations were acknowledged but unresolved.
+Claude cross-referenced all of this against the SR&ED eligibility framework and produced a document with the technological uncertainty, evidence of systematic investigation, and advancements achieved. It even pulled relevant open source issue threads from the search gem's GitHub repository to demonstrate that the performance limitations were acknowledged but unresolved.
 
-What would have been days of archaeological work — re-reading old commits, reconstructing the timeline of what I tried and why, translating it into SR&ED language — became an afternoon of reviewing and validating what the assistant produced.
+What would have been days of archaeological work — re-reading old commits, reconstructing the timeline of what I tried and why, translating it into SR&ED language — became an afternoon of reviewing and validating what the AI assistant produced.
 
 ## Beyond Code Generation
 
