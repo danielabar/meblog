@@ -1,0 +1,287 @@
+---
+title: "Securing Routes on Heroku with Rails Route Constraints"
+featuredImage: "../images/securing-routes-heroku-rails-arpad-czapp-eXZQIKHj5lY-unsplash.jpg"
+description: "Learn how to restrict admin routes to VPN IP addresses on Heroku using Rails Advanced Route Constraints."
+date: "2026-07-01"
+category: "rails"
+related:
+  - "Datadog APM for Rails on Heroku"
+  - "Some Elegance with Rails Caching"
+  - "Rails CORS Middleware For Multiple Resources"
+---
+
+At work, we needed to expand admin access. What had been a small group of developers accessing the admin panel was becoming unworkable as customer support demand grew. We were onboarding the entire Customer Success team, adding new admin features, and generally making the admin a more central part of daily operations.
+
+More people with admin access means more credentials floating around, which means a bigger attack surface. We decided to require VPN to access any `/admin` route — even with valid credentials, you can't reach admin from outside the corporate network.
+
+Our app runs on Heroku. Heroku's router is fully managed — there's no way to add firewall rules, IP filters, or WAF rules at the load balancer level. Every HTTP request that hits your app's public URL gets forwarded to a dyno, so your application code is your firewall.
+
+<aside class="markdown-aside">
+Heroku <a href="https://devcenter.heroku.com/articles/private-spaces-trusted-ip-ranges">Private Spaces</a> do offer infrastructure-level IP filtering via "trusted IP ranges," but it applies to all traffic for the entire Space — you can't restrict specific routes. The cost also starts at ~$1,000/month, which is overkill for restricting a handful of admin routes, especially for a small to mid size company.
+</aside>
+
+So we decided to implement the restriction in application code. This post walks through the solution.
+
+**Prerequisite: Static VPN IP Addresses**
+
+Before diving into the implementation, one important prerequisite: this approach requires your company's VPN to route traffic through a stable list of known egress IP addresses. If your VPN assigns dynamic or rotating egress IPs, you'd need a different strategy entirely.
+
+## Rails Advanced Route Constraints
+
+The solution has a few moving parts, but the core idea is straightforward: use a [Rails Advanced Route Constraint](https://guides.rubyonrails.org/routing.html#advanced-constraints) to wrap the entire `/admin` namespace. A route constraint is any object that responds to `matches?(request)` and returns a boolean. If it returns `true`, the routes inside the `constraints` block are accessible. If it returns `false`, Rails treats them as if they don't exist and returns a 404.
+
+Our constraint checks the client's IP address against a configurable allowlist of VPN egress IPs. Supporting this are a YAML config file for per-environment IP lists, and a feature flag for instant rollback without redeployment.
+
+Here's how the pieces fit together:
+
+1. **YAML config** defines the allowed VPN IPs per environment (and a bypass keyword for dev/test)
+2. **Constraint class** implements `matches?(request)` — checks the feature flag, then checks the IP
+3. **Route wiring** wraps the admin namespace with the constraint
+4. **Feature flag** provides a kill switch to disable the restriction instantly
+
+## The Implementation
+
+### Configuration
+
+The VPN IP allowlist lives in a YAML config file, following the standard Rails `config_for` pattern:
+
+```yaml
+# config/admin_vpn_allowlist.yml
+
+default: &default
+  allowed_ips:
+    # The IP addresses in this example are from RFC 5737 documentation ranges,
+    # reserved specifically for use in examples so they'll never collide with real servers.
+    # https://www.rfc-editor.org/rfc/rfc5737
+    - "198.51.100.10"
+    - "203.0.113.42"
+    - "192.0.2.77"
+
+development:
+  allowed_ips:
+    - "all"
+
+test:
+  allowed_ips:
+    - "all"
+
+production:
+  <<: *default
+```
+
+A few things to note here:
+
+**The `"all"` keyword** for development and test means the constraint class (shown in the next section) doesn't need any environment-checking conditionals. It simply checks if `"all"` is in the list.
+
+**VPN IPs are version-controlled.** Changes go through PRs with code review and leave an audit trail in git history. You could also define these as a comma-separated environment variable, but for a small, stable list like VPN egress IPs, keeping them in source was simpler — one less thing to configure per environment.
+
+**Environment inheritance via YAML anchors** (`<<: *default`) keeps production in sync with the default list while allowing per-environment overrides if ever needed.
+
+### Constraint Class
+
+This is the core of the implementation:
+
+```ruby
+# lib/constraints/vpn_ip_constraint.rb
+
+module Constraints
+  class VpnIpConstraint
+    def initialize
+      @config = Rails.application.config_for(:admin_vpn_allowlist)
+    end
+
+    def matches?(request)
+      return true unless Flipper.enabled?(:admin_vpn_restriction)
+      return true if allow_all?
+
+      client_ip = request.remote_ip
+      allowed = allowed?(client_ip)
+
+      log_blocked_request(request, client_ip) unless allowed
+
+      allowed
+    end
+
+    private
+
+    attr_reader :config
+
+    def allow_all?
+      allowed_ips.include?("all")
+    end
+
+    def allowed_ips
+      @allowed_ips ||= config[:allowed_ips] || []
+    end
+
+    def allowed?(ip)
+      allowed_ips.include?(ip)
+    end
+
+    def log_blocked_request(request, client_ip)
+      Rails.logger.warn(
+        "[VPN Constraint] Blocked admin access - " \
+        "IP: #{client_ip}, Path: #{request.path}"
+      )
+    end
+  end
+end
+```
+
+The class implements Rails' route constraint interface — it defines `matches?(request)` and returns a boolean. A few design decisions:
+
+**Feature flag check first.** If the `admin_vpn_restriction` flag is disabled, the constraint always allows access. This gives us an instant kill switch without requiring a code deployment — just toggle the flag in the Flipper UI.
+
+**Fail-closed security.** If `allowed_ips` is empty or nil (due to a misconfiguration or missing config), the `|| []` default means nobody gets through. The secure default is to block, not to allow.
+
+**Logging blocked requests** at warning level feeds into our Datadog monitoring. We can see who's being blocked, from where, and how often.
+
+**`request.remote_ip`** handles `X-Forwarded-For` parsing for us. Heroku's router adds the client's IP to this header, and Rails extracts it.
+
+### Wiring Into Routes
+
+The constraint wraps the entire admin namespace:
+
+```ruby
+# config/routes.rb
+
+constraints Constraints::VpnIpConstraint.new do
+  namespace :admin do
+    resources :customers
+    # ...
+  end
+end
+```
+
+When `matches?` returns false, Rails treats the routes inside the block as non-existent and returns a 404. This happens to be a security advantage: anyone outside the VPN can't even confirm these routes exist.
+
+### Testing
+
+The constraint is tested at two levels.
+
+**1. Unit tests** cover the IP matching logic and fail-closed edge cases. Here's a trimmed version — the full spec also covers the feature flag bypass and the `"all"` keyword:
+
+```ruby
+RSpec.describe Constraints::VpnIpConstraint do
+  subject(:constraint) { described_class.new }
+
+  let(:request) do
+    instance_double(ActionDispatch::Request,
+      remote_ip: client_ip, path: "/admin")
+  end
+  let(:client_ip) { "192.168.1.100" }
+
+  context "when IP restriction is active" do
+    before do
+      Flipper.enable(:admin_vpn_restriction)
+      allow(Rails.application).to receive(:config_for)
+        .with(:admin_vpn_allowlist)
+        .and_return(allowed_ips: ["203.0.113.10", "203.0.113.11"])
+    end
+
+    context "when client IP matches an allowed IP" do
+      let(:client_ip) { "203.0.113.10" }
+
+      it "returns true" do
+        expect(constraint.matches?(request)).to be true
+      end
+    end
+
+    context "when client IP does not match" do
+      let(:client_ip) { "192.168.1.100" }
+
+      it "returns false" do
+        expect(constraint.matches?(request)).to be false
+      end
+
+      it "logs a warning with IP and path" do
+        allow(Rails.logger).to receive(:warn)
+        constraint.matches?(request)
+        expect(Rails.logger).to have_received(:warn).with(
+          "[VPN Constraint] Blocked admin access - " \
+          "IP: 192.168.1.100, Path: /admin"
+        )
+      end
+    end
+  end
+
+  context "when allowed_ips is empty" do
+    before do
+      Flipper.enable(:admin_vpn_restriction)
+      allow(Rails.application).to receive(:config_for)
+        .with(:admin_vpn_allowlist)
+        .and_return(allowed_ips: [])
+    end
+
+    it "returns false (fail-closed)" do
+      expect(constraint.matches?(request)).to be false
+    end
+  end
+
+  context "when allowed_ips is nil" do
+    before do
+      Flipper.enable(:admin_vpn_restriction)
+      allow(Rails.application).to receive(:config_for)
+        .with(:admin_vpn_allowlist)
+        .and_return(allowed_ips: nil)
+    end
+
+    it "returns false (fail-closed)" do
+      expect(constraint.matches?(request)).to be false
+    end
+  end
+end
+```
+
+**2. Integration tests** verify that admin routes return 404 when the constraint blocks access:
+
+```ruby
+RSpec.describe "Admin VPN Restriction" do
+  let(:admin_user) { create(:admin) }
+
+  describe "when feature flag is disabled" do
+    before do
+      Flipper.disable(:admin_vpn_restriction)
+      sign_in(admin_user)
+    end
+
+    it "allows access to admin routes" do
+      get admin_users_path
+      expect(response).to have_http_status(:success)
+    end
+  end
+
+  describe "when feature flag is enabled" do
+    before do
+      Flipper.enable(:admin_vpn_restriction)
+      sign_in(admin_user)
+    end
+
+    context "when constraint denies access" do
+      before do
+        # Needed because constraint is instantiated when routes are loaded, not when test runs
+        allow_any_instance_of(Constraints::VpnIpConstraint)
+          .to receive(:matches?).and_return(false)
+      end
+
+      it "blocks access to admin routes (returns 404)" do
+        get admin_users_path
+        expect(response).to have_http_status(:not_found)
+      end
+    end
+  end
+end
+```
+
+The integration test stubs `matches?` directly rather than internal methods like `allow_all?` or `allowed?`. This decouples the test from implementation details as the internal IP matching logic is already covered in the unit tests.
+
+## Conclusion
+
+This post walked through restricting select routes to VPN IP addresses on Heroku using a Rails Advanced Route Constraint. This class that implements a `matches?(request)` method and wraps any set of routes you want to restrict. A YAML config keeps IP lists per-environment and version-controlled, the `"all"` keyword avoids environment-checking conditionals in dev and test, and a feature flag provides an instant kill switch in case things go wrong.
+
+One trade-off worth noting: blocked requests still reach your app. Every request to a restricted route hits a dyno, which consumes resources, before the route constraint rejects it with a 404.
+
+## TODO
+- work on intro, make it more clear it's a Rails app...
+- maybe add "Rollout" section - deploy code, turn on flag, a few hiccups with internal staff forgetting that it was required, resulting in Slack messages like "help admin is broken", solution: update internal docs for admin access
+- maybe update title to incorporate "IP Address"
