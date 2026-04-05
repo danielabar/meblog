@@ -10,21 +10,19 @@ related:
   - "Rails CORS Middleware For Multiple Resources"
 ---
 
-At work, we needed to expand admin access. What had been a small group of developers accessing the admin panel was becoming unworkable as customer support demand grew. We were onboarding the entire Customer Success team, adding new admin features, and generally making the admin a more central part of daily operations.
+At work, we have a Rails app with an admin area used for handling customer requests — things like account adjustments, refunds, and data corrections. For a long time, only a handful of staff had access, which worked fine when request volume was low. But as the customer base grew, so did the volume of support requests. It was getting overwhelming for the small number of people to handle alongside their regular work. The team decided to create a dedicated Customer Support role in the app and open admin access to the entire Customer Success team.
 
-More people with admin access means more credentials floating around, which means a bigger attack surface. We decided to require VPN to access any `/admin` route — even with valid credentials, you can't reach admin from outside the corporate network.
-
-Our app runs on Heroku. Heroku's router is fully managed — there's no way to add firewall rules, IP filters, or WAF rules at the load balancer level. Every HTTP request that hits your app's public URL gets forwarded to a dyno, so your application code is your firewall.
+That solved the capacity problem, but it also meant a much larger group of people with admin credentials — a bigger attack surface should any credentials leak. We decided to require VPN to access any `/admin` route. Even with valid credentials, you can't reach admin from outside the corporate network. Our app runs on Heroku. Heroku's router is fully managed — there's no way to add firewall rules, IP filters, or WAF rules at the load balancer level. Every HTTP request that hits the app's public URL gets forwarded to a dyno, so the application code is essentially also the firewall.
 
 <aside class="markdown-aside">
-Heroku <a href="https://devcenter.heroku.com/articles/private-spaces-trusted-ip-ranges">Private Spaces</a> do offer infrastructure-level IP filtering via "trusted IP ranges," but it applies to all traffic for the entire Space — you can't restrict specific routes. The cost also starts at ~$1,000/month, which is overkill for restricting a handful of admin routes, especially for a small to mid size company.
+Heroku <a class="markdown-link" href="https://devcenter.heroku.com/articles/private-spaces-trusted-ip-ranges">Private Spaces</a> do offer infrastructure-level IP filtering via "trusted IP ranges," but it applies to all traffic for the entire Space — you can't restrict specific routes. The cost also starts at ~$1,000/month, which is overkill for restricting a handful of admin routes, especially for a small to mid size company.
 </aside>
 
 So we decided to implement the restriction in application code. This post walks through the solution.
 
 **Prerequisite: Static VPN IP Addresses**
 
-Before diving into the implementation, one important prerequisite: this approach requires your company's VPN to route traffic through a stable list of known egress IP addresses. If your VPN assigns dynamic or rotating egress IPs, you'd need a different strategy entirely.
+Before diving into the implementation, one important prerequisite: this approach requires your company's VPN to route traffic through a stable list of known egress IP addresses. If your VPN assigns dynamic or rotating egress IPs, you'd need a different strategy.
 
 ## Rails Advanced Route Constraints
 
@@ -282,6 +280,5 @@ This post walked through restricting select routes to VPN IP addresses on Heroku
 One trade-off worth noting: blocked requests still reach your app. Every request to a restricted route hits a dyno, which consumes resources, before the route constraint rejects it with a 404.
 
 ## TODO
-- work on intro, make it more clear it's a Rails app...
-- maybe add "Rollout" section - deploy code, turn on flag, a few hiccups with internal staff forgetting that it was required, resulting in Slack messages like "help admin is broken", solution: update internal docs for admin access
-- maybe update title to incorporate "IP Address"
+- maybe add "Rollout" section - deploy to staging for manual testing, then deploy to prod, turn on flag, a few hiccups with internal staff forgetting that it was required, resulting in Slack messages like "help admin is broken", solution: update internal docs for admin access
+- maybe update title to incorporate "IP Address" and "restrict" rather than "secure"
