@@ -273,6 +273,10 @@ end
 
 The integration test stubs `matches?` directly rather than internal methods like `allow_all?` or `allowed?`. This decouples the test from implementation details as the internal IP matching logic is already covered in the unit tests.
 
+## Rollout
+
+After verifying on staging, we deployed to production with the flag disabled, then toggled it on. The rollout was mostly uneventful — the only hiccup was a few people messaging on Slack that admin seemed broken, having forgotten it now required VPN. We updated the internal docs to mention the requirement and that was that. If anything had gone seriously wrong, disabling the flag would have restored access instantly without a rollback deploy.
+
 ## Conclusion
 
 This post walked through restricting select routes to VPN IP addresses on Heroku using a Rails Advanced Route Constraint. This class that implements a `matches?(request)` method and wraps any set of routes you want to restrict. A YAML config keeps IP lists per-environment and version-controlled, the `"all"` keyword avoids environment-checking conditionals in dev and test, and a feature flag provides an instant kill switch in case things go wrong.
@@ -280,5 +284,4 @@ This post walked through restricting select routes to VPN IP addresses on Heroku
 One trade-off worth noting: blocked requests still reach your app. Every request to a restricted route hits a dyno, which consumes resources, before the route constraint rejects it with a 404.
 
 ## TODO
-- maybe add "Rollout" section - deploy to staging for manual testing, then deploy to prod, turn on flag, a few hiccups with internal staff forgetting that it was required, resulting in Slack messages like "help admin is broken", solution: update internal docs for admin access
 - maybe update title to incorporate "IP Address" and "restrict" rather than "secure"
