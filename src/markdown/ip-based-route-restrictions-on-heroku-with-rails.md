@@ -273,7 +273,7 @@ RSpec.describe "Admin VPN Restriction" do
 end
 ```
 
-The integration test stubs `matches?` directly rather than internal methods like `allow_all?` or `allowed?`. This decouples the test from implementation details as the internal IP matching logic is already covered in the unit tests.
+The integration test stubs `matches?` directly rather than internal methods like `allow_all?` or `allowed?`. This decouples the test from implementation details, as the internal IP matching logic is already covered in the unit tests.
 
 ## Rollout
 
