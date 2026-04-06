@@ -28,7 +28,7 @@ Before diving into the implementation, one important prerequisite: this approach
 
 ## Rails Advanced Route Constraints
 
-The solution has a few moving parts, but the core idea is straightforward: use a [Rails Advanced Route Constraint](https://guides.rubyonrails.org/routing.html#advanced-constraints) to wrap the entire `/admin` namespace. A route constraint is any object that responds to `matches?(request)` and returns a boolean. If it returns `true`, the routes inside the `constraints` block are accessible. If it returns `false`, Rails treats them as if they don't exist and returns a 404.
+The solution has a few moving parts, but the core idea is to use a [Rails Advanced Route Constraint](https://guides.rubyonrails.org/routing.html#advanced-constraints) to wrap the entire `/admin` namespace. A route constraint is any object that responds to `matches?(request)` and returns a boolean. If it returns `true`, the routes inside the `constraints` block are accessible. If it returns `false`, Rails treats them as if they don't exist and returns a 404.
 
 Our constraint checks the client's IP address against a configurable allowlist of VPN egress IPs. Supporting this are a YAML config file for per-environment IP lists, and a feature flag for instant rollback without redeployment.
 
