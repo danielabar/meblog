@@ -1,5 +1,5 @@
 ---
-title: "Securing Routes on Heroku with Rails Route Constraints"
+title: "IP-Based Route Restrictions on Heroku with Rails"
 featuredImage: "../images/securing-routes-heroku-rails-arpad-czapp-eXZQIKHj5lY-unsplash.jpg"
 description: "Learn how to restrict admin routes to VPN IP addresses on Heroku using Rails Advanced Route Constraints."
 date: "2026-07-01"
@@ -277,7 +277,4 @@ The integration test stubs `matches?` directly rather than internal methods like
 
 After verifying on staging, we deployed to production with the flag disabled, then toggled it on. The rollout was mostly uneventful — the only hiccup was a few people messaging on Slack that admin seemed broken, having forgotten it now required VPN. We updated the internal docs to mention the requirement and that was that. If anything had gone seriously wrong, disabling the flag would have restored access instantly without a rollback deploy.
 
-One trade-off worth noting: blocked requests still reach your app. Every request to a restricted route hits a dyno, which consumes resources, before the route constraint rejects it with a 404.
-
-## TODO
-- maybe update title to incorporate "IP Address" and "restrict" rather than "secure"
+One thing to keep in mind: since the restriction lives in application code, blocked requests still hit a dyno before getting a 404. For most apps that's negligible, and the simplicity of the approach — a single constraint class, a YAML file, and a feature flag — makes it a practical fit for Heroku apps that need route-level IP restrictions without infrastructure-level tooling.
