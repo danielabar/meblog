@@ -128,7 +128,7 @@ module Constraints
 end
 ```
 
-The class implements Rails' route constraint interface — it defines `matches?(request)` and returns a boolean. A few design decisions:
+A few design decisions of note:
 
 **Feature flag check first.** If the `admin_vpn_restriction` flag is disabled, the constraint always allows access. This gives us an instant kill switch without requiring a code deployment — just toggle the flag in the Flipper UI.
 
