@@ -153,7 +153,7 @@ constraints Constraints::VpnIpConstraint.new do
 end
 ```
 
-When `matches?` returns false, Rails treats the routes inside the block as non-existent and returns a 404. This happens to be a security advantage: anyone outside the VPN can't even confirm these routes exist.
+When `matches?` returns false, Rails treats the routes inside the block as non-existent and returns a 404. This is also a security advantage: anyone outside the VPN can't even confirm these routes exist.
 
 ### Testing
 
