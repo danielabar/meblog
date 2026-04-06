@@ -17,7 +17,7 @@ That solved the capacity problem, but it also meant a much larger group of peopl
 Our app runs on Heroku. Heroku's router is fully managed — there's no way to add firewall rules, IP filters, or WAF rules at the load balancer level. Every HTTP request that hits the app's public URL gets forwarded to a dyno, so the application code is essentially also the firewall.
 
 <aside class="markdown-aside">
-Heroku <a class="markdown-link" href="https://devcenter.heroku.com/articles/private-spaces-trusted-ip-ranges">Private Spaces</a> do offer infrastructure-level IP filtering via "trusted IP ranges," but it applies to all traffic for the entire Space — you can't restrict specific routes. The cost also starts at ~$1,000/month, which is overkill for restricting a handful of admin routes, especially for a small to mid size company.
+Heroku <a class="markdown-link" href="https://devcenter.heroku.com/articles/private-spaces-trusted-ip-ranges">Private Spaces</a> do offer infrastructure-level IP filtering via "trusted IP ranges," but it applies to all traffic for the entire Space — you can't restrict specific routes. The cost also starts at ~$1,000/month, which is overkill for restricting a handful of admin routes, especially for a small to mid-size company.
 </aside>
 
 So we decided to implement the restriction in application code. This post walks through the solution.
