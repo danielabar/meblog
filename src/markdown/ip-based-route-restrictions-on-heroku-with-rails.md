@@ -10,17 +10,17 @@ related:
   - "Rails CORS Middleware For Multiple Resources"
 ---
 
-The Rails app I maintain at work has an admin area used for handling customer requests — things like account adjustments, refunds, and data corrections. For a long time, only a handful of staff had access, which worked fine when request volume was low. But as the customer base grew, so did the volume of support requests. It was getting overwhelming for the small number of people to handle alongside their regular work. The team decided to create a dedicated Customer Support role in the app and open admin access to the entire Customer Success team.
+The Rails app I maintain at work has an admin area used for handling customer requests — things like account adjustments, refunds, and data corrections. For a long time, only a handful of staff had access, which worked fine when request volume was low. But as the customer base grew, so did the volume of support requests. It was getting overwhelming for the small number of people to handle alongside their regular work. This was resolved by adding a dedicated Customer Support role in the app, assigned to everyone in the Customer Success team.
 
-That solved the capacity problem, but it also meant a much larger group of people with admin credentials — a bigger attack surface should any credentials leak. We decided to require VPN to access any `/admin` route. Even with valid credentials, these routes would not be reachable from outside the corporate network.
+That solved the capacity problem, but it also meant a much larger group of people with admin credentials — a bigger attack surface should any credentials leak. We decided to require VPN to access any admin route. Even with valid credentials, these routes would not be reachable without being connected to the VPN.
 
-Our app runs on Heroku. Heroku's router is fully managed — there's no way to add firewall rules, IP filters, or WAF rules at the load balancer level. Every HTTP request that hits the app's public URL gets forwarded to a dyno, so the application code is essentially also the firewall.
+Our app runs on Heroku. Heroku's router is fully managed — there's no way to add firewall rules, IP filters, or WAF rules at the router itself. Every HTTP request that hits the app's public URL gets forwarded to a dyno, so the application code is essentially also the firewall.
 
-<aside class="markdown-aside">
-Heroku <a class="markdown-link" href="https://devcenter.heroku.com/articles/private-spaces-trusted-ip-ranges">Private Spaces</a> do offer infrastructure-level IP filtering via "trusted IP ranges," but it applies to all traffic for the entire Space — you can't restrict specific routes. The cost also starts at ~$1,000/month, which is overkill for restricting a handful of admin routes, especially for a small to mid-size company.
-</aside>
+**Managed Options on Heroku**
 
-So we decided to implement the restriction in application code. This post walks through the solution.
+Heroku does offer some managed options: [Private Spaces](https://devcenter.heroku.com/articles/private-spaces-trusted-ip-ranges) provide infrastructure-level IP filtering via "trusted IP ranges," but the restriction applies to all traffic for the entire Space (it can't scope it to specific routes), and pricing starts at ~$1,000/month. [Expedited WAF](https://devcenter.heroku.com/articles/expeditedwaf) is an add-on that sits at the edge (so blocked requests never reach a dyno) and includes a Page Protection feature that can restrict specific URLs like `/admin` to an IP allowlist. It starts at ~$95/month and requires routing your domain's DNS through the WAF.
+
+For a small company without dedicated ops, the recurring cost and additional infrastructure complexity of these options may not be justified. This post walks through a lighter-weight approach: implementing the restriction directly in the Rails app.
 
 **Prerequisite: Static VPN IP Addresses**
 
@@ -256,7 +256,3 @@ The integration test stubs `matches?` directly rather than internal methods like
 After verifying on staging, we deployed to production. The rollout was mostly uneventful — the only hiccup was a few people messaging on Slack that admin seemed broken, having forgotten it now required VPN. We updated the internal docs to mention the requirement and that was that.
 
 One thing to keep in mind: since the restriction lives in application code, blocked requests still hit a dyno before getting a 404. For most apps that's negligible, and the simplicity of the approach — a single constraint class and a YAML file — makes it a practical fit for Heroku apps that need route-level IP restrictions without infrastructure-level tooling.
-
-## TODO
-
-- analyze this would it work? pricing? https://devcenter.heroku.com/articles/expeditedwaf
