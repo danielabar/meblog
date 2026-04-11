@@ -30,14 +30,13 @@ Before diving into the implementation, one important prerequisite: this approach
 
 The solution has a few moving parts, but the core idea is to use a [Rails Advanced Route Constraint](https://guides.rubyonrails.org/routing.html#advanced-constraints) to wrap the entire `/admin` namespace. A route constraint is any object that responds to `matches?(request)` and returns a boolean. If it returns `true`, the routes inside the `constraints` block are accessible. If it returns `false`, Rails treats them as if they don't exist and returns a 404.
 
-Our constraint checks the client's IP address against a configurable allowlist of VPN egress IPs. Supporting this are a YAML config file for per-environment IP lists, and a feature flag for instant rollback without redeployment.
+Our constraint checks the client's IP address against a configurable allowlist of VPN egress IPs, backed by a YAML config file for per-environment IP lists.
 
 Here's how the pieces fit together:
 
 1. **YAML config** defines the allowed VPN IPs per environment (and a bypass keyword for dev/test)
-2. **Constraint class** implements `matches?(request)` — checks the feature flag, then checks the IP
+2. **Constraint class** implements `matches?(request)` — checks the client IP against the allowlist
 3. **Route wiring** wraps the admin namespace with the constraint
-4. **Feature flag** provides a kill switch to disable the restriction instantly
 
 ## The Implementation
 
@@ -91,7 +90,6 @@ module Constraints
     end
 
     def matches?(request)
-      return true unless Flipper.enabled?(:admin_vpn_restriction)
       return true if allow_all?
 
       client_ip = request.remote_ip
@@ -130,8 +128,6 @@ end
 
 A few design decisions of note:
 
-**Feature flag check first.** If the `admin_vpn_restriction` flag is disabled, the constraint always allows access. This gives us an instant kill switch without requiring a code deployment — just toggle the flag in the Flipper UI.
-
 **Fail-closed security.** If `allowed_ips` is empty or nil (due to a misconfiguration or missing config), the `|| []` default means nobody gets through. The secure default is to block, not to allow.
 
 **Logging blocked requests** at warning level feeds into our Datadog monitoring. We can see who's being blocked, from where, and how often.
@@ -159,7 +155,7 @@ When `matches?` returns false, Rails treats the routes inside the block as non-e
 
 The constraint is tested at two levels.
 
-**1. Unit tests** cover the IP matching logic and fail-closed edge cases. Here's a trimmed version — the full spec also covers the feature flag bypass and the `"all"` keyword:
+**1. Unit tests** cover the IP matching logic and fail-closed edge cases. Here's a trimmed version — the full spec also covers the `"all"` keyword:
 
 ```ruby
 RSpec.describe Constraints::VpnIpConstraint do
@@ -173,7 +169,6 @@ RSpec.describe Constraints::VpnIpConstraint do
 
   context "when IP restriction is active" do
     before do
-      Flipper.enable(:admin_vpn_restriction)
       allow(Rails.application).to receive(:config_for)
         .with(:admin_vpn_allowlist)
         .and_return(allowed_ips: ["203.0.113.10", "203.0.113.11"])
@@ -207,7 +202,6 @@ RSpec.describe Constraints::VpnIpConstraint do
 
   context "when allowed_ips is empty" do
     before do
-      Flipper.enable(:admin_vpn_restriction)
       allow(Rails.application).to receive(:config_for)
         .with(:admin_vpn_allowlist)
         .and_return(allowed_ips: [])
@@ -220,7 +214,6 @@ RSpec.describe Constraints::VpnIpConstraint do
 
   context "when allowed_ips is nil" do
     before do
-      Flipper.enable(:admin_vpn_restriction)
       allow(Rails.application).to receive(:config_for)
         .with(:admin_vpn_allowlist)
         .and_return(allowed_ips: nil)
@@ -239,35 +232,18 @@ end
 RSpec.describe "Admin VPN Restriction" do
   let(:admin_user) { create(:admin) }
 
-  describe "when feature flag is disabled" do
+  before { sign_in(admin_user) }
+
+  context "when constraint denies access" do
     before do
-      Flipper.disable(:admin_vpn_restriction)
-      sign_in(admin_user)
+      # Needed because constraint is instantiated when routes are loaded, not when test runs
+      allow_any_instance_of(Constraints::VpnIpConstraint)
+        .to receive(:matches?).and_return(false)
     end
 
-    it "allows access to admin routes" do
+    it "blocks access to admin routes (returns 404)" do
       get admin_users_path
-      expect(response).to have_http_status(:success)
-    end
-  end
-
-  describe "when feature flag is enabled" do
-    before do
-      Flipper.enable(:admin_vpn_restriction)
-      sign_in(admin_user)
-    end
-
-    context "when constraint denies access" do
-      before do
-        # Needed because constraint is instantiated when routes are loaded, not when test runs
-        allow_any_instance_of(Constraints::VpnIpConstraint)
-          .to receive(:matches?).and_return(false)
-      end
-
-      it "blocks access to admin routes (returns 404)" do
-        get admin_users_path
-        expect(response).to have_http_status(:not_found)
-      end
+      expect(response).to have_http_status(:not_found)
     end
   end
 end
@@ -277,10 +253,10 @@ The integration test stubs `matches?` directly rather than internal methods like
 
 ## Rollout
 
-After verifying on staging, we deployed to production with the flag disabled, then toggled it on. The rollout was mostly uneventful — the only hiccup was a few people messaging on Slack that admin seemed broken, having forgotten it now required VPN. We updated the internal docs to mention the requirement and that was that. If anything had gone seriously wrong, disabling the flag would have restored access instantly without a rollback deploy.
+After verifying on staging, we deployed to production. The rollout was mostly uneventful — the only hiccup was a few people messaging on Slack that admin seemed broken, having forgotten it now required VPN. We updated the internal docs to mention the requirement and that was that.
 
-One thing to keep in mind: since the restriction lives in application code, blocked requests still hit a dyno before getting a 404. For most apps that's negligible, and the simplicity of the approach — a single constraint class, a YAML file, and a feature flag — makes it a practical fit for Heroku apps that need route-level IP restrictions without infrastructure-level tooling.
+One thing to keep in mind: since the restriction lives in application code, blocked requests still hit a dyno before getting a 404. For most apps that's negligible, and the simplicity of the approach — a single constraint class and a YAML file — makes it a practical fit for Heroku apps that need route-level IP restrictions without infrastructure-level tooling.
 
 ## TODO
 
-- mention flag is planned for removal after everything stable in prod for awhile
+- analyze this would it work? pricing? https://devcenter.heroku.com/articles/expeditedwaf
