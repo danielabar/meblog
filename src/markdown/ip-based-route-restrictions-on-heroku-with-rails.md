@@ -30,7 +30,7 @@ Before diving into the implementation, one important prerequisite: this approach
 
 The core of the solution is an [Advanced Route Constraint](https://guides.rubyonrails.org/routing.html#advanced-constraints) that wraps the entire `/admin` namespace. A route constraint is any object that responds to `matches?(request)` and returns a boolean. If it returns `true`, the routes inside the `constraints` block are accessible. If it returns `false`, Rails treats them as if they don't exist and returns a 404.
 
-Our constraint checks the client's IP address against a configurable allowlist of VPN egress IPs, backed by a YAML config file for per-environment IP lists.
+The constraint needs to check the client's IP against an allowlist of VPN egress IPs, loaded per-environment from a YAML config file.
 
 Here's how the pieces fit together:
 
@@ -130,9 +130,7 @@ A few design decisions of note:
 
 **Fail-closed security.** If `allowed_ips` is empty or nil (due to a misconfiguration or missing config), the `|| []` default means nobody gets through. The secure default is to block, not to allow.
 
-**Logging blocked requests** at warning level surfaces them in your existing observability tooling, so you can see who's being blocked, from where, and how often.
-
-**`request.remote_ip`** handles `X-Forwarded-For` parsing. Heroku's router adds the client's IP to this header, and Rails extracts it.
+**Logging blocked requests** at warning level surfaces them in observability tooling.
 
 ### Wiring Into Routes
 
