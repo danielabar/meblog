@@ -24,7 +24,7 @@ For a small company without dedicated ops, the recurring cost and additional inf
 
 ## Rails Advanced Route Constraints
 
-One prerequisite before diving in: this approach requires the company's VPN to route traffic through a stable list of known egress IP addresses. If the VPN assigns dynamic or rotating egress IPs, you'd need a different strategy.
+One prerequisite before diving in: this approach requires the company's VPN to route traffic through a stable list of known egress IP addresses. If the VPN assigns dynamic egress IPs, a different strategy would be required.
 
 The core of the solution is an [Advanced Route Constraint](https://guides.rubyonrails.org/routing.html#advanced-constraints) that wraps the entire `/admin` namespace. A route constraint is any object that responds to `matches?(request)` and returns a boolean. If it returns `true`, the routes inside the `constraints` block are accessible. If it returns `false`, Rails treats them as if they don't exist and returns a 404.
 
