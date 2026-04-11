@@ -28,7 +28,7 @@ Before diving into the implementation, one important prerequisite: this approach
 
 ## Rails Advanced Route Constraints
 
-The solution has a few moving parts, but the core idea is to use a [Rails Advanced Route Constraint](https://guides.rubyonrails.org/routing.html#advanced-constraints) to wrap the entire `/admin` namespace. A route constraint is any object that responds to `matches?(request)` and returns a boolean. If it returns `true`, the routes inside the `constraints` block are accessible. If it returns `false`, Rails treats them as if they don't exist and returns a 404.
+The core of the solution is an [Advanced Route Constraint](https://guides.rubyonrails.org/routing.html#advanced-constraints) that wraps the entire `/admin` namespace. A route constraint is any object that responds to `matches?(request)` and returns a boolean. If it returns `true`, the routes inside the `constraints` block are accessible. If it returns `false`, Rails treats them as if they don't exist and returns a 404.
 
 Our constraint checks the client's IP address against a configurable allowlist of VPN egress IPs, backed by a YAML config file for per-environment IP lists.
 
@@ -38,19 +38,19 @@ Here's how the pieces fit together:
 2. **Constraint class** implements `matches?(request)` — checks the client IP against the allowlist
 3. **Route wiring** wraps the admin namespace with the constraint
 
-## The Implementation
+## Implementation
 
 ### Configuration
 
 The VPN IP allowlist lives in a YAML config file, following the standard Rails `config_for` pattern:
 
 ```yaml
-# config/admin_vpn_allowlist.yml
+# config/vpn_allowlist.yml
 
 default: &default
   allowed_ips:
     # The IP addresses in this example are from RFC 5737 documentation ranges,
-    # reserved specifically for use in examples so they'll never collide with real servers.
+    # reserved for use in examples so they'll never collide with real servers.
     # https://www.rfc-editor.org/rfc/rfc5737
     - "198.51.100.10"
     - "203.0.113.42"
@@ -72,7 +72,7 @@ A few things to note here:
 
 **The `"all"` keyword** for development and test means the constraint class (shown in the next section) doesn't need any environment-checking conditionals. It simply checks if `"all"` is in the list.
 
-**VPN IPs are version-controlled.** Changes go through PRs with code review and leave an audit trail in git history. You could also define these as a comma-separated environment variable, but for a small, stable list like VPN egress IPs, keeping them in source was simpler — one less thing to configure per environment.
+**VPN IPs are version-controlled.** Changes go through PRs with code review and leave an audit trail in git history. These could also be defined as a comma-separated environment variable, but if the list is small and stable, keeping them in source can be simpler — one less thing to configure per environment.
 
 **Environment inheritance via YAML anchors** (`<<: *default`) keeps production in sync with the default list while allowing per-environment overrides if ever needed.
 
@@ -86,7 +86,7 @@ This is the core of the implementation:
 module Constraints
   class VpnIpConstraint
     def initialize
-      @config = Rails.application.config_for(:admin_vpn_allowlist)
+      @config = Rails.application.config_for(:vpn_allowlist)
     end
 
     def matches?(request)
@@ -130,9 +130,9 @@ A few design decisions of note:
 
 **Fail-closed security.** If `allowed_ips` is empty or nil (due to a misconfiguration or missing config), the `|| []` default means nobody gets through. The secure default is to block, not to allow.
 
-**Logging blocked requests** at warning level feeds into our Datadog monitoring. We can see who's being blocked, from where, and how often.
+**Logging blocked requests** at warning level surfaces them in your existing observability tooling, so you can see who's being blocked, from where, and how often.
 
-**`request.remote_ip`** handles `X-Forwarded-For` parsing for us. Heroku's router adds the client's IP to this header, and Rails extracts it.
+**`request.remote_ip`** handles `X-Forwarded-For` parsing. Heroku's router adds the client's IP to this header, and Rails extracts it.
 
 ### Wiring Into Routes
 
@@ -170,7 +170,7 @@ RSpec.describe Constraints::VpnIpConstraint do
   context "when IP restriction is active" do
     before do
       allow(Rails.application).to receive(:config_for)
-        .with(:admin_vpn_allowlist)
+        .with(:vpn_allowlist)
         .and_return(allowed_ips: ["203.0.113.10", "203.0.113.11"])
     end
 
@@ -203,7 +203,7 @@ RSpec.describe Constraints::VpnIpConstraint do
   context "when allowed_ips is empty" do
     before do
       allow(Rails.application).to receive(:config_for)
-        .with(:admin_vpn_allowlist)
+        .with(:vpn_allowlist)
         .and_return(allowed_ips: [])
     end
 
@@ -215,7 +215,7 @@ RSpec.describe Constraints::VpnIpConstraint do
   context "when allowed_ips is nil" do
     before do
       allow(Rails.application).to receive(:config_for)
-        .with(:admin_vpn_allowlist)
+        .with(:vpn_allowlist)
         .and_return(allowed_ips: nil)
     end
 
@@ -230,9 +230,9 @@ end
 
 ```ruby
 RSpec.describe "Admin VPN Restriction" do
-  let(:admin_user) { create(:admin) }
+  let(:user) { create(:admin) }
 
-  before { sign_in(admin_user) }
+  before { sign_in(user) }
 
   context "when constraint denies access" do
     before do
@@ -253,6 +253,6 @@ The integration test stubs `matches?` directly rather than internal methods like
 
 ## Rollout
 
-After verifying on staging, we deployed to production. The rollout was mostly uneventful — the only hiccup was a few people messaging on Slack that admin seemed broken, having forgotten it now required VPN. We updated the internal docs to mention the requirement and that was that.
+After verifying on staging, we deployed to production. The rollout was mostly uneventful — the only hiccup was a few people messaging on Slack that admin seemed broken, having forgotten it now required VPN. We updated the internal docs to mention the requirement.
 
-One thing to keep in mind: since the restriction lives in application code, blocked requests still hit a dyno before getting a 404. For most apps that's negligible, and the simplicity of the approach — a single constraint class and a YAML file — makes it a practical fit for Heroku apps that need route-level IP restrictions without infrastructure-level tooling.
+One thing to keep in mind: since the restriction lives in application code, blocked requests still hit a dyno before getting a 404. For a small-ish app that's negligible, and the simplicity of the approach — a single constraint class and a YAML file — makes it a practical fit for Heroku apps that need route-level IP restrictions without infrastructure-level tooling.
