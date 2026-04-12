@@ -7,7 +7,7 @@ If you're reading this, it's likely because I was asked to complete a live codin
 
 The concern behind these assessments is understandable: how do you know someone can actually do the work? It's a legitimate question. But a one-hour coding test is a narrow answer to it. These exercises originated at companies like Google and Meta, where the scale of candidates arguably justified them. Most companies are not Google — they have a web application, a SaaS product, a CRUD-based platform. The skills that matter in that context — shipping reliable software, navigating a large codebase, diagnosing production issues, figuring out *what* to build in the first place — none of them show up in a timed exercise. And in an era where AI tools can generate algorithmic solutions instantly, testing whether someone can hand-write those solutions under a stopwatch is testing for a skill that is becoming commoditized.
 
-A stronger signal is a verifiable record. I've been a professional software engineer for over fifteen years, and I've been sharing my work publicly for the last 10+ years — through GitHub projects, technical blog posts, and presentations. What follows includes recent professional work and public projects going back many years. In many cases the two feed each other — lessons from production work become blog posts and demo repos. If you're deciding whether to continue a conversation with me, this is a representative sample you can review at your own pace — the same hour you'd spend on a live coding session, with considerably more to show for it.
+A stronger signal is a verifiable record. I've been a professional software engineer for over fifteen years, and I've been sharing my work publicly for the last 10+ years — through GitHub projects, technical blog posts, and presentations. What follows includes recent professional work and public projects going back many years. If you're deciding whether to continue a conversation with me, this is a representative sample you can review at your own pace — the same hour you'd spend on a live coding session, with considerably more to show for it.
 
 ## Professional Work
 
@@ -78,6 +78,6 @@ I also value continuous learning, and sharing what I'm learning in public helps 
 
 ## Let's Talk
 
-The work above shows a consistent pattern: building and shipping, learning continuously, and investing in making the people around me more effective — through documentation, presentations, and sharing solutions publicly so other developers benefit too.
+The work above shows a consistent pattern: building and shipping, learning continuously, and investing in making the people around me more effective.
 
-If you're interested in continuing the conversation, I'd welcome a discussion about what you're building, what challenges your team is facing, where you want to be in a few years, and how I could help you get there. We could dig into any of the work above in detail — the decisions behind it, what I'd do differently, how I approached problems I'd never seen before.
+If you're interested in continuing the conversation, I'd welcome a discussion about what you're building, what challenges your team is facing, where you want to be in a few years, and how I could help you get there. We could dig into any of the work above in detail — the decisions behind it, lessons learned, and what I'd do differently.
