@@ -10,7 +10,7 @@ related:
   - "Rails CORS Middleware For Multiple Resources"
 ---
 
-The Rails app I maintain at work has an admin area used for handling customer requests — things like account adjustments, refunds, and data corrections. For a long time, only a handful of staff had access, which worked fine when request volume was low. But as the customer base grew, so did the volume of support requests. It was getting overwhelming for the small number of people to handle alongside their regular work. This was resolved by adding a dedicated Customer Support role in the app, assigned to everyone in the Customer Success team.
+The Rails app I maintain at work has an admin area used for handling customer requests — things like account adjustments, refunds, and data corrections. For a long time, only a handful of staff had access, which worked fine when the workload was light. But as the customer base grew, support requests piled up. It was getting overwhelming for the small number of people to handle alongside their regular work. This was resolved by adding a dedicated Customer Support role in the app, assigned to everyone in the Customer Success team.
 
 That solved the capacity problem, but it also meant a much larger group of people with admin credentials — a bigger attack surface should any credentials leak. We decided to require VPN to access any admin route. Even with valid credentials, these routes would not be reachable without being connected to the VPN.
 
@@ -18,7 +18,9 @@ Our app runs on Heroku. Heroku's router is fully managed — there's no way to a
 
 **Managed Options on Heroku**
 
-Heroku does offer some managed options: [Private Spaces](https://devcenter.heroku.com/articles/private-spaces-trusted-ip-ranges) provide infrastructure-level IP filtering via "trusted IP ranges," but the restriction applies to all traffic for the entire Space (it can't scope it to specific routes), and pricing starts at ~$1,000/month. [Expedited WAF](https://devcenter.heroku.com/articles/expeditedwaf) is an add-on that sits at the edge (so blocked requests never reach a dyno) and includes a Page Protection feature that can restrict specific URLs like `/admin` to an IP allowlist. It starts at ~$95/month and requires routing your domain's DNS through the WAF.
+Heroku does offer some managed options. [Private Spaces](https://devcenter.heroku.com/articles/private-spaces-trusted-ip-ranges) provide infrastructure-level IP filtering via "trusted IP ranges," but the restriction applies to all traffic for the entire Space — it can't scope to specific routes — and pricing starts at ~$1,000/month.
+
+[Expedited WAF](https://devcenter.heroku.com/articles/expeditedwaf) is an add-on that sits at the edge (so blocked requests never reach a dyno) and includes a Page Protection feature that can restrict specific URLs like `/admin` to an IP allowlist. It starts at ~$95/month and requires routing your domain's DNS through the WAF.
 
 For a small company without dedicated ops, the recurring cost and additional infrastructure complexity of these options may not be justified. This post walks through a lighter-weight approach: implementing the restriction directly in the Rails app.
 
@@ -26,7 +28,7 @@ For a small company without dedicated ops, the recurring cost and additional inf
 
 One prerequisite before diving in: this approach requires the company's VPN to route traffic through a stable list of known egress IP addresses. If the VPN assigns dynamic egress IPs, a different strategy would be required.
 
-The core of the solution is an [Advanced Route Constraint](https://guides.rubyonrails.org/routing.html#advanced-constraints) that wraps the entire `/admin` namespace. A route constraint is any object that responds to `matches?(request)` and returns a boolean. If it returns `true`, the routes inside the `constraints` block are accessible. If it returns `false`, Rails treats them as if they don't exist and returns a 404.
+The core of the solution is an [Advanced Route Constraint](https://guides.rubyonrails.org/routing.html#advanced-constraints) that can wrap any route or group of routes in the Rails router. A route constraint is any object that responds to `matches?(request)` and returns a boolean. If it returns `true`, the routes inside the `constraints` block are accessible. If it returns `false`, Rails treats them as if they don't exist and returns a 404.
 
 The constraint needs to check the client's IP against an allowlist of VPN egress IPs, loaded per-environment from a YAML config file.
 
@@ -72,7 +74,7 @@ A few things to note here:
 
 **VPN IPs are version-controlled.** Changes go through PRs with code review and leave an audit trail in git history. These could also be defined as a comma-separated environment variable, but if the list is small and stable, keeping them in source can be simpler — one less thing to configure per environment.
 
-**Environment inheritance via YAML anchors** (`<<: *default`) keeps production in sync with the default list while allowing per-environment overrides if ever needed.
+**Environment inheritance via YAML anchors** (`<<: *default`) keeps production in sync with the default list while allowing per-environment overrides.
 
 ### Constraint Class
 
@@ -126,7 +128,7 @@ end
 
 A few design decisions of note:
 
-**Fail-closed security.** If `allowed_ips` is empty or nil (due to a misconfiguration or missing config), the `|| []` default means nobody gets through. The secure default is to block, not to allow.
+**Fail-closed security.** If `allowed_ips` is missing or nil, the `|| []` default means nobody gets through — misconfiguration locks everyone out rather than opening access.
 
 **Logging blocked requests** at warning level surfaces them in observability tooling.
 
@@ -145,11 +147,11 @@ constraints Constraints::VpnIpConstraint.new do
 end
 ```
 
-When `matches?` returns false, Rails treats the routes inside the block as non-existent and returns a 404. This is also a security advantage: anyone outside the VPN can't even confirm these routes exist.
+When `matches?` returns false, Rails treats the routes inside the block as non-existent and returns a 404. A security bonus: anyone outside the VPN can't even confirm these routes exist.
 
 ### Testing
 
-The constraint is tested at two levels.
+The constraint is tested at two levels. The examples below use RSpec, but the same verifications could be done with Minitest.
 
 **1. Unit tests** cover the IP matching logic and fail-closed edge cases. Here's a trimmed version — the full spec also covers the `"all"` keyword:
 
