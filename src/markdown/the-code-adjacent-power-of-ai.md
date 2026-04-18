@@ -2,7 +2,7 @@
 title: "The Code-Adjacent Power of AI"
 featuredImage: "../images/code-adjacent-powers-of-ai-reto-simonet-WN9QRESOu5c-unsplash.jpg"
 description: "AI coding assistants are obviously useful for writing code, but some of their most valuable contributions happen in the work that surrounds it."
-date: "2026-04-15"
+date: "2026-04-18"
 category: "productivity"
 related:
   - "Slowing Down AI On Purpose"
@@ -12,13 +12,13 @@ related:
 
 When most people think about AI coding assistants, they picture the obvious: writing code. But after months of daily use, I've found that some of the most valuable things I do with AI assistants aren't about producing code directly. I've started calling these *code-adjacent* activities. Here's what that looks like in practice. (My AI assistant of choice is [Claude Code](https://docs.anthropic.com/en/docs/claude-code/overview), but the workflows described here aren't specific to any one tool.)
 
-## Analyzing Existing Workflows
+## Understanding Existing Workflows
 
 On long-running projects, a question inevitably surfaces: "How does this feature *actually* work?" It usually comes from a business stakeholder who has observed that something is not quite right, but needs to understand the current behavior before they can decide what needs to change. The problem is that nobody knows the answer. The original developers are gone, the early tickets (if they exist at all) are one-liners with no context, and there's no documentation.
 
 This used to mean hours or days of a developer tracing through the code, leaving breadcrumbs in a scratch document, cross-referencing database schemas, services, background jobs, etc., and then translating it into something a non-technical person could follow.
 
-Now I point an AI assistant at the codebase and ask.
+Now I can hand the question to an AI assistant, point it at the codebase, and let it do all the tracing work — then have it write two versions of the answer: a plain-language explanation that a product manager or customer success person can act on, and a technical deep dive that gives engineers the full picture so they're ready to go when it's time to make changes.
 
 A recent example: a subscriber received an email that didn't quite match their situation — it contained content meant for a different type of account. A customer success team member flagged it in Slack, and it turned into a deep investigation because nobody was certain which emails were being sent, when, or by whom. Some people thought Stripe was handling the notifications. Others assumed the app was covering it.
 
@@ -73,17 +73,17 @@ The problem is that nothing works end-to-end until the very last piece lands. Ve
 
 When I describe a feature to an AI assistant and explicitly ask for vertical slices, it produces a breakdown that I'd estimate takes me about 70% of the way there. I usually need to adjust priorities, merge some tickets that are too granular, or add edge cases it missed. But the structure — the act of identifying what the thin slices are — comes from the conversation itself rather than staring at a blank Jira board.
 
-Once I approve the breakdown, I use an [MCP server](https://modelcontextprotocol.io) for the ticketing system to have the assistant create the tickets directly. The decomposition that used to be an exercise in Jira wrangling is now something the assistant handles — I just steer.
+Once I approve the breakdown, I use an [MCP server](https://modelcontextprotocol.io) for the ticketing system to have the assistant create the tickets directly. The decomposition that used to be an exercise in Jira wrangling is now something the assistant handles.
 
 ## Managing Your TODO List
 
 I used to keep a flat bullet-point list in Apple Notes. Every time something came up at work — a Slack discussion about a bug we should investigate, a nice-to-have idea someone mentioned, a deprecation warning from our hosting provider, a Dependabot PR with breaking changes, a support ticket revealing a deeper issue — I'd add a line. Sometimes I'd copy-paste a raw Slack URL with a one-word reminder. Other times I'd dump in a paragraph of context with no formatting.
 
-Within a few months, it was eighty-plus items in a wall of text. Active work mixed with vague future ideas. Bug reports tangled with tech debt notes. Items with Jira tickets next to items that were just a Slack link and a half-formed thought.
+Within a few months, the Notes file contained over 80 items and looked like a massive wall of text. Active work mixed with vague future ideas. Bug reports tangled with tech debt notes. Items with Jira tickets next to items that were just a Slack link and a half-formed thought.
 
 I moved the whole thing into a Markdown file and asked Claude to organize it. It read through every item, inferred the nature of each one, and sorted them into categories — Active, Business Priority, Tech Debt, Product Backlog, and others. Items that were just a raw Slack URL got expanded into a clear one-line description with the link preserved as a reference. Related items that I'd logged separately got grouped together.
 
-But the real value isn't the one-time organization — it's the ongoing maintenance. When something new comes up, I can point my AI assistant to the Slack discussion and say "add this to the TODO." The assistant reads the thread, understands the context, writes up a well-worded item, and places it in the appropriate category. When I finish something, I tell it and it removes the item.
+An additional benefit is that I can now have the AI assistant manage the list on an ongoing basis. When something new comes up, I point it to the Slack discussion and say "add this to the TODO." The assistant reads the thread, understands the context, writes up a well-worded item, and places it in the appropriate category. When I finish something, I tell it and it removes the item.
 
 The document went from an overwhelming dump of unsorted notes to a structured reference. It's now a living document that stays organized without me having to do the organizing.
 
@@ -93,7 +93,7 @@ One of my side projects, [Retirement Drawdown Simulator Canada](https://github.c
 
 When I asked Claude to review the README, its first observation was that the documentation focused on *how* — configuration, commands, output format — but never explained *why* someone should care. It didn't convey that the simulator models tax-aware withdrawals across multiple account types with interacting government benefits, enforces mandatory withdrawal rules, and uses statistical modeling to stress-test plans against futures worse than history.
 
-The rewritten README leads with what the project *does* and *why it matters*, then moves to how to use it. It includes annotated sample output that walks through a specific scenario year by year, explaining what each number means and why it matters for the financial decision. It even has a failure scenario showing how a bad sequence of early returns can drain an otherwise reasonable plan.
+The rewritten README leads with what the project *does* and *why it matters*, then moves to how to use it. It includes annotated sample output that walks through a specific scenario year by year, explaining what each number means and why it matters for the financial decision. It also walks through a failure scenario showing how a bad sequence of early returns can drain an otherwise reasonable plan.
 
 ## SR&ED Report Generation
 
