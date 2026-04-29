@@ -1,3 +1,10 @@
+import "@fontsource/bai-jamjuree/300.css"
+import "@fontsource/bai-jamjuree/400.css"
+import "@fontsource/bai-jamjuree/400-italic.css"
+import "@fontsource/bai-jamjuree/500.css"
+import "@fontsource/bai-jamjuree/600.css"
+import "@fontsource/bai-jamjuree/700.css"
+
 import "./src/styles/reset.css"
 import "./src/styles/global.css"
 import "./src/styles/markdown.css"
