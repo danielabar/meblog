@@ -143,12 +143,27 @@ Image in src/images:
 
 ## Fonts
 
-This project uses [Fontsource](https://www.gatsbyjs.com/docs/how-to/styling/using-web-fonts/#self-host-google-fonts-with-fontsource) to self host Google fonts. Fonts used include:
+This project uses [Fontsource](https://www.gatsbyjs.com/docs/how-to/styling/using-web-fonts/#self-host-google-fonts-with-fontsource) to self-host Google fonts. The site loads four families, each scoped to where it's used:
 
-[figtree](https://www.npmjs.com/package/@fontsource/figtree)
+| Font | Used for | Imported in | Weights loaded |
+|---|---|---|---|
+| [Bai Jamjuree](https://www.npmjs.com/package/@fontsource/bai-jamjuree) | Site-wide body and heading default. The `--base-font-family` CSS variable in `src/styles/global.css`. | `gatsby-browser.js` (loads on every page) | 300, 400, 400-italic, 500, 600, 700 |
+| [DM Sans](https://www.npmjs.com/package/@fontsource/dm-sans) | Homepage `/` only. The `--font-family-2026` variable consumed by `pages/index.module.css`, `components/shared/header.module.css`, `components/shared/footer.module.css`. | `src/pages/index.js` | 400, 500, 600, 700 |
+| [Figtree](https://www.npmjs.com/package/@fontsource/figtree) | Course card bodies inside `/learning`. Applied via `src/components/learning/course.module.css`. | `src/pages/learning.js` | 400, 600 |
+| [Fira Code](https://www.npmjs.com/package/@fontsource/fira-code) | Inline code and syntax-highlighted code blocks on individual blog posts. Applied via `.content code` in `src/templates/post.module.css`. | `src/templates/post.js` | default (400) |
 
-Weights: [300,400,500,600,700,800,900]
-Styles: [italic,normal]
+### Where to add a new font
+
+- **Site-wide font (used on most/every page):** import in `gatsby-browser.js` alongside the existing CSS imports. This is where Bai Jamjuree lives because it's the default body font and would otherwise need to be re-imported in every page file. (Historical note: prior to a 2026-04 cleanup, Bai Jamjuree was imported only in `src/pages/index.js` and silently leaked to other pages via Gatsby's CSS chunking. When the V1 homepage redesign replaced that import with DM Sans, Bai Jamjuree stopped loading entirely on non-Apple devices — Apple devices ship Bai Jamjuree as a system font and masked the bug locally. Don't repeat that pattern.)
+- **Page-specific font (used on one page only):** import at the top of the page file in `src/pages/<page>.js`. Examples: DM Sans on `index.js`.
+- **Template-specific font (used on programmatically generated pages):** import at the top of the template file in `src/templates/<template>.js`. Example: Fira Code on `post.js` for code-block rendering.
+
+### Verifying a font actually loads
+
+After adding or changing a font import, verify in DevTools on a non-Apple device (or with the system font equivalent disabled in macOS Font Book — many Google Fonts are now built into macOS/iOS and will render even when the webfont isn't loading):
+
+1. Network tab → filter for the font name → confirm 200 responses on the woff2 files.
+2. Computed style on a body paragraph → "Rendered Fonts" panel → confirm the source is the loaded webfont, not "Local font."
 
 ## Gatsby Upgrade Checklist
 
