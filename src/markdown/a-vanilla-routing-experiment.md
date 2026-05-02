@@ -2,7 +2,7 @@
 title: "A Vanilla Routing Experiment"
 featuredImage: "../images/vanilla-routing-experiment-lidia-nikole-vrkuliNgXx4-unsplash.jpg"
 description: "Building client-side routing with vanilla JavaScript: What started as a simple experiment revealed the hidden complexity that SPA frameworks solve for you."
-date: "2026-05-01"
+date: "2026-05-02"
 category: "javascript"
 related:
   - "When the Password Field Says No to Paste"
