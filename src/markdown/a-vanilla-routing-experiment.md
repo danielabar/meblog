@@ -485,7 +485,7 @@ Setting up Playwright, configuring the test runners for multiple browsers, and w
 
 ![to route or not to route](../images/to-route-or-not-to-route.png "to route or not to route")
 
-Web standards provide stability, code written against native APIs works the same years later. For small to medium static sites with a handful of views and routing needs that won't grow, that stability is a real win.
+Web standards provide stability, code written against native APIs works the same years later. For small-ish apps with a handful of views and simple routing needs, that stability is a real win.
 
 The catch is that the time investment in building, testing, and maintaining custom routing adds up. My simple attempt has no support for URL parameters, nested routes, query string parsing, or route guards. The moment a project needs any of these, you're debugging routing infrastructure instead of building features.
 
