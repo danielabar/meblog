@@ -10,23 +10,23 @@ related:
   - "Rapid Prototyping with ChatGPT: OAS Pension Calculator Part 1"
 ---
 
-There's something deeply appealing about vanilla JavaScript. In a world of constantly changing frameworks and build tools, I'm drawn to code that just works with what browsers provide, no fragile dependency chains, breaking webpack configs, or afternoon-consuming package-lock conflicts.
+There's something deeply appealing about vanilla JavaScript. In a world of constantly changing frameworks and build tools, I'm drawn to code that just works with what browsers provide.
 
-Over the years, I've built several portfolio projects like the [OAS Delay Calculator](https://danielabar.github.io/oas-delay-calculator-prototype/) and [Just Breathe](https://danielabar.github.io/just-breathe/) using almost entirely native web APIs, and each time, I'm reminded of how powerful modern browsers have become, and how refreshing it is to skip the build complexity entirely.
+Over the years, I've built several side projects like the [OAS Delay Calculator](https://danielabar.github.io/oas-delay-calculator-prototype/) and [Just Breathe](https://danielabar.github.io/just-breathe/) using almost entirely native web APIs, and each time, I'm reminded of how powerful modern browsers have become, and how refreshing it is to skip the build complexity entirely.
 
-But there's always that moment in every project where you build out your main view and think, "You know what would be nice? A few more pages." Maybe an about section, a contact form, or a portfolio gallery. Suddenly, you're faced with a choice: introduce a heavyweight SPA (Single Page Application) framework just for routing, or figure out how to handle navigation yourself.
+But there's always that moment in every project where you build out your main view and think, "You know what would be nice? A few more pages." Maybe an about section, or a contact form. Suddenly, you're faced with a choice: introduce a heavyweight SPA (Single Page Application) framework just for routing, or figure out how to handle navigation yourself.
 
 This question became particularly relevant after reading [Anti-frameworkism: Choosing native web APIs over frameworks](https://blog.logrocket.com/anti-frameworkism-native-web-apis). This article makes a compelling argument for embracing web standards, which got me wondering: What about vanilla routing? How hard could it be to build client-side navigation without a framework?
 
 ## The Simple Dream vs. Reality
 
-My idea was to create a set of drop-in routing files that I could reuse across projects. Not a reusable library that others would depend on, but a pattern I could copy and customize for each project's needs. On the surface, the concept sounded simple. Set up an `index.html` with `<nav>` for links, a `<main>` for swappable content, and a `<footer>`. Then listen for navigation events, swap out the content in the main section, and voilà! Client-side routing without the overhead.
+My idea was to create a set of drop-in routing files that I could reuse across projects. Not a reusable library that others would depend on, but a pattern I could copy and customize for each project's needs. On the surface, the concept sounded simple. Set up an `index.html` with `<nav>` for links and a `<main>` for swappable content. Then listen for navigation events, swap out the content in the main section, and voilà! Client-side routing without the overhead.
 
-To test this routing idea, I built a basic profile website, exactly the kind of project where vanilla routing makes sense. The requirements were intentionally simple: a home page for the main landing content, an about page with static information, and a contact page with a form requiring JavaScript interactivity.
+To validate the idea, I built a basic profile website containing a home page for the main landing content, an about page with static information, and a contact page with a form requiring JavaScript interactivity.
 
 The contact page would be the litmus test. Form validation, submission handling, loading states, and displaying a success message. These interactive behaviors would reveal whether the routing system could handle view-specific logic without devolving into a tangled mess.
 
-For this particular exploration into vanilla routing, I worked with AI assistance, specifically GitHub Copilot with the Claude Sonnet 4 model in VS Code. The AI pair programming approach proved valuable for iterating through different architectural approaches. You can explore the complete implementation at [github.com/danielabar/web_native_routing](https://github.com/danielabar/web_native_routing).
+I worked with AI assistance, specifically GitHub Copilot with the Claude Sonnet 4 model in VS Code. The source is available at [web_native_routing](https://github.com/danielabar/web_native_routing).
 
 ## Naive Implementation
 
@@ -270,11 +270,11 @@ Then I uncovered another critical issue.
 
 ## Problem 2: Browser Back/Forward Buttons
 
-Users expect browser navigation to just work. When they click the back button, they should return to the previous view. When they click forward, they should move ahead in their navigation history. This seems basic, but implementing it correctly with the History API turned out to be surprisingly tricky.
+Users expect browser navigation to just work. When they click the back button, they should return to the previous view. When they click forward, they should move ahead in their navigation history. My initial implementation created duplicate history entries whenever users used browser navigation. Resolving this required distinguishing between user-initiated navigation (clicking links) and browser-initiated navigation (back/forward buttons) as follows:
 
-My initial implementation created duplicate history entries whenever users used browser navigation. The key insight was learning to distinguish between user-initiated navigation (clicking links) and browser-initiated navigation (back/forward buttons). Each type needed different treatment.
-
-Here's how I solved it by introducing a `pushState` parameter to distinguish between navigation types:
+- **User clicks a link**: Create a new history entry with [history.pushState](https://developer.mozilla.org/en-US/docs/Web/API/History/pushState).
+- **Browser back/forward**: Don't create additional entries (just navigate).
+- **Initial page load**: Don't push state (the browser already has an entry).
 
 ```javascript
 async navigate(path, { pushState = true } = {}) {
@@ -314,19 +314,11 @@ init() {
 }
 ```
 
-The breakthrough was realizing that different types of navigation needed different treatment:
-
-- **User clicks a link**: Create a new history entry with `pushState`
-- **Browser back/forward**: Don't create additional entries (just navigate)
-- **Initial page load**: Don't push state (the browser already has an entry)
-
 ## Problem 3: Deep Links
 
-Just when I thought I had routing figured out, I discovered that direct URL access was broken. If a user bookmarked `/about` or typed `/contact` directly into their browser, they'd get an error. But here's the twist: it didn't matter whether the route was valid or not. Even typing `/about` (a perfectly valid route in my router) failed, because the request never reached my router at all.
+Then I discovered that direct URL access was broken. If a user bookmarked `/about` or typed `/contact` directly into their browser, they'd get an error, because the request never reached the router. The web server received the request, looked for `/about.html`, didn't find it, and served a generic 404 error. The vanilla router never got a chance to run. This is the fundamental challenge of client-side routing on static hosts: you need to convince the hosting provider to serve `index.html` for ALL paths, letting your router decide what to do with them.
 
-The web server received the request first, looked for `/about.html`, didn't find it, and served a generic 404 error. The vanilla router never got a chance to run. This is the fundamental challenge of client-side routing on static hosts: you need to convince the hosting provider to serve `index.html` for ALL paths, letting your router decide what to do with them.
-
-This was solved by adding a 404.html page to intercept failed requests and capture the intended URL:
+This was solved by adding a 404.html page to intercept failed requests and capture the intended URL in [sessionStorage](https://developer.mozilla.org/en-US/docs/Web/API/Window/sessionStorage). The `basePath` import handles deployment to subdirectories like GitHub Pages, explained in [Problem 5](#problem-5-deployment-path):
 
 ```html
 <!-- 404.html - SPA fallback -->
@@ -347,8 +339,6 @@ This was solved by adding a 404.html page to intercept failed requests and captu
 </html>
 ```
 
-The `basePath` import handles deployment to subdirectories like GitHub Pages—I'll explain how that works in [Problem 5](#problem-5-deployment-path).
-
 Then `index.html` was enhanced with an inline script to restore the intended URL before the router initializes:
 
 ```html
@@ -364,41 +354,46 @@ Then `index.html` was enhanced with an inline script to restore the intended URL
 </script>
 ```
 
-This script runs before the router initializes, so when `handleInitialRoute()` reads `location.pathname`, it gets the user's intended destination, not just the base path.
-
 This two-part solution works as follows: when a user visits `/contact` directly, GitHub Pages serves the 404.html which stores the full URL in sessionStorage and redirects to the base path. Then `index.html` loads, its inline script reads the stored URL, uses `history.replaceState()` to update the browser's address bar back to `/contact`, and deletes the sessionStorage value. Finally, the router initializes and navigates to the correct route based on the restored pathname.
-
-But there was one piece still missing: my router was now receiving ALL paths from the SPA fallback, including paths like `/foo` or `/nonexistent-page` that I never registered as routes. The SPA fallback solved getting URLs to my router, but now I needed to handle invalid routes gracefully.
 
 ## Problem 4: Invalid Routes
 
 With the SPA fallback working, my router was now receiving all direct URL requests, both valid routes like `/about` and invalid routes like `/foo` or `/nonexistent-page`. The static server was no longer rejecting these requests; instead, they were all being forwarded to `index.html` where my router would process them.
 
-This created a new problem: what should happen when users type a path that isn't registered in the router? Should they see a blank page? Get silently redirected to home? The answer was implementing a custom 404 view that lived inside the SPA itself. This meant adding another method to the router:
+This created a new problem: what should happen when users type a path that isn't registered in the router? Should they see a blank page? Get silently redirected to home? This was resolved by implementing a custom 404 view as a new method on the router class:
 
 ```javascript
-/**
- * Show 404 error page
- */
-show404() {
-  this.contentElement.innerHTML = `
-    <div class="error-page">
-      <h1>404 - Page Not Found</h1>
-      <p>The page you're looking for doesn't exist.</p>
-      <a href="/" class="btn btn-primary" data-route>Go Home</a>
-    </div>
-  `;
+class Router {
+  show404() {
+    this.contentElement.innerHTML = `
+      <div class="error-page">
+        <h1>404 - Page Not Found</h1>
+        <p>The page you're looking for doesn't exist.</p>
+        <a href="/" class="btn btn-primary" data-route>Go Home</a>
+      </div>
+    `;
+  }
 }
 ```
 
-The error method is invoked in the router's `navigate()` method when no route matches the requested path. But the challenge extended beyond just showing an error page. I had to consider:
+The error method is invoked in the router's `navigate()` method when no route matches the requested path:
 
-- Should invalid routes update the browser's address bar?
-- What happens if someone bookmarks a 404 URL?
-- How does this interact with the SPA fallback system?
-- Should 404 pages be treated as "real" routes for history purposes?
+```javascript
+class Router {
+  async navigate(path, { pushState = true } = {}) {
+    // Don't navigate if we're already on this route
+    if (this.currentRoute === path) return;
 
-Each of these questions led to more edge cases and more code. The SPA fallback had solved the server-level routing problem, but now I had to solve the client-level routing problem. My vanilla solution had to discover and handle each layer individually—or decide that for a simple project, some edge cases could remain unsolved.
+    const viewDir = this.routes.get(path);
+    if (!viewDir) {
+        console.warn(`No route found for ${path}`);
+        this.show404();
+        return;
+    }
+    // ...
+  }
+}
+```
 
 ## Problem 5: Deployment Path
 
@@ -419,9 +414,7 @@ This was passing the route path directly to `history.pushState()`—`/about`, `/
 
 The router had no subdirectory awareness. It needed to know its base path so it could both strip the prefix from incoming URLs (to match routes) and prepend it when constructing URLs for `history.pushState()`.
 
-The solution used a clever trick: ES modules know their own URL via [import.meta](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Operators/import.meta). Since the module file always lives at a known location relative to the deployment root, you can derive the base path from its URL at runtime—no configuration or build step needed.
-
-The entire detection lives in a two-line module:
+The solution used a clever trick: ES modules know their own URL via [import.meta](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Operators/import.meta). Since the module file always lives at a known location relative to the deployment root, you can derive the base path from its URL at runtime as follows:
 
 ```javascript
 // js/base-path.js
@@ -429,7 +422,7 @@ const moduleDir = new URL(".", import.meta.url).pathname;
 export const basePath = moduleDir.replace(/js\/$/, "");
 ```
 
-Here's how it works: `import.meta.url` returns the fully-resolved URL of the currently executing module. Passing `"."` to the `URL` constructor resolves to the module's directory. Since `base-path.js` always lives at `<deployment-root>/js/base-path.js`, the directory is always `<deployment-root>/js/`, and stripping the `js/` suffix yields the deployment root:
+`import.meta.url` returns the fully-resolved URL of the currently executing module. Passing `"."` to the `URL` constructor resolves to the module's directory. Since `base-path.js` always lives at `<deployment-root>/js/base-path.js`, the directory is always `<deployment-root>/js/`, and stripping the `js/` suffix yields the deployment root:
 
 **Local dev:** `import.meta.url` → `http://localhost:3000/js/base-path.js` → directory `/js/` → `basePath` = `/`
 
@@ -444,7 +437,7 @@ import { basePath } from './base-path.js';
 const router = new Router({ basePath });
 ```
 
-The router uses `basePath` in two complementary methods—one to strip the prefix from incoming URLs for route matching, and one to add it back when constructing URLs for the browser:
+The router can then use `basePath` to strip the prefix from incoming URLs for route matching, and to add it back when constructing URLs for the browser:
 
 ```javascript
 // Router constructs URLs correctly for any deployment context
@@ -462,13 +455,11 @@ async navigate(path) {
 }
 ```
 
-With this approach, the same source files work in any deployment context. There's no build step rewriting config values, no configuration to keep in sync, and no risk of dev/prod divergence. Deploy the source directory directly and the base path is detected correctly at runtime.
-
 ## Problem 6: Regression Testing
 
-Building your own routing system means you're now responsible for behaviors that framework users take for granted. With every code change — fixing a bug, adding a feature, refactoring — I found myself doing manual regression testing of the most basic interactions. Click "About". Does it load? Click "Contact". Does it work? Hit the back button twice. Does it return to home? Refresh the page. Does the view persist? Type `/about` directly into the address bar. Does it navigate correctly?
+Building your own routing system means you're now responsible for behaviors that framework users take for granted. With every code change, I found myself doing manual regression testing of the most basic interactions. Click "About". Does it load? Click "Contact". Does it work? Hit the back button twice. Does it return to home? Refresh the page. Does the view persist? Type `/about` directly into the address bar. Does it navigate correctly?
 
-This constant manual verification became exhausting. Framework routers have these fundamentals battle-tested through years of production use and automated test suites, but my vanilla solution required personally verifying everything, every time. The realization hit that I needed comprehensive automated browser tests to maintain confidence in the navigation. So I added Playwright end-to-end tests with Cucumber BDD for Given/When/Then style testing across multiple browsers. Here's an example of the test coverage that became essential:
+This constant manual verification became exhausting. Framework routers have these fundamentals battle-tested through years of production use and automated test suites. This made me realize that I needed to add automated browser tests to maintain confidence in the navigation. So I added [Playwright](https://github.com/microsoft/playwright) end-to-end tests with [Playwright BDD](https://github.com/vitalets/playwright-bdd) for Given/When/Then style testing across multiple browsers. Here's an example of the test coverage that became essential:
 
 ```gherkin
 Scenario: Browser navigation controls
@@ -492,29 +483,10 @@ Setting up Playwright, configuring the test runners for multiple browsers, and w
 
 ## Weighing the Tradeoffs
 
-After working through all these challenges, I gained a deep appreciation for both the power of vanilla JavaScript and the value of well-tested frameworks. The experience clarified when each approach makes sense.
-
 ![to route or not to route](../images/to-route-or-not-to-route.png "to route or not to route")
 
-**The Case for Vanilla Routing**
+Web standards provide stability, code written against native APIs works the same years later. For small to medium static sites with a handful of views and routing needs that won't grow, that stability is a real win.
 
-Web standards provide remarkable stability - code written against native APIs work largely the same way years later, without breaking changes or migration headaches. You'll never spend weeks on "framework upgrade projects" or deal with dependency vulnerability alerts from routing libraries. There's no risk of framework abandonment leaving your project in maintenance limbo.
+The catch is that the time investment in building, testing, and maintaining custom routing adds up. My simple attempt has no support for URL parameters, nested routes, query string parsing, or route guards. The moment a project needs any of these, you're debugging routing infrastructure instead of building features.
 
-For the right projects, vanilla routing can be a good choice. Small to medium static sites with a handful of views can benefit from the minimal overhead. Projects where routing complexity won't grow over time are ideal candidates.
-
-**The Case Against Vanilla Routing**
-
-The time investment in building, testing, and maintaining your own routing system is substantial. You're reinventing wheels that others have perfected over years of real-world use. For example, my simple attempt leaves some gaps that modern applications often need:
-
-- **URL Parameters**: No built-in support for routes like `/product/:id` or `/user/:id/edit/:field`
-- **Nested Routes**: Can't handle complex hierarchies like `/dashboard/users/:id/settings`
-- **Query String Parsing**: Manual handling required for URLs like `/products?category=electronics&sort=price`
-- **Regex Patterns**: No support for complex URL matching beyond simple string comparison
-- **Route Guards**: No authentication or permission checking before navigation
-- **Animated Transitions**: No built-in view transition animations or loading states
-
-If your project needs any of the features listed above, you'll likely spend more time building and debugging routing infrastructure than building actual features.
-
-## Closing Thoughts
-
-Building vanilla routing taught me that the web platform is remarkably capable, but using these capabilities directly involves meaningful tradeoffs. The real value wasn't in replacing SPA frameworks entirely, but in understanding what problems they solve through firsthand experience. Sometimes the best tool is the one that lets you ship features instead of debugging browser history APIs, but other times, understanding how things work under the hood is worth the journey itself.
+That makes vanilla routing a good fit for two cases: very small projects whose needs won't grow, and educational exercises like this one, where the goal is to understand what SPA frameworks are quietly doing on your behalf. For anything more complex, the maintenance cost of rolling your own likely outweighs the dependency cost of reaching for a framework that's already solved these problems.
