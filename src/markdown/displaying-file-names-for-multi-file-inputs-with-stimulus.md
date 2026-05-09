@@ -33,6 +33,10 @@ This means that the data is already there in the DOM. We can read it and render 
 
 To demonstrate the solution, we'll build a simple Pet Adoption Board where a shelter posts pets with multiple photos. This is a natural use case for  `has_many_attached :photos`.
 
+<aside class="markdown-aside">
+The demo uses <a class="markdown-link" href="https://tailwindcss.com">Tailwind CSS</a> for styling. Code samples omit the utility classes to stay focused on the file input behavior.
+</aside>
+
 **Create the App**
 
 Note that Rails 8 includes Stimulus by default:
@@ -185,5 +189,4 @@ The completed demo project is available on [Github](https://github.com/danielaba
 
 ## TODO
 
-- clarify about tailwind styling for quick demo styles but not shown in code samples for brevity
 - maybe mention more clearly in conclusion or somewhere that stimulus can be used outside of rails
