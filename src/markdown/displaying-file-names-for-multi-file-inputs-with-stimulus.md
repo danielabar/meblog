@@ -179,14 +179,60 @@ Before building this, I had my AI assistant research existing solutions. Here's 
 
 **The Stimulus ecosystem**: Searched across [stimulus-components](https://www.stimulus-components.com/), [stimulus-use](https://stimulus-use.github.io/stimulus-use/), [tailwindcss-stimulus-components](https://github.com/excid3/tailwindcss-stimulus-components), and the [awesome-stimulusjs](https://github.com/stimulus-components/awesome-stimulusjs) curated list. None contained a file input display controller.
 
+## Using Without Rails
+
+Note that Stimulus isn't tied to Rails, so if you want this functionality in any web app, Stimulus can be loaded from a CDN and used as follows:
+
+```html
+<!DOCTYPE html>
+<html>
+<head><title>File Input Demo</title></head>
+<body>
+  <div data-controller="file-input">
+    <label for="photos">Choose photos:</label>
+    <input type="file" id="photos" name="photos" multiple
+           data-file-input-target="input"
+           data-action="change->file-input#updateFileList">
+    <div data-file-input-target="list"></div>
+  </div>
+
+  <script type="module">
+    import { Application, Controller } from "https://unpkg.com/@hotwired/stimulus/dist/stimulus.js"
+
+    const application = Application.start()
+
+    class FileInputController extends Controller {
+      static targets = ["input", "list"]
+
+      updateFileList() {
+        const files = this.inputTarget.files
+        this.listTarget.innerHTML = ""
+
+        if (files.length === 0) return
+
+        Array.from(files).forEach((file) => {
+          const span = document.createElement("span")
+          span.textContent = file.name
+          this.listTarget.appendChild(span)
+        })
+      }
+    }
+
+    application.register("file-input", FileInputController)
+  </script>
+</body>
+</html>
+```
+
+Two things differ from the Rails setup:
+
+- **`Application.start()`** launches the Stimulus runtime (Rails handles this in `app/javascript/controllers/application.js`).
+- **`application.register("file-input", FileInputController)`** maps the controller name to the class (Rails' `controllers/index.js` does this automatically via its eager-load convention).
+
+The `data-controller`, `data-action`, and `data-*-target` attributes in the markup are identical.
+
 ## Conclusion
 
 The native file input's "n files" display is a well-known UX gap, and the fix is straightforward once you know about `HTMLInputElement.files`. A small focused Stimulus controller reads the `FileList`, renders each name, and gives users clear feedback on their selection.
 
-The full solution works with any multi-file input, not just Rails. The controller is vanilla JavaScript that reads a standard DOM API. Stimulus provides the wiring between the markup and the behavior.
-
 The completed demo project is available on [Github](https://github.com/danielabar/pet_adoptions_demo).
-
-## TODO
-
-- maybe mention more clearly in conclusion or somewhere that stimulus can be used outside of rails
