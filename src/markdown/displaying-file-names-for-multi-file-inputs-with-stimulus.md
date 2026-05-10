@@ -153,6 +153,8 @@ Which three? The user can't tell without opening the file picker again. Let's fi
 
 ## Building the Stimulus Controller
 
+To read `HTMLInputElement.files` and update the DOM on each selection change, we need a small JavaScript event listener. Stimulus is well-suited for this: it wires DOM events to controller methods with minimal setup and no build complexity.
+
 Generate the controller:
 
 ```bash
