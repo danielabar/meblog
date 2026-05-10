@@ -10,7 +10,7 @@ related:
   - "Understanding ActiveRecord Dependent Options"
 ---
 
-When you add a multi-file upload to a Rails form with Active Storage's `has_many_attached`, the browser's native file input shows something like "3 files" instead of listing the actual file names. This isn't a Rails limitation, it's how `<input type="file" multiple>` works in every browser. In this post, we'll build a small [Stimulus](https://stimulus.hotwired.dev) controller that reads the selected files and displays each name, giving users clear confirmation of what they picked. If you're new to Stimulus, the [official handbook](https://stimulus.hotwired.dev/handbook/introduction) is a good starting point — this post assumes basic familiarity.
+When you add a multi-file upload to a Rails form with Active Storage's `has_many_attached`, the browser's native file input shows something like "3 files" instead of listing the actual file names. This isn't a Rails limitation, it's how `<input type="file" multiple>` works in every browser. In this post, we'll build a small [Stimulus](https://stimulus.hotwired.dev) controller that reads the selected files and displays each name, giving users clear confirmation of what they picked. If you're new to Stimulus, the [official handbook](https://stimulus.hotwired.dev/handbook/introduction) is a good starting point, as this post assumes basic familiarity.
 
 ## Understanding the Browser Behavior
 
@@ -25,9 +25,7 @@ From the [MDN file input reference](https://developer.mozilla.org/en-US/docs/Web
 
 > When the user selected multiple files, the value represents the first file in the list of files they selected. The other files can be identified using the input's HTMLInputElement.files property.
 
-But the files *are* accessible through the [`HTMLInputElement.files`](https://developer.mozilla.org/en-US/docs/Web/API/File_API/Using_files_from_web_applications#getting_information_about_selected_files) property, which returns a `FileList` containing every selected file.
-
-This means that the data is already there in the DOM. We can read it and render the file names with a few lines of JavaScript.
+But the files *are* accessible through the [`HTMLInputElement.files`](https://developer.mozilla.org/en-US/docs/Web/API/File_API/Using_files_from_web_applications#getting_information_about_selected_files) property, which returns a `FileList` containing every selected file. This means that the data is already there in the DOM. We can read it and render the file names with a few lines of JavaScript.
 
 ## Demo App Setup
 
@@ -69,7 +67,7 @@ end
 
 **Update the Controller**
 
-The scaffold generates a `pet_params` method that permits the pet's scalar attributes. Photos should *not* be included there — passing them through `update` would replace the entire attachment collection rather than append to it. Instead, attach photos separately after a successful save:
+The scaffold generates a `pet_params` method that permits the pet model's attributes. Photos should *not* be included there: passing them through `update` would replace the entire attachment collection rather than append to it. Instead, attach photos separately after a successful save:
 
 ```ruby
 # app/controllers/pets_controller.rb
@@ -261,6 +259,6 @@ The `data-controller`, `data-action`, and `data-*-target` attributes in the mark
 
 ## Conclusion
 
-The native file input's "n files" display is a well-known UX gap, and the fix is straightforward once you know about `HTMLInputElement.files`. A small focused Stimulus controller reads the `FileList`, renders each name, and gives users clear feedback on their selection. The controller itself is framework-agnostic — the standalone example shows it works just as well outside Rails via a CDN import.
+The native file input's "n files" display is a well-known UX gap, and the fix is straightforward once you know about `HTMLInputElement.files`. A small focused Stimulus controller reads the `FileList`, renders each name, and gives users clear feedback on their selection. The controller itself is framework-agnostic; the standalone example shows it works just as well outside Rails via a CDN import.
 
 The completed demo project is available on [Github](https://github.com/danielabar/pet_adoptions_demo).
