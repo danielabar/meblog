@@ -228,6 +228,10 @@ Opening the browser DevTools confirms the controller is creating a `<span>` for 
 
 ![DevTools showing generated span elements](../images/custom-file-input-dom-elements.jpg "DevTools showing the generated span elements for each file name")
 
+And here is what the edit view looks like for a pet that was saved with photos attached:
+
+![edit view showing current photos with remove checkboxes and add photos input](../images/multiple-attach-edit-view.png "edit view with current photos, remove checkboxes, and add photos file input")
+
 ## What About Existing Solutions?
 
 Before building this, I used an AI assistant to survey the existing solutions. Here's what's available and why I didn't use them:
