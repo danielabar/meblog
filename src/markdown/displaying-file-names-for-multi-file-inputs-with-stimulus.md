@@ -21,17 +21,17 @@ Before writing any code, let's understand *why* the file input behaves this way.
 <input type="file" id="photos" name="photos" accept="image/png, image/jpeg" multiple>
 ```
 
-From [MDN Input Type File](https://developer.mozilla.org/en-US/docs/Web/HTML/Reference/Elements/input/file):
+From the [MDN file input reference](https://developer.mozilla.org/en-US/docs/Web/HTML/Reference/Elements/input/file):
 
 > When the user selected multiple files, the value represents the first file in the list of files they selected. The other files can be identified using the input's HTMLInputElement.files property.
 
-The input's `value` property only holds the first file's name. When multiple files are selected, browsers display a count like "3 files" because they don't iterate over the full list. But the files *are* accessible through the [`HTMLInputElement.files`](https://developer.mozilla.org/en-US/docs/Web/API/File_API/Using_files_from_web_applications#getting_information_about_selected_files) property, which returns a `FileList` containing every selected file.
+But the files *are* accessible through the [`HTMLInputElement.files`](https://developer.mozilla.org/en-US/docs/Web/API/File_API/Using_files_from_web_applications#getting_information_about_selected_files) property, which returns a `FileList` containing every selected file.
 
 This means that the data is already there in the DOM. We can read it and render the file names with a few lines of JavaScript.
 
 ## Demo App Setup
 
-To demonstrate the solution, we'll build a simple Pet Adoption Board where a shelter posts pets with multiple photos. This is a natural use case for  `has_many_attached :photos`.
+To demonstrate the solution, we'll build a simple Pet Adoption Board where a shelter posts pets with multiple photos.
 
 <aside class="markdown-aside">
 The demo uses <a class="markdown-link" href="https://tailwindcss.com">Tailwind CSS</a> for styling. Code samples omit the utility classes to stay focused on the file input behavior.
@@ -69,7 +69,35 @@ end
 
 **Update the Controller**
 
-The scaffold generates the usual RESTful controller. You'll need to update it to permit and attach the uploaded photos. The [demo project's controller](https://github.com/danielabar/pet_adoptions_demo) has the full details, but it's standard Active Storage plumbing.
+The scaffold generates a `pet_params` method that permits the pet's scalar attributes. Photos should *not* be included there — passing them through `update` would replace the entire attachment collection rather than append to it. Instead, attach photos separately after a successful save:
+
+```ruby
+# app/controllers/pets_controller.rb
+def create
+  @pet = Pet.new(pet_params)
+
+  respond_to do |format|
+    if @pet.save
+      attach_new_photos
+      format.html { redirect_to @pet, notice: "Pet was successfully created." }
+      # ...
+    end
+  end
+end
+
+def pet_params
+  params.expect(pet: [ :name, :breed, :age, :description ])
+end
+
+def attach_new_photos
+  new_photos = params.dig(:pet, :photos)
+  return if new_photos.blank? || new_photos.all?(&:blank?)
+
+  @pet.photos.attach(new_photos)
+end
+```
+
+`attach_new_photos` digs directly into params to retrieve the uploaded files, guards against blank submissions, and calls `attach` to add them without disturbing any previously attached photos. The [demo project's controller](https://github.com/danielabar/pet_adoptions_demo) shows the full implementation including the edit flow.
 
 **Add the File Input to the Form**
 
@@ -139,7 +167,7 @@ Let's walk through this:
 
 ## Wiring It Up in the View
 
-Next, the file input section in `app/views/pets/_form.html.erb` is updated to connect the Stimulus controller. This is accomplished with data dash attributes as follows:
+Update `app/views/pets/_form.html.erb` to wire up the controller:
 
 ```erb
 <div data-controller="file-input">
@@ -173,9 +201,9 @@ Opening the browser DevTools confirms the controller is creating a `<span>` for 
 
 ## What About Existing Solutions?
 
-Before building this, I had my AI assistant research existing solutions. Here's what it found and why I didn't use them for this simple use case:
+Before building this, I used an AI assistant to survey the existing solutions. Here's what's available and why I didn't use them:
 
-**Full upload libraries** like [Uppy](https://uppy.io/), [Dropzone.js](https://www.dropzone.dev/), and [FilePond](https://pqina.nl/filepond/) replace the native file input entirely with a custom UI that includes drag-and-drop, image previews, progress bars, and more. If you need those features, they're excellent. But if all you need is to show file names alongside a standard form input, pulling in a 50-200KB library is overkill.
+**Full upload libraries** like [Uppy](https://uppy.io/), [Dropzone.js](https://www.dropzone.dev/), and [FilePond](https://pqina.nl/filepond/) replace the native file input entirely with a custom UI that includes drag-and-drop, image previews, progress bars, and more. If you need those features, they're excellent. But if all you need is to show file names alongside a standard form input, pulling in tens to hundreds of KB of library is overkill.
 
 **The Stimulus ecosystem**: Searched across [stimulus-components](https://www.stimulus-components.com/), [stimulus-use](https://stimulus-use.github.io/stimulus-use/), [tailwindcss-stimulus-components](https://github.com/excid3/tailwindcss-stimulus-components), and the [awesome-stimulusjs](https://github.com/stimulus-components/awesome-stimulusjs) curated list. None contained a file input display controller.
 
@@ -233,6 +261,6 @@ The `data-controller`, `data-action`, and `data-*-target` attributes in the mark
 
 ## Conclusion
 
-The native file input's "n files" display is a well-known UX gap, and the fix is straightforward once you know about `HTMLInputElement.files`. A small focused Stimulus controller reads the `FileList`, renders each name, and gives users clear feedback on their selection.
+The native file input's "n files" display is a well-known UX gap, and the fix is straightforward once you know about `HTMLInputElement.files`. A small focused Stimulus controller reads the `FileList`, renders each name, and gives users clear feedback on their selection. The controller itself is framework-agnostic — the standalone example shows it works just as well outside Rails via a CDN import.
 
 The completed demo project is available on [Github](https://github.com/danielabar/pet_adoptions_demo).
