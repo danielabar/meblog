@@ -11,6 +11,7 @@
  */
 import React from "react"
 import { Link } from "gatsby"
+import SearchInput from "../search-input"
 import * as styles from "./header.module.css"
 
 const Header = () => {
@@ -34,6 +35,12 @@ const Header = () => {
           <Link to="/about">About</Link>
           <a href="/rss.xml">RSS</a>
         </nav>
+
+        {process.env.SEARCH_ENABLED === "true" && (
+          <div className={styles.navSearch}>
+            <SearchInput />
+          </div>
+        )}
       </div>
     </header>
   )
