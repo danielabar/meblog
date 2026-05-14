@@ -3,6 +3,18 @@ const path = require("path")
 const fs = require("fs")
 const searchHelper = require("./lib/search-helper")
 
+exports.createSchemaCustomization = ({ actions }) => {
+  const { createTypes } = actions
+  createTypes(`
+    type PopularCsv implements Node {
+      title: String!
+      published_at: String
+      slug: String!
+      post: MarkdownRemark @link(by: "fields.slug", from: "slug")
+    }
+  `)
+}
+
 // Add slug to each post
 exports.onCreateNode = ({ node, getNode, actions }) => {
   const { createNodeField } = actions
