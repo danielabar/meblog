@@ -51,6 +51,21 @@
   --base-font-family: "Bai Jamjuree", -apple-system, system-ui, "Segoe UI",
     Roboto, Oxygen-Sans, Ubuntu, Cantarell, "Helvetica Neue", sans-serif;
   --font-family-2026: "DM Sans", -apple-system, sans-serif;
+
+  /* V2 homepage tokens — consumed only by shared/* and home/* modules */
+  --paper: #fbfaf9;
+  --ink: var(--brand-darken-35);          /* #1a0d1f — alias, not a new color */
+  --ink-2: #2a1c33;
+  --ink-3: #5a4a64;
+  --ink-4: #8a7a93;
+  --ink-5: #b5a8be;
+  --line: #e8e2ec;
+  --line-soft: #f1edf3;
+  --accent: var(--brand);                 /* alias */
+  --accent-tint: var(--brand-lighten-50); /* alias */
+  --sans: "Figtree", -apple-system, system-ui, "Segoe UI", Roboto, sans-serif;
+  --mono: "JetBrains Mono", ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+  --display-font: var(--sans);
 }
 
 /* apply a natural box layout model to all elements, but allowing components to change */
