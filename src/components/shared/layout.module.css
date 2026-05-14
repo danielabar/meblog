@@ -1,7 +1,12 @@
 /* Modern Layout Component Styles */
 
 .container {
-  /* Overall page container */
+  background-color: var(--paper);
+  color: var(--ink);
+  font-family: var(--sans);
+  font-size: 17px;
+  line-height: 1.55;
+  min-height: 100vh;
 }
 
 .main {
