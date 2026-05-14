@@ -7,8 +7,11 @@ describe("Hero", () => {
     const container = render(<Hero />)
     expect(container).toMatchSnapshot()
 
-    expect(screen.getByText("15+")).toBeInTheDocument()
-    expect(screen.getByText("Years Building Software")).toBeInTheDocument()
-    expect(screen.getByText(/Rails, PostgreSQL, and full-stack development/i)).toBeInTheDocument()
+    expect(
+      screen.getByText(/Software that works, and writing about how it got that way\./i)
+    ).toBeInTheDocument()
+    expect(screen.getByText("Daniela Baron")).toBeInTheDocument()
+    expect(screen.getByText("Senior Rails engineer")).toBeInTheDocument()
+    expect(screen.getByText(/15\+ years of shipping/i)).toBeInTheDocument()
   })
 })
