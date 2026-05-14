@@ -1,6 +1,6 @@
 // Jest Snapshot v1, https://goo.gl/fbAQLP
 
-exports[`Home Page renders with layout, article list, and all-link 1`] = `
+exports[`Home Page renders hero, recent, popular, and projects sections 1`] = `
 {
   "asFragment": [Function],
   "baseElement": <body>
@@ -75,102 +75,279 @@ exports[`Home Page renders with layout, article list, and all-link 1`] = `
               </p>
             </section>
             <div>
-              <div>
-                Areas of Focus
-              </div>
-              <div>
-                <div>
-                  <div>
-                    Full-Stack Development
-                  </div>
-                  <div>
-                    Building complete solutions from database architecture to user interfaces
-                  </div>
-                </div>
-                <div>
-                  <div>
-                    Team Effectiveness
-                  </div>
-                  <div>
-                    Developer experience, CI/CD, documentation, and workflows that compound value
-                  </div>
-                </div>
-                <div>
-                  <div>
-                    AI-Assisted Development
-                  </div>
-                  <div>
-                    Leveraging AI while prioritizing system understanding and sustainable engineering practices
-                  </div>
-                </div>
-              </div>
-            </div>
-            <div>
-              <div>
-                Approach
-              </div>
-              <div>
-                I make teams more effective. Whether it's implementing full-text search architecture, upgrading legacy systems, or transforming developer experience through better documentation and CI/CD — I focus on work that compounds in value over time.
-              </div>
-            </div>
-            <div>
-              <div>
-                Recent Writing
-              </div>
               <section
-                data-testid="article-list-mini"
+                data-testid="posts-section"
               >
-                <a
-                  href="/blog/some-slug"
+                <div
+                  data-testid="section-head"
                 >
-                  <div>
-                    July 1, 2021
-                  </div>
-                  <div>
-                    First Title
-                  </div>
-                </a>
-                <a
-                  href="/blog/some-other-slug"
+                  <h2>
+                    Recent
+                  </h2>
+                  <a
+                    href="/blog"
+                  >
+                    all writing →
+                  </a>
+                </div>
+                <div>
+                  <a
+                    data-testid="post-card"
+                    href="/blog/first/"
+                  >
+                    <div>
+                      <img
+                        alt=""
+                        data-testid="gatsby-image"
+                      />
+                    </div>
+                    <div>
+                      <div>
+                        <span>
+                          April 18, 2026
+                        </span>
+                        <span
+                          aria-hidden="true"
+                        >
+                          ·
+                        </span>
+                        <span>
+                          Rails
+                        </span>
+                      </div>
+                      <h3>
+                        First Title
+                      </h3>
+                      <p>
+                        First Title description.
+                      </p>
+                    </div>
+                  </a>
+                  <a
+                    data-testid="post-card"
+                    href="/blog/second/"
+                  >
+                    <div>
+                      <img
+                        alt=""
+                        data-testid="gatsby-image"
+                      />
+                    </div>
+                    <div>
+                      <div>
+                        <span>
+                          April 18, 2026
+                        </span>
+                        <span
+                          aria-hidden="true"
+                        >
+                          ·
+                        </span>
+                        <span>
+                          Docker
+                        </span>
+                      </div>
+                      <h3>
+                        Second Title
+                      </h3>
+                      <p>
+                        Second Title description.
+                      </p>
+                    </div>
+                  </a>
+                  <a
+                    data-testid="post-card"
+                    href="/blog/third/"
+                  >
+                    <div>
+                      <img
+                        alt=""
+                        data-testid="gatsby-image"
+                      />
+                    </div>
+                    <div>
+                      <div>
+                        <span>
+                          April 18, 2026
+                        </span>
+                        <span
+                          aria-hidden="true"
+                        >
+                          ·
+                        </span>
+                        <span>
+                          Postgres
+                        </span>
+                      </div>
+                      <h3>
+                        Third Title
+                      </h3>
+                      <p>
+                        Third Title description.
+                      </p>
+                    </div>
+                  </a>
+                </div>
+              </section>
+              <section
+                data-testid="posts-section"
+              >
+                <div
+                  data-testid="section-head"
                 >
-                  <div>
-                    August 1, 2021
-                  </div>
-                  <div>
-                    Second Title
-                  </div>
-                </a>
+                  <h2>
+                    Popular
+                  </h2>
+                  <a
+                    href="/blog"
+                  >
+                    archive →
+                  </a>
+                </div>
+                <div>
+                  <a
+                    data-testid="post-card"
+                    href="/blog/very-popular/"
+                  >
+                    <div>
+                      <img
+                        alt=""
+                        data-testid="gatsby-image"
+                      />
+                    </div>
+                    <div>
+                      <div>
+                        <span>
+                          April 18, 2026
+                        </span>
+                        <span
+                          aria-hidden="true"
+                        >
+                          ·
+                        </span>
+                        <span>
+                          Rails
+                        </span>
+                      </div>
+                      <h3>
+                        Very Popular Title
+                      </h3>
+                      <p>
+                        Very Popular Title description.
+                      </p>
+                    </div>
+                  </a>
+                  <a
+                    data-testid="post-card"
+                    href="/blog/also-popular/"
+                  >
+                    <div>
+                      <img
+                        alt=""
+                        data-testid="gatsby-image"
+                      />
+                    </div>
+                    <div>
+                      <div>
+                        <span>
+                          April 18, 2026
+                        </span>
+                        <span
+                          aria-hidden="true"
+                        >
+                          ·
+                        </span>
+                        <span>
+                          Rails
+                        </span>
+                      </div>
+                      <h3>
+                        Also Popular Title
+                      </h3>
+                      <p>
+                        Also Popular Title description.
+                      </p>
+                    </div>
+                  </a>
+                </div>
               </section>
             </div>
-            <div>
-              <div>
-                Popular Archives
-              </div>
-              <section
-                data-testid="article-list-mini"
+            <section
+              data-testid="projects-section"
+            >
+              <div
+                data-testid="section-head"
               >
+                <h2>
+                  Side projects
+                </h2>
                 <a
-                  href="/blog/very-popular/"
+                  href="https://github.com/danielabar"
+                  rel="noopener noreferrer"
+                  target="_blank"
+                >
+                  all repos →
+                </a>
+              </div>
+              <div>
+                <a
+                  data-testid="project-card"
+                  href="https://github.com/danielabar/proj-a"
+                  rel="noopener noreferrer"
+                  target="_blank"
                 >
                   <div>
-                    January 2, 2022
+                    <span
+                      aria-hidden="true"
+                    >
+                      ·
+                    </span>
+                    <span>
+                      proj-a
+                    </span>
                   </div>
+                  <p>
+                    proj-a desc.
+                  </p>
                   <div>
-                    Very Popular Title
+                    <span>
+                      Ruby
+                    </span>
+                    <span>
+                      2025
+                    </span>
                   </div>
                 </a>
                 <a
-                  href="/blog/also-popular/"
+                  data-testid="project-card"
+                  href="https://github.com/danielabar/proj-b"
+                  rel="noopener noreferrer"
+                  target="_blank"
                 >
                   <div>
-                    February 3, 2022
+                    <span
+                      aria-hidden="true"
+                    >
+                      ·
+                    </span>
+                    <span>
+                      proj-b
+                    </span>
                   </div>
+                  <p>
+                    proj-b desc.
+                  </p>
                   <div>
-                    Also Popular Title
+                    <span>
+                      Ruby
+                    </span>
+                    <span>
+                      2025
+                    </span>
                   </div>
                 </a>
-              </section>
-            </div>
+              </div>
+            </section>
           </div>
         </main>
         <footer
@@ -337,102 +514,279 @@ exports[`Home Page renders with layout, article list, and all-link 1`] = `
             </p>
           </section>
           <div>
-            <div>
-              Areas of Focus
-            </div>
-            <div>
-              <div>
-                <div>
-                  Full-Stack Development
-                </div>
-                <div>
-                  Building complete solutions from database architecture to user interfaces
-                </div>
-              </div>
-              <div>
-                <div>
-                  Team Effectiveness
-                </div>
-                <div>
-                  Developer experience, CI/CD, documentation, and workflows that compound value
-                </div>
-              </div>
-              <div>
-                <div>
-                  AI-Assisted Development
-                </div>
-                <div>
-                  Leveraging AI while prioritizing system understanding and sustainable engineering practices
-                </div>
-              </div>
-            </div>
-          </div>
-          <div>
-            <div>
-              Approach
-            </div>
-            <div>
-              I make teams more effective. Whether it's implementing full-text search architecture, upgrading legacy systems, or transforming developer experience through better documentation and CI/CD — I focus on work that compounds in value over time.
-            </div>
-          </div>
-          <div>
-            <div>
-              Recent Writing
-            </div>
             <section
-              data-testid="article-list-mini"
+              data-testid="posts-section"
             >
-              <a
-                href="/blog/some-slug"
+              <div
+                data-testid="section-head"
               >
-                <div>
-                  July 1, 2021
-                </div>
-                <div>
-                  First Title
-                </div>
-              </a>
-              <a
-                href="/blog/some-other-slug"
+                <h2>
+                  Recent
+                </h2>
+                <a
+                  href="/blog"
+                >
+                  all writing →
+                </a>
+              </div>
+              <div>
+                <a
+                  data-testid="post-card"
+                  href="/blog/first/"
+                >
+                  <div>
+                    <img
+                      alt=""
+                      data-testid="gatsby-image"
+                    />
+                  </div>
+                  <div>
+                    <div>
+                      <span>
+                        April 18, 2026
+                      </span>
+                      <span
+                        aria-hidden="true"
+                      >
+                        ·
+                      </span>
+                      <span>
+                        Rails
+                      </span>
+                    </div>
+                    <h3>
+                      First Title
+                    </h3>
+                    <p>
+                      First Title description.
+                    </p>
+                  </div>
+                </a>
+                <a
+                  data-testid="post-card"
+                  href="/blog/second/"
+                >
+                  <div>
+                    <img
+                      alt=""
+                      data-testid="gatsby-image"
+                    />
+                  </div>
+                  <div>
+                    <div>
+                      <span>
+                        April 18, 2026
+                      </span>
+                      <span
+                        aria-hidden="true"
+                      >
+                        ·
+                      </span>
+                      <span>
+                        Docker
+                      </span>
+                    </div>
+                    <h3>
+                      Second Title
+                    </h3>
+                    <p>
+                      Second Title description.
+                    </p>
+                  </div>
+                </a>
+                <a
+                  data-testid="post-card"
+                  href="/blog/third/"
+                >
+                  <div>
+                    <img
+                      alt=""
+                      data-testid="gatsby-image"
+                    />
+                  </div>
+                  <div>
+                    <div>
+                      <span>
+                        April 18, 2026
+                      </span>
+                      <span
+                        aria-hidden="true"
+                      >
+                        ·
+                      </span>
+                      <span>
+                        Postgres
+                      </span>
+                    </div>
+                    <h3>
+                      Third Title
+                    </h3>
+                    <p>
+                      Third Title description.
+                    </p>
+                  </div>
+                </a>
+              </div>
+            </section>
+            <section
+              data-testid="posts-section"
+            >
+              <div
+                data-testid="section-head"
               >
-                <div>
-                  August 1, 2021
-                </div>
-                <div>
-                  Second Title
-                </div>
-              </a>
+                <h2>
+                  Popular
+                </h2>
+                <a
+                  href="/blog"
+                >
+                  archive →
+                </a>
+              </div>
+              <div>
+                <a
+                  data-testid="post-card"
+                  href="/blog/very-popular/"
+                >
+                  <div>
+                    <img
+                      alt=""
+                      data-testid="gatsby-image"
+                    />
+                  </div>
+                  <div>
+                    <div>
+                      <span>
+                        April 18, 2026
+                      </span>
+                      <span
+                        aria-hidden="true"
+                      >
+                        ·
+                      </span>
+                      <span>
+                        Rails
+                      </span>
+                    </div>
+                    <h3>
+                      Very Popular Title
+                    </h3>
+                    <p>
+                      Very Popular Title description.
+                    </p>
+                  </div>
+                </a>
+                <a
+                  data-testid="post-card"
+                  href="/blog/also-popular/"
+                >
+                  <div>
+                    <img
+                      alt=""
+                      data-testid="gatsby-image"
+                    />
+                  </div>
+                  <div>
+                    <div>
+                      <span>
+                        April 18, 2026
+                      </span>
+                      <span
+                        aria-hidden="true"
+                      >
+                        ·
+                      </span>
+                      <span>
+                        Rails
+                      </span>
+                    </div>
+                    <h3>
+                      Also Popular Title
+                    </h3>
+                    <p>
+                      Also Popular Title description.
+                    </p>
+                  </div>
+                </a>
+              </div>
             </section>
           </div>
-          <div>
-            <div>
-              Popular Archives
-            </div>
-            <section
-              data-testid="article-list-mini"
+          <section
+            data-testid="projects-section"
+          >
+            <div
+              data-testid="section-head"
             >
+              <h2>
+                Side projects
+              </h2>
               <a
-                href="/blog/very-popular/"
+                href="https://github.com/danielabar"
+                rel="noopener noreferrer"
+                target="_blank"
+              >
+                all repos →
+              </a>
+            </div>
+            <div>
+              <a
+                data-testid="project-card"
+                href="https://github.com/danielabar/proj-a"
+                rel="noopener noreferrer"
+                target="_blank"
               >
                 <div>
-                  January 2, 2022
+                  <span
+                    aria-hidden="true"
+                  >
+                    ·
+                  </span>
+                  <span>
+                    proj-a
+                  </span>
                 </div>
+                <p>
+                  proj-a desc.
+                </p>
                 <div>
-                  Very Popular Title
+                  <span>
+                    Ruby
+                  </span>
+                  <span>
+                    2025
+                  </span>
                 </div>
               </a>
               <a
-                href="/blog/also-popular/"
+                data-testid="project-card"
+                href="https://github.com/danielabar/proj-b"
+                rel="noopener noreferrer"
+                target="_blank"
               >
                 <div>
-                  February 3, 2022
+                  <span
+                    aria-hidden="true"
+                  >
+                    ·
+                  </span>
+                  <span>
+                    proj-b
+                  </span>
                 </div>
+                <p>
+                  proj-b desc.
+                </p>
                 <div>
-                  Also Popular Title
+                  <span>
+                    Ruby
+                  </span>
+                  <span>
+                    2025
+                  </span>
                 </div>
               </a>
-            </section>
-          </div>
+            </div>
+          </section>
         </div>
       </main>
       <footer

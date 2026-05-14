@@ -1,25 +1,20 @@
-.container {
+.page {
   margin: 0 auto;
   max-width: 1100px;
-  font-family: var(--font-family-2026);
+  padding: 0 24px 80px;
+  font-family: var(--sans);
 }
 
-.section {
-  margin-bottom: 2.5rem;
+.twoCol {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 40px;
+  margin-bottom: 64px;
 }
 
-.label {
-  font-size: 0.875rem;
-  text-transform: uppercase;
-  letter-spacing: 0.1em;
-  color: var(--base-font-color-muted, #706e71);
-  margin-bottom: 0.75rem;
-  font-weight: 600;
-}
-
-.text {
-  font-size: 1.125rem;
-  line-height: 1.8;
-  color: var(--base-font-color, #1a0d1f);
-  margin-bottom: 2rem;
+@media (max-width: 900px) {
+  .twoCol {
+    grid-template-columns: 1fr;
+    gap: 48px;
+  }
 }
