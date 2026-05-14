@@ -1,0 +1,9 @@
+.section {
+  display: flex;
+  flex-direction: column;
+}
+
+.cards {
+  display: grid;
+  gap: 16px;
+}
