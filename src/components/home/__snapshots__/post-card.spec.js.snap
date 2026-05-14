@@ -1,0 +1,39 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`PostCard matches snapshot 1`] = `
+<div>
+  <a
+    data-testid="post-card"
+    href="/blog/foo/"
+  >
+    <div>
+      <img
+        alt=""
+        data-image="{"layout":"constrained","width":280,"height":280}"
+        data-testid="gatsby-image"
+      />
+    </div>
+    <div>
+      <div>
+        <span>
+          April 18, 2026
+        </span>
+        <span
+          aria-hidden="true"
+        >
+          ·
+        </span>
+        <span>
+          productivity
+        </span>
+      </div>
+      <h3>
+        The Code-Adjacent Power of AI
+      </h3>
+      <p>
+        Snap me.
+      </p>
+    </div>
+  </a>
+</div>
+`;
