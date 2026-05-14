@@ -25,6 +25,7 @@
     "@fontsource/dm-sans": "^5.2.8",
     "@fontsource/figtree": "4.5.3",
     "@fontsource/fira-code": "4.5.1",
+    "@fontsource/jetbrains-mono": "^5.2.8",
     "applescript": "git+https://github.com/danielabar/vscode-applescript.git",
     "gatsby": "5.7.0",
     "gatsby-plugin-feed": "^5.13.1",
