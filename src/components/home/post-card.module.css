@@ -1,9 +1,8 @@
 .card {
   display: flex;
-  gap: 16px;
-  padding: 14px;
   border: 1px solid var(--line);
   border-radius: 10px;
+  overflow: hidden;
   background: var(--paper);
   text-decoration: none;
   color: inherit;
@@ -20,8 +19,6 @@
   flex-shrink: 0;
   width: 140px;
   align-self: stretch;
-  border-radius: 6px;
-  overflow: hidden;
   background: var(--line-soft);
 }
 
@@ -36,6 +33,7 @@
   flex-direction: column;
   gap: 6px;
   min-width: 0;
+  padding: 14px 16px;
 }
 
 .meta {
