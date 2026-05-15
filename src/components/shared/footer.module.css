@@ -3,7 +3,7 @@
 .footer {
   background: white;
   border-top: 1px solid rgba(129, 67, 156, 0.1);
-  padding: 1.5rem 2rem;
+  padding: 40px 32px 56px;
   margin-top: 2rem;
   font-family: var(--sans);
 }
