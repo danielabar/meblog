@@ -53,6 +53,7 @@
 
   /* V2 homepage tokens — consumed only by shared/* and home/* modules */
   --paper: #fbfaf9;
+  --paper-card: #ffffff;
   --ink: var(--brand-darken-35);          /* #1a0d1f — alias, not a new color */
   --ink-2: #2a1c33;
   --ink-3: #5a4a64;
