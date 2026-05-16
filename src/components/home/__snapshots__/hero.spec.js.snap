@@ -8,20 +8,6 @@ exports[`Hero renders correctly 1`] = `
       <section
         data-testid="hero"
       >
-        <div>
-          <span
-            aria-hidden="true"
-          />
-          <span>
-            Daniela Baron
-          </span>
-          <span>
-            /
-          </span>
-          <span>
-            Senior Rails engineer
-          </span>
-        </div>
         <h1>
           Software that works, and writing about how it got that way.
         </h1>
@@ -35,20 +21,6 @@ exports[`Hero renders correctly 1`] = `
     <section
       data-testid="hero"
     >
-      <div>
-        <span
-          aria-hidden="true"
-        />
-        <span>
-          Daniela Baron
-        </span>
-        <span>
-          /
-        </span>
-        <span>
-          Senior Rails engineer
-        </span>
-      </div>
       <h1>
         Software that works, and writing about how it got that way.
       </h1>

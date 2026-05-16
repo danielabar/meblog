@@ -53,20 +53,6 @@ exports[`Home Page renders hero, recent, popular, and projects sections 1`] = `
             <section
               data-testid="hero"
             >
-              <div>
-                <span
-                  aria-hidden="true"
-                />
-                <span>
-                  Daniela Baron
-                </span>
-                <span>
-                  /
-                </span>
-                <span>
-                  Senior Rails engineer
-                </span>
-              </div>
               <h1>
                 Software that works, and writing about how it got that way.
               </h1>
@@ -87,7 +73,11 @@ exports[`Home Page renders hero, recent, popular, and projects sections 1`] = `
                   <a
                     href="/blog"
                   >
-                    all writing →
+                    all writing
+                     
+                    <span>
+                      →
+                    </span>
                   </a>
                 </div>
                 <div>
@@ -201,7 +191,11 @@ exports[`Home Page renders hero, recent, popular, and projects sections 1`] = `
                   <a
                     href="/blog"
                   >
-                    archive →
+                    archive
+                     
+                    <span>
+                      →
+                    </span>
                   </a>
                 </div>
                 <div>
@@ -286,7 +280,11 @@ exports[`Home Page renders hero, recent, popular, and projects sections 1`] = `
                   rel="noopener noreferrer"
                   target="_blank"
                 >
-                  all repos →
+                  all repos
+                   
+                  <span>
+                    →
+                  </span>
                 </a>
               </div>
               <div>
@@ -492,20 +490,6 @@ exports[`Home Page renders hero, recent, popular, and projects sections 1`] = `
           <section
             data-testid="hero"
           >
-            <div>
-              <span
-                aria-hidden="true"
-              />
-              <span>
-                Daniela Baron
-              </span>
-              <span>
-                /
-              </span>
-              <span>
-                Senior Rails engineer
-              </span>
-            </div>
             <h1>
               Software that works, and writing about how it got that way.
             </h1>
@@ -526,7 +510,11 @@ exports[`Home Page renders hero, recent, popular, and projects sections 1`] = `
                 <a
                   href="/blog"
                 >
-                  all writing →
+                  all writing
+                   
+                  <span>
+                    →
+                  </span>
                 </a>
               </div>
               <div>
@@ -640,7 +628,11 @@ exports[`Home Page renders hero, recent, popular, and projects sections 1`] = `
                 <a
                   href="/blog"
                 >
-                  archive →
+                  archive
+                   
+                  <span>
+                    →
+                  </span>
                 </a>
               </div>
               <div>
@@ -725,7 +717,11 @@ exports[`Home Page renders hero, recent, popular, and projects sections 1`] = `
                 rel="noopener noreferrer"
                 target="_blank"
               >
-                all repos →
+                all repos
+                 
+                <span>
+                  →
+                </span>
               </a>
             </div>
             <div>
