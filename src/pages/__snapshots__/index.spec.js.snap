@@ -1,6 +1,6 @@
 // Jest Snapshot v1, https://goo.gl/fbAQLP
 
-exports[`Home Page renders hero, recent, popular, and projects sections 1`] = `
+exports[`Home Page renders hero, recent, and popular sections 1`] = `
 {
   "asFragment": [Function],
   "baseElement": <body>
@@ -266,86 +266,6 @@ exports[`Home Page renders hero, recent, popular, and projects sections 1`] = `
                 </div>
               </section>
             </div>
-            <section
-              data-testid="projects-section"
-            >
-              <div
-                data-testid="section-head"
-              >
-                <h2>
-                  Side projects
-                </h2>
-                <a
-                  href="https://github.com/danielabar"
-                  rel="noopener noreferrer"
-                  target="_blank"
-                >
-                  all repos
-                   
-                  <span>
-                    →
-                  </span>
-                </a>
-              </div>
-              <div>
-                <a
-                  data-testid="project-card"
-                  href="https://github.com/danielabar/proj-a"
-                  rel="noopener noreferrer"
-                  target="_blank"
-                >
-                  <div>
-                    <span
-                      aria-hidden="true"
-                    >
-                      ·
-                    </span>
-                    <span>
-                      proj-a
-                    </span>
-                  </div>
-                  <p>
-                    proj-a desc.
-                  </p>
-                  <div>
-                    <span>
-                      Ruby
-                    </span>
-                    <span>
-                      2025
-                    </span>
-                  </div>
-                </a>
-                <a
-                  data-testid="project-card"
-                  href="https://github.com/danielabar/proj-b"
-                  rel="noopener noreferrer"
-                  target="_blank"
-                >
-                  <div>
-                    <span
-                      aria-hidden="true"
-                    >
-                      ·
-                    </span>
-                    <span>
-                      proj-b
-                    </span>
-                  </div>
-                  <p>
-                    proj-b desc.
-                  </p>
-                  <div>
-                    <span>
-                      Ruby
-                    </span>
-                    <span>
-                      2025
-                    </span>
-                  </div>
-                </a>
-              </div>
-            </section>
           </div>
         </main>
         <footer
@@ -703,86 +623,6 @@ exports[`Home Page renders hero, recent, popular, and projects sections 1`] = `
               </div>
             </section>
           </div>
-          <section
-            data-testid="projects-section"
-          >
-            <div
-              data-testid="section-head"
-            >
-              <h2>
-                Side projects
-              </h2>
-              <a
-                href="https://github.com/danielabar"
-                rel="noopener noreferrer"
-                target="_blank"
-              >
-                all repos
-                 
-                <span>
-                  →
-                </span>
-              </a>
-            </div>
-            <div>
-              <a
-                data-testid="project-card"
-                href="https://github.com/danielabar/proj-a"
-                rel="noopener noreferrer"
-                target="_blank"
-              >
-                <div>
-                  <span
-                    aria-hidden="true"
-                  >
-                    ·
-                  </span>
-                  <span>
-                    proj-a
-                  </span>
-                </div>
-                <p>
-                  proj-a desc.
-                </p>
-                <div>
-                  <span>
-                    Ruby
-                  </span>
-                  <span>
-                    2025
-                  </span>
-                </div>
-              </a>
-              <a
-                data-testid="project-card"
-                href="https://github.com/danielabar/proj-b"
-                rel="noopener noreferrer"
-                target="_blank"
-              >
-                <div>
-                  <span
-                    aria-hidden="true"
-                  >
-                    ·
-                  </span>
-                  <span>
-                    proj-b
-                  </span>
-                </div>
-                <p>
-                  proj-b desc.
-                </p>
-                <div>
-                  <span>
-                    Ruby
-                  </span>
-                  <span>
-                    2025
-                  </span>
-                </div>
-              </a>
-            </div>
-          </section>
         </div>
       </main>
       <footer

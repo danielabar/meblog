@@ -13,8 +13,6 @@ import SEO from "../components/SEO"
 import Layout from "../components/shared/layout"
 import Hero from "../components/home/hero"
 import PostsSection from "../components/home/posts-section"
-import ProjectsSection from "../components/home/projects-section"
-
 import * as styles from "./index.module.css"
 
 const Index = ({ data }) => {
@@ -29,7 +27,6 @@ const Index = ({ data }) => {
       return true
     })
     .map(n => n.post)
-  const projects = data.projects.nodes.map(n => n.frontmatter)
 
   return (
     <Layout>
@@ -50,7 +47,6 @@ const Index = ({ data }) => {
             posts={popular}
           />
         </div>
-        <ProjectsSection projects={projects} />
       </div>
     </Layout>
   )
@@ -91,22 +87,6 @@ export const query = graphql`
         slug
         post {
           ...PostCardFields
-        }
-      }
-    }
-    projects: allMarkdownRemark(
-      filter: { fileAbsolutePath: { regex: "/src/projects/" } }
-      sort: { frontmatter: { order: ASC } }
-      limit: 6
-    ) {
-      nodes {
-        frontmatter {
-          name
-          url
-          description
-          langs
-          year
-          order
         }
       }
     }

@@ -28,17 +28,6 @@ const postNode = (id, title, category = "Rails") => ({
   },
 })
 
-const projectNode = (name, order) => ({
-  frontmatter: {
-    name,
-    url: `https://github.com/danielabar/${name}`,
-    description: `${name} desc.`,
-    langs: ["Ruby"],
-    year: 2025,
-    order,
-  },
-})
-
 const homeData = {
   recent: {
     nodes: [
@@ -54,16 +43,10 @@ const homeData = {
       { slug: "/blog/missing/", post: null },
     ],
   },
-  projects: {
-    nodes: [
-      projectNode("proj-a", 1),
-      projectNode("proj-b", 2),
-    ],
-  },
 }
 
 describe("Home Page", () => {
-  it("renders hero, recent, popular, and projects sections", () => {
+  it("renders hero, recent, and popular sections", () => {
     const container = render(<Index data={homeData} />)
     expect(container).toMatchSnapshot()
 
@@ -73,7 +56,6 @@ describe("Home Page", () => {
 
     expect(screen.getByRole("heading", { level: 2, name: "Recent" })).toBeInTheDocument()
     expect(screen.getByRole("heading", { level: 2, name: "Popular" })).toBeInTheDocument()
-    expect(screen.getByRole("heading", { level: 2, name: "Side projects" })).toBeInTheDocument()
   })
 
   it("filters out popular entries whose post link is null", () => {
