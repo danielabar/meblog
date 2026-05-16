@@ -1,18 +1,17 @@
 .card {
   display: flex;
-  border: 1px solid var(--line);
+  border: 1px solid transparent;
   border-radius: 10px;
   overflow: hidden;
   background: var(--paper-card);
+  box-shadow: var(--shadow-card);
   text-decoration: none;
   color: inherit;
-  transition: transform 160ms ease, box-shadow 160ms ease, border-color 160ms ease;
+  transition: box-shadow 300ms ease;
 }
 
 .card:hover {
-  transform: translateY(-2px);
-  box-shadow: 0 12px 32px -16px rgba(70, 37, 90, 0.18);
-  border-color: var(--ink-5);
+  box-shadow: var(--shadow-card-hover);
 }
 
 .image {
@@ -20,12 +19,28 @@
   width: 180px;
   align-self: stretch;
   background: var(--line-soft);
+  position: relative;
+}
+
+/* hairline outline overlay so positioned img content doesn't paint over the inset shadow */
+.image::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  box-shadow: inset 0 0 0 1px rgba(0, 0, 0, 0.08);
 }
 
 .image > * {
   width: 100%;
   height: 100%;
   object-fit: cover;
+  filter: saturate(0.92);
+  transition: filter 300ms ease;
+}
+
+.card:hover .image > * {
+  filter: saturate(1);
 }
 
 .body {
