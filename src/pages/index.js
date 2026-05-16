@@ -71,7 +71,7 @@ export const query = graphql`
       description
       featuredImage {
         childImageSharp {
-          gatsbyImageData(width: 280, aspectRatio: 1, placeholder: BLURRED)
+          gatsbyImageData(width: 360, aspectRatio: 1.45, placeholder: BLURRED)
         }
       }
     }
