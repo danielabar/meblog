@@ -22,6 +22,8 @@
   text-decoration: none;
   color: var(--ink-3);
   transition: color 120ms ease;
+  padding: 6px 8px;
+  margin: -6px -8px;
 }
 
 .link:hover {
