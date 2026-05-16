@@ -14,6 +14,11 @@
   box-shadow: var(--shadow-card-hover);
 }
 
+.card:active {
+  transform: scale(0.985);
+  transition: transform 80ms ease, box-shadow 80ms ease;
+}
+
 .image {
   flex-shrink: 0;
   width: 180px;
