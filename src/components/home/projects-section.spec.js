@@ -26,7 +26,7 @@ describe("ProjectsSection", () => {
     render(<ProjectsSection projects={projects} />)
 
     expect(screen.getByRole("heading", { level: 2, name: "Side projects" })).toBeInTheDocument()
-    expect(screen.getByText("all repos →")).toBeInTheDocument()
+    expect(screen.getByRole("link", { name: "all repos →" })).toBeInTheDocument()
     expect(screen.getAllByTestId("project-card")).toHaveLength(6)
   })
 
