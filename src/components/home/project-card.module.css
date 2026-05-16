@@ -55,10 +55,10 @@
 }
 
 .langs {
-  background: var(--accent-tint);
+  background: rgba(129, 67, 156, 0.08);
   color: var(--accent);
   padding: 3px 8px;
-  border-radius: 4px;
+  border-radius: 6px;
   text-transform: uppercase;
   font-weight: 600;
 }
