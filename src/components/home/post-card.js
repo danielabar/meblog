@@ -16,7 +16,7 @@ const PostCard = ({ post }) => {
       </div>
       <div className={styles.body}>
         <div className={styles.meta}>
-          <span className={styles.date}>{post.frontmatter.date}</span>
+          <span>{post.frontmatter.date}</span>
           <span className={styles.dot} aria-hidden="true">·</span>
           <span className={styles.tag}>{post.frontmatter.category}</span>
         </div>
