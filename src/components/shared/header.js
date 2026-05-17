@@ -11,7 +11,7 @@
  */
 import React from "react"
 import { Link } from "gatsby"
-import SearchInput from "../search-input"
+import SearchInput from "./search-input"
 import * as styles from "./header.module.css"
 
 const Header = () => {
