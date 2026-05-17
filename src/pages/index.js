@@ -83,7 +83,7 @@ export const query = graphql`
     excerpt(pruneLength: 160)
     frontmatter {
       title
-      date(formatString: "MMMM D, YYYY")
+      date(formatString: "YYYY-MM-DD")
       category
       description
       featuredImage {
