@@ -22,7 +22,6 @@
   },
   "dependencies": {
     "@fontsource/bai-jamjuree": "4.2.1",
-    "@fontsource/dm-sans": "^5.2.8",
     "@fontsource/figtree": "4.5.3",
     "@fontsource/fira-code": "4.5.1",
     "@fontsource/jetbrains-mono": "^5.2.8",
