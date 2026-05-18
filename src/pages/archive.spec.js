@@ -29,7 +29,9 @@ describe("Archive page", () => {
   it("renders page shell with title, meta, header, footer", () => {
     const { container } = render(<Archive data={data} />)
     expect(container).toMatchSnapshot()
-    expect(screen.getByRole("heading", { level: 1, name: "Archive" })).toBeInTheDocument()
+    expect(
+      screen.getByRole("heading", { level: 1, name: "Archive" })
+    ).toBeInTheDocument()
     expect(screen.getByTestId("header")).toBeInTheDocument()
     expect(screen.getByTestId("footer")).toBeInTheDocument()
   })

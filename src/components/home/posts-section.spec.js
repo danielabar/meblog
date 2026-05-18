@@ -4,7 +4,8 @@ import "@testing-library/jest-dom"
 
 jest.mock("gatsby-plugin-image", () => ({
   GatsbyImage: ({ alt }) => <img data-testid="gatsby-image" alt={alt} />,
-  getImage: img => (img && img.childImageSharp ? img.childImageSharp.gatsbyImageData : null),
+  getImage: img =>
+    img && img.childImageSharp ? img.childImageSharp.gatsbyImageData : null,
 }))
 
 import PostsSection from "./posts-section"
@@ -40,8 +41,12 @@ describe("PostsSection", () => {
       />
     )
 
-    expect(screen.getByRole("heading", { level: 2, name: "Recent" })).toBeInTheDocument()
-    expect(screen.getByRole("link", { name: "all writing →" })).toBeInTheDocument()
+    expect(
+      screen.getByRole("heading", { level: 2, name: "Recent" })
+    ).toBeInTheDocument()
+    expect(
+      screen.getByRole("link", { name: "all writing →" })
+    ).toBeInTheDocument()
     expect(screen.getAllByTestId("post-card")).toHaveLength(3)
     expect(screen.getByText("Post A")).toBeInTheDocument()
     expect(screen.getByText("Post C")).toBeInTheDocument()

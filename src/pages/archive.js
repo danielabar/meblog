@@ -52,8 +52,12 @@ const Archive = ({ data }) => {
                       data-testid="archive-row"
                     >
                       <span className={styles.date}>{p.frontmatter.date}</span>
-                      <span className={styles.rowTitle}>{p.frontmatter.title}</span>
-                      <span className={styles.cat}>{p.frontmatter.category}</span>
+                      <span className={styles.rowTitle}>
+                        {p.frontmatter.title}
+                      </span>
+                      <span className={styles.cat}>
+                        {p.frontmatter.category}
+                      </span>
                     </a>
                   ))}
                 </div>

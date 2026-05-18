@@ -23,7 +23,6 @@ const Header = () => {
           <Link to="/about">About</Link>
           <a href="/rss.xml">RSS</a>
         </nav>
-
       </div>
     </header>
   )
