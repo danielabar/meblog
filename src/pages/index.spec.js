@@ -58,6 +58,13 @@ describe("Home Page", () => {
     expect(screen.getByRole("heading", { level: 2, name: "Popular" })).toBeInTheDocument()
   })
 
+  it("links the Popular section to /archive", () => {
+    render(<Index data={homeData} />)
+    const popularSection = screen.getByRole("heading", { name: "Popular" }).closest("section")
+    const archiveLink = popularSection.querySelector(`a[href="/archive"]`)
+    expect(archiveLink).toBeInTheDocument()
+  })
+
   it("filters out popular entries whose post link is null", () => {
     jest.spyOn(console, "warn").mockImplementation(() => {})
 

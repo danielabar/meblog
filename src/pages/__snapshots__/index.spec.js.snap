@@ -189,7 +189,7 @@ exports[`Home Page renders hero, recent, and popular sections 1`] = `
                     Popular
                   </h2>
                   <a
-                    href="/blog"
+                    href="/archive"
                   >
                     archive
                      
@@ -546,7 +546,7 @@ exports[`Home Page renders hero, recent, and popular sections 1`] = `
                   Popular
                 </h2>
                 <a
-                  href="/blog"
+                  href="/archive"
                 >
                   archive
                    
