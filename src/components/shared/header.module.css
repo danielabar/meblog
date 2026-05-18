@@ -90,18 +90,6 @@
   width: 100%;
 }
 
-.navSearch {
-  margin-left: 1.5rem;
-  display: flex;
-  align-items: center;
-}
-
-@media (max-width: 720px) {
-  .navSearch {
-    display: none;
-  }
-}
-
 /* Mobile landscape and smaller */
 @media (max-width: 768px) {
   .header {
