@@ -1,14 +1,3 @@
-/**
- * Modern Header Component
- *
- * Part of 2026 homepage redesign. Features modern design with:
- * - Sticky positioning with backdrop blur
- * - DM Sans typography
- * - Polished hover states and animations
- *
- * Currently used only on homepage. May be adopted site-wide in future
- * redesigns to replace legacy src/components/header.js.
- */
 import React from "react"
 import { Link } from "gatsby"
 import * as styles from "./header.module.css"
@@ -34,6 +23,7 @@ const Header = () => {
           <Link to="/about">About</Link>
           <a href="/rss.xml">RSS</a>
         </nav>
+
       </div>
     </header>
   )

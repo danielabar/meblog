@@ -2,82 +2,72 @@ import React from "react"
 import { render, screen } from "@testing-library/react"
 import "@testing-library/jest-dom"
 
+jest.mock("../components/SEO", () => ({
+  __esModule: true,
+  default: () => <div />,
+}))
+
+jest.mock("gatsby-plugin-image", () => ({
+  GatsbyImage: ({ alt }) => <img data-testid="gatsby-image" alt={alt} />,
+  getImage: img => (img && img.childImageSharp ? img.childImageSharp.gatsbyImageData : null),
+}))
+
 import Index from "./index"
 
-jest.mock("../components/SEO", () => {
-  return {
-    __esModule: true,
-    default: () => {
-      return <div></div>
+const postNode = (id, title, category = "Rails") => ({
+  fields: { slug: `/blog/${id}/` },
+  excerpt: "exc",
+  frontmatter: {
+    title,
+    date: "April 18, 2026",
+    category,
+    description: `${title} description.`,
+    featuredImage: {
+      childImageSharp: { gatsbyImageData: { layout: "constrained" } },
     },
-  }
+  },
 })
 
 const homeData = {
-  allMarkdownRemark: {
-    edges: [
-      {
-        node: {
-          id: "aaa111",
-          fields: {
-            slug: "/blog/some-slug",
-          },
-          frontmatter: {
-            category: "Rails",
-            date: "July 1, 2021",
-            title: "First Title",
-          },
-        },
-      },
-      {
-        node: {
-          id: "bbb222",
-          fields: {
-            slug: "/blog/some-other-slug",
-          },
-          frontmatter: {
-            category: "Docker",
-            date: "August 1, 2021",
-            title: "Second Title",
-          },
-        },
-      },
+  recent: {
+    nodes: [
+      postNode("first", "First Title"),
+      postNode("second", "Second Title", "Docker"),
+      postNode("third", "Third Title", "Postgres"),
     ],
   },
   popular: {
-    edges: [
-      {
-        node: {
-          id: "ccc333",
-          title: "Very Popular Title",
-          published_at: "January 2, 2022",
-          slug: "/blog/very-popular/",
-        },
-      },
-      {
-        node: {
-          id: "ddd444",
-          title: "Also Popular Title",
-          published_at: "February 3, 2022",
-          slug: "/blog/also-popular/",
-        },
-      },
+    nodes: [
+      { slug: "/blog/very-popular/", post: postNode("very-popular", "Very Popular Title") },
+      { slug: "/blog/also-popular/", post: postNode("also-popular", "Also Popular Title") },
+      { slug: "/blog/missing/", post: null },
     ],
   },
 }
 
 describe("Home Page", () => {
-  it("renders with layout, article list, and all-link", () => {
+  it("renders hero, recent, and popular sections", () => {
     const container = render(<Index data={homeData} />)
     expect(container).toMatchSnapshot()
 
     expect(screen.getByTestId("header")).toBeInTheDocument()
-
-    const articleLists = screen.queryAllByTestId("article-list-mini")
-    expect(articleLists.length).toBe(2)
     expect(screen.getByTestId("footer")).toBeInTheDocument()
+    expect(screen.getByTestId("hero")).toBeInTheDocument()
 
-    expect(screen.getByText("Recent Writing")).toBeInTheDocument()
-    expect(screen.getByText("Popular Archives")).toBeInTheDocument()
+    expect(screen.getByRole("heading", { level: 2, name: "Recent" })).toBeInTheDocument()
+    expect(screen.getByRole("heading", { level: 2, name: "Popular" })).toBeInTheDocument()
+  })
+
+  it("filters out popular entries whose post link is null", () => {
+    jest.spyOn(console, "warn").mockImplementation(() => {})
+
+    render(<Index data={homeData} />)
+
+    const popularSection = screen.getByRole("heading", { name: "Popular" }).closest("section")
+    expect(popularSection).not.toBeNull()
+    const popularCards = popularSection.querySelectorAll("[data-testid='post-card']")
+    expect(popularCards).toHaveLength(2)
+
+    console.warn.mockRestore()
   })
 })

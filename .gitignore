@@ -79,3 +79,9 @@ tmp
 
 # AI Assistant files
 .claude/settings.local.json
+
+# Claude Code harness runtime lock for the scheduled-tasks subsystem
+.claude/scheduled_tasks.lock
+
+# Output dir from the Playwright MCP plugin (browser console logs, screenshots)
+.playwright-mcp/

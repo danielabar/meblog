@@ -83,7 +83,7 @@
 }
 
 .content pre {
-  font-family: SFMono-Regular, Menlo, Monaco, Consolas, Liberation Mono,
+  font-family: "Fira Code", SFMono-Regular, Menlo, Monaco, Consolas, Liberation Mono,
     Courier New, monospace;
   font-size: 1rem;
   margin-bottom: 20px;
@@ -95,7 +95,7 @@
   border-radius: 4px;
   color: #000000;
   font-size: 0.75rem;
-  font-family: SFMono-Regular, Menlo, Monaco, Consolas, Liberation Mono,
+  font-family: "Fira Code", SFMono-Regular, Menlo, Monaco, Consolas, Liberation Mono,
     Courier New, monospace;
   letter-spacing: 0.075em;
   line-height: 1;

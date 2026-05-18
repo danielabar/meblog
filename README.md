@@ -148,14 +148,14 @@ This project uses [Fontsource](https://www.gatsbyjs.com/docs/how-to/styling/usin
 | Font | Used for | Imported in | Weights loaded |
 |---|---|---|---|
 | [Bai Jamjuree](https://www.npmjs.com/package/@fontsource/bai-jamjuree) | Site-wide body and heading default. The `--base-font-family` CSS variable in `src/styles/global.css`. | `gatsby-browser.js` (loads on every page) | 300, 400, 400-italic, 500, 600, 700 |
-| [DM Sans](https://www.npmjs.com/package/@fontsource/dm-sans) | Homepage `/` only. The `--font-family-2026` variable consumed by `pages/index.module.css`, `components/shared/header.module.css`, `components/shared/footer.module.css`. | `src/pages/index.js` | 400, 500, 600, 700 |
-| [Figtree](https://www.npmjs.com/package/@fontsource/figtree) | Course card bodies inside `/learning`. Applied via `src/components/learning/course.module.css`. | `src/pages/learning.js` | 400, 600 |
+| [Figtree](https://www.npmjs.com/package/@fontsource/figtree) | Homepage `/` and `/learning` course cards. The `--sans` CSS variable consumed by `components/shared/layout.module.css` and `components/learning/course.module.css`. | `src/pages/index.js` (400, 500, 600, 700) and `src/pages/learning.js` (400, 600) | 400, 500, 600, 700 |
+| [JetBrains Mono](https://www.npmjs.com/package/@fontsource/jetbrains-mono) | Homepage dates and section labels. The `--mono` CSS variable consumed by `components/home/post-card.module.css` and `components/home/section-head.module.css`. | `src/pages/index.js` | 400, 500, 600 |
 | [Fira Code](https://www.npmjs.com/package/@fontsource/fira-code) | Inline code and syntax-highlighted code blocks on individual blog posts. Applied via `.content code` in `src/templates/post.module.css`. | `src/templates/post.js` | default (400) |
 
 ### Where to add a new font
 
 - **Site-wide font (used on most/every page):** import in `gatsby-browser.js` alongside the existing CSS imports. This is where Bai Jamjuree lives because it's the default body font and would otherwise need to be re-imported in every page file. (Historical note: prior to a 2026-04 cleanup, Bai Jamjuree was imported only in `src/pages/index.js` and silently leaked to other pages via Gatsby's CSS chunking. When the V1 homepage redesign replaced that import with DM Sans, Bai Jamjuree stopped loading entirely on non-Apple devices — Apple devices ship Bai Jamjuree as a system font and masked the bug locally. Don't repeat that pattern.)
-- **Page-specific font (used on one page only):** import at the top of the page file in `src/pages/<page>.js`. Examples: DM Sans on `index.js`.
+- **Page-specific font (used on one page only):** import at the top of the page file in `src/pages/<page>.js`. Example: Figtree on `index.js` and `learning.js`.
 - **Template-specific font (used on programmatically generated pages):** import at the top of the template file in `src/templates/<template>.js`. Example: Fira Code on `post.js` for code-block rendering.
 
 ### Verifying a font actually loads

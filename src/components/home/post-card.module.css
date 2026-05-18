@@ -1,0 +1,116 @@
+.card {
+  display: flex;
+  border: 1px solid transparent;
+  border-radius: 10px;
+  overflow: hidden;
+  background: var(--paper-card);
+  box-shadow: var(--shadow-card);
+  text-decoration: none;
+  color: inherit;
+  transition: box-shadow 300ms ease;
+}
+
+.card:hover {
+  box-shadow: var(--shadow-card-hover);
+}
+
+.card:active {
+  transform: scale(0.985);
+  transition: transform 80ms ease, box-shadow 80ms ease;
+}
+
+.image {
+  flex-shrink: 0;
+  width: 180px;
+  align-self: stretch;
+  background: var(--line-soft);
+  position: relative;
+}
+
+/* hairline outline overlay so positioned img content doesn't paint over the inset shadow */
+.image::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  box-shadow: inset 0 0 0 1px rgba(0, 0, 0, 0.08);
+}
+
+.image > * {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  filter: saturate(0.92);
+  transition: filter 300ms ease;
+}
+
+.card:hover .image > * {
+  filter: saturate(1);
+}
+
+.body {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  min-width: 0;
+  padding: 14px 16px;
+}
+
+.meta {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-family: var(--mono);
+  font-size: 11px;
+  letter-spacing: 0.06em;
+  color: var(--ink-4);
+  text-transform: uppercase;
+}
+
+.dot {
+  color: var(--ink-5);
+}
+
+.tag {
+  color: var(--accent);
+  font-weight: 600;
+}
+
+.title {
+  font-family: var(--display-font);
+  font-size: 18px;
+  font-weight: 600;
+  letter-spacing: -0.01em;
+  color: var(--ink);
+  margin: 2px 0 0;
+  line-height: 1.3;
+  display: -webkit-box;
+  -webkit-line-clamp: 1;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.excerpt {
+  font-family: var(--sans);
+  font-size: 14px;
+  color: var(--ink-3);
+  line-height: 1.5;
+  margin: 0;
+  text-wrap: pretty;
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+
+@media (max-width: 540px) {
+  .card {
+    flex-direction: column;
+  }
+
+  .image {
+    width: 100%;
+    aspect-ratio: 16 / 9;
+  }
+}

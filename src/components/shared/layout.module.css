@@ -1,16 +1,20 @@
 /* Modern Layout Component Styles */
 
 .container {
-  /* Overall page container */
+  background-color: var(--paper);
+  color: var(--ink);
+  font-family: var(--sans);
+  font-size: 17px;
+  line-height: 1.55;
+  min-height: 100vh;
+  min-height: 100dvh;
+  display: flex;
+  flex-direction: column;
 }
 
 .main {
-  /* Grid background pattern */
-  background-image:
-    linear-gradient(rgba(129, 67, 156, 0.02) 1px, transparent 1px),
-    linear-gradient(90deg, rgba(129, 67, 156, 0.02) 1px, transparent 1px);
-  background-size: 20px 20px;
   padding: 2rem 2rem;
+  flex: 1;
 }
 
 @media (max-width: 768px) {

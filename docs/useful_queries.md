@@ -249,6 +249,70 @@ Example output:
 }
 ```
 
+## Popular Posts via @link Join (Homepage)
+
+The homepage query for popular posts uses a schema customization in `gatsby-node.js` to add a `post` field directly on `PopularCsv` that resolves to the matching `MarkdownRemark` node. This avoids fetching both datasets separately and matching slugs in JavaScript.
+
+**Setup in `gatsby-node.js`:**
+
+```js
+exports.createSchemaCustomization = ({ actions }) => {
+  const { createTypes } = actions
+  createTypes(`
+    type PopularCsv implements Node {
+      title: String!
+      published_at: String
+      slug: String!
+      post: MarkdownRemark @link(by: "fields.slug", from: "slug")
+    }
+  `)
+}
+```
+
+`@link(by: "fields.slug", from: "slug")` tells Gatsby: for each `PopularCsv` node, find the `MarkdownRemark` node whose `fields.slug` matches this row's `slug` column, and expose it as `post`.
+
+**Query:**
+
+The `post` field accepts the same subfields as any `MarkdownRemark` node, so you can share a fragment between recent and popular sections:
+
+```graphql
+{
+  fragment PostCardFields on MarkdownRemark {
+    fields { slug }
+    excerpt(pruneLength: 160)
+    frontmatter {
+      title
+      date(formatString: "YYYY-MM-DD")
+      category
+      featuredImage {
+        childImageSharp {
+          gatsbyImageData(width: 360, aspectRatio: 1.45, placeholder: BLURRED)
+        }
+      }
+    }
+  }
+
+  recent: allMarkdownRemark(
+    sort: { frontmatter: { date: DESC } }
+    filter: { fileAbsolutePath: { regex: "/src/markdown/" } }
+    limit: 3
+  ) {
+    nodes { ...PostCardFields }
+  }
+
+  popular: allPopularCsv(limit: 3) {
+    nodes {
+      slug
+      post { ...PostCardFields }
+    }
+  }
+}
+```
+
+If a slug in `popular.csv` has no matching post (e.g. a post was deleted), `post` comes back `null` and should be filtered out in the component.
+
+The CSV order is preserved, so the analytics ranking is not disturbed by the join.
+
 ## Sort By Multiple Fields
 
 Eg: Short posts, most recently published.

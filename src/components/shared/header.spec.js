@@ -3,7 +3,7 @@ import { render, screen } from "@testing-library/react"
 import Header from "./header"
 
 describe("Header", () => {
-  it("renders correctly", () => {
+  it("renders the logo and primary nav links", () => {
     const container = render(<Header />)
     expect(container).toMatchSnapshot()
 

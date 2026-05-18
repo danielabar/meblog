@@ -1,34 +1,17 @@
 import React from "react"
 import * as styles from "./hero.module.css"
 
-const Hero = () => {
-  return (
-    <div className={styles.hero}>
-      <div className={styles.metricDisplay}>
-        <div className={styles.metricVisual}>
-          <div className={styles.metricBars}>
-            <div className={styles.bar}></div>
-            <div className={styles.bar}></div>
-            <div className={styles.bar}></div>
-            <div className={styles.bar}></div>
-            <div className={styles.bar}></div>
-          </div>
-        </div>
-        <div>
-          <div className={styles.metricNumber}>15+</div>
-          <div className={styles.metricLabel}>Years Building Software</div>
-        </div>
-      </div>
-
-      <div className={styles.heroText}>
-        I'm a senior software engineer with extensive experience delivering
-        solutions that scale. I specialize in{" "}
-        <strong>Rails, PostgreSQL, and full-stack development</strong> —
-        turning complex technical challenges into working software that real
-        people use.
-      </div>
-    </div>
-  )
-}
+const Hero = () => (
+  <section className={styles.hero} data-testid="hero">
+    <h1 className={styles.headline}>
+      Software that works, and writing about how it got that way.
+    </h1>
+    <p className={styles.sub}>
+      Senior engineer with 15+ years of shipping. I write about the craft,
+      the trade-offs, and the parts of the job that don't fit on a résumé.
+      New posts monthly; opinions formed slowly and held loosely.
+    </p>
+  </section>
+)
 
 export default Hero

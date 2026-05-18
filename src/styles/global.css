@@ -50,7 +50,32 @@
   --base-font-color: var(--brand-darken-35);
   --base-font-family: "Bai Jamjuree", -apple-system, system-ui, "Segoe UI",
     Roboto, Oxygen-Sans, Ubuntu, Cantarell, "Helvetica Neue", sans-serif;
-  --font-family-2026: "DM Sans", -apple-system, sans-serif;
+
+  /* V2 homepage tokens — consumed only by shared/* and home/* modules */
+  --paper: #fbfaf9;
+  --paper-card: #ffffff;
+  --ink: var(--brand-darken-35);          /* #1a0d1f — alias, not a new color */
+  --ink-2: #2a1c33;
+  --ink-3: #5a4a64;
+  --ink-4: #8a7a93;
+  --ink-5: #b5a8be;
+  --line: #e8e2ec;
+  --line-soft: #f1edf3;
+  --accent: var(--brand);                 /* alias */
+  --accent-tint: var(--brand-lighten-50); /* alias */
+  --sans: "Figtree", -apple-system, system-ui, "Segoe UI", Roboto, sans-serif;
+  --mono: "JetBrains Mono", ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+  --display-font: var(--sans);
+
+  /* Card elevation: ambient ring + contact + gentle lift. Tinted toward --ink. */
+  --shadow-card:
+    0 0 0 1px rgba(46, 24, 56, 0.06),
+    0 1px 2px rgba(46, 24, 56, 0.04),
+    0 4px 12px -4px rgba(46, 24, 56, 0.06);
+  --shadow-card-hover:
+    0 0 0 1px rgba(46, 24, 56, 0.07),
+    0 2px 4px rgba(46, 24, 56, 0.05),
+    0 10px 24px -6px rgba(46, 24, 56, 0.12);
 }
 
 /* apply a natural box layout model to all elements, but allowing components to change */

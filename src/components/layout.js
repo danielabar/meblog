@@ -6,7 +6,7 @@ import Footer from "./footer.js"
 const Layout = ({ children }) => (
   <div className={styles.container}>
     <Header />
-    <div>{children}</div>
+    <div className={styles.content}>{children}</div>
     <Footer />
   </div>
 )
