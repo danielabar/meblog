@@ -146,6 +146,12 @@
   }
 }
 
+@media (max-width: 480px) {
+  .title {
+    font-size: 34px;
+  }
+}
+
 @media (prefers-reduced-motion: reduce) {
   .row {
     transition: background 120ms ease;
