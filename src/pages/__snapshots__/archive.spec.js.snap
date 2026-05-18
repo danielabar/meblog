@@ -53,79 +53,100 @@ exports[`Archive page renders page shell with title, meta, header, footer 1`] = 
           </h1>
           <p>
             4
-             posts · 2019 → 2026
+             posts · 
+            2019
+             → 
+            2026
           </p>
         </header>
-        <ul>
-          <li>
-            <a
-              href="/blog/recent-1/"
-            >
-              <span>
-                2026-05-02
-              </span>
-               
-              <span>
-                Recent One
-              </span>
-               
-              <span>
-                rails
-              </span>
-            </a>
-          </li>
-          <li>
-            <a
-              href="/blog/recent-2/"
-            >
-              <span>
-                2026-01-10
-              </span>
-               
-              <span>
-                Recent Two
-              </span>
-               
-              <span>
-                productivity
-              </span>
-            </a>
-          </li>
-          <li>
-            <a
-              href="/blog/older-1/"
-            >
-              <span>
-                2024-08-04
-              </span>
-               
-              <span>
-                Older One
-              </span>
-               
-              <span>
-                rails
-              </span>
-            </a>
-          </li>
-          <li>
-            <a
-              href="/blog/oldest/"
-            >
-              <span>
-                2019-12-15
-              </span>
-               
-              <span>
-                Oldest
-              </span>
-               
-              <span>
-                terminal
-              </span>
-            </a>
-          </li>
-        </ul>
+        <div>
+          <section
+            data-testid="year-group"
+            id="y2026"
+          >
+            <h2>
+              2026
+            </h2>
+            <div>
+              <a
+                data-testid="archive-row"
+                href="/blog/recent-1/"
+              >
+                <span>
+                  2026-05-02
+                </span>
+                <span>
+                  Recent One
+                </span>
+                <span>
+                  rails
+                </span>
+              </a>
+              <a
+                data-testid="archive-row"
+                href="/blog/recent-2/"
+              >
+                <span>
+                  2026-01-10
+                </span>
+                <span>
+                  Recent Two
+                </span>
+                <span>
+                  productivity
+                </span>
+              </a>
+            </div>
+          </section>
+          <section
+            data-testid="year-group"
+            id="y2024"
+          >
+            <h2>
+              2024
+            </h2>
+            <div>
+              <a
+                data-testid="archive-row"
+                href="/blog/older-1/"
+              >
+                <span>
+                  2024-08-04
+                </span>
+                <span>
+                  Older One
+                </span>
+                <span>
+                  rails
+                </span>
+              </a>
+            </div>
+          </section>
+          <section
+            data-testid="year-group"
+            id="y2019"
+          >
+            <h2>
+              2019
+            </h2>
+            <div>
+              <a
+                data-testid="archive-row"
+                href="/blog/oldest/"
+              >
+                <span>
+                  2019-12-15
+                </span>
+                <span>
+                  Oldest
+                </span>
+                <span>
+                  terminal
+                </span>
+              </a>
+            </div>
+          </section>
+        </div>
       </div>
     </main>
     <footer

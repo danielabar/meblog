@@ -39,4 +39,24 @@ describe("Archive page", () => {
     expect(screen.getByText("Recent One")).toBeInTheDocument()
     expect(screen.getByText("Oldest")).toBeInTheDocument()
   })
+
+  it("groups posts by year, newest first", () => {
+    render(<Archive data={data} />)
+    const sections = screen.getAllByTestId("year-group")
+    expect(sections.map(s => s.id)).toEqual(["y2026", "y2024", "y2019"])
+  })
+
+  it("derives meta line from posts", () => {
+    render(<Archive data={data} />)
+    expect(screen.getByText(/4 posts · 2019 → 2026/)).toBeInTheDocument()
+  })
+
+  it("renders each post as a row inside its year section", () => {
+    render(<Archive data={data} />)
+    const rows = screen.getAllByTestId("archive-row")
+    expect(rows).toHaveLength(4)
+    expect(rows[0]).toHaveTextContent("Recent One")
+    expect(rows[0]).toHaveTextContent("2026-05-02")
+    expect(rows[0]).toHaveTextContent("rails")
+  })
 })
