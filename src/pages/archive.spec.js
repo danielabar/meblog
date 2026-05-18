@@ -59,4 +59,13 @@ describe("Archive page", () => {
     expect(rows[0]).toHaveTextContent("2026-05-02")
     expect(rows[0]).toHaveTextContent("rails")
   })
+
+  it("renders a year rail with one entry per year group", () => {
+    render(<Archive data={data} />)
+    const rail = screen.getByTestId("year-rail")
+    const railLinks = rail.querySelectorAll("a")
+    expect(railLinks).toHaveLength(3)
+    expect(railLinks[0]).toHaveAttribute("href", "#y2026")
+    expect(railLinks[2]).toHaveAttribute("href", "#y2019")
+  })
 })

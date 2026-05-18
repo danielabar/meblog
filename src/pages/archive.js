@@ -3,6 +3,7 @@ import { graphql } from "gatsby"
 
 import SEO from "../components/SEO"
 import Layout from "../components/shared/layout"
+import YearRail from "../components/archive/year-rail"
 import * as styles from "./archive.module.css"
 
 const groupByYear = posts => {
@@ -20,6 +21,7 @@ const Archive = ({ data }) => {
   const groups = groupByYear(posts)
   const newestYear = groups[0]?.year
   const oldestYear = groups[groups.length - 1]?.year
+  const years = groups.map(g => ({ year: g.year, count: g.items.length }))
 
   return (
     <Layout>
@@ -31,31 +33,34 @@ const Archive = ({ data }) => {
             {posts.length} posts · {oldestYear} → {newestYear}
           </p>
         </header>
-        <div className={styles.list}>
-          {groups.map(({ year, items }) => (
-            <section
-              key={year}
-              id={`y${year}`}
-              className={styles.yearGroup}
-              data-testid="year-group"
-            >
-              <h2 className={styles.yearH}>{year}</h2>
-              <div className={styles.yearRows}>
-                {items.map(p => (
-                  <a
-                    key={p.fields.slug}
-                    href={p.fields.slug}
-                    className={styles.row}
-                    data-testid="archive-row"
-                  >
-                    <span className={styles.date}>{p.frontmatter.date}</span>
-                    <span className={styles.rowTitle}>{p.frontmatter.title}</span>
-                    <span className={styles.cat}>{p.frontmatter.category}</span>
-                  </a>
-                ))}
-              </div>
-            </section>
-          ))}
+        <div className={styles.layout}>
+          <div className={styles.content}>
+            {groups.map(({ year, items }) => (
+              <section
+                key={year}
+                id={`y${year}`}
+                className={styles.yearGroup}
+                data-testid="year-group"
+              >
+                <h2 className={styles.yearH}>{year}</h2>
+                <div className={styles.yearRows}>
+                  {items.map(p => (
+                    <a
+                      key={p.fields.slug}
+                      href={p.fields.slug}
+                      className={styles.row}
+                      data-testid="archive-row"
+                    >
+                      <span className={styles.date}>{p.frontmatter.date}</span>
+                      <span className={styles.rowTitle}>{p.frontmatter.title}</span>
+                      <span className={styles.cat}>{p.frontmatter.category}</span>
+                    </a>
+                  ))}
+                </div>
+              </section>
+            ))}
+          </div>
+          <YearRail years={years} />
         </div>
       </div>
     </Layout>
