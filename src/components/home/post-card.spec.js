@@ -4,14 +4,22 @@ import "@testing-library/jest-dom"
 
 jest.mock("gatsby-plugin-image", () => ({
   GatsbyImage: ({ image, alt }) => (
-    <img data-testid="gatsby-image" data-image={JSON.stringify(image)} alt={alt} />
+    <img
+      data-testid="gatsby-image"
+      data-image={JSON.stringify(image)}
+      alt={alt}
+    />
   ),
-  getImage: img => (img && img.childImageSharp ? img.childImageSharp.gatsbyImageData : null),
+  getImage: img =>
+    img && img.childImageSharp ? img.childImageSharp.gatsbyImageData : null,
 }))
 
 import PostCard from "./post-card"
 
-const fixturePost = ({ description, excerpt = "Fallback excerpt copy." } = {}) => ({
+const fixturePost = ({
+  description,
+  excerpt = "Fallback excerpt copy.",
+} = {}) => ({
   fields: { slug: "/blog/foo/" },
   excerpt,
   frontmatter: {
@@ -32,7 +40,9 @@ describe("PostCard", () => {
     const post = fixturePost({ description: "The real description." })
     render(<PostCard post={post} />)
 
-    expect(screen.getByText("The Code-Adjacent Power of AI")).toBeInTheDocument()
+    expect(
+      screen.getByText("The Code-Adjacent Power of AI")
+    ).toBeInTheDocument()
     expect(screen.getByText("April 18, 2026")).toBeInTheDocument()
     expect(screen.getByText("productivity")).toBeInTheDocument()
     expect(screen.getByText("The real description.")).toBeInTheDocument()

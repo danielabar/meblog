@@ -62,9 +62,9 @@ const About = () => (
 
       <p className={styles.para}>
         I'm a full-stack generalist with deep expertise in Rails and PostgreSQL.
-        I understand the entire system, from database design and query optimization to
-        service layer to front-end interactivity to CI/CD pipeline
-        configuration. I can navigate architectural decisions with a
+        I understand the entire system, from database design and query
+        optimization to service layer to front-end interactivity to CI/CD
+        pipeline configuration. I can navigate architectural decisions with a
         pragmatic eye toward trade-offs and long-term maintainability.
       </p>
 

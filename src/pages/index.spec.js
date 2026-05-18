@@ -9,7 +9,8 @@ jest.mock("../components/SEO", () => ({
 
 jest.mock("gatsby-plugin-image", () => ({
   GatsbyImage: ({ alt }) => <img data-testid="gatsby-image" alt={alt} />,
-  getImage: img => (img && img.childImageSharp ? img.childImageSharp.gatsbyImageData : null),
+  getImage: img =>
+    img && img.childImageSharp ? img.childImageSharp.gatsbyImageData : null,
 }))
 
 import Index from "./index"
@@ -38,8 +39,14 @@ const homeData = {
   },
   popular: {
     nodes: [
-      { slug: "/blog/very-popular/", post: postNode("very-popular", "Very Popular Title") },
-      { slug: "/blog/also-popular/", post: postNode("also-popular", "Also Popular Title") },
+      {
+        slug: "/blog/very-popular/",
+        post: postNode("very-popular", "Very Popular Title"),
+      },
+      {
+        slug: "/blog/also-popular/",
+        post: postNode("also-popular", "Also Popular Title"),
+      },
       { slug: "/blog/missing/", post: null },
     ],
   },
@@ -54,8 +61,21 @@ describe("Home Page", () => {
     expect(screen.getByTestId("footer")).toBeInTheDocument()
     expect(screen.getByTestId("hero")).toBeInTheDocument()
 
-    expect(screen.getByRole("heading", { level: 2, name: "Recent" })).toBeInTheDocument()
-    expect(screen.getByRole("heading", { level: 2, name: "Popular" })).toBeInTheDocument()
+    expect(
+      screen.getByRole("heading", { level: 2, name: "Recent" })
+    ).toBeInTheDocument()
+    expect(
+      screen.getByRole("heading", { level: 2, name: "Popular" })
+    ).toBeInTheDocument()
+  })
+
+  it("links the Popular section to /archive", () => {
+    render(<Index data={homeData} />)
+    const popularSection = screen
+      .getByRole("heading", { name: "Popular" })
+      .closest("section")
+    const archiveLink = popularSection.querySelector(`a[href="/archive"]`)
+    expect(archiveLink).toBeInTheDocument()
   })
 
   it("filters out popular entries whose post link is null", () => {
@@ -63,9 +83,13 @@ describe("Home Page", () => {
 
     render(<Index data={homeData} />)
 
-    const popularSection = screen.getByRole("heading", { name: "Popular" }).closest("section")
+    const popularSection = screen
+      .getByRole("heading", { name: "Popular" })
+      .closest("section")
     expect(popularSection).not.toBeNull()
-    const popularCards = popularSection.querySelectorAll("[data-testid='post-card']")
+    const popularCards = popularSection.querySelectorAll(
+      "[data-testid='post-card']"
+    )
     expect(popularCards).toHaveLength(2)
 
     console.warn.mockRestore()

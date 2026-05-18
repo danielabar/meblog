@@ -1,0 +1,44 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`YearRail matches snapshot 1`] = `
+<div>
+  <aside
+    aria-label="Jump to year"
+    data-testid="year-rail"
+  >
+    <div>
+      jump to
+    </div>
+    <a
+      href="#y2026"
+    >
+      <span>
+        2026
+      </span>
+      <span>
+        10
+      </span>
+    </a>
+    <a
+      href="#y2025"
+    >
+      <span>
+        2025
+      </span>
+      <span>
+        13
+      </span>
+    </a>
+    <a
+      href="#y2019"
+    >
+      <span>
+        2019
+      </span>
+      <span>
+        1
+      </span>
+    </a>
+  </aside>
+</div>
+`;

@@ -1,0 +1,49 @@
+.rail {
+  position: sticky;
+  top: 100px;
+  align-self: start;
+}
+
+.label {
+  font-family: var(--mono);
+  font-size: 10px;
+  text-transform: uppercase;
+  letter-spacing: 0.12em;
+  color: var(--ink-4);
+  margin-bottom: 12px;
+}
+
+.link {
+  display: flex;
+  justify-content: space-between;
+  align-items: baseline;
+  padding: 10px 0;
+  text-decoration: none;
+  color: var(--ink-3);
+  font-family: var(--mono);
+  font-size: 13px;
+  font-variant-numeric: tabular-nums;
+  border-bottom: 1px solid var(--line-soft);
+  transition: color 120ms ease;
+}
+
+.link:hover,
+.link:focus-visible {
+  color: var(--accent);
+}
+
+.count {
+  font-size: 10px;
+  color: var(--ink-5);
+}
+
+.link:hover .count,
+.link:focus-visible .count {
+  color: var(--accent);
+}
+
+@media (max-width: 900px) {
+  .rail {
+    display: none;
+  }
+}

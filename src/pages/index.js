@@ -43,7 +43,7 @@ const Index = ({ data }) => {
           <PostsSection
             title="Popular"
             linkText="archive →"
-            linkTo="/blog"
+            linkTo="/archive"
             posts={popular}
           />
         </div>
