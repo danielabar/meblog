@@ -80,7 +80,7 @@ curl -X POST http://localhost:5000/hooks \
   -d '{"type":"invoice.payment_failed","data":{"object":{"customer":"cus_xxx","attempt_count":1}}}'
 ```
 
-This works for testing individual mailer methods, but it's not *real* testing. It requires hand-crafting a Stripe payload, it only tests one event in isolation, and misses the interactions between multiple webhook events that Stripe sends during a real payment failure cycle.
+This works for testing individual mailer methods, but it's not *real* testing. It requires hand-crafting a Stripe payload, it only tests one event in isolation, and completely missing the interactions between multiple webhook events that Stripe sends during a real payment failure cycle.
 
 I wanted something better: a way to make Stripe actually simulate the entire payment failure sequence and send real webhooks to my local server. Stripe has two tools that do exactly that.
 
