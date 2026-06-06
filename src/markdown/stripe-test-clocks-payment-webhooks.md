@@ -1,8 +1,8 @@
 ---
 title: "Beyond Mocked Payloads: End-to-End Stripe Webhook Testing"
 featuredImage: "../images/stripe-webhook-testing-towfiqu-barbhuiya-bwOAixLG0uc-unsplash.jpg"
-description: "How to use Stripe Test Clocks and the Stripe CLI to run a real end-to-end payment failure webhook test locally — no manual dashboard clicking, no waiting weeks for retries."
-date: "2026-06-01"
+description: "How to use Stripe Test Clocks and the Stripe CLI to run a real end-to-end payment failure webhook test locally."
+date: "2026-06-06"
 category: "rails"
 related:
   - "Build a Rails App with Slack Part 1: OAuth"
@@ -10,9 +10,9 @@ related:
   - "Sustainable Feature Testing in Rails with Cucumber"
 ---
 
-When your SaaS app needs to send carefully worded emails after a customer's payment fails — and different emails depending on whether they're a monthly or yearly subscriber — how do you actually test that? Not the unit tests (those are table stakes), but the real thing: Stripe sends a webhook, your app receives it, routes it, sends an email, and the email says the right thing to the right person.
+When your SaaS app needs to send email notifications after a customer's payment fails, and different emails depending on whether they're a monthly or yearly subscriber, how do you actually test that? Not the unit tests (those are table stakes), but the real thing: Stripe sends a webhook, your app receives it, routes it, sends an email, and the email says the right thing to the right person.
 
-The wrinkle is that payment failures don't happen all at once. Stripe retries over days and weeks — a first attempt, then several days later a second, then a third before finally cancelling the subscription. To test the full sequence for real, you'd have to wait weeks for failures to play out naturally, which is not practical for fast feedback.
+The wrinkle is that payment failures don't happen all at once. Stripe retries over days and weeks: a first attempt, then several days later a second, then a third before finally cancelling the subscription. To test the full sequence for real, you'd have to wait weeks for failures to play out naturally, which is not practical for fast feedback.
 
 I recently built a test harness that solves this, and along the way discovered a race condition that would have been invisible to any other testing approach. Here's how it works.
 
@@ -30,11 +30,11 @@ On top of that, monthly and yearly subscribers need different wording. Monthly s
 
 **The Stack:**
 
-The app is a Rails monolith: Action Mailer for emails, Sidekiq for background jobs, and rake tasks for the test harness automation. Stripe API calls use the official `stripe` gem.
+The app is a Rails monolith: Action Mailer for emails, Sidekiq for background jobs, and rake tasks for the test harness automation. Stripe API calls use the official [stripe](https://github.com/stripe/stripe-ruby) gem.
 
 ## Stripe Webhooks
 
-When events happen in Stripe — a payment succeeds, a subscription is canceled, an invoice fails — Stripe can notify your application by sending an HTTP POST request to a URL you configure. This is a webhook. You choose which events you care about from Stripe's extensive list, and Stripe sends you a JSON payload describing what happened.
+When events happen in Stripe, such as a payment succeeds, a subscription is canceled, an invoice fails, Stripe can notify your application by sending an HTTP POST request to a URL you configure. This is a webhook. You choose which events you care about from Stripe's extensive list, and Stripe sends you a JSON payload describing what happened.
 
 For our case, the key event is `invoice.payment_failed`. The payload includes the customer ID, the attempt count (1, 2, or 3), and details about the invoice.
 
@@ -70,9 +70,7 @@ def receive
 end
 ```
 
-The payment failure emails are routed based on two factors: the attempt number (1, 2, or 3) and the user's billing period. Keep this routing logic in mind — it becomes important later.
-
-But how do you test that this actually works end-to-end?
+The payment failure emails are routed based on two factors: the attempt number (1, 2, or 3) and the user's billing period.
 
 ## How to Test?
 
@@ -80,7 +78,7 @@ Real payment failures take weeks. Stripe's retry schedule spaces out attempts ov
 
 Unit tests with mocked payloads verify that *given this JSON, the right mailer is called*. That's necessary, but it doesn't tell you whether the real Stripe webhook payload matches what your code expects, whether the events arrive in the order you assumed, or whether your async job processing introduces timing issues.
 
-When I first asked my AI coding assistant how to test this, it kept insisting the best approach was to `curl` a static JSON payload to my webhook endpoint:
+When I first asked my AI coding assistant how to test this, it kept insisting the best approach was to [curl](https://curl.se/) a static JSON payload to my webhook endpoint:
 
 ```bash
 curl -X POST http://localhost:5000/hooks \
