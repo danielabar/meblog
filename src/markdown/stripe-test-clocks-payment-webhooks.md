@@ -22,9 +22,9 @@ I work on a SaaS that uses Stripe to manage subscriptions and recurring payments
 
 We wanted to send a different email for each attempt:
 
-1. **First failure**: A gentle nudge — "Hey, your payment didn't go through, please update your card"
-2. **Second failure**: An urgent warning — "This is your last chance before we suspend your account"
-3. **Third failure**: A closure notice — "Your account has been closed"
+1. **First failure**: A gentle nudge: "Hey, your payment didn't go through, please update your card"
+2. **Second failure**: An urgent warning: "This is your last chance before we suspend your account"
+3. **Third failure**: A closure notice: "Your account has been closed"
 
 On top of that, monthly and yearly subscribers need different wording. Monthly subscribers' data gets deleted after a grace period. Yearly subscribers' data is preserved indefinitely. That's six distinct emails (3 attempts x 2 billing periods), and getting the wrong one to the wrong person at the wrong time is a bad customer experience.
 
@@ -42,7 +42,7 @@ The Rails app has a controller endpoint that receives these webhooks and decides
 
 ```ruby
 def receive
-  # Signature verification omitted for clarity — see Stripe docs:
+  # Signature verification omitted for clarity; see Stripe docs:
   # https://docs.stripe.com/webhooks#verify-official-libraries
   event_json = JSON.parse(request.body.read)
 
@@ -102,7 +102,7 @@ The CLI has a command that's essential for local webhook testing:
 stripe listen --forward-to localhost:5000/hooks
 ```
 
-This creates a temporary additional webhook endpoint that forwards events to your local development server. It doesn't replace or interfere with any webhook endpoints you've already configured in the Stripe dashboard — those continue to receive events normally. The CLI just adds your local server as an extra destination. You see the events arrive in real time in your terminal.
+This creates a temporary additional webhook endpoint that forwards events to your local development server. It doesn't replace or interfere with any webhook endpoints you've already configured in the Stripe dashboard; those continue to receive events normally. The CLI just adds your local server as an extra destination. You see the events arrive in real time in your terminal.
 
 Together, these two tools were exactly what I needed.
 
@@ -112,7 +112,7 @@ I wrapped the workflow into a set of rake tasks, defined at `lib/tasks/test_cloc
 
 ### Create a Subscriber Destined to Fail
 
-The setup task creates everything Stripe needs for a realistic payment renewal failure. Notice the customer starts with a valid card. We need the initial subscription to succeed — just like a real customer whose card works fine at first:
+The setup task creates everything Stripe needs for a realistic payment renewal failure. Notice the customer starts with a valid card. We need the initial subscription to succeed, just like a real customer whose card works fine at first:
 
 ```ruby
 namespace :test_clock do
@@ -120,7 +120,7 @@ namespace :test_clock do
     frozen_time = Time.current.to_i
     email = ENV.fetch("EMAIL", "testclock+#{Time.current.to_i}@localhost.test")
 
-    # Create a test clock — this is our time machine
+    # Create a test clock
     test_clock = Stripe::TestHelpers::TestClock.create(
       frozen_time: frozen_time,
       name: "Payment Failure Test"
@@ -159,7 +159,7 @@ namespace :test_clock do
 end
 ```
 
-The `stripe_price_id` comes from your own integration — it's the test-mode ID for the [Price](https://docs.stripe.com/billing/subscriptions/build-subscriptions#create-pricing-model) associated with your subscription product.
+The `stripe_price_id` comes from your own integration (it's the test-mode ID for the [Price](https://docs.stripe.com/billing/subscriptions/build-subscriptions#create-pricing-model) associated with your subscription product).
 
 Now comes the trick. We swap the payment method to one of Stripe's [test cards that always fails](https://docs.stripe.com/testing#declined-payments):
 
@@ -343,9 +343,9 @@ end
 
 Exercising this harness requires three terminals open simultaneously:
 
-1. **Your web server and background jobs** — `bin/dev`, which starts both the Rails app server to receive the HTTP POST requests from Stripe, and your background job processor (ours is Sidekiq).
-2. **Stripe CLI webhook forwarding** — `stripe listen --forward-to localhost:5000/hooks` so that Stripe's webhooks reach your local machine
-3. **The test harness commands** — where you run the rake tasks to set up test data, advance time, and clean up
+1. **Your web server and background jobs:** `bin/dev`, which starts both the Rails app server to receive the HTTP POST requests from Stripe, and your background job processor (ours is Sidekiq).
+2. **Stripe CLI webhook forwarding:** `stripe listen --forward-to localhost:5000/hooks` so that Stripe's webhooks reach your local machine
+3. **The test harness commands:** where you run the rake tasks to set up test data, advance time, and clean up
 
 The full test cycle for one plan type looks like this:
 
@@ -356,9 +356,9 @@ Terminal 3: bin/rails test_clock:setup PLAN=monthly
             bin/rails test_clock:cleanup
 ```
 
-When you run `advance_past_renewal`, Stripe executes the billing cycle on their end — the subscription renewal, the payment failure, the retries, the cancellation — and sends an HTTP POST webhook to your endpoint for each event. `stripe listen` forwards those to your local server, your Rails app receives and processes them, and Sidekiq delivers the emails. In development, we use the [`letter_opener`](https://github.com/ryanb/letter_opener) gem, which intercepts outgoing emails and opens them as browser tabs — so three tabs pop open, one for each payment failure email.
+When you run `advance_past_renewal`, Stripe executes the billing cycle on their end (the subscription renewal, the payment failure, the retries, the cancellation) and sends an HTTP POST webhook to your endpoint for each event. `stripe listen` forwards those to your local server, your Rails app receives and processes them, and Sidekiq delivers the emails. In development, we use the [`letter_opener`](https://github.com/ryanb/letter_opener) gem, which intercepts outgoing emails and opens them as browser tabs; three tabs pop open, one for each payment failure email.
 
-You can see all three `invoice.payment_failed` webhooks arriving in sequence in the `stripe listen` terminal — the first failure, then a bit later the second, then the third — all from a single advance command. And you can visually verify the emails: Does the first one say "Action needed: Update your payment method"? Does it mention "monthly subscription"? Is the closure email appropriately dire about data deletion?
+You can see all three `invoice.payment_failed` webhooks arriving in sequence in the `stripe listen` terminal: the first failure, then a bit later the second, then the third, all from a single advance command. And you can visually verify the emails: Does the first one say "Action needed: Update your payment method"? Does it mention "monthly subscription"? Is the closure email appropriately dire about data deletion?
 
 Then repeat for `PLAN=yearly` and verify the yearly variants: does the closure email now reassure the subscriber their data is preserved? Six emails total across two plan types, each one visually verifiable in about a minute.
 
@@ -382,9 +382,9 @@ def receive
 end
 ```
 
-`AccountCloser` is a background job that clears the user's subscription data from our database — things like resetting subscription type and status fields.
+`AccountCloser` is a background job that clears the user's subscription data from our database: things like resetting subscription type and status fields.
 
-This seems straightforward. But during testing of the third failure email for yearly subscribers, I noticed something wrong: they were receiving the monthly version of the closure email — the one warning about permanent data deletion — instead of the yearly version reassuring them their data would be preserved.
+This seems straightforward. But during testing of the third failure email for yearly subscribers, I noticed something wrong: they were receiving the monthly version of the closure email (the one warning about permanent data deletion) instead of the yearly version reassuring them their data would be preserved.
 
 The webhook logs told the story. As visible in the terminal running `stripe listen --forward-to...`, when the third payment fails, Stripe sends two events in quick succession:
 
@@ -461,7 +461,7 @@ One other takeaway: AI coding assistants will sometimes anchor on the simplest p
 
 ## Summary
 
-Here are all the tools that make this work, and what each one contributes:
+Here are all the tools that make this work:
 
 | Tool | Role |
 |------|------|
@@ -471,4 +471,4 @@ Here are all the tools that make this work, and what each one contributes:
 | [letter_opener](https://github.com/ryanb/letter_opener) | Gem to preview emails instantly in the browser |
 | Rake tasks (`lib/tasks/test_clock.rake`) | Orchestrate setup, time advancement, and cleanup |
 
-If your SaaS handles subscription payment failures and you want confidence that the right customer gets the right email at the right time — especially when multiple webhook events interact in ways you might not expect — I'd encourage you to explore Stripe's Test Clock API. It turned what used to be a manual, slow, error-prone process into something I can run in a few minutes and feel confident about.
+If your SaaS handles subscription payment failures and you want confidence that the right customer gets the right email at the right time (especially when multiple webhook events interact in ways you might not expect), I'd encourage you to explore Stripe's Test Clock API. It turned what used to be a manual, slow, error-prone process into something I can run in a few minutes and feel confident about.
