@@ -356,7 +356,7 @@ Terminal 3: bin/rails test_clock:setup PLAN=monthly
             bin/rails test_clock:cleanup
 ```
 
-When you run `advance_past_renewal`, Stripe executes the billing cycle on their end — the subscription renewal, the payment failure, the retries, the cancellation — and sends an HTTP POST webhook to your endpoint for each event. `stripe listen` forwards those to your local server, your Rails app receives and processes them, and Sidekiq delivers the emails. In development, we use the `letter_opener` gem, which intercepts outgoing emails and opens them as browser tabs — so three tabs pop open, one for each payment failure email.
+When you run `advance_past_renewal`, Stripe executes the billing cycle on their end — the subscription renewal, the payment failure, the retries, the cancellation — and sends an HTTP POST webhook to your endpoint for each event. `stripe listen` forwards those to your local server, your Rails app receives and processes them, and Sidekiq delivers the emails. In development, we use the [`letter_opener`](https://github.com/ryanb/letter_opener) gem, which intercepts outgoing emails and opens them as browser tabs — so three tabs pop open, one for each payment failure email.
 
 You can see all three `invoice.payment_failed` webhooks arriving in sequence in the `stripe listen` terminal — the first failure, then a bit later the second, then the third — all from a single advance command. And you can visually verify the emails: Does the first one say "Action needed: Update your payment method"? Does it mention "monthly subscription"? Is the closure email appropriately dire about data deletion?
 
