@@ -10,15 +10,15 @@ related:
   - "Sustainable Feature Testing in Rails with Cucumber"
 ---
 
-I work on a SaaS that uses Stripe to manage subscriptions and recurring payments. Customers can choose to pay monthly or yearly. When a card fails at renewal, Stripe retries the payment up to three times over about two weeks (the exact schedule is configurable in your Stripe dashboard under Settings → Billing → Manage Failed Payments). After the third failure, Stripe cancels the subscription (also configurable).
-
-On top of that, monthly and yearly subscribers need different wording in the emails. Monthly subscribers' data gets deleted after a grace period. Yearly subscribers' data is preserved indefinitely. That's six distinct emails (3 attempts x 2 billing periods), and getting the wrong one to the wrong person at the wrong time is a bad customer experience.
+I work on a SaaS that uses Stripe to manage subscriptions and recurring payments. When a credit card fails at renewal, Stripe retries the payment up to three times over about two weeks (the exact schedule is configurable in your Stripe dashboard under Settings → Billing → Manage Failed Payments). After the third failure, Stripe cancels the subscription (also configurable).
 
 We wanted to send a different email for each attempt:
 
-1. **First failure**: A gentle nudge: "Hey, your payment didn't go through, please update your card"
+1. **First failure**: A gentle nudge: "Your payment didn't go through, please update your card"
 2. **Second failure**: An urgent warning: "This is your last chance before we suspend your account"
 3. **Third failure**: A closure notice: "Your account has been closed"
+
+On top of that, monthly and yearly subscribers need different wording in the emails. Monthly subscribers' data gets deleted after a grace period. Yearly subscribers' data is preserved indefinitely. That's six distinct emails (3 attempts x 2 billing periods), and getting the wrong one to the wrong person is a bad customer experience.
 
 How do you test that whole chain without waiting weeks for the failures to play out?
 
@@ -455,7 +455,7 @@ One other takeaway: AI coding assistants will sometimes anchor on the simplest p
 
 ## Summary
 
-Here are all the tools that make this work:
+Here are the tools that make this work:
 
 | Tool | Role |
 |------|------|
