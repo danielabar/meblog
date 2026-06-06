@@ -440,14 +440,14 @@ end
 
 ## Long-Term Value
 
-The test harness isn't a one-time tool. It becomes part of the development workflow. From now on, whenever someone needs to:
+Committing these rake tasks to the repo means any developer who later needs to:
 
 - Change the wording of any payment failure email
 - Add a new subscriber tier with different messaging
 - Modify the webhook routing logic
 - Update the retry schedule behavior
 
-...they can run the full test matrix locally in a few minutes and verify everything end-to-end.
+...can run the full test matrix locally in a few minutes and verify everything end-to-end.
 
 The combination of Stripe Test Clocks (for realistic time simulation), the Stripe CLI (for local webhook forwarding), and letter_opener (for instant email preview) creates a feedback loop that's almost as fast as running unit tests, but with the fidelity of a production environment.
 
