@@ -88,13 +88,13 @@ curl -X POST http://localhost:5000/hooks \
 
 This works for smoke-testing individual mailer methods, but it's not *real* testing. You're hand-crafting the payload, you're only testing one event in isolation, and you're completely missing the interactions between multiple webhook events that Stripe sends during a real payment failure cycle.
 
-I wanted something better: a way to make Stripe actually simulate the entire payment failure sequence and send real webhooks to my local server.
+I wanted something better: a way to make Stripe actually simulate the entire payment failure sequence and send real webhooks to my local server. Stripe has two tools that do exactly that.
 
 ## Stripe Tools
 
-**Test Clocks.** A colleague pointed me to Stripe's [Test Clocks](https://docs.stripe.com/billing/testing/test-clocks) feature (also called the Simulation API). Test Clocks support a simulated environment where you can fast-forward time. You create a customer associated with the clock, give them a subscription, then advance the clock past the renewal date. Stripe simulates everything that would happen: the renewal attempt, the payment failure, the retries, the subscription cancellation. And it sends real webhooks for each event.
+**[Test Clocks](https://docs.stripe.com/billing/testing/test-clocks):** Also called the Simulation API, this feature gives you a simulated environment where you can fast-forward time. You create a customer associated with the clock, give them a subscription, then advance the clock past the renewal date. Stripe simulates everything that would happen: the renewal attempt, the payment failure, the retries, the subscription cancellation. And it sends real webhooks for each event.
 
-**Stripe CLI.** The [Stripe CLI](https://docs.stripe.com/stripe-cli) is a command-line tool that lets you interact with your Stripe account. Critically, when you run `stripe login`, you're authenticated against Stripe's **test mode** only. Everything we're doing here — the CLI, the Test Clocks, the test cards — operates entirely in test mode, so there's no risk of touching production data.
+**[Stripe CLI](https://docs.stripe.com/stripe-cli):** This command-line tool lets you interact with your Stripe account. Critically, when you run `stripe login`, you're authenticated against Stripe's **test mode** only, so there's no risk of touching production data.
 
 The CLI has a command that's essential for local webhook testing:
 
@@ -185,7 +185,7 @@ end
 
 The subscription is active and healthy. But the next time Stripe tries to charge this customer, it will fail.
 
-We also create a local user in our database linked to this Stripe customer, so our webhook handler can look them up by Stripe customer ID. How you model this varies — you might have a separate subscriptions table, a different field name, or additional associations. The code below shows a simple example where `User` has a `stripe_customer_id` column:
+We also create a local user in our database linked to this Stripe customer, so our webhook handler can look them up by Stripe customer ID. Adjust this for your own data model. You might have a separate subscriptions table, a different field name, or additional associations. The code below shows a simple example where `User` has a `stripe_customer_id` column:
 
 ```ruby
 namespace :test_clock do
@@ -266,7 +266,9 @@ namespace :test_clock do
 end
 ```
 
-The `renewal_time` was stored in the state file during setup (from `subscription.current_period_end`). We add 30 days past that — a buffer to ensure all retries have completed. `wait_for_clock_ready`, `load_state`, and `state_file_path` are helper methods defined in the rake file:
+The `renewal_time` was stored in the state file during setup (from `subscription.current_period_end`). We add 30 days past that, which is a buffer to ensure all retries have completed. Clock advancement is asynchronous: Stripe processes it in the background, so `wait_for_clock_ready` polls the clock's status every two seconds and only returns once Stripe reports it as `"ready"`.
+
+`load_state` and `state_file_path` are utility methods to read from the state file:
 
 ```ruby
 def wait_for_clock_ready(clock_id)
@@ -295,7 +297,7 @@ Once the clock is ready, the updated frozen time is written back to the state fi
 
 ### Clean Up
 
-Here's one of the nicest things about Test Clocks: when you delete the clock, Stripe automatically deletes everything that was created inside it — the customer, the subscription, the invoices, the payment intents, the charges. No test data accumulating in your Stripe test environment.
+Here's one of the nicest things about Test Clocks: when you delete the clock, Stripe automatically deletes everything that was created inside it, such as the customer, the subscription, the invoices, the payment intents, the charges.
 
 ```ruby
 namespace :test_clock do
@@ -314,7 +316,7 @@ Clean slate, ready to test the next plan type.
 
 ### Putting It All Together
 
-Before running everything, here's the shape of the full rake file — all the tasks we've been building up, in one view:
+Before running everything, here's the shape of the full rake file with all the tasks we've been building up:
 
 ```ruby
 namespace :test_clock do
@@ -451,7 +453,7 @@ The test harness isn't a one-time tool. It becomes part of the development workf
 - Modify the webhook routing logic
 - Update the retry schedule behavior
 
-...they can run the full test matrix locally in a few minutes and verify everything end-to-end. No deploying to a staging environment, no manual Stripe dashboard gymnastics. Just three terminals and a rake task.
+...they can run the full test matrix locally in a few minutes and verify everything end-to-end.
 
 The combination of Stripe Test Clocks (for realistic time simulation), the Stripe CLI (for local webhook forwarding), and letter_opener (for instant email preview) creates a feedback loop that's almost as fast as running unit tests, but with the fidelity of a production environment.
 
