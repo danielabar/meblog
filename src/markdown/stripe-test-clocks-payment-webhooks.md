@@ -10,15 +10,9 @@ related:
   - "Sustainable Feature Testing in Rails with Cucumber"
 ---
 
-When your SaaS app needs to send email notifications after a customer's payment fails, and different emails depending on whether they're a monthly or yearly subscriber, how do you actually test that? Not the unit tests (those are table stakes), but the real thing: Stripe sends a webhook, your app receives it, routes it, sends an email, and the email says the right thing to the right person.
+I work on a SaaS that uses Stripe to manage subscriptions and recurring payments. Customers can choose to pay monthly or yearly. When a card fails at renewal, Stripe retries the payment up to three times over about two weeks (the exact schedule is configurable in your Stripe dashboard under Settings → Billing → Manage Failed Payments). After the third failure, Stripe cancels the subscription (also configurable).
 
-The wrinkle is that payment failures don't happen all at once. Stripe retries over days and weeks: a first attempt, then several days later a second, then a third before finally cancelling the subscription. To test the full sequence for real, you'd have to wait weeks for failures to play out naturally, which is not practical for fast feedback.
-
-I recently built a test harness that solves this, and along the way discovered a race condition that would have been invisible to any other testing approach. Here's how it works.
-
-## The Problem
-
-I work on a SaaS that uses Stripe to manage subscriptions and recurring payments. Customers can choose to pay monthly or yearly. When a customer's credit card fails at renewal, Stripe retries the payment up to three times over about two weeks (the exact schedule is configurable in your Stripe dashboard under Settings → Billing → Manage Failed Payments). After the third failure, Stripe cancels the subscription (also configurable).
+On top of that, monthly and yearly subscribers need different wording in the emails. Monthly subscribers' data gets deleted after a grace period. Yearly subscribers' data is preserved indefinitely. That's six distinct emails (3 attempts x 2 billing periods), and getting the wrong one to the wrong person at the wrong time is a bad customer experience.
 
 We wanted to send a different email for each attempt:
 
@@ -26,13 +20,15 @@ We wanted to send a different email for each attempt:
 2. **Second failure**: An urgent warning: "This is your last chance before we suspend your account"
 3. **Third failure**: A closure notice: "Your account has been closed"
 
-On top of that, monthly and yearly subscribers need different wording. Monthly subscribers' data gets deleted after a grace period. Yearly subscribers' data is preserved indefinitely. That's six distinct emails (3 attempts x 2 billing periods), and getting the wrong one to the wrong person at the wrong time is a bad customer experience.
+How do you test that whole chain without waiting weeks for the failures to play out?
 
-**The Stack:**
+Unit tests with mocked payloads can confirm that *given this JSON, the right mailer is called*. That's necessary, but it doesn't tell you whether the real Stripe payload matches what your code expects, whether events arrive in the order you assumed, or whether your async job processing introduces timing issues.
 
-The app is a Rails monolith: Action Mailer for emails, Sidekiq for background jobs, and rake tasks for the test harness automation. Stripe API calls use the official [stripe](https://github.com/stripe/stripe-ruby) gem.
+I recently built a test harness that solves this, and along the way discovered a race condition that would have been invisible to any other testing approach. Here's how it works.
 
 ## Stripe Webhooks
+
+The app is a Rails monolith: Action Mailer for emails, Sidekiq for background jobs, and rake tasks for the test harness automation. Stripe API calls use the official [stripe](https://github.com/stripe/stripe-ruby) gem.
 
 When events happen in Stripe, such as a payment succeeds, a subscription is canceled, an invoice fails, Stripe can notify your application by sending an HTTP POST request to a URL you configure. This is a webhook. You choose which events you care about from Stripe's extensive list, and Stripe sends you a JSON payload describing what happened.
 
@@ -76,8 +72,6 @@ The payment failure emails are routed based on two factors: the attempt number (
 
 Real payment failures take weeks. Stripe's retry schedule spaces out attempts over days. You can't sit around waiting for time to pass. And it's tedious to have to create a new subscriber each time, set up a valid payment method, then change to an invalid method that would fail renewal.
 
-Unit tests with mocked payloads verify that *given this JSON, the right mailer is called*. That's necessary, but it doesn't tell you whether the real Stripe webhook payload matches what your code expects, whether the events arrive in the order you assumed, or whether your async job processing introduces timing issues.
-
 When I first asked my AI coding assistant how to test this, it kept insisting the best approach was to [curl](https://curl.se/) a static JSON payload to my webhook endpoint:
 
 ```bash
@@ -86,7 +80,7 @@ curl -X POST http://localhost:5000/hooks \
   -d '{"type":"invoice.payment_failed","data":{"object":{"customer":"cus_xxx","attempt_count":1}}}'
 ```
 
-This works for smoke-testing individual mailer methods, but it's not *real* testing. You're hand-crafting the payload, you're only testing one event in isolation, and you're completely missing the interactions between multiple webhook events that Stripe sends during a real payment failure cycle.
+This works for testing individual mailer methods, but it's not *real* testing. It requires hand-crafting a Stripe payload, it only tests one event in isolation, and misses the interactions between multiple webhook events that Stripe sends during a real payment failure cycle.
 
 I wanted something better: a way to make Stripe actually simulate the entire payment failure sequence and send real webhooks to my local server. Stripe has two tools that do exactly that.
 
