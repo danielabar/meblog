@@ -10,15 +10,15 @@ related:
   - "The Code-Adjacent Power of AI"
 ---
 
-Hello Visitor is a small Rails app I run to power cookie-free page analytics, and search on this blog. It's been chugging along for about five years. Like most solo side projects, it grew over time, learned-on-the-job, and quietly accumulated tech debt I've never had time to dig into. Then I came across the [Thoughtbot Rails Audit skill](https://github.com/thoughtbot/rails-audit-thoughtbot), a Claude Skill that walks a Rails codebase and produces a structured audit report against Thoughtbot's house style.
+Hello Visitor is a small Rails app I run to power cookie-free page analytics, and search on this blog. It's been chugging along for about five years. Like many solo side projects, it grew over time, and quietly accumulated tech debt I've never had time to dig into. Then I came across the [Thoughtbot Rails Audit skill](https://github.com/thoughtbot/rails-audit-thoughtbot), a Claude Skill that walks a Rails codebase and produces a structured audit report against Thoughtbot's best practices.
 
-This post will show you...
+This post walks through a few of the findings the audit caught, and a workflow I developed to turn the markdown report into prioritized GitHub issues so improvements can be tackled one at a time.
 
 ## What the skill does
 
-If you haven't used Claude Skills before, I wrote about them in [Building an AI Blog Editor with Claude Skills](https://danielabar.github.io/blog/building-an-ai-blog-editor-with-claude-skills/); short version, a skill is a packaged set of instructions Claude can follow on demand via a slash command.
+A [Claude Skill](https://claude.com/skills) is a packaged set of instructions Claude can follow on demand via a slash command.
 
-The Rails Audit skill walks your codebase, runs [SimpleCov](https://github.com/simplecov-ruby/simplecov) for test coverage and [RubyCritic](https://github.com/whitesmith/rubycritic) for code quality, checks for Brakeman-style security smells, and writes a single markdown report grouped by category and severity.
+The Rails Audit skill walks your codebase against Thoughtbot's Ruby Science and Testing Rails guidance, covering testing practices, security, code design (skinny controllers, POROs, ActiveModel), Rails conventions, database and migration hygiene, external service handling, performance antipatterns, and Ruby style. It can optionally run [SimpleCov](https://github.com/simplecov-ruby/simplecov) for test coverage and [RubyCritic](https://github.com/whitesmith/rubycritic) for code quality metrics if you opt in when prompted. The output is a single markdown report grouped by category and severity.
 
 Installation is one command from the skill's [README](https://github.com/thoughtbot/rails-audit-thoughtbot):
 
@@ -27,7 +27,7 @@ git clone https://github.com/thoughtbot/rails-audit-thoughtbot \
   ~/.claude/skills/rails-audit-thoughtbot
 ```
 
-And there are three ways to invoke it:
+There are three ways to invoke it:
 
 | Context                           | Command                                     |
 | --------------------------------- | ------------------------------------------- |
@@ -35,23 +35,19 @@ And there are three ways to invoke it:
 | Inside a Claude session           | `/rails-audit-thoughtbot`                   |
 | Inside a Claude session, scoped   | `/rails-audit-thoughtbot audit controllers` |
 
-What I actually typed:
+Here's the prompt that I actually typed:
 
 ```
 /rails-audit-thoughtbot save all reports, output etc to scratch/rails-audit/
 ```
 
-That trailing instruction is a free-form arg; the skill picks it up and routes its outputs into `scratch/` instead of the repo root, which keeps AI-generated artefacts out of git.
+That trailing instruction is a free-form argument. The skill picks it up and routes its outputs into `scratch/` instead of the repo root, which keeps AI-generated artefacts out of git, as I have `scratch` in my global gitignore file.
 
-The audit itself ran for about 8 minutes on Hello Visitor (under 1000 lines of application code). The model was claude-sonnet-4-6, worth being explicit about since readers will assume the latest Opus by default.
+The audit itself ran for about 8 minutes on my small-ish project. It generated a single markdown file named `RAILS_AUDIT_REPORT.md` with an Executive Summary, a Key Findings list, one section per category with detailed explanations of each issue and recommended fixes, and a Quick Wins / Short-term / Long-term split at the bottom.
 
-<aside class="markdown-aside">
-Even on a project this small, the audit hit Claude Code's context limit partway through and auto-compacted. You can see the seam in the conversation history: a system message appears mid-run summarising the earlier portion. The audit recovered fine, but the report itself is large (mine was 26 KB of markdown) and the skill keeps re-reading it as it edits, which compounds. If you're running this on a real-sized Rails app, consider switching Claude Code to the 1M-token context window before invoking the skill.
-</aside>
-
-What you get back is a single markdown file with an executive-summary table (9 categories × 4 severity levels), a Key Findings list, one section per category with file paths and recommended fixes, and a Quick Wins / Short-term / Long-term split at the bottom.
-
-![TBD: Screenshot of the executive-summary table at the top of `RAILS_AUDIT_REPORT.md`: the 9 categories × 4 severity matrix.](TODO)
+![thoughtbot rails audit report summary](../images/thoughtbot-rails-audit-report-summary.jpg "thoughtbot rails audit report summary")
+...
+![thoughtbot rails audit report recommendations](../images/thoughtbot-rails-audit-report-recommendations.jpg "thoughtbot rails audit report recommendations")
 
 ## What it actually caught
 
@@ -173,8 +169,7 @@ If you want to try a similar workflow on your own project, I bundled it into a [
 The trigram index was the most satisfying find, a real performance issue I'd been quietly noticing for years. The rest of the backlog is making its way through one PR at a time, as I have time.
 
 ## TODO
-* screenshots!
+* WIP screenshots
+* WIP edit
 * link to Thoughtbot, mention Rails consultancy
-* "This post will show you..." explain what the reader will learn
 * Awkward sentence "The generated report is a single markdown file. Useful, but it's a doc, not a backlog. Here's the workflow I ended up with.", explain what I was trying to achieve
-* edit
