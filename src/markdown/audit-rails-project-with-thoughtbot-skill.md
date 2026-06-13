@@ -10,7 +10,7 @@ related:
   - "The Code-Adjacent Power of AI"
 ---
 
-Hello Visitor is a small Rails app I run to power cookie-free page analytics, and search on this blog. It's been chugging along for about five years. Like many solo side projects, it grew over time, and quietly accumulated tech debt I've never had time to dig into. Then I came across the [Thoughtbot Rails Audit skill](https://github.com/thoughtbot/rails-audit-thoughtbot), a Claude Skill that walks a Rails codebase and produces a structured audit report against Thoughtbot's best practices.
+I maintain a small Rails app to power cookie-free page analytics, and search on this blog. It's been chugging along for about five years. Like many solo side projects, it grew over time, and quietly accumulated tech debt I've never had time to dig into. Then I came across the [Thoughtbot Rails Audit skill](https://github.com/thoughtbot/rails-audit-thoughtbot), a Claude Skill that walks a Rails codebase and produces a structured audit report against Thoughtbot's best practices.
 
 This post walks through a few of the findings the audit caught, and a workflow I developed to turn the markdown report into prioritized GitHub issues so improvements can be tackled one at a time.
 
@@ -43,7 +43,7 @@ Here's the prompt that I actually typed:
 
 That trailing instruction is a free-form argument. The skill picks it up and routes its outputs into `scratch/` instead of the repo root, which keeps AI-generated artefacts out of git, as I have `scratch` in my global gitignore file.
 
-The audit itself ran for about 8 minutes on my small-ish project. It generated a single markdown file named `RAILS_AUDIT_REPORT.md` with an Executive Summary, a Key Findings list, one section per category with detailed explanations of each issue and recommended fixes, and a Quick Wins / Short-term / Long-term split at the bottom.
+The audit ran in under 10 minutes. It generated a single markdown file named `RAILS_AUDIT_REPORT.md` with an Executive Summary, a Key Findings list, then the findings themselves grouped by category (Testing, Security, Models, Controllers, Database & Performance, etc.) with detailed explanations and recommended fixes. Within each category, issues are listed as high, medium, or low severity. The report closes with a Recommendations Summary that re-groups the findings into Quick Wins, Short-term, and Long-term buckets.
 
 ![thoughtbot rails audit report summary](../images/thoughtbot-rails-audit-report-summary.jpg "thoughtbot rails audit report summary")
 ...
@@ -55,61 +55,62 @@ The full report had 25 findings across 9 categories. I'm only going to walk thro
 
 ### A missing trigram index
 
-This was the standout, the only `severity: high` in the report. Every dashboard query filters visits by URL with `LIKE '%...%'`, a leading-wildcard pattern that a standard B-tree index can't accelerate. The fix is a `pg_trgm` GIN index on `visits.url`, deployable concurrently in one migration.
+This was marked as high severity in the Database & Performance section. Every dashboard query in my analytics project filters visits by URL with `LIKE '%...%'`, a leading-wildcard pattern that a standard B-tree index can't accelerate. The fix is to enable the [pg-trgm](https://www.postgresql.org/docs/current/pgtrgm.html) extension, then add a GIN trigram index on `visits.url`.
 
-The honest punchline: **the app had been in production for about five years and I'd noticed the dashboard getting sluggish.** I hadn't connected it to a missing index; I'd half-assumed it was Heroku cold starts or a slow Chartkick render. The audit named the actual cause in one paragraph. This wasn't a "would have bit me later" finding; it was a "has been quietly biting me" finding. The audit took 8 minutes to spot something five years of casual use hadn't.
+I'd noticed the dashboard getting sluggish over the years but never had time to dig into it. The audit named the cause, and the fix turned out to be a quick win.
+
+Here's the actual section of the audit:
+
+![thoughtbot rails audit report database perf issue](../images/thoughtbot-rails-audit-report-database-perf-issue.jpg "thoughtbot rails audit report database perf issue")
 
 ### A class with no dedicated tests
 
-`app/queries/visit_query.rb` is the SQL layer behind the entire dashboard. It had no spec file of its own. Its seven query methods were exercised indirectly through `spec/models/visit_spec.rb`, which tests the aggregate Visit results, not the SQL itself.
+`app/queries/visit_query.rb` is the SQL layer behind the analytics dashboard. It had no spec file of its own. Its query methods were exercised indirectly through integration tests, but not every branch was covered, and the SQL behaviour itself wasn't pinned down anywhere. The audit recommended a dedicated spec file so each query method has its own focused tests.
 
-The concrete worry: if I (in a year from now, probably) flipped `ORDER BY count(...) ASC` to `DESC` in `by_page_bottom`, the existing tests would still pass. The "bottom pages" widget on the dashboard would silently start showing the top pages instead. Same story for the `LIMIT` constants; no test pinned them down.
+SimpleCov reported 100% line coverage on the file. That didn't catch the gap, because another test happened to walk through every line. Coverage % is a floor, not a ceiling: a class can be at 100% and still have no spec defending its actual behaviour.
 
-SimpleCov reported 100% line coverage on the file. That didn't catch this either, because another test happened to walk through every line. Coverage % is a floor, not a ceiling: a class can be at 100% and still have no spec defending its actual behaviour.
+TODO: Add image from actual report
 
 ### Date arithmetic hiding in a view partial
 
-The dashboard's "Quick Filters" partial has buttons for 24 Hours, 7 Days, 1 Month, 3 Months. The implementation lived directly in the ERB:
+The analytics dashboard's "Quick Filters" partial has buttons for 24 Hours, 7 Days, 1 Month, 3 Months. The audit pointed out that the implementation lived directly in the ERB. The same `24.hours.ago.to_date` / `7.days.ago.to_date` / `1.month.ago.to_date` literals appeared multiple times inside the same partial: once for the link's target, once for the active-state check, once for the URL. The audit recommended pulling the ranges into `VisitsHelper` as a constant hash so the view loops over a single source of truth.
 
-```erb
-<%= quick_filter_link('24 Hours',
-      { start_date: 24.hours.ago.to_date, end_date: Time.zone.today },
-      ...) %>
-```
+This is a view-layer organization smell: the code works, but having the logic directly in the view makes it difficult to test and re-use.
 
-The same `24.hours.ago.to_date` / `7.days.ago.to_date` / `1.month.ago.to_date` literals appeared multiple times inside the same partial: once for the link's target, once for the active-state check, once for the URL. The audit recommended pulling the ranges into `VisitsHelper` as a frozen constant hash so the view loops over a single source of truth.
+Here's the actual section of the audit:
 
-I'm including this one because it's a *different shape* of finding from the other two. It's not a perf bug. It's not a missing test. It's a view-layer organization smell: the code works, the tests pass, and the only signal something's off is "this is going to be annoying to change next time." The audit caught it without me asking anything specific about my views.
-
-![TBD: Screenshot of the GitHub issues list filtered by `label:audit` with `state=all` at https://github.com/danielabar/hello-visitor/issues?q=label%3Aaudit, showing all 25 audit findings with severity-coloured chips.](TODO)
+![thoughtbot rails audit report view issue](../images/thoughtbot-rails-audit-report-view-issue.jpg "thoughtbot rails audit report view issue")
 
 ## Turning the report into a backlog
 
-The generated report is a single markdown file. Useful, but it's a doc, not a backlog. Here's the workflow I ended up with.
+The report is a single markdown file. Useful as a one-time read, but in order to start making the improvements, I needed each finding as its own GitHub issue, labelled by severity and area so I could filter the list down to whatever fit the time I had. The next sections walk through a structured way to go from audit report to organized GitHub issues.
 
 ### 1. Have Claude propose a label scheme
 
-The existing repo labels didn't capture severity or topical area. I asked Claude to look at the report and propose the minimum set of new labels needed to make the issues filterable. My actual prompt:
+Before creating the issues, I wanted to make sure the repo had labels that would let me categorize and filter the findings later, by severity and area. The existing repo only had the default labels that GitHub provides (`bug`, `help wanted`, `good first issue`, etc), which weren't enough.
 
-> read scratch/rails-audit/RAILS_AUDIT_REPORT.md, then quickly skim through all the issue md files in scratch/rails-audit/issues, specifically severity and category and just the problem statement. then look at what github issue labels are already available in this project. then writeup as sibling to the audit report a file like github-issue-new-labels.md and propose what new labels would be useful
+I asked Claude to look at the report and propose a set of new labels. My prompt:
 
-Two things worth pointing out about the shape of this prompt:
-
-- **It tells Claude where to look** (the report, the per-issue files, the existing labels) rather than describing the project. Cheaper context, more accurate answer.
-- **It asks for a written artefact**. That's the move that turns a chat answer into a reviewable doc, and the doc is what makes the follow-up prompts tiny.
+> read scratch/rails-audit/RAILS_AUDIT_REPORT.md, then skim through all the issues specifically severity and category and the problem statement. then look at what github issue labels are already available in this project. then writeup as sibling to the audit report a file like github-issue-new-labels.md and propose what new labels would be useful
 
 Claude came back with eight labels across three groups: severity (high/medium/low), area (security/performance/testing/code-quality), and a single `audit` origin tag so I could later filter back to the source.
 
+<aside class="markdown-aside">
+For anything beyond a quick lookup, I usually ask Claude to write its answer to a markdown file under <code>scratch/</code> rather than just reply in the terminal. Formatted markdown is easier to skim than scrolling a session, and I can come back to it days later without hunting for the right conversation. <code>claude --resume</code> exists for picking up a session, but navigating a directory of named files is faster than scanning conversation summaries when I just want to re-read one specific answer.
+</aside>
+
 ### 2. Create the labels
 
-Once I approved the proposal, the follow-up prompt was two lines:
+After reviewing the proposed new labels, I then prompted Claude to create them:
 
 > read: scratch/rails-audit/github-issue-new-labels.md
 > then create the new labels
 
-That's it. The proposal file already had the names, colours, and descriptions; Claude just had to translate them into `gh label create` calls.
+The proposal file already had the names, colors, and descriptions; Claude just had to translate them into `gh label create` calls. Here is the result on GitHub:
 
-![TBD: Screenshot of https://github.com/danielabar/hello-visitor/labels?sort=count-desc, showing the resulting labels sorted by usage count, which doubles as a visual of how many issues landed under each.](TODO)
+![thoughtbot rails audit github issue labels](../images/thoughtbot-rails-audit-github-issue-labels.jpg "thoughtbot rails audit github issue labels")
+
+TODO: Aside about having gh cli installed
 
 ### 3. Draft one issue file per finding
 
@@ -170,6 +171,5 @@ The trigram index was the most satisfying find, a real performance issue I'd bee
 
 ## TODO
 * WIP screenshots
-* WIP edit
+* WIP edit (next up: What it actually caught)
 * link to Thoughtbot, mention Rails consultancy
-* Awkward sentence "The generated report is a single markdown file. Useful, but it's a doc, not a backlog. Here's the workflow I ended up with.", explain what I was trying to achieve
