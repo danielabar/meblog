@@ -83,38 +83,11 @@ Here's the actual section of the audit:
 
 ## Turning the report into a backlog
 
-The report is a single markdown file. Useful as a one-time read, but in order to start making the improvements, I needed each finding as its own GitHub issue, labelled by severity and area so I could filter the list down to whatever fit the time I had. The next sections walk through a structured way to go from audit report to organized GitHub issues.
+The report is a single markdown file. Useful as a one-time read, but in order to start making the improvements, I needed each finding as its own GitHub issue, labelled by severity and area so I could filter the list down to whatever fit the time I had. The next sections walk through how I went from audit report to organized GitHub issues.
 
-### 1. Have Claude propose a label scheme
+### 1. Draft one issue file per finding
 
-Before creating the issues, I wanted to make sure the repo had labels that would let me categorize and filter the findings later, by severity and area. The existing repo only had the default labels that GitHub provides (`bug`, `help wanted`, `good first issue`, etc), which weren't enough.
-
-I asked Claude to look at the report and propose a set of new labels. My prompt:
-
-> read scratch/rails-audit/RAILS_AUDIT_REPORT.md, then skim through all the issues specifically severity and category and the problem statement. then look at what github issue labels are already available in this project. then writeup as sibling to the audit report a file like github-issue-new-labels.md and propose what new labels would be useful
-
-Claude came back with eight labels across three groups: severity (high/medium/low), area (security/performance/testing/code-quality), and a single `audit` origin tag so I could later filter back to the source.
-
-<aside class="markdown-aside">
-For anything beyond a quick lookup, I usually ask Claude to write its answer to a markdown file under <code>scratch/</code> rather than just reply in the terminal. Formatted markdown is easier to skim than scrolling a session, and I can come back to it days later without hunting for the right conversation. <code>claude --resume</code> exists for picking up a session, but navigating a directory of named files is faster than scanning conversation summaries when I just want to re-read one specific answer.
-</aside>
-
-### 2. Create the labels
-
-After reviewing the proposed new labels, I then prompted Claude to create them:
-
-> read: scratch/rails-audit/github-issue-new-labels.md
-> then create the new labels
-
-The proposal file already had the names, colors, and descriptions; Claude just had to translate them into `gh label create` calls. Here is the result on GitHub:
-
-![thoughtbot rails audit github issue labels](../images/thoughtbot-rails-audit-github-issue-labels.jpg "thoughtbot rails audit github issue labels")
-
-TODO: Aside about having gh cli installed
-
-### 3. Draft one issue file per finding
-
-This is the step where the local-files-first detour earns its keep. The prompt:
+The first step was to split the report into one markdown file per finding, so I could think about each one in isolation before any of it touched GitHub. My prompt:
 
 > read: scratch/rails-audit/RAILS_AUDIT_REPORT.md
 > i want to split out the recommended improvements into separate tickets, and actually i dont completely understand all of them so each one needs a writeup like what the problem is and why we're addresing it and what expected results are and how the agent can verify its own work that the change was done correctly
@@ -132,16 +105,57 @@ The shape of each file:
 - **How to Verify:** a numbered list a future agent (or me) can follow.
 - **Implementation Notes:** example code, gotchas.
 
-Then a separate prompt to apply labels to those files, and finally:
+### 2. Have Claude propose a label scheme
+
+With the per-finding files in hand, I wanted labels so I could later filter the GitHub issues by severity and area. The existing repo only had the default GitHub labels (`bug`, `help wanted`, `good first issue`, etc), which weren't enough.
+
+I asked Claude to read both the audit report and the issue files I'd just generated, and propose a set of new labels:
+
+> read scratch/rails-audit/RAILS_AUDIT_REPORT.md
+> then quickly skin through all the issue md files in: scratch/rails-audit/issues
+> specifically at severity and category and just the problem statement
+> then look at what github issue labels are already available in this project
+> then writeup as sibling to the audit report a file like github-issue-new-labels.md and propose what new labels would be useful for later when we create all these issues, and choose colors as well i use dark theme
+
+<aside class="markdown-aside">
+For anything beyond a quick lookup, I usually ask Claude to write its answer to a markdown file under <code>scratch/</code> rather than just reply in the terminal. Formatted markdown is easier to skim than scrolling a session, and I can come back to it days later without hunting for the right conversation. <code>claude --resume</code> exists for picking up a session, but navigating a directory of named files is faster than scanning conversation summaries when I just want to re-read one specific answer.
+</aside>
+
+Claude came back with eight labels across three groups: severity (high/medium/low), area (security/performance/testing/code-quality), and a single `audit` origin tag so I could later filter back to the source.
+
+### 3. Apply labels back to the issue files
+
+The label scheme lived in `github-issue-new-labels.md`. The issue files didn't know about it yet. So:
+
+> now update all the md files in scratch/rails-audit/issues with all the labels each should get
+
+Each issue file now had a `**Labels**` line declaring exactly which labels it should be created with, so the eventual `gh issue create` loop could just parse that line out of each file.
+
+### 4. Create the labels on GitHub
+
+Up to this point everything was local markdown. Now the labels needed to actually exist on GitHub before I could attach them to issues:
+
+> read: scratch/rails-audit/github-issue-new-labels.md
+> then create the new labels
+
+The proposal file already had the names, colors, and descriptions; Claude just had to translate them into `gh label create` calls. Here is the result on GitHub:
+
+![thoughtbot rails audit github issue labels](../images/thoughtbot-rails-audit-github-issue-labels.jpg "thoughtbot rails audit github issue labels")
+
+TODO: Aside about having gh cli installed
+
+### 5. Create the issues on GitHub
+
+By this point all the thinking was in the files: each one had its title, body, and labels. The push was pure execution:
 
 > for each md file in scratch/rails-audit/issues
 > create the issue
 
-Two lines. By that point all the thinking was in the files; the push was pure execution.
+Two lines. Claude wrote a loop that read the title and `**Labels**` line out of each file and called `gh issue create` for each one.
 
 **Why the detour matters**: editing 25 markdown files locally is cheap. Editing 25 GitHub issues after the fact is awkward: every change is a PUT, every typo a notification email. Doing the thinking in plain files, *then* batch-pushing, kept the loop fast.
 
-### 4. Work the backlog
+### 6. Work the backlog
 
 I started with `severity: high` (just the trigram index), then moved into the medium pile. Beyond that there's no schedule; I work one or two on a weekend when I have time, then nothing for a few weeks, then maybe one more. Because every finding is a labelled issue, I can drop in and out without losing context. Filter by `severity: medium`, pick whichever has the cleanest scope for the time I have, ship a PR. The labelled backlog is what makes "a few hours when I have them" actually add up over time. Without it, this whole list would have lived in `scratch/rails-audit/` forever.
 
@@ -171,5 +185,5 @@ The trigram index was the most satisfying find, a real performance issue I'd bee
 
 ## TODO
 * WIP screenshots
-* WIP edit (next up: What it actually caught)
+* WIP edit
 * link to Thoughtbot, mention Rails consultancy
