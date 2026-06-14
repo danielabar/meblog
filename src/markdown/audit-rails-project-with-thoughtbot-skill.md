@@ -10,7 +10,7 @@ related:
   - "The Code-Adjacent Power of AI"
 ---
 
-I maintain a small Rails app to power cookie-free page analytics, and search on this blog. It's been chugging along for about five years. Like many solo side projects, it grew over time, and quietly accumulated tech debt I've never had time to dig into. Then I came across the [Thoughtbot Rails Audit skill](https://github.com/thoughtbot/rails-audit-thoughtbot), a Claude Skill that walks a Rails codebase and produces a structured audit report against Thoughtbot's best practices.
+I maintain a small Rails app to power cookie-free page analytics, and search on this blog. It's been chugging along for about five years. Like many solo side projects, it grew over time, and quietly accumulated tech debt. Then I came across the [Thoughtbot Rails Audit skill](https://github.com/thoughtbot/rails-audit-thoughtbot), a Claude Skill that walks a Rails codebase and produces a structured audit report against Thoughtbot's best practices.
 
 This post walks through a few of the findings the audit caught, and a workflow I developed to turn the markdown report into prioritized GitHub issues so improvements can be tackled one at a time.
 
@@ -57,7 +57,7 @@ The full report had 25 findings across 9 categories. I'm only going to walk thro
 
 This was marked as high severity in the Database & Performance section. Every dashboard query in my analytics project filters visits by URL with `LIKE '%...%'`, a leading-wildcard pattern that a standard B-tree index can't accelerate. The fix is to enable the [pg-trgm](https://www.postgresql.org/docs/current/pgtrgm.html) extension, then add a GIN trigram index on `visits.url`.
 
-I'd noticed the dashboard getting sluggish over the years but never had time to dig into it. The audit named the cause, and the fix turned out to be a quick win.
+I'd noticed the dashboard getting sluggish over the years but never had time to dig into it. Fixing it turned out to be relatively easy.
 
 Here's the actual section of the audit:
 
@@ -67,9 +67,9 @@ Here's the actual section of the audit:
 
 `app/queries/visit_query.rb` is the SQL layer behind the analytics dashboard. It had no spec file of its own. Its query methods were exercised indirectly through integration tests, but not every branch was covered, and the SQL behaviour itself wasn't pinned down anywhere. The audit recommended a dedicated spec file so each query method has its own focused tests.
 
-SimpleCov reported 100% line coverage on the file. That didn't catch the gap, because another test happened to walk through every line. Coverage % is a floor, not a ceiling: a class can be at 100% and still have no spec defending its actual behaviour.
+Here's the actual section of the audit:
 
-TODO: Add image from actual report
+![thoughtbot rails audit report test issue](../images/thoughtbot-rails-audit-report-test-issue.jpg "thoughtbot rails audit report test issue")
 
 ### Date arithmetic hiding in a view partial
 
@@ -95,15 +95,7 @@ The first step was to split the report into one markdown file per finding, so I 
 > so please create a new dir: scratch/rails-audit/issues
 > and under there writeup a file per each issue with the title and description, eventually these will get created as github issues so we can address them one at a time
 
-What I like about this prompt in hindsight: I told Claude *why* I wanted the writeups (I didn't understand all the findings) and *who* the writeups are for (an agent who'll later verify its own work). That second part is why every issue file ended up with a structured "How to Verify" section.
-
-The shape of each file:
-
-- **Problem:** what's broken or smelly.
-- **Why We're Addressing It:** the motivation, in my own words.
-- **Expected Result:** what "done" looks like.
-- **How to Verify:** a numbered list a future agent (or me) can follow.
-- **Implementation Notes:** example code, gotchas.
+The key parts of this prompt are asking for the *why* behind each finding so each ticket would teach me something rather than just hand off a task to an agent, and asking for a verification step so every issue carries its own success criteria when an agent later picks it up.
 
 ### 2. Have Claude propose a label scheme
 
@@ -112,20 +104,20 @@ With the per-finding files in hand, I wanted labels so I could later filter the 
 I asked Claude to read both the audit report and the issue files I'd just generated, and propose a set of new labels:
 
 > read scratch/rails-audit/RAILS_AUDIT_REPORT.md
-> then quickly skin through all the issue md files in: scratch/rails-audit/issues
+> then quickly skim through all the issue md files in: scratch/rails-audit/issues
 > specifically at severity and category and just the problem statement
 > then look at what github issue labels are already available in this project
 > then writeup as sibling to the audit report a file like github-issue-new-labels.md and propose what new labels would be useful for later when we create all these issues, and choose colors as well i use dark theme
+
+Claude came back with eight labels across three groups: severity (high/medium/low), area (security/performance/testing/code-quality), and a single `audit` origin tag so I could later filter back to the source.
 
 <aside class="markdown-aside">
 For anything beyond a quick lookup, I usually ask Claude to write its answer to a markdown file under <code>scratch/</code> rather than just reply in the terminal. Formatted markdown is easier to skim than scrolling a session, and I can come back to it days later without hunting for the right conversation. <code>claude --resume</code> exists for picking up a session, but navigating a directory of named files is faster than scanning conversation summaries when I just want to re-read one specific answer.
 </aside>
 
-Claude came back with eight labels across three groups: severity (high/medium/low), area (security/performance/testing/code-quality), and a single `audit` origin tag so I could later filter back to the source.
-
 ### 3. Apply labels back to the issue files
 
-The label scheme lived in `github-issue-new-labels.md`. The issue files didn't know about it yet. So:
+The label scheme lived in `github-issue-new-labels.md`. The issue files didn't know about it yet. So my next prompt was:
 
 > now update all the md files in scratch/rails-audit/issues with all the labels each should get
 
@@ -142,11 +134,13 @@ The proposal file already had the names, colors, and descriptions; Claude just h
 
 ![thoughtbot rails audit github issue labels](../images/thoughtbot-rails-audit-github-issue-labels.jpg "thoughtbot rails audit github issue labels")
 
-TODO: Aside about having gh cli installed
+<aside class="markdown-aside">
+This and the next step assume the <a class="markdown-link" href="https://cli.github.com/">GitHub CLI</a> (<code>gh</code>) is installed and authenticated. Claude uses it for all GitHub operations, such as creating labels, issues, PRs, etc.
+</aside>
 
 ### 5. Create the issues on GitHub
 
-By this point all the thinking was in the files: each one had its title, body, and labels. The push was pure execution:
+By this point all the thinking was in the files: each one had its title, body, and labels. The next prompt was simply to get Claude to create the issues and label them accordingly:
 
 > for each md file in scratch/rails-audit/issues
 > create the issue
@@ -185,5 +179,7 @@ The trigram index was the most satisfying find, a real performance issue I'd bee
 
 ## TODO
 * WIP screenshots
-* WIP edit
+* WIP edit (next up: Create the issues on GitHub)
 * link to Thoughtbot, mention Rails consultancy
+* conclusion - maybe focus on sort of like having a professional consultant review? emphasize not replacing human but a good starting point for improving code quality
+* tidy up spelling/grammar/line breaks on prompts, then somewhere add that prompts where cleaned up for that but otherwise are exactly what was typed
