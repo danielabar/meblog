@@ -175,6 +175,22 @@ To query blog posts:
 }
 ```
 
+## Markdown Asides
+
+To add a callout/aside box in a blog post, use raw HTML (not markdown syntax) as follows:
+
+```html
+<aside class="markdown-aside">
+Content goes here. Use <code>inline code</code> for code snippets (not backticks — this is HTML).
+For links, use <a class="markdown-link" href="https://example.com">link text</a>.
+</aside>
+```
+
+Rules:
+- The `<aside>` element must have `class="markdown-aside"` for correct styling
+- Links inside the aside must use `<a class="markdown-link" href="...">` — plain `href` without the class won't be styled correctly
+- Use `<code>...</code>` for inline code, not backticks, since the content is HTML not markdown
+
 ## Markdown Linking
 
 **Link to another post:**
