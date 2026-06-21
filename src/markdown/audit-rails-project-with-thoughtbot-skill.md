@@ -10,13 +10,13 @@ related:
   - "The Code-Adjacent Power of AI"
 ---
 
-I maintain a small Rails app to power cookie-free page analytics, and search on this blog. It's been chugging along for about five years. Like many solo side projects, it grew over time, and quietly accumulated tech debt. Then I came across the [Thoughtbot Rails Audit skill](https://github.com/thoughtbot/rails-audit-thoughtbot), a Claude Skill that walks a Rails codebase and produces a structured audit report against Thoughtbot's best practices.
+I maintain a small Rails app to power cookie-free page analytics, and search on this blog. It's been chugging along for about five years. Like many solo side projects, it grew over time, and quietly accumulated tech debt. Then I came across the [Thoughtbot Rails Audit skill](https://github.com/thoughtbot/rails-audit-thoughtbot), a Claude Code skill from [Thoughtbot](https://thoughtbot.com/) (a software consultancy) that walks a Rails codebase and produces a structured audit report against their best practices.
 
-This post walks through a few of the findings the audit caught, and a workflow I developed to turn the markdown report into prioritized GitHub issues so improvements can be tackled one at a time.
+This post walks through how I ran the audit against my project, a few of the findings the audit caught, and a workflow I developed to turn the markdown report into prioritized GitHub issues so improvements can be tackled one at a time.
 
 ## What the skill does
 
-A [Claude Skill](https://claude.com/skills) is a packaged set of instructions Claude can follow on demand via a slash command.
+A [Claude Code skill](https://docs.anthropic.com/en/docs/claude-code/skills) is a packaged set of instructions Claude Code can follow on demand via a slash command.
 
 The Rails Audit skill walks your codebase against Thoughtbot's Ruby Science and Testing Rails guidance, covering testing practices, security, code design (skinny controllers, POROs, ActiveModel), Rails conventions, database and migration hygiene, external service handling, performance antipatterns, and Ruby style. It can optionally run [SimpleCov](https://github.com/simplecov-ruby/simplecov) for test coverage and [RubyCritic](https://github.com/whitesmith/rubycritic) for code quality metrics if you opt in when prompted. The output is a single markdown report grouped by category and severity.
 
@@ -35,11 +35,9 @@ There are three ways to invoke it:
 | Inside a Claude session           | `/rails-audit-thoughtbot`                   |
 | Inside a Claude session, scoped   | `/rails-audit-thoughtbot audit controllers` |
 
-Here's the prompt that I actually typed:
+Here's the prompt I provided:
 
-```
-/rails-audit-thoughtbot save all reports, output etc to scratch/rails-audit/
-```
+> /rails-audit-thoughtbot save all reports, output etc to scratch/rails-audit/
 
 That trailing instruction is a free-form argument. The skill picks it up and routes its outputs into `scratch/` instead of the repo root, which keeps AI-generated artefacts out of git, as I have `scratch` in my global gitignore file.
 
@@ -59,7 +57,7 @@ This was marked as high severity in the Database & Performance section. Every da
 
 I'd noticed the dashboard getting sluggish over the years but never had time to dig into it. Fixing it turned out to be relatively easy.
 
-Here's the actual section of the audit:
+Here's the section of the audit:
 
 ![thoughtbot rails audit report database perf issue](../images/thoughtbot-rails-audit-report-database-perf-issue.jpg "thoughtbot rails audit report database perf issue")
 
@@ -67,7 +65,7 @@ Here's the actual section of the audit:
 
 `app/queries/visit_query.rb` is the SQL layer behind the analytics dashboard. It had no spec file of its own. Its query methods were exercised indirectly through integration tests, but not every branch was covered, and the SQL behaviour itself wasn't pinned down anywhere. The audit recommended a dedicated spec file so each query method has its own focused tests.
 
-Here's the actual section of the audit:
+Here's the section of the audit:
 
 ![thoughtbot rails audit report test issue](../images/thoughtbot-rails-audit-report-test-issue.jpg "thoughtbot rails audit report test issue")
 
@@ -77,7 +75,7 @@ The analytics dashboard's "Quick Filters" partial has buttons for 24 Hours, 7 Da
 
 This is a view-layer organization smell: the code works, but having the logic directly in the view makes it difficult to test and re-use.
 
-Here's the actual section of the audit:
+Here's the section of the audit:
 
 ![thoughtbot rails audit report view issue](../images/thoughtbot-rails-audit-report-view-issue.jpg "thoughtbot rails audit report view issue")
 
@@ -85,7 +83,7 @@ Here's the actual section of the audit:
 
 The report is a single markdown file. Useful as a one-time read, but in order to start making the improvements, I needed each finding as its own GitHub issue, labelled by severity and area so I could filter the list down to whatever fit the time I had. The next sections walk through how I went from audit report to organized GitHub issues.
 
-### 1. Draft one issue file per finding
+### 1. Draft One Issue per Finding
 
 The first step was to split the report into one markdown file per finding, so I could think about each one in isolation before any of it touched GitHub. My prompt:
 
@@ -101,7 +99,7 @@ The key parts of this prompt are asking for the *why* behind each finding so eac
 I prefer drafting locally first: it's easier to read through a folder of markdown files than to open numerous browser tabs of GitHub issues. Also once an issue is live any change means a round-trip through the <code>gh</code> CLI.
 </aside>
 
-### 2. Have Claude propose a label scheme
+### 2. Define Labels
 
 After reviewing the issue files, the next obvious step would be to ask Claude to create each one as a GitHub issue in the repo. But I was concerned about a dump of so many issues with no way to organize them. The existing repo only had the default GitHub labels (`bug`, `help wanted`, `good first issue`, etc), which weren't enough to filter by severity or area, so I wanted a label scheme in place before any issues got created.
 
@@ -119,7 +117,7 @@ Claude came back with eight labels across three groups: severity (high/medium/lo
 For anything beyond a quick lookup, I usually ask Claude to write its answer to a markdown file under <code>scratch/</code> rather than just reply in the terminal. Formatted markdown is easier to skim than scrolling a session, and I can come back to it days later without hunting for the right conversation. <code>claude --resume</code> exists for picking up a session, but navigating a directory of named files is faster than scanning conversation summaries when I just want to re-read one specific answer.
 </aside>
 
-### 3. Apply labels back to the issue files
+### 3. Apply Labels to Issue Files
 
 The label scheme lived in `github-issue-new-labels.md`. The issue files didn't know about it yet. So my next prompt was:
 
@@ -127,7 +125,7 @@ The label scheme lived in `github-issue-new-labels.md`. The issue files didn't k
 
 Each issue file now had a `**Labels**` line declaring exactly which labels it should be created with, so the eventual `gh issue create` loop could just parse that line out of each file.
 
-### 4. Create the labels on GitHub
+### 4. Create Labels
 
 Up to this point everything was written in markdown files in my local `scratch` dir. Now the labels needed to actually exist on GitHub before I could attach them to issues:
 
@@ -142,30 +140,30 @@ The proposal file already had the names, colors, and descriptions; Claude just h
 This and the next step assume the <a class="markdown-link" href="https://cli.github.com/">GitHub CLI</a> (<code>gh</code>) is installed and authenticated. Claude uses it for all GitHub operations, such as creating labels, issues, PRs, etc.
 </aside>
 
-### 5. Create the issues and work the backlog
+### 5. Create Labelled Issues
 
 By this point all the thinking was in the files: each one had its title, body, and labels. The next prompt was to get Claude to create the issues and label them accordingly:
 
 > for each md file in scratch/rails-audit/issues
 > create the issue
 
-No I could finally start working on these. I picked up the `severity: high`, then moved into the medium pile. Beyond that there's no schedule; I work one or two on a weekend when I have time. Because every finding is a labelled issue, I can drop in and out without losing context.
+Then I could finally start working on these. I picked up the `severity: high`, then moved into the medium pile. Beyond that there's no schedule; I work one or two on a weekend when I have time. Because every finding is a labelled issue, I can drop in and out without losing context.
 
-## How long this took
+## Time Spent
 
-The 8-minute audit headline is only the audit itself, not the rest of the workflow above. End-to-end, from invoking the skill to having all the labelled issues live on GitHub, was an afternoon. About 72 minutes was active Claude conversation across five sessions; the rest was me reading the report, deciding what I wanted, and breaks. The active typing time is small; the *thinking* time isn't.
+End-to-end, from invoking the skill to having all the labelled issues live on GitHub, was an afternoon. About 72 minutes was active Claude conversation across five sessions; the rest was me reading the output files and deciding what I wanted.
 
 <aside class="markdown-aside">
-I reconstructed those times by reading my own Claude Code conversation history. Every Claude Code conversation is persisted as a <code>.jsonl</code> file under <code>~/.claude/projects/&lt;encoded-project-path&gt;/</code>, one event per line with timestamps. That means Claude can read its own history, so if you've forgotten how long a session took, what you actually typed, or which conversation a decision happened in, you can just ask.
+I reconstructed those times by asking Claude to read my conversation history. Every Claude Code conversation is persisted as a <code>.jsonl</code> file under <code>~/.claude/projects/&lt;encoded-project-path&gt;/</code>, one event per line with timestamps. That means Claude can read its own history, so if you've forgotten how long a session took, what you actually typed, or which conversation a decision happened in, you can just ask.
 </aside>
 
-## The skill is opinionated
+## The skill is Opinionated
 
-The audit reflects thoughtbot's house style: business logic in models, POROs, or ActiveModel objects rather than service objects; names that read as Ruby objects (`Stats#collect`) rather than as patterns (`StatsCollector#call`); skinny controllers, decomposed models.
+The audit reflects Thoughtbot's house style: business logic in models, POROs, or ActiveModel objects rather than service objects; names that read as Ruby objects (`Stats#collect`) rather than as patterns (`StatsCollector#call`); skinny controllers, decomposed models.
 
 For my project, this was pretty well aligned: the codebase already uses `VisitSearch` (ActiveModel form object), `VisitQuery` (raw SQL PORO), and `Stats` (plain aggregate). The audit was effectively grading against the style I happened to use, which made it work well here. It might land differently on a codebase built around `Interactor` / `call` / service objects.
 
-The skill's README doesn't document any config for projects that intentionally diverge. What you could try is pass intent in the same free-form arg, something like *"we use the Interactor pattern deliberately; don't flag it as an issue."* I haven't tested how reliably the skill respects that, but it's what I'd try first.
+The skill's README doesn't document any config for projects that intentionally diverge. What you could try is pass intent in the free-form arg, something like *"we use the Interactor pattern deliberately; don't flag it as an issue."* I haven't tested how reliably the skill respects that, but it's what I'd try first for a project that has different conventions.
 
 ## Wrapping up
 
@@ -176,7 +174,6 @@ If you want to try a similar workflow on your own project, I bundled it into a [
 The trigram index was the most satisfying find, a real performance issue I'd been quietly noticing for years. The rest of the backlog is making its way through one PR at a time, as I have time.
 
 ## TODO
-* WIP screenshots
 * WIP edit (next up: Create the issues on GitHub)
 * link to Thoughtbot, mention Rails consultancy
 * conclusion - maybe focus on sort of like having a professional consultant review? emphasize not replacing human but a good starting point for improving code quality
