@@ -2,7 +2,7 @@
 title: "Audit a Rails Project with the Thoughtbot Audit Skill"
 featuredImage: "../images/audit-rails-project-thoughtbot-skill-fr0ggy5-5VxbaZn7GtE-unsplash.jpg"
 description: "Turning a Claude skill audit report into a labelled, severity-tiered GitHub backlog, and what the audit caught in a small Rails 8 app."
-date: "2026-06-15"
+date: "2026-07-01"
 category: "rails"
 related:
   - "Building an AI Blog Editor with Claude Skills"
