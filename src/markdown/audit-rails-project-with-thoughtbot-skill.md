@@ -49,7 +49,7 @@ The audit ran in under 10 minutes. It generated a single markdown file named `RA
 ...
 ![thoughtbot rails audit report recommendations](../images/thoughtbot-rails-audit-report-recommendations.jpg "thoughtbot rails audit report recommendations")
 
-## What it actually caught
+## Examples it caught
 
 The full report had 25 findings across 9 categories. I'm only going to walk through three, because each one is a different *shape* of finding and together they hint at the range of things an audit like this can surface.
 
@@ -97,9 +97,13 @@ The first step was to split the report into one markdown file per finding, so I 
 
 The key parts of this prompt are asking for the *why* behind each finding so each ticket would teach me something rather than just hand off a task to an agent, and asking for a verification step so every issue carries its own success criteria when an agent later picks it up.
 
+<aside class="markdown-aside">
+I prefer drafting locally first: it's easier to read through a folder of markdown files than to open numerous browser tabs of GitHub issues. Also once an issue is live any change means a round-trip through the <code>gh</code> CLI.
+</aside>
+
 ### 2. Have Claude propose a label scheme
 
-With the per-finding files in hand, I wanted labels so I could later filter the GitHub issues by severity and area. The existing repo only had the default GitHub labels (`bug`, `help wanted`, `good first issue`, etc), which weren't enough.
+After reviewing the issue files, the next obvious step would be to ask Claude to create each one as a GitHub issue in the repo. But I was concerned about a dump of so many issues with no way to organize them. The existing repo only had the default GitHub labels (`bug`, `help wanted`, `good first issue`, etc), which weren't enough to filter by severity or area, so I wanted a label scheme in place before any issues got created.
 
 I asked Claude to read both the audit report and the issue files I'd just generated, and propose a set of new labels:
 
@@ -125,7 +129,7 @@ Each issue file now had a `**Labels**` line declaring exactly which labels it sh
 
 ### 4. Create the labels on GitHub
 
-Up to this point everything was local markdown. Now the labels needed to actually exist on GitHub before I could attach them to issues:
+Up to this point everything was written in markdown files in my local `scratch` dir. Now the labels needed to actually exist on GitHub before I could attach them to issues:
 
 > read: scratch/rails-audit/github-issue-new-labels.md
 > then create the new labels
@@ -138,22 +142,16 @@ The proposal file already had the names, colors, and descriptions; Claude just h
 This and the next step assume the <a class="markdown-link" href="https://cli.github.com/">GitHub CLI</a> (<code>gh</code>) is installed and authenticated. Claude uses it for all GitHub operations, such as creating labels, issues, PRs, etc.
 </aside>
 
-### 5. Create the issues on GitHub
+### 5. Create the issues and work the backlog
 
-By this point all the thinking was in the files: each one had its title, body, and labels. The next prompt was simply to get Claude to create the issues and label them accordingly:
+By this point all the thinking was in the files: each one had its title, body, and labels. The next prompt was to get Claude to create the issues and label them accordingly:
 
 > for each md file in scratch/rails-audit/issues
 > create the issue
 
-Two lines. Claude wrote a loop that read the title and `**Labels**` line out of each file and called `gh issue create` for each one.
+No I could finally start working on these. I picked up the `severity: high`, then moved into the medium pile. Beyond that there's no schedule; I work one or two on a weekend when I have time. Because every finding is a labelled issue, I can drop in and out without losing context.
 
-**Why the detour matters**: editing 25 markdown files locally is cheap. Editing 25 GitHub issues after the fact is awkward: every change is a PUT, every typo a notification email. Doing the thinking in plain files, *then* batch-pushing, kept the loop fast.
-
-### 6. Work the backlog
-
-I started with `severity: high` (just the trigram index), then moved into the medium pile. Beyond that there's no schedule; I work one or two on a weekend when I have time, then nothing for a few weeks, then maybe one more. Because every finding is a labelled issue, I can drop in and out without losing context. Filter by `severity: medium`, pick whichever has the cleanest scope for the time I have, ship a PR. The labelled backlog is what makes "a few hours when I have them" actually add up over time. Without it, this whole list would have lived in `scratch/rails-audit/` forever.
-
-### What this actually cost
+## How long this took
 
 The 8-minute audit headline is only the audit itself, not the rest of the workflow above. End-to-end, from invoking the skill to having all the labelled issues live on GitHub, was an afternoon. About 72 minutes was active Claude conversation across five sessions; the rest was me reading the report, deciding what I wanted, and breaks. The active typing time is small; the *thinking* time isn't.
 
@@ -165,9 +163,9 @@ I reconstructed those times by reading my own Claude Code conversation history. 
 
 The audit reflects thoughtbot's house style: business logic in models, POROs, or ActiveModel objects rather than service objects; names that read as Ruby objects (`Stats#collect`) rather than as patterns (`StatsCollector#call`); skinny controllers, decomposed models.
 
-In Hello Visitor's case this lined up: the codebase already uses `VisitSearch` (ActiveModel form object), `VisitQuery` (raw SQL PORO), and `Stats` (plain aggregate). The audit was effectively grading against the style I happened to use, which made it work well here. It might land differently on a codebase built around `Interactor` / `call` / service objects.
+For my project, this was pretty well aligned: the codebase already uses `VisitSearch` (ActiveModel form object), `VisitQuery` (raw SQL PORO), and `Stats` (plain aggregate). The audit was effectively grading against the style I happened to use, which made it work well here. It might land differently on a codebase built around `Interactor` / `call` / service objects.
 
-The skill's README doesn't document any config for projects that intentionally diverge. What you can do (and this is inference, not documentation) is pass intent in the same free-form arg, something like *"we use the Interactor pattern deliberately; don't flag it as an issue."* I haven't tested how reliably the skill respects that, but it's what I'd try first.
+The skill's README doesn't document any config for projects that intentionally diverge. What you could try is pass intent in the same free-form arg, something like *"we use the Interactor pattern deliberately; don't flag it as an issue."* I haven't tested how reliably the skill respects that, but it's what I'd try first.
 
 ## Wrapping up
 
