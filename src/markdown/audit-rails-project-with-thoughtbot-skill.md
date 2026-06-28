@@ -171,12 +171,8 @@ The skill's README doesn't document any config for projects that intentionally d
 
 ## Wrapping up
 
-The audit was worth running because the workflow gave me a backlog I can actually work: labelled, severity-sorted, one issue at a time. The opinionatedness lined up with my style; that's not a given on every codebase, so your mileage will vary.
+The Rails Audit skill is worth running even if you know Rails well. Think of it as a brief consulting engagement: fresh eyes on code you've gotten too used to. The findings still need judgment, some land immediately, others won't fit your conventions, but it's a great starting point for improvements.
 
 If you want to try a similar workflow on your own project, I bundled it into a [companion gist](https://gist.github.com/danielabar/87730357992409e51384cc41bdc0e07a). Drop it into your project as `scratch/rails-audit/AGENT_PLAYBOOK.md`, point Claude at it with *"read scratch/rails-audit/AGENT_PLAYBOOK.md and execute it"*, and it'll walk through the same steps.
 
-The trigram index was the most satisfying find, a real performance issue I'd been quietly noticing for years. The rest of the backlog is making its way through one PR at a time, as I have time.
-
-## TODO
-* conclusion - maybe focus on sort of like having a professional consultant review? emphasize not replacing human but a good starting point for improving code quality
-* tidy up spelling/grammar/line breaks on prompts, then somewhere add that prompts where cleaned up for that but otherwise are exactly what was typed
+The trigram index was the most satisfying find, a real performance issue I'd been quietly noticing for years. The rest of the backlog is making its way through one PR at a time.
