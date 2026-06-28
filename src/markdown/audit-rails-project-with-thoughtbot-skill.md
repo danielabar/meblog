@@ -10,15 +10,15 @@ related:
   - "The Code-Adjacent Power of AI"
 ---
 
-I maintain a small Rails app to power cookie-free page analytics, and search on this blog. It's been chugging along for about five years. Like many solo side projects, it grew over time, and quietly accumulated tech debt. So when I came across the [Thoughtbot Rails Audit skill](https://github.com/thoughtbot/rails-audit-thoughtbot), a Claude Code skill from [Thoughtbot](https://thoughtbot.com/) (a software consultancy) that analyzes a Rails codebase and produces a structured audit report based on their best practices, I decided to run it against mine.
+I maintain a small Rails app to power cookie-free page analytics, and search on this blog. It's been chugging along for about five years. Like many solo side projects, it grew over time, and accumulated some tech debt. So when I came across this [Rails Audit skill](https://github.com/thoughtbot/rails-audit-thoughtbot), that analyzes a Rails codebase and produces a structured audit report based on Thoughtbot's best practices, I decided to run it against mine.
 
 This post walks through how I ran the audit against my project, a few of the findings the audit caught, and a workflow I developed to turn the report into prioritized GitHub issues so improvements can be tackled one at a time.
 
+If you're new to Claude Code skills, see my previous post on [Building an AI Blog Editor with Claude Skills](../building-an-ai-blog-editor-with-claude-skills), which covers the concept, before diving in here.
+
 ## What the skill does
 
-A [Claude Code skill](https://docs.anthropic.com/en/docs/claude-code/skills) is a packaged set of instructions Claude Code can follow on demand via a slash command.
-
-The Rails Audit skill walks your codebase against Thoughtbot's Ruby Science and Testing Rails guidance, covering testing practices, security, code design (skinny controllers, POROs, ActiveModel), Rails conventions, database and migration hygiene, external service handling, performance antipatterns, and Ruby style. It can optionally run [SimpleCov](https://github.com/simplecov-ruby/simplecov) for test coverage and [RubyCritic](https://github.com/whitesmith/rubycritic) for code quality metrics if you opt in when prompted. The output is a single markdown report grouped by category and severity.
+The Rails Audit skill walks your codebase against [Thoughtbot's](https://thoughtbot.com/services/ruby-on-rails-development) Ruby Science and Testing Rails guidance, covering testing practices, security, code design (skinny controllers, POROs, ActiveModel), Rails conventions, database and migration hygiene, external service handling, performance antipatterns, and Ruby style. It can optionally run [SimpleCov](https://github.com/simplecov-ruby/simplecov) for test coverage and [RubyCritic](https://github.com/whitesmith/rubycritic) for code quality metrics if you opt in when prompted. The output is a single markdown report grouped by category and severity.
 
 Installation is one command from the skill's [README](https://github.com/thoughtbot/rails-audit-thoughtbot):
 
@@ -49,11 +49,11 @@ The audit ran in under 10 minutes. It generated a single markdown file named `RA
 
 ## Examples it caught
 
-The full report had 25 findings across 9 categories. I'm only going to walk through three, because each one is a different *shape* of finding and together they hint at the range of things an audit like this can surface.
+The full report had over 20 findings. This section walks through a sampling of issues it found.
 
-### A missing trigram index
+**Missing trigram index**
 
-This was marked as high severity in the Database & Performance section. Every dashboard query in my analytics project filters visits by URL with `LIKE '%...%'`, a leading-wildcard pattern that a standard B-tree index can't accelerate. The fix is to enable the [pg-trgm](https://www.postgresql.org/docs/current/pgtrgm.html) extension, then add a GIN trigram index on `visits.url`.
+This was marked as high severity in the Database & Performance section. Every dashboard query filters visits by URL with `LIKE '%...%'`, a leading-wildcard pattern that a standard B-tree index can't accelerate. The fix is to enable the [pg-trgm](https://www.postgresql.org/docs/current/pgtrgm.html) extension, then add a GIN trigram index on `visits.url`.
 
 I'd noticed the dashboard getting sluggish over the years but never had time to dig into it. Fixing it turned out to be relatively easy.
 
@@ -61,7 +61,7 @@ Here's the section of the audit:
 
 ![thoughtbot rails audit report database perf issue](../images/thoughtbot-rails-audit-report-database-perf-issue.jpg "thoughtbot rails audit report database perf issue")
 
-### A class with no dedicated tests
+**Class with no dedicated tests**
 
 `app/queries/visit_query.rb` is the SQL layer behind the analytics dashboard. It had no spec file of its own. Its query methods were exercised indirectly through integration tests, but not every branch was covered, and the SQL behaviour itself wasn't pinned down anywhere. The audit recommended a dedicated spec file so each query method has its own focused tests.
 
@@ -69,7 +69,7 @@ Here's the section of the audit:
 
 ![thoughtbot rails audit report test issue](../images/thoughtbot-rails-audit-report-test-issue.jpg "thoughtbot rails audit report test issue")
 
-### Date arithmetic hiding in a view partial
+**Date arithmetic in view partial**
 
 The analytics dashboard's "Quick Filters" partial has buttons for 24 Hours, 7 Days, 1 Month, 3 Months. The audit pointed out that the implementation lived directly in the ERB. The same `24.hours.ago.to_date` / `7.days.ago.to_date` / `1.month.ago.to_date` literals appeared multiple times inside the same partial: once for the link's target, once for the active-state check, once for the URL. The audit recommended pulling the ranges into `VisitsHelper` as a constant hash so the view loops over a single source of truth.
 
