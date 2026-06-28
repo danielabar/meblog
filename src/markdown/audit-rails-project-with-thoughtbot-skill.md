@@ -169,10 +169,8 @@ For my project, this was pretty well aligned: the codebase already uses `VisitSe
 
 The skill's README doesn't document any config for projects that intentionally diverge. What you could try is pass intent in the free-form arg, something like *"this project uses the Interactor pattern deliberately; don't flag it as an issue."* I haven't tested how reliably the skill respects that, but it's what I'd try first for a project that has different conventions.
 
-## Wrapping up
+## Final Thoughts
 
-The Rails Audit skill is worth running even if you know Rails well. Think of it as a brief consulting engagement: fresh eyes on code you've gotten too used to. The findings still need judgment, some land immediately, others won't fit your conventions, but it's a great starting point for improvements.
+The Rails Audit skill is worth running even if you know Rails well. Think of it as a brief consulting engagement: fresh eyes on code you've gotten too used to. The findings still need judgment, some land immediately, others won't fit your conventions, but it's a great starting point for improvements. The trigram index was the most satisfying find, a real performance issue I'd been noticing for years.
 
-If you want to try a similar workflow on your own project, I bundled it into a [companion gist](https://gist.github.com/danielabar/87730357992409e51384cc41bdc0e07a). Drop it into your project as `scratch/rails-audit/AGENT_PLAYBOOK.md`, point Claude at it with *"read scratch/rails-audit/AGENT_PLAYBOOK.md and execute it"*, and it'll walk through the same steps.
-
-The trigram index was the most satisfying find, a real performance issue I'd been quietly noticing for years. The rest of the backlog is making its way through one PR at a time.
+If you want to try the post-audit workflow on your own project (splitting the report into individual issue files, defining and applying labels, creating labelled issues), I bundled those steps into a [companion gist](https://gist.github.com/danielabar/87730357992409e51384cc41bdc0e07a). Install the Thoughtbot skill and run the audit first, then drop the playbook into `scratch/rails-audit/AGENT_PLAYBOOK.md` and point Claude at it with *"read scratch/rails-audit/AGENT_PLAYBOOK.md and execute it"*.
