@@ -10,9 +10,9 @@ related:
   - "The Code-Adjacent Power of AI"
 ---
 
-I maintain a small Rails app to power cookie-free page analytics, and search on this blog. It's been chugging along for about five years. Like many solo side projects, it grew over time, and quietly accumulated tech debt. Then I came across the [Thoughtbot Rails Audit skill](https://github.com/thoughtbot/rails-audit-thoughtbot), a Claude Code skill from [Thoughtbot](https://thoughtbot.com/) (a software consultancy) that walks a Rails codebase and produces a structured audit report against their best practices.
+I maintain a small Rails app to power cookie-free page analytics, and search on this blog. It's been chugging along for about five years. Like many solo side projects, it grew over time, and quietly accumulated tech debt. So when I came across the [Thoughtbot Rails Audit skill](https://github.com/thoughtbot/rails-audit-thoughtbot), a Claude Code skill from [Thoughtbot](https://thoughtbot.com/) (a software consultancy) that analyzes a Rails codebase and produces a structured audit report based on their best practices, I decided to run it against mine.
 
-This post walks through how I ran the audit against my project, a few of the findings the audit caught, and a workflow I developed to turn the markdown report into prioritized GitHub issues so improvements can be tackled one at a time.
+This post walks through how I ran the audit against my project, a few of the findings the audit caught, and a workflow I developed to turn the report into prioritized GitHub issues so improvements can be tackled one at a time.
 
 ## What the skill does
 
@@ -174,7 +174,5 @@ If you want to try a similar workflow on your own project, I bundled it into a [
 The trigram index was the most satisfying find, a real performance issue I'd been quietly noticing for years. The rest of the backlog is making its way through one PR at a time, as I have time.
 
 ## TODO
-* WIP edit (next up: Create the issues on GitHub)
-* link to Thoughtbot, mention Rails consultancy
 * conclusion - maybe focus on sort of like having a professional consultant review? emphasize not replacing human but a good starting point for improving code quality
 * tidy up spelling/grammar/line breaks on prompts, then somewhere add that prompts where cleaned up for that but otherwise are exactly what was typed
