@@ -2,7 +2,7 @@
 title: "IP-Based Route Restrictions on Heroku with Rails"
 featuredImage: "../images/securing-routes-heroku-rails-arpad-czapp-eXZQIKHj5lY-unsplash.jpg"
 description: "Learn how to restrict admin routes to VPN IP addresses on Heroku using Rails Advanced Route Constraints."
-date: "2026-07-01"
+date: "2026-09-01"
 category: "rails"
 related:
   - "Datadog APM for Rails on Heroku"
