@@ -2,7 +2,7 @@
 title: "Audit a Rails Project with the Thoughtbot Audit Skill"
 featuredImage: "../images/audit-rails-project-thoughtbot-skill-fr0ggy5-5VxbaZn7GtE-unsplash.jpg"
 description: "Turning a Claude skill audit report into a labelled, severity-tiered GitHub backlog, and what the audit caught in a small Rails 8 app."
-date: "2026-07-01"
+date: "2026-07-05"
 category: "rails"
 related:
   - "Building an AI Blog Editor with Claude Skills"
@@ -47,6 +47,8 @@ The audit ran in under 10 minutes. It generated a single markdown file named `RA
 ...
 ![thoughtbot rails audit report recommendations](../images/thoughtbot-rails-audit-report-recommendations.jpg "thoughtbot rails audit report recommendations")
 
+The letter codes beside each issue are a naming scheme the audit defines: a category abbreviation (S = Security, DB = Database, T = Testing, etc.) concatenated with a sequence number within that category.
+
 ## Issues Discovered
 
 The full report had over 20 findings. This section walks through a sampling of issues it found.
@@ -55,7 +57,7 @@ The full report had over 20 findings. This section walks through a sampling of i
 
 This was marked as high severity in the Database & Performance section. Every dashboard query filters visits by URL with `LIKE '%...%'`, a leading-wildcard pattern that a standard B-tree index can't accelerate. The fix is to enable the [pg-trgm](https://www.postgresql.org/docs/current/pgtrgm.html) extension, then add a GIN trigram index on `visits.url`.
 
-I'd noticed the dashboard getting sluggish over the years but never had time to dig into it. Fixing it turned out to be relatively easy.
+I'd noticed the dashboard getting sluggish over the years but never had time to dig into it. Fixing it turned out to be relatively easy by adding a migration.
 
 Here's the section of the audit:
 
@@ -103,7 +105,7 @@ I prefer drafting locally first: it's easier to read through a folder of markdow
 
 After reviewing the issue files, the next obvious step would be to ask Claude to create each one as a GitHub issue in the repo. But I was concerned about a dump of so many issues with no way to organize them. The existing repo only had the default GitHub labels (`bug`, `help wanted`, `good first issue`, etc), which weren't enough to filter by severity or area, so I wanted a label scheme in place before any issues got created.
 
-I asked Claude to read both the audit report and the issue files I'd just generated, and propose a set of new labels:
+I asked Claude to read the audit report and the issue files I'd just generated, and propose a set of new labels:
 
 > read scratch/rails-audit/RAILS_AUDIT_REPORT.md
 > then quickly skim through all the issue md files in: scratch/rails-audit/issues
@@ -111,7 +113,9 @@ I asked Claude to read both the audit report and the issue files I'd just genera
 > then look at what github issue labels are already available in this project
 > then writeup as sibling to the audit report a file like github-issue-new-labels.md and propose what new labels would be useful for later when we create all these issues, and choose colors as well i use dark theme
 
-Claude came back with eight labels across three groups: severity (high/medium/low), area (security/performance/testing/code-quality), and a single `audit` origin tag so I could later filter back to the source.
+Claude came back with eight labels across three groups: severity (high/medium/low), area (security/performance/testing/code-quality), and a single `audit` origin tag so I could later filter back to the source. Here's a snippet of the `github-issue-new-labels.md` I asked it to create:
+
+![thoughtbot rails audit github issue labels proposal](../images/thoughtbot-rails-audit-github-issue-labels-proposal.jpg "thoughtbot rails audit github issue labels proposal")
 
 <aside class="markdown-aside">
 For anything beyond a quick lookup, I usually ask Claude to write its answer to a markdown file under <code>scratch/</code> rather than just reply in the terminal. Formatted markdown is easier to skim than scrolling a session, and I can come back to it days later without hunting for the right conversation. <code>claude --resume</code> exists for picking up a session, but navigating a directory of named files is faster than scanning conversation summaries when I just want to re-read one specific answer.
@@ -123,7 +127,9 @@ The label scheme lived in `github-issue-new-labels.md`. The issue files didn't k
 
 > now update all the md files in scratch/rails-audit/issues with all the labels each should get
 
-After Claude had done that, each issue file now had a `**Labels**` line declaring exactly which labels it should be created with.
+After Claude had done that, each issue file now had a `**Labels**` line declaring exactly which labels it should be created with. Here's a snippet of one of the markdown issue files `scratch/rails-audit/issues/add-trigram-index-visits-url.md`, after Claude updated it with suitable labels:
+
+![thoughtbot rails audit database index issue markdown example snippet](../images/thoughtbot-rails-audit-database-index-issue-markdown-example-snippet.jpg "thoughtbot rails audit database index issue markdown example snippet")
 
 **Create Labels**
 
