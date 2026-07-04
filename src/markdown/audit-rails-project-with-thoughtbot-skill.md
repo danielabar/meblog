@@ -10,11 +10,13 @@ related:
   - "The Code-Adjacent Power of AI"
 ---
 
-I maintain a small Rails app to power cookie-free page analytics, and search on this blog. It's been chugging along for about five years. Like many solo side projects, it grew over time, and accumulated some tech debt. So when I came across this [Rails Audit skill](https://github.com/thoughtbot/rails-audit-thoughtbot), that analyzes a Rails codebase and produces a structured audit report based on Thoughtbot's best practices, I decided to run it against mine.
+I maintain a small Rails app to power cookie-free page analytics, and search on this blog. It's been chugging along for about five years. Like many solo side projects, it grew over time, and accumulated some tech debt. So when I came across this [Rails Audit Skill](https://github.com/thoughtbot/rails-audit-thoughtbot), that analyzes a Rails codebase and produces a structured audit report based on Thoughtbot's best practices, I decided to run it against mine.
 
 This post walks through how I ran the audit against my project, a few of the findings the audit caught, and a workflow I developed to turn the report into prioritized GitHub issues so improvements can be tackled one at a time.
 
-If you're new to Claude Code skills, see my previous post on [Building an AI Blog Editor with Claude Skills](../building-an-ai-blog-editor-with-claude-skills), which covers the concept, before diving in here.
+<aside class="markdown-aside">
+New to Claude Code skills? See my previous post on <a class="markdown-link" href="https://danielabaron.me/blog/building-an-ai-blog-editor-with-claude-skills/">Building an AI Blog Editor with Claude Skills</a>, which covers the concept, before diving in here.
+</aside>
 
 ## What the Skill Does
 
@@ -161,7 +163,7 @@ Then I started with `severity: high` issues, then moved into the medium pile. Be
 
 ## Time Spent
 
-End-to-end, from invoking the skill to having all the labelled issues live on GitHub, was an afternoon. About 72 minutes was active Claude conversation across five sessions; the rest was me reading the output files and deciding what I wanted.
+End-to-end, from invoking the skill to having all the labelled issues live on GitHub, was an afternoon. About 72 minutes was active Claude conversation across five sessions; the rest was me reading the output files, synthesizing the findings, and organizing the work into something I could chip away at over time.
 
 <aside class="markdown-aside">
 I reconstructed those times by asking Claude to read my conversation history. Every Claude Code conversation is persisted as a <code>.jsonl</code> file under <code>~/.claude/projects/&lt;encoded-project-path&gt;/</code>, one event per line with timestamps. That means Claude can read its own history, so if you've forgotten how long a session took, what you actually typed, or which conversation a decision happened in, you can just ask.
