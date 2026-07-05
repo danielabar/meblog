@@ -6,7 +6,7 @@ date: "2026-07-05"
 category: "rails"
 related:
   - "Building an AI Blog Editor with Claude Skills"
-  - "Add RuboCop to a Legacy Project"
+  - "Add Rubocop to an Existing Rails Project"
   - "The Code-Adjacent Power of AI"
 ---
 
