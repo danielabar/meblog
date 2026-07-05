@@ -45,8 +45,12 @@ That trailing instruction is a free-form argument. The skill picks it up and rou
 
 The audit ran in under 10 minutes. It generated a single markdown file named `RAILS_AUDIT_REPORT.md` with an Executive Summary, a Key Findings list, then the findings themselves grouped by category (Testing, Security, Models, Controllers, Database & Performance, etc.) with detailed explanations and recommended fixes. Within each category, issues are listed as high, medium, or low severity. The report closes with a Recommendations Summary that re-groups the findings into Quick Wins, Short-term, and Long-term buckets.
 
+Here's a snippet of what the report looked like:
+
 ![thoughtbot rails audit report summary](../images/thoughtbot-rails-audit-report-summary.jpg "thoughtbot rails audit report summary")
-...
+
+And the recommendations section at the end:
+
 ![thoughtbot rails audit report recommendations](../images/thoughtbot-rails-audit-report-recommendations.jpg "thoughtbot rails audit report recommendations")
 
 The letter codes beside each issue are a naming scheme the audit defines: a category abbreviation (S = Security, DB = Database, T = Testing, etc.) concatenated with a sequence number within that category.
