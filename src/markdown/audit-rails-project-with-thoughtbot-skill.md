@@ -181,6 +181,6 @@ For my project, this was pretty well aligned. It may read as wrong on a codebase
 
 ## Final Thoughts
 
-The Rails Audit skill is worth running even if you know Rails well. Think of it as a brief consulting engagement: fresh eyes on code you've gotten too used to. The findings still need judgment: some land immediately, others won't fit your conventions, but it's a great starting point for improvements. The trigram index was the most satisfying find, a real performance issue I'd been noticing for years.
+The Rails Audit skill is worth running on any project that's been around awhile. Think of it as a brief consulting engagement: fresh eyes on code you've gotten too used to. The findings still need judgment: some land immediately, others won't fit your conventions, but it's a great starting point for improvements. The trigram index was the most satisfying find, a real performance issue I'd been noticing for years.
 
 If you want to try the post-audit workflow on your own project (splitting the report into individual issue files, defining and applying labels, creating labelled issues), I bundled those steps into a [companion gist](https://gist.github.com/danielabar/87730357992409e51384cc41bdc0e07a). Install the Thoughtbot skill and run the audit first, then drop the playbook into `scratch/rails-audit/AGENT_PLAYBOOK.md` and point Claude at it with *"read scratch/rails-audit/AGENT_PLAYBOOK.md and execute it"*.
