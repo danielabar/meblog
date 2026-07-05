@@ -167,7 +167,7 @@ With the issues organized and labelled on GitHub, I could shift from the audit w
 
 ## Time Spent
 
-End-to-end, from invoking the skill to having all the labelled issues live on GitHub, was an afternoon. About 72 minutes was active Claude conversation across five sessions; the rest was me reading the output files, synthesizing the findings, and organizing the work into something I could chip away at over time.
+Before AI, a thorough manual audit on a project this size would have taken days, and for a side project, would never have felt worth the effort. This took an afternoon. About 72 minutes was active Claude conversation across five sessions; the rest was me reading the output files, synthesizing the findings, and organizing the work into something I could chip away at over time.
 
 <aside class="markdown-aside">
 I reconstructed those times by asking Claude to read my conversation history. Every Claude Code conversation is persisted as a <code>.jsonl</code> file under <code>~/.claude/projects/&lt;encoded-project-path&gt;/</code>, one event per line with timestamps. That means Claude can read its own history, so if you've forgotten how long a session took, what you actually typed, or which conversation a decision happened in, you can just ask.
