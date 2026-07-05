@@ -45,7 +45,7 @@ That trailing instruction is a free-form argument. The skill picks it up and rou
 
 The audit ran in under 10 minutes. It generated a single markdown file named `RAILS_AUDIT_REPORT.md` with an Executive Summary, a Key Findings list, then the findings themselves grouped by category (Testing, Security, Models, Controllers, Database & Performance, etc.) with detailed explanations and recommended fixes. Within each category, issues are listed as high, medium, or low severity. The report closes with a Recommendations Summary that re-groups the findings into Quick Wins, Short-term, and Long-term buckets.
 
-Here's a snippet of what the report looked like:
+Here's a snippet of what the beginning of the report looked like:
 
 ![thoughtbot rails audit report summary](../images/thoughtbot-rails-audit-report-summary.jpg "thoughtbot rails audit report summary")
 
@@ -163,7 +163,7 @@ Here's a sampling of the issues listing on GitHub:
 
 ![thoughtbot rails audit github issues](../images/thoughtbot-rails-audit-github-issues.jpg "thoughtbot rails audit github issues")
 
-Then I started with `severity: high` issues, then moved into the medium pile. Beyond that there's no schedule; I work one or two issues on a weekend when I have time. Because every finding is a labelled issue, I can drop in and out without losing context.
+With the issues organized and labelled on GitHub, I could shift from the audit work to the actual code improvements. I started with `severity: high` issues, then moved into the medium pile. Beyond that there's no schedule; I work one or two issues on a weekend when I have time. Because every finding is a labelled issue, I can drop in and out without losing context.
 
 ## Time Spent
 
