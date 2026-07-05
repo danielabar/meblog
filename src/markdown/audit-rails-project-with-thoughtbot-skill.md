@@ -177,9 +177,7 @@ I reconstructed the time by asking Claude to read my conversation history. Every
 
 If you're thinking of trying this on your Rails project, be aware that the audit reflects Thoughtbot's house style: business logic in models, POROs, or ActiveModel objects rather than service objects; names that read as Ruby objects (`Stats#collect`) rather than as patterns (`StatsCollector#call`); skinny controllers, decomposed models.
 
-For my project, this was pretty well aligned: the codebase already uses `VisitSearch` (ActiveModel form object), `VisitQuery` (raw SQL PORO), and `Stats` (plain aggregate). The audit was effectively grading against the style I happened to use, which made it work well here. It might land differently on a codebase built around `Interactor` / `call` / service objects.
-
-The skill's README doesn't document any config for projects that intentionally diverge. What you could try is pass intent in the free-form arg, something like *"this project uses the Interactor pattern deliberately; don't flag it as an issue."* I haven't tested how reliably the skill respects that, but it's what I'd try first for a project that has different conventions.
+For my project, this was pretty well aligned. It may read as wrong on a codebase built around `Interactor` / `call` / service objects. The skill's README doesn't document any config for projects that intentionally diverge. What you could try is pass intent in the free-form arg, something like *"this project uses the Interactor pattern deliberately; don't flag it as an issue."* I haven't tested how reliably the skill respects that, but it's what I'd try first for a project that has different conventions.
 
 ## Final Thoughts
 
