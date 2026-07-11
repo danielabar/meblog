@@ -166,4 +166,7 @@ Here's an analogy I keep coming back to: a high-efficiency washing machine uses 
 
 - various TODO's in the post
   - some screenshots at: scratch/token-savings
+- Also Headroom: https://github.com/headroomlabs-ai/headroom (haven't tried)
+- toolsearch tool: https://www.anthropic.com/engineering/advanced-tool-use (haven't tried)
+- newsletter: https://codenewsletter.ai/subscribe
 - edit
