@@ -42,23 +42,33 @@ Before getting into the tools to optimize usage, it helps to know that pricing i
 
 ### rtk
 
-[rtk](https://github.com/rtk-ai/rtk) (Rust Token Killer) saves input tokens. It acts as a proxy for common CLI commands. Claude runs a command like `git status`, and instead of the raw output going straight into the conversation, rtk intercepts it, runs the real command, and returns a condensed version. That condensed version is what actually gets sent to the model.
+[rtk](https://github.com/rtk-ai/rtk) (Rust Token Killer) saves input tokens. It acts as a proxy for common CLI commands. For example, when Claude runs a command like `git log`, instead of the raw output going straight into the conversation, `rtk` intercepts it, runs the real command, and returns a condensed version. That condensed version is what actually gets sent to the model.
 
-TODO: side-by-side example, `git status` output vs `rtk git status` output on a side project
+To demonstrate, the screenshot below shows on the left side, the output of `git log` on one of my projects, and that's not even the entire output you can see there's more to page. On the right is the rtk version `rtk git log`, notice how much more condensed the output is.
 
-You can see your savings with `rtk gain --daily`:
+![git log output before and after rtk compression](../images/token-savings-git-log-comparison.jpg "git log output before and after rtk compression")
 
-TODO: sample `rtk gain --daily` output
+Multiply this out by all the commands Claude typically runs for coding sessions and the savings add up significantly. You can see your savings with `rtk gain --daily`. For example:
 
-A couple of things worth knowing about reading that table: the "Input" and "Output" columns here refer to the size of the *command's* output before and after rtk compresses it, not input/output tokens in the model-pricing sense from the section above. It's easy to conflate the two since the words overlap. "Output" in this table means the raw stdout from the shell command, which then becomes a smaller amount of input sent to Claude.
+![rtk gain daily output showing token savings](../images/token-savings-rtk-gain-daily.jpg "rtk gain daily output showing token savings")
 
-Installing rtk adds a reference to your user-level `~/CLAUDE.md`, something like:
+The "Input" and "Output" columns in the savings table refer to the size of the *command's* output before and after rtk compresses it, not input/output tokens in the model-pricing sense. The words overlap, but they mean different things here: "Output" in this table is the raw stdout from the shell command, which then becomes a smaller amount of input sent to Claude.
+
+For example the table shows that on May 23, I ran 221 commands, which produced 102.3K of raw output. That's what would have been sent to the model had I not been using `rtk`. But `rtk` intercepted those and compressed the output so that only 70.4K was actually sent to the model. That yields a savings of 32.1K (31.4%) input tokens from running commands.
+
+**How does Claude know to invoke rtk?**
+
+If you're curious how Claude knows to use `rtk`: installing it adds a reference in your user-level `~/.claude/CLAUDE.md`, like this:
 
 ```
 @RTK.md
 ```
 
 That `@` reference tells Claude to load `RTK.md`, which has the actual instructions for how and when to route commands through rtk. It's set up this way so it's active on every conversation, since you want command-wrapping behavior everywhere, not just in specific projects.
+
+The install also drops `~/.claude/RTK.md` alongside it, containing the actual instructions. From my install, it looks like this:
+
+![RTK.md instructions file installed by rtk](../images/token-savings-rtk-md.jpg "RTK.md instructions file installed by rtk")
 
 ### Caveman
 
