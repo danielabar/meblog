@@ -22,17 +22,21 @@ That's when I realized this wasn't sustainable. This post walks through the tool
 
 ### Usage meter
 
-First thing worth knowing: there's a meter, and you can check it. In Claude Desktop, click your name at the bottom left, then Settings, then Usage. Sometimes it doesn't refresh on its own, so you have to click back in to get the latest number. Ever since that mid-month scare, I keep this open in a window off to the side.
+The first thing to know is you can check your usage directly. In Claude Desktop, click your name at the bottom left, then Settings, then Usage. Sometimes it doesn't refresh on its own, so you have to click back in to get the latest number. Ever since that mid-month scare, I keep this open in a window off to the side. Here's what it looks like on my personal Pro plan but it's a similar process for Enterprise:
+
+![Claude Desktop usage profile and meter](../images/token-savings-claude-desktop-combined.jpg "Claude Desktop usage profile and meter")
 
 ### Claude Monitor
 
-[Claude Code Usage Monitor](https://github.com/Maciek-roboblog/Claude-Code-Usage-Monitor) is a separate CLI tool that gives you a live read on burn rate within a rolling 5-hour session window. It's not connected to your account, so it's estimating, not reading real numbers. You can tell it what plan you're on (there's no Enterprise option, but there is a "custom" plan you can configure), and it'll show you things like a prediction for when you'll run out at your current rate. Treat it as a gut check on how fast you're going, not an exact figure.
+[Claude Code Usage Monitor](https://github.com/Maciek-roboblog/Claude-Code-Usage-Monitor) is a separate CLI tool that gives you a live read on burn rate within a rolling 5-hour session window. It's not connected to your account, so it's estimating, not reading real numbers. You can tell it what plan you're on (there's no Enterprise option, but there is a "custom" plan you can configure), and it'll show you things like a prediction for when you'll run out at your current rate. Treat it as a gut check on how fast you're going, not an exact figure. It aggregates across every active Claude Code session on the machine, so the burn rate and prediction reflect all of them combined, not just the session you're currently working in.
 
-TODO: screenshot of claude-monitor running
+I keep this running in a terminal window in VS Code, beside my Claude Code terminal. The screenshot below shows cost, token, and message usage bars, current burn rate, and a prediction for when tokens will run out if usage were to continue at the current rate:
+
+![Claude Code Usage Monitor running in terminal](../images/claude-monitor-example.jpg "Claude Code Usage Monitor running in terminal")
 
 ## Input tokens vs output tokens
 
-Before getting into the tools, it helps to know that pricing is split into two buckets: input tokens (everything sent to the model: your prompt, the conversation history, any files or context loaded) and output tokens (what the model generates back). They're priced differently, with output tokens typically costing more per token than input. You don't need exact numbers to make use of this. Just knowing the two are tracked and billed separately explains why some tools target one side and some target the other, which is the next section.
+Before getting into the tools to optimize usage, it helps to know that pricing is split into two buckets: input tokens (everything sent to the model: your prompt, the conversation history, any files or context loaded) and output tokens (what the model generates back). They're priced differently, with output tokens typically costing more per token than input. You don't need exact numbers to make use of this. Just knowing the two are tracked and billed separately explains why some tools target one side and some target the other.
 
 ## Tools
 
@@ -158,9 +162,10 @@ Here's an analogy I keep coming back to: a high-efficiency washing machine uses 
 
 ## TODO
 
-- various TODO's in the post
+- WIP various TODO's in the post
   - some screenshots at: scratch/token-savings
 - Also Headroom: https://github.com/headroomlabs-ai/headroom (haven't tried)
 - toolsearch tool: https://www.anthropic.com/engineering/advanced-tool-use (haven't tried)
 - newsletter: https://codenewsletter.ai/subscribe
+- maybe screenshot of my VSCode setup with three terminals across the top (mention Panel Postition -> Top), 2 claude codes and one claude-monitor
 - edit
