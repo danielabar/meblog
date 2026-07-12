@@ -72,17 +72,21 @@ The install also drops `~/.claude/RTK.md` alongside it, containing the actual in
 
 ### Caveman
 
-[Caveman](https://github.com/JuliusBrussee/caveman) saves output tokens. It changes how Claude responds: strips out filler, hedging, and pleasantries, while keeping the technical content intact.
+[Caveman](https://github.com/JuliusBrussee/caveman) saves output tokens. It changes how Claude responds by stripping out filler, hedging, and pleasantries, while keeping the technical content intact.
 
-It's installed as a hook, not a slash command you invoke each time.
-
-TODO: find and show where the caveman hook is configured (plugin.json or similar)
-
-`full` is the default intensity once it's installed. You can turn it off mid-conversation by saying "normal mode" to compare.
+`full` is the default intensity once it's installed. You can turn it off mid-conversation by starting a prompt with `normal mode` to compare the more verbose output that Claude otherwise responds with.
 
 TODO: side-by-side example from a side project, same question asked with caveman on vs "normal mode"
 
 `/caveman-stats` gives you an estimate of output token savings for the current session. It's not re-running your actual commands against the model without caveman for a real comparison. Instead it estimates against benchmarks from its own repo. Treat the number as a rough estimate, not an exact accounting.
+
+TODO: img token-savings-caveman-stats-example.jpg
+
+**How does Claude know to invoke caveman?**
+
+It's installed as a hook, not a slash command you invoke each time.
+
+TODO: find and show where the caveman hook is configured (plugin.json or similar)
 
 ### CodeGraph
 
