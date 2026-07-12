@@ -10,19 +10,13 @@ related:
   - "The Code-Adjacent Power of AI"
 ---
 
-## How it started
+At work we're on Claude Enterprise, and I'd been using Claude Code for analysis, design, coding, reviews, investigating production issues, documentation. I assumed Enterprise meant I didn't need to think about usage or limits. Then, mid-month, I got this response from Claude in the middle of a session:
 
-TODO: Maybe don't need to link to other post here
+![Claude Code out of tokens message](../images/ran-out-of-tokens.png "Claude Code out of tokens message")
 
-At work we're on Claude Enterprise, and I'd been using Claude Code for pretty much everything: writing code, [reviewing PRs, drafting docs, code-adjacent work in general](../what-ai-assisted-coding-feels-like-in-early-2026). I assumed Enterprise meant I didn't need to think about usage or limits.
+I posted in Slack to ask if anyone else had seen it. Turns out several other engineers on the team had hit the exact same wall, right around the same point in the month. Someone pointed me to the individual usage meter on Claude desktop, which I hadn't known existed on Enterprise plans. Our workspace admin also gave everyone a bump in tokens, buying some breathing room. But now that I could see the meter, I could watch the burn rate, and it was clear that even with the extra tokens, it wasn't going to last to end of month.
 
-Mid-month, I got this:
-
-TODO: `ran-out-of-tokens.png`
-
-I posted in Slack to ask if anyone else had seen it. Turns out a bunch of other engineers on the team had hit the exact same wall, right around the same point in the month. Our workspace admin gave everyone a bump in tokens. That bought some breathing room, but now that I knew where to find the usage meter, I could see the rate I was burning through it. Even with the extra tokens, I wasn't going to make it to end of month.
-
-That's when it clicked: this wasn't sustainable, and I needed to figure out how to cut token usage without giving up quality or slowing down. What follows is what I've landed on.
+That's when I realized this wasn't sustainable. This post walks through the tools and techniques I've since put together, which have cut my token usage without giving up quality or slowing down.
 
 ## Watch your usage
 
