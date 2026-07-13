@@ -95,19 +95,29 @@ Here's the relevant snippets from `~/.claude/plugins/marketplaces/caveman/.claud
 
 ### CodeGraph
 
-[CodeGraph](https://github.com/colbymchenry/codegraph) parses your codebase into a graph of nodes and edges (symbols and their relationships) stored in a local SQLite database. When you ask a structural question, "what calls this function," "what would break if I changed this," Claude can query the graph directly instead of grepping and reading through files to piece the answer together.
+[CodeGraph](https://github.com/colbymchenry/codegraph) parses your codebase into a graph of nodes and edges (symbols and their relationships) stored in a local SQLite database. When you ask a structural question such as "what calls this function" or "what would break if I changed this" Claude can query the graph directly instead of grepping and reading through files to piece the answer together.
 
-I'm not 100% sure how much this saves in raw tokens, but my read is that it helps because querying a database is a more direct path to the answer than searching and reading files, and it also tends to be faster.
+While this tool does not offer a token savings report, my understanding is that it helps because querying a database is a more direct path to the answer than searching and reading files. It also tends to be faster and more accurate.
 
-TODO: `token-savings-codegraph-usage-example.jpg`, screenshot of Claude using CodeGraph mid-conversation
+Here's an example of the model using CodeGraph to trace a "share plan" flow across controller, serializer, and nutrition-calculation code, narrowing in on the right entry point over several calls:
 
-To be clear this isn't a black box. After running the init command, CodeGraph adds a gitignored `.codegraph/` directory to your project root containing `codegraph.db`. It also runs a background process that watches your files (TODO: find this with `ps` and show it) and keeps the graph in sync as you edit, so there's nothing to manually re-run.
+![Claude using CodeGraph mid-conversation](../images/token-savings-codegraph-usage-example.jpg "Claude using CodeGraph mid-conversation")
 
-Since it's just a SQLite file, you can open it yourself with any SQLite tool, DBeaver for example, and look at the nodes and edges tables directly.
+**How does Claude know to invoke codegraph?**
 
-TODO: screenshot of DBeaver with `.codegraph/codegraph.db` open, nodes/edges tables
+After running the `init` command, CodeGraph adds a gitignored `.codegraph/` directory to your project root containing `codegraph.db`. Since it's just a SQLite file, you can open it yourself with any SQLite tool. For example, I used DBeaver to open it and inspect the first few rows of the `nodes` table:
 
-Like rtk, CodeGraph adds itself to your project-level `CLAUDE.md` so it's part of every session in that repo. (TODO: Show my CLAUDE.md snip for codegraph)
+![CodeGraph's nodes table opened in DBeaver](../images/token-savings-codegraph-sqlite-nodes-table.jpg "CodeGraph's nodes table opened in DBeaver")
+
+Like rtk, CodeGraph adds itself to your project-level `CLAUDE.md` so it's part of every session in that repo. It does this by adding the following line at the end of your `~/.claude/CLAUDE.md` file:
+
+![CodeGraph's line added to CLAUDE.md](../images/token-savings-claude-md-codegraph-section.jpg "CodeGraph's line added to CLAUDE.md")
+
+It also runs a background process that watches your files and keeps the graph in sync as you edit, so there's nothing to manually re-run. You can see it with `ps aux | grep -i codegraph | grep -v grep` (condensed here to just the CPU/MEM columns and command):
+
+```
+0.0  0.2  .../codegraph-darwin-arm64/node --liftoff-only .../codegraph.js serve --mcp
+```
 
 ## Settings and habits
 
