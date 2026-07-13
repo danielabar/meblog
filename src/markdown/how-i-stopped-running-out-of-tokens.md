@@ -123,17 +123,17 @@ It also runs a background process that watches your files and keeps the graph in
 
 ### Default to Sonnet
 
-I used to default to Opus for everything, including tasks that didn't need it, and then forget to switch back for the next task. Now I default to Sonnet. It handles the majority of day-to-day work well, and I set effort to medium rather than the current default of high.
+I used to default to Opus, and then try to remember to switch to Sonnet for simpler tasks, but kept forgetting and burned Opus-level tokens on stuff that didn't need it. Since then I've learned Sonnet is good enough for the majority of day-to-day work, so now it's my default, with effort set to `medium` rather than the default of `high`.
 
-TODO: I've found Sonnet is good enough for the majority of tasks.
-
-Worth a note on effort levels: with the newer Sonnet models, effort defaults to high, and if you push it up further to extra-high or max, it can end up costing more than just using Opus for that task. If you find yourself wanting extra-high or max effort regularly, that's probably a sign to switch models rather than crank the effort dial. (More on the effort/cost tradeoff: [Claude Sonnet 5, Opus 4.8, Fable 5: when to use which](https://www.digitalapplied.com/blog/claude-sonnet-5-opus-4-8-fable-5-when-to-use-which-2026#effort-matrix).)
+<aside class="markdown-aside">
+With the newer Sonnet models, effort defaults to <code>high</code>, and if you push it up further to <code>xhigh</code> or <code>max</code>, it can end up costing more than using Opus for that task. If you find yourself wanting extra-high or max effort regularly, that's probably a sign to switch models rather than crank the effort dial. More on the effort/cost tradeoff: <a class="markdown-link" href="https://www.digitalapplied.com/blog/claude-sonnet-5-opus-4-8-fable-5-when-to-use-which-2026#effort-matrix">Claude Sonnet 5, Opus 4.8, Fable 5: when to use which</a>.
+</aside>
 
 ### Set advisor to Opus
 
-Claude Code has an [advisor](https://code.claude.com/docs/en/advisor) feature. With it set to Opus, Sonnet handles the day-to-day and delegates Opus in when it hits something that genuinely needs the stronger model. Use `/advisor` to set this.
+Claude Code has an [advisor](https://code.claude.com/docs/en/advisor) feature. With it set to Opus, Sonnet handles the day-to-day and delegates Opus in when it hits something that genuinely needs the stronger model. Use `/advisor` to set this. Here's an example of Sonnet calling advisor mid-task, catching an untested edge case before wrapping up:
 
-TODO: `sonnet-calling-advisor-example-2.jpg`, screenshot of Claude calling advisor mid-task
+![Sonnet calling advisor mid-task](../images/sonnet-calling-advisor-example-2.jpg "Sonnet calling advisor mid-task")
 
 The effect is you get cheaper execution most of the time, since Sonnet is doing the bulk of the work, and you only pay Opus rates for the parts that actually need it.
 
