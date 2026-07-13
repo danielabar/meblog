@@ -80,13 +80,18 @@ TODO: side-by-side example from a side project, same question asked with caveman
 
 `/caveman-stats` gives you an estimate of output token savings for the current session. It's not re-running your actual commands against the model without caveman for a real comparison. Instead it estimates against benchmarks from its own repo. Treat the number as a rough estimate, not an exact accounting.
 
-TODO: img token-savings-caveman-stats-example.jpg
+![caveman-stats output showing estimated token savings](../images/token-savings-caveman-stats-example.jpg "caveman-stats output showing estimated token savings")
 
 **How does Claude know to invoke caveman?**
 
-It's installed as a hook, not a slash command you invoke each time.
+Caveman is installed as a Claude Code plugin. You don't have to remember to type `/caveman` every time you start a conversation because the plugin registers two hooks: a `SessionStart` hook that turns the mode on at the start of a session, and a `UserPromptSubmit` hook that re-applies it on every single message you send.
 
-TODO: find and show where the caveman hook is configured (plugin.json or similar)
+Here's the relevant snippets from `~/.claude/plugins/marketplaces/caveman/.claude-plugin/plugin.json`:
+
+```json
+"SessionStart": "node \"${CLAUDE_PLUGIN_ROOT}/src/hooks/caveman-activate.js\"",
+"UserPromptSubmit": "node \"${CLAUDE_PLUGIN_ROOT}/src/hooks/caveman-mode-tracker.js\""
+```
 
 ### CodeGraph
 
