@@ -192,9 +192,9 @@ Here's an analogy I keep coming back to: a high-efficiency washing machine uses 
 ## TODO
 
 - WIP various TODO's in the post
-  - some screenshots at: scratch/token-savings
 - Also Headroom: https://github.com/headroomlabs-ai/headroom (haven't tried)
 - toolsearch tool: https://www.anthropic.com/engineering/advanced-tool-use (haven't tried)
 - newsletter: https://codenewsletter.ai/subscribe
 - maybe screenshot of my VSCode setup with three terminals across the top (mention Panel Postition -> Top), 2 claude codes and one claude-monitor
+- intro needs work, maybe "my team"
 - edit
