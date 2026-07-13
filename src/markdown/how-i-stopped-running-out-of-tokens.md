@@ -153,11 +153,11 @@ My team's project-level `CLAUDE.md` had accumulated a lot of `@` references over
 
 I had Claude audit the file and help whittle it down. First pass: some of those `@` references turned out to be redundant, already covered by Rails-specific skills we had set up in the project. For the rest, the fix was to reword them from always-load references into conditional ones, something like *"When asked about subscriptions, read `path/to/subscriptions-doc.md`."* Claude only pulls that file in when it's actually relevant to the question being asked.
 
-To make sure I wasn't losing fidelity in the process, Claude also generated a set of sample prompts I could run against the trimmed-down file to confirm it could still find the same details it could before.
+To make sure I wasn't losing fidelity in the process, I asked Claude to generate sample prompts to run after the file was trimmed-down, to confirm it could still find the same details as before.
 
 TODO: before/after numbers on total input tokens saved by this CLAUDE.md cleanup
 
-This one is worth taking seriously if you're on a team. It's not just your own savings, it multiplies by every team member, on every conversation, for as long as that file stays bloated.
+This one is worth doing if you're on a team. It's not just your own savings, it multiplies by every team member, on every conversation, for as long as that file stays bloated.
 
 ### Clear often
 
@@ -165,7 +165,7 @@ Claude Code doesn't hold state between messages the way you might assume. The mo
 
 `/clear` when you finish a task or switch to a new one. I'll also clear mid-task if I'm taking a different approach on the same problem, even before it's done, if the earlier back-and-forth isn't useful anymore.
 
-There's a nuance here worth knowing about: [prompt caching](https://code.claude.com/docs/en/prompt-caching). It softens the resend cost somewhat, cached portions of a conversation are cheaper to resend than fresh input, but there's still a (smaller) cost to writing to the cache, and cached entries expire after a TTL that varies by plan. Worth reading the docs if you want the full picture, but the short version is that while caching helps, it doesn't eliminate the cost of a long conversation.
+Nuance: [prompt caching](https://code.claude.com/docs/en/prompt-caching). It softens the resend cost somewhat, cached portions of a conversation are cheaper to resend than fresh input, but there's still a (smaller) cost to writing to the cache, and cached entries expire after a TTL that varies by plan. Worth reading the docs if you want the full picture, but the short version is that while caching helps, it doesn't eliminate the cost of a long conversation.
 
 ## Summary
 
