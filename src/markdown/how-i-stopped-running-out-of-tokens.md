@@ -73,11 +73,15 @@ The install also drops `~/.claude/RTK.md` alongside it, containing the actual in
 
 ### Caveman
 
-[Caveman](https://github.com/JuliusBrussee/caveman) saves output tokens. It changes how Claude responds by stripping out filler, hedging, and pleasantries, while keeping the technical content intact.
+[Caveman](https://github.com/JuliusBrussee/caveman) saves output tokens. It changes how Claude responds by stripping out filler, hedging, and pleasantries, while keeping the technical content intact. `full` is the default intensity once it's installed. You can turn it off mid-conversation by starting a prompt with `normal mode` to compare the more verbose output that Claude otherwise responds with.
 
-`full` is the default intensity once it's installed. You can turn it off mid-conversation by starting a prompt with `normal mode` to compare the more verbose output that Claude otherwise responds with.
+The screenshot below shows the model responses side by side with and without caveman, to the same prompt asking how referrer normalization works on an analytics project. You can see the caveman response is more terse, whereas the non caveman response contains more prose:
 
-TODO: side-by-side example from a side project, same question asked with caveman on vs "normal mode"
+![token savings caveman compare](../images/token-savings-caveman-compare.jpg "token savings caveman compare")
+
+<aside class="markdown-aside">
+The token counts at the bottom of each file aren't something caveman adds automatically. After getting both responses, I asked Claude to estimate the token count for each using the rough <a class="markdown-link" href="https://help.openai.com/en/articles/4936856-what-are-tokens-and-how-to-count-them">char 4 heuristic</a>, then appended those lines myself for the comparison.
+</aside>
 
 `/caveman-stats` gives you an estimate of output token savings for the current session. It's not re-running your actual commands against the model without caveman for a real comparison. Instead it estimates against benchmarks from its own repo. Treat the number as a rough estimate, not an exact accounting.
 
@@ -195,7 +199,7 @@ An analogy I keep coming back to: a high-efficiency washing machine uses less wa
 - WIP various TODO's in the post
 - Also Headroom: https://github.com/headroomlabs-ai/headroom (haven't tried)
 - toolsearch tool: https://www.anthropic.com/engineering/advanced-tool-use (haven't tried)
-- also `/checkup`: https://x.com/bcherny/status/2074997570317779038 (haven't tried)
+- also `/checkup`: https://x.com/bcherny/status/2074997570317779038 (haven't tried, not available on my claude version?)
 - newsletter: https://codenewsletter.ai/subscribe
 - maybe screenshot of my VSCode setup with three terminals across the top (mention Panel Postition -> Top), 2 claude codes and one claude-monitor
 - edit
