@@ -11,11 +11,13 @@ related:
 ---
 
 These days nearly all my engineering work runs through AI: analysis, design, coding, code review, debugging production issues, documentation.
-At work my team is using Claude Enterprise, and I assumed that meant I didn't need to think about usage or limits. Then, mid-month, I got this response from Claude in the middle of a session:
+At work my team is using Claude Enterprise, and I assumed that meant I didn't need to think about usage or limits. Then, mid-month, I got this error message from Claude in the middle of a session:
+
+> You've hit your org's monthly spend limit · ask your admin to raise it at claude.ai/admin-settings/usage
 
 ![Claude Code out of tokens message](../images/ran-out-of-tokens.png "Claude Code out of tokens message")
 
-After posting in Slack to ask if anyone else had seen it, turns out several other engineers on the team had hit the exact same wall, right around the same point in the month. Someone pointed me to the individual usage meter on Claude desktop, which I hadn't known existed on Enterprise plans. Our workspace admin also gave everyone a bump in tokens, buying some breathing room. But now that I could see the meter, I could watch the burn rate, and it was clear that even with the extra tokens, it wasn't going to last to the end of the month.
+After posting in Slack to ask if anyone else had seen it, turns out several other engineers on the team had hit the exact same wall, right around the same point in the month. Someone pointed me to the individual usage meter on Claude desktop, which I hadn't known existed on Enterprise plans. Our workspace admin also gave everyone a bump in tokens, buying some breathing room. But now that I could see the meter and watch the burn rate, and it was clear that even with the extra tokens, it wasn't going to last to the end of the month.
 
 That's when I realized this wasn't sustainable. This post walks through the tools and techniques I've since put together, which have cut my token usage without giving up quality or slowing down.
 
@@ -174,7 +176,7 @@ Nuance: [prompt caching](https://code.claude.com/docs/en/prompt-caching). It sof
 
 ## Is it working?
 
-At this point you may be wondering: but is all this effort actually worth it, is it really saving anything? In my case the answer is a resounding yes. The chart below (which you can find from the Claude Desktop usage view) shows my daily spend by model. There's a clear cluster of high-cost days around mid-June, before I started optimizing, followed by a noticeable drop in daily cost once I started applying these techniques:
+At this point you may be wondering: Is all this effort actually worth it, is it really saving anything? In my case the answer is a resounding yes. The chart below (which you can find from the Claude Desktop usage view) shows my daily spend by model. There's a clear cluster of high-cost days around mid-June, before I started optimizing, followed by a noticeable drop in daily cost once I started applying these techniques:
 
 ![Daily spend by model chart from Claude Desktop showing high usage in mid-June dropping off afterward](../images/token-savings-daily-spend-by-model.jpg "Daily spend by model")
 
@@ -204,13 +206,11 @@ Most of what's here I picked up from the [Code newsletter](https://codenewslette
 
 ## Closing thoughts
 
-![token savings bugs bunny tired](../images/token-savings-bugs-bunny-tired.jpg "token savings bugs bunny tired")
-
 If you're feeling exhausted reading this, I don't blame you. Learning to use AI tools effectively is already a big shift in how software engineering gets done. And just as that starts to feel normal, here comes another layer: "also, watch your spending," and a list of another 20 things to learn.
+
+![token savings bugs bunny tired](../images/token-savings-bugs-bunny-tired.jpg "token savings bugs bunny tired")
 
 An analogy I keep coming back to: a high-efficiency washing machine uses less water by design. You don't buy a separate gadget and bolt it onto your washer to make it use less water. It's just built that way. I'm hoping token efficiency eventually gets baked into the tooling the same way, so we can spend less time watching meters and more time actually shipping things that solve problems for the people using our software.
 
 ## TODO
-
-- maybe screenshot of my VSCode setup with three terminals across the top (mention Panel Postition -> Top), 2 claude codes and one claude-monitor
 - edit
