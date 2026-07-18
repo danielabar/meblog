@@ -172,6 +172,12 @@ Claude Code doesn't hold state between messages the way you might assume. The mo
 
 Nuance: [prompt caching](https://code.claude.com/docs/en/prompt-caching). It softens the resend cost somewhat, cached portions of a conversation are cheaper to resend than fresh input, but there's still a (smaller) cost to writing to the cache, and cached entries expire after a TTL that varies by plan. Worth reading the docs if you want the full picture, but the short version is that while caching helps, it doesn't eliminate the cost of a long conversation.
 
+## Is it working?
+
+At this point you may be wondering: but is all this effort actually worth it, is it really saving anything? In my case the answer is a resounding yes. The chart below (which you can find from the Claude Desktop usage view) shows my daily spend by model. There's a clear cluster of high-cost days around mid-June, before I started optimizing, followed by a noticeable drop in daily cost once I started applying these techniques:
+
+![Daily spend by model chart from Claude Desktop showing high usage in mid-June dropping off afterward](../images/token-savings-daily-spend-by-model.jpg "Daily spend by model")
+
 ## Haven't tried yet
 
 A few more things on my radar that I haven't gotten to yet, but seem like they would also be helpful:
@@ -206,6 +212,5 @@ An analogy I keep coming back to: a high-efficiency washing machine uses less wa
 
 ## TODO
 
-- Add section like Is it Working and share screenshots of latest claude desktop usage which now includes charts: token-savings-daily-spend-by-model.jpg and token-savings-top-skills-cost-per-use.jpg
 - maybe screenshot of my VSCode setup with three terminals across the top (mention Panel Postition -> Top), 2 claude codes and one claude-monitor
 - edit
