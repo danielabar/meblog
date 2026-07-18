@@ -158,11 +158,11 @@ My team's project-level `CLAUDE.md` had accumulated a lot of `@` references over
 
 I had Claude audit the file and help whittle it down. First pass: some of those `@` references turned out to be redundant, already covered by Rails-specific skills we had set up in the project. For the rest, the fix was to reword them from always-load references into conditional ones, something like *"When asked about subscriptions, read `path/to/subscriptions-doc.md`."* Claude only pulls that file in when it's actually relevant to the question being asked.
 
-To make sure I wasn't losing fidelity in the process, I asked Claude to generate sample prompts to run after the file was trimmed-down, to confirm it could still find the same details as before.
+To make sure I wasn't losing fidelity in the process, I asked Claude to generate sample prompts that I could run after the file was trimmed down, to confirm it could still find the same details as before. Here's a snip from one of the PR's I submitted to edit the project level `CLAUDE.md` to reduce the amount of context it was consuming:
 
-TODO: before/after numbers on total input tokens saved by this CLAUDE.md cleanup
+![before after total input tokens saved by this CLAUDE.md cleanup](../images/token-savings-claude-md-audit.png "Before after input token savings from CLAUDE.md audit")
 
-This one is worth doing if you're on a team. It's not just your own savings, it multiplies by every team member, on every conversation, for as long as that file stays bloated.
+This one is definitely worth doing if you're on a team because it's not just your own savings. It multiplies by every team member, on every conversation, for as long as that file stays bloated.
 
 ### Clear often
 
@@ -196,10 +196,10 @@ An analogy I keep coming back to: a high-efficiency washing machine uses less wa
 
 ## TODO
 
-- WIP various TODO's in the post
 - Also Headroom: https://github.com/headroomlabs-ai/headroom (haven't tried)
 - toolsearch tool: https://www.anthropic.com/engineering/advanced-tool-use (haven't tried)
 - also `/checkup`: https://x.com/bcherny/status/2074997570317779038 (haven't tried, not available on my claude version?)
 - newsletter: https://codenewsletter.ai/subscribe
+- Add section like Is it Working and share screenshots of latest claude desktop usage which now includes charts: token-savings-daily-spend-by-model.jpg and token-savings-top-skills-cost-per-use.jpg
 - maybe screenshot of my VSCode setup with three terminals across the top (mention Panel Postition -> Top), 2 claude codes and one claude-monitor
 - edit
