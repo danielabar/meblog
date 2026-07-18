@@ -194,6 +194,8 @@ A few more things on my radar that I haven't gotten to yet, but seem like they w
 | Audit `CLAUDE.md` | Input tokens | Replace always-loaded `@` references with conditional, on-demand ones |
 | `/clear` often | Input tokens | Avoids resending a long, no-longer-relevant conversation history |
 
+Most of what's here I picked up from the [Code newsletter](https://codenewsletter.ai/subscribe). Sign up if you want more like this.
+
 ## Closing thoughts
 
 ![token savings bugs bunny tired](../images/token-savings-bugs-bunny-tired.jpg "token savings bugs bunny tired")
@@ -204,7 +206,6 @@ An analogy I keep coming back to: a high-efficiency washing machine uses less wa
 
 ## TODO
 
-- newsletter: https://codenewsletter.ai/subscribe
 - Add section like Is it Working and share screenshots of latest claude desktop usage which now includes charts: token-savings-daily-spend-by-model.jpg and token-savings-top-skills-cost-per-use.jpg
 - maybe screenshot of my VSCode setup with three terminals across the top (mention Panel Postition -> Top), 2 claude codes and one claude-monitor
 - edit
