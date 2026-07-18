@@ -172,6 +172,14 @@ Claude Code doesn't hold state between messages the way you might assume. The mo
 
 Nuance: [prompt caching](https://code.claude.com/docs/en/prompt-caching). It softens the resend cost somewhat, cached portions of a conversation are cheaper to resend than fresh input, but there's still a (smaller) cost to writing to the cache, and cached entries expire after a TTL that varies by plan. Worth reading the docs if you want the full picture, but the short version is that while caching helps, it doesn't eliminate the cost of a long conversation.
 
+## Haven't tried yet
+
+A few more things on my radar that I haven't gotten to yet, but seem like they would also be helpful:
+
+- [Headroom](https://github.com/headroomlabs-ai/headroom): another token-efficiency tool, similar territory to rtk and Caveman.
+- [Tool Search Tool](https://www.anthropic.com/engineering/advanced-tool-use): Anthropic's own guidance on trimming token usage from tool definitions.
+- `/checkup` (alias `/doctor`): flags further inefficiencies in your setup, like unused MCP servers and skills. See [this X post](https://x.com/bcherny/status/2074997570317779038) for further details.
+
 ## Summary
 
 | Tool / technique | Saves | What it does |
@@ -196,9 +204,6 @@ An analogy I keep coming back to: a high-efficiency washing machine uses less wa
 
 ## TODO
 
-- Also Headroom: https://github.com/headroomlabs-ai/headroom (haven't tried)
-- toolsearch tool: https://www.anthropic.com/engineering/advanced-tool-use (haven't tried)
-- also `/checkup`: https://x.com/bcherny/status/2074997570317779038 (haven't tried, not available on my claude version?)
 - newsletter: https://codenewsletter.ai/subscribe
 - Add section like Is it Working and share screenshots of latest claude desktop usage which now includes charts: token-savings-daily-spend-by-model.jpg and token-savings-top-skills-cost-per-use.jpg
 - maybe screenshot of my VSCode setup with three terminals across the top (mention Panel Postition -> Top), 2 claude codes and one claude-monitor
