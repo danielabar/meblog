@@ -43,6 +43,8 @@ Before getting into the tools to optimize usage, it helps to know that pricing i
 
 ## Tools
 
+These are dedicated tools I installed, each targeting a different part of the token pipeline: input, output, and search efficiency.
+
 ### rtk
 
 [rtk](https://github.com/rtk-ai/rtk) (Rust Token Killer) saves input tokens. It acts as a proxy for common CLI commands. For example, when Claude runs a command like `git log`, instead of the raw output going straight into the conversation, `rtk` intercepts it, runs the real command, and returns a condensed version. That condensed version is what actually gets sent to the model.
@@ -122,6 +124,8 @@ It also runs a background process that watches your files and keeps the graph in
 ```
 
 ## Settings and habits
+
+This section walks through some of the settings and habits I've developed to further reduce token usage.
 
 ### Default to Sonnet
 
