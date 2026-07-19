@@ -123,7 +123,7 @@ It also runs a background process that watches your files and keeps the graph in
 0.0  0.2  .../codegraph-darwin-arm64/node --liftoff-only .../codegraph.js serve --mcp
 ```
 
-## Settings and habits
+## Settings and Habits
 
 This section walks through some of the settings and habits I've developed to further reduce token usage.
 
@@ -155,9 +155,9 @@ Running this at work is what led me to the biggest single win I found, covered n
 
 ### Audit your CLAUDE.md
 
-My team's project-level `CLAUDE.md` had accumulated a lot of `@` references over time: frontend docs, analytics how-tos, Stripe subscription details, third-party integration guides, and more. Each `@` reference tells Claude to load that file's contents into every session automatically. So even a conversation with nothing to do with subscriptions was loading the full subscriptions doc, on top of everything else, every single time.
+My team's project-level `CLAUDE.md` had accumulated a lot of `@` references over time: frontend docs, analytics how-tos, Stripe subscription details, third-party integration guides, and more. Each `@` reference tells Claude to load that file's contents into every session automatically, even if not relevant to the question at hand.
 
-I had Claude audit the file and help whittle it down. First pass: some of those `@` references turned out to be redundant, already covered by Rails-specific skills we had set up in the project. For the rest, the fix was to reword them from always-load references into conditional ones, something like *"When asked about subscriptions, read `path/to/subscriptions-doc.md`."* Claude only pulls that file in when it's actually relevant to the question being asked.
+I had Claude audit the file and help whittle it down. First pass: some of those `@` references turned out to be redundant, already covered by Rails-specific skills we had set up in the project. For the rest, the fix was to reword them from always-load references into conditional ones. For example, *"When asked about subscriptions, read `path/to/subscriptions-doc.md`."* Claude only pulls that file in when it's actually relevant to the question being asked.
 
 To make sure I wasn't losing fidelity in the process, I asked Claude to generate sample prompts that I could run after the file was trimmed down, to confirm it could still find the same details as before. I also had Claude check its own context size before and after the edits, then share those numbers in the PR description so my team could see the impact. Here's a snip from one of the PR's I submitted to edit the project level `CLAUDE.md` to reduce the amount of context it was consuming:
 
@@ -173,9 +173,9 @@ Claude Code doesn't hold state between messages the way you might assume. The mo
 
 **Nuance:** Prompt caching softens the resend cost somewhat. Cached portions of a conversation are cheaper to resend than fresh input, but there's still a (smaller) cost to writing to the cache, and cached entries expire after a TTL that varies by plan. The [documentation](https://code.claude.com/docs/en/prompt-caching) goes into more details, but the short version is that while caching helps, it doesn't eliminate the cost of a long conversation.
 
-## Is it working?
+## Is It Working?
 
-At this point you may be wondering: Is all this effort actually worth it, is it really saving anything? In my case the answer is a resounding yes. The chart below (which you can find from the Claude Desktop usage view) shows my daily spend by model. There's a clear cluster of high-cost days around mid-June, before I started optimizing, followed by a noticeable drop in daily cost once I started applying these techniques:
+At this point you may be wondering: Is all this effort actually worth it, is it really saving anything? In my case the answer is a resounding yes. The chart below (which you can find from the Claude Desktop usage view for Enterprise plans) shows my daily spend by model. There's a clear cluster of high-cost days around mid-June, before I started optimizing, followed by a noticeable drop in daily cost once I started applying these techniques:
 
 ![Daily spend by model chart from Claude Desktop showing high usage in mid-June dropping off afterward](../images/token-savings-daily-spend-by-model.jpg "Daily spend by model")
 
