@@ -107,15 +107,15 @@ Here's an example of the model using CodeGraph to trace a "share plan" flow acro
 
 **How does Claude know to invoke codegraph?**
 
-After running the `init` command, CodeGraph adds a gitignored `.codegraph/` directory to your project root containing `codegraph.db`. Since it's just a SQLite file, you can open it yourself with any SQLite tool. For example, I used DBeaver to open it and inspect the first few rows of the `nodes` table:
+After running the `init` command, CodeGraph adds a gitignored `.codegraph/` directory to your project root containing `codegraph.db`. Since it's just a SQLite file, you can open it yourself with any SQLite tool. For example, I used [DBeaver](https://dbeaver.io/) to open it and inspect the first few rows of the `nodes` table:
 
 ![CodeGraph's nodes table opened in DBeaver](../images/token-savings-codegraph-sqlite-nodes-table.jpg "CodeGraph's nodes table opened in DBeaver")
 
-Like rtk, CodeGraph adds itself to your project-level `CLAUDE.md` so it's part of every session in that repo. It does this by adding the following line at the end of your `~/.claude/CLAUDE.md` file:
+Like rtk, CodeGraph adds itself to your project-level `CLAUDE.md` so it's part of every session in that repo. It does this by adding the following section at the end of your `~/.claude/CLAUDE.md` file:
 
-![CodeGraph's line added to CLAUDE.md](../images/token-savings-claude-md-codegraph-section.jpg "CodeGraph's line added to CLAUDE.md")
+![CodeGraph's section added to CLAUDE.md](../images/token-savings-claude-md-codegraph-section.jpg "CodeGraph's section added to CLAUDE.md")
 
-It also runs a background process that watches your files and keeps the graph in sync as you edit, so there's nothing to manually re-run. You can see it with `ps aux | grep -i codegraph | grep -v grep` (condensed here to just the CPU/MEM columns and command):
+It also runs a background process that watches your files and keeps the graph in sync as you edit. You can see it with `ps aux | grep -i codegraph | grep -v grep` (condensed here to just the CPU/MEM columns):
 
 ```
 0.0  0.2  .../codegraph-darwin-arm64/node --liftoff-only .../codegraph.js serve --mcp
