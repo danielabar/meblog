@@ -75,9 +75,9 @@ The install also generates `~/.claude/RTK.md` alongside it, containing the actua
 
 ### Caveman
 
-[Caveman](https://github.com/JuliusBrussee/caveman) saves output tokens. It changes how Claude responds by stripping out filler, hedging, and pleasantries, while keeping the technical content intact. You can turn it off mid-conversation by starting a prompt with `normal mode` to compare the more verbose output that Claude otherwise responds with.
+[Caveman](https://github.com/JuliusBrussee/caveman) saves output tokens. It changes how Claude responds by stripping out filler, hedging, and pleasantries, while keeping the technical content intact. It's not just shorter responses, it's a different shape. Caveman trades prose for fragments, bullets, and arrow chains (`→`), and front-loads file:line references instead of burying them in sentences. That structure carries more signal per token, not just fewer of them.
 
-The screenshot below shows the model responses side by side with and without caveman, to the same prompt asking how referrer normalization works on an analytics project. You can see the caveman response is more terse (~424 tokens), whereas the non caveman response contains more prose, at ~487 tokens. This yields about a 13% savings on this one exchange:
+You can turn it off mid-conversation by starting a prompt with `normal mode` to compare the more verbose output that Claude otherwise responds with. The screenshot below shows the model responses side by side with and without caveman to the same prompt, asking how referrer normalization works on an analytics project. On the right side, non-caveman explains the flow in paragraphs. On the left, Caveman gives the same flow as a numbered list. Caveman comes in at ~424 tokens vs ~487 (13% savings), but the real gain is how much of each response is signal instead of connective words.
 
 ![token savings caveman compare](../images/token-savings-caveman-compare.jpg "token savings caveman compare")
 
@@ -89,16 +89,11 @@ The token counts at the bottom of each file aren't something caveman adds automa
 
 ![caveman-stats output showing estimated token savings](../images/token-savings-caveman-stats-example.jpg "caveman-stats output showing estimated token savings")
 
+Caveman's repo claims up to 65% output token reduction across its test prompts (this post's 13% example is one data point, not the tool's ceiling), and cites research suggesting brevity-constrained answers can improve accuracy, not just cut cost.
+
 **How does Claude know to invoke caveman?**
 
-Caveman is installed as a Claude Code plugin. You don't have to remember to type `/caveman` every time you start a conversation because the plugin registers two hooks: a `SessionStart` hook that turns the mode on at the start of a session, and a `UserPromptSubmit` hook that re-applies it on every single message you send.
-
-Here's the relevant snippets from `~/.claude/plugins/marketplaces/caveman/.claude-plugin/plugin.json`:
-
-```json
-"SessionStart": "node \"${CLAUDE_PLUGIN_ROOT}/src/hooks/caveman-activate.js\"",
-"UserPromptSubmit": "node \"${CLAUDE_PLUGIN_ROOT}/src/hooks/caveman-mode-tracker.js\""
-```
+Caveman is installed as a Claude Code plugin. You don't have to remember to type `/caveman` every time you start a conversation because the plugin registers two hooks: a `SessionStart` hook that turns the mode on at the start of a session, and a `UserPromptSubmit` hook that re-applies it on every single message you send. Check your `~/.claude/plugins/marketplaces/caveman/.claude-plugin/plugin.json` for how the hooks are set up.
 
 ### CodeGraph
 
