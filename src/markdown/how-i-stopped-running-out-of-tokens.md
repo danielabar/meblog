@@ -49,7 +49,7 @@ These are dedicated tools I installed, each targeting a different part of the to
 
 [rtk](https://github.com/rtk-ai/rtk) (Rust Token Killer) saves input tokens. It acts as a proxy for common CLI commands. For example, when Claude runs a command like `git log`, instead of the raw output going straight into the conversation, `rtk` intercepts it, runs the real command, and returns a condensed version. That condensed version is what actually gets sent to the model.
 
-To demonstrate, the screenshot below shows on the left side, the output of `git log` on one of my projects, and that's not even the entire output you can see there's more to page. On the right is the rtk version `rtk git log`, notice how much more condensed the output is.
+To demonstrate, the screenshot below shows `git log` output on one of my projects. On the left, the raw output (truncated; there's more to scroll), and on the right, the `rtk git log` version. Notice how much more condensed it is.
 
 ![git log output before and after rtk compression](../images/token-savings-git-log-comparison.jpg "git log output before and after rtk compression")
 
@@ -57,9 +57,9 @@ Multiply this by all the commands Claude typically runs for coding sessions and 
 
 ![rtk gain daily output showing token savings](../images/token-savings-rtk-gain-daily.jpg "rtk gain daily output showing token savings")
 
-The "Input" and "Output" columns in the savings table refer to the size of the *command's* output before and after rtk compresses it, not input/output tokens in the model-pricing sense. The words overlap, but they mean different things here: "Output" in this table is the raw stdout from the shell command, which then becomes a smaller amount of input sent to Claude.
+The "Input" and "Output" columns in the savings table refer to the size of the *command's* output before and after rtk compresses it, not input/output tokens in the model-pricing sense. The words overlap, but they mean different things here: "Input" in this table is the raw stdout from the shell command, and "Output" is the smaller, compressed version that actually becomes input sent to Claude.
 
-For example the table shows that on May 23, I ran 221 commands, which produced 102.3K of raw output. That's what would have been sent to the model had I not been using `rtk`. But `rtk` intercepted those and compressed the output so that only 70.4K was actually sent to the model. That yields a savings of 32.1K (31.4%) input tokens from running commands.
+For example, the table shows that on May 23, I ran 221 commands, which produced 102.3K of raw output. That's what would have been sent to the model had I not been using `rtk`. But `rtk` intercepted those and compressed the output so that only 70.4K was actually sent to the model. That yields a savings of 32.1K (31.4%) input tokens from running commands.
 
 **How does Claude know to invoke rtk?**
 
@@ -210,6 +210,3 @@ If you're feeling exhausted reading this, I don't blame you. Learning to use AI 
 ![token savings bugs bunny tired](../images/token-savings-bugs-bunny-tired.jpg "token savings bugs bunny tired")
 
 An analogy I keep coming back to: a high-efficiency washing machine uses less water by design. You don't buy a separate gadget and bolt it onto your washer to make it use less water. It's just built that way. I'm hoping token efficiency eventually gets baked into the AI tooling the same way, so we can spend less time watching meters and more time focused on shipping things that solve problems for the people using our software.
-
-## TODO
-- edit
