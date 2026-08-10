@@ -12,7 +12,7 @@ related:
 
 Taking a break from my usual tech/programming topics to cover something far more difficult. I recently celebrated a birthday, and with it came the usual question: What do you want for your birthday? This year, given everything that's happened, the answer that came to mind was far bigger than any gift. It belongs in the same category as "world peace" or "an end to poverty": enormous and far too vague for anyone to actually act on. So instead, I'm going to ask for something specific.
 
-What I want is for more patients and caregivers facing cancer to hear about one idea: That cancer may have a metabolic dimension, maybe even a root cause that the genetic paradigm has missed, and this may be why cures built on genetics remain so elusive. In practice that means knowing what's already shown safe today, and pushing for the rest to be properly tested.
+What I want is for more patients and caregivers facing cancer to hear about one idea: That cancer may have a metabolic dimension, maybe even a root cause that the genetic paradigm has missed, and this may be why cures built on genetics remain so elusive. In practice that means giving metabolic-targeted therapies a real look: knowing what's already shown safe today, and pushing for the rest to be properly tested.
 
 "Cancer" is too big a word to build a case on. It's really hundreds of diseases, and the case for a metabolic root cause may be stronger for some than others. So I'll narrow to the one I've spent this year caregiving through: [glioblastoma](https://my.clevelandclinic.org/health/diseases/17032-glioblastoma).
 
