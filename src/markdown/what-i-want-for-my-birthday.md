@@ -178,19 +178,19 @@ A motivated patient may be able to scale some of these walls, but this is not en
 
 ## What I'm Asking For
 
-Circling back to my birthday ask. What I want is smaller than it might sound: awareness. That patients and caregivers facing a diagnosis like this hear that this research exists, that ketogenic metabolic therapy has evidence behind it as an adjunct, and that it's worth raising with an oncology team. Beyond that:
+Circling back to my birthday ask. What I'm asking for is awareness. That patients and caregivers facing a diagnosis like this hear that this research exists, that ketogenic metabolic therapy has evidence behind it as an adjunct, and that it's worth raising with an oncology team. Beyond that:
 
-1. **More research.** The studies so far are small, and the strongest version of the therapy, press-pulse, has only been tested in animals. Phase 3 trials, the kind rigorous enough to settle whether this belongs in standard care, are the missing piece. Trials like UCSF's Phase 2 study and Cedars-Sinai's DIET2TREAT are a start, but they test diet alone, not the full protocol.
-2. **Wider access to supervision.** Trained clinicians and oncology dietitians who can run this safely, so it isn't limited to the patients resourceful enough to find their own way to it.
-3. **More patients simply knowing it's an option.** The more people ask, the more this research looks worth funding, and the more likely it becomes that, someday, a clinic near you has someone who can say yes.
+**More research.** The studies so far are small, and the strongest version of the therapy, press-pulse, has only been tested in animals. Phase 3 trials, the kind rigorous enough to settle whether this belongs in standard care, are the missing piece.
 
-The payoff isn't only measured in survival months. A patient who isn't nauseated and wrecked by treatment, who feels better instead of worse, can keep working, keep contributing, keep dignity intact, and may not require going on disability.
+**Wider access to supervision.** Trained clinicians who can run this safely, so it isn't limited to the patients resourceful enough to find their own way to it.
 
-I think of my loved one, of the woman with breast cancer too afraid of what standard treatment would do to her, and of everyone sitting in a waiting room right now about to hear the same words we did. For all these people, their families, their caregivers, I hope more of us find out whether the metabolic approach to cancer can give them more of the only thing that matters. It would cost a fraction of what's already spent on cancer. I would give up every birthday gift for the rest of my life to see this happen.
+The payoff isn't only measured in survival months. A patient who isn't nauseated, who feels better, can keep working, keep contributing, and keep dignity intact.
 
-If you want to go deeper than a blog post allows, consider the following books:
+I think of my loved one, of the woman with breast cancer too afraid of what standard treatment would do to her, and of everyone sitting in a waiting room right now about to hear the same words we did. For all these people, their families, their caregivers, I hope more of us find out whether the metabolic approach to cancer can give them more of the only thing that matters. I would give up every birthday gift for the rest of my life to see this happen.
 
-- [Cancer as a Metabolic Disease](https://www.amazon.com/Cancer-Metabolic-Disease-Management-Prevention/dp/0470584920) by Thomas Seyfried. The primary source, dense and technical.
-- [Tripping Over the Truth](https://www.amazon.com/Tripping-over-Truth-Overturning-Entrenched/dp/160358935X) by Travis Christofferson. Same theory, told as history and journalism.
-- [The Keto Code](https://www.amazon.com/Keto-Code-Comprehensive-Guide-Oncology/dp/0981582737) by Dr. Jocelyn Tan. Unpacks the biochemical pathways connecting metabolism to cancer.
-- [Keto for Cancer](https://www.amazon.com/Keto-Cancer-Ketogenic-Metabolic-Nutritional/dp/1603587012) by Miriam Kalamian, co-authored with Seyfried. A practical, protocol-level guide.
+If you want to go deeper, consider the following books:
+
+- [Cancer as a Metabolic Disease](https://www.amazon.com/Cancer-Metabolic-Disease-Management-Prevention/dp/0470584920)
+- [Tripping Over the Truth](https://www.amazon.com/Tripping-over-Truth-Overturning-Entrenched/dp/160358935X)
+- [The Keto Code](https://www.amazon.com/Keto-Code-Comprehensive-Guide-Oncology/dp/0981582737)
+- [Keto for Cancer](https://www.amazon.com/Keto-Cancer-Ketogenic-Metabolic-Nutritional/dp/1603587012)
