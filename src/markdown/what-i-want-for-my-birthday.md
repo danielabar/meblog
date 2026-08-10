@@ -91,11 +91,11 @@ Diet alone isn't enough, because cancer has a backup fuel: glutamine, the most a
 
 Taken together, this diet + pulse + GKI monitoring protocol is referred to as *Ketogenic Metabolic Therapy* (KMT).
 
-### Symptom Management
+### Fasting Around Chemo
 
-He also covered symptom management: fasting a day before chemo, the day of, and a day after pushes the body into deeper ketosis around treatment. A [case series of 10 cancer patients](https://pmc.ncbi.nlm.nih.gov/articles/PMC2815756/) found nausea, vomiting, and fatigue were markedly reduced on chemo cycles paired with a short fast.
+He also covered fasting timed to chemo: a day before, the day of, and a day after pushes the body into deeper ketosis around treatment. A [case series of 10 cancer patients](https://pmc.ncbi.nlm.nih.gov/articles/PMC2815756/) found nausea, vomiting, and fatigue were markedly reduced on chemo cycles paired with a short fast.
 
-He also pointed to a [glioma-specific animal study](https://pmc.ncbi.nlm.nih.gov/articles/PMC3439413/): in starved glioma cells, a third of the usual dose of temozolomide (the standard chemo drug given to glioblastoma patients) killed as many cells as the full dose did in fed cells, and mice combining fasting with chemo and radiation survived far longer than those on standard treatment alone. Seyfried describes this as fasting "sensitizing" the cancer to chemo: it shifts healthy cells into a protective, low-growth state that cancer cells can't enter because their growth signals are stuck on.
+The same fasting protocol can also improve chemo's effectiveness, although this has only been shown in animals. A [glioma-specific animal study](https://pmc.ncbi.nlm.nih.gov/articles/PMC3439413/) found that in starved glioma cells, a third of the usual dose of temozolomide (the standard chemo drug given to glioblastoma patients) killed as many cells as the full dose did in fed cells, and mice combining fasting with chemo and radiation survived far longer than those on standard treatment alone. Seyfried describes this as fasting "sensitizing" the cancer to chemo: it shifts healthy cells into a protective, low-growth state that cancer cells can't enter because their growth signals are stuck on.
 
 ### Management, Not Cure
 
