@@ -34,11 +34,24 @@ After the initial shock of the diagnosis wore off, a question kept turning over 
 
 I've listened to health and science podcasts for years. After the diagnosis, I recalled hearing Thomas Seyfried, a Ph.D. [professor and cancer researcher](https://www.bc.edu/bc-web/schools/morrissey/departments/biology/people/faculty-directory/thomas-seyfried.html) at Boston College, interviewed on the [Jesse Chapus podcast](https://youtu.be/g4EY9WWuSR8?si=CK0pa4HMSxMgQaBt), discussing his research into cancer, and glioblastoma specifically. What follows is a compilation of that interview, others of his I found afterward, conversations with other cancer researchers, and their papers.
 
+Some terminology that comes up in this section:
+
+- **Mitochondria:** tiny structures inside almost every cell that convert food into usable energy, often called the cell's power plant.
+- **Cellular respiration:** the efficient way mitochondria make energy, using oxygen.
+- **Glucose:** blood sugar, what carbohydrates break down into once eaten, and the body's primary fuel.
+- **Fermentation:** a cruder, much less efficient backup way to make energy that doesn't depend on mitochondria working properly.
+- **ROS (reactive oxygen species):** unstable byproduct molecules of energy production, think of them as exhaust, that can damage nearby DNA if they build up.
+- **Ketosis:** a metabolic state where the body burns fat for fuel instead of sugar, producing ketones.
+
 ### Somatic Mutation Theory
 
 Seyfried started by laying out the mainstream theory: cancer starts with mutations. Cells copy their DNA every time they divide, copying is imperfect, and over a lifetime errors can accumulate in genes that control growth. A mutation in an oncogene can jam the accelerator on; a mutation in a tumor suppressor gene can cut the brakes. The immune system normally catches and clears cells like this, but sometimes they evade detection, and a cell with both problems divides without limit, forming a tumor.
 
-He walked through what led him to question this theory. The same mutations found in cancer cells also show up in healthy cells that never turn into tumors. Different patients with the same type of cancer often have different mutations from each other. Even within a single patient's own tumor, different cells carry different mutations. Then the [transfer experiments](https://pmc.ncbi.nlm.nih.gov/articles/PMC4493566/): fuse the nucleus of a cancer cell into the cytoplasm of a normal cell (its mitochondria intact, its own nucleus removed), and malignancy is suppressed. Do the reverse, put a normal nucleus into a cancer cell's cytoplasm, and the malignancy persists. That result is hard to square with a theory that puts DNA mutation in the driver's seat.
+He then walked through what led him to question this theory. If DNA mutation really is the root cause of cancer, a few things should follow. Here's what he found instead:
+
+1. **Cancer mutations should be specific to cancer cells.** Instead, the same mutations found in cancer cells also show up in healthy cells that never turn into tumors.
+2. **The same cancer should be driven by the same mutations.** Instead, different patients with the same type of cancer often have different mutations from each other, and even different cells within a single patient's own tumor carry different mutations from one another.
+3. **Swapping the DNA of a cancer cell should determine whether it behaves like cancer.** This is the one Seyfried leaned on hardest, and it's worth walking through carefully. A cell has two main compartments: the nucleus, which holds the DNA, and the cytoplasm surrounding it, which holds the mitochondria. In a series of [transfer experiments](https://pmc.ncbi.nlm.nih.gov/articles/PMC4493566/), researchers took the nucleus out of a cancer cell and put it into the cytoplasm of a normal cell, the one with healthy mitochondria. If mutated DNA were really driving the cancer, that cancer nucleus should have kept the cell malignant. Instead, malignancy was suppressed. Then they ran the experiment in reverse: a normal, healthy nucleus placed into a cancer cell's cytoplasm, mitochondria and all. If DNA were the cause, a clean nucleus should have fixed the cell. Instead, the cell stayed malignant. Both results point the same way: whatever is driving the cancer travels with the cytoplasm and its mitochondria, not with the nucleus and its DNA.
 
 Another problem with the mutation theory is the money spent chasing it with comparatively little to show. In December 1971, Richard Nixon signed the [National Cancer Act](https://www.cancer.gov/about-nci/overview/history/national-cancer-act-1971), aka the "war on cancer." Since the 1980s, the genetic paradigm has absorbed most of a staggering sum spent on cancer research. Despite this, cancer deaths keep rising each year, even as headlines tout one "breakthrough" after another. Seyfried also points out that most of the reported decline in U.S. cancer deaths traces back to 1990s smoking-cessation campaigns rather than treatment breakthroughs.
 
@@ -48,27 +61,33 @@ No single figure captures total cancer research spend. NIH alone has put roughly
 
 ### Metabolic Theory of Cancer
 
-Then the observation at the center of his work: nearly every cancer cell has defective mitochondria. They can't run normal cellular respiration, the process of using oxygen and glucose to make energy efficiently. Instead they fall back on fermentation, an inefficient way of generating energy, which is why cancer cells pull in many times more glucose than a healthy cell needs, even when oxygen is plentiful.
+Then the observation at the center of his work: nearly every cancer cell has defective mitochondria. Healthy cells run on cellular respiration, using oxygen to burn fuel efficiently, the way a well-tuned car engine burns gasoline. Cancer cells can't do that. Instead they fall back on fermentation, an older and much cruder way of generating energy, closer to a campfire than an engine: it works, but it wastes most of the fuel it burns to get a much smaller amount of usable energy out. That inefficiency is why cancer cells pull in many times more glucose than a healthy cell needs, even when oxygen is plentiful.
 
 Fermentation is an older energy pathway, left over from before there was oxygen in the atmosphere, when all life was single-celled. Every cell today, however complex, still carries that ancestral code. The behavior that comes with it is the behavior of a single-celled organism: consume, divide, repeat, without restraint.
 
-Under this model, carcinogens (smoking, asbestos, obesity, radiation, etc.) don't cause cancer by damaging DNA directly. Rather, they damage mitochondrial respiration first. A cell with damaged mitochondria can't generate enough energy through respiration, so it sends a stress signal to the nucleus to switch on fermentation as a backup means of energy production. Those damaged mitochondria also leak reactive oxygen species (ROS), a normal byproduct of energy metabolism that respiration ordinarily keeps in check but that damaged mitochondria produce in excess. It's this elevated ROS that randomly damages DNA, including the genes that would otherwise suppress a tumor.
+Under this model, carcinogens (smoking, asbestos, obesity, radiation, etc.) don't cause cancer by damaging DNA directly. The chain runs the other way, step by step:
 
-This chain of events suggests that the DNA mutations observed in cancer cells are *downstream effects* of mitochondrial injury, *not the root cause*. This makes cancer a disease of energy metabolism, not a disease of genes.
+1. A carcinogen damages a cell's mitochondria.
+2. Damaged mitochondria can't generate enough energy through respiration, so the cell sends a stress signal to the nucleus.
+3. That signal [switches on a set of genes](https://academic.oup.com/carcin/article/35/3/515/2463440) that turn on fermentation and drive unrestrained growth, the single-celled behavior described above.
+4. Those same damaged mitochondria also leak extra reactive oxygen species (ROS), the "exhaust" that respiration normally keeps in check but that damaged mitochondria produce in excess.
+5. Over time, the elevated ROS randomly damages nearby DNA.
+
+This chain of events suggests that the DNA mutations observed in cancer cells are *downstream effects* of mitochondrial injury, *not the root cause*. Mitochondrial damage comes first and drives fermentation and growth directly through gene activation; the random DNA mutations are fallout from that, arriving later as a side effect of the exhaust the damaged mitochondria produce. This makes cancer a disease of energy metabolism, not a disease of genes.
 
 <aside class="markdown-aside">
 German biochemist Otto Warburg first documented <a class="markdown-link" href="https://www.nature.com/articles/nrc3038">cancer cells' abnormal fermentation</a> over a century ago. Some of his measurement tools were later found to be flawed, but his core call, mitochondrial dysfunction as cancer's origin, was <a class="markdown-link" href="https://pmc.ncbi.nlm.nih.gov/articles/PMC12170717/">directionally correct</a>.
 </aside>
 
-Why does the root cause matter? Because it determines where research money goes. A misdiagnosis sends decades of work chasing the wrong target. Genetic research has produced drugs aimed at specific mutations, and for glioblastoma in particular, the results have been thin. If the mutations are downstream of a metabolic problem rather than the cause of it, that would explain why targeting them hasn't moved survival numbers much, and it points treatment somewhere else entirely.
+Why does the root cause matter? Because it determines where research money goes. If the mutations are downstream of a metabolic problem rather than the cause, that would explain why targeting them hasn't moved survival numbers much, and it points treatment somewhere else entirely.
 
 ### Ketogenic Metabolic Therapy
 
 If the root problem is metabolic, then it follows that depriving the cancer of the fuel it depends on most could be an effective method of slowing it down. Cancer cells prefer glucose. Healthy cells, unlike cancer cells, can run efficiently on ketones, the fuel the body produces from fat when carbohydrate intake is low. Get the body into ketosis, burning fat for fuel instead of glucose, and you shift the fuel supply in a direction cancer cells can't use, but healthy cells can. For brain cancer, this is crucial because ketones can cross the blood-brain barrier, so the brain stays fuelled while the tumor is deprived.
 
-Getting into ketosis for cancer management requires a following a calorie-restricted ketogenic diet. This is very high fat (roughly 70-80% of calories), moderate protein, and carbohydrate held under 20 grams a day for most patients. There's also a biomarker for how deep the ketosis needs to be: the [Glucose Ketone Index](https://www.frontiersin.org/journals/science/articles/10.3389/fsci.2026.1763395/full) (GKI), a ratio of blood glucose to ketones. Research suggests holding it between 1 and 2 puts the most metabolic pressure on the tumor and correlates with improved survival.
+Getting into ketosis for cancer management requires following a calorie-restricted ketogenic diet. This is very high fat (roughly 70-80% of calories), moderate protein, and carbohydrate held under 20 grams a day for most patients. There's also a biomarker for how deep the ketosis needs to be: the [Glucose Ketone Index](https://www.frontiersin.org/journals/science/articles/10.3389/fsci.2026.1763395/full) (GKI), a ratio of blood glucose to ketones. Research suggests holding it between 1 and 2 keeps the tumor fuel-starved while ketones stay high enough to fuel the rest of the body, and this range correlates with improved survival.
 
-There's a further complication though. Cancer cells have a backup fuel: glutamine, the most abundant amino acid in the body. You can't diet your way out of glutamine availability, since eliminating it would mean eliminating nearly all protein, which the body needs, and even then the body manufactures its own supply. So depriving cancer of both fuels takes more than diet alone; it's the basis for a combined strategy Seyfried calls [press-pulse](https://link.springer.com/article/10.1186/s12986-017-0178-2#Sec3), a sustained "press" on glucose through diet paired with periodic "pulses" that target glutamine directly, used intermittently.
+Diet alone isn't enough, because cancer has a backup fuel: glutamine, the most abundant amino acid in the body. You can't diet your way out of glutamine availability, since eliminating it would mean eliminating nearly all protein, which the body needs, and even then the body manufactures its own supply. So depriving cancer of both fuels takes more than diet alone; it's the basis for a combined strategy Seyfried calls [press-pulse](https://link.springer.com/article/10.1186/s12986-017-0178-2#Sec3), a sustained "press" on glucose through diet paired with periodic "pulses" that target glutamine directly, used intermittently.
 
 Taken together, this diet + pulse + GKI monitoring protocol is referred to as *Ketogenic Metabolic Therapy* (KMT).
 
@@ -78,7 +97,7 @@ He also covered symptom management: fasting a day before chemo, the day of, and 
 
 ### Questioning Radiation
 
-He also raised a more provocative point: radiation itself may work against the goal. Other researchers have found that [irradiated brain tissue creates conditions that favor more aggressive tumor regrowth](https://pmc.ncbi.nlm.nih.gov/articles/PMC8585920/), which may explain why recurrences after radiation often come back worse. He argues this makes the case for human trials comparing KMT plus low-dose chemo against full standard of care.
+He also raised a more provocative point: radiation itself may work against the goal. Other researchers have found that [irradiated brain tissue creates conditions that favor more aggressive tumor regrowth](https://pmc.ncbi.nlm.nih.gov/articles/PMC8585920/), which may explain why recurrences after radiation often come back worse. He argues this makes the case for human trials comparing KMT plus low-dose chemo against chemo + radiation.
 
 ### Management, Not Cure
 
@@ -87,7 +106,7 @@ He closes on a caveat: KMT isn't a cure for glioblastoma (or cancer more general
 What impressed me is these ideas did not come from a wellness influencer peddling supplements. They're from a cancer researcher, with decades of experience and peer-reviewed published research, discussing the exact disease we were facing.
 
 <aside class="markdown-aside">
-If you want to dig deeper into how the metabolic and genetic theories stack up against each other, <a class="markdown-link" href="https://pmc.ncbi.nlm.nih.gov/articles/PMC8467939/">this review</a> is a good starting point.
+The explanations above are simplified to fit a blog post. For a deeper dive, Seyfried's <a class="markdown-link" href="https://academic.oup.com/carcin/article/35/3/515/2463440">Cancer as a Metabolic Disease</a> lays out the full mechanism, and <a class="markdown-link" href="https://pmc.ncbi.nlm.nih.gov/articles/PMC8467939/">this review</a> is a good starting point for how the metabolic and genetic theories stack up against each other.
 </aside>
 
 ## Looking for a Clinician
