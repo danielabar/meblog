@@ -93,11 +93,9 @@ Taken together, this diet + pulse + GKI monitoring protocol is referred to as *K
 
 ### Symptom Management
 
-He also covered symptom management: fasting a day before chemo, the day of, and a day after pushes the body into deeper ketosis around treatment. [Small studies](https://pmc.ncbi.nlm.nih.gov/articles/PMC10996027/) suggest this protocol eases common side effects like nausea and vomiting, and improves how well the chemo works. The mechanism behind this is that fasting shifts healthy cells into a protective low-growth state that cancer cells can't enter because their growth signals are stuck on.
+He also covered symptom management: fasting a day before chemo, the day of, and a day after pushes the body into deeper ketosis around treatment. A [case series of 10 cancer patients](https://pmc.ncbi.nlm.nih.gov/articles/PMC2815756/) found nausea, vomiting, and fatigue were markedly reduced on chemo cycles paired with a short fast.
 
-### Questioning Radiation
-
-He also raised a more provocative point: radiation itself may work against the goal. Other researchers have found that [irradiated brain tissue creates conditions that favor more aggressive tumor regrowth](https://pmc.ncbi.nlm.nih.gov/articles/PMC8585920/), which may explain why recurrences after radiation often come back worse. He argues this makes the case for human trials comparing KMT plus low-dose chemo against chemo + radiation.
+He also pointed to a [glioma-specific animal study](https://pmc.ncbi.nlm.nih.gov/articles/PMC3439413/): in starved glioma cells, a third of the usual dose of temozolomide (the standard chemo drug given to glioblastoma patients) killed as many cells as the full dose did in fed cells, and mice combining fasting with chemo and radiation survived far longer than those on standard treatment alone. Seyfried describes this as fasting "sensitizing" the cancer to chemo: it shifts healthy cells into a protective, low-growth state that cancer cells can't enter because their growth signals are stuck on.
 
 ### Management, Not Cure
 
