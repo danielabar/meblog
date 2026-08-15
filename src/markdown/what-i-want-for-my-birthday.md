@@ -201,9 +201,4 @@ The payoff isn't only measured in survival months. A patient who isn't nauseated
 
 I think of my loved one, of the woman with breast cancer too afraid of what standard treatment would do to her, and of everyone sitting in a waiting room right now about to hear the same words we did. For all these people, their families, their caregivers, I hope more of us find out whether the metabolic approach to cancer can give them more of the only thing that matters. I would give up every birthday gift for the rest of my life to see this happen.
 
-If you want to go deeper, consider the following books:
-
-- [Cancer as a Metabolic Disease](https://www.amazon.com/Cancer-Metabolic-Disease-Management-Prevention/dp/0470584920)
-- [Tripping Over the Truth](https://www.amazon.com/Tripping-over-Truth-Overturning-Entrenched/dp/160358935X)
-- [The Keto Code](https://www.amazon.com/Keto-Code-Comprehensive-Guide-Oncology/dp/0981582737)
-- [Keto for Cancer](https://www.amazon.com/Keto-Cancer-Ketogenic-Metabolic-Nutritional/dp/1603587012)
+If you want to go deeper, Seyfried's book [Cancer as a Metabolic Disease](https://www.amazon.com/Cancer-Metabolic-Disease-Management-Prevention/dp/0470584920) covers the theory, and the book [Keto for Cancer](https://www.amazon.com/Keto-Cancer-Ketogenic-Metabolic-Nutritional/dp/1603587012) covers the practical implementation.
