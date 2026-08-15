@@ -67,18 +67,7 @@ end
 
 **Update the Controller**
 
-It might seem natural to add `photos: []` to `pet_params`, but two things complicate that. First, assigning `photos` through `pet.update` replaces the entire attachment collection rather than appending to it. A user adding one photo to a pet that already has three would lose the existing three. Second, we want users to have the ability to remove individual existing photos when editing, which the form (assembled later) handles with a checkbox per attached photo:
-
-```erb
-<%# app/views/pets/_form.html.erb %>
-<% pet.photos.each do |photo| %>
-  <%= image_tag photo %>
-  <%= check_box_tag "pet[remove_photo_ids][]", photo.id, false %>
-  Remove
-<% end %>
-```
-
-That submits `pet[remove_photo_ids][]` as an array of IDs, which isn't a model attribute. So the controller permits only the regular pet attributes, then handles photos separately: append new uploads after save, and purge any marked for removal.
+It might seem natural to add `photos: []` to `pet_params`, but two things complicate that. First, assigning `photos` through `pet.update` replaces the entire attachment collection rather than appending to it. A user adding one photo to a pet that already has three would lose the existing three. Second, we want users to have the ability to remove individual existing photos when editing. The form will handle that with a checkbox per attached photo, submitting `pet[remove_photo_ids][]` as an array of IDs, which isn't a model attribute. So the controller permits only the regular pet attributes, then handles photos separately: append new uploads after save, and purge any marked for removal.
 
 ```ruby
 # app/controllers/pets_controller.rb
@@ -124,18 +113,28 @@ def purge_removed_photos
 end
 ```
 
-`attach_new_photos` digs into params for the uploaded files, guards against blank submissions, and calls `attach` so existing photos stay put. `purge_removed_photos` removes any photos whose IDs came in via the remove checkboxes. See the [demo project's form](https://github.com/danielabar/pet_adoptions_demo/blob/main/app/views/pets/_form.html.erb) for the full markup.
-
+`attach_new_photos` digs into params for the uploaded files, guards against blank submissions, and calls `attach` so existing photos stay put. `purge_removed_photos` removes any photos whose IDs came in via the remove checkboxes.
 **Add the File Input to the Form**
 
-Add a file input before the submit button in `app/views/pets/_form.html.erb`:
+**Update the View**
+
+Add a file input before the submit button in `app/views/pets/_form.html.erb`. When editing a pet that already has photos, also render each existing photo with a checkbox for removing it:
 
 ```erb
+<%# app/views/pets/_form.html.erb %>
+<% pet.photos.each do |photo| %>
+  <%= image_tag photo %>
+  <%= check_box_tag "pet[remove_photo_ids][]", photo.id, false %>
+  Remove
+<% end %>
+
 <div>
   <%= form.label :photos, "Add photos" %>
   <%= form.file_field :photos, multiple: true %>
 </div>
 ```
+
+This is just a snippet. See the [demo project form](https://github.com/danielabar/pet_adoptions_demo/blob/main/app/views/pets/_form.html.erb) for the full markup.
 
 Run the server with `bin/dev` and visit `http://localhost:3000/pets/new`. You'll see a form like this:
 
