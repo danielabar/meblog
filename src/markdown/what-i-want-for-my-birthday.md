@@ -127,7 +127,7 @@ Imagine if part of standard care had been a way to make that treatment more bear
 
 She didn't die because there was no cure. She died because the side effects were frightening enough that she chose to avoid treatment altogether. You don't need to accept any theory about the origins of cancer to see the problem: standard treatment is hard enough on the body that some patients walk away from it entirely.
 
-## The Evidence for KMT
+## Evidence for KMT
 
 Let's turn to the existing evidence for metabolic therapy. The human studies are small. There are no completed large randomized controlled trials. But there is enough signal that should interest everyone who has a stake in improving glioblastoma outcomes.
 
@@ -142,10 +142,6 @@ Some terminology when reading research papers: <strong class="markdown-strong">I
 [2022 study of 16 glioma patients](https://pmc.ncbi.nlm.nih.gov/articles/PMC9339381/): patients who maintained ketosis for an average of about 20 months reported, by standard neuro-oncology criteria, 8 complete and 8 partial responses, with one patient, who had a grade 3 anaplastic astrocytoma, maintaining ketosis for 36 months and showing complete resolution of the enhancing tumour on MRI.
 
 [2024 case series from Colombia](https://athenaeumpub.com/wp-content/uploads/The-Effect-of-Ketogenic-Metabolic-Therapy-on-Recurrent-High-Grade-Gliomas-Case-Series.pdf): followed 29 patients with recurrent high-grade gliomas on ketogenic metabolic therapy. Among the roughly two-thirds who managed to stick with it, at 12 months 55 percent had stable disease and 20 percent a partial response, and the quality-of-life results were notable: seizure control improved in 95 percent and cognition in 80 percent, as reported by patients and their families.
-
-[2024 case report](https://pmc.ncbi.nlm.nih.gov/articles/PMC10996027/): describes a 64-year-old woman with IDH-wildtype glioblastoma who used the ketogenic approach alongside full standard care. She remained stable for about two years, and then, after a period of stress and reduced adherence, the tumour progressed. It is a single case, but it illustrates the link between staying in the therapeutic range and disease control, done with standard care.
-
-[Pair of pediatric case reports from 1995](https://pubmed.ncbi.nlm.nih.gov/7790697/): among the first human signals, within days of starting a ketogenic diet, PET scans showed roughly a 22 percent drop in glucose uptake at the tumour site, and one child then remained free of disease progression for a further 12 months.
 
 [2022 feasibility study of 10 glioblastoma patients](https://pmc.ncbi.nlm.nih.gov/articles/PMC9586748/): a combined fasting and ketogenic strategy found feasible and safe, but it did not show a survival benefit. Median survival was about 13 months, in line with standard care, and the authors were careful to say you cannot draw survival conclusions from a case series this small.
 
