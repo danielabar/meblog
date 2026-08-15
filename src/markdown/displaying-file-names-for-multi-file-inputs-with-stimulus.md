@@ -2,7 +2,7 @@
 title: "Displaying File Names for Multi-File Inputs with Stimulus"
 featuredImage: "../images/displaying-multiple-file-names-stimulus-jon-tyson-566CgCRSNCk-unsplash.jpg"
 description: "How to build a small Stimulus controller that displays individual file names when users select multiple files, replacing the browser's generic count."
-date: "2026-08-01"
+date: "2026-08-15"
 category: "rails"
 related:
   - "Copy to Clipboard with Stimulus & Rails"
@@ -29,7 +29,7 @@ But the files *are* accessible through the [`HTMLInputElement.files`](https://de
 
 ## Demo App Setup
 
-To demonstrate the solution, we'll build a simple Pet Adoption Board where a shelter posts pets with multiple photos.
+To demonstrate the solution, we'll build a simple Pet Adoption Board where shelter staff post pets that are up for adoption with multiple photos.
 
 <aside class="markdown-aside">
 The demo uses <a class="markdown-link" href="https://tailwindcss.com">Tailwind CSS</a> for styling. Code samples omit the utility classes to stay focused on the file input behavior.
@@ -67,7 +67,7 @@ end
 
 **Update the Controller**
 
-It might seem natural to add `photos: []` to `pet_params`, but two things complicate that. First, assigning `photos` through `pet.update` replaces the entire attachment collection rather than appending to it. A user adding one photo to a pet that already has three would lose the existing three. Second, we want users to remove individual existing photos when editing, which the form (assembled later) handles with a checkbox per attached photo:
+It might seem natural to add `photos: []` to `pet_params`, but two things complicate that. First, assigning `photos` through `pet.update` replaces the entire attachment collection rather than appending to it. A user adding one photo to a pet that already has three would lose the existing three. Second, we want users to have the ability to remove individual existing photos when editing, which the form (assembled later) handles with a checkbox per attached photo:
 
 ```erb
 <%# app/views/pets/_form.html.erb %>
