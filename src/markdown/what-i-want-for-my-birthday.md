@@ -43,7 +43,7 @@ Some terminology that comes up in this section:
 
 ### Somatic Mutation Theory
 
-Seyfried started by laying out the mainstream theory: cancer starts with mutations. Cells copy their DNA every time they divide, copying is imperfect, and over a lifetime errors can accumulate in genes that control growth. A mutation in an oncogene can jam the accelerator on; a mutation in a tumor suppressor gene can cut the brakes. The immune system normally catches and clears cells like this, but sometimes they evade detection, and a cell with both problems divides without limit, forming a tumor.
+Seyfried started by laying out the mainstream theory: cancer starts with mutations. Cells copy their DNA every time they divide, copying is imperfect, and over a lifetime (and exposure to carcinogens) errors can accumulate in genes that control growth. A mutation in an oncogene can jam the accelerator on; a mutation in a tumor suppressor gene can cut the brakes. The immune system normally catches and clears cells like this, but sometimes they evade detection, and a cell with both problems divides without limit, forming a tumor.
 
 He then walked through what led him to question this theory. If DNA mutation really is the root cause of cancer, a few things should follow:
 
@@ -67,7 +67,7 @@ Under this model, carcinogens (smoking, asbestos, obesity, etc.) don't cause can
 
 1. A carcinogen damages a cell's mitochondria.
 2. Damaged mitochondria can't generate enough energy through respiration, so the cell sends a stress signal to the nucleus.
-3. That signal [switches on a set of genes](https://academic.oup.com/carcin/article/35/3/515/2463440) that turn on fermentation and drive unrestrained growth, the single-celled behavior described above.
+3. That signal [switches on a set of genes](https://academic.oup.com/carcin/article/35/3/515/2463440) that turn on fermentation and drive unrestrained growth.
 4. Those same damaged mitochondria also leak extra reactive oxygen species (ROS), the "exhaust" that respiration normally keeps in check but that damaged mitochondria produce in excess.
 5. Over time, the elevated ROS randomly damages nuclear DNA.
 
@@ -77,7 +77,7 @@ This chain of events suggests that the DNA mutations observed in cancer cells ar
 German biochemist Otto Warburg first documented <a class="markdown-link" href="https://www.nature.com/articles/nrc3038">cancer cells' abnormal fermentation</a> over a century ago. Some of his measurement tools were later found to be flawed, but his core call, mitochondrial dysfunction as cancer's origin, was <a class="markdown-link" href="https://pmc.ncbi.nlm.nih.gov/articles/PMC12170717/">directionally correct</a>.
 </aside>
 
-Understanding the root cause matters because it changes where treatment should be aimed. If genetic mutations are downstream of a metabolic problem rather than the cause, that explains why targeting them hasn't moved survival numbers much, and points to targeting the metabolism itself instead.
+Understanding the root cause matters because it changes where treatment should be aimed. If genetic mutations are downstream of a metabolic problem rather than the cause, that explains why targeting them hasn't moved survival numbers much, and points to targeting cancer metabolism.
 
 ### Ketogenic Metabolic Therapy
 
@@ -125,7 +125,7 @@ I keep thinking about someone else, a woman I knew who was diagnosed with breast
 
 Imagine if part of standard care had been a way to make that treatment more bearable and more effective: guidance on KMT to reduce the side effects and improve the results. She might have been able to face the treatment. She might still be here.
 
-She didn't die because there was no cure. She died because the side effects were frightening enough that she chose to avoid treatment altogether. You don't need to accept any theory about the origins of cancer to see the problem: standard treatment is hard enough on the body that some patients walk away from it entirely.
+She didn't die because there was no treatment. She died because the side effects were frightening enough that she chose to avoid treatment altogether. You don't need to accept any theory about the origins of cancer to see the problem: standard treatment is hard enough on the body that some patients walk away from it entirely.
 
 ## Evidence for KMT
 
@@ -155,7 +155,7 @@ This [2024 meta-analysis](https://pmc.ncbi.nlm.nih.gov/articles/PMC11011080/) fo
 
 Given research into the metabolic origins of cancer goes all the way back to the 1920's, you may be wondering why you haven't heard of this before. A few things working against metabolic therapy reaching patients:
 
-**Medicine is slow to adopt what it discovers:** In 1847, [Ignaz Semmelweis](https://en.wikipedia.org/wiki/Ignaz_Semmelweis), a physician in Vienna, found that doctors washing their hands with chlorinated lime before delivering babies cut maternity-ward deaths from over 18% to around 2%. The medical establishment rejected his findings, and hand washing didn't become standard practice for decades.
+**Medicine is slow to adopt what it discovers:** For example, in 1847, [Ignaz Semmelweis](https://en.wikipedia.org/wiki/Ignaz_Semmelweis), a physician in Vienna, found that doctors washing their hands with chlorinated lime before delivering babies cut maternity-ward deaths from over 18% to around 2%. The medical establishment rejected his findings, and hand washing didn't become standard practice for decades.
 
 **There's no one positioned to profit from proving it:** Imagine if the results from the Greece study mentioned above, small scale as they are, had been attributed to some new molecule that could be patented. In that case, surely a pharmaceutical company would be pouring in research funds and it would be written about in oncology journals.
 
@@ -175,14 +175,14 @@ In practice, my LO and I encountered some challenges, from the search for a clin
 
 **The white coat:** Bringing up something you read or heard online with your oncologist is intimidating. You're not a medical expert, and it can feel like second-guessing the person managing your care, especially soon after a diagnosis when everything already feels overwhelming. Most patients need support to have that conversation at all, let alone push it further on their own.
 
-**Family and friends:** Celebration and food are inseparable, and the foods at the centre of nearly every gathering are exactly the wrong ones: cake and dessert, bread and rolls, mashed potatoes, sugary drinks, alcohol. When someone declines what they have always eaten, it invites questions. "Did your doctor tell you to do that?" "No, I read about it online." That answer earns skeptical looks. This creates friction at moments meant for joy and togetherness.
+**Family and friends:** Celebration and food are inseparable, and these foods are usually incompatible with keto: cake and dessert, bread and rolls, mashed potatoes, sugary drinks, alcohol. When someone declines what they have always eaten, it invites questions. "Did your doctor tell you to do that?" "No, I read about it online." That answer earns skeptical looks. This creates friction at moments meant for joy and togetherness.
 
 **The protocol is hard:** KMT is nothing like the keto of recipe blogs. It is not for weight loss. In fact for some patients losing weight is undesirable, so the diet has to include far more fat than anyone naturally cooks with, just to hold weight steady. And the protocol involves more than dieting. Here are just a few critical details:
 
 - **Not everyone is a candidate:** Some conditions prevent the body from breaking down and using fat for fuel. For those patients ketosis is off the table entirely, and finding that out safely requires a clinician.
 - **Getting the ratio right is its own discipline:** Ketogenic ratios (grams of fat to combined grams of protein and carbohydrate) aren't one-size-fits-all. Different studies use different ratios, and picking and holding the right one for a given patient's weight, treatment stage, and lab results is a research-informed calculation.
 - **The diet itself is a minefield of small errors:** Berries and nuts, despite having a reputation for being "keto friendly", actually contain a high number of carbohydrates, for someone targeting less than 20 grams daily. Cottage cheese, which shows up in a lot of keto recipes, is high in protein and naturally occurring sugar (lactose). Protein is not a "free" food: eaten in excess, the body converts it to glucose through gluconeogenesis, which further feeds the tumour.
-- **Water fasting, used to deepen ketosis around chemo days, carries its own risk:** If a patient's body fat is too low, blood glucose can drop further than intended, and hypoglycemia can trigger a seizure. This is an especially dangerous outcome for someone with a brain tumour already prone to seizures.
+- **Water fasting, used to deepen ketosis around chemo days, carries its own risk:** If a patient's body fat is too low, blood glucose can drop further than intended, without ketones getting high enough, and can trigger a seizure. This is an especially dangerous outcome for someone with a brain tumour already prone to seizures.
 - **Daily Monitoring:** Glucose and ketones need daily blood-meter checks, tracked against a target ratio (the GKI). Research points to a GKI between 1 and 2 (some studies go up to 3) as the range that puts the most pressure on the cancer, and simply cutting back on sugar and starchy carbs won't get you there. This requires purchasing a blood meter, a one-time cost, but glucose strips, ketone strips, and lancets are all single-use and purchased separately, and none of it is currently treated as a covered medical expense.
 - **Diet alone doesn't finish the job:** Cancer's backup fuel, glutamine, cannot be dieted away: eliminating glutamine-containing foods would mean eliminating almost all protein, and even then the body manufactures its own supply. Bringing glutamine down requires a combination of aerobic and resistance exercise, and drugs that target glutamine metabolism directly. These must be dosed and monitored by a trained medical team because of their own toxicity risks.
 
@@ -190,7 +190,7 @@ A motivated patient may be able to get over some of these hurdles, but this is n
 
 ## What I'm Asking For
 
-Circling back to my birthday ask. What I'm asking for is awareness. That patients and caregivers facing a diagnosis like this hear that this research exists, that ketogenic metabolic therapy has evidence behind it as an adjunct, and that it's worth raising with an oncology team. Beyond that:
+Circling back to my birthday ask. What I'm asking for is awareness. That patients and caregivers hear that ketogenic metabolic therapy has evidence as an adjunct, and that it's worth raising with an oncology team. Beyond that:
 
 **More research.** The studies so far are small, and the strongest version of the therapy, press-pulse, has only been tested in animals. Phase 3 trials, the kind rigorous enough to settle whether this belongs in standard care, are the missing piece.
 
