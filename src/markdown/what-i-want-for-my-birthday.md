@@ -10,11 +10,9 @@ related:
   - "Building an AI Blog Editor with Claude Skills"
 ---
 
-Taking a break from my usual tech/programming topics to cover something far more difficult. I recently celebrated a birthday, and with it came the usual question: What do you want for your birthday? This year, given everything that's happened, the answer that came to mind was far bigger than any gift. It belongs in the same category as "world peace" or "an end to poverty": enormous and far too vague for anyone to actually act on. So instead, I'm going to ask for something specific.
+Taking a break from my usual tech/programming topics to cover something far more difficult. I recently celebrated a birthday, and with it came the usual question: What do you want for your birthday? This year, given everything that's happened, the answer wasn't a thing you could wrap.
 
-What I want is for more patients and caregivers facing cancer to hear about one idea: That cancer may have a metabolic dimension, maybe even a root cause that the genetic paradigm has missed, and this may be why cures built on genetics remain so elusive. In practice that means giving metabolic-targeted therapies a real look: knowing what's already shown safe today, and pushing for the rest to be properly tested.
-
-"Cancer" is too big a word to build a case on. It's really hundreds of diseases, and the case for a metabolic root cause may be stronger for some than others. So I'll narrow to the one I've spent this year caregiving through: [glioblastoma](https://my.clevelandclinic.org/health/diseases/17032-glioblastoma).
+What I want is for more patients and caregivers facing cancer to hear about one idea: That cancer may have a metabolic dimension, maybe even a root cause that the genetic paradigm has missed, and this may be why cures built on genetics remain so elusive. Cancer is really hundreds of different diseases, and the case for a metabolic root cause may be stronger for some than others. So I'll narrow to the one I've spent this year caregiving through: [glioblastoma](https://my.clevelandclinic.org/health/diseases/17032-glioblastoma).
 
 <aside class="markdown-aside">
 Nothing in this post should be considered medical advice. I'm a software engineer, not a doctor or a scientist. This is a personal story, what I've learned and experienced as a caregiver, not a treatment plan for anyone else.
@@ -24,7 +22,7 @@ Nothing in this post should be considered medical advice. I'm a software enginee
 
 To explain why I'm asking for something so oddly specific (and not easy to wrap up with a bow), let me back up. A little over a year ago, someone I love suffered a [tonic-clonic seizure](https://www.mayoclinic.org/diseases-conditions/grand-mal-seizure/symptoms-causes/syc-20363458), lost consciousness, and was rushed to the emergency room. In a short span of time, we went from an ordinary life to hearing words I still have trouble writing down: glioblastoma, grade 4, the most aggressive kind of brain cancer there is.
 
-The prognosis handed to us was about 12 - 15 months to live, with standard of care treatment (radiation + chemo). Some more grim numbers: Less than 30% of patients survive beyond 2 years, and only about 5% make it to the 5 year mark.
+The prognosis handed to us was about 12 - 15 months with standard of care treatment (radiation + chemo). Some more grim numbers: Less than 30% of patients survive beyond 2 years, and only about 5% make it to the 5 year mark.
 
 I have spent the year since as his caregiver. A grade 4 glioblastoma diagnosis is a particular kind of grief: someone you love is going to die in slow motion, as the tumour grows and presses in on the brain, preventing it from being able to perform functions we take for granted such as walking, talking, bathing, dressing, and eventually eating, swallowing, and breathing.
 
@@ -32,22 +30,22 @@ After the initial shock of the diagnosis wore off, a question kept turning over 
 
 ## The Idea I Remembered
 
-I've listened to health and science podcasts for years. After the diagnosis, I recalled hearing Thomas Seyfried, a Ph.D. [professor and cancer researcher](https://www.bc.edu/bc-web/schools/morrissey/departments/biology/people/faculty-directory/thomas-seyfried.html) at Boston College, interviewed on the [Jesse Chapus podcast](https://youtu.be/g4EY9WWuSR8?si=CK0pa4HMSxMgQaBt), discussing his research into cancer, and glioblastoma specifically. What follows is a compilation of that interview, others of his I found afterward, conversations with other cancer researchers, and their papers.
+I've listened to health and science podcasts for years. After the diagnosis, I recalled hearing Thomas Seyfried, a Ph.D. [professor and cancer researcher](https://www.bc.edu/bc-web/schools/morrissey/departments/biology/people/faculty-directory/thomas-seyfried.html) at Boston College, interviewed on the [Jesse Chapus podcast](https://youtu.be/g4EY9WWuSR8?si=CK0pa4HMSxMgQaBt), discussing his research into cancer, and glioblastoma specifically. What follows is a compilation of that interview, others of his I found afterward, and research papers.
 
 Some terminology that comes up in this section:
 
-- **Mitochondria:** tiny structures inside almost every cell that convert food into usable energy, often called the cell's power plant.
-- **Cellular respiration:** the efficient way mitochondria make energy, using oxygen.
+- **Mitochondria:** tiny structures inside almost every cell that convert food into usable energy.
+- **Cellular respiration:** the efficient way mitochondria make energy, using a combination of glucose and oxygen.
 - **Glucose:** blood sugar, what carbohydrates break down into once eaten, and the body's primary fuel.
-- **Fermentation:** a cruder, much less efficient backup way to make energy that doesn't depend on mitochondria working properly.
-- **ROS (reactive oxygen species):** unstable byproduct molecules of energy production, think of them as exhaust, that can damage nearby DNA if they build up.
-- **Ketosis:** a metabolic state where the body burns fat for fuel instead of sugar, producing ketones.
+- **Fermentation:** a less efficient way to make energy by converting glucose into lactic acid, without needing oxygen or working mitochondria.
+- **ROS (reactive oxygen species):** unstable byproduct molecules of energy production, think of them as exhaust, that can damage nuclear DNA if they build up.
+- **Ketosis:** a metabolic state where the body burns fat for fuel instead of glucose, producing ketones.
 
 ### Somatic Mutation Theory
 
 Seyfried started by laying out the mainstream theory: cancer starts with mutations. Cells copy their DNA every time they divide, copying is imperfect, and over a lifetime errors can accumulate in genes that control growth. A mutation in an oncogene can jam the accelerator on; a mutation in a tumor suppressor gene can cut the brakes. The immune system normally catches and clears cells like this, but sometimes they evade detection, and a cell with both problems divides without limit, forming a tumor.
 
-He then walked through what led him to question this theory. If DNA mutation really is the root cause of cancer, a few things should follow. Here's what he found instead:
+He then walked through what led him to question this theory. If DNA mutation really is the root cause of cancer, a few things should follow:
 
 1. **Cancer mutations should be specific to cancer cells.** Instead, the same mutations found in cancer cells also show up in healthy cells that never turn into tumors.
 2. **The same cancer should be driven by the same mutations.** Instead, different patients with the same type of cancer often have different mutations from each other, and even different cells within a single patient's own tumor carry different mutations from one another.
@@ -56,50 +54,50 @@ He then walked through what led him to question this theory. If DNA mutation rea
 Another problem with the mutation theory is the money spent chasing it with comparatively little to show. In December 1971, Richard Nixon signed the [National Cancer Act](https://www.cancer.gov/about-nci/overview/history/national-cancer-act-1971), aka the "war on cancer." Since the 1980s, the genetic paradigm has absorbed most of a staggering sum spent on cancer research. Despite this, cancer deaths keep rising each year, even as headlines tout one "breakthrough" after another. Seyfried also points out that most of the reported decline in U.S. cancer deaths traces back to 1990s smoking-cessation campaigns rather than treatment breakthroughs.
 
 <aside class="markdown-aside">
-No single figure captures total cancer research spend. NIH alone has put roughly <a class="markdown-link" href="https://officeofbudget.od.nih.gov/approp_hist.html">$178.5 billion</a> into the National Cancer Institute (NCI) since 1971 (not inflation adjusted figure), and pharma spends more than <a class="markdown-link" href="https://pubmed.ncbi.nlm.nih.gov/39315831/">$80 billion a year</a> on oncology R&D, more than NCI's entire 54-year total, every single year. Global public and philanthropic funding adds another <a class="markdown-link" href="https://www.thelancet.com/journals/lanonc/article/PIIS1470-2045(23)00182-1/fulltext">$5.56 to $8.51 billion</a> annually (2006-2018).
+No single figure captures total cancer research spend. NIH (U.S. National Institutes of Health) has put roughly <a class="markdown-link" href="https://officeofbudget.od.nih.gov/approp_hist.html">$178.5 billion</a> into the National Cancer Institute (NCI) since 1971 (not inflation adjusted figure), and pharma spends more than <a class="markdown-link" href="https://pubmed.ncbi.nlm.nih.gov/39315831/">$80 billion a year</a> on oncology R&D, more than NCI's entire 54-year total, every single year. Global public and philanthropic funding adds another <a class="markdown-link" href="https://www.thelancet.com/journals/lanonc/article/PIIS1470-2045(23)00182-1/fulltext">$5.56 to $8.51 billion</a> annually.
 </aside>
 
 ### Metabolic Theory of Cancer
 
-Then the observation at the center of his work: nearly every cancer cell has defective mitochondria. Healthy cells run on cellular respiration, using oxygen to burn fuel efficiently, the way a well-tuned car engine burns gasoline. Cancer cells can't do that. Instead they fall back on fermentation, an older and much cruder way of generating energy, closer to a campfire than an engine: it works, but it wastes most of the fuel it burns to get a much smaller amount of usable energy out. That inefficiency is why cancer cells pull in many times more glucose than a healthy cell needs, even when oxygen is plentiful.
+Seyfried then lays out an alternate hypothesis that better fits the observed behaviour of cancer cells: nearly every cancer cell has defective mitochondria. Healthy cells run on cellular respiration, using oxygen to burn fuel efficiently, the way a well-tuned car engine burns gasoline. Cancer cells can't do that. Instead they fall back on fermentation, an older and much cruder way of generating energy, closer to a campfire than an engine: it works, but it wastes most of the fuel it burns to get a much smaller amount of usable energy out. That inefficiency is why cancer cells pull in many times more glucose than a healthy cell needs, even when oxygen is plentiful.
 
-Fermentation is an older energy pathway, left over from before there was oxygen in the atmosphere, when all life was single-celled. Every cell today, however complex, still carries that ancestral code. The behavior that comes with it is the behavior of a single-celled organism: consume, divide, repeat, without restraint.
+This matters because fermentation isn't just a less efficient backup, it's an older one: a pathway left over from before there was oxygen in the atmosphere, when all life was single-celled. Every cell today, however complex, still carries that ancestral code. Reverting to it seems to bring back the behavior that came with it: consume, divide, repeat, without restraint, forming a tumour.
 
-Under this model, carcinogens (smoking, asbestos, obesity, etc.) don't cause cancer by damaging DNA directly. The chain runs the other way:
+Under this model, carcinogens (smoking, asbestos, obesity, etc.) don't cause cancer by damaging DNA directly. Rather, the chain of events is:
 
 1. A carcinogen damages a cell's mitochondria.
 2. Damaged mitochondria can't generate enough energy through respiration, so the cell sends a stress signal to the nucleus.
 3. That signal [switches on a set of genes](https://academic.oup.com/carcin/article/35/3/515/2463440) that turn on fermentation and drive unrestrained growth, the single-celled behavior described above.
 4. Those same damaged mitochondria also leak extra reactive oxygen species (ROS), the "exhaust" that respiration normally keeps in check but that damaged mitochondria produce in excess.
-5. Over time, the elevated ROS randomly damages nearby DNA.
+5. Over time, the elevated ROS randomly damages nuclear DNA.
 
-This chain of events suggests that the DNA mutations observed in cancer cells are *downstream effects* of mitochondrial injury, *not the root cause*. Mitochondrial damage comes first and drives fermentation and growth directly through gene activation; the random DNA mutations are fallout from that, arriving later as a side effect of the exhaust the damaged mitochondria produce. This makes cancer a disease of energy metabolism, not a disease of genes.
+This chain of events suggests that the DNA mutations observed in cancer cells are *downstream effects* of mitochondrial injury, not the *root cause*.
 
 <aside class="markdown-aside">
 German biochemist Otto Warburg first documented <a class="markdown-link" href="https://www.nature.com/articles/nrc3038">cancer cells' abnormal fermentation</a> over a century ago. Some of his measurement tools were later found to be flawed, but his core call, mitochondrial dysfunction as cancer's origin, was <a class="markdown-link" href="https://pmc.ncbi.nlm.nih.gov/articles/PMC12170717/">directionally correct</a>.
 </aside>
 
-Why does the root cause matter? Because it determines where research money goes. If the mutations are downstream of a metabolic problem rather than the cause, that would explain why targeting them hasn't moved survival numbers much, and it points treatment somewhere else entirely.
+Understanding the root cause matters because it changes where treatment should be aimed. If genetic mutations are downstream of a metabolic problem rather than the cause, that explains why targeting them hasn't moved survival numbers much, and points to targeting the metabolism itself instead.
 
 ### Ketogenic Metabolic Therapy
 
-If the root problem is metabolic, then it follows that depriving the cancer of the fuel it depends on most could be an effective method of slowing it down. Cancer cells prefer glucose. Healthy cells, unlike cancer cells, can run efficiently on ketones, the fuel the body produces from fat when carbohydrate intake is low. Get the body into ketosis, burning fat for fuel instead of glucose, and you shift the fuel supply in a direction cancer cells can't use, but healthy cells can. For brain cancer, this is crucial because ketones can cross the blood-brain barrier, so the brain stays fuelled while the tumor is deprived.
+Depriving the cancer of the fuel it depends on most, then, could be an effective way to slow it down. Cancer cells prefer glucose. Healthy cells, unlike cancer cells, can run efficiently on ketones, the fuel the body produces from fat when carbohydrate intake is low. Get the body into ketosis, burning fat for fuel instead of glucose, and you shift the fuel supply in a direction cancer cells can't use, but healthy cells can. For brain cancer, this is crucial because ketones can cross the blood-brain barrier, so the brain stays fuelled while the tumor is deprived.
 
 Getting into ketosis for cancer management requires following a calorie-restricted ketogenic diet. This is very high fat (roughly 70-80% of calories), moderate protein, and carbohydrate held under 20 grams a day for most patients. There's also a biomarker for how deep the ketosis needs to be: the [Glucose Ketone Index](https://www.frontiersin.org/journals/science/articles/10.3389/fsci.2026.1763395/full) (GKI), a ratio of blood glucose to ketones. Research suggests holding it between 1 and 2 keeps the tumor fuel-starved while ketones stay high enough to fuel the rest of the body, and this range correlates with improved survival.
 
-Diet alone isn't enough, because cancer has a backup fuel: glutamine, the most abundant amino acid in the body. You can't diet your way out of glutamine availability, since eliminating it would mean eliminating nearly all protein, which the body needs, and even then the body manufactures its own supply. So depriving cancer of both fuels takes more than diet alone; it's the basis for a combined strategy Seyfried calls [press-pulse](https://link.springer.com/article/10.1186/s12986-017-0178-2#Sec3), a sustained "press" on glucose through diet paired with periodic "pulses" that target glutamine directly, used intermittently.
+Diet alone isn't enough, because cancer has a backup fuel: glutamine, the most abundant amino acid in the body. You can't diet your way out of glutamine availability, since eliminating it would mean eliminating nearly all protein, which the body needs, and even then the body manufactures its own supply. So depriving cancer of both fuels takes more than diet alone; it's the basis for a combined strategy Seyfried calls [press-pulse](https://link.springer.com/article/10.1186/s12986-017-0178-2#Sec3), a sustained "press" on glucose through diet paired with periodic "pulses" that target glutamine.
 
 Taken together, this diet + pulse + GKI monitoring protocol is referred to as *Ketogenic Metabolic Therapy* (KMT).
 
 ### Fasting Around Chemo
 
-He also covered fasting timed to chemo: a day before, the day of, and a day after pushes the body into deeper ketosis around treatment. A [case series of 10 cancer patients](https://pmc.ncbi.nlm.nih.gov/articles/PMC2815756/) found nausea, vomiting, and fatigue were markedly reduced on chemo cycles paired with a short fast.
+KMT can also be used to reduce chemo side effects, through fasting timed around treatment: a day before, the day of, and a day after, pushing the body into deeper ketosis. A [case series of 10 cancer patients](https://pmc.ncbi.nlm.nih.gov/articles/PMC2815756/) found nausea, vomiting, and fatigue were reduced on chemo cycles paired with a short fast.
 
 The same fasting protocol can also improve chemo's effectiveness, although this has only been shown in animals. A [glioma-specific animal study](https://pmc.ncbi.nlm.nih.gov/articles/PMC3439413/) found that in starved glioma cells, a third of the usual dose of temozolomide (the standard chemo drug given to glioblastoma patients) killed as many cells as the full dose did in fed cells, and mice combining fasting with chemo and radiation survived far longer than those on standard treatment alone. Seyfried describes this as fasting "sensitizing" the cancer to chemo: it shifts healthy cells into a protective, low-growth state that cancer cells can't enter because their growth signals are stuck on.
 
 ### Management, Not Cure
 
-He closes on a caveat: KMT isn't a cure for glioblastoma (or cancer more generally), but a way to manage it. He recommends using KMT as an adjunct, to extend overall survival with a higher quality of life.
+KMT isn't a cure for glioblastoma (or cancer more generally), but a way to manage it. Seyfried recommends using KMT as an adjunct, to extend overall survival with a higher quality of life.
 
 What impressed me is these ideas did not come from a wellness influencer peddling supplements. They're from a cancer researcher, with decades of experience and peer-reviewed published research, discussing the exact disease we were facing.
 
