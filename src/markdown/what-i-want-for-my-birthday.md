@@ -157,17 +157,19 @@ As of this writing (2026), a [Phase 2 randomized controlled trial at UCSF](https
 
 This [2024 meta-analysis](https://pmc.ncbi.nlm.nih.gov/articles/PMC11011080/) found that dexamethasone, the steroid given to glioblastoma patients to control surgery and radiation-induced brain swelling, is associated with significantly reduced overall and progression-free survival. This tells us that standard care can carry hidden costs, and that keto-adaptation, which lowers the blood sugar that dexamethasone spikes, might mitigate some of them.
 
-## Why It's Stuck
+## Why Haven't I Heard of This?
 
-Imagine if the results from the Greece study mentioned above, small scale as they are, had been attributed to some new molecule that could be patented. In that case, surely a pharmaceutical company would be pouring in research funds and it would be written about in oncology journals.
+Given research into the metabolic origins of cancer goes all the way back to the 1920's, you may be wondering why you haven't heard of this before. Two things are working against metabolic therapy reaching patients.
+
+**First: medicine is slow to adopt what it discovers.** In 1847, [Ignaz Semmelweis](https://en.wikipedia.org/wiki/Ignaz_Semmelweis), a physician in Vienna, noticed doctors were carrying infection from autopsies to delivery rooms, and that handwashing with chlorinated lime cut maternal deaths on his ward from over 18% to around 2%. He published and argued for mandatory hand washing before examining patients, but the medical establishment rejected his findings, He died in 1865 having never seen it adopted. Hand washing only became standard practice decades later.
+
+**Second: there's no one positioned to profit from proving it.** Imagine if the results from the Greece study mentioned above, small scale as they are, had been attributed to some new molecule that could be patented. In that case, surely a pharmaceutical company would be pouring in research funds and it would be written about in oncology journals.
 
 This isn't hypothetical. In 2024, the FDA and Health Canada approved [vorasidenib](https://www.fda.gov/drugs/resources-information-approved-drugs/fda-approves-vorasidenib-grade-2-astrocytoma-or-oligodendroglioma-susceptible-idh1-or-idh2-mutation), a drug that targets a specific IDH1/IDH2 mutation, found mostly in slower-growing, lower-grade gliomas (not glioblastoma). It costs nearly 40K USD per month (roughly 478,000 dollars a year) and is taken indefinitely, until progression or dose toxicity.
 
-So why don't we hear more about metabolic therapy from conventional cancer care? Especially since research showing cancer has metabolic origins dates back to the 1920's.
+The interventions in metabolic therapy are not patentable. A diet cannot be patented. The drugs that show up in these protocols are mostly old and off-patent. Nutritional counselling is not a profit centre. So there is no pharmaceutical company that stands to earn the kind of return that justifies pouring billions into research.
 
-The interventions here are, for the most part, not patentable. A diet cannot be patented. The drugs that show up in these protocols are mostly old and off-patent. Nutritional counselling is not a profit centre. So there is no pharmaceutical company that stands to earn the kind of return that justifies pouring billion into research.
-
-When private markets fail to fund something that would serve the public good, that is precisely the situation where governments are supposed to step in. Here, at any meaningful scale, they have not. This leaves metabolic therapy stuck because it cannot cross a bridge that requires a profit motive to build.
+When private markets fail to fund something that would serve the public good, that is precisely the situation where governments are supposed to step in. Here, at any meaningful scale, they have not. This leaves metabolic therapy stuck because it cannot cross a bridge that requires a profit motive to build, and it's still waiting on the kind of paradigm shift that took Semmelweis's discovery two decades to earn.
 
 To the extent patients and caregivers stumble onto metabolic therapy on their own, it leaves them wondering if more could be done, or running N-of-1 experiments on themselves with no supervision. More on this in the next section.
 
