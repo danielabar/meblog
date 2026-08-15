@@ -24,7 +24,7 @@ To explain why I'm asking for something so specific (and not easy to wrap up wit
 
 The prognosis handed to us was about 12 - 15 months with standard of care treatment (radiation + chemo). Some more grim numbers: Less than 30% of patients survive beyond 2 years, and only about 5% make it to the 5 year mark.
 
-I have spent the year since as his caregiver. A grade 4 glioblastoma diagnosis is a particular kind of grief: someone you love is going to die in slow motion, as the tumour grows and presses in on the brain, preventing it from being able to perform functions we take for granted such as walking, talking, bathing, dressing, and eventually eating, swallowing, and breathing.
+I have spent the year since as his caregiver. A grade 4 glioblastoma diagnosis is a particular kind of grief: someone you love is going to die in slow motion, as the tumour grows and presses in on the brain, preventing it from being able to perform functions we take for granted such as walking, talking, and eventually breathing.
 
 After the initial shock of the diagnosis wore off, a question kept turning over and over in my head. We hear about cancer breakthroughs in the news all the time. So how, in 2026, was glioblastoma still a death sentence? Why aren't more effective treatments available?
 
