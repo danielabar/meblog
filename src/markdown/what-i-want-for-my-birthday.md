@@ -10,12 +10,12 @@ related:
   - "Building an AI Blog Editor with Claude Skills"
 ---
 
-Taking a break from my usual tech/programming topics to cover something far more difficult. I recently celebrated a birthday, and with it came the usual question: What do you want for your birthday? This year, given everything that's happened, the answer wasn't a thing you could wrap.
+Taking a break from my usual tech/programming topics to cover something far more difficult. I recently celebrated a birthday, and with it came the usual question: What do you want for your birthday? This year, given everything that's happened, the answer wasn't something that could be wrapped.
 
-What I want is for more patients and caregivers facing cancer to hear about one idea: That cancer may have a metabolic dimension, maybe even a root cause that the genetic paradigm has missed, and this may be why cures built on genetics remain so elusive. Cancer is really hundreds of different diseases, and the case for a metabolic root cause may be stronger for some than others. So I'll narrow to the one I've spent this year caregiving through: [glioblastoma](https://my.clevelandclinic.org/health/diseases/17032-glioblastoma).
+What I want is for more patients and caregivers facing cancer to hear about one idea: That cancer may have a metabolic dimension, maybe even a root cause that the genetic paradigm has missed, and this may be why cures targeting DNA mutations remain elusive. Cancer is really hundreds of different diseases, and the case for a metabolic root cause may be stronger for some than others. So I'll narrow to the one I've spent this year caregiving through: [glioblastoma](https://my.clevelandclinic.org/health/diseases/17032-glioblastoma).
 
 <aside class="markdown-aside">
-Nothing in this post should be considered medical advice. I'm a software engineer, not a doctor or a scientist. This is a personal story, what I've learned and experienced as a caregiver, not a treatment plan for anyone else.
+Nothing in this post should be considered medical advice. I'm a software engineer, not a doctor or scientist. This is a personal story, what I've learned and experienced as a caregiver, not a treatment plan for anyone else.
 </aside>
 
 ## A Year Ago
