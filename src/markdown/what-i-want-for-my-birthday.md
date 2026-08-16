@@ -43,7 +43,7 @@ Some terminology that comes up in this section:
 
 ### Somatic Mutation Theory
 
-Seyfried started by laying out the mainstream theory: cancer starts with mutations. Cells copy their DNA every time they divide, copying is imperfect, and over a lifetime (and exposure to carcinogens) errors can accumulate in genes that control growth. A mutation in an oncogene can jam the accelerator on; a mutation in a tumor suppressor gene can cut the brakes. The immune system normally catches and clears cells like this, but sometimes they evade detection, and a cell with both problems divides without limit, forming a tumor.
+Seyfried started by laying out the mainstream theory of cancer: it starts with DNA mutations. Cells copy their DNA every time they divide, copying is imperfect, and over a lifetime (and exposure to carcinogens) errors can accumulate in genes that control growth. A mutation in an oncogene can jam the accelerator on; a mutation in a tumor suppressor gene can cut the brakes. The immune system normally catches and clears cells like this, but sometimes they evade detection, and a cell with both problems divides without limit, forming a tumor.
 
 He then walked through what led him to question this theory. If DNA mutation really is the root cause of cancer, a few things should follow:
 
@@ -54,7 +54,7 @@ He then walked through what led him to question this theory. If DNA mutation rea
 Another problem with the mutation theory is the money spent chasing it with comparatively little to show. In December 1971, Richard Nixon signed the [National Cancer Act](https://www.cancer.gov/about-nci/overview/history/national-cancer-act-1971), aka the "war on cancer." Since the 1980s, a staggering sum has been spent chasing the genetic paradigm. Despite this, Seyfried points out that raw U.S. cancer deaths keep climbing each year, roughly 1,700 Americans a day by the [American Cancer Society's own count](https://acsjournals.onlinelibrary.wiley.com/doi/full/10.3322/caac.70043), even as headlines tout one "breakthrough" after another. He attributes most of the reported decline in the age-adjusted death rate to 1990s smoking-cessation campaigns rather than treatment breakthroughs.
 
 <aside class="markdown-aside">
-No single figure captures total cancer research spend. NIH (U.S. National Institutes of Health) has put roughly <a class="markdown-link" href="https://officeofbudget.od.nih.gov/approp_hist.html">$178.5 billion</a> into the National Cancer Institute (NCI) since 1971 (not inflation adjusted), while the pharmaceutical industry worldwide spends more than <a class="markdown-link" href="https://pubmed.ncbi.nlm.nih.gov/39315831/">$80 billion a year</a> on oncology R&D.
+No single figure captures total cancer research spend. NIH (U.S. National Institutes of Health) has put roughly <a class="markdown-link" href="https://officeofbudget.od.nih.gov/approp_hist.html">$178.5 billion</a> into the National Cancer Institute (NCI) since 1971 (not inflation adjusted), while the pharmaceutical industry worldwide spends more than <a class="markdown-link" href="https://pubmed.ncbi.nlm.nih.gov/39315831/">$80 billion a year</a> on oncology R&D. Globally, public and philanthropic funders put <a class="markdown-link" href="https://www.thelancet.com/journals/lanonc/article/PIIS1470-2045(23)00182-1/fulltext">$24.5 billion</a> into cancer research from 2016 to 2020, with brain cancer receiving $1.3 billion of that.
 </aside>
 
 ### Metabolic Theory of Cancer
