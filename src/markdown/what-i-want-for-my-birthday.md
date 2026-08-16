@@ -20,9 +20,9 @@ Nothing in this post should be considered medical advice. I'm a software enginee
 
 ## A Year Ago
 
-To explain why I'm asking for something so specific (and not easy to wrap up with a bow), let me back up. A little over a year ago, someone I love suffered a [tonic-clonic seizure](https://www.mayoclinic.org/diseases-conditions/grand-mal-seizure/symptoms-causes/syc-20363458), lost consciousness, and was rushed to the emergency room. In a short span of time, we went from an ordinary life to hearing words I still have trouble writing down: glioblastoma, grade 4, the most aggressive kind of brain cancer there is.
+To explain why I'm asking for something so specific, let me back up. A little over a year ago, someone I love suffered a [tonic-clonic seizure](https://www.mayoclinic.org/diseases-conditions/grand-mal-seizure/symptoms-causes/syc-20363458), lost consciousness, and was rushed to the emergency room. In a short span of time, we went from an ordinary life to hearing words I still have trouble writing down: glioblastoma, grade 4, the most aggressive kind of brain cancer there is.
 
-The prognosis handed to us was about 12 - 15 months with standard of care treatment (radiation + chemo). Some more grim numbers: Less than 30% of patients survive beyond 2 years, and only about 5% make it to the 5 year mark.
+The prognosis handed to us was about 12 - 15 months with standard of care treatment. Some more grim numbers: Less than 30% of patients survive beyond 2 years, and only about 5% make it to the 5 year mark.
 
 I have spent the year since as his caregiver. A grade 4 glioblastoma diagnosis is a particular kind of grief: someone you love is going to die in slow motion, as the tumour grows and presses in on the brain, preventing it from being able to perform functions we take for granted such as walking, talking, and eventually breathing.
 
