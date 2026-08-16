@@ -30,7 +30,7 @@ After the initial shock of the diagnosis wore off, a question kept turning over 
 
 ## The Idea I Remembered
 
-I've listened to health and science podcasts for years. After the diagnosis, I recalled hearing Thomas Seyfried, a Ph.D. [professor and cancer researcher](https://www.bc.edu/bc-web/schools/morrissey/departments/biology/people/faculty-directory/thomas-seyfried.html) at Boston College, interviewed on the [Jesse Chapus podcast](https://youtu.be/g4EY9WWuSR8?si=CK0pa4HMSxMgQaBt), discussing his research into cancer, and glioblastoma specifically.
+I've listened to health and science podcasts for years. After the diagnosis, I recalled hearing Thomas Seyfried, a Ph.D. [professor and cancer researcher](https://www.bc.edu/bc-web/schools/morrissey/departments/biology/people/faculty-directory/thomas-seyfried.html) at Boston College, interviewed on the [Jesse Chappus podcast](https://youtu.be/g4EY9WWuSR8?si=CK0pa4HMSxMgQaBt), discussing his research into cancer, and glioblastoma specifically.
 
 Some terminology that comes up in this section:
 
@@ -54,7 +54,7 @@ He then walked through what led him to question this theory. If DNA mutation rea
 Another problem with the mutation theory is the money spent chasing it with comparatively little to show. In December 1971, Richard Nixon signed the [National Cancer Act](https://www.cancer.gov/about-nci/overview/history/national-cancer-act-1971), aka the "war on cancer." Since the 1980s, the genetic paradigm has absorbed most of the money spent on cancer research. Despite this, cancer deaths keep rising each year, even as headlines tout one "breakthrough" after another. Seyfried also points out that most of the reported decline in U.S. cancer deaths traces back to 1990s smoking-cessation campaigns rather than treatment breakthroughs.
 
 <aside class="markdown-aside">
-No single figure captures total cancer research spend. NIH (U.S. National Institutes of Health) has put roughly <a class="markdown-link" href="https://officeofbudget.od.nih.gov/approp_hist.html">$178.5 billion</a> into the National Cancer Institute (NCI) since 1971 (not inflation adjusted), while pharma alone spends more than <a class="markdown-link" href="https://pubmed.ncbi.nlm.nih.gov/39315831/">$80 billion a year</a> on oncology R&D, more than NCI's entire 54-year total, annually.
+No single figure captures total cancer research spend. NIH (U.S. National Institutes of Health) has put roughly <a class="markdown-link" href="https://officeofbudget.od.nih.gov/approp_hist.html">$178.5 billion</a> into the National Cancer Institute (NCI) since 1971 (not inflation adjusted), while the pharmaceutical industry worldwide spends more than <a class="markdown-link" href="https://pubmed.ncbi.nlm.nih.gov/39315831/">$80 billion a year</a> on oncology R&D.
 </aside>
 
 ### Metabolic Theory of Cancer
@@ -93,7 +93,7 @@ Taken together, this diet + pulse + GKI monitoring protocol is referred to as *K
 
 KMT can also be used to reduce chemo side effects, through fasting timed around treatment: a day before, the day of, and a day after, pushing the body into deeper ketosis. A [case series of 10 cancer patients](https://pmc.ncbi.nlm.nih.gov/articles/PMC2815756/) found nausea, vomiting, and fatigue were reduced on chemo cycles paired with a short fast.
 
-The same fasting protocol can also improve chemo's effectiveness, although this has only been shown in animals. A [glioma-specific animal study](https://pmc.ncbi.nlm.nih.gov/articles/PMC3439413/) found that in starved glioma cells, a third of the usual dose of temozolomide (the standard chemo drug given to glioblastoma patients) killed as many cells as the full dose did in fed cells, and mice combining fasting with chemo and radiation survived far longer than those on standard treatment alone. Seyfried describes this as fasting "sensitizing" the cancer to chemo: it shifts healthy cells into a protective, low-growth state that cancer cells can't enter because their growth signals are stuck on.
+The same fasting protocol can also improve chemo's effectiveness, although this has only been shown in animals. A [glioma-specific animal study](https://pmc.ncbi.nlm.nih.gov/articles/PMC3439413/) found that in starved glioma cells, a third of the usual dose of temozolomide (the standard chemo drug given to glioblastoma patients) killed as many cells as the full dose did in fed cells. Mice that fasted around chemo, and separately mice that fasted around radiation, survived far longer than those on standard treatment alone. Seyfried describes this as fasting "sensitizing" the cancer to chemo: it shifts healthy cells into a protective, low-growth state that cancer cells can't enter because their growth signals are stuck on.
 
 ### Management, Not Cure
 
@@ -129,11 +129,7 @@ She didn't die because there was no treatment. She died because the side effects
 
 ## Evidence for KMT
 
-Let's turn to the existing evidence for metabolic therapy. The human studies are small. There are no completed large randomized controlled trials. But there is enough signal that should interest everyone who has a stake in improving glioblastoma outcomes.
-
-<aside class="markdown-aside">
-Some terminology when reading research papers: <strong class="markdown-strong">In vitro</strong>: in a dish. <strong class="markdown-strong">In vivo</strong>: in a living animal. <strong class="markdown-strong">OS</strong> (overall survival) and <strong class="markdown-strong">PFS</strong> (progression-free survival): standard trial measures, how long patients live, how long before the tumour regrows. <strong class="markdown-strong">QoL</strong>: quality of life. Research climbs a ladder: pre-clinical (cells, then mice), then human trials in phases: <strong class="markdown-strong">Phase 1</strong> asks if it's safe, <strong class="markdown-strong">Phase 2</strong> asks if it's effective, <strong class="markdown-strong">Phase 3</strong> is the large randomized controlled trial (RCT) that's the gate to clinical practice.
-</aside>
+Let's turn to the existing evidence for metabolic therapy. The human studies are small, mostly single-arm, and compared against historical benchmarks rather than randomized controls, so treat the survival numbers below as promising signal, not proof. There are no completed large randomized controlled trials. But there is enough signal that should interest everyone who has a stake in improving glioblastoma outcomes.
 
 [Prospective study from Greece (2025)](https://pmc.ncbi.nlm.nih.gov/articles/PMC11876051/): followed 18 newly diagnosed glioblastoma patients and compared those who stuck to a ketogenic diet beyond six months against those who did not, alongside standard treatment. The diet-adherent group had a three-year survival rate of 66.7 percent, versus 8.3 percent in the non-adherent group, a statistically significant difference. Adherent patients lived from 33 months to more than 84, while non-adherent patients died at around 15.7 months, close to the historical average. Notably, all of the long-term survivors were IDH-wildtype, the harder-to-treat subtype. Patients chose whether to stick to the diet, so some of that gap could reflect that healthier or more motivated patients find it easier to adhere. That confound is real, but a gap this large in three-year survival is worth further investigation.
 
@@ -147,7 +143,7 @@ Some terminology when reading research papers: <strong class="markdown-strong">I
 
 The strongest form of the therapy, press-pulse, has so far only been tested in animals. In this [2018 mouse study](https://www.frontiersin.org/journals/nutrition/articles/10.3389/fnut.2018.00091/full), researchers combined a ketogenic diet with a glutamine-targeting compound and hyperbaric oxygen. This outperformed standard chemotherapy on survival, without the toxicity.
 
-As of this writing (2026), a [Phase 2 randomized controlled trial at UCSF](https://clinicaltrials.ucsf.edu/trial/NCT05708352) in San Francisco is enrolling 170 newly diagnosed glioblastoma patients, designed to test whether the ketogenic diet improves overall survival. And Cedars-Sinai in Los Angeles is running a multi-site randomized trial called [DIET2TREAT](https://ascopubs.org/doi/10.1200/JCO.2024.42.16_suppl.TPS2103). However, these test diet alone rather than the full protocol. The UCSF trial's ketogenic diet intervention runs for 18 weeks, far shorter than the 12-36 month windows in the case series and cohort studies above where the survival and quality-of-life signal actually showed up.
+As of this writing (2026), a [Phase 2 randomized controlled trial](https://clinicaltrials.gov/study/NCT05708352) called DIET2TREAT is enrolling 170 newly diagnosed glioblastoma patients to test whether the ketogenic diet improves overall survival. However, it tests diet alone rather than the full KMT protocol, and the intervention runs for 18 weeks, far shorter than the 12-36 month windows in the case series and cohort studies above where the survival and quality-of-life signal actually showed up.
 
 This [2024 meta-analysis](https://pmc.ncbi.nlm.nih.gov/articles/PMC11011080/) found that dexamethasone, the steroid given to glioblastoma patients to control surgery and radiation-induced brain swelling, is associated with significantly reduced overall and progression-free survival. This tells us that standard care can carry hidden costs, and that keto-adaptation, which lowers the blood sugar that dexamethasone spikes, might mitigate some of them.
 
