@@ -125,7 +125,7 @@ I keep thinking about someone else, a woman I knew who was diagnosed with breast
 
 Imagine if part of standard care had been a way to make that treatment more bearable and more effective: guidance on KMT to reduce the side effects and improve the results. She might have been able to face the treatment. She might still be here.
 
-She didn't die because there was no treatment. She died because the side effects were frightening enough that she chose to avoid treatment altogether. You don't need to accept any theory about the origins of cancer to see the problem: standard treatment is hard enough on the body that some patients walk away from it entirely.
+She didn't die because there was no treatment. She died because the side effects were frightening enough that she chose to avoid treatment altogether. Regardless of what's driving cancer, standard treatment is hard enough on the body that some patients walk away from it entirely.
 
 ## Evidence for KMT
 
