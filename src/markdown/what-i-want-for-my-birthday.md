@@ -115,17 +115,21 @@ From our searching in Canada, we couldn't find KMT being offered alongside stand
 
 ## Standard of Care
 
-So what does standard care offer for glioblastoma? Surgery to remove what can be removed, radiation for what remains, and chemotherapy for whatever is left. The problem is none of these eliminate the cancer, and it always comes back, more aggressive than when it started.
+No clinician offering KMT meant falling back on standard treatment alone. For glioblastoma this means surgery to remove what can be removed, radiation given together with chemotherapy, then chemotherapy alone for months after. The problem is none of these eliminate the cancer, and it always comes back, more aggressive than when it started. When it does, Avastin (bevacizumab), sometimes combined with a stronger chemo drug, can [ease symptoms but doesn't extend survival](https://www.nejm.org/doi/full/10.1056/NEJMoa1707358).
 
-The treatment itself carries real risk. Months after finishing radiation, my LO suffered a seizure so severe that he nearly stopped breathing. If not for the speed of the paramedics and the emergency team who got him intubated and into intensive care, he might not have survived. Further imaging revealed that radiation-induced inflammation had irritated the blood-brain barrier, triggering the seizure.
+The treatment itself carries risk. Months after finishing radiation, my LO suffered a seizure so severe that he nearly stopped breathing. If not for the speed of the paramedics and the emergency team who got him intubated and into intensive care, he might not have survived. Further imaging revealed that radiation-induced inflammation had irritated the blood-brain barrier, triggering the seizure. He was also left with expressive aphasia (difficulty with word finding and communication), as a result of the seizure occurring near the part of the brain responsible for language.
 
 **The Cost of Fear**
 
-I keep thinking about someone else, a woman I knew who was diagnosed with breast cancer. She was so afraid of the chemotherapy, the nausea, the vomiting, the suffering of it, that she put off treatment. She has since passed away.
+I keep thinking about someone else, a woman I knew who was diagnosed with breast cancer. She was so afraid of the treatment that she put it off. She has since passed away.
 
 Imagine if part of standard care had been a way to make that treatment more bearable and more effective: guidance on KMT to reduce the side effects and improve the results. She might have been able to face the treatment. She might still be here.
 
-She didn't die because there was no treatment. She died because the side effects were frightening enough that she chose to avoid treatment altogether. Regardless of what's driving cancer, standard treatment is hard enough on the body that some patients walk away from it entirely.
+She didn't die because there was no treatment. She died because the side effects were frightening enough that she chose to avoid it altogether.
+
+<aside class="markdown-aside">
+This is not an argument against radiation or standard treatment. Seyfried raises a separate, more speculative point: <a class="markdown-link" href="https://pmc.ncbi.nlm.nih.gov/articles/PMC8585920/">animal research</a> suggests irradiated brain tissue becomes a more favorable environment for tumor regrowth, which may help explain why glioblastoma recurrences after radiation often come back more aggressive. From this he argues there's a case for human trials comparing KMT plus low-dose chemo against standard chemo + radiation. That remains an open question, which would be useful to have answered so patients and doctors could weigh radiation's tradeoffs.
+</aside>
 
 ## Evidence for KMT
 
