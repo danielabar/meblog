@@ -128,7 +128,7 @@ Imagine if part of standard care had been a way to make that treatment more bear
 She didn't die because there was no treatment. She died because the side effects were frightening enough that she chose to avoid it altogether.
 
 <aside class="markdown-aside">
-This is not an argument against radiation or standard treatment. Seyfried raises a separate, more speculative point: <a class="markdown-link" href="https://pmc.ncbi.nlm.nih.gov/articles/PMC8585920/">animal research</a> suggests irradiated brain tissue becomes a more favorable environment for tumor regrowth, which may help explain why glioblastoma recurrences after radiation often come back more aggressive. From this he argues there's a case for human trials comparing KMT plus low-dose chemo against standard chemo + radiation. That remains an open question, which would be useful to have answered so patients and doctors could weigh radiation's tradeoffs.
+This is not an argument against radiation or standard treatment. Seyfried raises a separate, more speculative point: <a class="markdown-link" href="https://pmc.ncbi.nlm.nih.gov/articles/PMC8585920/">animal research</a> suggests irradiated brain tissue becomes a more favorable environment for tumor regrowth, which may help explain why glioblastoma recurrences after radiation often come back more aggressive. From this he argues there's a case for human trials comparing KMT plus low-dose chemo against standard chemo + radiation. That remains an open question, which would be useful to have answered so patients and doctors could weigh radiation's tradeoffs in brain cancer.
 </aside>
 
 ## Evidence for KMT
