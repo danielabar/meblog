@@ -194,7 +194,7 @@ A motivated patient may be able to get over some of these hurdles, but this is n
 
 Circling back to my birthday ask. What I'm asking for is awareness. That patients and caregivers hear that ketogenic metabolic therapy has evidence as an adjunct, and that it's worth raising with an oncology team. Beyond that:
 
-**More research:** The studies so far are small, and the strongest version of the therapy, press-pulse, has only been tested in animals. Phase 3 trials, the kind rigorous enough to settle whether this belongs in standard care, are the missing piece.
+**More research:** The studies so far are small, and the strongest version of the therapy has only been tested in animals. Phase 3 trials, the kind rigorous enough to settle whether this belongs in standard care, are the missing piece.
 
 **Wider access:** Trained clinicians who can run this safely, so it isn't limited to the patients resourceful enough to find their own way to it.
 
