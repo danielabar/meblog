@@ -145,6 +145,8 @@ Let's turn to the existing evidence for metabolic therapy. The human studies are
 
 [2022 feasibility study of 10 glioblastoma patients](https://pmc.ncbi.nlm.nih.gov/articles/PMC9586748/): a combined fasting and ketogenic strategy found feasible and safe, but it did not show a survival benefit. Median survival was about 13 months, in line with standard care.
 
+*Note:* half the patients in this study had poor-prognosis disease (progression, inoperable tumors, or palliative status) that would've excluded them from most trials. Also most only started the metabolic strategy after finishing chemoradiation rather than overlapping it, while metabolic therapy theory argues best results come from starting before and maintaining during standard treatment.
+
 The strongest form of the therapy, press-pulse, has so far only been tested in animals. In this [2018 mouse study](https://www.frontiersin.org/journals/nutrition/articles/10.3389/fnut.2018.00091/full), researchers combined a ketogenic diet with a glutamine-targeting compound and hyperbaric oxygen. This outperformed standard chemotherapy on survival, without the toxicity.
 
 As of this writing (2026), a [Phase 2 randomized controlled trial](https://clinicaltrials.gov/study/NCT05708352) is enrolling 170 newly diagnosed glioblastoma patients to test whether the ketogenic diet improves overall survival. However, it tests diet alone rather than the full KMT protocol, and the intervention runs for 18 weeks, far shorter than the 12-36 month windows in the case series and cohort studies above where the survival and quality-of-life signal actually showed up.
@@ -157,7 +159,7 @@ Given research into the metabolic origins of cancer goes all the way back to the
 
 **Medicine is slow to adopt what it discovers:** For example, in 1847, [Ignaz Semmelweis](https://en.wikipedia.org/wiki/Ignaz_Semmelweis), a physician in Vienna, found that doctors washing their hands with chlorinated lime before delivering babies cut maternity-ward deaths from over 18% to around 2%. The medical establishment rejected his findings, and hand washing didn't become standard practice for decades.
 
-**There's no one positioned to profit from proving it:** Imagine if the results from the Greece study mentioned above, small scale as they are, had been attributed to some new molecule that could be patented. In that case, surely a pharmaceutical company would be pouring in research funds and it would be written about in oncology journals.
+**There's no one positioned to profit from proving it:** Imagine if the results from the studies, small scale as they are, had been attributed to a new molecule that could be patented. In that case, surely a pharmaceutical company would be pouring in research funds to bring it to market.
 
 This isn't hypothetical. In 2024, the FDA and Health Canada approved [vorasidenib](https://www.fda.gov/drugs/resources-information-approved-drugs/fda-approves-vorasidenib-grade-2-astrocytoma-or-oligodendroglioma-susceptible-idh1-or-idh2-mutation), a drug that targets a specific IDH1 mutation, found mostly in slower-growing, lower-grade gliomas (not glioblastoma). It costs nearly 40K USD per month and is taken indefinitely, until progression or dose toxicity.
 
@@ -181,7 +183,7 @@ In practice, my LO and I encountered some challenges, from the search for a clin
 
 - **Not everyone is a candidate:** Some conditions prevent the body from breaking down and using fat for fuel. For those patients ketosis is off the table entirely, and finding that out safely requires a clinician.
 - **Getting the ratio right is its own discipline:** Ketogenic ratios (grams of fat to combined grams of protein and carbohydrate) aren't one-size-fits-all. Different studies use different ratios, and picking and holding the right one for a given patient's weight, treatment stage, and lab results is a research-informed calculation.
-- **The diet itself is a minefield of small errors:** Berries and nuts, despite having a reputation for being "keto friendly", actually contain a high number of carbohydrates, for someone targeting less than 20 grams daily. Cottage cheese, which shows up in a lot of keto recipes, is high in protein and naturally occurring sugar (lactose). Protein is not a "free" food: eaten in excess, the body converts it to glucose through gluconeogenesis, which further feeds the tumour.
+- **The diet itself is a minefield of small errors:** Berries and nuts, despite having a reputation for being "keto friendly", actually contain a high number of carbohydrates, for someone targeting less than 20 grams daily. Cottage cheese, which shows up in a lot of keto recipes, is high in protein and naturally occurring sugar (lactose). Protein is not a "free" food: eaten in excess, the body converts it to glucose through gluconeogenesis, which further fuels the tumour.
 - **Water fasting, used to deepen ketosis around chemo days, carries its own risk:** If a patient's body fat is too low, blood glucose can drop further than intended, without ketones getting high enough, and can trigger a seizure. This is an especially dangerous outcome for someone with a brain tumour already prone to seizures.
 - **Daily Monitoring:** Glucose and ketones need daily blood-meter checks, tracked against a target ratio (the GKI). Research points to a GKI between 1 and 2 (some studies go up to 3) as the range that puts the most pressure on the cancer, and simply cutting back on sugar and starchy carbs won't get you there. This requires purchasing a blood meter, a one-time cost, but glucose strips, ketone strips, and lancets are all single-use and purchased separately, and none of it is currently treated as a covered medical expense.
 - **Diet alone doesn't finish the job:** Glutamine, as mentioned earlier in this post, is the sticking point here too. Bringing it down requires a combination of aerobic and resistance exercise, and drugs that target glutamine metabolism directly. These must be dosed and monitored by a trained medical team because of their own toxicity risks.
@@ -192,9 +194,9 @@ A motivated patient may be able to get over some of these hurdles, but this is n
 
 Circling back to my birthday ask. What I'm asking for is awareness. That patients and caregivers hear that ketogenic metabolic therapy has evidence as an adjunct, and that it's worth raising with an oncology team. Beyond that:
 
-**More research.** The studies so far are small, and the strongest version of the therapy, press-pulse, has only been tested in animals. Phase 3 trials, the kind rigorous enough to settle whether this belongs in standard care, are the missing piece.
+**More research:** The studies so far are small, and the strongest version of the therapy, press-pulse, has only been tested in animals. Phase 3 trials, the kind rigorous enough to settle whether this belongs in standard care, are the missing piece.
 
-**Wider access to supervision.** Trained clinicians who can run this safely, so it isn't limited to the patients resourceful enough to find their own way to it.
+**Wider access:** Trained clinicians who can run this safely, so it isn't limited to the patients resourceful enough to find their own way to it.
 
 The payoff isn't only measured in survival months. A patient who isn't nauseated, who feels better, can keep working, keep contributing, and keep dignity intact.
 
