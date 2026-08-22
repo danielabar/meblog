@@ -59,7 +59,7 @@ No single figure captures total cancer research spend. NIH (U.S. National Instit
 
 ### Metabolic Theory of Cancer
 
-Seyfried then lays out an alternate hypothesis that its the observed behaviour of cancer cells: nearly every cancer cell has defective mitochondria. Healthy cells run on cellular respiration, using oxygen to burn fuel efficiently. Cancer cells can't do that. Instead they fall back on fermentation, a less efficient way of generating energy that burns through many times more glucose than a healthy cell needs, even when oxygen is plentiful.
+Seyfried then lays out an alternate hypothesis that better matches the observed behaviour of cancer cells: nearly every cancer cell has defective mitochondria. Healthy cells run on cellular respiration, using oxygen to burn fuel efficiently. Cancer cells can't do that. Instead they fall back on fermentation, a less efficient way of generating energy that burns through many times more glucose than a healthy cell needs, even when oxygen is plentiful.
 
 This matters because fermentation isn't just a less efficient backup. It's an older pathway left over from before there was oxygen in the atmosphere, when most life was single-celled. Every cell today, however complex, still carries that ancestral code. Reverting to it brings back the behavior that came with it: consume, divide, repeat, without restraint, forming a tumour.
 
@@ -91,9 +91,9 @@ Taken together, this diet + pulse + GKI monitoring protocol is referred to as *K
 
 ### Fasting Around Chemo
 
-KMT can also be used to reduce chemo side effects, through fasting timed around treatment: a day before, the day of, and a day after, pushing the body into deeper ketosis. A [case series of 10 cancer patients](https://pmc.ncbi.nlm.nih.gov/articles/PMC2815756/) found nausea, vomiting, and fatigue were reduced on chemo cycles paired with a short fast.
+KMT can also be used to reduce chemo side effects, through fasting timed around treatment, pushing the body into deeper ketosis. A [case series of 10 cancer patients](https://pmc.ncbi.nlm.nih.gov/articles/PMC2815756/) found nausea, vomiting, and fatigue were reduced on chemo cycles paired with a short fast.
 
-The same fasting protocol can also improve chemo's effectiveness, although this has only been shown in animals. A [glioma-specific animal study](https://pmc.ncbi.nlm.nih.gov/articles/PMC3439413/) found that in starved glioma cells, a third of the usual dose of temozolomide (the standard chemo drug given to glioblastoma patients) killed as many cells as the full dose did in fed cells. Mice that fasted around chemo, and separately mice that fasted around radiation, survived longer than those on standard treatment alone. Seyfried describes this as fasting "sensitizing" the cancer to chemo: it shifts healthy cells into a protective, low-growth state that cancer cells can't enter because their growth signals are stuck on.
+The same fasting protocol can also improve chemo's effectiveness, although this has only been shown in animals. A [glioma-specific animal study](https://pmc.ncbi.nlm.nih.gov/articles/PMC3439413/) found that in starved glioma cells, a third of the usual dose of temozolomide (the standard chemo drug given to glioblastoma patients) killed as many cells as the full dose did in fed cells. Mice that fasted around chemo, and separately mice that fasted around radiation, survived longer than those on standard treatment alone. Seyfried describes this as "sensitizing" the cancer to chemo: it shifts healthy cells into a protective, low-growth state that cancer cells can't enter because their growth signals are stuck on.
 
 ### Management, Not Cure
 
