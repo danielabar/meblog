@@ -21,7 +21,7 @@
 
 .image {
   flex-shrink: 0;
-  width: 180px;
+  width: 208px;
   align-self: stretch;
   background: var(--line-soft);
   position: relative;
@@ -84,8 +84,10 @@
   color: var(--ink);
   margin: 2px 0 0;
   line-height: 1.3;
+  min-height: calc(2 * 1.3em); /* reserve 2 lines so short titles don't shift the excerpt below */
+  text-wrap: balance;
   display: -webkit-box;
-  -webkit-line-clamp: 1;
+  -webkit-line-clamp: 2;
   -webkit-box-orient: vertical;
   overflow: hidden;
   text-overflow: ellipsis;
@@ -97,6 +99,7 @@
   color: var(--ink-3);
   line-height: 1.5;
   margin: 0;
+  min-height: calc(2 * 1.5em); /* reserve 2 lines so a 1-line excerpt doesn't shrink the card */
   text-wrap: pretty;
   display: -webkit-box;
   -webkit-line-clamp: 2;
