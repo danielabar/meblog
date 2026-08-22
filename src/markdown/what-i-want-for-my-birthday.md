@@ -1,7 +1,7 @@
 ---
 title: "What I Want for My Birthday"
 featuredImage: "../images/birthday-nicolas-brulois-PvgV249iMFI-unsplash.jpg"
-description: "A caregiver's case for taking metabolic, mitochondrial-targeted therapy seriously in glioblastoma research and treatment."
+description: "If you're facing a cancer diagnosis, or caring for someone who is, cancer may have a metabolic root cause, and that could change how it's treated."
 date: "2026-09-01"
 category: "health"
 related:
