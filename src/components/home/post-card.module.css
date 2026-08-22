@@ -21,7 +21,7 @@
 
 .image {
   flex-shrink: 0;
-  width: 180px;
+  width: 208px;
   align-self: stretch;
   background: var(--line-soft);
   position: relative;
