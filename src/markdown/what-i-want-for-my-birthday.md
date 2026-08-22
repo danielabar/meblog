@@ -198,7 +198,7 @@ Circling back to my birthday ask. What I'm asking for is awareness. That patient
 
 **Wider access:** Trained clinicians who can run this safely, so it isn't limited to the patients resourceful enough to find their own way to it.
 
-The payoff isn't only measured in survival months. A patient who isn't nauseated, who feels better, can keep working, keep contributing, and keep dignity intact.
+The payoff isn't only measured in survival months; it's also quality of life. A patient who isn't nauseated, who feels good, can keep working, keep contributing, and keep their dignity intact.
 
 I think of my loved one, of the woman with breast cancer too afraid of what standard treatment would do to her, and of everyone sitting in a waiting room right now about to hear the same words we did. For all these people, their families, their caregivers, I hope more of us find out whether the metabolic approach to cancer can give us more of the only thing that matters. I would give up every birthday gift for the rest of my life to see this happen.
 
