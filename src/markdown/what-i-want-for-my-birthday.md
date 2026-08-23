@@ -135,6 +135,10 @@ This is not an argument against radiation or standard treatment. Seyfried raises
 
 Let's turn to the existing evidence for metabolic therapy. The human studies are small, mostly single-arm, and compared against historical benchmarks rather than randomized controls, so treat the survival numbers below as promising signal rather than proof:
 
+<aside class="markdown-aside">
+If you plan to read the studies below, it helps to know how research typically progresses: lab/cell studies (<code>in vitro</code>) and animal studies (<code>in vivo</code>) <a class="markdown-link" href="https://www.fda.gov/patients/drug-development-process/step-2-preclinical-research">come first</a>, followed by <a class="markdown-link" href="https://www.fda.gov/patients/drug-development-process/step-3-clinical-research">human trials</a>, Phase 1 through 4, each phase testing on more people with more confidence.
+</aside>
+
 [Clinical study (2025)](https://pmc.ncbi.nlm.nih.gov/articles/PMC11876051/): followed 18 newly diagnosed glioblastoma patients and compared those who stuck to a ketogenic diet beyond six months against those who did not, alongside standard treatment. The diet-adherent group had a three-year survival rate of 66.7 percent, versus 8.3 percent in the non-adherent group, a statistically significant difference. Adherent patients lived from 33 months to more than 84, while non-adherent patients died at around 15.7 months, close to the historical average. Patients chose whether to stick to the diet, so some of that gap could reflect that healthier or more motivated patients finding it easier to adhere. That confound is real, but a gap this large in three-year survival is worth further investigation.
 
 [Phase 1 safety trial (2025)](https://www.nature.com/articles/s41598-025-06675-6): tested a supervised ketogenic diet alongside standard chemoradiation in 17 newly diagnosed glioblastoma patients. The diet was safe, patients maintained ketosis, and median overall survival was 29.4 months, against a historical benchmark of ~15.
