@@ -20,9 +20,9 @@ Nothing in this post should be considered medical advice. I'm a software enginee
 
 ## A Year Ago
 
-To explain why I'm asking for something so specific, let me back up. A little over a year ago, someone I love suffered a [tonic-clonic seizure](https://www.mayoclinic.org/diseases-conditions/grand-mal-seizure/symptoms-causes/syc-20363458), lost consciousness, and was rushed to the emergency room. In a short span of time, we went from an ordinary life to hearing words I still have trouble writing down: glioblastoma, grade 4, the most aggressive kind of brain cancer there is.
+To explain why I'm asking for something so specific, let me back up. A little over a year ago, someone I love suffered a [seizure](https://www.mayoclinic.org/diseases-conditions/grand-mal-seizure/symptoms-causes/syc-20363458), lost consciousness, and was rushed to the emergency room. In a short span of time, we went from an ordinary life to hearing words I still have trouble writing down: glioblastoma, grade 4, the most aggressive kind of brain cancer there is.
 
-The prognosis handed to us was about 12 - 15 months with standard of care treatment. Some more grim numbers: Less than 30% of patients survive beyond 2 years, and only about 5% make it to the 5 year mark.
+The prognosis handed to us was about 12 - 15 months with standard of care treatment. Some more grim numbers: Less than 30% of patients survive beyond 2 years, and only about 5% make it to the 5 year mark. There is no cure.
 
 I have spent the year since as his caregiver. A grade 4 glioblastoma diagnosis is a particular kind of grief: someone you love is going to die in slow motion, as the tumour grows and presses in on the brain, preventing it from being able to perform functions we take for granted such as walking, talking, and eventually breathing.
 
@@ -51,7 +51,7 @@ He then walked through what led him to question this theory. If DNA mutations ar
 2. **The same cancer should be driven by the same mutations.** Instead, different patients with the same type of cancer often have different mutations from each other, and even different cells within a single patient's own tumor carry different mutations from one another.
 3. **Swapping the DNA of a cancer cell should determine whether it behaves like cancer.** A cell has two main compartments: the nucleus, which holds the DNA, and the cytoplasm surrounding it, which holds the mitochondria. In a series of [transfer experiments](https://pmc.ncbi.nlm.nih.gov/articles/PMC4493566/), researchers took the nucleus out of a cancer cell and put it into the cytoplasm of a normal cell with healthy mitochondria. If mutated DNA were really driving the cancer, that cancer nucleus should have kept the cell malignant. Instead, malignancy was suppressed. Then they ran the experiment in reverse: a normal, healthy nucleus placed into a cancer cell's cytoplasm. If DNA were the cause, a clean nucleus should have fixed the cell. Instead, the cell stayed malignant. Both results point the same way: whatever is driving the cancer travels with the cytoplasm and its mitochondria, not with the nucleus and its DNA.
 
-Another problem with the mutation theory is the money spent chasing it with relatively little to show. In December 1971, Richard Nixon signed the [National Cancer Act](https://www.cancer.gov/about-nci/overview/history/national-cancer-act-1971), aka the "war on cancer." Since the 1980s, a staggering sum has been spent on research. Despite this, Seyfried points out that U.S. cancer deaths [keep climbing each year](https://acsjournals.onlinelibrary.wiley.com/doi/full/10.3322/caac.70043), even as headlines tout one "breakthrough" after another. He attributes most of the reported decline in the death rate to 1990s smoking-cessation campaigns rather than treatment breakthroughs.
+Another problem with the mutation theory is the money spent chasing it with relatively little to show. In December 1971, Richard Nixon signed the [National Cancer Act](https://www.cancer.gov/about-nci/overview/history/national-cancer-act-1971), aka the "war on cancer." Since the 1980s, a staggering sum has been spent on research. Despite this, Seyfried points out that U.S. cancer deaths keep climbing each year, even as headlines tout one "breakthrough" after another. He attributes most of the [reported decline](https://acsjournals.onlinelibrary.wiley.com/doi/full/10.3322/caac.70043) in the death rate to 1990s smoking-cessation campaigns rather than treatment breakthroughs.
 
 <aside class="markdown-aside">
 No single figure captures total cancer research spend. NIH (U.S. National Institutes of Health) has put roughly <a class="markdown-link" href="https://officeofbudget.od.nih.gov/approp_hist.html">$178.5 billion</a> into the National Cancer Institute (NCI) since 1971 (not inflation adjusted), while the pharmaceutical industry worldwide spends more than <a class="markdown-link" href="https://pubmed.ncbi.nlm.nih.gov/39315831/">$80 billion a year</a> on oncology R&D. Globally, public and philanthropic funders put <a class="markdown-link" href="https://www.thelancet.com/journals/lanonc/article/PIIS1470-2045(23)00182-1/fulltext">$24.5 billion</a> into cancer research from 2016 to 2020.
@@ -91,19 +91,19 @@ Taken together, this diet + pulse + GKI monitoring protocol is referred to as *K
 
 ### Fasting Around Chemo
 
-KMT can also be used to reduce chemo side effects, through fasting timed around treatment, pushing the body into deeper ketosis. A [case series of 10 cancer patients](https://pmc.ncbi.nlm.nih.gov/articles/PMC2815756/) found nausea, vomiting, and fatigue were reduced on chemo cycles paired with a short fast.
+KMT can also be used to reduce chemo side effects, through fasting timed around treatment, pushing the body into deeper ketosis. A [case series](https://pmc.ncbi.nlm.nih.gov/articles/PMC2815756/) found nausea, vomiting, and fatigue were reduced on chemo cycles paired with a short fast.
 
-The same fasting protocol can also improve chemo's effectiveness, although this has only been shown in animals. A [glioma-specific animal study](https://pmc.ncbi.nlm.nih.gov/articles/PMC3439413/) found that in starved glioma cells, a third of the usual dose of temozolomide (the standard chemo drug given to glioblastoma patients) killed as many cells as the full dose did in fed cells. Mice that fasted around chemo, and separately mice that fasted around radiation, survived longer than those on standard treatment alone. Seyfried describes this as "sensitizing" the cancer to chemo: it shifts healthy cells into a protective, low-growth state that cancer cells can't enter because their growth signals are stuck on.
+The same fasting protocol can also improve chemo's effectiveness, although this has only been [studied in animals](https://pmc.ncbi.nlm.nih.gov/articles/PMC3439413/): starved glioma cells needed just a third of the usual dose of temozolomide (the standard chemo drug given to glioblastoma patients) to kill as many cells as the full dose did in fed cells. Mice that fasted around chemo, and separately mice that fasted around radiation, survived longer than those on standard treatment alone. Seyfried describes this as "sensitizing" the cancer to chemo: it shifts healthy cells into a protective, low-growth state that cancer cells can't enter because their growth signals are stuck on.
 
 ### Management, Not Cure
 
-KMT isn't a cure for glioblastoma (or cancer more generally), but a way to manage it. Seyfried recommends using KMT as an adjunct, to extend overall survival with a higher quality of life.
-
-What impressed me is these ideas did not come from a wellness influencer peddling supplements. They're from a cancer researcher, with decades of experience and peer-reviewed published research, discussing the exact disease we were facing.
+KMT isn't a cure for glioblastoma (or cancer more generally), but a way to manage it. Seyfried recommends using KMT as an adjunct, to extend overall survival and improve quality of life.
 
 <aside class="markdown-aside">
 The explanations above are simplified to fit a blog post. For a deeper dive, Seyfried's paper <a class="markdown-link" href="https://academic.oup.com/carcin/article/35/3/515/2463440">Cancer as a Metabolic Disease: Implications for Novel Therapeutics</a> lays out the full mechanism, and <a class="markdown-link" href="https://pmc.ncbi.nlm.nih.gov/articles/PMC8467939/">this review</a> is a good starting point for how the metabolic and genetic theories stack up against each other.
 </aside>
+
+What impressed me is these ideas did not come from a wellness influencer peddling supplements. They're from a cancer researcher, with decades of experience and peer-reviewed published research, discussing the exact disease we were facing.
 
 ## Looking for a Clinician
 
@@ -115,7 +115,7 @@ From our searching in Canada, we couldn't find KMT being offered alongside stand
 
 ## Standard of Care
 
-No clinician offering KMT meant falling back on standard treatment alone. For glioblastoma this means surgery to remove what can be removed, radiation given together with chemotherapy, then chemotherapy alone for months after. The problem is none of these eliminate the cancer, and it always comes back, more aggressive than when it started. When it does, Avastin (bevacizumab), sometimes combined with a stronger chemo drug, can [ease symptoms but doesn't extend survival](https://www.nejm.org/doi/full/10.1056/NEJMoa1707358).
+No clinician offering KMT meant falling back on standard treatment alone. For glioblastoma this is surgery to remove what can be removed, radiation given together with chemotherapy, then chemotherapy alone for months after. The problem is none of these eliminate the cancer, and it always comes back, more aggressive than when it started. When it does, Avastin (bevacizumab), sometimes combined with another chemo drug, can [ease symptoms](https://www.nejm.org/doi/full/10.1056/NEJMoa1707358), but doesn't extend survival.
 
 The treatment itself carries risk. Months after finishing radiation, my LO suffered a seizure so severe that he nearly stopped breathing. If not for the speed of the paramedics and the emergency team who got him intubated and into intensive care, he might not have survived. Further imaging revealed that radiation-induced inflammation had irritated the blood-brain barrier, triggering the seizure. He was also left with expressive aphasia (difficulty with word finding and communication), as a result of the seizure occurring near the part of the brain responsible for language.
 
@@ -123,19 +123,19 @@ The treatment itself carries risk. Months after finishing radiation, my LO suffe
 
 I keep thinking about someone else, a woman I knew who was diagnosed with breast cancer. She was so afraid of the treatment that she put it off. She has since passed away.
 
-Imagine if part of standard care had been a way to make that treatment more bearable and more effective: guidance on KMT to reduce the side effects and improve the results. She might have been able to face the treatment. She might still be here.
+Imagine if part of standard care had been a way to make that treatment more bearable: guidance on KMT to reduce the side effects and maybe even improve the results. She might have been able to face the treatment. She might still be here.
 
 She didn't die because there was no treatment. She died because the side effects were frightening enough that she chose to avoid it altogether.
 
 <aside class="markdown-aside">
-This is not an argument against radiation or standard treatment. Seyfried raises a separate, more speculative point: <a class="markdown-link" href="https://pmc.ncbi.nlm.nih.gov/articles/PMC8585920/">animal research</a> suggests irradiated brain tissue becomes a more favorable environment for tumor regrowth, which may help explain why glioblastoma recurrences after radiation often come back more aggressive. From this he argues there's a case for human trials comparing KMT plus low-dose chemo against standard chemo + radiation. That remains an open question, which would be useful to have answered so patients and doctors could weigh radiation's tradeoffs in brain cancer.
+This is not an argument against radiation or standard treatment. Seyfried raises a separate, more speculative point: <a class="markdown-link" href="https://pmc.ncbi.nlm.nih.gov/articles/PMC8585920/">animal research</a> suggests irradiated brain tissue becomes a more favorable environment for tumor regrowth, which may explain why glioblastoma recurrences after radiation are more aggressive. From this he argues there's a case for human trials comparing KMT plus low-dose chemo against standard chemo + radiation. That remains an open question, which would be useful to have answered to weigh radiation's tradeoffs in brain cancer.
 </aside>
 
 ## Evidence for KMT
 
-Let's turn to the existing evidence for metabolic therapy. The human studies are small, mostly single-arm, and compared against historical benchmarks rather than randomized controls, so treat the survival numbers below as promising signal, not proof:
+Let's turn to the existing evidence for metabolic therapy. The human studies are small, mostly single-arm, and compared against historical benchmarks rather than randomized controls, so treat the survival numbers below as promising signal rather than proof:
 
-[Clinical study (2025)](https://pmc.ncbi.nlm.nih.gov/articles/PMC11876051/): followed 18 newly diagnosed glioblastoma patients and compared those who stuck to a ketogenic diet beyond six months against those who did not, alongside standard treatment. The diet-adherent group had a three-year survival rate of 66.7 percent, versus 8.3 percent in the non-adherent group, a statistically significant difference. Adherent patients lived from 33 months to more than 84, while non-adherent patients died at around 15.7 months, close to the historical average. Patients chose whether to stick to the diet, so some of that gap could reflect that healthier or more motivated patients find it easier to adhere. That confound is real, but a gap this large in three-year survival is worth further investigation.
+[Clinical study (2025)](https://pmc.ncbi.nlm.nih.gov/articles/PMC11876051/): followed 18 newly diagnosed glioblastoma patients and compared those who stuck to a ketogenic diet beyond six months against those who did not, alongside standard treatment. The diet-adherent group had a three-year survival rate of 66.7 percent, versus 8.3 percent in the non-adherent group, a statistically significant difference. Adherent patients lived from 33 months to more than 84, while non-adherent patients died at around 15.7 months, close to the historical average. Patients chose whether to stick to the diet, so some of that gap could reflect that healthier or more motivated patients finding it easier to adhere. That confound is real, but a gap this large in three-year survival is worth further investigation.
 
 [Phase 1 safety trial (2025)](https://www.nature.com/articles/s41598-025-06675-6): tested a supervised ketogenic diet alongside standard chemoradiation in 17 newly diagnosed glioblastoma patients. The diet was safe, patients maintained ketosis, and median overall survival was 29.4 months, against a historical benchmark of roughly 15.
 
