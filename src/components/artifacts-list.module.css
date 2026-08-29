@@ -1,0 +1,23 @@
+.container {
+  margin-bottom: 40px;
+}
+
+.header {
+  font-size: 34px;
+  font-weight: 500;
+  letter-spacing: -0.5px;
+  line-height: 2.5rem;
+  margin: 0 0 15px;
+  opacity: 0.8;
+}
+
+.artifactsContainer {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.artifactLink {
+  font-size: 18px;
+  font-weight: 500;
+}

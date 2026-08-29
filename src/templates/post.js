@@ -6,6 +6,7 @@ import SEO from "../components/SEO"
 import Layout from "../components/layout"
 import AllLink from "../components/all-link"
 import RelatedPosts from "../components/related-posts"
+import ArtifactsList from "../components/artifacts-list"
 import * as styles from "./post.module.css"
 import "@fontsource/fira-code"
 
@@ -36,6 +37,10 @@ const Post = props => {
       <div className={styles.container}>
         <div className={styles.wrapper}>
           <main className={styles.main}>
+            <ArtifactsList
+              postSlug={slug}
+              artifacts={markdown.frontmatter.artifacts}
+            />
             <h1 className={styles.title}>{title}</h1>
             <div className={styles.published}>
               Published {publishedDate} &middot; {timeToRead} min read
@@ -80,6 +85,10 @@ export const query = graphql`
         title
         date(formatString: "DD MMM YYYY")
         description
+        artifacts {
+          slug
+          title
+        }
         featuredImage {
           childImageSharp {
             gatsbyImageData(width: 900, layout: CONSTRAINED)
