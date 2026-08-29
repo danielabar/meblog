@@ -14,7 +14,7 @@ const ArtifactsList = ({ postSlug, artifacts }) => {
         {artifacts.map(artifact => (
           <Link
             key={artifact.slug}
-            to={`${postSlug}/${artifact.slug}`}
+            to={`${postSlug.replace(/\/$/, "")}/${artifact.slug}`}
             className={styles.artifactLink}
           >
             {artifact.title}

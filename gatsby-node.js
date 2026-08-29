@@ -98,6 +98,7 @@ exports.createPages = ({ graphql, actions }) => {
 
         // build artifact pages owned by this post
         const artifacts = node.frontmatter.artifacts || []
+        const postSlugTrimmed = node.fields.slug.replace(/\/$/, "")
         artifacts.forEach(artifact => {
           const staticFilePath = path.join("static", "artifacts", artifact.file)
           if (!fs.existsSync(staticFilePath)) {
@@ -106,10 +107,10 @@ exports.createPages = ({ graphql, actions }) => {
             )
           }
           createPage({
-            path: `${node.fields.slug}/${artifact.slug}`,
+            path: `${postSlugTrimmed}/${artifact.slug}`,
             component: path.resolve("./src/templates/artifact.js"),
             context: {
-              slug: `${node.fields.slug}/${artifact.slug}`,
+              slug: `${postSlugTrimmed}/${artifact.slug}`,
               title: artifact.title,
               file: artifact.file,
               creditText: artifact.creditText,
