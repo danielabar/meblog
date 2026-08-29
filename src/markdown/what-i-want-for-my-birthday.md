@@ -10,7 +10,7 @@ related:
   - "Building an AI Blog Editor with Claude Skills"
 artifacts:
   - slug: "metabolic-theory-eli5"
-    title: "Cancer's Power Plants: The Metabolic Theory, Explained Simply"
+    title: "The Metabolic Theory of Cancer"
     file: "metabolic-theory-eli5.html"
     creditText: "eli5 skill"
     creditUrl: "https://github.com/anthropics/claude-plugins-community/tree/main/eli5"

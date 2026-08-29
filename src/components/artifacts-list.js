@@ -13,7 +13,7 @@ const ArtifactsList = ({ postSlug, artifacts }) => {
       className={styles.container}
       data-testid="artifacts-list"
     >
-      <h2 className={styles.header}>Visual Explainers</h2>
+      <p className={styles.eyebrow}>Visual Explainers</p>
       <div className={styles.artifactsContainer}>
         {artifacts.map(artifact => (
           <Link
@@ -21,7 +21,21 @@ const ArtifactsList = ({ postSlug, artifacts }) => {
             to={`${postSlug.replace(/\/$/, "")}/${artifact.slug}`}
             className={styles.artifactLink}
           >
+            <svg
+              className={styles.artifactIcon}
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              strokeWidth="1.8"
+              aria-hidden="true"
+            >
+              <rect x="3" y="4" width="18" height="14" rx="2" />
+              <path d="M8 21h8M12 18v3" />
+            </svg>
             {artifact.title}
+            <span className={styles.artifactArrow} aria-hidden="true">
+              &rarr;
+            </span>
           </Link>
         ))}
       </div>

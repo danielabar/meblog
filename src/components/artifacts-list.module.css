@@ -1,14 +1,16 @@
 .container {
-  margin-bottom: 40px;
+  margin: 44px 0 40px;
+  padding-top: 32px;
+  border-top: 1px solid var(--line);
 }
 
-.header {
-  font-size: 34px;
-  font-weight: 500;
-  letter-spacing: -0.5px;
-  line-height: 2.5rem;
-  margin: 0 0 15px;
-  opacity: 0.8;
+.eyebrow {
+  font-size: 12px;
+  font-weight: 600;
+  letter-spacing: 1.5px;
+  text-transform: uppercase;
+  color: var(--brand-saturate-60);
+  margin: 0 0 14px;
 }
 
 .artifactsContainer {
@@ -18,6 +20,33 @@
 }
 
 .artifactLink {
-  font-size: 18px;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 14px 16px;
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  font-size: 16px;
   font-weight: 500;
+  color: var(--ink);
+  text-decoration: none;
+  transition: border-color 0.2s ease, background 0.2s ease;
+}
+
+.artifactLink:hover {
+  border-color: var(--brand-lighten-40);
+  background: var(--brand-lighten-55);
+}
+
+.artifactIcon {
+  width: 20px;
+  height: 20px;
+  flex-shrink: 0;
+  color: var(--brand-saturate-60);
+}
+
+.artifactArrow {
+  margin-left: auto;
+  opacity: 0.4;
+  font-weight: 400;
 }
