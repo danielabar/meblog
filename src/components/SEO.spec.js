@@ -230,4 +230,22 @@ describe("SEO", () => {
       ])
     )
   })
+
+  it("adds a noindex meta tag when noindex is true", () => {
+    render(<SEO title="Artifact" pathname="/blog/article-slug/artifact-slug" track="NO" noindex={true} />)
+
+    const helmet = Helmet.peek()
+    expect(helmet.metaTags).toEqual(
+      expect.arrayContaining([{ content: "noindex", name: "robots" }])
+    )
+  })
+
+  it("omits the robots meta tag by default", () => {
+    render(<SEO title="Home" pathname="/" track="NO" />)
+
+    const helmet = Helmet.peek()
+    expect(helmet.metaTags).toEqual(
+      expect.not.arrayContaining([{ content: "noindex", name: "robots" }])
+    )
+  })
 })
