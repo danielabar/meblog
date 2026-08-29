@@ -60,6 +60,13 @@ exports.createPages = ({ graphql, actions }) => {
                 date(formatString: "YYYY-MM-DD")
                 description
                 related
+                artifacts {
+                  slug
+                  title
+                  file
+                  creditText
+                  creditUrl
+                }
               }
               fields {
                 slug
@@ -87,6 +94,30 @@ exports.createPages = ({ graphql, actions }) => {
             slug: node.fields.slug,
             relatedPosts: node.frontmatter.related,
           },
+        })
+
+        // build artifact pages owned by this post
+        const artifacts = node.frontmatter.artifacts || []
+        artifacts.forEach(artifact => {
+          const staticFilePath = path.join("static", "artifacts", artifact.file)
+          if (!fs.existsSync(staticFilePath)) {
+            throw new Error(
+              `Artifact file not found: ${staticFilePath} (referenced from ${node.fields.slug})`
+            )
+          }
+          createPage({
+            path: `${node.fields.slug}/${artifact.slug}`,
+            component: path.resolve("./src/templates/artifact.js"),
+            context: {
+              slug: `${node.fields.slug}/${artifact.slug}`,
+              title: artifact.title,
+              file: artifact.file,
+              creditText: artifact.creditText,
+              creditUrl: artifact.creditUrl,
+              postSlug: node.fields.slug,
+              postTitle: node.frontmatter.title,
+            },
+          })
         })
 
         // generate search insert statements for postgres full text search service
