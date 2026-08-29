@@ -5,7 +5,14 @@ import Layout from "../components/layout"
 import * as styles from "./artifact.module.css"
 
 const Artifact = ({ pageContext }) => {
-  const { title, file, creditText, creditUrl, postSlug, postTitle } = pageContext
+  const {
+    title,
+    file,
+    creditText,
+    creditUrl,
+    postSlug,
+    postTitle,
+  } = pageContext
 
   return (
     <Layout>
