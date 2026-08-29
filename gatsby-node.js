@@ -12,6 +12,18 @@ exports.createSchemaCustomization = ({ actions }) => {
       slug: String!
       post: MarkdownRemark @link(by: "fields.slug", from: "slug")
     }
+
+    type MarkdownRemarkFrontmatterArtifact {
+      slug: String!
+      title: String!
+      file: String!
+      creditText: String
+      creditUrl: String
+    }
+
+    type MarkdownRemarkFrontmatter {
+      artifacts: [MarkdownRemarkFrontmatterArtifact]
+    }
   `)
 }
 
