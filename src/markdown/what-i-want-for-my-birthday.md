@@ -8,6 +8,12 @@ related:
   - "Off the Chart: Candid Conversations in Health Care"
   - "Building a No Frills Meditation App"
   - "Building an AI Blog Editor with Claude Skills"
+artifacts:
+  - slug: "metabolic-theory-eli5"
+    title: "Cancer's Power Plants: The Metabolic Theory, Explained Simply"
+    file: "metabolic-theory-eli5.html"
+    creditText: "eli5 skill"
+    creditUrl: "https://github.com/anthropics/claude-plugins-community/tree/main/eli5"
 ---
 
 Taking a break from my usual tech/programming topics to cover something far more difficult. I recently celebrated a birthday, and with it came the usual question: What do you want for your birthday? This year, given everything that's happened, the answer wasn't something that could be wrapped.
