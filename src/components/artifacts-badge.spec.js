@@ -7,7 +7,9 @@ import ArtifactsBadge from "./artifacts-badge"
 describe("ArtifactsBadge", () => {
   it("Renders singular label and anchor link for one artifact", () => {
     render(<ArtifactsBadge artifacts={[{ slug: "x", title: "X" }]} />)
-    const link = screen.getByRole("link", { name: /Visual explainer available/ })
+    const link = screen.getByRole("link", {
+      name: /Visual explainer available/,
+    })
     expect(link).toHaveAttribute("href", "#visual-explainers")
   })
 
