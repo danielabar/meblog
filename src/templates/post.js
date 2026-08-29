@@ -37,10 +37,6 @@ const Post = props => {
       <div className={styles.container}>
         <div className={styles.wrapper}>
           <main className={styles.main}>
-            <ArtifactsList
-              postSlug={slug}
-              artifacts={markdown.frontmatter.artifacts}
-            />
             <h1 className={styles.title}>{title}</h1>
             <div className={styles.published}>
               Published {publishedDate} &middot; {timeToRead} min read
@@ -62,6 +58,10 @@ const Post = props => {
             />
           </div>
         </div>
+        <ArtifactsList
+          postSlug={slug}
+          artifacts={markdown.frontmatter.artifacts}
+        />
         <RelatedPosts related={related} />
         <AllLink marginTop="60px" />
       </div>

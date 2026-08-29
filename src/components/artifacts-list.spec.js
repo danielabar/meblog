@@ -21,6 +21,21 @@ describe("ArtifactsList", () => {
     )
   })
 
+  it("Renders with an id for anchor linking", () => {
+    render(
+      <ArtifactsList
+        postSlug="/blog/what-i-want-for-my-birthday"
+        artifacts={[
+          { slug: "metabolic-theory-eli5", title: "Cancer's Power Plants" },
+        ]}
+      />
+    )
+    expect(screen.getByTestId("artifacts-list")).toHaveAttribute(
+      "id",
+      "visual-explainers"
+    )
+  })
+
   it("Renders nothing when there are no artifacts", () => {
     render(<ArtifactsList postSlug="/blog/some-post" artifacts={[]} />)
     expect(screen.queryByTestId("artifacts-list")).not.toBeInTheDocument()

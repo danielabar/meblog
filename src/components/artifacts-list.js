@@ -8,7 +8,11 @@ const ArtifactsList = ({ postSlug, artifacts }) => {
   }
 
   return (
-    <section className={styles.container} data-testid="artifacts-list">
+    <section
+      id="visual-explainers"
+      className={styles.container}
+      data-testid="artifacts-list"
+    >
       <h2 className={styles.header}>Visual Explainers</h2>
       <div className={styles.artifactsContainer}>
         {artifacts.map(artifact => (
