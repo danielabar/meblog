@@ -13,11 +13,12 @@
 .credit {
   margin-bottom: 16px;
   font-size: 0.9em;
-  color: var(--brand-grey-medium);
+  color: var(--base-font-color);
+  opacity: 0.7;
 }
 
 .creditLink {
-  color: inherit;
+  color: var(--link-color);
   text-decoration: underline;
 }
 
