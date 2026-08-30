@@ -100,6 +100,9 @@ module.exports = {
             },
           },
           {
+            resolve: `gatsby-remark-artifact-embed`,
+          },
+          {
             resolve: `gatsby-plugin-feed`,
             options: {
               query: `

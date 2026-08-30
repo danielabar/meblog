@@ -166,3 +166,50 @@
   cursor: default;
   margin-bottom: 15px;
 }
+
+.markdown-artifact-card {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin: 20px 0;
+  padding: 11px 16px;
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  font-size: 16px;
+  font-weight: 500;
+  line-height: 1.3;
+  color: var(--ink);
+  text-decoration: none;
+  transition: border-color 0.2s ease, background 0.2s ease;
+}
+
+.markdown-artifact-card:hover {
+  border-color: var(--brand-lighten-40);
+  background: var(--brand-lighten-55);
+}
+
+.markdown-artifact-icon {
+  width: 20px;
+  height: 20px;
+  flex-shrink: 0;
+  color: var(--brand-saturate-60);
+}
+
+.markdown-artifact-body {
+  display: flex;
+  flex-direction: column;
+  gap: 1px;
+}
+
+.markdown-artifact-subtitle {
+  font-size: 12.5px;
+  font-weight: 400;
+  color: var(--ink-4);
+}
+
+.markdown-artifact-arrow {
+  margin-left: auto;
+  align-self: center;
+  opacity: 0.4;
+  font-weight: 400;
+}

@@ -85,6 +85,8 @@ German biochemist Otto Warburg first documented <a class="markdown-link" href="h
 
 Understanding what's driving cancer matters because it changes where treatment should be aimed. If genetic mutations are downstream of a metabolic problem, that explains why targeting them hasn't moved survival numbers much, and points to targeting cancer metabolism.
 
+<!-- artifact: metabolic-theory-eli5 -->
+
 ### Ketogenic Metabolic Therapy
 
 It follows that depriving the cancer of the fuel it depends on most could be an effective way to slow it down. Cancer cells prefer glucose. Healthy cells, unlike cancer cells, can run efficiently on ketones, the fuel the body produces from fat when carbohydrate intake is low. Get the body into ketosis, burning fat for fuel instead of glucose, and you shift the fuel supply in a direction cancer cells can't use, but healthy cells can. For brain cancer, this is crucial because ketones can cross the blood-brain barrier, so the brain stays fuelled while the tumor is deprived.
