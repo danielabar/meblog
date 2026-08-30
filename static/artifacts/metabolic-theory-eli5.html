@@ -52,7 +52,7 @@
     background: var(--accent); color: #17120c; font-weight: 700; font-size: 0.9rem;
     flex-shrink: 0;
   }
-  .figure { display: flex; justify-content: center; margin: 16px 0; }
+  .figure { display: flex; justify-content: center; margin: 16px 0 8px; }
   .figure svg { max-width: 100%; height: auto; }
   p.caption {
     text-align: center; color: var(--muted); font-size: 0.95rem; margin: 4px 0 0;
@@ -88,9 +88,8 @@
 <div class="wrap">
 
 <header>
-  <div class="badge">A caregiver's simple explainer, not medical advice</div>
   <h1>Cancer's Power Plants</h1>
-  <p>One scientist's theory: cancer might start with broken energy factories inside cells, not broken DNA.</p>
+  <p>Theory: cancer might start with broken energy factories inside cells, not broken DNA.</p>
 </header>
 
 <section class="panel">
@@ -123,7 +122,7 @@
           <circle cx="70" cy="70" r="14" fill="#5bd0a0"/>
           <circle cx="130" cy="70" r="14" fill="#5bd0a0"/>
           <path d="M70 70 L130 70" stroke="#eef2fb" stroke-width="2" stroke-dasharray="4 3"/>
-          <text x="100" y="30" text-anchor="middle" fill="#5bd0a0" font-size="12" font-weight="700">+ oxygen</text>
+          <text x="100" y="38" text-anchor="middle" fill="#5bd0a0" font-size="12" font-weight="700">+ oxygen</text>
         </svg>
       </div>
       <h3 class="tag-good">Clean way (respiration)</h3>
@@ -135,7 +134,7 @@
           <rect x="20" y="20" width="160" height="100" rx="14" fill="#1d2740" stroke="#ff6b6b" stroke-width="2"/>
           <circle cx="70" cy="70" r="14" fill="#ff6b6b"/>
           <circle cx="130" cy="70" r="14" fill="#ff6b6b"/>
-          <text x="100" y="30" text-anchor="middle" fill="#ff6b6b" font-size="12" font-weight="700">no oxygen needed</text>
+          <text x="100" y="38" text-anchor="middle" fill="#ff6b6b" font-size="12" font-weight="700">no oxygen needed</text>
         </svg>
       </div>
       <h3 class="tag-bad">Ancient backup (fermentation)</h3>
@@ -300,7 +299,7 @@
       <div class="figure">
         <svg width="180" height="130" viewBox="0 0 180 130">
           <rect x="20" y="20" width="140" height="70" rx="12" fill="#243052" stroke="#3a4a78" stroke-width="2"/>
-          <text x="90" y="60" text-anchor="middle" fill="#ff8a5b" font-size="30">&#127853;</text>
+          <text x="90" y="55" text-anchor="middle" dominant-baseline="central" fill="#ff8a5b" font-size="30">&#127853;</text>
         </svg>
       </div>
       <h3 class="tag-bad">Cancer cells</h3>
@@ -310,7 +309,7 @@
       <div class="figure">
         <svg width="180" height="130" viewBox="0 0 180 130">
           <rect x="20" y="20" width="140" height="70" rx="12" fill="#243052" stroke="#3a4a78" stroke-width="2"/>
-          <text x="90" y="60" text-anchor="middle" fill="#5bd0a0" font-size="30">&#129361;</text>
+          <text x="90" y="55" text-anchor="middle" dominant-baseline="central" fill="#5bd0a0" font-size="30">&#129361;</text>
         </svg>
       </div>
       <h3 class="tag-good">Healthy cells</h3>
@@ -326,11 +325,11 @@
 <section class="panel">
   <h2><span class="step-num">8</span> The catch: a backup fuel</h2>
   <div class="figure">
-    <svg width="300" height="140" viewBox="0 0 300 140">
-      <circle cx="150" cy="70" r="55" fill="#243052" stroke="#ff6b6b" stroke-width="3"/>
+    <svg width="300" height="160" viewBox="0 0 300 160">
+      <circle cx="150" cy="60" r="48" fill="#243052" stroke="#ff6b6b" stroke-width="3"/>
       <text x="150" y="55" text-anchor="middle" fill="#eef2fb" font-size="13" font-weight="700">tumor</text>
-      <text x="150" y="80" text-anchor="middle" fill="#9aa7c2" font-size="11">no sugar left...</text>
-      <text x="150" y="98" text-anchor="middle" fill="#ff8a5b" font-size="12" font-weight="700">eats glutamine instead</text>
+      <text x="150" y="75" text-anchor="middle" fill="#9aa7c2" font-size="11">no sugar left...</text>
+      <text x="150" y="140" text-anchor="middle" fill="#ff8a5b" font-size="12" font-weight="700">eats glutamine instead</text>
     </svg>
   </div>
   <p style="text-align:center; color: var(--muted);">
@@ -356,7 +355,7 @@
 </section>
 
 <footer>
-  Based on the research and papers cited in "What I Want for My Birthday" &mdash; a personal blog post about caregiving through a glioblastoma diagnosis.
+  Based on the research and papers cited in "What I Want for My Birthday".
 </footer>
 
 </div>
