@@ -230,22 +230,37 @@ To add one:
    ```
 
 This automatically creates a page at
-`/blog/<post-slug>/<artifact-slug>/` and adds it to a "Visual Explainers"
-list rendered near the top of the post. No further action is needed for
-it to be linked and discoverable.
+`/blog/<post-slug>/<artifact-slug>/`, but nothing links to it until you
+place a card for it in the post body (below). There is no automatic
+top-of-post list.
 
-**Linking to it inline from within the post body** (in addition to, not
-instead of, the automatic top-of-post list):
+**Placing a link card at a specific point in the post** (the normal way
+to surface an artifact): drop a marker comment where you want the card to
+appear, referencing the `slug` from that post's `artifacts` frontmatter:
 
-**From regular markdown**, relative to the post (note `./`, not `../`,
+```markdown
+<!-- artifact: metabolic-theory-eli5 -->
+```
+
+This is handled by the local remark plugin at
+`plugins/gatsby-remark-artifact-embed/`, which swaps the marker for a
+link card (icon, title, "Simplified visual explainer" subtitle, arrow)
+pointing at the artifact's page. Place it wherever in the post the
+content it explains has just been covered, not necessarily near the top.
+The build fails if the slug isn't declared in that post's `artifacts`
+frontmatter, so a typo or a stale slug (e.g. after a rename) is caught at
+build time rather than shipping a broken link.
+
+**Linking to it inline as plain text instead of a card** (e.g. mid-sentence,
+or from inside an `<aside>`), relative to the post (note `./`, not `../`,
 since the artifact page is nested one level under the post's own URL):
 
 ```markdown
 For a visual walkthrough, see [this explainer](./metabolic-theory-eli5).
 ```
 
-**From inside an `<aside>`** (which uses raw HTML, not markdown syntax,
-per the "Markdown Asides" section above), use `<a class="markdown-link">`
+From inside an `<aside>` (which uses raw HTML, not markdown syntax, per
+the "Markdown Asides" section above), use `<a class="markdown-link">`
 with the same relative path:
 
 ```html
