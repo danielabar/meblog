@@ -6,8 +6,6 @@ import SEO from "../components/SEO"
 import Layout from "../components/layout"
 import AllLink from "../components/all-link"
 import RelatedPosts from "../components/related-posts"
-import ArtifactsList from "../components/artifacts-list"
-import ArtifactsBadge from "../components/artifacts-badge"
 import * as styles from "./post.module.css"
 import "@fontsource/fira-code"
 
@@ -42,7 +40,6 @@ const Post = props => {
             <div className={styles.published}>
               Published {publishedDate} &middot; {timeToRead} min read
             </div>
-            <ArtifactsBadge artifacts={markdown.frontmatter.artifacts} />
             <GatsbyImage
               image={featuredImgFluid}
               className={styles.featureImage}
@@ -60,10 +57,6 @@ const Post = props => {
             />
           </div>
         </div>
-        <ArtifactsList
-          postSlug={slug}
-          artifacts={markdown.frontmatter.artifacts}
-        />
         <RelatedPosts related={related} />
         <AllLink marginTop="60px" />
       </div>
@@ -87,10 +80,6 @@ export const query = graphql`
         title
         date(formatString: "DD MMM YYYY")
         description
-        artifacts {
-          slug
-          title
-        }
         featuredImage {
           childImageSharp {
             gatsbyImageData(width: 900, layout: CONSTRAINED)

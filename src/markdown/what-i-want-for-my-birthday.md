@@ -85,8 +85,6 @@ German biochemist Otto Warburg first documented <a class="markdown-link" href="h
 
 Understanding what's driving cancer matters because it changes where treatment should be aimed. If genetic mutations are downstream of a metabolic problem, that explains why targeting them hasn't moved survival numbers much, and points to targeting cancer metabolism.
 
-<!-- artifact: metabolic-theory-eli5 -->
-
 ### Ketogenic Metabolic Therapy
 
 It follows that depriving the cancer of the fuel it depends on most could be an effective way to slow it down. Cancer cells prefer glucose. Healthy cells, unlike cancer cells, can run efficiently on ketones, the fuel the body produces from fat when carbohydrate intake is low. Get the body into ketosis, burning fat for fuel instead of glucose, and you shift the fuel supply in a direction cancer cells can't use, but healthy cells can. For brain cancer, this is crucial because ketones can cross the blood-brain barrier, so the brain stays fuelled while the tumor is deprived.
@@ -96,6 +94,8 @@ Getting into ketosis for cancer management requires following a calorie-restrict
 Diet alone isn't enough, because cancer has a backup fuel: glutamine, the most abundant amino acid in the body. You can't diet your way out of glutamine availability, since eliminating it would mean eliminating nearly all protein, which the body needs, and even then the body manufactures its own supply. That's the basis for a combined strategy Seyfried calls [press-pulse](https://link.springer.com/article/10.1186/s12986-017-0178-2): a sustained "press" on tumor metabolism through diet, paired with periodic "pulses" of drugs or procedures that intensify the stress on the cancer.
 
 Taken together, this diet + pulse + GKI monitoring protocol is referred to as *Ketogenic Metabolic Therapy* (KMT).
+
+<!-- artifact: metabolic-theory-eli5 -->
 
 ### Fasting Around Chemo
 
