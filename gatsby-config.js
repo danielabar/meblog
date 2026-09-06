@@ -21,7 +21,12 @@ module.exports = {
     "gatsby-transformer-sharp",
     "gatsby-transformer-remark",
     "gatsby-plugin-react-helmet",
-    "gatsby-plugin-sitemap",
+    {
+      resolve: "gatsby-plugin-sitemap",
+      options: {
+        excludes: ["/blog/*/*"],
+      },
+    },
     "gatsby-plugin-workerize-loader",
     "gatsby-transformer-csv",
     {
