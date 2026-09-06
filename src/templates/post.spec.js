@@ -24,6 +24,7 @@ describe("Post", () => {
           date: "14 Aug 2021",
           description: "This is a description",
           title: "This is the title",
+          artifacts: [],
           featuredImage: {
             childImageSharp: {
               gatsbyImageData: {

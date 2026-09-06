@@ -1,0 +1,6 @@
+{
+  "name": "gatsby-remark-artifact-embed",
+  "version": "1.0.0",
+  "description": "Local remark plugin: replace an <!-- artifact: slug --> marker in markdown with a link card to that post's artifact subpage",
+  "main": "index.js"
+}
