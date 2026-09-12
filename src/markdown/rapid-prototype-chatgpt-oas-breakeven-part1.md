@@ -8,6 +8,12 @@ related:
   - "Promotional interest rates and the fine print"
   - "Saving on monthly expenses - A Cautionary Tale"
   - "Build and Publish a Presentation with RevealJS and Github"
+artifacts:
+  - slug: "oas-breakeven-age-eli5"
+    title: "Claim Now, or Wait? The OAS Breakeven Age"
+    file: "oas-breakeven-age-eli5.html"
+    creditText: "eli5 skill"
+    creditUrl: "https://github.com/anthropics/claude-plugins-community/tree/main/eli5"
 ---
 
 When building software, it's crucial to determine if you're on the right track before investing significant effort in selecting the language to build in, framework, architecture, automated testing, and setting up CI/CD pipelines. Rapid prototyping allows you to quickly reach valuable insights and validate your approach.
@@ -83,7 +89,7 @@ It was at this point I realized I would have to take more technical control over
 
 I ran some manual calculations, assuming the simplest case: Someone who is eligible for a full OAS pension at 65, and not eligible for GIS. For 2024, they would receive a monthly OAS amount of $713.34 if starting at age 65. This means by the time they turn 66, they would have received a total of $713.34 * 12 = $8,560.08, i.e. 12 monthly payments. And by age 67, they would have a total of $713.34 * 12 * 2 = $17,120.16, i.e. 12 monthly payments per year at 2 years. By age 70, this person would have accumulated 5 years worth of payments which is 60 months for a total of $713.34 * 12 * 5 = $42,800.40. And so on, for each year the person is still alive and collecting OAS.
 
-On the other hand, waiting until age 70 would increase the monthly payment by 36%, i.e. 0.06% for each month delay, so 5 years of delay === 60 months, and 60 * 0.6% = 36%. So that 713.34 monthly payment would turn into: $713.34 * 1.36 = $970.14. By the time this person turns 71, they would have a total of $970.14 * 12 = $11,641.68. While this sounds like an impressive amount more than the $8,560.08 amount they would have had in one year if starting at 65, they're missing out on the $42,800.40 they could have had by starting at age 65.
+On the other hand, waiting until age 70 would increase the monthly payment by 36%, i.e. 0.6% for each month delay, so 5 years of delay === 60 months, and 60 * 0.6% = 36%. So that 713.34 monthly payment would turn into: $713.34 * 1.36 = $970.14. By the time this person turns 71, they would have a total of $970.14 * 12 = $11,641.68. While this sounds like an impressive amount more than the $8,560.08 amount they would have had in one year if starting at 65, they're missing out on the $42,800.40 they could have had by starting at age 65.
 
 <aside class="markdown-aside">
 To keep things simple, I'm ignoring annual inflation adjustments and comparing everything in today's dollars.
@@ -124,6 +130,8 @@ Here are the results - I've highlighted age 84, explanation to follow:
 The amounts represent the *total* OAS accumulated. Even though starting at age 70 results in a higher monthly payment compared to starting at age 65, the table above shows that the *total* OAS accumulated is less up until age 84, when it starts to pull ahead. In other words, someone would have to live until at least age 84 to have a greater total amount. And even then, it's only a few hundred dollars.
 
 Given that according to Statistics Canada data [combined life expectancy](https://www150.statcan.gc.ca/t1/tbl1/en/tv.action?pid=1310011401&pickMembers%5B0%5D=1.1&pickMembers%5B1%5D=3.1&pickMembers%5B2%5D=4.8&cubeTimeFrame.startYear=2020+%2F+2022&cubeTimeFrame.endYear=2020+%2F+2022&referencePeriods=20200101%2C20200101) (for men and women that have reached age 65) for 2022 is ~85, you can start to see that it may not make sense for some people to delay OAS to age 70.
+
+<!-- artifact: oas-breakeven-age-eli5 -->
 
 ## Visualization
 

@@ -8,6 +8,12 @@ related:
   - "Start a Rails 6 Project with RSpec"
   - "Testing Faraday with RSpec"
   - "Solving a Python Interview Question in Ruby"
+artifacts:
+  - slug: "rspec-rollback-eli5"
+    title: "The RSpec Rollback Boundary"
+    file: "rspec-rollback-eli5.html"
+    creditText: "eli5 skill"
+    creditUrl: "https://github.com/anthropics/claude-plugins-community/tree/main/eli5"
 ---
 
 This post will walk you through some troubleshooting techniques when [RSpec](https://rspec.info/) tests are failing due to unexpected data in the test database. I had experienced some RSpec tests that were passing the first time they ran, individually, but then failing on subsequent runs, or when run as part of the entire test suite. It turned out to be a combination of two things - not fully understanding how RSpec manages transactions, and how using or not using `let/let!` helper methods can impact this.
@@ -103,6 +109,8 @@ So any data created within an example will be run within a transaction and rolle
 > ... use transactional fixtures will clear the DB as long as you created the data in the example itself. before :all do ... end is considered outside of the example, because the data remains untouched across multiple examples. Whatever you create in before :all you have to delete in after :all.
 
 Although my test wasn't using a `before` block, this got me wondering whether data created in a `describe` block is considered *outside* of the example? To answer this question, I modified the test to move the data creation into the `it` block:
+
+<!-- artifact: rspec-rollback-eli5 -->
 
 ```ruby
 require "rails_helper"

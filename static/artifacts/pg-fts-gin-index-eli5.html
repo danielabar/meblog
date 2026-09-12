@@ -1,0 +1,258 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Sequential Scan vs. GIN Index</title>
+<style>
+  :root {
+    --bg: #0f1420;
+    --panel: #171f30;
+    --panel2: #1d2740;
+    --text: #eef2fb;
+    --muted: #9aa7c2;
+    --accent: #ff8a5b;
+    --good: #5bd0a0;
+    --bad: #ff6b6b;
+    --line: #2a3350;
+  }
+  * { box-sizing: border-box; }
+  body {
+    margin: 0;
+    background: var(--bg);
+    color: var(--text);
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Helvetica, Arial, sans-serif;
+    line-height: 1.4;
+  }
+  .wrap { max-width: 900px; margin: 0 auto; padding: 40px 20px 80px; }
+  header { text-align: center; margin-bottom: 50px; }
+  header h1 { font-size: 2rem; margin: 0 0 10px; }
+  header p { color: var(--muted); font-size: 1.05rem; margin: 0; }
+  section.panel {
+    background: var(--panel);
+    border: 1px solid var(--line);
+    border-radius: 16px;
+    padding: 28px;
+    margin-bottom: 24px;
+  }
+  section.panel h2 {
+    margin: 0 0 16px;
+    font-size: 1.3rem;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+  }
+  .step-num {
+    display: inline-flex; align-items: center; justify-content: center;
+    width: 28px; height: 28px; border-radius: 50%;
+    background: var(--accent); color: #17120c; font-weight: 700; font-size: 0.9rem;
+    flex-shrink: 0;
+  }
+  .figure { display: flex; justify-content: center; margin: 16px 0 8px; }
+  .figure svg { max-width: 100%; height: auto; }
+  p.caption {
+    text-align: center; color: var(--muted); font-size: 0.95rem; margin: 4px 0 0;
+  }
+  .row { display: flex; gap: 20px; flex-wrap: wrap; justify-content: center; }
+  .col { flex: 1; min-width: 240px; text-align: center; }
+  .col h3 { margin: 8px 0 4px; font-size: 1rem; }
+  .col p { margin: 0; color: var(--muted); font-size: 0.9rem; }
+  .tag-good { color: var(--good); font-weight: 600; }
+  .tag-bad { color: var(--bad); font-weight: 600; }
+  .note {
+    background: var(--panel2); border-left: 3px solid var(--accent);
+    padding: 12px 16px; border-radius: 8px; font-size: 0.9rem; color: var(--muted);
+    margin-top: 16px;
+  }
+  .stat-row { display: flex; gap: 16px; justify-content: center; flex-wrap: wrap; margin-top: 16px; }
+  .stat-box {
+    background: var(--panel2); border: 1px solid var(--line); border-radius: 12px;
+    padding: 14px 22px; text-align: center; min-width: 140px;
+  }
+  .stat-box .num { font-size: 1.4rem; font-weight: 700; }
+  .stat-box .label { color: var(--muted); font-size: 0.8rem; margin-top: 2px; }
+  footer {
+    text-align: center; color: var(--muted); font-size: 0.85rem; margin-top: 40px;
+    border-top: 1px solid var(--line); padding-top: 20px;
+  }
+</style>
+</head>
+<body>
+<div class="wrap">
+
+<header>
+  <h1>Two Ways to Find a Row</h1>
+  <p>Searching for "chicken soup" among thousands of documents can take two very different paths.</p>
+</header>
+
+<section class="panel">
+  <h2><span class="step-num">1</span> A pile of documents, one search</h2>
+  <div class="figure">
+    <svg width="620" height="140" viewBox="0 0 620 140">
+      <g>
+        <rect x="20" y="30" width="70" height="80" rx="8" fill="#1d2740" stroke="#3a4a78" stroke-width="2"/>
+        <rect x="100" y="30" width="70" height="80" rx="8" fill="#1d2740" stroke="#3a4a78" stroke-width="2"/>
+        <rect x="180" y="30" width="70" height="80" rx="8" fill="#1d2740" stroke="#3a4a78" stroke-width="2"/>
+        <rect x="260" y="30" width="70" height="80" rx="8" fill="#1d2740" stroke="#3a4a78" stroke-width="2"/>
+        <rect x="340" y="30" width="70" height="80" rx="8" fill="#1d2740" stroke="#3a4a78" stroke-width="2"/>
+        <text x="55" y="70" text-anchor="middle" dominant-baseline="central" font-size="26">📄</text>
+        <text x="135" y="70" text-anchor="middle" dominant-baseline="central" font-size="26">📄</text>
+        <text x="215" y="70" text-anchor="middle" dominant-baseline="central" font-size="26">📄</text>
+        <text x="295" y="70" text-anchor="middle" dominant-baseline="central" font-size="26">📄</text>
+        <text x="375" y="70" text-anchor="middle" dominant-baseline="central" font-size="26">📄</text>
+        <text x="200" y="125" text-anchor="middle" fill="#9aa7c2" font-size="12">...thousands more</text>
+      </g>
+      <g>
+        <rect x="460" y="35" width="140" height="70" rx="10" fill="#243052" stroke="#ff8a5b" stroke-width="2"/>
+        <text x="530" y="60" text-anchor="middle" dominant-baseline="central" font-size="22">🔎</text>
+        <text x="530" y="88" text-anchor="middle" fill="#ff8a5b" font-size="12" font-weight="700">"chicken soup"</text>
+      </g>
+    </svg>
+  </div>
+  <p class="caption">Only a handful of documents actually mention <strong>chicken soup</strong>. The question is how Postgres finds them.</p>
+</section>
+
+<section class="panel">
+  <h2><span class="step-num">2</span> Plan A: check every single row</h2>
+  <div class="figure">
+    <svg width="740" height="260" viewBox="0 0 740 260">
+      <line x1="30" y1="40" x2="710" y2="40" stroke="#3a4a78" stroke-width="2" marker-end="url(#arrowA)"/>
+      <text x="370" y="20" text-anchor="middle" fill="#9aa7c2" font-size="12">reads rows one at a time, computing to_tsvector() for each</text>
+      <defs>
+        <marker id="arrowA" markerWidth="10" markerHeight="10" refX="8" refY="3" orient="auto">
+          <path d="M0,0 L8,3 L0,6 Z" fill="#3a4a78"/>
+        </marker>
+      </defs>
+
+      <!-- 8 rows -->
+      <g font-family="inherit">
+        <!-- row 1 -->
+        <rect x="20" y="70" width="70" height="60" rx="8" fill="#1d2740" stroke="#3a4a78" stroke-width="2"/>
+        <text x="55" y="100" text-anchor="middle" dominant-baseline="central" font-size="20">⚙️</text>
+        <text x="55" y="160" text-anchor="middle" dominant-baseline="central" font-size="20">❌</text>
+
+        <!-- row 2 -->
+        <rect x="105" y="70" width="70" height="60" rx="8" fill="#1d2740" stroke="#3a4a78" stroke-width="2"/>
+        <text x="140" y="100" text-anchor="middle" dominant-baseline="central" font-size="20">⚙️</text>
+        <text x="140" y="160" text-anchor="middle" dominant-baseline="central" font-size="20">❌</text>
+
+        <!-- row 3: match -->
+        <rect x="190" y="70" width="70" height="60" rx="8" fill="#1d3a2e" stroke="#5bd0a0" stroke-width="3"/>
+        <text x="225" y="100" text-anchor="middle" dominant-baseline="central" font-size="20">⚙️</text>
+        <text x="225" y="160" text-anchor="middle" dominant-baseline="central" font-size="20">✅</text>
+
+        <!-- row 4 -->
+        <rect x="275" y="70" width="70" height="60" rx="8" fill="#1d2740" stroke="#3a4a78" stroke-width="2"/>
+        <text x="310" y="100" text-anchor="middle" dominant-baseline="central" font-size="20">⚙️</text>
+        <text x="310" y="160" text-anchor="middle" dominant-baseline="central" font-size="20">❌</text>
+
+        <!-- row 5 -->
+        <rect x="360" y="70" width="70" height="60" rx="8" fill="#1d2740" stroke="#3a4a78" stroke-width="2"/>
+        <text x="395" y="100" text-anchor="middle" dominant-baseline="central" font-size="20">⚙️</text>
+        <text x="395" y="160" text-anchor="middle" dominant-baseline="central" font-size="20">❌</text>
+
+        <!-- row 6 -->
+        <rect x="445" y="70" width="70" height="60" rx="8" fill="#1d2740" stroke="#3a4a78" stroke-width="2"/>
+        <text x="480" y="100" text-anchor="middle" dominant-baseline="central" font-size="20">⚙️</text>
+        <text x="480" y="160" text-anchor="middle" dominant-baseline="central" font-size="20">❌</text>
+
+        <!-- row 7: match -->
+        <rect x="530" y="70" width="70" height="60" rx="8" fill="#1d3a2e" stroke="#5bd0a0" stroke-width="3"/>
+        <text x="565" y="100" text-anchor="middle" dominant-baseline="central" font-size="20">⚙️</text>
+        <text x="565" y="160" text-anchor="middle" dominant-baseline="central" font-size="20">✅</text>
+
+        <!-- row 8 -->
+        <rect x="615" y="70" width="70" height="60" rx="8" fill="#1d2740" stroke="#3a4a78" stroke-width="2"/>
+        <text x="650" y="100" text-anchor="middle" dominant-baseline="central" font-size="20">⚙️</text>
+        <text x="650" y="160" text-anchor="middle" dominant-baseline="central" font-size="20">❌</text>
+      </g>
+
+      <text x="370" y="200" text-anchor="middle" fill="#9aa7c2" font-size="12">...and every other row in the table, the same way</text>
+      <text x="370" y="230" text-anchor="middle" fill="#ff8a5b" font-size="13" font-weight="700">every row gets visited and computed, even the ones thrown away</text>
+    </svg>
+  </div>
+  <p class="caption">This is a <strong>sequential scan</strong>: Postgres computes a tsvector for every row, checks it against the query, and discards most of the work.</p>
+</section>
+
+<section class="panel">
+  <h2><span class="step-num">3</span> Plan B: look it up in an index</h2>
+  <div class="figure">
+    <svg width="740" height="190" viewBox="0 0 740 190">
+      <!-- inverted index box -->
+      <rect x="20" y="30" width="220" height="150" rx="10" fill="#243052" stroke="#ff8a5b" stroke-width="2"/>
+      <text x="130" y="55" text-anchor="middle" fill="#ff8a5b" font-size="13" font-weight="700">GIN index</text>
+      <text x="35" y="85" fill="#eef2fb" font-size="12">"chicken" &#8594; rows 3, 7</text>
+      <text x="35" y="110" fill="#eef2fb" font-size="12">"soup"    &#8594; rows 3, 7</text>
+      <text x="35" y="135" fill="#9aa7c2" font-size="12">"rice"    &#8594; rows 2, 5</text>
+      <text x="35" y="160" fill="#9aa7c2" font-size="12">"beef"    &#8594; rows 1, 6</text>
+
+      <defs>
+        <marker id="arrowB" markerWidth="10" markerHeight="10" refX="8" refY="3" orient="auto">
+          <path d="M0,0 L8,3 L0,6 Z" fill="#5bd0a0"/>
+        </marker>
+      </defs>
+
+      <!-- 8 rows in a 4x2 grid; all untouched/faded except the two matches -->
+      <rect x="400" y="30" width="60" height="50" rx="8" fill="#1d2740" stroke="#3a4a78" stroke-width="2" opacity="0.35"/>
+      <rect x="470" y="30" width="60" height="50" rx="8" fill="#1d2740" stroke="#3a4a78" stroke-width="2" opacity="0.35"/>
+      <rect x="540" y="30" width="60" height="50" rx="8" fill="#1d3a2e" stroke="#5bd0a0" stroke-width="3"/>
+      <text x="570" y="55" text-anchor="middle" dominant-baseline="central" font-size="18">✅</text>
+      <rect x="610" y="30" width="60" height="50" rx="8" fill="#1d2740" stroke="#3a4a78" stroke-width="2" opacity="0.35"/>
+
+      <rect x="400" y="90" width="60" height="50" rx="8" fill="#1d2740" stroke="#3a4a78" stroke-width="2" opacity="0.35"/>
+      <rect x="470" y="90" width="60" height="50" rx="8" fill="#1d2740" stroke="#3a4a78" stroke-width="2" opacity="0.35"/>
+      <rect x="540" y="90" width="60" height="50" rx="8" fill="#1d3a2e" stroke="#5bd0a0" stroke-width="3"/>
+      <text x="570" y="115" text-anchor="middle" dominant-baseline="central" font-size="18">✅</text>
+      <rect x="610" y="90" width="60" height="50" rx="8" fill="#1d2740" stroke="#3a4a78" stroke-width="2" opacity="0.35"/>
+
+      <!-- direct arrows from the index straight to the two matching rows, skipping everything else -->
+      <path d="M240 80 C 350 70, 420 60, 540 55" stroke="#5bd0a0" stroke-width="3" fill="none" marker-end="url(#arrowB)"/>
+      <path d="M240 100 C 350 130, 420 115, 540 115" stroke="#5bd0a0" stroke-width="3" fill="none" marker-end="url(#arrowB)"/>
+
+      <text x="535" y="165" text-anchor="middle" fill="#9aa7c2" font-size="12">the faded rows are never touched at all</text>
+    </svg>
+  </div>
+  <p class="caption">A <strong>GIN index</strong> already maps every word to the rows that contain it. Postgres jumps straight to rows 3 and 7, no computing, no checking, no wasted work.</p>
+</section>
+
+<section class="panel">
+  <h2><span class="step-num">4</span> Why it matters as the table grows</h2>
+  <div class="figure">
+    <svg width="640" height="240" viewBox="0 0 640 240">
+      <line x1="60" y1="20" x2="60" y2="200" stroke="#3a4a78" stroke-width="2"/>
+      <line x1="60" y1="200" x2="600" y2="200" stroke="#3a4a78" stroke-width="2"/>
+      <text x="20" y="115" text-anchor="middle" fill="#9aa7c2" font-size="12" transform="rotate(-90 20 115)">work done</text>
+      <text x="330" y="225" text-anchor="middle" fill="#9aa7c2" font-size="12">table size</text>
+
+      <path d="M60 190 L580 30" stroke="#ff6b6b" stroke-width="3" fill="none"/>
+      <text x="140" y="128" fill="#ff6b6b" font-size="12" font-weight="700">sequential scan</text>
+      <text x="140" y="146" fill="#9aa7c2" font-size="11">grows with every row</text>
+
+      <path d="M60 190 C 250 188, 400 182, 580 175" stroke="#5bd0a0" stroke-width="3" fill="none"/>
+      <text x="420" y="160" fill="#5bd0a0" font-size="12" font-weight="700">GIN index</text>
+      <text x="420" y="145" fill="#9aa7c2" font-size="11">grows with the matches, not the table</text>
+    </svg>
+  </div>
+  <div class="stat-row">
+    <div class="stat-box">
+      <div class="num" style="color: var(--bad);">~283ms</div>
+      <div class="label">sequential scan</div>
+    </div>
+    <div class="stat-box">
+      <div class="num" style="color: var(--good);">~2.4ms</div>
+      <div class="label">GIN index scan</div>
+    </div>
+    <div class="stat-box">
+      <div class="num" style="color: var(--accent);">~118×</div>
+      <div class="label">faster</div>
+    </div>
+  </div>
+  <div class="note">Add more rows to the table, and a sequential scan gets slower. Do the same to a GIN-indexed column, and the query barely notices, because it only ever visits the rows that actually match.</div>
+</section>
+
+<footer>
+  How Postgres chooses between reading every row and looking one up directly.
+</footer>
+
+</div>
+</body>
+</html>
