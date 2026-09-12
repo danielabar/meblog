@@ -477,6 +477,17 @@ For those keeping count, that's three terminal tabs required to work with this a
 <span class="grvsc-line"><span class="grvsc-source"><span class="mtk1">  </span><span class="mtk7">end</span></span></span>
 <span class="grvsc-line"><span class="grvsc-source"><span class="mtk7">end</span></span></span></code></pre>
 <p class="markdown-para">With this approach, if any error is raised during message processing, Karafka will automatically retry up to a configured number of <code>max_retries</code> (which can also be set to zero if you don't ever want it to retry). If message processing still fails after the retries are exhausted, a new message containing the same header and payload as the troublesome message will be produced to the topic specified in the <code>dead_letter_queue</code> method, in this case, <code>dlq_inventory_management_product_updates</code>.</p>
+<a href="/blog/rails-kafka-consumer/kafka-dlq-eli5" class="markdown-artifact-card">
+  <svg class="markdown-artifact-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true">
+    <rect x="3" y="4" width="18" height="14" rx="2" />
+    <path d="M8 21h8M12 18v3" />
+  </svg>
+  <span class="markdown-artifact-body">
+    <span>The Dead Letter Queue Escape Hatch</span>
+    <span class="markdown-artifact-subtitle">Simplified visual explainer</span>
+  </span>
+  <span class="markdown-artifact-arrow" aria-hidden="true">&rarr;</span>
+</a>
 <p class="markdown-para">With the modified <code>karafka.rb</code> in place (remember to restart the karafka server <code>bundle exec karafka server</code> after making changes to <code>karafka.rb</code>), producing an inventory update message with a product code that does not exist will generate the following log messages in the Karafka server. I've annotated them with <code>=== EXPLANATION ===</code>, which shows that after consuming the bad message, Karafka will make two more attempts to process it. If those still fail, it writes the message the the topic <code>dlq_inventory_management_product_updates</code>, then moves on, waiting to consume new messages:</p>
 <pre class="grvsc-container gatsby-highlight monokai" data-language="" data-index="32"><code class="grvsc-code"><span class="grvsc-line"><span class="grvsc-source">=== START CONSUMING BAD MESSAGE ===</span></span>
 <span class="grvsc-line"><span class="grvsc-source">[d13504295353] Consume job for ProductInventoryConsumer on</span></span>

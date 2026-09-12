@@ -1,0 +1,191 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>The RSpec Rollback Boundary</title>
+<style>
+  :root {
+    --bg: #0f1420;
+    --panel: #171f30;
+    --panel2: #1d2740;
+    --text: #eef2fb;
+    --muted: #9aa7c2;
+    --accent: #ff8a5b;
+    --good: #5bd0a0;
+    --bad: #ff6b6b;
+    --line: #2a3350;
+  }
+  * { box-sizing: border-box; }
+  body {
+    margin: 0;
+    background: var(--bg);
+    color: var(--text);
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Helvetica, Arial, sans-serif;
+    line-height: 1.4;
+  }
+  .wrap { max-width: 900px; margin: 0 auto; padding: 40px 20px 80px; }
+  header { text-align: center; margin-bottom: 50px; }
+  header h1 { font-size: 2rem; margin: 0 0 10px; }
+  header p { color: var(--muted); font-size: 1.05rem; margin: 0; }
+  section.panel {
+    background: var(--panel);
+    border: 1px solid var(--line);
+    border-radius: 16px;
+    padding: 28px;
+    margin-bottom: 24px;
+  }
+  section.panel h2 {
+    margin: 0 0 16px;
+    font-size: 1.3rem;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+  }
+  .step-num {
+    display: inline-flex; align-items: center; justify-content: center;
+    width: 28px; height: 28px; border-radius: 50%;
+    background: var(--accent); color: #17120c; font-weight: 700; font-size: 0.9rem;
+    flex-shrink: 0;
+  }
+  .figure { display: flex; justify-content: center; margin: 16px 0 8px; }
+  .figure svg { max-width: 100%; height: auto; }
+  p.caption {
+    text-align: center; color: var(--muted); font-size: 0.95rem; margin: 4px 0 0;
+  }
+  .row { display: flex; gap: 20px; flex-wrap: wrap; justify-content: center; }
+  .col { flex: 1; min-width: 300px; text-align: center; }
+  .col h3 { margin: 8px 0 4px; font-size: 1rem; }
+  .col p { margin: 0; color: var(--muted); font-size: 0.9rem; }
+  .tag-good { color: var(--good); font-weight: 600; }
+  .tag-bad { color: var(--bad); font-weight: 600; }
+  .note {
+    background: var(--panel2); border-left: 3px solid var(--accent);
+    padding: 12px 16px; border-radius: 8px; font-size: 0.9rem; color: var(--muted);
+    margin-top: 16px;
+  }
+  code {
+    background: var(--panel2); border: 1px solid var(--line); border-radius: 4px;
+    padding: 1px 6px; font-size: 0.9em; color: var(--text);
+  }
+  footer {
+    text-align: center; color: var(--muted); font-size: 0.85rem; margin-top: 40px;
+    border-top: 1px solid var(--line); padding-top: 20px;
+  }
+</style>
+</head>
+<body>
+<div class="wrap">
+
+<header>
+  <h1>The RSpec Rollback Boundary</h1>
+  <p>The transaction that undoes your test data doesn't start where you think it does.</p>
+</header>
+
+<section class="panel">
+  <h2><span class="step-num">1</span> The safety net you were promised</h2>
+  <div class="figure">
+    <svg width="640" height="170" viewBox="0 0 640 170">
+      <rect x="20" y="26" width="600" height="110" rx="14" fill="#243052" stroke="#3a4a78" stroke-width="2"/>
+      <rect x="140" y="50" width="360" height="64" rx="10" fill="none" stroke="#5bd0a0" stroke-width="2.5" stroke-dasharray="6 4"/>
+      <text x="320" y="40" text-anchor="middle" fill="#5bd0a0" font-size="13" font-weight="700">the transaction</text>
+      <text x="320" y="72" text-anchor="middle" dominant-baseline="central" fill="#eef2fb" font-size="13">everything your test does in here</text>
+      <text x="320" y="94" text-anchor="middle" dominant-baseline="central" fill="#9aa7c2" font-size="12">gets undone when the test ends</text>
+      <text x="80" y="82" text-anchor="middle" dominant-baseline="central" fill="#9aa7c2" font-size="24">🧪</text>
+      <text x="80" y="112" text-anchor="middle" fill="#9aa7c2" font-size="11">one test</text>
+    </svg>
+  </div>
+  <p class="caption">
+    <code>config.use_transactional_fixtures = true</code> wraps each test in a database transaction, then rolls it back. That's the theory.
+  </p>
+</section>
+
+<section class="panel">
+  <h2><span class="step-num">2</span> But the box doesn't start where you'd guess</h2>
+  <p style="color: var(--muted); text-align: center; margin-top: -6px;">
+    A <code>describe</code> block is just Ruby code that defines your tests. It runs <strong>once</strong>, up front, while RSpec is still figuring out what tests exist &mdash; before any test, and its transaction, has begun.
+  </p>
+  <div class="figure">
+    <svg width="700" height="130" viewBox="0 0 700 130">
+      <line x1="30" y1="70" x2="670" y2="70" stroke="#3a4a78" stroke-width="3"/>
+      <circle cx="80" cy="70" r="8" fill="#9aa7c2"/>
+      <text x="80" y="30" text-anchor="middle" fill="#eef2fb" font-size="12" font-weight="700">describe block loads</text>
+      <text x="80" y="100" text-anchor="middle" fill="#9aa7c2" font-size="11">no transaction yet</text>
+      <circle cx="420" cy="70" r="8" fill="#5bd0a0"/>
+      <text x="420" y="30" text-anchor="middle" fill="#eef2fb" font-size="12" font-weight="700">first "it" example starts</text>
+      <text x="420" y="100" text-anchor="middle" fill="#5bd0a0" font-size="11">transaction opens here</text>
+      <circle cx="620" cy="70" r="8" fill="#5bd0a0"/>
+      <text x="620" y="30" text-anchor="middle" fill="#eef2fb" font-size="12" font-weight="700">example ends</text>
+      <text x="620" y="100" text-anchor="middle" fill="#5bd0a0" font-size="11">rolled back</text>
+    </svg>
+  </div>
+</section>
+
+<section class="panel">
+  <h2><span class="step-num">3</span> Same-looking code, two very different outcomes</h2>
+  <div class="row">
+    <div class="col">
+      <div class="figure">
+        <svg width="320" height="240" viewBox="0 0 320 240">
+          <rect x="10" y="10" width="300" height="220" rx="14" fill="#1d2740" stroke="#ff6b6b" stroke-width="2"/>
+          <text x="160" y="34" text-anchor="middle" fill="#ff6b6b" font-size="13" font-weight="700">describe "my tests" do</text>
+          <rect x="30" y="50" width="260" height="46" rx="8" fill="#2a1a1a" stroke="#ff6b6b" stroke-width="1.5"/>
+          <text x="160" y="68" text-anchor="middle" dominant-baseline="central" fill="#eef2fb" font-size="12" font-family="monospace">FactoryBot.create(:plan)</text>
+          <text x="160" y="86" text-anchor="middle" dominant-baseline="central" fill="#ff8a5b" font-size="11">outside any "it"</text>
+          <line x1="30" y1="110" x2="290" y2="110" stroke="#3a4a78" stroke-width="1" stroke-dasharray="3 3"/>
+          <rect x="30" y="122" width="260" height="34" rx="8" fill="#243052" stroke="#3a4a78" stroke-width="1"/>
+          <text x="160" y="139" text-anchor="middle" dominant-baseline="central" fill="#9aa7c2" font-size="11" font-family="monospace">it "some test" do ... end</text>
+          <text x="160" y="190" text-anchor="middle" fill="#ff6b6b" font-size="12" font-weight="700">INSERT runs before BEGIN</text>
+          <text x="160" y="210" text-anchor="middle" fill="#ff6b6b" font-size="12" font-weight="700">→ COMMIT, stays in the DB</text>
+        </svg>
+      </div>
+      <h3 class="tag-bad">Created in the describe block</h3>
+      <p>Ruby evaluates this line while RSpec is still building the example list &mdash; no transaction has opened.</p>
+    </div>
+    <div class="col">
+      <div class="figure">
+        <svg width="320" height="240" viewBox="0 0 320 240">
+          <rect x="10" y="10" width="300" height="220" rx="14" fill="#1d2740" stroke="#5bd0a0" stroke-width="2"/>
+          <text x="160" y="34" text-anchor="middle" fill="#5bd0a0" font-size="13" font-weight="700">describe "my tests" do</text>
+          <rect x="26" y="46" width="268" height="146" rx="10" fill="none" stroke="#5bd0a0" stroke-width="2.5" stroke-dasharray="6 4"/>
+          <text x="160" y="62" text-anchor="middle" fill="#5bd0a0" font-size="11" font-weight="700">BEGIN / SAVEPOINT</text>
+          <rect x="40" y="74" width="240" height="34" rx="8" fill="#243052" stroke="#3a4a78" stroke-width="1"/>
+          <text x="160" y="91" text-anchor="middle" dominant-baseline="central" fill="#9aa7c2" font-size="11" font-family="monospace">it "some test" do</text>
+          <rect x="52" y="116" width="216" height="40" rx="8" fill="#0d2a1e" stroke="#5bd0a0" stroke-width="1.5"/>
+          <text x="160" y="136" text-anchor="middle" dominant-baseline="central" fill="#eef2fb" font-size="11" font-family="monospace">FactoryBot.create(:plan)</text>
+          <text x="160" y="188" text-anchor="middle" fill="#5bd0a0" font-size="11" font-weight="700">ROLLBACK</text>
+          <text x="160" y="210" text-anchor="middle" fill="#5bd0a0" font-size="12" font-weight="700">→ gone after the test</text>
+        </svg>
+      </div>
+      <h3 class="tag-good">Created inside "it" (or via let!)</h3>
+      <p>This line only runs once the example itself is executing &mdash; already inside the open transaction.</p>
+    </div>
+  </div>
+  <div class="note">
+    <code>let!</code> looks like it lives in the <code>describe</code> block, but it's really a <code>before</code> hook in disguise: RSpec runs it at the <em>start of each example</em>, after the transaction has already opened. That's why <code>let!</code> data rolls back, but a bare line in <code>describe</code> does not.
+  </div>
+</section>
+
+<section class="panel">
+  <h2><span class="step-num">4</span> The rule of thumb</h2>
+  <p style="text-align: center; color: var(--muted); margin-top: -6px;">
+    Ask one question about any line that creates data: <strong>does it run while an example is executing, or before RSpec has even started one?</strong>
+  </p>
+  <div class="row">
+    <div class="col">
+      <h3 class="tag-good">Rolls back</h3>
+      <p>Code inside an <code>it</code> block, or reached via <code>let</code>/<code>let!</code>, since both only run once an example is under way.</p>
+    </div>
+    <div class="col">
+      <h3 class="tag-bad">Does not roll back</h3>
+      <p>Code written directly in a <code>describe</code> block, run at load time, before the first example's transaction has opened.</p>
+    </div>
+  </div>
+</section>
+
+<footer>
+  Based on troubleshooting a leaking test database with transactional fixtures.
+</footer>
+
+</div>
+</body>
+</html>

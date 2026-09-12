@@ -108,6 +108,17 @@
 <p class="markdown-para">... use transactional fixtures will clear the DB as long as you created the data in the example itself. before :all do ... end is considered outside of the example, because the data remains untouched across multiple examples. Whatever you create in before :all you have to delete in after :all.</p>
 </blockquote>
 <p class="markdown-para">Although my test wasn't using a <code>before</code> block, this got me wondering whether data created in a <code>describe</code> block is considered <em class="markdown-emphasis">outside</em> of the example? To answer this question, I modified the test to move the data creation into the <code>it</code> block:</p>
+<a href="/blog/when-rspec-doesnt-rollback/rspec-rollback-eli5" class="markdown-artifact-card">
+  <svg class="markdown-artifact-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true">
+    <rect x="3" y="4" width="18" height="14" rx="2" />
+    <path d="M8 21h8M12 18v3" />
+  </svg>
+  <span class="markdown-artifact-body">
+    <span>The RSpec Rollback Boundary</span>
+    <span class="markdown-artifact-subtitle">Simplified visual explainer</span>
+  </span>
+  <span class="markdown-artifact-arrow" aria-hidden="true">&rarr;</span>
+</a>
 <pre class="grvsc-container gatsby-highlight monokai" data-language="ruby" data-index="5"><code class="grvsc-code"><span class="grvsc-line"><span class="grvsc-source"><span class="mtk7">require</span><span class="mtk1"> </span><span class="mtk6">&quot;rails_helper&quot;</span></span></span>
 <span class="grvsc-line"><span class="grvsc-source"></span></span>
 <span class="grvsc-line"><span class="grvsc-source"><span class="mtk1">describe </span><span class="mtk6">&quot;my test class&quot;</span><span class="mtk1"> </span><span class="mtk7">do</span></span></span>
