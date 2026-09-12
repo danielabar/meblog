@@ -8,6 +8,12 @@ related:
   - "Add a Kafka Consumer to Rails"
   - "Setup a Rails Project with Postgres and Docker"
   - "Rails CORS Middleware For Multiple Resources"
+artifacts:
+  - slug: "slack-oauth-flow-eli5"
+    title: "How \"Add to Slack\" OAuth Actually Works"
+    file: "slack-oauth-flow-eli5.html"
+    creditText: "eli5 skill"
+    creditUrl: "https://github.com/anthropics/claude-plugins-community/tree/main/eli5"
 ---
 
 Welcome to the first installment of this multi-part series on building a Slack application with Rails. This series will guide you through the process of creating a Slack application with Rails and is structured as follows:
@@ -543,6 +549,8 @@ export default class extends Controller {
 <aside class="markdown-aside">
 For stronger security, Slack also supports <a class="markdown-link" href="https://api.slack.com/authentication/rotation">OAuth token rotation</a>, although I couldn't find support for that in the `slack-ruby-bot-server` gem. So for this relatively simple app, I will not be using this feature.
 </aside>
+
+<!-- artifact: slack-oauth-flow-eli5 -->
 
 ## Rails Blocked Host
 

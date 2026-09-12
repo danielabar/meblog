@@ -8,6 +8,12 @@ related:
   - "Efficient Database Queries in Rails: A Practical Approach"
   - "Roll Your Own Search with Rails and Postgres: Search Engine"
   - "Switching From Ruby to SQL Schema in Rails"
+artifacts:
+  - slug: "pg-fts-gin-index-eli5"
+    title: "Sequential Scan vs. GIN Index"
+    file: "pg-fts-gin-index-eli5.html"
+    creditText: "eli5 skill"
+    creditUrl: "https://github.com/anthropics/claude-plugins-community/tree/main/eli5"
 ---
 
 A while back, I built a site-wide search bar for a Rails app, one of those "type anything and get relevant results instantly" features. We implemented it using PostgreSQL full-text search via the excellent [pg_search](https://github.com/Casecommons/pg_search) gem.
@@ -261,6 +267,8 @@ The solution is to move tsvector generation out of the query path entirely. Inst
 
 A [GIN](https://www.postgresql.org/docs/current/gin.html) (Generalized Inverted Index) is designed for multi-value data types, things like arrays, JSONB, and `tsvector`.
 Instead of indexing an entire row value, it indexes *individual tokens* and maps them back to the rows that contain them. This is exactly what we want for full-text search: "find all rows that contain these lexemes".
+
+<!-- artifact: pg-fts-gin-index-eli5 -->
 
 **Migration**
 

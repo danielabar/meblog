@@ -8,11 +8,19 @@ related:
   - "About Those Docs"
   - "Reflections on Effective Teams"
   - "Find Jira Tickets Faster"
+artifacts:
+  - slug: "development-iceberg-eli5"
+    title: "The Development Iceberg"
+    file: "development-iceberg-eli5.html"
+    creditText: "eli5 skill"
+    creditUrl: "https://github.com/anthropics/claude-plugins-community/tree/main/eli5"
 ---
 
 If you’ve worked on a software development project of any significant complexity, you’ve probably observed that it nearly always takes longer to deliver than the planned timeline. There are many reasons for this including incomplete initial understanding of requirements, salespeople providing unrealistic promises to close a deal, and unforseen technical challenges.
 
 But even if the scope and tech stack is well understood, and developers are empowered provide estimates rather than being imposed on by outside forces, things still take longer than expected. Why is that? This post will cover some additional factors that are often unaccounted for, but a crucial part of the process. When asked how long some new feature will take to build, developers are often focused on the effort to write the code, and possibly also the unit tests. However there are many other items that need to get done to get the feature released and into customers hands, but are often not included in estimates. Let's explore some of these.
+
+<!-- artifact: development-iceberg-eli5 -->
 
 ## Ticket Description
 

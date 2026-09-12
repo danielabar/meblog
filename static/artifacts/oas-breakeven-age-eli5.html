@@ -1,0 +1,212 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>OAS Breakeven Age, Explained Simply</title>
+<style>
+  :root {
+    --bg: #0f1420;
+    --panel: #171f30;
+    --panel2: #1d2740;
+    --text: #eef2fb;
+    --muted: #9aa7c2;
+    --accent: #ff8a5b;
+    --good: #5bd0a0;
+    --bad: #ff6b6b;
+    --line: #2a3350;
+  }
+  * { box-sizing: border-box; }
+  body {
+    margin: 0;
+    background: var(--bg);
+    color: var(--text);
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Helvetica, Arial, sans-serif;
+    line-height: 1.4;
+  }
+  .wrap { max-width: 900px; margin: 0 auto; padding: 40px 20px 80px; }
+  header { text-align: center; margin-bottom: 50px; }
+  header h1 { font-size: 2rem; margin: 0 0 10px; }
+  header p { color: var(--muted); font-size: 1.05rem; margin: 0; }
+  section.panel {
+    background: var(--panel);
+    border: 1px solid var(--line);
+    border-radius: 16px;
+    padding: 28px;
+    margin-bottom: 24px;
+  }
+  section.panel h2 {
+    margin: 0 0 16px;
+    font-size: 1.3rem;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+  }
+  .step-num {
+    display: inline-flex; align-items: center; justify-content: center;
+    width: 28px; height: 28px; border-radius: 50%;
+    background: var(--accent); color: #17120c; font-weight: 700; font-size: 0.9rem;
+    flex-shrink: 0;
+  }
+  .figure { display: flex; justify-content: center; margin: 16px 0 8px; }
+  .figure svg { max-width: 100%; height: auto; }
+  p.caption {
+    text-align: center; color: var(--muted); font-size: 0.95rem; margin: 4px 0 0;
+  }
+  .row { display: flex; gap: 20px; flex-wrap: wrap; justify-content: center; }
+  .col { flex: 1; min-width: 240px; text-align: center; }
+  .col h3 { margin: 8px 0 4px; font-size: 1rem; }
+  .col p { margin: 0; color: var(--muted); font-size: 0.9rem; }
+  .tag-good { color: var(--good); font-weight: 600; }
+  .tag-bad { color: var(--bad); font-weight: 600; }
+  .note {
+    background: var(--panel2); border-left: 3px solid var(--accent);
+    padding: 12px 16px; border-radius: 8px; font-size: 0.9rem; color: var(--muted);
+    margin-top: 16px;
+  }
+  footer {
+    text-align: center; color: var(--muted); font-size: 0.85rem; margin-top: 40px;
+    border-top: 1px solid var(--line); padding-top: 20px;
+  }
+</style>
+</head>
+<body>
+<div class="wrap">
+
+<header>
+  <h1>Claim Now, or Wait?</h1>
+  <p>A bigger monthly cheque later only wins if you live long enough to collect it.</p>
+</header>
+
+<section class="panel">
+  <h2><span class="step-num">1</span> Two starting lines</h2>
+  <div class="row">
+    <div class="col">
+      <div class="figure">
+        <svg width="200" height="140" viewBox="0 0 200 140">
+          <rect x="20" y="20" width="160" height="100" rx="14" fill="#1d2740" stroke="#5bd0a0" stroke-width="2"/>
+          <text x="100" y="70" text-anchor="middle" dominant-baseline="central" fill="#5bd0a0" font-size="34">&#128176;</text>
+        </svg>
+      </div>
+      <h3 class="tag-good">Claim at 65</h3>
+      <p>Smaller monthly payment, but it starts right away.</p>
+    </div>
+    <div class="col">
+      <div class="figure">
+        <svg width="200" height="140" viewBox="0 0 200 140">
+          <rect x="20" y="20" width="160" height="100" rx="14" fill="#1d2740" stroke="#ff8a5b" stroke-width="2"/>
+          <text x="100" y="70" text-anchor="middle" dominant-baseline="central" fill="#ff8a5b" font-size="34">&#8987;</text>
+        </svg>
+      </div>
+      <h3 style="color: var(--accent);">Delay to 70</h3>
+      <p>Bigger monthly payment, but nothing arrives for 5 more years.</p>
+    </div>
+  </div>
+</section>
+
+<section class="panel">
+  <h2><span class="step-num">2</span> Waiting grows the cheque</h2>
+  <div class="figure">
+    <svg width="640" height="150" viewBox="0 0 640 150">
+      <line x1="80" y1="110" x2="560" y2="110" stroke="#3a4a78" stroke-width="3"/>
+      <circle cx="80" cy="110" r="7" fill="#5bd0a0"/>
+      <text x="80" y="82" text-anchor="middle" fill="#eef2fb" font-size="13" font-weight="700">age 65</text>
+      <text x="80" y="135" text-anchor="middle" fill="#9aa7c2" font-size="12">$713 / month</text>
+
+      <circle cx="560" cy="110" r="7" fill="#ff8a5b"/>
+      <text x="560" y="82" text-anchor="middle" fill="#eef2fb" font-size="13" font-weight="700">age 70</text>
+      <text x="560" y="135" text-anchor="middle" fill="#ff8a5b" font-size="12" font-weight="700">$970 / month</text>
+
+      <path d="M140 60 C300 20 340 20 500 60" stroke="#ff8a5b" stroke-width="2" fill="none" stroke-dasharray="4 3"/>
+      <text x="320" y="56" text-anchor="middle" fill="#9aa7c2" font-size="12">+0.6% for every month you wait</text>
+    </svg>
+  </div>
+  <p class="caption">Each month of delay adds 0.6% to your payment. Wait the full 5 years, and it's <strong>36% higher</strong> for the rest of your life.</p>
+</section>
+
+<section class="panel">
+  <h2><span class="step-num">3</span> But delay means empty months</h2>
+  <div class="figure">
+    <svg width="640" height="200" viewBox="0 0 640 200">
+      <text x="20" y="24" fill="#9aa7c2" font-size="12">age 65</text>
+      <text x="460" y="24" text-anchor="end" fill="#9aa7c2" font-size="12">age 70</text>
+
+      <text x="620" y="55" text-anchor="end" fill="#5bd0a0" font-size="13" font-weight="700">claim at 65</text>
+      <g>
+        <rect x="20" y="40" width="80" height="34" rx="6" fill="#5bd0a0" opacity="0.85"/>
+        <rect x="110" y="40" width="80" height="34" rx="6" fill="#5bd0a0" opacity="0.85"/>
+        <rect x="200" y="40" width="80" height="34" rx="6" fill="#5bd0a0" opacity="0.85"/>
+        <rect x="290" y="40" width="80" height="34" rx="6" fill="#5bd0a0" opacity="0.85"/>
+        <rect x="380" y="40" width="80" height="34" rx="6" fill="#5bd0a0" opacity="0.85"/>
+        <text x="230" y="93" text-anchor="middle" fill="#5bd0a0" font-size="12">5 years of payments banked</text>
+      </g>
+
+      <text x="620" y="145" text-anchor="end" fill="#ff6b6b" font-size="13" font-weight="700">delay to 70</text>
+      <g>
+        <rect x="20" y="130" width="80" height="34" rx="6" fill="none" stroke="#ff6b6b" stroke-width="2" stroke-dasharray="5 4"/>
+        <rect x="110" y="130" width="80" height="34" rx="6" fill="none" stroke="#ff6b6b" stroke-width="2" stroke-dasharray="5 4"/>
+        <rect x="200" y="130" width="80" height="34" rx="6" fill="none" stroke="#ff6b6b" stroke-width="2" stroke-dasharray="5 4"/>
+        <rect x="290" y="130" width="80" height="34" rx="6" fill="none" stroke="#ff6b6b" stroke-width="2" stroke-dasharray="5 4"/>
+        <rect x="380" y="130" width="80" height="34" rx="6" fill="none" stroke="#ff6b6b" stroke-width="2" stroke-dasharray="5 4"/>
+        <text x="230" y="183" text-anchor="middle" fill="#ff6b6b" font-size="12">$0 collected these same years</text>
+      </g>
+    </svg>
+  </div>
+  <p class="caption">The early claimer has a 5-year head start in the bank. The delayed claimer is starting from zero, just with bigger deposits ahead.</p>
+</section>
+
+<section class="panel">
+  <h2><span class="step-num">4</span> So which wins? Track the running total</h2>
+  <div class="figure">
+    <svg width="700" height="300" viewBox="0 0 700 300">
+      <line x1="40" y1="260" x2="660" y2="260" stroke="#3a4a78" stroke-width="2"/>
+      <line x1="40" y1="20" x2="40" y2="260" stroke="#3a4a78" stroke-width="2"/>
+      <text x="18" y="140" text-anchor="middle" fill="#9aa7c2" font-size="12" transform="rotate(-90 18 140)">total collected</text>
+
+      <text x="40" y="278" text-anchor="middle" fill="#9aa7c2" font-size="12">65</text>
+      <text x="164" y="278" text-anchor="middle" fill="#9aa7c2" font-size="12">70</text>
+      <text x="288" y="278" text-anchor="middle" fill="#9aa7c2" font-size="12">75</text>
+      <text x="412" y="278" text-anchor="middle" fill="#9aa7c2" font-size="12">80</text>
+      <text x="536" y="278" text-anchor="middle" fill="#9aa7c2" font-size="12">85</text>
+      <text x="660" y="278" text-anchor="middle" fill="#9aa7c2" font-size="12">90</text>
+      <text x="350" y="296" text-anchor="middle" fill="#9aa7c2" font-size="12">age</text>
+
+      <polyline points="40,260 164,217 288,174 412,132 536,89 660,46"
+        fill="none" stroke="#5bd0a0" stroke-width="3"/>
+      <polyline points="164,260 288,202 412,144 536,85 660,27"
+        fill="none" stroke="#ff8a5b" stroke-width="3"/>
+
+      <line x1="511" y1="20" x2="511" y2="260" stroke="#eef2fb" stroke-width="1.5" stroke-dasharray="4 3" opacity="0.7"/>
+      <circle cx="511" cy="97" r="6" fill="#eef2fb"/>
+      <text x="511" y="42" text-anchor="middle" fill="#eef2fb" font-size="13" font-weight="700">breakeven: ~84</text>
+
+      <circle cx="600" cy="120" r="6" fill="#5bd0a0"/>
+      <text x="612" y="124" fill="#5bd0a0" font-size="13" font-weight="700">claim at 65</text>
+      <circle cx="600" cy="145" r="6" fill="#ff8a5b"/>
+      <text x="612" y="149" fill="#ff8a5b" font-size="13" font-weight="700">delay to 70</text>
+    </svg>
+  </div>
+  <p class="caption">The early claimer's total leads for years. The delayed claimer's bigger deposits slowly close the gap, and overtake it at the breakeven age.</p>
+</section>
+
+<section class="panel">
+  <h2><span class="step-num">5</span> Before breakeven vs. after</h2>
+  <div class="row">
+    <div class="col">
+      <h3 class="tag-good">Die before ~84</h3>
+      <p>Claiming at 65 collected more, total.</p>
+    </div>
+    <div class="col">
+      <h3 style="color: var(--accent);">Live past ~84</h3>
+      <p>Delaying to 70 ends up ahead.</p>
+    </div>
+  </div>
+  <div class="note">Nobody knows their own lifespan in advance, which is exactly why this is a bet, not a sure thing.</div>
+</section>
+
+<footer>
+  A simplified illustration of the tradeoff, using the numbers from this post's calculations.
+</footer>
+
+</div>
+</body>
+</html>

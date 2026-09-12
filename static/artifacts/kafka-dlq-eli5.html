@@ -1,0 +1,232 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>The Dead Letter Queue Escape Hatch</title>
+<style>
+  :root {
+    --bg: #0f1420;
+    --panel: #171f30;
+    --panel2: #1d2740;
+    --text: #eef2fb;
+    --muted: #9aa7c2;
+    --accent: #ff8a5b;
+    --good: #5bd0a0;
+    --bad: #ff6b6b;
+    --line: #2a3350;
+  }
+  * { box-sizing: border-box; }
+  body {
+    margin: 0;
+    background: var(--bg);
+    color: var(--text);
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Helvetica, Arial, sans-serif;
+    line-height: 1.4;
+  }
+  .wrap { max-width: 900px; margin: 0 auto; padding: 40px 20px 80px; }
+  header { text-align: center; margin-bottom: 50px; }
+  header h1 { font-size: 2rem; margin: 0 0 10px; }
+  header p { color: var(--muted); font-size: 1.05rem; margin: 0; }
+  section.panel {
+    background: var(--panel);
+    border: 1px solid var(--line);
+    border-radius: 16px;
+    padding: 28px;
+    margin-bottom: 24px;
+  }
+  section.panel h2 {
+    margin: 0 0 16px;
+    font-size: 1.3rem;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+  }
+  .step-num {
+    display: inline-flex; align-items: center; justify-content: center;
+    width: 28px; height: 28px; border-radius: 50%;
+    background: var(--accent); color: #17120c; font-weight: 700; font-size: 0.9rem;
+    flex-shrink: 0;
+  }
+  .figure { display: flex; justify-content: center; margin: 16px 0 8px; }
+  .figure svg { max-width: 100%; height: auto; }
+  p.caption {
+    text-align: center; color: var(--muted); font-size: 0.95rem; margin: 4px 0 0;
+  }
+  .row { display: flex; gap: 20px; flex-wrap: wrap; justify-content: center; }
+  .col { flex: 1; min-width: 240px; text-align: center; }
+  .col h3 { margin: 8px 0 4px; font-size: 1rem; }
+  .col p { margin: 0; color: var(--muted); font-size: 0.9rem; }
+  .tag-good { color: var(--good); font-weight: 600; }
+  .tag-bad { color: var(--bad); font-weight: 600; }
+  .note {
+    background: var(--panel2); border-left: 3px solid var(--accent);
+    padding: 12px 16px; border-radius: 8px; font-size: 0.9rem; color: var(--muted);
+    margin-top: 16px;
+  }
+  footer {
+    text-align: center; color: var(--muted); font-size: 0.85rem; margin-top: 40px;
+    border-top: 1px solid var(--line); padding-top: 20px;
+  }
+</style>
+</head>
+<body>
+<div class="wrap">
+
+<header>
+  <h1>The Dead Letter Queue Escape Hatch</h1>
+  <p>What happens when a Kafka consumer can't process a message, and how it avoids getting stuck forever.</p>
+</header>
+
+<section class="panel">
+  <h2><span class="step-num">1</span> The happy path</h2>
+  <div class="figure">
+    <svg width="680" height="140" viewBox="0 0 680 140">
+      <rect x="20" y="45" width="150" height="60" rx="10" fill="#243052" stroke="#3a4a78" stroke-width="2"/>
+      <text x="95" y="75" text-anchor="middle" dominant-baseline="central" fill="#eef2fb" font-size="13" font-weight="600">message</text>
+
+      <path d="M170 75 L255 75" stroke="#5bd0a0" stroke-width="3" fill="none" marker-end="url(#arrowGood1)"/>
+
+      <rect x="265" y="35" width="150" height="80" rx="10" fill="#1d2740" stroke="#5bd0a0" stroke-width="2"/>
+      <text x="340" y="65" text-anchor="middle" dominant-baseline="central" fill="#5bd0a0" font-size="24">&#9989;</text>
+      <text x="340" y="95" text-anchor="middle" dominant-baseline="central" fill="#eef2fb" font-size="12" font-weight="600">processed OK</text>
+
+      <path d="M415 75 L500 75" stroke="#5bd0a0" stroke-width="3" fill="none" marker-end="url(#arrowGood2)"/>
+
+      <rect x="510" y="45" width="150" height="60" rx="10" fill="#243052" stroke="#3a4a78" stroke-width="2"/>
+      <text x="585" y="75" text-anchor="middle" dominant-baseline="central" fill="#eef2fb" font-size="13" font-weight="600">next message</text>
+
+      <defs>
+        <marker id="arrowGood1" markerWidth="10" markerHeight="10" refX="8" refY="3" orient="auto">
+          <path d="M0,0 L8,3 L0,6 Z" fill="#5bd0a0"/>
+        </marker>
+        <marker id="arrowGood2" markerWidth="10" markerHeight="10" refX="8" refY="3" orient="auto">
+          <path d="M0,0 L8,3 L0,6 Z" fill="#5bd0a0"/>
+        </marker>
+      </defs>
+    </svg>
+  </div>
+  <p class="caption">Most messages arrive, get processed right away, and the consumer moves on. No drama.</p>
+</section>
+
+<section class="panel">
+  <h2><span class="step-num">2</span> But sometimes processing fails</h2>
+  <div class="figure">
+    <svg width="680" height="150" viewBox="0 0 680 150">
+      <rect x="20" y="50" width="150" height="60" rx="10" fill="#243052" stroke="#3a4a78" stroke-width="2"/>
+      <text x="95" y="80" text-anchor="middle" dominant-baseline="central" fill="#eef2fb" font-size="13" font-weight="600">message</text>
+
+      <path d="M170 80 L255 80" stroke="#ff6b6b" stroke-width="3" fill="none" marker-end="url(#arrowBad1)"/>
+
+      <rect x="265" y="35" width="170" height="90" rx="10" fill="#1d2740" stroke="#ff6b6b" stroke-width="2"/>
+      <text x="350" y="65" text-anchor="middle" dominant-baseline="central" fill="#ff6b6b" font-size="24">&#10060;</text>
+      <text x="350" y="100" text-anchor="middle" dominant-baseline="central" fill="#eef2fb" font-size="12" font-weight="600">error raised</text>
+
+      <path d="M435 80 L520 80" stroke="#ff8a5b" stroke-width="3" fill="none" marker-end="url(#arrowBad2)"/>
+
+      <rect x="530" y="50" width="130" height="60" rx="10" fill="#243052" stroke="#ff8a5b" stroke-width="2"/>
+      <text x="595" y="80" text-anchor="middle" dominant-baseline="central" fill="#ff8a5b" font-size="13" font-weight="600">retry it</text>
+
+      <defs>
+        <marker id="arrowBad1" markerWidth="10" markerHeight="10" refX="8" refY="3" orient="auto">
+          <path d="M0,0 L8,3 L0,6 Z" fill="#ff6b6b"/>
+        </marker>
+        <marker id="arrowBad2" markerWidth="10" markerHeight="10" refX="8" refY="3" orient="auto">
+          <path d="M0,0 L8,3 L0,6 Z" fill="#ff8a5b"/>
+        </marker>
+      </defs>
+    </svg>
+  </div>
+  <p class="caption">A bug, a bad value, a missing record: whatever the cause, the consumer can't finish the job. It does not just give up on the first try.</p>
+</section>
+
+<section class="panel">
+  <h2><span class="step-num">3</span> Retry with a longer wait each time</h2>
+  <div class="figure">
+    <svg width="700" height="220" viewBox="0 0 700 220">
+      <circle cx="90" cy="110" r="42" fill="#1d2740" stroke="#ff8a5b" stroke-width="2"/>
+      <text x="90" y="98" text-anchor="middle" dominant-baseline="central" fill="#ff8a5b" font-size="20" font-weight="700">1</text>
+      <text x="90" y="122" text-anchor="middle" dominant-baseline="central" fill="#9aa7c2" font-size="11">retry</text>
+      <text x="90" y="175" text-anchor="middle" dominant-baseline="central" fill="#eef2fb" font-size="12">wait 2s</text>
+
+      <path d="M138 110 L217 110" stroke="#ff8a5b" stroke-width="3" fill="none" marker-end="url(#arrowR1)"/>
+
+      <circle cx="270" cy="110" r="46" fill="#1d2740" stroke="#ff8a5b" stroke-width="2"/>
+      <text x="270" y="98" text-anchor="middle" dominant-baseline="central" fill="#ff8a5b" font-size="20" font-weight="700">2</text>
+      <text x="270" y="122" text-anchor="middle" dominant-baseline="central" fill="#9aa7c2" font-size="11">retry</text>
+      <text x="270" y="180" text-anchor="middle" dominant-baseline="central" fill="#eef2fb" font-size="12">wait 4s</text>
+
+      <path d="M322 110 L401 110" stroke="#ff6b6b" stroke-width="3" fill="none" marker-end="url(#arrowR2)"/>
+
+      <circle cx="460" cy="110" r="50" fill="#1d2740" stroke="#ff6b6b" stroke-width="3"/>
+      <text x="460" y="102" text-anchor="middle" dominant-baseline="central" fill="#ff6b6b" font-size="22" font-weight="700">&#10060;</text>
+      <text x="460" y="128" text-anchor="middle" dominant-baseline="central" fill="#9aa7c2" font-size="11">still failing</text>
+      <text x="460" y="188" text-anchor="middle" dominant-baseline="central" fill="#eef2fb" font-size="12">limit reached</text>
+
+      <defs>
+        <marker id="arrowR1" markerWidth="10" markerHeight="10" refX="8" refY="3" orient="auto">
+          <path d="M0,0 L8,3 L0,6 Z" fill="#ff8a5b"/>
+        </marker>
+        <marker id="arrowR2" markerWidth="10" markerHeight="10" refX="8" refY="3" orient="auto">
+          <path d="M0,0 L8,3 L0,6 Z" fill="#ff6b6b"/>
+        </marker>
+      </defs>
+    </svg>
+  </div>
+  <p class="caption">Each retry waits longer than the last (this is called <strong>backoff</strong>). Maybe the problem was temporary and just needed time to clear.</p>
+</section>
+
+<section class="panel">
+  <h2><span class="step-num">4</span> Out of retries: the DLQ escape hatch</h2>
+  <div class="figure">
+    <svg width="700" height="180" viewBox="0 0 700 180">
+      <circle cx="90" cy="90" r="50" fill="#1d2740" stroke="#ff6b6b" stroke-width="3"/>
+      <text x="90" y="80" text-anchor="middle" dominant-baseline="central" fill="#ff6b6b" font-size="20" font-weight="700">&#10060;</text>
+      <text x="90" y="106" text-anchor="middle" dominant-baseline="central" fill="#9aa7c2" font-size="11">retries used up</text>
+
+      <path d="M143 90 L232 90" stroke="#ff8a5b" stroke-width="3" fill="none" marker-end="url(#arrowD1)"/>
+
+      <rect x="240" y="35" width="220" height="110" rx="12" fill="#1d2740" stroke="#ff8a5b" stroke-width="2"/>
+      <text x="350" y="60" text-anchor="middle" dominant-baseline="central" fill="#ff8a5b" font-size="26">&#128682;</text>
+      <text x="350" y="98" text-anchor="middle" dominant-baseline="central" fill="#eef2fb" font-size="13" font-weight="700">moved to DLQ topic</text>
+      <text x="350" y="122" text-anchor="middle" dominant-baseline="central" fill="#9aa7c2" font-size="11">set aside, not lost</text>
+
+      <path d="M460 90 L549 90" stroke="#5bd0a0" stroke-width="3" fill="none" marker-end="url(#arrowD2)"/>
+
+      <rect x="557" y="60" width="130" height="60" rx="10" fill="#243052" stroke="#5bd0a0" stroke-width="2"/>
+      <text x="622" y="90" text-anchor="middle" dominant-baseline="central" fill="#5bd0a0" font-size="13" font-weight="600">next message</text>
+
+      <defs>
+        <marker id="arrowD1" markerWidth="10" markerHeight="10" refX="8" refY="3" orient="auto">
+          <path d="M0,0 L8,3 L0,6 Z" fill="#ff8a5b"/>
+        </marker>
+        <marker id="arrowD2" markerWidth="10" markerHeight="10" refX="8" refY="3" orient="auto">
+          <path d="M0,0 L8,3 L0,6 Z" fill="#5bd0a0"/>
+        </marker>
+      </defs>
+    </svg>
+  </div>
+  <p class="caption">The troublesome message gets copied to a separate <strong>DLQ topic</strong>, parked for someone to look at later. The consumer is now free to keep going.</p>
+  <div class="note">Without a DLQ, the consumer would keep retrying the same stuck message forever, and every message behind it would just have to wait.</div>
+</section>
+
+<section class="panel">
+  <h2><span class="step-num">5</span> The two paths, side by side</h2>
+  <div class="row">
+    <div class="col">
+      <h3 class="tag-good">Happy path</h3>
+      <p>message &#8594; processed &#8594; done &#8594; next message</p>
+    </div>
+    <div class="col">
+      <h3 class="tag-bad">Failure path</h3>
+      <p>message &#8594; fails &#8594; retry, retry &#8594; still fails &#8594; DLQ topic &#8594; next message</p>
+    </div>
+  </div>
+</section>
+
+<footer>
+  From "Add a Kafka Consumer to Rails".
+</footer>
+
+</div>
+</body>
+</html>

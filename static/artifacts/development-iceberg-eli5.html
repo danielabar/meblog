@@ -1,0 +1,160 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>The Development Iceberg, Explained Simply</title>
+<style>
+  :root {
+    --bg: #0f1420;
+    --panel: #171f30;
+    --panel2: #1d2740;
+    --text: #eef2fb;
+    --muted: #9aa7c2;
+    --accent: #ff8a5b;
+    --good: #5bd0a0;
+    --line: #2a3350;
+  }
+  * { box-sizing: border-box; }
+  body {
+    margin: 0;
+    background: var(--bg);
+    color: var(--text);
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Helvetica, Arial, sans-serif;
+    line-height: 1.4;
+  }
+  .wrap { max-width: 900px; margin: 0 auto; padding: 40px 20px 80px; }
+  header { text-align: center; margin-bottom: 50px; }
+  header h1 { font-size: 2rem; margin: 0 0 10px; }
+  header p { color: var(--muted); font-size: 1.05rem; margin: 0; }
+  section.panel {
+    background: var(--panel);
+    border: 1px solid var(--line);
+    border-radius: 16px;
+    padding: 28px;
+    margin-bottom: 24px;
+  }
+  section.panel h2 {
+    margin: 0 0 16px;
+    font-size: 1.3rem;
+  }
+  .figure { display: flex; justify-content: center; margin: 8px 0 8px; }
+  .figure svg { max-width: 100%; height: auto; }
+  p.caption {
+    text-align: center; color: var(--muted); font-size: 0.95rem; margin: 12px 0 0;
+  }
+  .legend {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 10px 24px;
+    margin-top: 24px;
+  }
+  .legend-item {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+  }
+  .legend-num {
+    display: inline-flex; align-items: center; justify-content: center;
+    width: 28px; height: 28px; border-radius: 50%;
+    background: var(--accent); color: #17120c; font-weight: 700; font-size: 0.9rem;
+    flex-shrink: 0;
+  }
+  .legend-item span.label { font-size: 0.95rem; }
+  .note {
+    background: var(--panel2); border-left: 3px solid var(--accent);
+    padding: 14px 18px; border-radius: 8px; font-size: 0.95rem; color: var(--text);
+  }
+  @media (max-width: 520px) {
+    .legend { grid-template-columns: 1fr; }
+  }
+</style>
+</head>
+<body>
+<div class="wrap">
+
+<header>
+  <h1>The Development Iceberg</h1>
+  <p>When someone asks "how long will this take?", most people only picture the part above the water.</p>
+</header>
+
+<section class="panel">
+  <h2>What actually goes into a feature</h2>
+  <div class="figure">
+    <svg width="900" height="700" viewBox="0 0 900 700" xmlns="http://www.w3.org/2000/svg">
+      <defs>
+        <linearGradient id="water" x1="0" y1="0" x2="0" y2="1">
+          <stop offset="0%" stop-color="#2a6fa8" stop-opacity="0.55"/>
+          <stop offset="100%" stop-color="#153a5c" stop-opacity="0.75"/>
+        </linearGradient>
+      </defs>
+
+      <!-- submerged ice mass -->
+      <polygon points="400,220 220,300 120,420 140,580 280,660 450,690 620,660 760,580 780,420 680,300 500,220"
+        fill="#bcd6ea" stroke="#7fa3c2" stroke-width="2"/>
+
+      <!-- water tint over submerged mass -->
+      <rect x="0" y="220" width="900" height="480" fill="url(#water)"/>
+
+      <!-- waterline -->
+      <line x1="10" y1="220" x2="890" y2="220" stroke="#eef2fb" stroke-width="2" stroke-dasharray="6 5" opacity="0.8"/>
+      <text x="855" y="208" text-anchor="end" dominant-baseline="central" fill="var(--muted)" font-size="13">waterline</text>
+
+      <!-- visible tip -->
+      <polygon points="450,50 400,220 500,220" fill="#eaf6ff" stroke="#7fa3c2" stroke-width="2"/>
+
+      <!-- tip label -->
+      <text x="450" y="22" text-anchor="middle" dominant-baseline="central" fill="#eef2fb" font-size="17" font-weight="700">Writing the Code</text>
+
+      <!-- numbered points inside submerged mass -->
+      <g font-size="16" font-weight="700" fill="#17120c">
+        <circle cx="480" cy="280" r="26" fill="#ff8a5b"/>
+        <text x="480" y="280" text-anchor="middle" dominant-baseline="central">1</text>
+
+        <circle cx="350" cy="300" r="26" fill="#ff8a5b"/>
+        <text x="350" y="300" text-anchor="middle" dominant-baseline="central">2</text>
+
+        <circle cx="620" cy="350" r="26" fill="#ff8a5b"/>
+        <text x="620" y="350" text-anchor="middle" dominant-baseline="central">3</text>
+
+        <circle cx="250" cy="400" r="26" fill="#ff8a5b"/>
+        <text x="250" y="400" text-anchor="middle" dominant-baseline="central">4</text>
+
+        <circle cx="450" cy="450" r="26" fill="#ff8a5b"/>
+        <text x="450" y="450" text-anchor="middle" dominant-baseline="central">5</text>
+
+        <circle cx="680" cy="460" r="26" fill="#ff8a5b"/>
+        <text x="680" y="460" text-anchor="middle" dominant-baseline="central">6</text>
+
+        <circle cx="300" cy="520" r="26" fill="#ff8a5b"/>
+        <text x="300" y="520" text-anchor="middle" dominant-baseline="central">7</text>
+
+        <circle cx="600" cy="560" r="26" fill="#ff8a5b"/>
+        <text x="600" y="560" text-anchor="middle" dominant-baseline="central">8</text>
+
+        <circle cx="450" cy="600" r="26" fill="#ff8a5b"/>
+        <text x="450" y="600" text-anchor="middle" dominant-baseline="central">9</text>
+      </g>
+    </svg>
+  </div>
+  <p class="caption">The small tip above the waterline is what most estimates account for. Everything numbered below it also has to happen &mdash; and together it's the bigger half of the work.</p>
+
+  <div class="legend">
+    <div class="legend-item"><span class="legend-num">1</span><span class="label">Ticket description</span></div>
+    <div class="legend-item"><span class="legend-num">2</span><span class="label">Local verification</span></div>
+    <div class="legend-item"><span class="legend-num">3</span><span class="label">Automated tests</span></div>
+    <div class="legend-item"><span class="legend-num">4</span><span class="label">Engineering docs</span></div>
+    <div class="legend-item"><span class="legend-num">5</span><span class="label">Deployed verification</span></div>
+    <div class="legend-item"><span class="legend-num">6</span><span class="label">Git cleanup</span></div>
+    <div class="legend-item"><span class="legend-num">7</span><span class="label">Pull request write-up</span></div>
+    <div class="legend-item"><span class="legend-num">8</span><span class="label">Context shifting while waiting</span></div>
+    <div class="legend-item"><span class="legend-num">9</span><span class="label">Final push to production</span></div>
+  </div>
+</section>
+
+<section class="panel">
+  <div class="note">Skip any of these and the work doesn't disappear &mdash; it just shows up later as a surprise, unbudgeted and unplanned.</div>
+</section>
+
+</div>
+</body>
+</html>

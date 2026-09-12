@@ -8,6 +8,12 @@ related:
   - "Rails CORS Middleware For Multiple Resources"
   - "Fix Rails Blocked Host Error with Docker"
   - "Add Rubocop to an Existing Rails Project"
+artifacts:
+  - slug: "kafka-dlq-eli5"
+    title: "The Dead Letter Queue Escape Hatch"
+    file: "kafka-dlq-eli5.html"
+    creditText: "eli5 skill"
+    creditUrl: "https://github.com/anthropics/claude-plugins-community/tree/main/eli5"
 ---
 
 This post will walk through how to integrate a Kafka consumer into a Rails application in a maintainable and testable way. Why would you need to do this? Consider the following scenario: You're working on an e-commerce system that has been developed with Rails. The product details page needs to be enhanced to show whether the current product is in stock, out of stock, or only has small number of items left (eg: "Only 3 left in stock!"). This information comes from a legacy inventory management system that has been written in a different programming language. This legacy system is responsible for updating the inventory count based on events, such as product purchases, returns, or stock replenishments.
@@ -547,6 +553,8 @@ end
 ```
 
 With this approach, if any error is raised during message processing, Karafka will automatically retry up to a configured number of `max_retries` (which can also be set to zero if you don't ever want it to retry). If message processing still fails after the retries are exhausted, a new message containing the same header and payload as the troublesome message will be produced to the topic specified in the `dead_letter_queue` method, in this case, `dlq_inventory_management_product_updates`.
+
+<!-- artifact: kafka-dlq-eli5 -->
 
 With the modified `karafka.rb` in place (remember to restart the karafka server `bundle exec karafka server` after making changes to `karafka.rb`), producing an inventory update message with a product code that does not exist will generate the following log messages in the Karafka server. I've annotated them with `=== EXPLANATION ===`, which shows that after consuming the bad message, Karafka will make two more attempts to process it. If those still fail, it writes the message the the topic `dlq_inventory_management_product_updates`, then moves on, waiting to consume new messages:
 
