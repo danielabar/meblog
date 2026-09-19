@@ -1,0 +1,78 @@
+---
+title: "When a Site Blocks Text Selection"
+featuredImage: "TBD"
+description: "A DevTools console snippet to restore text selection, copy, and right-click on a site that blocks them."
+date: "2026-11-01"
+category: "javascript"
+related:
+  - "When the Password Field Says No to Paste"
+  - "Access Chrome Bookmarks with Keyboard"
+  - "The Code-Adjacent Power of AI"
+---
+
+I recently came across a useful blog post about automated testing best practices. It covered a set of rules, explaining why each should be followed, and a ready-to-use Claude Code skill that enforces those rules automatically when an AI assistant is writing specs for you. Exactly the kind of thing a developer might want to copy and paste for their Claude Code setup.
+
+But when I went to copy the skill section into my own `.claude/skills` directory, my mouse seemed to have stopped responding. Everywhere on the page that I tried to click and drag to highlight text, nothing happened. I also tried to right-click to inspect element on the code block where the skill was, and nothing happened there either, no context menu appeared. tbh my heart skipped a beat because I thought maybe the page had malicious content, you know like something running in the background like trying to install a crypto miner or something like that, and that's why my mouse had stopped responding.
+
+## Investigating
+
+I opened Chrome's Task Manager (Window > Task Manager) to check CPU and memory for that tab specifically — a background tab pegged at high CPU is the tell for something like a cryptominer. Nothing stood out: normal footprint, no runaway process.
+
+My next thought was was something must be wrong with my mouse. I use a Magic Mouse over Bluetooth, and it does occasionally drop out or get flaky mid-click. So I checked System Settings, saw it was connected fine. I also tried clicking around on other tabs and windows, and all seemed well.
+
+Then I thought maybe the page itself was just broken, perhaps a JS error left it half-loaded. I hit refresh, but no change in behaviour, click to highlight and right-click was still broken.
+
+At that point it was clear: this wasn't my mouse, and it wasn't a broken page. Something on the site was deliberately blocking selection, copying, and right-click. What could it possibly be? Curiosity piqued!
+
+![a curious cat peering intently at something](../images/curios-cat.jpg "Curiosity piqued")
+
+## Getting the AI Assistant to Investigate
+
+I pointed Claude Code at the blog post URL using the [Chrome DevTools MCP server](https://github.com/ChromeDevTools/chrome-devtools-mcp) and asked it to figure out what was going on. It discovered the following:
+
+It discovered `user-select: none` set as a CSS rule on `<body>`, which blocks text selection outright, plus listeners on `contextmenu`, `selectstart`, `copy`, `cut`, `paste`, and `dragstart`, attached to both `document` and `document.body`. Tracing the listeners back to their source led to `wp-security-front-script.js`, shipped by **All-In-One Security (AIOS)**, formerly known as "All In One WP Security & Firewall." It's a general-purpose hardening plugin (firewall rules, brute-force lockout, 2FA), and Copy Protection is just one optional toggle buried in its settings, off by default. Per the plugin's own docs, it's meant to "disable right clicking on your site so that users will not be able to copy the content."
+
+## Undoing It, the Same Way I Undid Blocked Paste
+
+This felt familiar. A while back I wrote about [websites that block pasting into password fields](/blog/password-field-no-paste/), and the fix there relied on a neat trick: event listeners added during the *capture* phase run before listeners added during the normal *bubble* phase, so you can intercept an event before the page's own blocking code ever sees it.
+
+I pointed Claude at my earlier blog post about paste blocking, then asked it if a similar idea could be used to allow highlight text selection and copy when this plugin was active. I also prompted Claude to actually test the fix in DevTools against the live page before handing it to me, rather than just describing something that sounded plausible. It came back with two pieces: a competing CSS rule to override `user-select: none`, and a capture-phase listener to beat the plugin's own event handlers.
+It confirmed the CSS override took effect, and worked out that the most bulletproof way to neutralize an unknown number of existing listeners (20 apiece, remember) was to intercept the events one level higher, on `window`, before they ever reach `document` or `body` at all.
+
+Claude then provided this snippet to paste it into the DevTools Console on any page with this kind of blocking:
+
+```js
+(function(){
+  const style = document.createElement('style');
+  style.textContent = '*{user-select:text !important;-webkit-user-select:text !important;}';
+  document.documentElement.appendChild(style);
+
+  ['contextmenu','selectstart','copy','cut','paste','dragstart','mousedown','keydown'].forEach(evt => {
+    window.addEventListener(evt, e => e.stopPropagation(), true);
+  });
+
+  document.oncontextmenu = null;
+  document.onselectstart = null;
+  document.oncopy = null;
+  document.body.oncontextmenu = null;
+})();
+```
+
+What each part does:
+
+The `<style>` tag fixes selection. `user-select: none` is a CSS rendering rule the browser applies directly: "don't let this text become selected, full stop." So this snippet undoes that with a competing CSS rule using `!important`.
+
+The `window.addEventListener(evt, ..., true)` calls register capture-phase listeners on `window`, which is the outermost point in the DOM tree an event passes through. Since capture runs top-down (`window` → `document` → `body` → target), calling `stopPropagation()` there stops the event before it ever reaches the plugin's listeners on `document` and `body`.
+
+The `on*` assignments at the end are just a fallback, in case anything was wired up as an inline handler instead of via `addEventListener`.
+
+After pasting that into the browser devtools console, copy, right-click, and select-all all work again as per normal expected browser behaviour.
+
+<aside class="markdown-aside">
+Blocking copy-paste on a post that exists to hand readers a code snippet is an odd choice, if someone wants it badly enough they can screenshot it, retype it, or just <code>curl</code> the raw HTML. All it really does is make a basic, expected browser behaviour stop working, enough to make a reader's heart skip a beat wondering if something's actually broken.
+</aside>
+
+## Takeaway
+
+If you encounter a website with this kind of copy blocking behaviour, try running the snippet in this post. And if that doesn't work, point your AI assistant at it with Chrome DevTools MCP to troubleshoot and solve the issue.
+</content>
