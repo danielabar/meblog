@@ -1,6 +1,6 @@
 ---
 title: "When a Site Blocks Text Selection"
-featuredImage: "TBD"
+featuredImage: "../images/when-site-blocks-text-selection-juan-molina-7hQDelVc08A-unsplash.jpg"
 description: "A DevTools console snippet to restore text selection, copy, and right-click on a site that blocks them."
 date: "2026-11-01"
 category: "javascript"
@@ -10,11 +10,11 @@ related:
   - "The Code-Adjacent Power of AI"
 ---
 
-I recently came across a useful blog post about automated testing best practices. It covered a set of rules, explaining why each should be followed, and a ready-to-use Claude Code skill that enforces those rules automatically when an AI assistant is writing specs for you. Exactly the kind of thing a developer might want to copy and paste for their Claude Code setup.
+I recently came across a blog post about automated testing best practices. It covered a set of rules, explaining why each should be followed, and a ready-to-use Claude Code skill that enforces those rules automatically when an AI assistant is writing the specs. Exactly the kind of thing a developer might want to copy and paste for their Claude Code setup.
 
 But when I went to copy the skill section into my own `.claude/skills` directory, my mouse stopped responding. Everywhere I tried to click and drag to highlight text, nothing happened. It felt like the page had suddenly locked up. Right-click did nothing either, no context menu. My heart skipped a beat: was this a broken mouse, or was something actually running on my machine, a crypto miner, ransomware quietly encrypting files while the tab just sat there, unresponsive.
 
-## Investigating
+## Ruling Out
 
 I opened Chrome's Task Manager (Window > Task Manager) to check CPU and memory for that tab specifically. A background tab pegged at high CPU is the tell for something like a cryptominer, but nothing stood out.
 
@@ -26,13 +26,13 @@ At that point it was clear: this wasn't my mouse, and it wasn't a broken page. S
 
 ![a curious cat peering intently at something](../images/curios-cat.jpg "Curiosity piqued")
 
-## Getting the AI Assistant to Investigate
+## AI Investigation
 
 I pointed Claude Code at the blog post URL using the [Chrome DevTools MCP server](https://github.com/ChromeDevTools/chrome-devtools-mcp) and asked it to figure out what was going on. It discovered the following:
 
 It discovered `user-select: none` set as a CSS rule on `<body>`, which blocks text selection outright, plus listeners on `contextmenu`, `selectstart`, `copy`, `cut`, `paste`, and `dragstart`, attached to both `document` and `document.body`. Tracing the listeners back to their source led to `wp-security-front-script.js`, shipped by **All-In-One Security (AIOS)**, formerly known as "All In One WP Security & Firewall." It's a general-purpose hardening plugin (firewall rules, brute-force lockout, 2FA), and Copy Protection is just one optional toggle buried in its settings, off by default. Per the plugin's own docs, it's meant to "disable right clicking on your site so that users will not be able to copy the content."
 
-## Undoing It, the Same Way I Undid Blocked Paste
+## Undoing It
 
 This felt familiar. A while back I wrote about [websites that block pasting into password fields](/blog/password-field-no-paste/), and the fix there relied on a neat trick: event listeners added during the *capture* phase run before listeners added during the normal *bubble* phase, so you can intercept an event before the page's own blocking code ever sees it.
 
