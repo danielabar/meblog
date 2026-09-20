@@ -28,11 +28,17 @@ At that point it was clear: this wasn't my mouse, and it wasn't a broken page. S
 
 ## AI Investigation
 
-I pointed Claude Code at the blog post URL and prompted it to use the [Chrome DevTools MCP server](https://github.com/ChromeDevTools/chrome-devtools-mcp) to figure out what was going on. It pretty quickly found the following:
+I pointed Claude Code at the blog post URL and prompted it to use the [Chrome DevTools MCP server](https://github.com/ChromeDevTools/chrome-devtools-mcp) to figure out what was going on.
+
+<aside class="markdown-aside">
+The Chrome DevTools MCP server gives an AI assistant direct control of a fresh, automated Chrome instance (no access to your regular browser's cookies or logins): it can load a page, inspect the DOM, read computed styles, list attached event listeners, watch network requests, and run JS in the console. Instead of guessing at markup from a page source dump, the assistant can poke at the actual running page the same way a developer would in DevTools.
+</aside>
+
+It pretty quickly found the following:
 
 Firstly, `user-select: none` was set as a CSS rule on `<body>`, blocking all text selection. Additionally, listeners on `contextmenu`, `selectstart`, `copy`, `cut`, `paste`, and `dragstart`, were attached to `document` and `document.body`.
 
-Tracing the listeners back to their source led to `wp-security-front-script.js`, shipped by [All-In-One Security (AIOS)](https://wordpress.org/plugins/all-in-one-wp-security-and-firewall/). This is a WordPress plugin that adds firewall rules, login lockout after failed attempts, and two-factor authentication. Copy Protection is an optional toggle in its settings, off by default. While not described on the official plugin's page, this [tutorial](https://www.webnots.com/wordpress-all-in-one-wp-security-and-firewall-plugin-tutorial/) shows that enabling Copy Protection will:
+Claude was also able to trace the listeners back to their source, which was a script named `wp-security-front-script.js`. This is shipped by [All-In-One Security (AIOS)](https://wordpress.org/plugins/all-in-one-wp-security-and-firewall/), which is a WordPress plugin that adds firewall rules, login lockout after failed attempts, and two-factor authentication. Copy Protection is an optional toggle in this plugins' settings. While not described on the official plugin's page, this [tutorial](https://www.webnots.com/wordpress-all-in-one-wp-security-and-firewall-plugin-tutorial/) shows that enabling Copy Protection will:
 
 > Disable the "Right Click", "Text Selection", and "Copy" option on the front end of your site.
 
