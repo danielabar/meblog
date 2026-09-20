@@ -42,14 +42,15 @@ Claude was also able to trace the listeners back to their source, which was a sc
 
 > Disable the "Right Click", "Text Selection", and "Copy" option on the front end of your site.
 
-This felt familiar. A while back I wrote about [websites that block pasting into password fields](/blog/password-field-no-paste/), and the fix there relied on a neat trick: event listeners added during the *capture* phase run before listeners added during the normal *bubble* phase, so you can intercept an event before the page's own blocking code ever sees it.
+This felt familiar. A while back I wrote about websites that [block pasting into password fields](../password-field-no-paste/). The fix there relied on how event listeners added during the *capture* phase run before listeners added during the normal *bubble* phase, so you can intercept an event before the page's own blocking code ever sees it.
 
 ## Undoing It
 
-I pointed Claude at my earlier blog post about paste blocking, then asked it if a similar idea could be used to allow highlight text selection and copy when this plugin was active. I also prompted Claude to actually test the fix in DevTools against the live page before handing it to me, rather than just describing something that sounded plausible. It came back with two pieces: a competing CSS rule to override `user-select: none`, and a capture-phase listener to beat the plugin's own event handlers.
-It confirmed the CSS override took effect, and worked out that the most bulletproof way to neutralize an unknown number of existing listeners (20 apiece, remember) was to intercept the events one level higher, on `window`, before they ever reach `document` or `body` at all.
+I pointed Claude at my earlier blog post about paste blocking, then asked it if a similar idea could be used to allow highlight text selection and copy when this plugin was active. I also prompted Claude to actually test the fix with the Chrome DevTools MCP server, against the live page before handing it to me, rather than just describing something that sounded plausible.
 
-Claude then provided this snippet to paste it into the DevTools Console on any page with this kind of blocking:
+It came back with two pieces: a competing CSS rule to override `user-select: none`, and a capture-phase listener to beat the plugin's own event handlers. It confirmed the CSS override took effect, and worked out that the most bulletproof way to neutralize an unknown number of existing listeners was to intercept the events one level higher, on `window`, before they ever reach `document` or `body`.
+
+Claude then provided this snippet to paste into the browser DevTools Console on any page with this kind of blocking:
 
 ```js
 (function(){
@@ -70,19 +71,18 @@ Claude then provided this snippet to paste it into the DevTools Console on any p
 
 What each part does:
 
-The `<style>` tag fixes selection. `user-select: none` is a CSS rendering rule the browser applies directly: "don't let this text become selected, full stop." So this snippet undoes that with a competing CSS rule using `!important`.
+The `<style>` tag fixes selection. `user-select: none` is a CSS rendering rule the browser applies directly, which has the effect of not allowing text to be selected. So this snippet undoes that with a competing CSS rule using `!important`.
 
-The `window.addEventListener(evt, ..., true)` calls register capture-phase listeners on `window`, which is the outermost point in the DOM tree an event passes through. Since capture runs top-down (`window` → `document` → `body` → target), calling `stopPropagation()` there stops the event before it ever reaches the plugin's listeners on `document` and `body`.
+`addEventListener`'s third arg is `useCapture`, defaulting to `false` (bubble phase). Setting it to `true` here, registers [capture-phase](https://developer.mozilla.org/en-US/docs/Web/API/Event/eventPhase) listeners on `window` instead, which is the outermost point in the DOM tree an event passes through. Since capture runs top-down (`window` → `document` → `body` → target), calling `stopPropagation()` there stops the event before it ever reaches the plugin's bubble phase listeners on `document` and `body`.
 
 The `on*` assignments at the end are just a fallback, in case anything was wired up as an inline handler instead of via `addEventListener`.
 
 After pasting that into the browser devtools console, copy, right-click, and select-all all work again as per normal expected browser behaviour.
 
 <aside class="markdown-aside">
-Blocking copy-paste on a post that exists to hand readers a code snippet is an odd choice, if someone wants it badly enough they can screenshot it, retype it, or just <code>curl</code> the raw HTML. All it really does is make a basic, expected browser behaviour stop working, enough to make a reader's heart skip a beat wondering if something's actually broken.
+Blocking copy-paste on a post that exists to hand readers a code snippet seems like an odd choice. If someone wants it badly enough they can screenshot it, or just <code>curl</code> the raw HTML and hand it to their AI assistant to reconstruct the skill. All it really does is make a basic, expected browser behaviour stop working, enough to make a reader's heart skip a beat wondering if something's broken or they've been hacked.
 </aside>
 
 ## Takeaway
 
 If you encounter a website with this kind of copy blocking behaviour, try running the snippet in this post. And if that doesn't work, point your AI assistant at it with Chrome DevTools MCP to troubleshoot and solve the issue.
-</content>
