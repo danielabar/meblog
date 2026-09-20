@@ -36,7 +36,7 @@ The Chrome DevTools MCP server gives an AI assistant direct control of a fresh, 
 
 It pretty quickly found the following:
 
-Firstly, `user-select: none` was set as a CSS rule on `<body>`, blocking all text selection. Additionally, listeners on `contextmenu`, `selectstart`, `copy`, `cut`, `paste`, and `dragstart`, were attached to `document` and `document.body`.
+Firstly, `user-select: none` was set as a CSS rule on `<body>`, blocking all text selection. Additionally, listeners on `contextmenu`, `selectstart`, `copy`, `cut`, `paste`, and `dragstart`, were attached to `document` and `document.body`, each one presumably calling `preventDefault()` to block its action.
 
 Claude was also able to trace the listeners back to their source, which was a script named `wp-security-front-script.js`. This is shipped by [All-In-One Security (AIOS)](https://wordpress.org/plugins/all-in-one-wp-security-and-firewall/), which is a WordPress plugin that adds firewall rules, login lockout after failed attempts, and two-factor authentication. Copy Protection is an optional toggle in this plugins' settings. While not described on the official plugin's page, this [tutorial](https://www.webnots.com/wordpress-all-in-one-wp-security-and-firewall-plugin-tutorial/) shows that enabling Copy Protection will:
 
@@ -73,11 +73,11 @@ What each part does:
 
 The `<style>` tag fixes selection. `user-select: none` is a CSS rendering rule the browser applies directly, which has the effect of not allowing text to be selected. So this snippet undoes that with a competing CSS rule using `!important`.
 
-`addEventListener`'s third arg is `useCapture`, defaulting to `false` (bubble phase). Setting it to `true` here, registers [capture-phase](https://developer.mozilla.org/en-US/docs/Web/API/Event/eventPhase) listeners on `window` instead, which is the outermost point in the DOM tree an event passes through. Since capture runs top-down (`window` → `document` → `body` → target), calling `stopPropagation()` there stops the event before it ever reaches the plugin's bubble phase listeners on `document` and `body`.
+`addEventListener`'s third arg is `useCapture`, defaulting to `false` (bubble phase). Setting it to `true` here registers [capture-phase](https://developer.mozilla.org/en-US/docs/Web/API/Event/eventPhase) listeners on `window` instead, which is the outermost point in the DOM tree an event passes through. Since capture runs top-down (`window` → `document` → `body` → target), calling `stopPropagation()` there stops the event before it ever reaches the plugin's bubble phase listeners on `document` and `body`.
 
 The `on*` assignments at the end are just a fallback, in case anything was wired up as an inline handler instead of via `addEventListener`.
 
-After pasting that into the browser devtools console, copy, right-click, and select-all all work again as per normal expected browser behaviour.
+After pasting that into the browser devtools console, copy, right-click, and select-all all worked again as per normal expected browser behaviour.
 
 <aside class="markdown-aside">
 Blocking copy-paste on a post that exists to hand readers a code snippet seems like an odd choice. If someone wants it badly enough they can screenshot it, or just <code>curl</code> the raw HTML and hand it to their AI assistant to reconstruct the skill. All it really does is make a basic, expected browser behaviour stop working, enough to make a reader's heart skip a beat wondering if something's broken or they've been hacked.
