@@ -10,7 +10,7 @@ related:
   - "The Code-Adjacent Power of AI"
 ---
 
-I recently came across a blog post about automated testing best practices. It covered a set of rules, explaining why each should be followed, and a ready-to-use Claude Code skill that enforces those rules automatically when an AI assistant is writing the specs. Exactly the kind of thing a developer might want to copy and paste for their Claude Code setup.
+I recently came across a blog post about automated testing best practices. It covered a set of rules, explaining why each should be followed, and a ready-to-use Claude Code skill that enforces those rules automatically when an AI assistant is writing the specs. Exactly the kind of thing a developer might want to copy into into their Claude Code setup.
 
 But when I went to copy the skill section into my own `.claude/skills` directory, my mouse stopped responding. Everywhere I tried to click and drag to highlight text, nothing happened. It felt like the page had suddenly locked up. Right-click did nothing either, no context menu. My heart skipped a beat: was this a broken mouse, or was something actually running on my machine, a crypto miner, ransomware quietly encrypting files while the tab just sat there, unresponsive.
 
@@ -20,7 +20,7 @@ I opened Chrome's Task Manager (Window > Task Manager) to check CPU and memory f
 
 My next thought was was something must be wrong with my mouse. I use a Magic Mouse over Bluetooth, and it does occasionally drop out or get flaky mid-click. So I checked System Settings, saw it was connected fine. I also tried clicking around on other tabs and windows, and all seemed well.
 
-Then I thought maybe the page itself was just broken, perhaps a JS error left it half-loaded. I hit refresh, but no change in behaviour, click to highlight and right-click was still broken.
+Then I thought maybe the page itself was just broken, perhaps a JS error left it half-loaded. I hit refresh, but the mouse was still unresponsive, on that page only.
 
 At that point it was clear: this wasn't my mouse, and it wasn't a broken page. Something on the site was deliberately blocking selection, copying, and right-click. What could it possibly be? Curiosity piqued!
 
@@ -28,13 +28,17 @@ At that point it was clear: this wasn't my mouse, and it wasn't a broken page. S
 
 ## AI Investigation
 
-I pointed Claude Code at the blog post URL using the [Chrome DevTools MCP server](https://github.com/ChromeDevTools/chrome-devtools-mcp) and asked it to figure out what was going on. It discovered the following:
+I pointed Claude Code at the blog post URL and prompted it to use the [Chrome DevTools MCP server](https://github.com/ChromeDevTools/chrome-devtools-mcp) to figure out what was going on. It pretty quickly found the following:
 
-It discovered `user-select: none` set as a CSS rule on `<body>`, which blocks text selection outright, plus listeners on `contextmenu`, `selectstart`, `copy`, `cut`, `paste`, and `dragstart`, attached to both `document` and `document.body`. Tracing the listeners back to their source led to `wp-security-front-script.js`, shipped by **All-In-One Security (AIOS)**, formerly known as "All In One WP Security & Firewall." It's a general-purpose hardening plugin (firewall rules, brute-force lockout, 2FA), and Copy Protection is just one optional toggle buried in its settings, off by default. Per the plugin's own docs, it's meant to "disable right clicking on your site so that users will not be able to copy the content."
+Firstly, `user-select: none` was set as a CSS rule on `<body>`, blocking all text selection. Additionally, listeners on `contextmenu`, `selectstart`, `copy`, `cut`, `paste`, and `dragstart`, were attached to `document` and `document.body`.
 
-## Undoing It
+Tracing the listeners back to their source led to `wp-security-front-script.js`, shipped by [All-In-One Security (AIOS)](https://wordpress.org/plugins/all-in-one-wp-security-and-firewall/). This is a WordPress plugin that adds firewall rules, login lockout after failed attempts, and two-factor authentication. Copy Protection is an optional toggle in its settings, off by default. While not described on the official plugin's page, this [tutorial](https://www.webnots.com/wordpress-all-in-one-wp-security-and-firewall-plugin-tutorial/) shows that enabling Copy Protection will:
+
+> Disable the "Right Click", "Text Selection", and "Copy" option on the front end of your site.
 
 This felt familiar. A while back I wrote about [websites that block pasting into password fields](/blog/password-field-no-paste/), and the fix there relied on a neat trick: event listeners added during the *capture* phase run before listeners added during the normal *bubble* phase, so you can intercept an event before the page's own blocking code ever sees it.
+
+## Undoing It
 
 I pointed Claude at my earlier blog post about paste blocking, then asked it if a similar idea could be used to allow highlight text selection and copy when this plugin was active. I also prompted Claude to actually test the fix in DevTools against the live page before handing it to me, rather than just describing something that sounded plausible. It came back with two pieces: a competing CSS rule to override `user-select: none`, and a capture-phase listener to beat the plugin's own event handlers.
 It confirmed the CSS override took effect, and worked out that the most bulletproof way to neutralize an unknown number of existing listeners (20 apiece, remember) was to intercept the events one level higher, on `window`, before they ever reach `document` or `body` at all.
