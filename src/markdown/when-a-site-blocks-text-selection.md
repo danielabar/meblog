@@ -2,7 +2,7 @@
 title: "When a Site Blocks Text Selection"
 featuredImage: "../images/when-site-blocks-text-selection-juan-molina-7hQDelVc08A-unsplash.jpg"
 description: "A DevTools console snippet to restore text selection, copy, and right-click on a site that blocks them."
-date: "2026-11-01"
+date: "2026-10-01"
 category: "javascript"
 related:
   - "When the Password Field Says No to Paste"
@@ -12,7 +12,7 @@ related:
 
 I recently came across a blog post about automated testing best practices. It covered a set of rules, explaining why each should be followed, and a ready-to-use Claude Code skill that enforces those rules automatically when an AI assistant is writing the specs. Exactly the kind of thing a developer might want to copy into their Claude Code setup.
 
-But when I went to copy the skill section into my own `.claude/skills` directory, my mouse stopped responding. Everywhere I tried to click and drag to highlight text, nothing happened. It felt like the page had suddenly locked up. Right-click did nothing either, no context menu. My heart skipped a beat: was this a broken mouse, or was something actually running on my machine, a crypto miner, ransomware quietly encrypting files while the tab just sat there, unresponsive.
+But when I went to copy the skill section into my own `.claude/skills` directory, my mouse stopped responding. Everywhere I tried to click and drag to highlight text, nothing happened. It felt like the page had suddenly locked up. Right-click did nothing either, no context menu. My heart skipped a beat: was this a broken mouse, or was something actually running on my machine, a crypto miner, ransomware quietly encrypting files while the tab just sat there, unresponsive?
 
 ## Ruling Out the Obvious
 
@@ -31,7 +31,7 @@ It was at this point I started to suspect something on the site might be deliber
 I pointed Claude Code at the blog post URL, described the copy selection issue, and prompted it to use the [Chrome DevTools MCP server](https://github.com/ChromeDevTools/chrome-devtools-mcp) to figure out what was going on.
 
 <aside class="markdown-aside">
-The Chrome DevTools MCP server gives an AI assistant direct control of a fresh, automated Chrome instance. It can load a page, inspect the DOM, read computed styles, list attached event listeners, watch network requests, and run JS in the console. Instead of guessing at markup from a page source dump, the assistant can poke at the actual running page the same way a developer would in their browser developer tools.
+The Chrome DevTools MCP server gives an AI assistant control of an automated Chrome instance. It can load a page, inspect the DOM, read CSS rules, watch network requests, and run JS in the console. Instead of guessing at markup from a page source dump, the assistant can poke at the actual running page the same way a developer would in their browser developer tools.
 </aside>
 
 It pretty quickly found the following:
