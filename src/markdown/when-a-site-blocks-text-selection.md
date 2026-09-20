@@ -14,24 +14,24 @@ I recently came across a blog post about automated testing best practices. It co
 
 But when I went to copy the skill section into my own `.claude/skills` directory, my mouse stopped responding. Everywhere I tried to click and drag to highlight text, nothing happened. It felt like the page had suddenly locked up. Right-click did nothing either, no context menu. My heart skipped a beat: was this a broken mouse, or was something actually running on my machine, a crypto miner, ransomware quietly encrypting files while the tab just sat there, unresponsive.
 
-## Ruling Out
+## Ruling Out The Obvious
 
 I opened Chrome's Task Manager (Window > Task Manager) to check CPU and memory for that tab specifically. A background tab pegged at high CPU is the tell for something like a cryptominer, but nothing stood out.
 
-My next thought was was something must be wrong with my mouse. I use a Magic Mouse over Bluetooth, and it does occasionally drop out or get flaky mid-click. So I checked System Settings, saw it was connected fine. I also tried clicking around on other tabs and windows, and all seemed well.
+My next thought was was something must be wrong with my mouse. I use a Magic Mouse over Bluetooth, and it does occasionally drop out or get flaky mid-click. So I checked System Settings, saw it was connected fine. I also tried clicking around on other tabs and windows, and the mouse was behaving normally.
 
-Then I thought maybe the page itself was just broken, perhaps a JS error left it half-loaded. I hit refresh, but the mouse was still unresponsive, on that page only.
+Then I thought maybe the page itself was broken, perhaps a JS error left it half-loaded. But hitting browser refresh didn't help, the mouse was still unresponsive, on that page only.
 
-At that point it was clear: this wasn't my mouse, and it wasn't a broken page. Something on the site was deliberately blocking selection, copying, and right-click. What could it possibly be? Curiosity piqued!
+It was at this point I started to suspect something on the site might be deliberately blocking selection, copying, and right-click. What could it possibly be? Curiosity piqued!
 
 ![a curious cat peering intently at something](../images/curios-cat.jpg "Curiosity piqued")
 
 ## AI Investigation
 
-I pointed Claude Code at the blog post URL and prompted it to use the [Chrome DevTools MCP server](https://github.com/ChromeDevTools/chrome-devtools-mcp) to figure out what was going on.
+I pointed Claude Code at the blog post URL, described the copy selection issue, and prompted it to use the [Chrome DevTools MCP server](https://github.com/ChromeDevTools/chrome-devtools-mcp) to figure out what was going on.
 
 <aside class="markdown-aside">
-The Chrome DevTools MCP server gives an AI assistant direct control of a fresh, automated Chrome instance (no access to your regular browser's cookies or logins): it can load a page, inspect the DOM, read computed styles, list attached event listeners, watch network requests, and run JS in the console. Instead of guessing at markup from a page source dump, the assistant can poke at the actual running page the same way a developer would in DevTools.
+The Chrome DevTools MCP server gives an AI assistant direct control of a fresh, automated Chrome instance. It can load a page, inspect the DOM, read computed styles, list attached event listeners, watch network requests, and run JS in the console. Instead of guessing at markup from a page source dump, the assistant can poke at the actual running page the same way a developer would in their browser developer tools.
 </aside>
 
 It pretty quickly found the following:
