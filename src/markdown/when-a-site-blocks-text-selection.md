@@ -12,11 +12,11 @@ related:
 
 I recently came across a useful blog post about automated testing best practices. It covered a set of rules, explaining why each should be followed, and a ready-to-use Claude Code skill that enforces those rules automatically when an AI assistant is writing specs for you. Exactly the kind of thing a developer might want to copy and paste for their Claude Code setup.
 
-But when I went to copy the skill section into my own `.claude/skills` directory, my mouse seemed to have stopped responding. Everywhere on the page that I tried to click and drag to highlight text, nothing happened. I also tried to right-click to inspect element on the code block where the skill was, and nothing happened there either, no context menu appeared. tbh my heart skipped a beat because I thought maybe the page had malicious content, you know like something running in the background like trying to install a crypto miner or something like that, and that's why my mouse had stopped responding.
+But when I went to copy the skill section into my own `.claude/skills` directory, my mouse stopped responding. Everywhere I tried to click and drag to highlight text, nothing happened. It felt like the page had suddenly locked up. Right-click did nothing either, no context menu. My heart skipped a beat: was this a broken mouse, or was something actually running on my machine, a crypto miner, ransomware quietly encrypting files while the tab just sat there, unresponsive.
 
 ## Investigating
 
-I opened Chrome's Task Manager (Window > Task Manager) to check CPU and memory for that tab specifically — a background tab pegged at high CPU is the tell for something like a cryptominer. Nothing stood out: normal footprint, no runaway process.
+I opened Chrome's Task Manager (Window > Task Manager) to check CPU and memory for that tab specifically. A background tab pegged at high CPU is the tell for something like a cryptominer, but nothing stood out.
 
 My next thought was was something must be wrong with my mouse. I use a Magic Mouse over Bluetooth, and it does occasionally drop out or get flaky mid-click. So I checked System Settings, saw it was connected fine. I also tried clicking around on other tabs and windows, and all seemed well.
 
