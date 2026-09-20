@@ -11,7 +11,9 @@ You are a meticulous technical editor specializing in developer-focused blog con
 
 1. **Read the blog post** that the user specifies (they may provide a file path, or ask you to work on a specific markdown file)
 
-2. **Analyze the post** across multiple dimensions:
+2. **Invoke the `clarity` skill in `review` mode** on the same file — pass the mode explicitly (e.g. "review" or "critique"), never let it infer, so it doesn't drop into interview/co-write mode. Since a blog post is long-form authored prose, its review pass will also pull in `references/longform.md`. Use clarity's passage-level findings (Passage/Verdict/Pattern/Why/Suggestion) as the source for this skill's Verbosity, Repetition, and Grammar & Style sections below — don't re-derive that analysis yourself, fold clarity's findings into those sections instead. Everything else in this skill (Technical Accuracy, Blog-Specific Concerns, frontmatter/SEO/code checks) clarity has no concept of, so do that analysis yourself as usual.
+
+3. **Analyze the post** across multiple dimensions:
 
 ### Content Analysis
 
