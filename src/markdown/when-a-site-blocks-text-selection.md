@@ -16,13 +16,13 @@ But when I went to copy the skill section into my own `.claude/skills` directory
 
 ## Ruling Out the Obvious
 
-I opened Chrome's Task Manager (Window > Task Manager) to check CPU and memory for that tab specifically. A background tab pegged at high CPU is the tell for something like a cryptominer, but nothing stood out.
+I opened Chrome's Task Manager (Window -> Task Manager) to check CPU and memory for that tab specifically. A background tab pegged at high CPU could be a sign of suspicious activity, but nothing stood out.
 
 My next thought was that something must be wrong with my mouse. I use a Magic Mouse over Bluetooth, and it does occasionally drop out or get flaky mid-click. So I checked System Settings, saw it was connected fine. I also tried clicking around on other tabs and windows, and the mouse was behaving normally.
 
 Then I thought maybe the page itself was broken, perhaps a JS error left it half-loaded. But hitting browser refresh didn't help, the mouse was still unresponsive, on that page only.
 
-It was at this point I started to suspect something on the site might be deliberately blocking selection, copying, and right-click. What could it possibly be? Curiosity piqued!
+At this point I started to suspect something on the site might be deliberately blocking selection, copying, and right-click. What could it possibly be? Curiosity piqued!
 
 ![a curious cat peering intently at something](../images/curios-cat.jpg "Curiosity piqued")
 
@@ -80,7 +80,7 @@ The `on*` assignments at the end are just a fallback, in case anything was wired
 After pasting that into the browser devtools console, copy, right-click, and select-all all worked again, like nothing had ever blocked them.
 
 <aside class="markdown-aside">
-Blocking copy-paste on a post that exists to hand readers a code snippet seems like an odd choice. If someone wants it badly enough they can screenshot it, or just <code>curl</code> the raw HTML and hand it to their AI assistant to reconstruct the skill. All it really does is make a basic, expected browser behaviour stop working, enough to make a reader's heart skip a beat wondering if something's broken or they've been hacked.
+Blocking copy-paste on a post that exists to hand readers a code snippet seems like an odd choice. If someone wants it badly enough they can screenshot it, or just <code>curl</code> the raw HTML and hand it to their AI assistant to reconstruct the content. All it really does is make a basic, expected browser behaviour stop working, enough to make a reader's heart skip a beat wondering if something's broken or they've been hacked.
 </aside>
 
 ## Takeaway
