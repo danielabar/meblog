@@ -10,15 +10,11 @@ related:
   - "Rails CORS Middleware For Multiple Resources"
 ---
 
-The Rails app I maintain at work has an admin area used for handling customer requests — things like account adjustments, refunds, and data corrections. For a long time, only a handful of staff had access, which worked fine when the workload was light. But as the customer base grew, support requests piled up. It was getting overwhelming for the small number of people to handle alongside their regular work. This was resolved by adding a dedicated Customer Support role in the app, assigned to everyone in the Customer Success team.
+The Rails app I maintain at work has an admin area used for handling back office operations and customer support. For a long time, only a handful of staff had access, which worked fine when the workload was light. But as the customer base grew, support requests piled up. It was getting overwhelming for the small number of people to handle alongside their regular work. This was resolved by adding a dedicated Customer Support role in the app, assigned to everyone in the Customer Success team.
 
-That solved the capacity problem, but it also meant a much larger group of people with admin credentials — a bigger attack surface should any credentials leak. We decided to require VPN to access any admin route. Even with valid credentials, these routes would not be reachable without being connected to the VPN.
+That solved the capacity problem, but it also meant a much larger group of people with admin credentials, which presented a bigger attack surface should any credentials leak. We decided to require VPN to access any admin route. Even with valid credentials, these routes would not be reachable without being connected to the VPN.
 
-Our app runs on Heroku. Heroku's router is fully managed — there's no way to add firewall rules, IP filters, or WAF rules at the router itself. Every HTTP request that hits the app's public URL gets forwarded to a dyno, so the application code is essentially also the firewall.
-
-<aside class="markdown-aside">
-Heroku announced in February 2026 it's moving to a <a class="markdown-link" href="https://www.heroku.com/blog/an-update-on-heroku/">sustaining engineering model</a>, meaning no new features, and focusing on stability and support. Our team has since migrated away, but this technique still works for any Rack-based app running on a PaaS with a fully-managed router.
-</aside>
+Our app runs on Heroku, which provides a fully managed router. This means there's no way to add firewall rules, IP filters, or WAF rules at the router itself. Every HTTP request that hits the app's public URL gets forwarded to a dyno, so the application code is essentially also the firewall.
 
 **Managed Options on Heroku**
 
@@ -27,6 +23,11 @@ Heroku does offer some managed options. [Private Spaces](https://devcenter.herok
 [Expedited WAF](https://devcenter.heroku.com/articles/expeditedwaf) is an add-on that sits at the edge (so blocked requests never reach a dyno) and includes a Page Protection feature that can restrict specific URLs like `/admin` to an IP allowlist. It starts at ~$95/month and requires routing your domain's DNS through the WAF.
 
 For a small company without dedicated ops, the recurring cost and additional infrastructure complexity of these options may not be justified. This post walks through a lighter-weight approach: implementing the restriction directly in the Rails app.
+
+<aside class="markdown-aside">
+Heroku announced in February 2026 it's moving to a <a class="markdown-link" href="https://www.heroku.com/blog/an-update-on-heroku/">sustaining engineering model</a>, meaning no new features, and focusing on stability and support. Our team has since migrated away, but the technique described in this post should still work for any Rack-based app running on a PaaS with a fully-managed router.
+</aside>
+
 
 ## Rails Advanced Route Constraints
 
@@ -76,7 +77,7 @@ A few things to note here:
 
 **The `"all"` keyword** for development and test means the constraint class (shown in the next section) doesn't need any environment-checking conditionals. It simply checks if `"all"` is in the list.
 
-**VPN IPs are version-controlled.** Changes go through PRs with code review and leave an audit trail in git history. These could also be defined as a comma-separated environment variable, but if the list is small and stable, keeping them in source can be simpler — one less thing to configure per environment.
+**VPN IPs are version-controlled.** Changes go through PRs with code review and leave an audit trail in git history. These could also be defined as a comma-separated environment variable, but if the list is small and stable, keeping them in source can be simpler.
 
 **Environment inheritance via YAML anchors** (`<<: *default`) keeps production in sync with the default list while allowing per-environment overrides.
 
@@ -132,7 +133,7 @@ end
 
 A few design decisions of note:
 
-**Fail-closed security.** If `allowed_ips` is missing or nil, the `|| []` default means nobody gets through — misconfiguration locks everyone out rather than opening access.
+**Fail-closed security.** If `allowed_ips` is missing or nil, the `|| []` default means nobody gets through. Misconfiguration locks everyone out rather than opening access.
 
 **Logging blocked requests** at warning level surfaces them in observability tooling.
 
@@ -151,13 +152,13 @@ constraints Constraints::VpnIpConstraint.new do
 end
 ```
 
-When `matches?` returns false, Rails treats the routes inside the block as non-existent and returns a 404. A security bonus: anyone outside the VPN can't even confirm these routes exist.
+When `matches?` returns false, Rails treats the routes inside the block as non-existent and returns a 404. This provides a security bonus in that anyone outside the VPN can't even confirm these routes exist.
 
 ### Testing
 
 The constraint is tested at two levels. The examples below use RSpec, but the same verifications could be done with Minitest.
 
-**1. Unit tests** cover the IP matching logic and fail-closed edge cases. Here's a trimmed version — the full spec also covers the `"all"` keyword:
+**1. Unit tests** cover the IP matching logic and fail-closed edge cases. Here's a trimmed version (the full spec also covers the `"all"` keyword):
 
 ```ruby
 RSpec.describe Constraints::VpnIpConstraint do
@@ -255,6 +256,6 @@ The integration test stubs `matches?` directly rather than internal methods like
 
 ## Rollout
 
-After verifying on staging, we deployed to production. The rollout was mostly uneventful — the only hiccup was a few people messaging on Slack that admin seemed broken, having forgotten it now required VPN. We updated the internal docs to mention the requirement.
+After verifying on staging, we deployed to production. The rollout was mostly uneventful, the only hiccup was a few people messaging on Slack that admin seemed broken, having forgotten it now required VPN. We updated our internal docs to mention the requirement.
 
-One thing to keep in mind: since the restriction lives in application code, blocked requests still hit a dyno before getting a 404. For a small-ish app that's negligible, and the simplicity of the approach — a single constraint class and a YAML file — makes it a practical fit for Heroku apps that need route-level IP restrictions without infrastructure-level tooling.
+One thing to keep in mind: since the restriction lives in application code, blocked requests still hit a dyno before getting a 404. For a small-ish app that's negligible, and the simplicity of the approach makes it a practical fit for Heroku apps that need route-level IP restrictions without infrastructure-level tooling.
