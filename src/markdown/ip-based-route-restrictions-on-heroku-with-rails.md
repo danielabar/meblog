@@ -2,7 +2,7 @@
 title: "IP-Based Route Restrictions on Heroku with Rails"
 featuredImage: "../images/securing-routes-heroku-rails-arpad-czapp-eXZQIKHj5lY-unsplash.jpg"
 description: "Learn how to restrict admin routes to VPN IP addresses on Heroku using Rails Advanced Route Constraints."
-date: "2026-09-01"
+date: "2026-11-01"
 category: "rails"
 related:
   - "Datadog APM for Rails on Heroku"
@@ -15,6 +15,10 @@ The Rails app I maintain at work has an admin area used for handling customer re
 That solved the capacity problem, but it also meant a much larger group of people with admin credentials — a bigger attack surface should any credentials leak. We decided to require VPN to access any admin route. Even with valid credentials, these routes would not be reachable without being connected to the VPN.
 
 Our app runs on Heroku. Heroku's router is fully managed — there's no way to add firewall rules, IP filters, or WAF rules at the router itself. Every HTTP request that hits the app's public URL gets forwarded to a dyno, so the application code is essentially also the firewall.
+
+<aside class="markdown-aside">
+Heroku announced in February 2026 it's moving to a <a class="markdown-link" href="https://www.heroku.com/blog/an-update-on-heroku/">sustaining engineering model</a>, meaning no new features, and focusing on stability and support. Our team has since migrated away, but this technique still works for any Rack-based app running on a PaaS with a fully-managed router.
+</aside>
 
 **Managed Options on Heroku**
 
