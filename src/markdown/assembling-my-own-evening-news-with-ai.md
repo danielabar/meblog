@@ -204,6 +204,5 @@ The script is checked by a second AI session, not by a person. The rules catch a
 
 ## TODO
 
-- Refine The Idea section: explain  coming to the realization that maybe I could build this myself, given how capable AI agents have become.
 - in sources: distinguish between "news outlet" vs "primary" like statistics canada, federal court docs, others? is this distinguished in `scripts/sources.toml`?
 - conclusion needs work
