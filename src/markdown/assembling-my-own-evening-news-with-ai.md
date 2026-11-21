@@ -10,27 +10,27 @@ related:
   - "Building an AI Blog Editor with Claude Skills"
 ---
 
-There used to be a simple way to keep up with the news. After work, around six, you turned on the TV to the evening news and in under half an hour you had a broad idea of what had happened that day. Then the program ended, and you didn't need to look again until the same time next day.
+There used to be a simple way to keep up with the news. After work, around 6 or 11, you turned on the TV to the evening news and in under half an hour you had a broad idea of what had happened that day. Then the program ended, and you didn't need to look again until the same time next day.
 
-To say things have changed is an understatement. Now news is available and pushed 24/7, on smart phones and social media. A lot of what looks like news is written to get a click, rather than to inform. I may be looking at the past with rose-tinted glasses, but I seem to recall the news of decades past being primarily to inform, and stating multiple viewpoints, leaving it up to the audience to decide what to think. Things feel very different now.
+Now news is available and pushed 24/7, on smart phones and social media. A lot of what looks like news is written to get a click, rather than to inform. I may be looking at the past with rose-tinted glasses, but I seem to recall the news of decades past being primarily to inform, and stating multiple viewpoints, leaving it up to the audience to decide what to think. Things feel very different now.
 
-For the last few years I wondered whether I could make a version of that old evening news myself. Recently I did: a daily news video of about ten minutes, made by an AI agent and the scripts it wrote, from scouring and summarizing multiple sources. This post covers how it works.
+For the last few years I wondered whether I could make a version of that old evening news myself. Recently I did: a daily news video of about ten minutes, made by an AI agent and the scripts it wrote, from scouring and summarizing multiple sources. First, why I wanted it, then how it works.
 
-## How we got here
+## Tuning Out
 
-Before getting into the build details, here's a brief history of problems I feel with news today:
+Here's what I think went wrong, roughly in the order it happened.
 
 **24-hour news:** CNN launched on June 1, 1980, as the first 24-hour news network, and it became the model during the [1991 Gulf War](https://www.mediapost.com/publications/article/352064/continuous-cable-news-was-created-40-years-ago-thi.html). Canada followed: [CBC Newsworld in 1989](https://amp.cbc.ca/archives/when-cbc-newsworld-launched-in-1989-1.4763338) and the CTV news channel in 1997. Fox News and MSNBC both arrived in 1996. A channel that is on all day needs something to say all day, even when nothing new has happened.
 
-**9/11:** The attacks on September 11, 2001, changed how many people watched. Cable news audiences [jumped](https://www.upi.com/Odd_News/2001/10/03/News-from-the-entertainment-capital/67611002137963/) (CNN's prime-time audience in the third quarter of 2001 was about double the year before, Fox News nearly tripled), and the habit of [checking in at set times](https://www.yahoo.com/lifestyle/9-11-attacks-upended-appointment-040100425.html) began to give way to leaving the news on.
+**9/11:** The attacks on September 11, 2001, changed how many people watched. Cable news audiences [jumped](https://www.upi.com/Odd_News/2001/10/03/News-from-the-entertainment-capital/67611002137963/) and the habit of [checking in at set times](https://www.yahoo.com/lifestyle/9-11-attacks-upended-appointment-040100425.html) began to give way to leaving the news on.
 
-**The internet, social media, smart phones, unlimited data:** Facebook introduced the [News Feed in 2006](https://digiday.com/publishers/showing-people-want-timeline-facebooks-recent-news-feed-tweaks/) and the Like button in 2009. The iPhone arrived in 2007. A story could now reach you wherever you were, all day, and every outlet was competing with every other outlet, and with your friends' posts, for the same few seconds of attention. A [2017 study](https://pmc.ncbi.nlm.nih.gov/articles/PMC5514704) of more than half a million tweets found that each moral-emotional word in a message raised how much it was shared by about 20 percent. A [2018 study in *Science*](https://mitsloan.mit.edu/press/false-news-spreads-widely-and-easily) found that false news spread farther and faster than true news on Twitter. The incentive to alarm or anger people is built into the system.
+**The internet, social media, smart phones, unlimited data:** Facebook introduced the [News Feed in 2006](https://digiday.com/publishers/showing-people-want-timeline-facebooks-recent-news-feed-tweaks/) and the Like button in 2009. The iPhone arrived in 2007. A story could now reach you wherever you were, all day, and every outlet was competing with every other outlet, and with your friends' posts, for the same few seconds of attention. A [2017 study](https://pmc.ncbi.nlm.nih.gov/articles/PMC5514704) of more than half a million tweets found that each moral-emotional word in a message raised how much it was shared by about 20 percent. A [2018 study in *Science*](https://mitsloan.mit.edu/press/false-news-spreads-widely-and-easily) found that false news spread farther and faster than true news on Twitter. The incentive to alarm or anger people got baked into the system.
 
-**Opinion mixed with reporting:** For a long time newspapers kept opinion and editorializing in a dedicated Op-Ed section, *separate* from the reporting section. My feeling is that over the last decade or so this line has blurred: stories that tell you what to think, that cover one side, that seem to start from a conclusion. This [2018 Pew survey](https://www.journalism.org/2018/06/18/distinguishing-between-factual-and-opinion-statements-in-the-news/) found that only 26 percent of Americans correctly labeled five plainly factual news statements as factual, and they leaned toward calling statements they agreed with "factual".
+**Opinion mixed with reporting:** For a long time newspapers kept opinion and editorializing in a dedicated Op-Ed section, *separate* from the reporting section. My feeling is that over the last decade or so this line has blurred. This [2018 Pew survey](https://www.journalism.org/2018/06/18/distinguishing-between-factual-and-opinion-statements-in-the-news/) found that only 26 percent of Americans correctly labeled five plainly factual news statements as factual, and they leaned toward calling statements they agreed with "factual".
 
 **Predictions:** Another kind of story I have become wary of is the prediction. "Expert says AI could take all jobs by 2030." "Analysts expect the Bank of Canada to hike interest rates." These kind of headlines have the shape of news but no event behind them. They're written to make you worry or hope, which is essentially clickbait. In my experience predictions nearly always turn out wrong, and nobody goes back to say so. I wrote about this in [AI Predictions, Fear, and Focus](TODO LINK).
 
-**Declining trust:** The [Reuters Institute's 2025 Digital News Report for Canada](https://www.cem.ulaval.ca/wp-content/uploads/2025/06/dnrcanada2025e.pdf) says 39 percent of Canadians trust most news most of the time, the lowest since Canada joined the survey in 2016 (the peak was 58 percent in 2018). 69 percent said they had limited their news exposure at least occasionally, up from 55 percent in 2017. Among those who avoid news, 51 percent said the news hurts their mood, 35 percent said they were worn out by the amount of it, and 30 percent said it was untrustworthy or biased.
+**Declining trust:** The [Reuters Institute's 2025 Digital News Report for Canada](https://www.cem.ulaval.ca/wp-content/uploads/2025/06/dnrcanada2025e.pdf) found that 39 percent of Canadians trust most news most of the time, the lowest since Canada joined the survey in 2016 (the peak was 58 percent in 2018). 69 percent said they had limited their news exposure at least occasionally, up from 55 percent in 2017. Among those who avoid news, 51 percent said the news hurts their mood, 35 percent said they were worn out by the amount of it, and 30 percent said it was untrustworthy or biased.
 
 I was one of those people. I had tuned out almost all news except tech. If you only want to know what is going on, quickly, it had become hard to do.
 
@@ -204,8 +204,6 @@ The script is checked by a second AI session, not by a person. The rules catch a
 
 ## TODO
 
-- How we got here: Need one lead in sentence explaining why before we get into the making of this, some brief history of the news...
 - Refine The Idea section: explain  coming to the realization that maybe I could build this myself, given how capable AI agents have become.
-- share some screenshots/visual frames from videos
 - in sources: distinguish between "news outlet" vs "primary" like statistics canada, federal court docs, others? is this distinguished in `scripts/sources.toml`?
 - conclusion needs work
