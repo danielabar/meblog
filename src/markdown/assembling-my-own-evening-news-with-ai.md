@@ -154,7 +154,7 @@ Each episode comes in under ten minutes. The rules give a word budget of about 1
 
 Once it worked, I decided to share the episodes as a YouTube channel. That meant a name and a look. I chose "Canada in Ten", and Claude drafted logo options. I asked for a clock with a maple leaf, and I had the idea that the opening should draw the clock's red arc from zero to ten minutes while the voice says the name and the tagline, "Today's Canadian news in under ten minutes."
 
-![Opening of the Canada in Ten episode for November 20, with the clock logo, the show name, the tagline and the date over an Ottawa background](../images/canada-news-opening.png "The opening of the November 20 episode")
+![Opening of the Canada in Ten episode for November 20, with the clock logo, the show name, the tagline and the date over an Ottawa background](../images/canada-news-opening.jpg "The opening of the November 20 episode")
 
 For the video thumbnail, Claude suggested the lead story's photo, the logo and the show name at the top left, the date in a red tag at the top right, and the lead story's headline in large type across the bottom. Here's the one for the November 20 episode, when the federal budget passed.
 
@@ -170,23 +170,23 @@ While the narration tells the story, the video has a few features that illustrat
 
 **Two sides of a dispute.** When a story has two parties disagreeing, each gets its own half of the screen, with a portrait and a quote. In the November 11 episode, a story about Quebec's letters to U.S. officials shows Prime Minister Mark Carney on the left and Premier Paul St-Pierre Plamondon on the right.
 
-![Two-sided scene with Prime Minister Mark Carney quoted on the left and Premier Paul St-Pierre Plamondon quoted on the right, split by a vertical line](../images/canada-news-two-sides.png "Both sides of a dispute shown at once")
+![Two-sided scene with Prime Minister Mark Carney quoted on the left and Premier Paul St-Pierre Plamondon quoted on the right, split by a vertical line](../images/canada-news-two-sides.jpg "Both sides of a dispute shown at once")
 
 **Numbers.** When the story turns on a figure, the number is shown large with a label saying what it measures. In the November 16 episode, a story about October inflation shows that gasoline cost 30.9% more than a year earlier.
 
-![A single large figure, plus 30.9%, labelled as gasoline in October compared to a year earlier](../images/canada-news-numbers.png "A number shown large with a label")
+![A single large figure, plus 30.9%, labelled as gasoline in October compared to a year earlier](../images/canada-news-numbers.jpg "A number shown large with a label")
 
 **Maps.** When a story is about a place, a map highlights the region and marks the spot, so a viewer who has never heard of it can see where it is. In the November 9 episode, a story about data centre protests in Nova Scotia marks Point Tupper on a map of the province.
 
-![Map of Nova Scotia with Point Tupper marked, over a photo of the protest in Halifax](../images/canada-news-map.png "A map marking where the story takes place")
+![Map of Nova Scotia with Point Tupper marked, over a photo of the protest in Halifax](../images/canada-news-map.jpg "A map marking where the story takes place")
 
 **Routes.** When a story is about a path between two places, arrows connect them on a map. In the October 28 episode, a story about Air Canada and United shows ten routes between Canadian and U.S. cities as curved arrows.
 
-![Map of North America with ten curved arrows from Canadian to U.S. cities](../images/canada-news-routes.png "Arrows showing routes between cities")
+![Map of North America with ten curved arrows from Canadian to U.S. cities](../images/canada-news-routes.jpg "Arrows showing routes between cities")
 
 **Saying what we did not find.** When a side has not been heard, the show says so explicitly. In the November 19 episode, a story about a Divorce Act study says it did not find a statement from the committee or the government on why some clauses were removed.
 
-![Panel reading "We did not find a statement on why the clauses were removed" over a photo of the Justice Minister](../images/canada-news-not-found.png "A scene that says what was not found")
+![Panel reading "We did not find a statement on why the clauses were removed" over a photo of the Justice Minister](../images/canada-news-not-found.jpg "A scene that says what was not found")
 
 ## Limitations
 
