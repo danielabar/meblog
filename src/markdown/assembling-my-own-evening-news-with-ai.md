@@ -38,11 +38,11 @@ I was one of those people. I had tuned out almost all news except tech. If you o
 
 One day I discovered [The NewsWorthy](https://www.thenewsworthy.com/), a podcast whose tagline is "fast, fair, fun". The host is a former TV news reporter who left a ten-year career in 2017 to start it. The episodes are under ten minutes, they try to cover more than one side of a story, and they do not tell you what you should think.
 
-Another influence is Paula Pant's podcast **Afford Anything**, in particular the monthly [First Friday episodes](https://affordanything.com/episodes/?search=%22First+Friday%22). They start from official numbers, such as the Bureau of Labor Statistics jobs report, and explain what the numbers mean without using them to alarm. This is where I got the idea of using the Canadian equivalents, such as Statistics Canada.
+Another influence is Paula Pant's podcast **Afford Anything**, in particular the monthly [First Friday episodes](https://affordanything.com/episodes/?search=%22First+Friday%22). They start from official numbers, such as the Bureau of Labor Statistics jobs report, and explain what the numbers mean without using them to alarm.
 
-The third is [Tech Brew Ride Home](https://www.techbrew.com/welcome), a daily tech news show that comes out in the late afternoon, after the day's headlines are out, so you can catch up on the way home from work. You hear what happened, and then you are done for the day instead of checking and scrolling constantly.
+The third is [Tech Brew Ride Home](https://www.techbrew.com/welcome), a daily tech news show that comes out in the late afternoon, after the day's headlines are out, so you can catch up on the way home from work. You hear what happened, and then you are all caught up for the day.
 
-What all three gave me was a feeling I had not had from news in a long time: being calmly informed. I came away knowing what had happened, without feeling more anxious or depressed than when I started. However, all three are focused on the United States. I looked for a Canadian equivalent and couldn't find it.
+What all three gave me was a feeling I had not had from news in a long time: being calmly and efficiently informed. However, all three are focused on the United States. I looked for a Canadian equivalent and couldn't find it.
 
 ## Idea
 
