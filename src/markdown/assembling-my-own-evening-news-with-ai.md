@@ -46,9 +46,9 @@ What all three gave me was a feeling I had not had from news in a long time: bei
 
 ## Idea
 
-Then AI agents became capable enough to take on a big project, and I realized I might be able to build this myself. A fair, just-the-facts summary needs many sources: outlets with different viewpoints, plus primary sources like Statistics Canada data, court decisions and parliamentary votes. Collecting and comparing all of that every day would be a full-time job. The idea had crossed my mind before, but I never had the time. An agent could do the reading and write the summary for me. And while I was at it, why not make it a video, with illustrations to go along with the stories?
+Since I couldn't find a Canadian version, I thought about making one myself. But a fair, just-the-facts summary needs many sources: outlets with different viewpoints, plus primary sources like Statistics Canada data, court decisions and parliamentary votes. Collecting and comparing all of that every day would be a full-time job, and I didn't have the time. Then, in the last year, AI agents became capable enough to take on big projects. I realized an agent might be able to do this work. And while I was at it, why not make it a video, with illustrations to go along with the stories?
 
-Here is a trimmed down version of the prompt I gave Claude Code (Opus 5.5, medium effort):
+So I wrote a prompt describing the show I wanted and gave it to Claude Code (Opus 5.5, medium effort). Here is a trimmed down version:
 
 > I want a daily 5 - 10 minute video with news from Canada covering national level, then provincial, and municipal for big cities if anything noteable. The style should be "just the facts", from multiple news sources perspectives to try and avoid one-sided bias. We should not spout opinions or try to influence the audience, we just want to inform.
 
