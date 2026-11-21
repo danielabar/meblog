@@ -205,4 +205,5 @@ The script is checked by a second AI session, not by a person. The rules catch a
 ## TODO
 
 - in sources: distinguish between "news outlet" vs "primary" like statistics canada, federal court docs, others? is this distinguished in `scripts/sources.toml`?
+- explain why not sharing the code - fyi written in python with manim for animations, not so important when ai agents are writing the code, judge more by the outcome than the code
 - conclusion needs work
