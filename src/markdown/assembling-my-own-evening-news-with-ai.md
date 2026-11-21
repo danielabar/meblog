@@ -46,7 +46,7 @@ What all three gave me was a feeling I had not had from news in a long time: bei
 
 ## Idea
 
-Then AI assistants arrived, and I had the thought: a person cannot read a hundred sources a day, but an AI can. Could it scan a wide variety of outlets and also official sources like Statistics Canada, the Bank of Canada, the Supreme Court of Canada, the provincial governments, the Prime Minister's Office, the political parties, the unions, and write a short, fair summary? And since it is good at that, why not make it a video, with photos of the subjects, a chart when the story is about numbers, and a few animations?
+Then AI agents became capable enough to take on a big project, and I realized I might be able to build this myself. A fair, just-the-facts summary needs many sources: outlets with different viewpoints, plus primary sources like Statistics Canada data, court decisions and parliamentary votes. Collecting and comparing all of that every day would be a full-time job. The idea had crossed my mind before, but I never had the time. An agent could do the reading and write the summary for me. And while I was at it, why not make it a video, with illustrations to go along with the stories?
 
 Here is a trimmed down version of the prompt I gave Claude Code (Opus 5.5, medium effort):
 
